@@ -1,0 +1,5 @@
+echo "Running unit tests..."
+pnpm test:all
+
+echo "Running Playwright e2e tests..."
+pnpm test:e2e

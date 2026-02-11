@@ -1,0 +1,612 @@
+# MyCircle — Micro Frontend Architecture Analysis
+
+A comprehensive analysis of the MyCircle personal dashboard architecture, covering micro frontend communication, data flow, persistence, and key implementation patterns.
+
+## Table of Contents
+
+- [High-Level Architecture](#high-level-architecture)
+- [Micro Frontends](#micro-frontends)
+- [Inter-MFE Communication](#inter-mfe-communication)
+- [Data Flow](#data-flow)
+- [Persistence & Storage](#persistence--storage)
+- [GraphQL & Apollo Client](#graphql--apollo-client)
+- [Authentication & User Profile](#authentication--user-profile)
+- [Theme System](#theme-system)
+- [Key Files Reference](#key-files-reference)
+
+---
+
+## High-Level Architecture
+
+```
++──────────────────────────────────────────────────────────────────────────+
+|                          Firebase Hosting                                |
++──────────────────────────────────────────────────────────────────────────+
+|  +-----------+ +-------------+ +-----------------+ +---------------+    |
+|  |   Shell   | | City Search | | Weather Display | | Stock Tracker |    |
+|  |  (Host)   | |    (MFE)    | |      (MFE)      | |     (MFE)     |    |
+|  | Port 3000 | |  Port 3001  | |   Port 3002     | |  Port 3004    |    |
+|  +-----------+ +-------------+ +-----------------+ +---------------+    |
+|  +-----------------+ +--------------+                                    |
+|  | Podcast Player  | | AI Assistant |                                    |
+|  |     (MFE)       | |    (MFE)     |                                    |
+|  |   Port 3005     | |  Port 3006   |                                    |
+|  +-----------------+ +--------------+                                    |
++──────────────────────────────────────────────────────────────────────────+
+                                |
+                                v
++──────────────────────────────────────────────────────────────────────────+
+|                     Firebase Cloud Functions                             |
+|  +────────────────────────────────────────────────────────────────────+  |
+|  |  GraphQL API · Stock Proxy · Podcast Proxy · AI Chat (Gemini)    |  |
+|  +────────────────────────────────────────────────────────────────────+  |
++──────────────────────────────────────────────────────────────────────────+
+                                |
+                                v
++──────────────────────────────────────────────────────────────────────────+
+|  OpenWeather API  ·  Finnhub API  ·  PodcastIndex API  ·  Google Gemini |
++──────────────────────────────────────────────────────────────────────────+
+```
+
+### Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 18, TypeScript, Tailwind CSS |
+| **Build** | Vite 5, Module Federation |
+| **API** | Apollo Server 5, GraphQL |
+| **Data Sources** | OpenWeather API, Finnhub API, PodcastIndex API, Google Gemini |
+| **Hosting** | Firebase Hosting + Cloud Functions |
+| **Auth** | Firebase Auth (Google OAuth) |
+| **Database** | Cloud Firestore (user profiles, favorites, preferences) |
+| **Push Notifications** | Firebase Cloud Messaging |
+| **Bot Protection** | Firebase App Check (reCAPTCHA Enterprise) |
+| **Feature Flags** | Firebase Remote Config |
+| **Runtime** | Node.js 22 |
+| **Package Manager** | pnpm (workspaces) |
+
+---
+
+## Micro Frontends
+
+### Shell (Host) - `packages/shell/`
+
+The orchestrator that loads and composes all remote micro frontends.
+
+**Responsibilities:**
+- Application routing (React Router v7)
+- Layout: sticky header with nav links, toggles, notifications, user menu
+- Authentication context (Firebase Auth)
+- Theme context (dark/light mode with system preference detection)
+- i18n / language selection
+- Unit toggles (temperature, wind speed)
+- Push notification management (Firebase Cloud Messaging)
+- Remote Config context (Firebase Remote Config)
+- Loading remote MFEs via Module Federation
+
+**Route Structure:**
+```
+/                  -> DashboardPage (quick access cards, city search, favorites, recents)
+/weather/:coords   -> WeatherDisplay MFE (lazy-loaded, includes inline comparison)
+/stocks            -> StockTracker MFE (lazy-loaded)
+/podcasts          -> PodcastPlayer MFE (lazy-loaded, discover + subscribed tabs)
+/ai                -> AiAssistant MFE (lazy-loaded)
+/compare           -> WeatherCompare (legacy, still accessible)
+/*                 -> 404 NotFound
+```
+
+**Provider Hierarchy:**
+```
+ApolloProvider
+  -> AuthProvider
+    -> RemoteConfigProvider
+      -> ThemeProvider
+        -> ThemeSync (side-effect component)
+        -> BrowserRouter
+          -> Layout (Outlet)
+            -> Routes
+```
+
+### City Search (Remote MFE) - `packages/city-search/`
+
+Exposes `CitySearch` component via Module Federation.
+
+**Key Behavior:**
+- Input focus with empty query -> shows "Recent Searches" dropdown (up to 5 cities)
+- Typing triggers a 300ms debounced GraphQL `searchCities` query
+- City selection publishes `CITY_SELECTED` event via event bus
+- Click-outside detection closes all dropdowns
+- Receives `recentCities` as a prop from the shell's `CitySearchWrapper`
+
+**Module Federation Config:**
+```typescript
+federation({
+  name: 'citySearch',
+  filename: 'remoteEntry.js',
+  exposes: {
+    './CitySearch': './src/components/CitySearch.tsx'
+  },
+  shared: ['react', 'react-dom', 'react-router-dom', '@apollo/client']
+})
+```
+
+### Weather Display (Remote MFE) - `packages/weather-display/`
+
+Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
+
+**Key Behavior:**
+- Extracts `lat,lon` from URL params (`/weather/:coords`)
+- Listens for `CITY_SELECTED` DOM events from other MFEs
+- Uses `useWeatherData(lat, lon, true)` hook with real-time subscriptions
+- Renders: `CurrentWeather`, `HourlyForecast`, `Forecast`
+- Shows a "Live" badge when WebSocket subscription is active
+
+**Data Displayed:**
+| Component | Data Points |
+|-----------|------------|
+| **CurrentWeather** | Temperature, feels-like, weather icon, description, humidity, wind speed + direction, pressure, cloudiness |
+| **HourlyForecast** | 48-hour forecast with temp, icon, rain probability |
+| **Forecast** | 7-day grid with date, icon, max/min temps, description, rain probability |
+
+### Shared Package - `packages/shared/`
+
+Library consumed by all micro frontends. Not a standalone app.
+
+**Exports (via barrel `src/index.ts`):**
+- Apollo Client factory & singleton (`createApolloClient`, `getApolloClient`)
+- GraphQL queries & fragments (`GET_WEATHER`, `SEARCH_CITIES`, etc.)
+- Event bus (`eventBus`, `MFEvents`, `subscribeToMFEvent`)
+- Types (`City`, `CurrentWeather`, `ForecastDay`, etc.)
+- Hooks (`useWeatherData`)
+- i18n (`useTranslation`)
+- Utility functions (weather icons, formatting)
+
+### Stock Tracker - `packages/stock-tracker/`
+
+Exposes `StockTracker` component via Module Federation.
+
+**Key Behavior:**
+- Real-time stock quote lookup via Finnhub API (proxied through Cloud Functions)
+- Symbol search and watchlist management
+- Authenticated requests (Firebase ID token attached)
+
+### Podcast Player - `packages/podcast-player/`
+
+Exposes `PodcastPlayer` component via Module Federation.
+
+**Key Behavior:**
+- Tabbed interface: "Discover" (trending + search) and "My Subscriptions"
+- Podcast discovery and search via PodcastIndex API (proxied through Cloud Functions)
+- Episode listing and detail view
+- Built-in audio player for episode playback
+- Podcast subscriptions stored in localStorage (`podcast-subscriptions`)
+- Subscribed tab fetches feed details via `podcastFeed(feedId)` query
+- All podcast/episode IDs use GraphQL `ID` type (string) to handle large PodcastIndex IDs
+- Authenticated requests (Firebase ID token attached)
+
+### AI Assistant - `packages/ai-assistant/`
+
+Exposes `AiAssistant` component via Module Federation.
+
+**Key Behavior:**
+- Conversational AI chat powered by Google Gemini
+- Context-aware responses
+- Authenticated requests (Firebase ID token attached)
+
+---
+
+## Inter-MFE Communication
+
+### Event Bus
+
+A singleton event bus (`packages/shared/src/utils/eventBus.ts`) using two delivery mechanisms:
+
+1. **In-process listeners** — for same-bundle communication (e.g., shell components)
+2. **DOM CustomEvents** — for cross-MFE communication via `window.dispatchEvent`
+
+```typescript
+class EventBusImpl {
+  private listeners: Map<string, Set<EventCallback>>;
+
+  subscribe(event, callback)    // In-process listener, returns unsubscribe fn
+  publish(event, data)          // Fires local listeners + dispatches DOM event
+}
+
+// For listening to events from OTHER micro frontends (DOM-level)
+function subscribeToMFEvent(event, callback)  // window.addEventListener wrapper
+```
+
+### Event Types
+
+```typescript
+const MFEvents = {
+  CITY_SELECTED:        'mf:city-selected',
+  WEATHER_LOADED:       'mf:weather-loaded',
+  NAVIGATION_REQUEST:   'mf:navigation-request',
+  THEME_CHANGED:        'mf:theme-changed',
+  USER_LOCATION_CHANGED: 'mf:user-location-changed'
+}
+```
+
+### Communication Flows
+
+**City Selection (primary flow):**
+```
+CitySearch.tsx                          CitySearchWrapper.tsx
+(city-search MFE)                       (shell)
+     |                                       |
+     |-- eventBus.publish(CITY_SELECTED) --> eventBus.subscribe(CITY_SELECTED)
+     |                                       |
+     |                                       +--> addCity() -> Firestore
+     |
+     +-- navigate(/weather/:coords)
+                                        WeatherDisplay.tsx
+                                        (weather-display MFE)
+                                             |
+                                        subscribeToMFEvent(CITY_SELECTED)
+                                             |
+                                             +--> setLocation() -> fetch weather
+```
+
+**Geolocation Flow:**
+```
+UseMyLocation.tsx (shell)
+     |
+     +--> navigator.geolocation.getCurrentPosition()
+     |
+     +--> REVERSE_GEOCODE GraphQL query
+     |
+     +--> sessionStorage.setItem('selectedCity', ...)
+     |
+     +--> navigate(/weather/:lat,:lon)
+```
+
+---
+
+## Data Flow
+
+### Complete Data Flow Diagram
+
+```
+SHELL APP (Host)
+|
++-- AuthProvider (Context)
+|   +-- Firebase Auth subscription (onAuthStateChanged)
+|   +-- User profile state (Firestore)
+|   +-- Recent cities state
+|
++-- ThemeProvider (Context)
+|   +-- Theme state ('light' | 'dark')
+|   +-- localStorage persistence
+|   +-- System preference detection (prefers-color-scheme)
+|
++-- ApolloProvider
+|   +-- GraphQL client (HTTP + WS links)
+|   +-- In-memory cache (normalized by lat/lon)
+|
++-- Layout
+    +-- ThemeToggle -> updateDarkMode() -> Firestore
+    +-- UserMenu -> signIn/signOut -> Firebase Auth
+    |
+    +-- CitySearchWrapper (loads CitySearch MFE)
+    |   +-- Listens to CITY_SELECTED event
+    |   +-- Saves city to Firestore via addCity()
+    |   +-- Passes recentCities as prop to CitySearch
+    |
+    +-- WeatherDisplay MFE
+        +-- Listens to CITY_SELECTED event
+        +-- useWeatherData hook
+        +-- Queries GraphQL via Apollo
+        +-- Renders current + forecast + hourly
+```
+
+---
+
+## Persistence & Storage
+
+### Firebase Firestore — User Profile
+
+**Document path:** `users/{uid}`
+
+```typescript
+interface UserProfile {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  darkMode: boolean;
+  recentCities: RecentCity[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+interface RecentCity {
+  id: string;           // "{lat},{lon}"
+  name: string;
+  country: string;
+  state?: string;
+  lat: number;
+  lon: number;
+  searchedAt: Date;
+}
+```
+
+**Recent Cities Rules:**
+- Deduplicated by `id` on save (existing entry removed before prepend)
+- Sorted by recency (newest first)
+- Hard limit of 10 cities
+- Only saved when user is authenticated
+
+### Browser LocalStorage — Theme & Preferences
+
+| Key | Value | Purpose |
+|-----|-------|---------|
+| `'theme'` | `'light'` or `'dark'` | Fast theme restore on page load (before Firestore loads) |
+| `'weather-live-enabled'` | `'true'` or `'false'` | Weather live polling toggle state |
+| `'stock-live-enabled'` | `'true'` or `'false'` | Stock live polling toggle state |
+| `'stock-tracker-watchlist'` | JSON array | Stock watchlist items |
+| `'podcast-subscriptions'` | JSON array of string IDs | Subscribed podcast feed IDs |
+
+### Browser SessionStorage — Geolocation
+
+| Key | Value | Purpose |
+|-----|-------|---------|
+| `'selectedCity'` | City JSON | Temporary storage after reverse geocode lookup |
+
+### Apollo In-Memory Cache
+
+- Cache normalization by `lat` and `lon` coordinates
+- Fetch policies: `cache-and-network` for watch queries, `network-only` for one-off queries
+- Shared across all MFEs via the same Apollo Client instance
+
+---
+
+## GraphQL & Apollo Client
+
+### Client Configuration
+
+```typescript
+// packages/shared/src/apollo/client.ts
+
+// Environment-aware endpoint detection
+const graphqlUrl = isProduction
+  ? '/graphql'                          // Firebase Functions proxy
+  : 'http://localhost:3003/graphql';    // Local dev server
+
+// WebSocket subscriptions only in development
+const wsUrl = isDev
+  ? 'ws://localhost:3003/graphql'
+  : null;                               // Disabled in production
+```
+
+**Cache Type Policies:**
+```typescript
+typePolicies: {
+  Query: {
+    fields: {
+      weather:         { keyArgs: ['lat', 'lon'] },
+      currentWeather:  { keyArgs: ['lat', 'lon'] },
+      forecast:        { keyArgs: ['lat', 'lon'] },
+      hourlyForecast:  { keyArgs: ['lat', 'lon'] },
+    }
+  }
+}
+```
+
+### Queries & Subscription
+
+| Query | Parameters | Returns |
+|-------|-----------|---------|
+| `GET_WEATHER` | `lat, lon` | `current` + `forecast[]` + `hourly[]` |
+| `GET_CURRENT_WEATHER` | `lat, lon` | `CurrentWeather` |
+| `GET_FORECAST` | `lat, lon` | `ForecastDay[]` |
+| `GET_HOURLY_FORECAST` | `lat, lon` | `HourlyForecast[]` |
+| `SEARCH_CITIES` | `query, limit` | `City[]` |
+| `REVERSE_GEOCODE` | `lat, lon` | `City` |
+| `WEATHER_UPDATES` (subscription) | `lat, lon` | `WeatherUpdate` (real-time) |
+
+All weather queries share a `WeatherConditionFragment` for consistent field selection.
+
+### useWeatherData Hook
+
+```typescript
+// packages/shared/src/hooks/useWeatherData.ts
+
+function useWeatherData(lat, lon, enableRealtime) {
+  // Always runs: HTTP query
+  const { data, loading, error } = useQuery(GET_WEATHER, { variables: { lat, lon } });
+
+  // Dev only: WebSocket subscription
+  useSubscription(WEATHER_UPDATES, {
+    skip: isProduction || !enableRealtime,
+    variables: { lat, lon },
+    onData: ({ data }) => { /* merge subscription data */ }
+  });
+
+  return {
+    current,      // Subscription data takes priority over query data
+    forecast,
+    hourly,
+    loading,
+    error,
+    isLive,       // True when subscription is active
+    lastUpdate    // Timestamp of last subscription update
+  };
+}
+```
+
+---
+
+## Authentication & User Profile
+
+### Auth Flow
+
+```
+User clicks "Sign In"
+     |
+     v
+signInWithPopup(auth, GoogleAuthProvider)
+     |
+     v
+ensureUserProfile(user)          // Creates Firestore doc if first login
+     |
+     v
+onAuthStateChanged fires
+     |
+     v
+AuthProvider:
+  +-- setUser(firebaseUser)
+  +-- getUserProfile(uid)        // Fetch from Firestore
+  +-- setProfile(profile)
+  +-- setRecentCities(profile.recentCities)
+```
+
+### Profile Operations
+
+| Function | Description |
+|----------|------------|
+| `ensureUserProfile(user)` | Creates Firestore doc on first login |
+| `getUserProfile(uid)` | Reads profile from Firestore |
+| `addRecentCity(uid, city)` | Deduplicates, prepends, caps at 10, writes to Firestore |
+| `getRecentCities(uid)` | Reads `recentCities` from profile |
+| `updateUserDarkMode(uid, darkMode)` | Updates dark mode preference |
+
+---
+
+## Theme System
+
+### Dual-Layer Persistence
+
+The theme system uses two persistence layers for different purposes:
+
+1. **LocalStorage** — fast restore on page load (avoids flash of wrong theme)
+2. **Firestore** — cross-device sync for authenticated users
+
+### Initialization Priority
+
+```
+1. Read localStorage('theme')
+2. If not set, check system preference: matchMedia('prefers-color-scheme: dark')
+3. Apply 'dark' class to <html> element
+4. After auth loads: ThemeSync reads profile.darkMode from Firestore
+5. If profile preference differs, override local theme
+```
+
+### ThemeSync Component
+
+A side-effect-only component (`renders null`) that bridges auth and theme contexts:
+
+```
+Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
+```
+
+---
+
+## Key Files Reference
+
+| Component | File Path | Purpose |
+|-----------|-----------|---------|
+| **App (Shell)** | `packages/shell/src/App.tsx` | Routing, lazy MFE loading |
+| **Layout** | `packages/shell/src/components/Layout.tsx` | Header, nav, toggles, footer |
+| **CitySearchWrapper** | `packages/shell/src/components/CitySearchWrapper.tsx` | MFE host, event listener, city persistence |
+| **UseMyLocation** | `packages/shell/src/components/UseMyLocation.tsx` | Geolocation + reverse geocode |
+| **FavoriteCities** | `packages/shell/src/components/FavoriteCities.tsx` | Favorited cities grid |
+| **WeatherCompare** | `packages/shell/src/components/WeatherCompare.tsx` | Legacy multi-city comparison page |
+| **WeatherComparison** | `packages/weather-display/src/components/WeatherComparison.tsx` | Inline weather comparison (within weather detail) |
+| **DashboardPage** | `packages/shell/src/pages/DashboardPage.tsx` | Dashboard homepage with quick access cards |
+| **SubscribedPodcasts** | `packages/podcast-player/src/components/SubscribedPodcasts.tsx` | Subscribed podcasts tab view |
+| **NotificationBell** | `packages/shell/src/components/NotificationBell.tsx` | Push notification UI |
+| **LanguageSelector** | `packages/shell/src/components/LanguageSelector.tsx` | i18n language picker |
+| **UnitToggle / SpeedToggle** | `packages/shell/src/components/UnitToggle.tsx` | °C/°F and wind speed toggles |
+| **AuthContext** | `packages/shell/src/context/AuthContext.tsx` | User state, recent/favorite cities, profile ops |
+| **ThemeContext** | `packages/shell/src/context/ThemeContext.tsx` | Theme state, localStorage, system pref |
+| **RemoteConfigContext** | `packages/shell/src/context/RemoteConfigContext.tsx` | Firebase Remote Config feature flags |
+| **ThemeSync** | `packages/shell/src/components/ThemeSync.tsx` | Auth -> theme sync |
+| **Firebase Lib** | `packages/shell/src/lib/firebase.ts` | Firestore CRUD, auth, FCM, App Check |
+| **CitySearch** | `packages/city-search/src/components/CitySearch.tsx` | Search UI, debounce, event publishing |
+| **WeatherDisplay** | `packages/weather-display/src/components/WeatherDisplay.tsx` | Weather UI, event listener, subscriptions |
+| **CurrentWeather** | `packages/weather-display/src/components/CurrentWeather.tsx` | Current conditions display |
+| **Forecast** | `packages/weather-display/src/components/Forecast.tsx` | 7-day forecast grid |
+| **StockTracker** | `packages/stock-tracker/src/components/StockTracker.tsx` | Stock quotes and watchlist |
+| **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, audio player |
+| **AiAssistant** | `packages/ai-assistant/src/components/AiAssistant.tsx` | AI chat UI (Gemini) |
+| **Event Bus** | `packages/shared/src/utils/eventBus.ts` | Cross-MFE communication |
+| **Apollo Client** | `packages/shared/src/apollo/client.ts` | GraphQL setup, caching |
+| **Queries** | `packages/shared/src/apollo/queries.ts` | GraphQL queries & subscription |
+| **useWeatherData** | `packages/shared/src/hooks/useWeatherData.ts` | Weather data fetching + real-time |
+| **i18n** | `packages/shared/src/i18n/` | Translation files and hook |
+| **GraphQL Server** | `server/index.ts` | Local dev Express + Apollo + WebSocket |
+| **GraphQL Schema** | `server/graphql/schema.ts` | Type definitions + subscription |
+| **GraphQL Resolvers** | `server/graphql/resolvers.ts` | Query + subscription resolvers |
+| **Firebase Functions** | `functions/src/index.ts` | Production Cloud Functions (GraphQL, proxies, AI) |
+
+---
+
+## Project Structure
+
+```
+mycircle/
++-- packages/
+|   +-- shared/                  # Shared types, utilities, Apollo client, i18n
+|   |   +-- src/
+|   |       +-- apollo/          # Client factory, queries, fragments
+|   |       +-- hooks/           # useWeatherData and other shared hooks
+|   |       +-- i18n/            # Internationalization (translations)
+|   |       +-- types/           # TypeScript interfaces
+|   |       +-- utils/           # Event bus, weather helpers
+|   |       +-- data/            # Static data files
+|   |       +-- index.ts         # Barrel exports
+|   +-- shell/                   # Host micro frontend
+|   |   +-- src/
+|   |       +-- components/      # Layout, toggles, UserMenu, NotificationBell, etc.
+|   |       +-- context/         # AuthContext, ThemeContext, RemoteConfigContext
+|   |       +-- lib/             # Firebase integration (auth, Firestore, FCM, App Check)
+|   |       +-- App.tsx          # Routes & providers
+|   +-- city-search/             # City search micro frontend
+|   |   +-- src/
+|   |       +-- components/      # CitySearch
+|   |       +-- test/
+|   +-- weather-display/         # Weather display micro frontend
+|   |   +-- src/
+|   |       +-- components/      # WeatherDisplay, CurrentWeather, Forecast, HourlyForecast
+|   |       +-- hooks/
+|   |       +-- test/
+|   +-- stock-tracker/           # Stock tracker micro frontend
+|   |   +-- src/
+|   |       +-- components/      # StockTracker, quote display, watchlist
+|   |       +-- hooks/
+|   |       +-- test/
+|   +-- podcast-player/          # Podcast player micro frontend
+|   |   +-- src/
+|   |       +-- components/      # PodcastPlayer, episode list, audio player
+|   |       +-- hooks/
+|   |       +-- test/
+|   +-- ai-assistant/            # AI assistant micro frontend
+|       +-- src/
+|           +-- components/      # AiAssistant, chat UI
+|           +-- hooks/
+|           +-- test/
++-- server/                      # Local development GraphQL server
+|   +-- index.ts                 # Entry — Apollo + REST proxies + AI endpoint
+|   +-- api/                     # OpenWeather & geocoding API clients
+|   +-- graphql/                 # Schema, resolvers, pubsub
+|   +-- middleware/              # Server-side caching
+|   +-- types/                   # Server TypeScript types
++-- functions/                   # Firebase Cloud Functions (production)
+|   +-- src/
+|       +-- index.ts             # GraphQL, stock proxy, podcast proxy, AI chat
+|       +-- schema.ts            # GraphQL schema (production)
+|       +-- resolvers.ts         # Self-contained resolvers
+|       +-- recaptcha.ts         # reCAPTCHA verification
++-- e2e/                         # Playwright end-to-end tests
+|   +-- integration/             # Integration tests against deployed app
++-- scripts/
+|   +-- assemble-firebase.mjs   # Firebase build assembly
+|   +-- generate-icons.mjs      # PWA icon generation
++-- docs/
+|   +-- architecture.md         # This file
++-- firebase.json               # Firebase hosting + functions config
++-- firestore.rules             # Firestore security rules
++-- pnpm-workspace.yaml        # Workspace package declarations
++-- package.json                # Root workspace config
+```

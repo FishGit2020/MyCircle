@@ -1,0 +1,111 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "dist/firebase",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/graphql",
+        "function": "graphql"
+      },
+      {
+        "source": "/stock/**",
+        "function": "stockProxy"
+      },
+      {
+        "source": "/podcast/**",
+        "function": "podcastProxy"
+      },
+      {
+        "source": "/ai/**",
+        "function": "aiChat"
+      },
+      {
+        "source": "/city-search/**",
+        "destination": "/city-search/index.html"
+      },
+      {
+        "source": "/weather-display/**",
+        "destination": "/weather-display/index.html"
+      },
+      {
+        "source": "/stock-tracker/**",
+        "destination": "/stock-tracker/index.html"
+      },
+      {
+        "source": "/podcast-player/**",
+        "destination": "/podcast-player/index.html"
+      },
+      {
+        "source": "/ai-assistant/**",
+        "destination": "/ai-assistant/index.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|mjs)",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/javascript"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      },
+      {
+        "source": "**/remoteEntry.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      },
+      {
+        "source": "/sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs22",
+    "predeploy": ["pnpm --dir \"$RESOURCE_DIR\" run build"]
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "auth": {
+      "port": 9099
+    },
+    "ui": {
+      "enabled": true
+    }
+  }
+}

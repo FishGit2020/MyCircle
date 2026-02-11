@@ -1,0 +1,47 @@
+.stock-tracker-container {
+  /* Scoped styles for the stock tracker micro frontend */
+}
+
+@keyframes stock-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stock-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.stock-card-enter {
+  animation: stock-fade-in 0.2s ease-out;
+}
+
+.stock-loading-pulse {
+  animation: stock-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.stock-search-dropdown {
+  animation: dropdown-in 0.15s ease-out;
+  transform-origin: top center;
+}

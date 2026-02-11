@@ -1,0 +1,306 @@
+import { gql } from '@apollo/client';
+
+const WEATHER_CONDITION_FRAGMENT = gql`
+  fragment WeatherConditionFields on WeatherCondition {
+    id
+    main
+    description
+    icon
+  }
+`;
+
+export const GET_WEATHER = gql`
+  ${WEATHER_CONDITION_FRAGMENT}
+  query GetWeather($lat: Float!, $lon: Float!) {
+    weather(lat: $lat, lon: $lon) {
+      current {
+        temp
+        feels_like
+        temp_min
+        temp_max
+        pressure
+        humidity
+        weather {
+          ...WeatherConditionFields
+        }
+        wind {
+          speed
+          deg
+          gust
+        }
+        clouds {
+          all
+        }
+        dt
+        timezone
+        sunrise
+        sunset
+        visibility
+      }
+      forecast {
+        dt
+        temp {
+          min
+          max
+          day
+          night
+        }
+        weather {
+          ...WeatherConditionFields
+        }
+        humidity
+        wind_speed
+        pop
+      }
+      hourly {
+        dt
+        temp
+        weather {
+          ...WeatherConditionFields
+        }
+        pop
+        wind_speed
+      }
+    }
+  }
+`;
+
+export const GET_CURRENT_WEATHER = gql`
+  ${WEATHER_CONDITION_FRAGMENT}
+  query GetCurrentWeather($lat: Float!, $lon: Float!) {
+    currentWeather(lat: $lat, lon: $lon) {
+      temp
+      feels_like
+      temp_min
+      temp_max
+      pressure
+      humidity
+      weather {
+        ...WeatherConditionFields
+      }
+      wind {
+        speed
+        deg
+        gust
+      }
+      clouds {
+        all
+      }
+      dt
+      timezone
+      sunrise
+      sunset
+      visibility
+    }
+  }
+`;
+
+export const GET_FORECAST = gql`
+  ${WEATHER_CONDITION_FRAGMENT}
+  query GetForecast($lat: Float!, $lon: Float!) {
+    forecast(lat: $lat, lon: $lon) {
+      dt
+      temp {
+        min
+        max
+        day
+        night
+      }
+      weather {
+        ...WeatherConditionFields
+      }
+      humidity
+      wind_speed
+      pop
+    }
+  }
+`;
+
+export const GET_HOURLY_FORECAST = gql`
+  ${WEATHER_CONDITION_FRAGMENT}
+  query GetHourlyForecast($lat: Float!, $lon: Float!) {
+    hourlyForecast(lat: $lat, lon: $lon) {
+      dt
+      temp
+      weather {
+        ...WeatherConditionFields
+      }
+      pop
+      wind_speed
+    }
+  }
+`;
+
+export const SEARCH_CITIES = gql`
+  query SearchCities($query: String!, $limit: Int) {
+    searchCities(query: $query, limit: $limit) {
+      id
+      name
+      country
+      state
+      lat
+      lon
+    }
+  }
+`;
+
+export const REVERSE_GEOCODE = gql`
+  query ReverseGeocode($lat: Float!, $lon: Float!) {
+    reverseGeocode(lat: $lat, lon: $lon) {
+      id
+      name
+      country
+      state
+      lat
+      lon
+    }
+  }
+`;
+
+// ─── Stock Queries ──────────────────────────────────────────
+
+export const SEARCH_STOCKS = gql`
+  query SearchStocks($query: String!) {
+    searchStocks(query: $query) {
+      description
+      displaySymbol
+      symbol
+      type
+    }
+  }
+`;
+
+export const GET_STOCK_QUOTE = gql`
+  query GetStockQuote($symbol: String!) {
+    stockQuote(symbol: $symbol) {
+      c
+      d
+      dp
+      h
+      l
+      o
+      pc
+      t
+    }
+  }
+`;
+
+export const GET_STOCK_CANDLES = gql`
+  query GetStockCandles($symbol: String!, $resolution: String, $from: Int!, $to: Int!) {
+    stockCandles(symbol: $symbol, resolution: $resolution, from: $from, to: $to) {
+      c
+      h
+      l
+      o
+      t
+      v
+      s
+    }
+  }
+`;
+
+// ─── Podcast Queries ────────────────────────────────────────
+
+export const SEARCH_PODCASTS = gql`
+  query SearchPodcasts($query: String!) {
+    searchPodcasts(query: $query) {
+      feeds {
+        id
+        title
+        author
+        artwork
+        description
+        categories
+        episodeCount
+        language
+      }
+      count
+    }
+  }
+`;
+
+export const GET_TRENDING_PODCASTS = gql`
+  query GetTrendingPodcasts {
+    trendingPodcasts {
+      feeds {
+        id
+        title
+        author
+        artwork
+        description
+        categories
+        episodeCount
+        language
+      }
+      count
+    }
+  }
+`;
+
+export const GET_PODCAST_EPISODES = gql`
+  query GetPodcastEpisodes($feedId: ID!) {
+    podcastEpisodes(feedId: $feedId) {
+      items {
+        id
+        title
+        description
+        datePublished
+        duration
+        enclosureUrl
+        image
+        feedId
+      }
+      count
+    }
+  }
+`;
+
+export const GET_PODCAST_FEED = gql`
+  query GetPodcastFeed($feedId: ID!) {
+    podcastFeed(feedId: $feedId) {
+      id
+      title
+      author
+      artwork
+      description
+      categories
+      episodeCount
+      language
+    }
+  }
+`;
+
+export const WEATHER_UPDATES = gql`
+  ${WEATHER_CONDITION_FRAGMENT}
+  subscription WeatherUpdates($lat: Float!, $lon: Float!) {
+    weatherUpdates(lat: $lat, lon: $lon) {
+      lat
+      lon
+      timestamp
+      current {
+        temp
+        feels_like
+        temp_min
+        temp_max
+        pressure
+        humidity
+        weather {
+          ...WeatherConditionFields
+        }
+        wind {
+          speed
+          deg
+          gust
+        }
+        clouds {
+          all
+        }
+        dt
+        timezone
+        sunrise
+        sunset
+        visibility
+      }
+    }
+  }
+`;
