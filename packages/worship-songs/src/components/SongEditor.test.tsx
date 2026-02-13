@@ -85,6 +85,18 @@ describe('SongEditor', () => {
     expect(screen.getByRole('textbox', { name: /worship\.content/ })).toBeRequired();
   });
 
+  it('renders required field legend text', () => {
+    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    expect(screen.getByText('worship.requiredFieldLegend')).toBeInTheDocument();
+  });
+
+  it('renders red asterisks on required fields with aria-hidden', () => {
+    const { container } = render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    const asterisks = container.querySelectorAll('span.text-red-500[aria-hidden="true"]');
+    expect(asterisks.length).toBe(2); // Title and Content
+    asterisks.forEach(a => expect(a.textContent).toBe('*'));
+  });
+
   it('renders the BPM input field', () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
     expect(screen.getByLabelText('worship.bpm')).toBeInTheDocument();
