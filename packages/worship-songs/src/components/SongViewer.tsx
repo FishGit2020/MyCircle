@@ -1,12 +1,38 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 import { transposeContent, transposeChord } from '../utils/transpose';
 import ChordLine from './ChordLine';
 
+const ALL_KEYS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+const SCROLL_SPEEDS = [20, 30, 40, 50, 70, 100]; // ms per 1px — lower = faster
+const DEFAULT_SCROLL_SPEED = 50;
+
 function getKeyName(originalKey: string, semitones: number): string {
   if (semitones === 0) return originalKey;
   return transposeChord(originalKey, semitones);
+}
+
+function semitonesToKey(originalKey: string, targetKey: string): number {
+  const normalize: Record<string, string> = { 'Db': 'C#', 'D#': 'Eb', 'Gb': 'F#', 'G#': 'Ab', 'A#': 'Bb' };
+  const orig = normalize[originalKey] ?? originalKey;
+  const tgt = normalize[targetKey] ?? targetKey;
+  const fromIdx = ALL_KEYS.indexOf(orig);
+  const toIdx = ALL_KEYS.indexOf(tgt);
+  if (fromIdx === -1 || toIdx === -1) return 0;
+  return ((toIdx - fromIdx) + 12) % 12;
+}
+
+function loadScrollSpeed(): number {
+  try {
+    const stored = localStorage.getItem(StorageKeys.WORSHIP_SCROLL_SPEED);
+    if (stored) { const n = parseInt(stored, 10); if (SCROLL_SPEEDS.includes(n)) return n; }
+  } catch { /* */ }
+  return DEFAULT_SCROLL_SPEED;
+}
+
+function saveScrollSpeed(speed: number) {
+  try { localStorage.setItem(StorageKeys.WORSHIP_SCROLL_SPEED, String(speed)); } catch { /* */ }
 }
 
 interface SongViewerProps {
@@ -21,6 +47,8 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
   const [semitones, setSemitones] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
   const [autoScroll, setAutoScroll] = useState(false);
+  const [scrollSpeed, setScrollSpeed] = useState(loadScrollSpeed);
+  const [copied, setCopied] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -28,12 +56,12 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
   const transposedContent = isChordPro ? transposeContent(song.content, semitones) : song.content;
   const currentKey = isChordPro ? getKeyName(song.originalKey, semitones) : song.originalKey;
 
-  // Auto-scroll
+  // Auto-scroll with adjustable speed
   useEffect(() => {
     if (autoScroll) {
       scrollIntervalRef.current = setInterval(() => {
         window.scrollBy({ top: 1, behavior: 'auto' });
-      }, 50);
+      }, scrollSpeed);
     } else if (scrollIntervalRef.current) {
       clearInterval(scrollIntervalRef.current);
       scrollIntervalRef.current = null;
@@ -41,10 +69,31 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
     return () => {
       if (scrollIntervalRef.current) clearInterval(scrollIntervalRef.current);
     };
-  }, [autoScroll]);
+  }, [autoScroll, scrollSpeed]);
 
   const handlePrint = useCallback(() => {
     window.print();
+  }, []);
+
+  const handleCopyLyrics = useCallback(async () => {
+    try {
+      // Strip ChordPro bracket notation for clean lyrics
+      const clean = isChordPro
+        ? transposedContent.replace(/\[([^\]]+)\]/g, '').replace(/\n{3,}/g, '\n\n')
+        : song.content;
+      await navigator.clipboard.writeText(`${song.title}\n${song.artist ? `${song.artist}\n` : ''}\n${clean}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* */ }
+  }, [song, transposedContent, isChordPro]);
+
+  const handleTargetKeyChange = useCallback((targetKey: string) => {
+    setSemitones(semitonesToKey(song.originalKey, targetKey));
+  }, [song.originalKey]);
+
+  const handleScrollSpeedChange = useCallback((speed: number) => {
+    setScrollSpeed(speed);
+    saveScrollSpeed(speed);
   }, []);
 
   return (
@@ -109,7 +158,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
       <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
         {/* Transpose controls — only for ChordPro */}
         {isChordPro ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-gray-600 dark:text-gray-400">{t('worship.transpose')}:</span>
             <button
               onClick={() => setSemitones(s => s - 1)}
@@ -136,6 +185,20 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
                 {t('worship.resetKey')}
               </button>
             )}
+
+            {/* Direct key picker */}
+            <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-gray-200 dark:border-gray-700">
+              <span className="text-xs text-gray-500 dark:text-gray-400">{t('worship.targetKey')}:</span>
+              <select
+                value={currentKey}
+                onChange={e => handleTargetKeyChange(e.target.value)}
+                className="px-1.5 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-1 focus:ring-blue-500 outline-none"
+              >
+                {ALL_KEYS.map(k => (
+                  <option key={k} value={k}>{k}</option>
+                ))}
+              </select>
+            </div>
           </div>
         ) : (
           <p className="text-xs text-gray-400 dark:text-gray-500 italic">
@@ -143,7 +206,29 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
           </p>
         )}
 
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2 ml-auto flex-wrap">
+          {/* Copy lyrics */}
+          <button
+            onClick={handleCopyLyrics}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+          >
+            {copied ? (
+              <>
+                <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                {t('worship.copied')}
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                {t('worship.copyLyrics')}
+              </>
+            )}
+          </button>
+
           {/* Auto-scroll toggle */}
           <button
             onClick={() => setAutoScroll(!autoScroll)}
@@ -158,6 +243,22 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
             </svg>
             {t('worship.autoScroll')}
           </button>
+
+          {/* Scroll speed (visible when auto-scroll is active) */}
+          {autoScroll && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500 dark:text-gray-400">{t('worship.scrollSpeed')}:</span>
+              <input
+                type="range"
+                min={0}
+                max={SCROLL_SPEEDS.length - 1}
+                value={SCROLL_SPEEDS.indexOf(scrollSpeed)}
+                onChange={e => handleScrollSpeedChange(SCROLL_SPEEDS[parseInt(e.target.value)])}
+                className="w-16 h-1.5 accent-green-500"
+                aria-label={t('worship.scrollSpeed')}
+              />
+            </div>
+          )}
 
           {/* Print */}
           <button
