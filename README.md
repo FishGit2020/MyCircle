@@ -32,6 +32,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Historical weather** — "This day last year" comparison using Open-Meteo archive API
 - **Air Quality Index** — real-time AQI with color-coded levels, expandable pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
 - Visible live/paused toggle with clear state indication
+- **Weather alerts** — subscribe to severe weather push notifications for your favorite cities; Cloud Function checks conditions every 30 minutes and sends FCM alerts for thunderstorms, heavy rain/snow, tornadoes, and other severe events
 
 ### Stocks & Crypto
 - Real-time stock quotes via Finnhub API
@@ -42,7 +43,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### Podcasts
 - Podcast discovery and search via PodcastIndex API
-- Episode playback with built-in audio player
+- Episode playback with built-in audio player and adjustable playback speed
 - **Persistent audio player** — continues playing across all routes (navigate to Stocks, Weather, etc. without interrupting playback)
 - **Category/genre filtering** — browse trending podcasts by genre with filter chips, category badges on cards
 - **Share episode clip** — share currently playing episode with timestamp via Web Share API or clipboard fallback
@@ -149,6 +150,18 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Worship Songs** | Song library with lyrics, chord editor, YouTube links, metronome | `WorshipSongs` |
 | **Notebook** | Personal note-taking with search and Firestore sync | `Notebook` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
+
+### Dashboard Widgets
+
+The homepage features a customizable widget dashboard with drag-and-drop reordering and visibility toggles (layout persisted in localStorage):
+
+| Widget | Icon | Data Source |
+|--------|------|-------------|
+| **Weather** | Cloud/sun | Current conditions + 7-day forecast for your city |
+| **Stocks** | Chart | Watchlist prices from Finnhub API |
+| **Podcasts** | Headphones | Latest episodes from subscribed feeds |
+| **Bible** | Book | Verse of the Day from curated collection |
+| **Notebook** | Pencil | Recent notes count from Firestore |
 
 ### Routes
 
@@ -431,11 +444,18 @@ After deployment, the app is available at:
 - **Hosting:** `https://mycircle-dash.web.app`
 - **GraphQL:** `https://us-central1-mycircle-dash.cloudfunctions.net/graphql`
 
-Cloud Functions handle:
-- `/graphql` — GraphQL API (weather queries, city search, reverse geocode)
-- `/stock/**` — Finnhub stock API proxy
-- `/podcast/**` — PodcastIndex API proxy
-- `/ai/**` — Gemini AI chat endpoint
+#### Cloud Functions
+
+| Function | Route / Trigger | Purpose | Rate Limit |
+|----------|----------------|---------|------------|
+| `graphql` | `/graphql` | GraphQL API — weather, city search, stocks, podcasts, bible, crypto | — |
+| `stockProxy` | `/stock/**` | Finnhub API proxy (search, quote, profile, candles) | 60 req/min/IP |
+| `podcastProxy` | `/podcast/**` | PodcastIndex API proxy (search, trending, episodes) | 60 req/min/IP |
+| `aiChat` | `/ai/chat` | Gemini AI chat with function calling (weather, stocks, crypto, navigation) | 10 req/min/IP |
+| `subscribeToAlerts` | Callable | Subscribe/unsubscribe FCM tokens to weather alerts for cities | — |
+| `checkWeatherAlerts` | Scheduled (every 30 min) | Check weather for subscribed cities, send FCM for severe conditions | — |
+
+All proxy functions require Firebase Auth. `stockProxy`, `podcastProxy`, and `aiChat` use IP-based rate limiting via `node-cache`.
 
 ## GraphQL API
 
@@ -578,6 +598,21 @@ Three layers prevent version drift across micro frontends:
 | `VITE_FIREBASE_VAPID_KEY` | FCM VAPID key | For push notifications |
 | `VITE_RECAPTCHA_SITE_KEY` | reCAPTCHA v3 site key | For bot protection |
 | `VITE_SENTRY_DSN` | Sentry DSN for error tracking | For monitoring |
+
+### Emulator overrides (`.env.emulator`)
+
+These are only used when running Firebase emulators with the mock API server (see `pnpm emulator:test`):
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `OPENWEATHER_BASE_URL` | `https://api.openweathermap.org` | Redirect to mock server |
+| `FINNHUB_BASE_URL` | `https://finnhub.io` | Redirect to mock server |
+| `COINGECKO_BASE_URL` | `https://api.coingecko.com` | Redirect to mock server |
+| `PODCASTINDEX_BASE_URL` | `https://api.podcastindex.org` | Redirect to mock server |
+| `BIBLE_API_BASE_URL` | `https://bible-api.com` | Redirect to mock server |
+| `OPEN_METEO_BASE_URL` | `https://archive-api.open-meteo.com` | Redirect to mock server |
+| `FIRESTORE_EMULATOR_HOST` | — | `localhost:8080` |
+| `FIREBASE_AUTH_EMULATOR_HOST` | — | `localhost:9099` |
 
 > **Note:** Firebase is optional — the app works without it (auth, push notifications, and profile sync are disabled).
 
