@@ -701,3 +701,17 @@ mycircle/
 +-- pnpm-workspace.yaml        # Workspace package declarations
 +-- package.json                # Root workspace config
 ```
+
+---
+
+## CI/CD
+
+GitHub Actions workflows automate testing and deployment:
+
+| Workflow | File | Trigger | Steps |
+|----------|------|---------|-------|
+| **CI** | `.github/workflows/ci.yml` | PR to `main` | Install → Typecheck → Unit tests |
+| **Deploy** | `.github/workflows/deploy.yml` | Push to `main` | Install → Build → Firebase Hosting deploy |
+| **E2E** | `.github/workflows/e2e.yml` | PR to `main` | Install → Playwright install → Build → E2E tests |
+
+All workflows use `pnpm/action-setup@v4`, `actions/setup-node@v4` with Node 22 and pnpm dependency caching. The deploy workflow uses `FirebaseExtended/action-hosting-deploy@v0` with a `FIREBASE_SERVICE_ACCOUNT` secret for authentication.

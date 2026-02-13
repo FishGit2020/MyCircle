@@ -308,6 +308,18 @@ mycircle/
 | `pnpm test:e2e` | Run Playwright end-to-end tests |
 | `pnpm typecheck` | TypeScript type checking |
 
+## CI/CD
+
+MyCircle uses **GitHub Actions** for continuous integration and deployment:
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| **CI** (`ci.yml`) | PR to `main` | Installs deps, runs `typecheck:all`, runs `test:all` |
+| **Deploy** (`deploy.yml`) | Push to `main` | Builds the full app, deploys to Firebase Hosting (live channel) |
+| **E2E** (`e2e.yml`) | PR to `main` | Builds the app, installs Playwright browsers, runs `test:e2e` |
+
+All workflows use `pnpm/action-setup@v4` with Node 22 and pnpm caching for fast installs.
+
 ## Deployment to Firebase
 
 ### Prerequisites
