@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
 import { useTranslation } from '@weather/shared';
 import ThemeToggle from './ThemeToggle';
@@ -9,15 +9,21 @@ import NotificationBell from './NotificationBell';
 import OfflineIndicator from './OfflineIndicator';
 import LanguageSelector from './LanguageSelector';
 import FeedbackButton from './FeedbackButton';
+import GlobalAudioPlayer from './GlobalAudioPlayer';
 import { useRemoteConfigContext } from '../context/RemoteConfigContext';
 
 export default function Layout() {
   const { t } = useTranslation();
   const { config, loading: configLoading } = useRemoteConfigContext();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hasActivePlayer, setHasActivePlayer] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
+
+  const handlePlayerStateChange = useCallback((active: boolean) => {
+    setHasActivePlayer(active);
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -164,11 +170,13 @@ export default function Layout() {
         </div>
       </header>
 
-      <main id="main-content" className="flex-grow container mx-auto px-4 py-8">
+      <main id="main-content" className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-24' : ''}`}>
         <Outlet />
       </main>
 
-      <FeedbackButton />
+      <GlobalAudioPlayer onPlayerStateChange={handlePlayerStateChange} />
+
+      <FeedbackButton hasActivePlayer={hasActivePlayer} />
 
       <footer role="contentinfo" className="bg-gray-800 dark:bg-gray-950 text-white py-6 mt-12 transition-colors">
         <div className="container mx-auto px-4 text-center">

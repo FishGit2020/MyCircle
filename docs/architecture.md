@@ -105,6 +105,8 @@ ApolloProvider
         -> BrowserRouter
           -> Layout (Outlet)
             -> Routes
+            -> GlobalAudioPlayer (persistent across all routes)
+            -> FeedbackButton
 ```
 
 ### City Search (Remote MFE) - `packages/city-search/`
@@ -224,7 +226,9 @@ const MFEvents = {
   WEATHER_LOADED:       'mf:weather-loaded',
   NAVIGATION_REQUEST:   'mf:navigation-request',
   THEME_CHANGED:        'mf:theme-changed',
-  USER_LOCATION_CHANGED: 'mf:user-location-changed'
+  USER_LOCATION_CHANGED: 'mf:user-location-changed',
+  PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
+  PODCAST_CLOSE_PLAYER: 'mf:podcast-close-player',
 }
 ```
 
@@ -259,6 +263,26 @@ UseMyLocation.tsx (shell)
      +--> sessionStorage.setItem('selectedCity', ...)
      |
      +--> navigate(/weather/:lat,:lon)
+```
+
+**Persistent Podcast Player Flow:**
+```
+PodcastPlayer.tsx                           GlobalAudioPlayer.tsx
+(podcast-player MFE)                        (shell)
+     |                                           |
+     |-- eventBus.publish(PODCAST_PLAY_EPISODE) --> subscribeToMFEvent(PODCAST_PLAY_EPISODE)
+     |   { episode, podcast }                    |
+     |                                           +--> setEpisode(episode)
+     |                                           +--> setPodcast(podcast)
+     |                                           +--> <audio> starts playback
+     |                                           |
+     |-- eventBus.publish(PODCAST_CLOSE_PLAYER) --> subscribeToMFEvent(PODCAST_CLOSE_PLAYER)
+     |                                           |
+     |                                           +--> audio.pause()
+     |                                           +--> setEpisode(null)
+     |
+     +-- User navigates to /stocks, /weather, etc.
+         GlobalAudioPlayer stays mounted in Layout (persists across routes)
 ```
 
 ---
@@ -528,7 +552,8 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **CurrentWeather** | `packages/weather-display/src/components/CurrentWeather.tsx` | Current conditions display |
 | **Forecast** | `packages/weather-display/src/components/Forecast.tsx` | 7-day forecast grid |
 | **StockTracker** | `packages/stock-tracker/src/components/StockTracker.tsx` | Stock quotes and watchlist |
-| **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, audio player |
+| **GlobalAudioPlayer** | `packages/shell/src/components/GlobalAudioPlayer.tsx` | Persistent audio player (shell-level, survives route changes) |
+| **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, event publishing |
 | **AiAssistant** | `packages/ai-assistant/src/components/AiAssistant.tsx` | AI chat UI (Gemini) |
 | **Event Bus** | `packages/shared/src/utils/eventBus.ts` | Cross-MFE communication |
 | **Apollo Client** | `packages/shared/src/apollo/client.ts` | GraphQL setup, caching |

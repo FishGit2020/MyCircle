@@ -36,6 +36,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 ### Podcasts
 - Podcast discovery and search via PodcastIndex API
 - Episode playback with built-in audio player
+- **Persistent audio player** — continues playing across all routes (navigate to Stocks, Weather, etc. without interrupting playback)
 - Podcast subscriptions with "My Subscriptions" tab
 - Subscribe/unsubscribe from any podcast feed
 

@@ -5,36 +5,10 @@ import {
   GET_TRENDING_PODCASTS,
   GET_PODCAST_EPISODES,
 } from '@weather/shared';
+import type { Podcast, Episode, PodcastSearchResult } from '@weather/shared';
 
-// --- Types ---
-
-export interface Podcast {
-  id: string | number;
-  title: string;
-  author: string;
-  artwork: string;
-  description: string;
-  feedUrl: string;
-  episodeCount: number;
-  categories: Record<string, string>;
-}
-
-export interface Episode {
-  id: string | number;
-  title: string;
-  description: string;
-  datePublished: number;
-  duration: number;
-  enclosureUrl: string;
-  enclosureType: string;
-  image: string;
-  feedId: string | number;
-}
-
-export interface PodcastSearchResult {
-  feeds: Podcast[];
-  count: number;
-}
+// Re-export types for backward compatibility
+export type { Podcast, Episode, PodcastSearchResult };
 
 // --- GraphQL Response Types ---
 

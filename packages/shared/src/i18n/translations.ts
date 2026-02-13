@@ -298,6 +298,8 @@ const en = {
   'podcasts.skipBack': 'Skip back 15s',
   'podcasts.nowPlaying': 'Now Playing',
   'podcasts.episodeCount': '{count} episodes',
+  'podcasts.closePlayer': 'Close player',
+  'podcasts.seekPosition': 'Seek position',
 
   // AI Assistant
   'ai.title': 'AI Assistant',
@@ -637,6 +639,8 @@ const es: Record<TranslationKey, string> = {
   'podcasts.skipBack': 'Retroceder 15s',
   'podcasts.nowPlaying': 'Reproduciendo',
   'podcasts.episodeCount': '{count} episodios',
+  'podcasts.closePlayer': 'Cerrar reproductor',
+  'podcasts.seekPosition': 'Posici\u00f3n de b\u00fasqueda',
 
   // AI Assistant
   'ai.title': 'Asistente IA',

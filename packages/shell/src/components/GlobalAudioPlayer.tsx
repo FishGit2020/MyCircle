@@ -1,12 +1,10 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { useTranslation } from '@weather/shared';
-import type { Episode, Podcast } from '../hooks/usePodcastData';
-
-interface AudioPlayerProps {
-  episode: Episode | null;
-  podcast: Podcast | null;
-  onClose: () => void;
-}
+import {
+  useTranslation,
+  subscribeToMFEvent,
+  MFEvents,
+} from '@weather/shared';
+import type { Episode, Podcast, PodcastPlayEpisodeEvent } from '@weather/shared';
 
 const PLAYBACK_SPEEDS = [0.5, 1, 1.25, 1.5, 2];
 
@@ -21,9 +19,15 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerProps) {
+export interface GlobalAudioPlayerProps {
+  onPlayerStateChange?: (active: boolean) => void;
+}
+
+export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPlayerProps) {
   const { t } = useTranslation();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [episode, setEpisode] = useState<Episode | null>(null);
+  const [podcast, setPodcast] = useState<Podcast | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -31,6 +35,44 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const speedMenuRef = useRef<HTMLDivElement>(null);
 
+  // Subscribe to play/close events from Podcast MFE
+  useEffect(() => {
+    const unsubPlay = subscribeToMFEvent<PodcastPlayEpisodeEvent>(
+      MFEvents.PODCAST_PLAY_EPISODE,
+      (data) => {
+        setEpisode(data.episode);
+        setPodcast(data.podcast);
+      }
+    );
+
+    const unsubClose = subscribeToMFEvent(
+      MFEvents.PODCAST_CLOSE_PLAYER,
+      () => {
+        const audio = audioRef.current;
+        if (audio) {
+          audio.pause();
+          audio.src = '';
+        }
+        setEpisode(null);
+        setPodcast(null);
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setDuration(0);
+      }
+    );
+
+    return () => {
+      unsubPlay();
+      unsubClose();
+    };
+  }, []);
+
+  // Notify parent of player state changes
+  useEffect(() => {
+    onPlayerStateChange?.(episode !== null);
+  }, [episode, onPlayerStateChange]);
+
+  // Load and play when episode changes
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !episode) return;
@@ -51,6 +93,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     };
   }, [episode?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Attach event listeners — re-run when episode changes (bug fix)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -73,6 +116,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     };
   }, [episode?.id]);
 
+  // Close speed menu on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (speedMenuRef.current && !speedMenuRef.current.contains(event.target as Node)) {
@@ -82,6 +126,27 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!episode) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      // Only handle when not inside an input/textarea
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [episode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const togglePlayPause = useCallback(() => {
     const audio = audioRef.current;
@@ -123,6 +188,19 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     audio.currentTime = fraction * duration;
   }, [duration]);
 
+  const handleSeekKeyboard = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      audio.currentTime = Math.min(audio.currentTime + 5, duration);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      audio.currentTime = Math.max(audio.currentTime - 5, 0);
+    }
+  }, [duration]);
+
   const changeSpeed = useCallback((speed: number) => {
     const audio = audioRef.current;
     if (audio) {
@@ -138,11 +216,12 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
       audio.pause();
       audio.src = '';
     }
+    setEpisode(null);
+    setPodcast(null);
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
-    onClose();
-  }, [onClose]);
+  }, []);
 
   if (!episode) return null;
 
@@ -157,15 +236,18 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     >
       <audio ref={audioRef} preload="metadata" className="hidden" />
 
-      {/* Progress bar (clickable) */}
+      {/* Progress bar (clickable + keyboard accessible) */}
       <div
         className="h-1 bg-gray-200 dark:bg-gray-700 cursor-pointer group"
         onClick={handleSeek}
-        role="progressbar"
+        onKeyDown={handleSeekKeyboard}
+        role="slider"
+        tabIndex={0}
         aria-label={t('podcasts.seekPosition')}
         aria-valuenow={Math.round(currentTime)}
         aria-valuemin={0}
         aria-valuemax={Math.round(duration)}
+        aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
       >
         <div
           className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-150 group-hover:bg-blue-600 dark:group-hover:bg-blue-300"
@@ -239,7 +321,10 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
 
         {/* Time + speed */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums min-w-[90px] text-center">
+          <span
+            className="text-xs text-gray-500 dark:text-gray-400 tabular-nums min-w-[90px] text-center"
+            aria-live="polite"
+          >
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
 

@@ -12,7 +12,7 @@ const CATEGORY_KEYS: { value: Category; key: string }[] = [
   { value: 'other', key: 'feedback.categoryOther' },
 ];
 
-export default function FeedbackButton() {
+export default function FeedbackButton({ hasActivePlayer }: { hasActivePlayer?: boolean }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -133,7 +133,7 @@ export default function FeedbackButton() {
       <button
         ref={triggerRef}
         onClick={handleOpen}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 focus-visible:outline-none"
+        className={`fixed ${hasActivePlayer ? 'bottom-20' : 'bottom-6'} right-6 z-40 flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 focus-visible:outline-none`}
         aria-haspopup="dialog"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
