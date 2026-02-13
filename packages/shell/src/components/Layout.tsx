@@ -10,6 +10,7 @@ import FeedbackButton from './FeedbackButton';
 import GlobalAudioPlayer from './GlobalAudioPlayer';
 import CommandPalette from './CommandPalette';
 import BottomNav from './BottomNav';
+import PwaInstallPrompt from './PwaInstallPrompt';
 import { useRemoteConfigContext } from '../context/RemoteConfigContext';
 
 export default function Layout() {
@@ -114,6 +115,7 @@ export default function Layout() {
       <CommandPalette />
 
       <FeedbackButton hasActivePlayer={hasActivePlayer} />
+      <PwaInstallPrompt />
 
       <footer role="contentinfo" className="bg-gray-800 dark:bg-gray-950 text-white py-6 mt-12 transition-colors">
         <div className="container mx-auto px-4 text-center">
