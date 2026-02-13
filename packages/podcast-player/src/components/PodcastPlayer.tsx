@@ -147,6 +147,7 @@ export default function PodcastPlayer() {
                   src={selectedPodcast.artwork}
                   alt={selectedPodcast.title}
                   className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover shadow-md flex-shrink-0"
+                  loading="lazy"
                 />
               ) : (
                 <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
