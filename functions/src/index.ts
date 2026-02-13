@@ -9,12 +9,42 @@ import type { Request, Response } from 'express';
 import axios from 'axios';
 import NodeCache from 'node-cache';
 import crypto from 'crypto';
+import { z } from 'zod';
 import type { FunctionDeclaration } from '@google/genai';
+import { verifyRecaptchaToken } from './recaptcha.js';
 
 // Initialize Firebase Admin (idempotent)
 if (getApps().length === 0) {
   initializeApp();
 }
+
+// ─── CORS origins whitelist ─────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  'https://mycircle-app.web.app',
+  'https://mycircle-app.firebaseapp.com',
+  'http://localhost:3000',
+];
+
+// ─── Rate Limiter ───────────────────────────────────────────────────
+const rateLimitCache = new NodeCache({ stdTTL: 60, checkperiod: 30 });
+
+function checkRateLimit(ip: string, limit: number, windowSec: number): boolean {
+  const key = `rate:${ip}:${windowSec}`;
+  const current = rateLimitCache.get<number>(key) || 0;
+  if (current >= limit) return true;
+  rateLimitCache.set(key, current + 1, windowSec);
+  return false;
+}
+
+// ─── Zod Schemas ────────────────────────────────────────────────────
+const aiChatBodySchema = z.object({
+  message: z.string().min(1).max(5000),
+  history: z.array(z.object({
+    role: z.string(),
+    content: z.string(),
+  })).optional(),
+  context: z.record(z.unknown()).optional(),
+});
 
 /** Verify Firebase Auth ID token from Authorization header. Returns uid or null. */
 async function verifyAuthToken(req: Request): Promise<string | null> {
@@ -68,7 +98,7 @@ async function getServer() {
 // Export the Cloud Function
 export const graphql = onRequest(
   {
-    cors: true,
+    cors: ALLOWED_ORIGINS,
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 60,
@@ -338,7 +368,7 @@ const stockCache = new NodeCache();
  */
 export const stockProxy = onRequest(
   {
-    cors: true,
+    cors: ALLOWED_ORIGINS,
     invoker: 'public',
     maxInstances: 10,
     memory: '256MiB',
@@ -356,6 +386,13 @@ export const stockProxy = onRequest(
     const stockUid = await verifyAuthToken(req);
     if (!stockUid) {
       res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    // Rate limit: 60 req/min per IP
+    const stockIp = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
+    if (checkRateLimit(stockIp, 60, 60)) {
+      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
       return;
     }
 
@@ -466,12 +503,12 @@ const aiChatCache = new NodeCache();
  */
 export const aiChat = onRequest(
   {
-    cors: true,
+    cors: ALLOWED_ORIGINS,
     invoker: 'public',
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 60,
-    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY'],
+    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY'],
   },
   async (req: Request, res: Response) => {
     if (req.method !== 'POST') {
@@ -486,22 +523,40 @@ export const aiChat = onRequest(
       return;
     }
 
+    // Rate limit: 10 req/min per IP
+    const aiIp = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
+    if (checkRateLimit(aiIp, 10, 60)) {
+      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+      return;
+    }
+
+    // reCAPTCHA verification (graceful — skip if token missing for backward compat)
+    const recaptchaToken = req.headers['x-recaptcha-token'] as string;
+    if (recaptchaToken) {
+      const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+      if (recaptchaSecret) {
+        const result = await verifyRecaptchaToken(recaptchaToken, recaptchaSecret);
+        if (!result.valid) {
+          res.status(403).json({ error: result.reason || 'reCAPTCHA verification failed' });
+          return;
+        }
+      }
+    }
+
     const geminiKey = process.env.GEMINI_API_KEY;
     if (!geminiKey) {
       res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
       return;
     }
 
-    const { message, history, context } = req.body as {
-      message: string;
-      history?: { role: string; content: string }[];
-      context?: Record<string, unknown>;
-    };
-
-    if (!message || typeof message !== 'string') {
-      res.status(400).json({ error: 'message is required' });
+    // Validate request body with Zod
+    const parseResult = aiChatBodySchema.safeParse(req.body);
+    if (!parseResult.success) {
+      res.status(400).json({ error: 'Invalid request body', details: parseResult.error.flatten().fieldErrors });
       return;
     }
+
+    const { message, history, context } = parseResult.data;
 
     try {
       // Dynamically import the Google Gen AI SDK
@@ -826,7 +881,7 @@ async function executeGetCryptoPrices(): Promise<string> {
 
 export const podcastProxy = onRequest(
   {
-    cors: true,
+    cors: ALLOWED_ORIGINS,
     invoker: 'public',
     maxInstances: 10,
     memory: '256MiB',
@@ -845,6 +900,13 @@ export const podcastProxy = onRequest(
     const podcastUid = await verifyAuthToken(req);
     if (!podcastUid) {
       res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    // Rate limit: 60 req/min per IP
+    const podcastIp = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
+    if (checkRateLimit(podcastIp, 60, 60)) {
+      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
       return;
     }
 

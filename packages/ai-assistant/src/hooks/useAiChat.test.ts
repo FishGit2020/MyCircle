@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+
+// Mock getRecaptchaToken before importing the hook
+vi.mock('@mycircle/shared', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@mycircle/shared')>();
+  return {
+    ...actual,
+    getRecaptchaToken: vi.fn().mockResolvedValue(''),
+  };
+});
+
 import { useAiChat } from './useAiChat';
 
 // Mock fetch

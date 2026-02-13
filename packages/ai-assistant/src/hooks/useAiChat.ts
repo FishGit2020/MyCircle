@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { getRecaptchaToken } from '@mycircle/shared';
 
 export interface ChatMessage {
   id: string;
@@ -144,11 +145,13 @@ export function useAiChat() {
       const userContext = gatherUserContext();
 
       const idToken = await (window as any).__getFirebaseIdToken?.();
+      const recaptchaToken = await getRecaptchaToken('ai_chat');
       const response = await fetch('/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {}),
+          ...(recaptchaToken ? { 'x-recaptcha-token': recaptchaToken } : {}),
         },
         body: JSON.stringify({ message: content, history, context: userContext }),
         signal: abortRef.current.signal,

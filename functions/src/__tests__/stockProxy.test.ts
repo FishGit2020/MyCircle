@@ -43,6 +43,9 @@ vi.mock('firebase-functions/v2/https', () => {
 vi.mock('firebase-functions/v2/scheduler', () => ({
   onSchedule: (_opts: any, handler: any) => handler,
 }));
+vi.mock('../recaptcha.js', () => ({
+  verifyRecaptchaToken: vi.fn().mockResolvedValue({ valid: true, score: 0.9 }),
+}));
 
 import axios from 'axios';
 
