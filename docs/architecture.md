@@ -114,11 +114,13 @@ ApolloProvider
 Exposes `CitySearch` component via Module Federation.
 
 **Key Behavior:**
-- Input focus with empty query -> shows "Recent Searches" dropdown (up to 5 cities)
+- Input focus with empty query -> shows "Recent Searches" dropdown (up to 5 cities) with "Clear all" button
 - Typing triggers a 300ms debounced GraphQL `searchCities` query
-- City selection publishes `CITY_SELECTED` event via event bus
+- **Inline recent matching** — matching recent cities appear above API results with a "Recent" badge and relative timestamp
+- **localStorage fallback** — non-authenticated users get local recent city persistence (`recent-cities` key)
+- City selection publishes `CITY_SELECTED` event via event bus and saves to local recents
 - Click-outside detection closes all dropdowns
-- Receives `recentCities` as a prop from the shell's `CitySearchWrapper`
+- Receives `recentCities`, `onRemoveCity`, and `onClearRecents` as props from the shell's `CitySearchWrapper`
 
 **Module Federation Config:**
 ```typescript
@@ -376,6 +378,7 @@ interface RecentCity {
 | `'podcast-subscriptions'` | JSON array of string IDs | Subscribed podcast feed IDs |
 | `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles |
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
+| `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |
 | `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle |
 | `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle |
 | `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle |
