@@ -20,7 +20,9 @@ vi.mock('@mycircle/shared', () => ({
     BIBLE_FONT_SIZE: 'bible-font-size',
     BIBLE_NOTES: 'bible-notes',
     BIBLE_DEVOTIONAL_LOG: 'bible-devotional-log',
+    BIBLE_TRANSLATION: 'bible-translation',
   },
+  getDailyDevotional: () => ({ book: 'Psalms', chapter: 23, theme: 'The Lord is my shepherd' }),
 }));
 
 // Mock the hooks since they depend on Apollo
@@ -341,5 +343,126 @@ describe('Daily Devotional', () => {
     );
 
     expect(screen.getByText('bible.devotionalCompleted')).toBeInTheDocument();
+  });
+});
+
+describe('Bible Version Selector', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.clearAllMocks();
+  });
+
+  it('renders the version selector dropdown', () => {
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    expect(screen.getByLabelText('bible.versionSelect')).toBeInTheDocument();
+  });
+
+  it('defaults to WEB when no version is stored', () => {
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
+    expect(select.value).toBe('web');
+  });
+
+  it('restores saved version from localStorage', () => {
+    localStorage.setItem('bible-translation', 'kjv');
+
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
+    expect(select.value).toBe('kjv');
+  });
+
+  it('persists version selection to localStorage', async () => {
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await user.selectOptions(screen.getByLabelText('bible.versionSelect'), 'kjv');
+    expect(localStorage.getItem('bible-translation')).toBe('kjv');
+  });
+
+  it('shows all version options', () => {
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
+    expect(select.options.length).toBe(6);
+    // Check a few
+    expect(select.options[0].value).toBe('web');
+    expect(select.options[1].value).toBe('kjv');
+  });
+
+  it('reloads passage with new version when changed during passage view', async () => {
+    const mockLoadPassage = vi.fn();
+    const mod = await import('../hooks/useBibleData');
+    vi.mocked(mod.useBiblePassage).mockReturnValue({
+      passage: {
+        text: 'In the beginning God created the heavens and the earth.',
+        reference: 'Genesis 1',
+        translation: 'WEB',
+        verseCount: 31,
+      },
+      loading: false,
+      error: null,
+      selectedBook: 'Genesis',
+      selectedChapter: 1,
+      loadPassage: mockLoadPassage,
+    });
+    vi.mocked(mod.useVotd).mockReturnValue({
+      verse: { text: 'Test', reference: 'Test 1:1', translation: 'NIV', copyright: null },
+      loading: false,
+      error: null,
+    });
+
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    // Navigate to Genesis chapter 1
+    await user.click(screen.getByText('Genesis'));
+    await user.click(screen.getByText('1'));
+
+    // Clear mock calls from navigation
+    mockLoadPassage.mockClear();
+
+    // Change version to KJV
+    await user.selectOptions(screen.getByLabelText('bible.versionSelect'), 'kjv');
+
+    // Should reload passage with new translation
+    expect(mockLoadPassage).toHaveBeenCalledWith('Genesis', 1, 'kjv');
+  });
+
+  it('has accessible label for version selector', () => {
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    expect(screen.getByText('bible.version')).toBeInTheDocument();
+    expect(screen.getByLabelText('bible.versionSelect')).toBeInTheDocument();
   });
 });

@@ -50,6 +50,7 @@ export const StorageKeys = {
   WIDGET_LAYOUT: 'widget-dashboard-layout',
   RECENT_CITIES: 'recent-cities',
   LAST_SEEN_ANNOUNCEMENT: 'last-seen-announcement',
+  BIBLE_TRANSLATION: 'bible-translation',
 } as const;
 
 export interface CitySelectedEvent {

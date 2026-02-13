@@ -449,6 +449,7 @@ interface Announcement {
 | `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle |
 | `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle |
 | `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
+| `'bible-translation'` | Bible version ID (e.g., `'kjv'`) | Selected Bible version for passage reading |
 
 ### Browser SessionStorage — Geolocation
 

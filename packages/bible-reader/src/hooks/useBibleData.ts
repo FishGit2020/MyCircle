@@ -81,10 +81,10 @@ export function useBiblePassage() {
     fetchPolicy: 'cache-first',
   });
 
-  const loadPassage = useCallback((book: string, chapter: number) => {
+  const loadPassage = useCallback((book: string, chapter: number, translation?: string) => {
     setSelectedBook(book);
     setSelectedChapter(chapter);
-    fetchPassage({ variables: { reference: `${book} ${chapter}` } });
+    fetchPassage({ variables: { reference: `${book} ${chapter}`, translation } });
   }, [fetchPassage]);
 
   return {
