@@ -55,7 +55,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **Frontend** | React 18, TypeScript, Tailwind CSS |
 | **Build** | Vite 5, Module Federation |
 | **API** | Apollo Server 5, GraphQL |
-| **Data Sources** | OpenWeather API, Open-Meteo Archive API, Finnhub API, PodcastIndex API, Google Gemini |
+| **Data Sources** | OpenWeather API (weather + air pollution), Open-Meteo Archive API, Finnhub API, PodcastIndex API, Google Gemini |
 | **Hosting** | Firebase Hosting + Cloud Functions |
 | **Auth** | Firebase Auth (Google OAuth) |
 | **Database** | Cloud Firestore (user profiles, favorites, preferences) |
@@ -140,8 +140,9 @@ Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
 - Extracts `lat,lon` from URL params (`/weather/:coords`)
 - Listens for `CITY_SELECTED` DOM events from other MFEs
 - Uses `useWeatherData(lat, lon, true)` hook with real-time subscriptions
-- Renders: `CurrentWeather`, `HourlyForecast`, `Forecast`, `HistoricalWeather`
+- Renders: `CurrentWeather`, `HourlyForecast`, `Forecast`, `HistoricalWeather`, `AirQuality`
 - **Historical weather comparison** — "This day last year" using Open-Meteo archive API via `useHistoricalWeather` hook
+- **Air Quality Index** — real-time AQI (1-5 European scale) with color-coded levels (Good/Fair/Moderate/Poor/Very Poor), expandable pollutant breakdown via `useAirQuality` hook
 - Shows a "Live" badge when WebSocket subscription is active
 
 **Data Displayed:**
@@ -151,6 +152,7 @@ Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
 | **HourlyForecast** | 48-hour forecast with temp, icon, rain probability |
 | **Forecast** | 7-day grid with date, icon, max/min temps, description, rain probability |
 | **HistoricalWeather** | Side-by-side comparison of today vs same day last year (temp high/low, precipitation, wind, weather condition) |
+| **AirQuality** | AQI level badge, color-coded scale bar, expandable pollutant grid (PM2.5, PM10, O₃, NO₂, SO₂, CO) |
 
 ### Shared Package - `packages/shared/`
 
@@ -160,8 +162,8 @@ Library consumed by all micro frontends. Not a standalone app.
 - Apollo Client factory & singleton (`createApolloClient`, `getApolloClient`)
 - GraphQL queries & fragments (`GET_WEATHER`, `SEARCH_CITIES`, etc.)
 - Event bus (`eventBus`, `MFEvents`, `subscribeToMFEvent`)
-- Types (`City`, `CurrentWeather`, `ForecastDay`, `HistoricalWeatherDay`, etc.)
-- Hooks (`useWeatherData`, `useHistoricalWeather`)
+- Types (`City`, `CurrentWeather`, `ForecastDay`, `HistoricalWeatherDay`, `AirQuality`, etc.)
+- Hooks (`useWeatherData`, `useHistoricalWeather`, `useAirQuality`)
 - i18n (`useTranslation`)
 - Utility functions (weather icons, formatting)
 
@@ -433,6 +435,7 @@ typePolicies: {
 | `GET_FORECAST` | `lat, lon` | `ForecastDay[]` |
 | `GET_HOURLY_FORECAST` | `lat, lon` | `HourlyForecast[]` |
 | `GET_HISTORICAL_WEATHER` | `lat, lon, date` | `HistoricalWeatherDay` (Open-Meteo archive) |
+| `GET_AIR_QUALITY` | `lat, lon` | `AirQuality` (OpenWeather Air Pollution API) |
 | `SEARCH_CITIES` | `query, limit` | `City[]` |
 | `REVERSE_GEOCODE` | `lat, lon` | `City` |
 | `WEATHER_UPDATES` (subscription) | `lat, lon` | `WeatherUpdate` (real-time) |
@@ -571,6 +574,8 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **Queries** | `packages/shared/src/apollo/queries.ts` | GraphQL queries & subscription |
 | **useWeatherData** | `packages/shared/src/hooks/useWeatherData.ts` | Weather data fetching + real-time |
 | **useHistoricalWeather** | `packages/shared/src/hooks/useHistoricalWeather.ts` | Historical weather (Open-Meteo) |
+| **useAirQuality** | `packages/shared/src/hooks/useAirQuality.ts` | Air quality data (OpenWeather Air Pollution) |
+| **AirQuality** | `packages/weather-display/src/components/AirQuality.tsx` | AQI display with pollutant breakdown |
 | **i18n** | `packages/shared/src/i18n/` | Translation files and hook |
 | **GraphQL Server** | `server/index.ts` | Local dev Express + Apollo + WebSocket |
 | **GraphQL Schema** | `server/graphql/schema.ts` | Type definitions + subscription |

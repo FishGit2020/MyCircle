@@ -95,6 +95,21 @@ const en = {
   'dashboard.sunriseSunset': 'Sunrise & Sunset',
   'dashboard.weatherMap': 'Weather Map',
   'dashboard.historicalWeather': 'This Day Last Year',
+  'dashboard.airQuality': 'Air Quality',
+
+  // Air Quality
+  'weather.airQuality': 'Air Quality Index',
+  'weather.aqiGood': 'Good',
+  'weather.aqiGoodDesc': 'Air quality is satisfactory with little or no risk.',
+  'weather.aqiFair': 'Fair',
+  'weather.aqiFairDesc': 'Acceptable air quality. Some pollutants may pose a moderate concern for sensitive individuals.',
+  'weather.aqiModerate': 'Moderate',
+  'weather.aqiModerateDesc': 'Sensitive groups may experience health effects. The general public is less likely to be affected.',
+  'weather.aqiPoor': 'Poor',
+  'weather.aqiPoorDesc': 'Health effects possible for everyone. Sensitive groups may experience more serious effects.',
+  'weather.aqiVeryPoor': 'Very Poor',
+  'weather.aqiVeryPoorDesc': 'Health alert: everyone may experience serious health effects. Avoid outdoor activity.',
+  'weather.pollutants': 'Pollutants',
 
   // Historical Weather
   'weather.historicalTitle': 'This Day Last Year',
@@ -688,6 +703,21 @@ const es: Record<TranslationKey, string> = {
   'dashboard.sunriseSunset': 'Amanecer y atardecer',
   'dashboard.weatherMap': 'Mapa meteorol\u00f3gico',
   'dashboard.historicalWeather': 'Este d\u00eda el a\u00f1o pasado',
+  'dashboard.airQuality': 'Calidad del aire',
+
+  // Air Quality
+  'weather.airQuality': '\u00cdndice de calidad del aire',
+  'weather.aqiGood': 'Buena',
+  'weather.aqiGoodDesc': 'La calidad del aire es satisfactoria con poco o ning\u00fan riesgo.',
+  'weather.aqiFair': 'Aceptable',
+  'weather.aqiFairDesc': 'Calidad aceptable. Algunos contaminantes pueden ser preocupantes para personas sensibles.',
+  'weather.aqiModerate': 'Moderada',
+  'weather.aqiModerateDesc': 'Grupos sensibles pueden experimentar efectos en la salud.',
+  'weather.aqiPoor': 'Mala',
+  'weather.aqiPoorDesc': 'Posibles efectos en la salud para todos. Grupos sensibles pueden verse m\u00e1s afectados.',
+  'weather.aqiVeryPoor': 'Muy mala',
+  'weather.aqiVeryPoorDesc': 'Alerta sanitaria: todos pueden experimentar efectos graves. Evite actividad al aire libre.',
+  'weather.pollutants': 'Contaminantes',
 
   // Historical Weather
   'weather.historicalTitle': 'Este d\u00eda el a\u00f1o pasado',

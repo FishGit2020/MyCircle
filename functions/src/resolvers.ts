@@ -156,6 +156,36 @@ async function getHourlyForecast(apiKey: string, lat: number, lon: number): Prom
   }));
 }
 
+// ─── Air Quality via OpenWeatherMap (free tier) ────────────────
+
+async function getAirQuality(apiKey: string, lat: number, lon: number) {
+  const cacheKey = `aqi:${lat.toFixed(2)}:${lon.toFixed(2)}`;
+  const cached = weatherCache.get<any>(cacheKey);
+  if (cached) return cached;
+
+  const response = await axios.get('https://api.openweathermap.org/data/2.5/air_pollution', {
+    params: { lat, lon, appid: apiKey },
+    timeout: 5000,
+  });
+
+  const item = response.data.list?.[0];
+  if (!item) return null;
+
+  const result = {
+    aqi: item.main.aqi,
+    co: item.components.co,
+    no: item.components.no,
+    no2: item.components.no2,
+    o3: item.components.o3,
+    so2: item.components.so2,
+    pm2_5: item.components.pm2_5,
+    pm10: item.components.pm10,
+  };
+
+  weatherCache.set(cacheKey, result, 600);
+  return result;
+}
+
 // ─── Historical Weather via Open-Meteo (free, no API key) ──────
 
 function wmoCodeToDescription(code: number): { description: string; icon: string } {
@@ -508,6 +538,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         const data = await getHourlyForecast(apiKey, lat, lon);
         weatherCache.set(cacheKey, data);
         return data;
+      },
+
+      airQuality: async (_: any, { lat, lon }: { lat: number; lon: number }) => {
+        const apiKey = getApiKey();
+        return await getAirQuality(apiKey, lat, lon);
       },
 
       historicalWeather: async (_: any, { lat, lon, date }: { lat: number; lon: number; date: string }) => {

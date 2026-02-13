@@ -65,6 +65,21 @@ export const GET_WEATHER = gql`
   }
 `;
 
+export const GET_AIR_QUALITY = gql`
+  query GetAirQuality($lat: Float!, $lon: Float!) {
+    airQuality(lat: $lat, lon: $lon) {
+      aqi
+      co
+      no
+      no2
+      o3
+      so2
+      pm2_5
+      pm10
+    }
+  }
+`;
+
 export const GET_HISTORICAL_WEATHER = gql`
   query GetHistoricalWeather($lat: Float!, $lon: Float!, $date: String!) {
     historicalWeather(lat: $lat, lon: $lon, date: $date) {
