@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import DashboardPage from './DashboardPage';
 
-// Mock @mycircle/shared — useTranslation (identity) + Apollo hooks for useDailyVerse
+// Mock @mycircle/shared — useTranslation (identity) + Apollo hooks for useDailyVerse + daily verse utils
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -11,6 +11,13 @@ vi.mock('@mycircle/shared', () => ({
   // useDailyVerse calls useQuery(GET_BIBLE_VOTD, { skip: true }) on initial render
   useQuery: () => ({ data: null, loading: false, error: null }),
   GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
+  getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
+  getAllDailyVerses: () => [{ text: 'Test verse', reference: 'Test 1:1' }],
+  StorageKeys: {
+    STOCK_WATCHLIST: 'stock-watchlist',
+    PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
+    WORSHIP_SONGS_CACHE: 'worship-songs-cache',
+  },
 }));
 
 // Mock useAuth — unauthenticated user with no cities

@@ -18,6 +18,8 @@ vi.mock('@mycircle/shared', () => ({
   subscribeToMFEvent: () => () => {},
   useQuery: () => ({ data: null, loading: false, error: null }),
   GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
+  getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
+  getAllDailyVerses: () => [{ text: 'Test verse', reference: 'Test 1:1' }],
 }));
 
 vi.mock('../context/AuthContext', () => ({
