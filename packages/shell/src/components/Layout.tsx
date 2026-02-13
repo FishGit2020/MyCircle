@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import ThemeToggle from './ThemeToggle';
@@ -8,42 +8,19 @@ import OfflineIndicator from './OfflineIndicator';
 import LanguageSelector from './LanguageSelector';
 import FeedbackButton from './FeedbackButton';
 import GlobalAudioPlayer from './GlobalAudioPlayer';
+import CommandPalette from './CommandPalette';
+import BottomNav from './BottomNav';
 import { useRemoteConfigContext } from '../context/RemoteConfigContext';
 
 export default function Layout() {
   const { t } = useTranslation();
   const { config, loading: configLoading } = useRemoteConfigContext();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [hasActivePlayer, setHasActivePlayer] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const toggleRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
 
   const handlePlayerStateChange = useCallback((active: boolean) => {
     setHasActivePlayer(active);
   }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [location.pathname]);
-
-  // Close mobile menu when clicking outside (excluding the toggle button)
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-      if (
-        menuRef.current && !menuRef.current.contains(target) &&
-        toggleRef.current && !toggleRef.current.contains(target)
-      ) {
-        setMenuOpen(false);
-      }
-    }
-    if (menuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [menuOpen]);
 
   const navLinkClass = (path: string) => {
     const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
@@ -51,15 +28,6 @@ export default function Layout() {
       isActive
         ? 'text-blue-600 dark:text-blue-400'
         : 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
-    }`;
-  };
-
-  const mobileNavLinkClass = (path: string) => {
-    const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
-    return `block px-3 py-2 rounded-lg text-sm font-medium transition ${
-      isActive
-        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
     }`;
   };
 
@@ -108,73 +76,42 @@ export default function Layout() {
               <Link to="/ai" className={navLinkClass('/ai')}>
                 {t('nav.ai')}
               </Link>
+              <button
+                onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                aria-label="Search (Ctrl+K)"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span className="hidden lg:inline">Search</span>
+                <kbd className="hidden lg:inline px-1 py-0.5 bg-white dark:bg-gray-800 rounded text-[10px] border border-gray-200 dark:border-gray-600">Ctrl+K</kbd>
+              </button>
               <LanguageSelector />
               <ThemeToggle />
               <NotificationBell />
               <UserMenu />
             </nav>
 
-            {/* Mobile controls: small buttons + hamburger */}
+            {/* Mobile controls (bottom nav replaces hamburger) */}
             <div className="flex md:!hidden items-center space-x-2">
               <LanguageSelector />
               <ThemeToggle />
               <NotificationBell />
-              <button
-                ref={toggleRef}
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-colors"
-                aria-label="Toggle menu"
-              >
-                {menuOpen ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                )}
-              </button>
+              <UserMenu />
             </div>
           </div>
-
-          {/* Mobile dropdown menu */}
-          {menuOpen && (
-            <div ref={menuRef} className="md:hidden mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-1">
-              <Link to="/" className={mobileNavLinkClass('/')}>
-                {t('nav.home')}
-              </Link>
-              <Link to="/weather" className={mobileNavLinkClass('/weather')}>
-                {t('dashboard.weather')}
-              </Link>
-              <Link to="/stocks" className={mobileNavLinkClass('/stocks')}>
-                {t('nav.stocks')}
-              </Link>
-              <Link to="/podcasts" className={mobileNavLinkClass('/podcasts')}>
-                {t('nav.podcasts')}
-              </Link>
-              <Link to="/bible" className={mobileNavLinkClass('/bible')}>
-                Bible
-              </Link>
-              <Link to="/worship" className={mobileNavLinkClass('/worship')}>
-                {t('nav.worship')}
-              </Link>
-              <Link to="/ai" className={mobileNavLinkClass('/ai')}>
-                {t('nav.ai')}
-              </Link>
-              <div className="px-3 py-2">
-                <UserMenu />
-              </div>
-            </div>
-          )}
         </div>
       </header>
 
-      <main id="main-content" className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-24' : ''}`}>
+      <main id="main-content" className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-28 md:pb-24' : 'pb-20 md:pb-8'}`}>
         <Outlet />
       </main>
 
       <GlobalAudioPlayer onPlayerStateChange={handlePlayerStateChange} />
+
+      <BottomNav hasActivePlayer={hasActivePlayer} />
+      <CommandPalette />
 
       <FeedbackButton hasActivePlayer={hasActivePlayer} />
 

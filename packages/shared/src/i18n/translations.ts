@@ -385,6 +385,66 @@ const en = {
   'pwa.newVersion': 'A new version is available',
   'pwa.reload': 'Reload',
   'pwa.dismiss': 'Dismiss',
+
+  // Bible
+  'nav.bible': 'Bible',
+  'bible.readScripture': 'Read Scripture',
+
+  // Toast messages
+  'toast.addedToWatchlist': 'Added to watchlist',
+  'toast.removedFromWatchlist': 'Removed from watchlist',
+  'toast.subscribed': 'Subscribed',
+  'toast.unsubscribed': 'Unsubscribed',
+  'toast.addedToFavorites': 'Added to favorites',
+  'toast.removedFromFavorites': 'Removed from favorites',
+  'toast.copiedToClipboard': 'Copied to clipboard',
+  'toast.songSaved': 'Song saved',
+  'toast.songDeleted': 'Song deleted',
+
+  // Breadcrumb
+  'breadcrumb.home': 'Home',
+  'breadcrumb.weather': 'Weather',
+  'breadcrumb.stocks': 'Stocks',
+  'breadcrumb.podcasts': 'Podcasts',
+  'breadcrumb.bible': 'Bible',
+  'breadcrumb.worship': 'Worship',
+  'breadcrumb.ai': 'AI Assistant',
+
+  // Command palette
+  'commandPalette.placeholder': 'Search cities, stocks, podcasts, Bible, songs...',
+  'commandPalette.noResults': 'No results found',
+  'commandPalette.hint': 'Press Ctrl+K to search anywhere',
+  'commandPalette.recentSearches': 'Recent Searches',
+  'commandPalette.quickActions': 'Quick Actions',
+  'commandPalette.goToWeather': 'Go to Weather',
+  'commandPalette.goToStocks': 'Go to Stocks',
+  'commandPalette.goToPodcasts': 'Go to Podcasts',
+  'commandPalette.goToBible': 'Go to Bible',
+  'commandPalette.goToWorship': 'Go to Worship',
+  'commandPalette.goToAi': 'Go to AI Assistant',
+
+  // Bottom nav
+  'bottomNav.home': 'Home',
+  'bottomNav.weather': 'Weather',
+  'bottomNav.stocks': 'Stocks',
+  'bottomNav.podcasts': 'Podcasts',
+  'bottomNav.more': 'More',
+
+  // Onboarding
+  'onboarding.welcome': 'Welcome to MyCircle!',
+  'onboarding.step1Title': 'Search for a City',
+  'onboarding.step1Desc': 'Start by searching for your city to see the weather forecast.',
+  'onboarding.step2Title': 'Track Stocks',
+  'onboarding.step2Desc': 'Add your favorite stocks to your watchlist for quick access.',
+  'onboarding.step3Title': 'Discover Podcasts',
+  'onboarding.step3Desc': 'Subscribe to podcasts and listen on the go.',
+  'onboarding.step4Title': 'Read Scripture',
+  'onboarding.step4Desc': 'Explore the Bible with verse of the day and reading plans.',
+  'onboarding.getStarted': 'Get Started',
+  'onboarding.next': 'Next',
+  'onboarding.skip': 'Skip',
+  'onboarding.done': 'Done',
+  'onboarding.stepOf': 'Step {current} of {total}',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -770,6 +830,66 @@ const es: Record<TranslationKey, string> = {
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
   'pwa.reload': 'Recargar',
   'pwa.dismiss': 'Cerrar',
+
+  // Bible
+  'nav.bible': 'Biblia',
+  'bible.readScripture': 'Leer las Escrituras',
+
+  // Toast messages
+  'toast.addedToWatchlist': 'Agregado a la lista',
+  'toast.removedFromWatchlist': 'Eliminado de la lista',
+  'toast.subscribed': 'Suscrito',
+  'toast.unsubscribed': 'Suscripci\u00f3n cancelada',
+  'toast.addedToFavorites': 'Agregado a favoritos',
+  'toast.removedFromFavorites': 'Eliminado de favoritos',
+  'toast.copiedToClipboard': 'Copiado al portapapeles',
+  'toast.songSaved': 'Canci\u00f3n guardada',
+  'toast.songDeleted': 'Canci\u00f3n eliminada',
+
+  // Breadcrumb
+  'breadcrumb.home': 'Inicio',
+  'breadcrumb.weather': 'Clima',
+  'breadcrumb.stocks': 'Acciones',
+  'breadcrumb.podcasts': 'Podcasts',
+  'breadcrumb.bible': 'Biblia',
+  'breadcrumb.worship': 'Adoraci\u00f3n',
+  'breadcrumb.ai': 'Asistente IA',
+
+  // Command palette
+  'commandPalette.placeholder': 'Buscar ciudades, acciones, podcasts, Biblia, canciones...',
+  'commandPalette.noResults': 'Sin resultados',
+  'commandPalette.hint': 'Presiona Ctrl+K para buscar',
+  'commandPalette.recentSearches': 'B\u00fasquedas recientes',
+  'commandPalette.quickActions': 'Acciones r\u00e1pidas',
+  'commandPalette.goToWeather': 'Ir a Clima',
+  'commandPalette.goToStocks': 'Ir a Acciones',
+  'commandPalette.goToPodcasts': 'Ir a Podcasts',
+  'commandPalette.goToBible': 'Ir a Biblia',
+  'commandPalette.goToWorship': 'Ir a Adoraci\u00f3n',
+  'commandPalette.goToAi': 'Ir a Asistente IA',
+
+  // Bottom nav
+  'bottomNav.home': 'Inicio',
+  'bottomNav.weather': 'Clima',
+  'bottomNav.stocks': 'Acciones',
+  'bottomNav.podcasts': 'Podcasts',
+  'bottomNav.more': 'M\u00e1s',
+
+  // Onboarding
+  'onboarding.welcome': '\u00a1Bienvenido a MyCircle!',
+  'onboarding.step1Title': 'Busca una Ciudad',
+  'onboarding.step1Desc': 'Comienza buscando tu ciudad para ver el pron\u00f3stico del clima.',
+  'onboarding.step2Title': 'Sigue Acciones',
+  'onboarding.step2Desc': 'Agrega tus acciones favoritas a tu lista de seguimiento.',
+  'onboarding.step3Title': 'Descubre Podcasts',
+  'onboarding.step3Desc': 'Suscr\u00edbete a podcasts y esc\u00fachalos en cualquier lugar.',
+  'onboarding.step4Title': 'Lee las Escrituras',
+  'onboarding.step4Desc': 'Explora la Biblia con el vers\u00edculo del d\u00eda y planes de lectura.',
+  'onboarding.getStarted': 'Comenzar',
+  'onboarding.next': 'Siguiente',
+  'onboarding.skip': 'Omitir',
+  'onboarding.done': 'Listo',
+  'onboarding.stepOf': 'Paso {current} de {total}',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {
