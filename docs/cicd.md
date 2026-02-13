@@ -9,18 +9,25 @@ MyCircle uses **GitHub Actions** for continuous integration, end-to-end testing,
 ```
   PR opened to main
        │
-       ├──► CI  (ci.yml)                      ⬚ Skipped if only docs changed
+       ├──► CI  (ci.yml)               ✅ Required   ⬚ Skipped if only docs changed
        │     ├─ pnpm install --frozen-lockfile
        │     ├─ Check shared dependency versions
        │     ├─ Build shared package (dist/)
        │     ├─ Typecheck all packages
        │     └─ Unit tests (root + all MFEs)
        │
-       └──► E2E  (e2e.yml)                    ⬚ Skipped if only docs changed
-             ├─ pnpm install --frozen-lockfile
-             ├─ Install Playwright browsers (cached)
-             ├─ Build full app (production)
-             └─ Run Playwright E2E tests against production build
+       ├──► E2E  (e2e.yml → e2e job)   ✅ Required   ⬚ Skipped if only docs changed
+       │     ├─ Build full app (firebase:build)
+       │     ├─ Serve dist/firebase/ via express.static
+       │     └─ Playwright E2E tests (browser-mocked)
+       │
+       └──► E2E Emulator (e2e.yml → e2e-emulator job)   ⚪ Optional
+             ├─ Build full app + setup Java
+             ├─ Start mock API server + Firebase emulators
+             ├─ Seed Firestore emulator
+             └─ Playwright E2E tests (full-stack, no browser mocks)
+
+  Both CI + E2E pass → PR can be merged (squash)
 
   PR merged → push to main
        │
@@ -32,6 +39,8 @@ MyCircle uses **GitHub Actions** for continuous integration, end-to-end testing,
              ├─ Deploy Cloud Functions
              └─ Smoke test (HTTP 200 check)
 ```
+
+> **Branch protection:** `main` requires `ci` and `e2e` checks to pass before merge. Admin bypass is disabled. See [docs/pr-lifecycle.md](./pr-lifecycle.md) for full PR workflow details.
 
 ---
 
@@ -79,16 +88,33 @@ Concurrency: only one CI run per PR branch (previous runs cancelled).
 
 **Trigger:** Pull request to `main` (code changes only)
 
+This workflow runs two parallel jobs:
+
+#### Job: `e2e` (required check)
+
 | Step | Command | Purpose |
 |------|---------|---------|
 | Checkout + Setup | Same as CI | — |
 | Cache browsers | `actions/cache@v4` | Cache `~/.cache/ms-playwright` to avoid re-downloading ~400MB |
 | Playwright browsers | `npx playwright install --with-deps` | Install browsers (skipped if cache hit) |
-| Build | `pnpm build` | Full production build of all MFEs |
-| E2E tests | `pnpm test:e2e` | Playwright tests against the production build (`pnpm start`) |
+| Build | `pnpm firebase:build` | Full production build + assembly into `dist/firebase/` |
+| E2E tests | `pnpm test:e2e` | Playwright tests against static production build |
 | Upload report | `actions/upload-artifact@v4` | Upload Playwright HTML report + traces on failure (14-day retention) |
 
-> **CI vs local:** In CI, Playwright starts `pnpm start` (production server). Locally, it starts `pnpm dev`. This is controlled by `process.env.CI` in `playwright.config.ts`.
+> **CI vs local:** In CI, Playwright starts `pnpm start:static` (serves `dist/firebase/` via Express on port 3000). Locally, it starts `pnpm dev` (all MFE dev servers). This is controlled by `process.env.CI` in `playwright.config.ts`. All API calls are mocked at the browser level via `page.route()`.
+
+#### Job: `e2e-emulator` (optional check)
+
+| Step | Command | Purpose |
+|------|---------|---------|
+| Checkout + Setup | Same as CI | — |
+| Setup Java | `actions/setup-java@v4` (Temurin 21) | Required by Firebase emulators |
+| Playwright browsers | `npx playwright install --with-deps chromium` | Install Chromium only |
+| Build | `pnpm firebase:build` | Full production build |
+| Emulator tests | `pnpm emulator:test` | Starts mock API server + Firebase emulators, seeds Firestore, runs Playwright |
+| Upload report | `actions/upload-artifact@v4` | Upload Playwright HTML report (14-day retention) |
+
+> **Full-stack testing:** Unlike the mocked `e2e` job, emulator tests make real requests through the full chain: Browser → Hosting Emulator → Functions Emulator → Mock API Server. No browser-level mocking.
 
 Concurrency: only one E2E run per PR branch.
 
@@ -152,6 +178,9 @@ pnpm test:e2e
 
 # E2E with visible browser
 pnpm test:e2e:headed
+
+# Emulator E2E tests (full-stack, requires Java for Firebase emulators)
+pnpm emulator:test
 ```
 
 ---
@@ -209,6 +238,7 @@ For private repos, ensure **Actions** is enabled under **Settings → Actions �
 
 | Resource | URL |
 |----------|-----|
+| **PR Lifecycle & Branch Protection** | [docs/pr-lifecycle.md](./pr-lifecycle.md) |
 | GitHub Actions docs | https://docs.github.com/en/actions |
 | pnpm/action-setup | https://github.com/pnpm/action-setup |
 | actions/setup-node | https://github.com/actions/setup-node |
