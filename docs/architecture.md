@@ -44,7 +44,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
                                 |
                                 v
 +──────────────────────────────────────────────────────────────────────────+
-|  OpenWeather API  ·  Finnhub API  ·  PodcastIndex API  ·  Google Gemini |
+|  OpenWeather API · Open-Meteo Archive · Finnhub API · PodcastIndex API · Gemini |
 +──────────────────────────────────────────────────────────────────────────+
 ```
 
@@ -55,7 +55,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **Frontend** | React 18, TypeScript, Tailwind CSS |
 | **Build** | Vite 5, Module Federation |
 | **API** | Apollo Server 5, GraphQL |
-| **Data Sources** | OpenWeather API, Finnhub API, PodcastIndex API, Google Gemini |
+| **Data Sources** | OpenWeather API, Open-Meteo Archive API, Finnhub API, PodcastIndex API, Google Gemini |
 | **Hosting** | Firebase Hosting + Cloud Functions |
 | **Auth** | Firebase Auth (Google OAuth) |
 | **Database** | Cloud Firestore (user profiles, favorites, preferences) |
@@ -140,7 +140,8 @@ Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
 - Extracts `lat,lon` from URL params (`/weather/:coords`)
 - Listens for `CITY_SELECTED` DOM events from other MFEs
 - Uses `useWeatherData(lat, lon, true)` hook with real-time subscriptions
-- Renders: `CurrentWeather`, `HourlyForecast`, `Forecast`
+- Renders: `CurrentWeather`, `HourlyForecast`, `Forecast`, `HistoricalWeather`
+- **Historical weather comparison** — "This day last year" using Open-Meteo archive API via `useHistoricalWeather` hook
 - Shows a "Live" badge when WebSocket subscription is active
 
 **Data Displayed:**
@@ -149,6 +150,7 @@ Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
 | **CurrentWeather** | Temperature, feels-like, weather icon, description, humidity, wind speed + direction, pressure, cloudiness |
 | **HourlyForecast** | 48-hour forecast with temp, icon, rain probability |
 | **Forecast** | 7-day grid with date, icon, max/min temps, description, rain probability |
+| **HistoricalWeather** | Side-by-side comparison of today vs same day last year (temp high/low, precipitation, wind, weather condition) |
 
 ### Shared Package - `packages/shared/`
 
@@ -158,8 +160,8 @@ Library consumed by all micro frontends. Not a standalone app.
 - Apollo Client factory & singleton (`createApolloClient`, `getApolloClient`)
 - GraphQL queries & fragments (`GET_WEATHER`, `SEARCH_CITIES`, etc.)
 - Event bus (`eventBus`, `MFEvents`, `subscribeToMFEvent`)
-- Types (`City`, `CurrentWeather`, `ForecastDay`, etc.)
-- Hooks (`useWeatherData`)
+- Types (`City`, `CurrentWeather`, `ForecastDay`, `HistoricalWeatherDay`, etc.)
+- Hooks (`useWeatherData`, `useHistoricalWeather`)
 - i18n (`useTranslation`)
 - Utility functions (weather icons, formatting)
 
@@ -370,6 +372,11 @@ interface RecentCity {
 | `'stock-live-enabled'` | `'true'` or `'false'` | Stock live polling toggle state |
 | `'stock-tracker-watchlist'` | JSON array | Stock watchlist items |
 | `'podcast-subscriptions'` | JSON array of string IDs | Subscribed podcast feed IDs |
+| `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles |
+| `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
+| `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle |
+| `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle |
+| `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle |
 
 ### Browser SessionStorage — Geolocation
 
@@ -425,6 +432,7 @@ typePolicies: {
 | `GET_CURRENT_WEATHER` | `lat, lon` | `CurrentWeather` |
 | `GET_FORECAST` | `lat, lon` | `ForecastDay[]` |
 | `GET_HOURLY_FORECAST` | `lat, lon` | `HourlyForecast[]` |
+| `GET_HISTORICAL_WEATHER` | `lat, lon, date` | `HistoricalWeatherDay` (Open-Meteo archive) |
 | `SEARCH_CITIES` | `query, limit` | `City[]` |
 | `REVERSE_GEOCODE` | `lat, lon` | `City` |
 | `WEATHER_UPDATES` (subscription) | `lat, lon` | `WeatherUpdate` (real-time) |
@@ -537,6 +545,9 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **FavoriteCities** | `packages/shell/src/components/FavoriteCities.tsx` | Favorited cities grid |
 | **WeatherCompare** | `packages/shell/src/components/WeatherCompare.tsx` | Legacy multi-city comparison page |
 | **WeatherComparison** | `packages/weather-display/src/components/WeatherComparison.tsx` | Inline weather comparison (within weather detail) |
+| **HistoricalWeather** | `packages/weather-display/src/components/HistoricalWeather.tsx` | "This day last year" side-by-side comparison |
+| **WidgetDashboard** | `packages/shell/src/components/WidgetDashboard.tsx` | Drag-and-drop customizable widget grid |
+| **PwaInstallPrompt** | `packages/shell/src/components/PwaInstallPrompt.tsx` | Add to Home Screen banner |
 | **DashboardPage** | `packages/shell/src/pages/DashboardPage.tsx` | Dashboard homepage with quick access cards |
 | **SubscribedPodcasts** | `packages/podcast-player/src/components/SubscribedPodcasts.tsx` | Subscribed podcasts tab view |
 | **NotificationBell** | `packages/shell/src/components/NotificationBell.tsx` | Push notification UI |
@@ -559,6 +570,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **Apollo Client** | `packages/shared/src/apollo/client.ts` | GraphQL setup, caching |
 | **Queries** | `packages/shared/src/apollo/queries.ts` | GraphQL queries & subscription |
 | **useWeatherData** | `packages/shared/src/hooks/useWeatherData.ts` | Weather data fetching + real-time |
+| **useHistoricalWeather** | `packages/shared/src/hooks/useHistoricalWeather.ts` | Historical weather (Open-Meteo) |
 | **i18n** | `packages/shared/src/i18n/` | Translation files and hook |
 | **GraphQL Server** | `server/index.ts` | Local dev Express + Apollo + WebSocket |
 | **GraphQL Schema** | `server/graphql/schema.ts` | Type definitions + subscription |

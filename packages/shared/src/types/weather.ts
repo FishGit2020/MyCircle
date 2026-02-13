@@ -49,3 +49,13 @@ export interface HourlyForecast {
   pop: number;
   wind_speed: number;
 }
+
+export interface HistoricalWeatherDay {
+  date: string;
+  temp_max: number;
+  temp_min: number;
+  precipitation: number;
+  wind_speed_max: number;
+  weather_description: string;
+  weather_icon: string;
+}

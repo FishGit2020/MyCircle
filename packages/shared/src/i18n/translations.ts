@@ -94,6 +94,19 @@ const en = {
   'dashboard.whatToWear': 'What to Wear',
   'dashboard.sunriseSunset': 'Sunrise & Sunset',
   'dashboard.weatherMap': 'Weather Map',
+  'dashboard.historicalWeather': 'This Day Last Year',
+
+  // Historical Weather
+  'weather.historicalTitle': 'This Day Last Year',
+  'weather.historicalDesc': 'Compare today\u2019s weather with this day one year ago',
+  'weather.lastYear': 'Last Year',
+  'weather.tempHigh': 'High',
+  'weather.tempLow': 'Low',
+  'weather.precipitation': 'Precipitation',
+  'weather.windMax': 'Max Wind',
+  'weather.warmer': 'warmer',
+  'weather.cooler': 'cooler',
+  'weather.noHistoricalData': 'Historical data not available',
 
   // Notifications
   'notifications.enable': 'Enable notifications',
@@ -674,6 +687,19 @@ const es: Record<TranslationKey, string> = {
   'dashboard.whatToWear': 'Qu\u00e9 ponerse',
   'dashboard.sunriseSunset': 'Amanecer y atardecer',
   'dashboard.weatherMap': 'Mapa meteorol\u00f3gico',
+  'dashboard.historicalWeather': 'Este d\u00eda el a\u00f1o pasado',
+
+  // Historical Weather
+  'weather.historicalTitle': 'Este d\u00eda el a\u00f1o pasado',
+  'weather.historicalDesc': 'Compara el clima de hoy con este d\u00eda hace un a\u00f1o',
+  'weather.lastYear': 'A\u00f1o pasado',
+  'weather.tempHigh': 'M\u00e1xima',
+  'weather.tempLow': 'M\u00ednima',
+  'weather.precipitation': 'Precipitaci\u00f3n',
+  'weather.windMax': 'Viento m\u00e1x.',
+  'weather.warmer': 'm\u00e1s c\u00e1lido',
+  'weather.cooler': 'm\u00e1s fr\u00edo',
+  'weather.noHistoricalData': 'Datos hist\u00f3ricos no disponibles',
 
   // Notifications
   'notifications.enable': 'Activar notificaciones',

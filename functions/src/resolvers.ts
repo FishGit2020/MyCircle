@@ -156,6 +156,57 @@ async function getHourlyForecast(apiKey: string, lat: number, lon: number): Prom
   }));
 }
 
+// ─── Historical Weather via Open-Meteo (free, no API key) ──────
+
+function wmoCodeToDescription(code: number): { description: string; icon: string } {
+  if (code === 0) return { description: 'Clear sky', icon: '01d' };
+  if (code <= 3) return { description: code === 1 ? 'Mainly clear' : code === 2 ? 'Partly cloudy' : 'Overcast', icon: code <= 1 ? '02d' : '04d' };
+  if (code <= 48) return { description: 'Fog', icon: '50d' };
+  if (code <= 55) return { description: 'Drizzle', icon: '09d' };
+  if (code <= 65) return { description: 'Rain', icon: '10d' };
+  if (code <= 75) return { description: 'Snow', icon: '13d' };
+  if (code <= 82) return { description: 'Rain showers', icon: '09d' };
+  if (code === 95) return { description: 'Thunderstorm', icon: '11d' };
+  if (code <= 99) return { description: 'Thunderstorm with hail', icon: '11d' };
+  return { description: 'Unknown', icon: '03d' };
+}
+
+async function getHistoricalWeather(lat: number, lon: number, date: string) {
+  const cacheKey = `historical:${lat.toFixed(2)}:${lon.toFixed(2)}:${date}`;
+  const cached = weatherCache.get<any>(cacheKey);
+  if (cached) return cached;
+
+  const response = await axios.get('https://archive-api.open-meteo.com/v1/archive', {
+    params: {
+      latitude: lat,
+      longitude: lon,
+      start_date: date,
+      end_date: date,
+      daily: 'temperature_2m_max,temperature_2m_min,weathercode,windspeed_10m_max,precipitation_sum',
+      timezone: 'auto',
+    },
+    timeout: 10000,
+  });
+
+  const daily = response.data.daily;
+  if (!daily || !daily.time || daily.time.length === 0) return null;
+
+  const weatherCode = daily.weathercode?.[0] ?? 0;
+  const { description, icon } = wmoCodeToDescription(weatherCode);
+  const result = {
+    date: daily.time[0],
+    temp_max: Math.round(daily.temperature_2m_max[0]),
+    temp_min: Math.round(daily.temperature_2m_min[0]),
+    precipitation: daily.precipitation_sum?.[0] ?? 0,
+    wind_speed_max: daily.windspeed_10m_max?.[0] ?? 0,
+    weather_description: description,
+    weather_icon: icon,
+  };
+
+  weatherCache.set(cacheKey, result, 86400); // Cache for 24h — historical data doesn't change
+  return result;
+}
+
 async function searchCities(apiKey: string, query: string, limit: number = 5): Promise<City[]> {
   const client = createGeoClient(apiKey);
   const response = await client.get('/direct', { params: { q: query, limit } });
@@ -457,6 +508,10 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         const data = await getHourlyForecast(apiKey, lat, lon);
         weatherCache.set(cacheKey, data);
         return data;
+      },
+
+      historicalWeather: async (_: any, { lat, lon, date }: { lat: number; lon: number; date: string }) => {
+        return await getHistoricalWeather(lat, lon, date);
       },
 
       searchCities: async (_: any, { query, limit = 5 }: { query: string; limit?: number }) => {
