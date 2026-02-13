@@ -1,13 +1,15 @@
 import React from 'react';
 import { useTranslation } from '@mycircle/shared';
-import { StockCandle } from '../hooks/useStockData';
+import { StockCandle, Timeframe, TIMEFRAMES } from '../hooks/useStockData';
 
 interface Props {
   symbol: string;
   candles: StockCandle;
+  timeframe?: Timeframe;
+  onTimeframeChange?: (tf: Timeframe) => void;
 }
 
-export default function StockChart({ symbol, candles }: Props) {
+export default function StockChart({ symbol, candles, timeframe = '1M', onTimeframeChange }: Props) {
   const { t, locale } = useTranslation();
 
   if (!candles || candles.s === 'no_data' || !candles.c || candles.c.length < 2) {
@@ -81,20 +83,39 @@ export default function StockChart({ symbol, candles }: Props) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{symbol}</h3>
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-          <span className="flex items-center gap-1">
-            <span className="w-3 h-0.5 inline-block rounded" style={{ backgroundColor: lineColor }} />
-            {t('stocks.price')}
-          </span>
-          <span>
-            {t('stocks.high')}: ${maxPrice.toFixed(2)}
-          </span>
-          <span>
-            {t('stocks.low')}: ${minPrice.toFixed(2)}
-          </span>
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{symbol}</h3>
+          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-0.5 inline-block rounded" style={{ backgroundColor: lineColor }} />
+              {t('stocks.price')}
+            </span>
+            <span>
+              {t('stocks.high')}: ${maxPrice.toFixed(2)}
+            </span>
+            <span>
+              {t('stocks.low')}: ${minPrice.toFixed(2)}
+            </span>
+          </div>
         </div>
+        {onTimeframeChange && (
+          <div className="flex gap-1">
+            {TIMEFRAMES.map(tf => (
+              <button
+                key={tf.id}
+                onClick={() => onTimeframeChange(tf.id)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition ${
+                  timeframe === tf.id
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {tf.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="overflow-x-auto">

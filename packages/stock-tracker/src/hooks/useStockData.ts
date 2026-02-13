@@ -31,6 +31,16 @@ export interface StockCandle {
   s: string;   // Status ("ok" or "no_data")
 }
 
+export type Timeframe = '1W' | '1M' | '3M' | '6M' | '1Y';
+
+export const TIMEFRAMES: { id: Timeframe; label: string; days: number; resolution: string }[] = [
+  { id: '1W', label: '1W', days: 7, resolution: '60' },
+  { id: '1M', label: '1M', days: 30, resolution: 'D' },
+  { id: '3M', label: '3M', days: 90, resolution: 'D' },
+  { id: '6M', label: '6M', days: 180, resolution: 'D' },
+  { id: '1Y', label: '1Y', days: 365, resolution: 'W' },
+];
+
 // --- GraphQL Response Types ---
 
 interface SearchStocksResponse {
@@ -125,7 +135,7 @@ export function useStockQuote(
   };
 }
 
-// --- Hook: useStockCandles ---
+// --- Hook: useStockCandles (with timeframe support) ---
 
 interface UseStockCandlesReturn {
   candles: StockCandle | null;
@@ -134,12 +144,13 @@ interface UseStockCandlesReturn {
   refetch: () => void;
 }
 
-export function useStockCandles(symbol: string | null): UseStockCandlesReturn {
+export function useStockCandles(symbol: string | null, timeframe: Timeframe = '1M'): UseStockCandlesReturn {
+  const tf = TIMEFRAMES.find(t => t.id === timeframe) ?? TIMEFRAMES[1];
   const now = useMemo(() => Math.floor(Date.now() / 1000), []);
-  const thirtyDaysAgo = useMemo(() => now - 30 * 24 * 60 * 60, [now]);
+  const from = useMemo(() => now - tf.days * 24 * 60 * 60, [now, tf.days]);
 
   const { data, loading, error, refetch } = useQuery<StockCandlesResponse>(GET_STOCK_CANDLES, {
-    variables: { symbol: symbol!, from: thirtyDaysAgo, to: now },
+    variables: { symbol: symbol!, resolution: tf.resolution, from, to: now },
     skip: !symbol,
     fetchPolicy: 'cache-and-network',
   });

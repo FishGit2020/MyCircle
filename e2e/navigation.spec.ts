@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 
 test.describe('Navigation', () => {
   test('Home link returns to homepage', async ({ page }) => {
-    await page.goto('/weather/51.5074,-0.1278?name=London');
+    await page.goto('/ai');
     await page.getByRole('link', { name: 'Home' }).first().click();
 
     await expect(page).toHaveURL('/');
