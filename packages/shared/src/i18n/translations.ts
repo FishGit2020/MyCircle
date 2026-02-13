@@ -387,6 +387,10 @@ const en = {
   'podcasts.removeFromQueue': 'Remove from queue',
   'podcasts.showNotes': 'Show notes',
   'podcasts.completed': 'Played',
+  'podcasts.categories': 'Categories',
+  'podcasts.allCategories': 'All',
+  'podcasts.browseByGenre': 'Browse by Genre',
+  'podcasts.noInCategory': 'No podcasts found in this category',
 
   // AI Assistant
   'ai.title': 'AI Assistant',
@@ -1021,6 +1025,10 @@ const es: Record<TranslationKey, string> = {
   'podcasts.removeFromQueue': 'Quitar de la cola',
   'podcasts.showNotes': 'Notas del episodio',
   'podcasts.completed': 'Escuchado',
+  'podcasts.categories': 'Categor\u00edas',
+  'podcasts.allCategories': 'Todas',
+  'podcasts.browseByGenre': 'Explorar por G\u00e9nero',
+  'podcasts.noInCategory': 'No se encontraron podcasts en esta categor\u00eda',
 
   // AI Assistant
   'ai.title': 'Asistente IA',

@@ -71,6 +71,19 @@ export default function PodcastCard({
           {podcast.author}
         </p>
 
+        {podcast.categories && typeof podcast.categories === 'string' && (podcast.categories as string).length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {(podcast.categories as string).split(', ').slice(0, 2).map(cat => (
+              <span
+                key={cat}
+                className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 truncate max-w-[80px]"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mt-2">
           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
             {episodeCountText}

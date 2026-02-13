@@ -190,6 +190,7 @@ Exposes `PodcastPlayer` component via Module Federation.
 - Podcast discovery and search via PodcastIndex API (proxied through Cloud Functions)
 - Episode listing and detail view
 - Built-in audio player for episode playback
+- **Category/genre filtering**: `TrendingPodcasts` extracts categories from podcast data (comma-separated strings), sorts by frequency (top 12), renders filter chips. `PodcastCard` displays up to 2 category badges as purple chips.
 - Podcast subscriptions stored in localStorage (`podcast-subscriptions`)
 - Subscribed tab fetches feed details via `podcastFeed(feedId)` query
 - All podcast/episode IDs use GraphQL `ID` type (string) to handle large PodcastIndex IDs
