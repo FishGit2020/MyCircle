@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, GET_BIBLE_VOTD } from '@mycircle/shared';
 
 export interface DailyVerse {
@@ -59,9 +59,13 @@ interface VotdResponse {
 }
 
 export function useDailyVerse() {
-  const dailyVerse = useMemo(() => {
-    const day = new Date().getDate();
-    return DAILY_VERSES[(day - 1) % DAILY_VERSES.length];
+  const [verseIndex, setVerseIndex] = useState(
+    () => (new Date().getDate() - 1) % DAILY_VERSES.length
+  );
+  const dailyVerse = DAILY_VERSES[verseIndex];
+
+  const shuffleVerse = useCallback(() => {
+    setVerseIndex(prev => (prev + 1) % DAILY_VERSES.length);
   }, []);
 
   const [showVotd, setShowVotd] = useState(false);
@@ -91,6 +95,7 @@ export function useDailyVerse() {
     verse: showVotd && votd ? votd : dailyVerse,
     showVotd,
     toggleVotd,
+    shuffleVerse,
     loading: showVotd && votdLoading,
   };
 }

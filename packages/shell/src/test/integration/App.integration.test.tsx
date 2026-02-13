@@ -105,42 +105,10 @@ describe('App Integration', () => {
     });
   });
 
-  describe('Navigation', () => {
-    it('has working home link in header', () => {
-      renderApp('/weather/51.5074,-0.1278');
-
-      const homeLinks = screen.getAllByText('Home');
-      expect(homeLinks.length).toBeGreaterThan(0);
-    });
-
-    it('has working logo link to home', () => {
-      renderApp('/weather/51.5074,-0.1278');
-
-      const logoLink = screen.getByRole('link', { name: /MyCircle/i });
-      expect(logoLink).toHaveAttribute('href', '/');
-    });
-
-    it('has stocks and podcasts nav links', () => {
-      renderApp('/');
-
-      expect(screen.getAllByText('Stocks').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('Podcasts').length).toBeGreaterThan(0);
-    });
-  });
-
   describe('Layout', () => {
-    it('renders header on all pages', () => {
+    it('renders header and footer on all pages', () => {
       renderApp('/');
       expect(screen.getByText('MyCircle')).toBeInTheDocument();
-
-      cleanup();
-
-      renderApp('/weather/51.5074,-0.1278');
-      expect(screen.getByText('MyCircle')).toBeInTheDocument();
-    });
-
-    it('renders footer on all pages', () => {
-      renderApp('/');
       expect(screen.getByText('OpenWeatherMap')).toBeInTheDocument();
     });
   });

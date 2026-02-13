@@ -5,6 +5,8 @@ import { toPng } from 'html-to-image';
 import Layout from './components/Layout';
 import Loading from './components/Loading';
 import ErrorBoundary from './components/ErrorBoundary';
+import UnitToggle from './components/UnitToggle';
+import SpeedToggle from './components/SpeedToggle';
 import WeatherCompare from './components/WeatherCompare';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
@@ -165,6 +167,8 @@ function WeatherPage() {
   return (
     <div>
       <div className="flex justify-end gap-2 mb-4">
+        <UnitToggle />
+        <SpeedToggle />
         <ShareButton weatherRef={weatherRef} />
         <FavoriteButton />
       </div>

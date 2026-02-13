@@ -90,9 +90,4 @@ describe('Layout', () => {
     expect(owmLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('renders speed toggle button', () => {
-    renderWithRouter(<Layout />);
-
-    expect(screen.getAllByText('m/s').length).toBeGreaterThan(0);
-  });
 });

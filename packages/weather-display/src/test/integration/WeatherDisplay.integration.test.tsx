@@ -70,7 +70,7 @@ const mockWeatherResponse = {
   }
 };
 
-// Subscription mock that never resolves (simulates waiting for push)
+// Subscription mock with long delay (simulates waiting for push)
 const subscriptionMock = {
   request: {
     query: WEATHER_UPDATES,
@@ -79,7 +79,7 @@ const subscriptionMock = {
   result: {
     data: null,
   },
-  delay: Infinity,
+  delay: 30_000,
 };
 
 const successMocks = [

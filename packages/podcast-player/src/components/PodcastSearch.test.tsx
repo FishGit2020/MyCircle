@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
@@ -38,16 +38,11 @@ const renderWithProviders = (ui: React.ReactElement) => {
 describe('PodcastSearch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers({ shouldAdvanceTime: true });
     mockUsePodcastSearch.mockReturnValue({
       data: null,
       loading: false,
       error: null,
     });
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it('renders search input with placeholder', () => {
@@ -61,6 +56,7 @@ describe('PodcastSearch', () => {
   });
 
   it('passes query to search hook on input change', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderWithProviders(<PodcastSearch onSelectPodcast={vi.fn()} />);
 
@@ -68,6 +64,7 @@ describe('PodcastSearch', () => {
     await user.type(input, 'tech');
 
     expect(mockUsePodcastSearch).toHaveBeenCalledWith('tech');
+    vi.useRealTimers();
   });
 
   it('shows search results when data is returned', () => {

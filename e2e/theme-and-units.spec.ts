@@ -20,9 +20,9 @@ test.describe('Theme toggle', () => {
 
 test.describe('Unit toggle', () => {
   test('switches between Celsius and Fahrenheit', async ({ page }) => {
-    await page.goto('/');
+    // Unit toggles are now on weather pages, not the global header
+    await page.goto('/weather');
 
-    // Both desktop and mobile navs render the unit toggle; pick the first visible one
     const unitButton = page.getByRole('button', { name: /°[CF]/ }).first();
     await expect(unitButton).toBeVisible();
 

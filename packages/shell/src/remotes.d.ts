@@ -1,3 +1,5 @@
+/// <reference types="vite-plugin-pwa/react" />
+
 // Type declarations for remote micro frontend modules
 declare module 'citySearch/CitySearch' {
   const CitySearch: React.ComponentType;

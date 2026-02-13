@@ -66,7 +66,7 @@ export default function DashboardPage() {
   const watchlist = getWatchlist();
   const subscribedIds = getSubscribedIds();
   const worshipSongCount = getWorshipSongCount();
-  const { verse, showVotd, toggleVotd, loading: verseLoading } = useDailyVerse();
+  const { verse, showVotd, toggleVotd, shuffleVerse, loading: verseLoading } = useDailyVerse();
 
   return (
     <div className="space-y-8">
@@ -98,12 +98,22 @@ export default function DashboardPage() {
                 )}
               </>
             )}
-            <button
-              onClick={toggleVotd}
-              className="mt-2 text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-            >
-              {showVotd ? 'Show daily verse' : "View today's verse (YouVersion)"}
-            </button>
+            <div className="mt-2 flex items-center justify-center gap-3">
+              <button
+                onClick={toggleVotd}
+                className="text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+              >
+                {showVotd ? 'Show daily verse' : "View today's verse (YouVersion)"}
+              </button>
+              {!showVotd && (
+                <button
+                  onClick={shuffleVerse}
+                  className="text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  Next verse ›
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </section>

@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import ThemeToggle from './ThemeToggle';
-import UnitToggle from './UnitToggle';
-import SpeedToggle from './SpeedToggle';
 import UserMenu from './UserMenu';
 import NotificationBell from './NotificationBell';
 import OfflineIndicator from './OfflineIndicator';
@@ -111,8 +109,6 @@ export default function Layout() {
                 {t('nav.ai')}
               </Link>
               <LanguageSelector />
-              <UnitToggle />
-              <SpeedToggle />
               <ThemeToggle />
               <NotificationBell />
               <UserMenu />
@@ -121,8 +117,6 @@ export default function Layout() {
             {/* Mobile controls: small buttons + hamburger */}
             <div className="flex md:!hidden items-center space-x-2">
               <LanguageSelector />
-              <UnitToggle />
-              <SpeedToggle />
               <ThemeToggle />
               <NotificationBell />
               <button

@@ -9,6 +9,7 @@ import { RemoteConfigProvider } from './context/RemoteConfigContext';
 import ThemeSync from './components/ThemeSync';
 import DataSync from './components/DataSync';
 import App from './App';
+import ReloadPrompt from './components/ReloadPrompt';
 import './index.css';
 
 const client = getApolloClient();
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <BrowserRouter>
                 <App />
               </BrowserRouter>
+              <ReloadPrompt />
             </ApolloProvider>
           </RemoteConfigProvider>
         </AuthProvider>

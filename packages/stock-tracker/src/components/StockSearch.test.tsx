@@ -43,11 +43,6 @@ describe('StockSearch', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it('renders search input with placeholder', () => {
@@ -61,171 +56,174 @@ describe('StockSearch', () => {
     expect(input).toBeInTheDocument();
   });
 
-  it('displays search results after typing', async () => {
-    const mocks = [createSearchMock('AAPL')];
-
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <StockSearch onSelect={mockOnSelect} />
-      </MockedProvider>
-    );
-
-    const input = screen.getByPlaceholderText('Search stocks...');
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'AAPL' } });
-
-    // Advance past debounce
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(350);
+  describe('Search with debounce', () => {
+    beforeEach(() => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
     });
 
-    // Flush Apollo mock delivery
-    await flushPromises();
-
-    await waitFor(() => {
-      expect(screen.getByText('AAPL')).toBeInTheDocument();
-      expect(screen.getByText('APPLE INC')).toBeInTheDocument();
-    });
-  });
-
-  it('calls onSelect when a result is clicked', async () => {
-    const mocks = [createSearchMock('AAPL')];
-
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <StockSearch onSelect={mockOnSelect} />
-      </MockedProvider>
-    );
-
-    const input = screen.getByPlaceholderText('Search stocks...');
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'AAPL' } });
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(350);
-    });
-    await flushPromises();
-
-    await waitFor(() => {
-      expect(screen.getByText('APPLE INC')).toBeInTheDocument();
+    afterEach(() => {
+      vi.useRealTimers();
     });
 
-    const option = screen.getAllByRole('option')[0];
-    fireEvent.click(option);
+    it('displays search results after typing', async () => {
+      const mocks = [createSearchMock('AAPL')];
 
-    expect(mockOnSelect).toHaveBeenCalledWith('AAPL', 'APPLE INC');
-  });
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <StockSearch onSelect={mockOnSelect} />
+        </MockedProvider>
+      );
 
-  it('clears input after selection', async () => {
-    const mocks = [createSearchMock('AAPL')];
+      const input = screen.getByPlaceholderText('Search stocks...');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'AAPL' } });
 
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <StockSearch onSelect={mockOnSelect} />
-      </MockedProvider>
-    );
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(350);
+      });
+      await flushPromises();
 
-    const input = screen.getByPlaceholderText('Search stocks...') as HTMLInputElement;
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'AAPL' } });
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(350);
-    });
-    await flushPromises();
-
-    await waitFor(() => {
-      expect(screen.getByText('APPLE INC')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('AAPL')).toBeInTheDocument();
+        expect(screen.getByText('APPLE INC')).toBeInTheDocument();
+      });
     });
 
-    const option = screen.getAllByRole('option')[0];
-    fireEvent.click(option);
+    it('calls onSelect when a result is clicked', async () => {
+      const mocks = [createSearchMock('AAPL')];
 
-    expect(input.value).toBe('');
-  });
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <StockSearch onSelect={mockOnSelect} />
+        </MockedProvider>
+      );
 
-  it('debounces search requests', async () => {
-    const mocks = [createSearchMock('AAP')];
+      const input = screen.getByPlaceholderText('Search stocks...');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'AAPL' } });
 
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <StockSearch onSelect={mockOnSelect} />
-      </MockedProvider>
-    );
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(350);
+      });
+      await flushPromises();
 
-    const input = screen.getByPlaceholderText('Search stocks...');
-    fireEvent.focus(input);
+      await waitFor(() => {
+        expect(screen.getByText('APPLE INC')).toBeInTheDocument();
+      });
 
-    // Type characters rapidly
-    fireEvent.change(input, { target: { value: 'A' } });
-    await act(async () => { vi.advanceTimersByTime(100); });
-    fireEvent.change(input, { target: { value: 'AA' } });
-    await act(async () => { vi.advanceTimersByTime(100); });
-    fireEvent.change(input, { target: { value: 'AAP' } });
+      const option = screen.getAllByRole('option')[0];
+      fireEvent.click(option);
 
-    // After debounce timer fires, the query for 'AAP' should execute
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(350);
-    });
-    await flushPromises();
-
-    await waitFor(() => {
-      expect(screen.getByText('APPLE INC')).toBeInTheDocument();
-    });
-  });
-
-  it('supports keyboard navigation', async () => {
-    const mocks = [createSearchMock('A')];
-
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <StockSearch onSelect={mockOnSelect} />
-      </MockedProvider>
-    );
-
-    const input = screen.getByPlaceholderText('Search stocks...');
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'A' } });
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(350);
-    });
-    await flushPromises();
-
-    await waitFor(() => {
-      expect(screen.getByText('AAPL')).toBeInTheDocument();
+      expect(mockOnSelect).toHaveBeenCalledWith('AAPL', 'APPLE INC');
     });
 
-    // Arrow down to first item
-    fireEvent.keyDown(input, { key: 'ArrowDown' });
-    const firstOption = screen.getAllByRole('option')[0];
-    expect(firstOption).toHaveAttribute('aria-selected', 'true');
+    it('clears input after selection', async () => {
+      const mocks = [createSearchMock('AAPL')];
 
-    // Enter to select
-    fireEvent.keyDown(input, { key: 'Enter' });
-    expect(mockOnSelect).toHaveBeenCalledWith('AAPL', 'APPLE INC');
-  });
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <StockSearch onSelect={mockOnSelect} />
+        </MockedProvider>
+      );
 
-  it('shows no results message when search returns empty', async () => {
-    const mocks: MockedResponse[] = [createSearchMock('xyz', [])];
+      const input = screen.getByPlaceholderText('Search stocks...') as HTMLInputElement;
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'AAPL' } });
 
-    render(
-      <MockedProvider mocks={mocks} addTypename={false}>
-        <StockSearch onSelect={mockOnSelect} />
-      </MockedProvider>
-    );
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(350);
+      });
+      await flushPromises();
 
-    const input = screen.getByPlaceholderText('Search stocks...');
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'xyz' } });
+      await waitFor(() => {
+        expect(screen.getByText('APPLE INC')).toBeInTheDocument();
+      });
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(350);
+      const option = screen.getAllByRole('option')[0];
+      fireEvent.click(option);
+
+      expect(input.value).toBe('');
     });
-    await flushPromises();
 
-    await waitFor(() => {
-      expect(screen.getByText('No stocks found')).toBeInTheDocument();
+    it('debounces search requests', async () => {
+      const mocks = [createSearchMock('AAP')];
+
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <StockSearch onSelect={mockOnSelect} />
+        </MockedProvider>
+      );
+
+      const input = screen.getByPlaceholderText('Search stocks...');
+      fireEvent.focus(input);
+
+      fireEvent.change(input, { target: { value: 'A' } });
+      await act(async () => { vi.advanceTimersByTime(100); });
+      fireEvent.change(input, { target: { value: 'AA' } });
+      await act(async () => { vi.advanceTimersByTime(100); });
+      fireEvent.change(input, { target: { value: 'AAP' } });
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(350);
+      });
+      await flushPromises();
+
+      await waitFor(() => {
+        expect(screen.getByText('APPLE INC')).toBeInTheDocument();
+      });
+    });
+
+    it('supports keyboard navigation', async () => {
+      const mocks = [createSearchMock('A')];
+
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <StockSearch onSelect={mockOnSelect} />
+        </MockedProvider>
+      );
+
+      const input = screen.getByPlaceholderText('Search stocks...');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'A' } });
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(350);
+      });
+      await flushPromises();
+
+      await waitFor(() => {
+        expect(screen.getByText('AAPL')).toBeInTheDocument();
+      });
+
+      fireEvent.keyDown(input, { key: 'ArrowDown' });
+      const firstOption = screen.getAllByRole('option')[0];
+      expect(firstOption).toHaveAttribute('aria-selected', 'true');
+
+      fireEvent.keyDown(input, { key: 'Enter' });
+      expect(mockOnSelect).toHaveBeenCalledWith('AAPL', 'APPLE INC');
+    });
+
+    it('shows no results message when search returns empty', async () => {
+      const mocks: MockedResponse[] = [createSearchMock('xyz', [])];
+
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <StockSearch onSelect={mockOnSelect} />
+        </MockedProvider>
+      );
+
+      const input = screen.getByPlaceholderText('Search stocks...');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'xyz' } });
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(350);
+      });
+      await flushPromises();
+
+      await waitFor(() => {
+        expect(screen.getByText('No stocks found')).toBeInTheDocument();
+      });
     });
   });
 });

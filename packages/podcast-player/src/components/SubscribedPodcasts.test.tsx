@@ -203,7 +203,7 @@ describe('SubscribedPodcasts', () => {
           query: GET_PODCAST_FEED,
           variables: { feedId: '101' },
         },
-        delay: Infinity,
+        delay: 30_000,
         result: {
           data: { podcastFeed: mockFeed },
         },

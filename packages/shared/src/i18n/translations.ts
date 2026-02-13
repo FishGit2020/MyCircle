@@ -380,6 +380,11 @@ const en = {
   'worship.tags': 'Tags',
   'worship.loginToEdit': 'Sign in to add or edit songs',
   'worship.noTransposeText': 'Transposition is available for ChordPro format only',
+
+  // PWA update prompt
+  'pwa.newVersion': 'A new version is available',
+  'pwa.reload': 'Reload',
+  'pwa.dismiss': 'Dismiss',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -760,6 +765,11 @@ const es: Record<TranslationKey, string> = {
   'worship.tags': 'Etiquetas',
   'worship.loginToEdit': 'Inicia sesi\u00f3n para agregar o editar canciones',
   'worship.noTransposeText': 'La transposici\u00f3n solo est\u00e1 disponible en formato ChordPro',
+
+  // PWA update prompt
+  'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
+  'pwa.reload': 'Recargar',
+  'pwa.dismiss': 'Cerrar',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {

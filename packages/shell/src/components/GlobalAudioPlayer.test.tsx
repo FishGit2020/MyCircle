@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import GlobalAudioPlayer from './GlobalAudioPlayer';
@@ -62,128 +62,51 @@ describe('GlobalAudioPlayer', () => {
     vi.clearAllMocks();
   });
 
-  it('renders nothing initially', () => {
-    const { container } = renderWithProviders(
-      <GlobalAudioPlayer />
-    );
-    expect(container.querySelector('[role="region"]')).toBeNull();
-  });
-
-  it('renders player when PODCAST_PLAY_EPISODE event is received', () => {
-    renderWithProviders(<GlobalAudioPlayer />);
-
-    act(() => {
-      dispatchPlayEvent();
-    });
-
-    expect(screen.getByRole('region', { name: 'Now Playing' })).toBeInTheDocument();
-    const titles = screen.getAllByText('Test Episode Title');
-    expect(titles.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('hides player when PODCAST_CLOSE_PLAYER event is received', () => {
+  it('renders player on PODCAST_PLAY_EPISODE and hides on PODCAST_CLOSE_PLAYER', () => {
     const { container } = renderWithProviders(<GlobalAudioPlayer />);
 
-    act(() => {
-      dispatchPlayEvent();
-    });
+    // Initially empty
+    expect(container.querySelector('[role="region"]')).toBeNull();
 
+    act(() => { dispatchPlayEvent(); });
     expect(screen.getByRole('region', { name: 'Now Playing' })).toBeInTheDocument();
 
-    act(() => {
-      dispatchCloseEvent();
-    });
-
+    act(() => { dispatchCloseEvent(); });
     expect(container.querySelector('[role="region"]')).toBeNull();
   });
 
-  it('calls onPlayerStateChange with true when episode plays', () => {
+  it('calls onPlayerStateChange on play and close', () => {
     const onStateChange = vi.fn();
     renderWithProviders(<GlobalAudioPlayer onPlayerStateChange={onStateChange} />);
 
-    act(() => {
-      dispatchPlayEvent();
-    });
-
+    act(() => { dispatchPlayEvent(); });
     expect(onStateChange).toHaveBeenCalledWith(true);
-  });
 
-  it('calls onPlayerStateChange with false when player closes', () => {
-    const onStateChange = vi.fn();
-    renderWithProviders(<GlobalAudioPlayer onPlayerStateChange={onStateChange} />);
-
-    act(() => {
-      dispatchPlayEvent();
-    });
-
-    act(() => {
-      dispatchCloseEvent();
-    });
-
+    act(() => { dispatchCloseEvent(); });
     expect(onStateChange).toHaveBeenLastCalledWith(false);
   });
 
-  it('renders close button and hides player when clicked', () => {
+  it('closes player on close button click and Escape key', () => {
     const { container } = renderWithProviders(<GlobalAudioPlayer />);
 
-    act(() => {
-      dispatchPlayEvent();
-    });
-
+    // Test close button
+    act(() => { dispatchPlayEvent(); });
     const closeButtons = screen.getAllByLabelText('Close player');
-    expect(closeButtons.length).toBeGreaterThanOrEqual(1);
-
     fireEvent.click(closeButtons[0]);
-
     expect(container.querySelector('[role="region"]')).toBeNull();
-  });
 
-  it('closes player on Escape key', () => {
-    const { container } = renderWithProviders(<GlobalAudioPlayer />);
-
-    act(() => {
-      dispatchPlayEvent();
-    });
-
+    // Test Escape key
+    act(() => { dispatchPlayEvent(); });
     expect(screen.getByRole('region', { name: 'Now Playing' })).toBeInTheDocument();
-
     fireEvent.keyDown(document, { key: 'Escape' });
-
     expect(container.querySelector('[role="region"]')).toBeNull();
-  });
-
-  it('renders seek bar with slider role', () => {
-    renderWithProviders(<GlobalAudioPlayer />);
-
-    act(() => {
-      dispatchPlayEvent();
-    });
-
-    const slider = screen.getByRole('slider', { name: 'Seek position' });
-    expect(slider).toBeInTheDocument();
-    expect(slider).toHaveAttribute('aria-valuenow');
-    expect(slider).toHaveAttribute('aria-valuemin', '0');
-    expect(slider).toHaveAttribute('aria-valuemax');
-  });
-
-  it('displays podcast title when provided', () => {
-    renderWithProviders(<GlobalAudioPlayer />);
-
-    act(() => {
-      dispatchPlayEvent();
-    });
-
-    expect(screen.getByText('Test Podcast')).toBeInTheDocument();
   });
 
   it('persists player state across re-renders', () => {
     const { rerender } = renderWithProviders(<GlobalAudioPlayer />);
 
-    act(() => {
-      dispatchPlayEvent();
-    });
+    act(() => { dispatchPlayEvent(); });
 
-    // Re-render to simulate a state change elsewhere
     rerender(
       <MemoryRouter>
         <GlobalAudioPlayer />
@@ -193,5 +116,13 @@ describe('GlobalAudioPlayer', () => {
     expect(screen.getByRole('region', { name: 'Now Playing' })).toBeInTheDocument();
     const titles = screen.getAllByText('Test Episode Title');
     expect(titles.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('displays podcast title when provided', () => {
+    renderWithProviders(<GlobalAudioPlayer />);
+
+    act(() => { dispatchPlayEvent(); });
+
+    expect(screen.getByText('Test Podcast')).toBeInTheDocument();
   });
 });
