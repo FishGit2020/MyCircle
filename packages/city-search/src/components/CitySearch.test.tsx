@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import CitySearch from './CitySearch';
-import { SEARCH_CITIES, eventBus, MFEvents } from '@mycircle/shared';
+import { SEARCH_CITIES, eventBus, MFEvents, StorageKeys } from '@mycircle/shared';
 
 const mockNavigate = vi.fn();
 
@@ -72,6 +72,15 @@ const mocks = [
       data: { searchCities: [] },
     },
   },
+  {
+    request: {
+      query: SEARCH_CITIES,
+      variables: { query: 'Tok', limit: 5 },
+    },
+    result: {
+      data: { searchCities: [{ id: '35.68,139.69', name: 'Tokyo', country: 'JP', state: null, lat: 35.6762, lon: 139.6503 }] },
+    },
+  },
 ];
 
 const renderWithProviders = (ui: React.ReactElement, apolloMocks = mocks) => {
@@ -87,6 +96,7 @@ const renderWithProviders = (ui: React.ReactElement, apolloMocks = mocks) => {
 describe('CitySearch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   it('renders search input and micro frontend badge', () => {
@@ -279,6 +289,160 @@ describe('CitySearch', () => {
       expect(eventSpy).toHaveBeenCalledWith({ city: mockCities[0] });
 
       unsubscribe();
+    });
+  });
+
+  describe('Recent Cities & Autocomplete', () => {
+    const recentCities = [
+      { id: '35.68,139.69', name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503, searchedAt: Date.now() - 3600000 },
+      { id: '48.86,2.35', name: 'Paris', country: 'FR', lat: 48.8566, lon: 2.3522, searchedAt: Date.now() - 7200000 },
+    ];
+
+    it('shows recent cities in dropdown when input focused with empty query', () => {
+      renderWithProviders(<CitySearch recentCities={recentCities} />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      expect(screen.getByText('Recent Searches')).toBeInTheDocument();
+      expect(screen.getByText('Tokyo')).toBeInTheDocument();
+      expect(screen.getByText('Paris')).toBeInTheDocument();
+    });
+
+    it('shows "Clear all" button when recent cities are present', () => {
+      renderWithProviders(<CitySearch recentCities={recentCities} />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      expect(screen.getByText('Clear all')).toBeInTheDocument();
+    });
+
+    it('calls onClearRecents when "Clear all" is clicked', () => {
+      const onClearRecents = vi.fn();
+      renderWithProviders(<CitySearch recentCities={recentCities} onClearRecents={onClearRecents} />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      fireEvent.click(screen.getByText('Clear all'));
+      expect(onClearRecents).toHaveBeenCalled();
+    });
+
+    it('does not show "Clear all" when showing popular cities', () => {
+      renderWithProviders(<CitySearch recentCities={[]} />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      expect(screen.getByText('Popular Cities')).toBeInTheDocument();
+      expect(screen.queryByText('Clear all')).not.toBeInTheDocument();
+    });
+
+    it('shows matching recent cities inline during search with "Recent" badge', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      renderWithProviders(<CitySearch recentCities={recentCities} />);
+
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.change(input, { target: { value: 'Tok' } });
+      await vi.advanceTimersByTimeAsync(300);
+
+      await waitFor(() => {
+        expect(screen.getByText('Tokyo')).toBeInTheDocument();
+        expect(screen.getByText('Recent')).toBeInTheDocument();
+      });
+
+      vi.useRealTimers();
+    });
+
+    it('removes individual recent city via remove button', () => {
+      const onRemoveCity = vi.fn();
+      renderWithProviders(<CitySearch recentCities={recentCities} onRemoveCity={onRemoveCity} />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      const removeBtn = screen.getByLabelText('Remove Tokyo from recent searches');
+      fireEvent.click(removeBtn);
+      expect(onRemoveCity).toHaveBeenCalledWith('35.68,139.69');
+    });
+
+    it('shows popular cities when no recents exist', () => {
+      renderWithProviders(<CitySearch />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      expect(screen.getByText('Popular Cities')).toBeInTheDocument();
+      expect(screen.getByText('New York')).toBeInTheDocument();
+    });
+  });
+
+  describe('localStorage Fallback', () => {
+    beforeEach(() => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('saves selected city to localStorage', async () => {
+      renderWithProviders(<CitySearch />);
+
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.change(input, { target: { value: 'London' } });
+      await vi.advanceTimersByTimeAsync(300);
+
+      await waitFor(() => {
+        expect(screen.getByText('London')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getAllByRole('option', { name: /London/i })[0]);
+
+      const stored = JSON.parse(localStorage.getItem(StorageKeys.RECENT_CITIES) || '[]');
+      expect(stored).toHaveLength(1);
+      expect(stored[0].name).toBe('London');
+      expect(stored[0].searchedAt).toBeDefined();
+    });
+
+    it('loads local recents on mount when no prop recents', () => {
+      localStorage.setItem(StorageKeys.RECENT_CITIES, JSON.stringify([
+        { id: '40.71,-74.01', name: 'New York', country: 'US', lat: 40.7128, lon: -74.006, searchedAt: Date.now() },
+      ]));
+
+      renderWithProviders(<CitySearch />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      expect(screen.getByText('Recent Searches')).toBeInTheDocument();
+      expect(screen.getByText('New York')).toBeInTheDocument();
+    });
+
+    it('prefers prop recents over local recents', () => {
+      localStorage.setItem(StorageKeys.RECENT_CITIES, JSON.stringify([
+        { id: '40.71,-74.01', name: 'New York', country: 'US', lat: 40.7128, lon: -74.006, searchedAt: Date.now() },
+      ]));
+
+      const propRecents = [
+        { id: '35.68,139.69', name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
+      ];
+
+      renderWithProviders(<CitySearch recentCities={propRecents} />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      expect(screen.getByText('Tokyo')).toBeInTheDocument();
+    });
+
+    it('clears local recents when Clear all is clicked without auth', () => {
+      localStorage.setItem(StorageKeys.RECENT_CITIES, JSON.stringify([
+        { id: '40.71,-74.01', name: 'New York', country: 'US', lat: 40.7128, lon: -74.006, searchedAt: Date.now() },
+      ]));
+
+      renderWithProviders(<CitySearch />);
+      const input = screen.getByPlaceholderText('Search for a city...');
+      fireEvent.focus(input);
+
+      expect(screen.getByText('Recent Searches')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Clear all'));
+
+      const stored = JSON.parse(localStorage.getItem(StorageKeys.RECENT_CITIES) || '[]');
+      expect(stored).toHaveLength(0);
     });
   });
 });

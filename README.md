@@ -19,6 +19,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **PWA Install Prompt** — Add to Home Screen banner with 7-day dismissal memory
 
 ### Weather
+- **Enhanced city autocomplete** — inline recent city matching during search, localStorage fallback for non-auth users, "Clear all" recents
 - Search for cities worldwide with autocomplete
 - Current weather conditions with real-time live polling
 - 7-day forecast and 48-hour hourly forecast

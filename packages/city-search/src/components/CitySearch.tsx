@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useLazyQuery } from '@apollo/client/react';
-import { SEARCH_CITIES, REVERSE_GEOCODE, City, eventBus, MFEvents, useTranslation, fuzzySearchCities, MAJOR_CITIES } from '@mycircle/shared';
+import { SEARCH_CITIES, REVERSE_GEOCODE, City, eventBus, MFEvents, useTranslation, fuzzySearchCities, MAJOR_CITIES, StorageKeys } from '@mycircle/shared';
 import WeatherPreview from './WeatherPreview';
 import './CitySearch.css';
 
@@ -20,6 +20,7 @@ interface RecentCity {
   state?: string;
   lat: number;
   lon: number;
+  searchedAt?: number;
 }
 
 const POPULAR_CITIES: RecentCity[] = [
@@ -30,13 +31,38 @@ const POPULAR_CITIES: RecentCity[] = [
   { id: '-33.87,151.21', name: 'Sydney', country: 'AU', state: 'New South Wales', lat: -33.8688, lon: 151.2093 },
 ];
 
+const MAX_LOCAL_RECENTS = 10;
+
+function loadLocalRecents(): RecentCity[] {
+  try {
+    const stored = localStorage.getItem(StorageKeys.RECENT_CITIES);
+    return stored ? JSON.parse(stored) : [];
+  } catch { return []; }
+}
+
+function saveLocalRecents(cities: RecentCity[]) {
+  try {
+    localStorage.setItem(StorageKeys.RECENT_CITIES, JSON.stringify(cities.slice(0, MAX_LOCAL_RECENTS)));
+  } catch { /* ignore */ }
+}
+
+function formatTimeAgo(timestamp?: number): string {
+  if (!timestamp) return '';
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return '<1m';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+  return `${Math.floor(seconds / 86400)}d`;
+}
+
 interface Props {
   onCitySelect?: (city: City) => void;
   recentCities?: RecentCity[];
   onRemoveCity?: (cityId: string) => void;
+  onClearRecents?: () => void;
 }
 
-export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCity }: Props) {
+export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCity, onClearRecents }: Props) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<City[]>([]);
@@ -44,6 +70,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [localRecents, setLocalRecents] = useState<RecentCity[]>(loadLocalRecents);
   const navigate = useNavigate();
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,6 +91,14 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
       setGeoError(t('search.failedToLookUp'));
     }
   });
+
+  // Merge prop-based recents (Firebase, auth users) with local recents (localStorage, non-auth)
+  const allRecents = useMemo(() => {
+    if (recentCities.length > 0) return recentCities;
+    return localRecents;
+  }, [recentCities, localRecents]);
+
+  const hasAuthRecents = recentCities.length > 0;
 
   useEffect(() => {
     if (data?.searchCities) {
@@ -114,8 +149,40 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
     setGeoError(null);
   };
 
+  // Filter recent cities matching the current query for inline autocomplete
+  const matchingRecents = useMemo(() => {
+    if (query.length < 2) return [];
+    const q = query.toLowerCase();
+    return allRecents.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.country.toLowerCase().includes(q) ||
+      (c.state && c.state.toLowerCase().includes(q))
+    ).slice(0, 3);
+  }, [query, allRecents]);
+
+  // Deduplicate: remove matching recents from API results to avoid duplicates
+  const filteredResults = useMemo(() => {
+    if (matchingRecents.length === 0) return results;
+    const recentIds = new Set(matchingRecents.map(c => c.id));
+    return results.filter(r => !recentIds.has(r.id));
+  }, [results, matchingRecents]);
+
+  const addToLocalRecents = useCallback((city: City | RecentCity) => {
+    setLocalRecents(prev => {
+      const id = city.id || `${city.lat},${city.lon}`;
+      const filtered = prev.filter(c => c.id !== id);
+      const updated: RecentCity[] = [
+        { id, name: city.name, country: city.country, state: city.state, lat: city.lat, lon: city.lon, searchedAt: Date.now() },
+        ...filtered,
+      ].slice(0, MAX_LOCAL_RECENTS);
+      saveLocalRecents(updated);
+      return updated;
+    });
+  }, []);
+
   const handleCityClick = useCallback((city: City | RecentCity) => {
     eventBus.publish(MFEvents.CITY_SELECTED, { city });
+    addToLocalRecents(city);
 
     if (onCitySelect) {
       onCitySelect(city as City);
@@ -127,7 +194,27 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
     setInputFocused(false);
     setHighlightedIndex(-1);
     setGeoError(null);
-  }, [onCitySelect, navigate]);
+  }, [onCitySelect, navigate, addToLocalRecents]);
+
+  const handleClearAllRecents = useCallback(() => {
+    if (hasAuthRecents && onClearRecents) {
+      onClearRecents();
+    }
+    setLocalRecents([]);
+    saveLocalRecents([]);
+  }, [hasAuthRecents, onClearRecents]);
+
+  const handleRemoveCity = useCallback((cityId: string) => {
+    if (hasAuthRecents && onRemoveCity) {
+      onRemoveCity(cityId);
+    } else {
+      setLocalRecents(prev => {
+        const updated = prev.filter(c => c.id !== cityId);
+        saveLocalRecents(updated);
+        return updated;
+      });
+    }
+  }, [hasAuthRecents, onRemoveCity]);
 
   const handleUseMyLocation = useCallback(() => {
     setGeoError(null);
@@ -177,17 +264,18 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
   }, [query, loading, results, data]);
 
   // Derive dropdown visibility from current state
-  const showSearchResults = results.length > 0 && !loading;
-  const showFuzzySuggestions = fuzzySuggestions.length > 0 && !loading;
-  const showNoResults = query.length >= 2 && !loading && results.length === 0 && data?.searchCities !== undefined && fuzzySuggestions.length === 0;
+  const hasInlineRecents = matchingRecents.length > 0 && !loading;
+  const showSearchResults = (filteredResults.length > 0 || hasInlineRecents) && !loading;
+  const showFuzzySuggestions = fuzzySuggestions.length > 0 && !loading && !showSearchResults;
+  const showNoResults = query.length >= 2 && !loading && results.length === 0 && data?.searchCities !== undefined && fuzzySuggestions.length === 0 && matchingRecents.length === 0;
   const showDropdown = inputFocused && query.length < 2 && !loading && results.length === 0;
-  const isShowingRecent = recentCities.length > 0;
-  const dropdownCities = isShowingRecent ? recentCities.slice(0, 5) : POPULAR_CITIES;
+  const isShowingRecent = allRecents.length > 0;
+  const dropdownCities = isShowingRecent ? allRecents.slice(0, 5) : POPULAR_CITIES;
   const dropdownLabel = isShowingRecent ? t('search.recentSearches') : t('search.popularCities');
 
-  // Get the currently visible list for keyboard navigation
+  // Build combined visible items for keyboard nav: matching recents + API results
   const visibleItems: (City | RecentCity)[] = showSearchResults
-    ? results
+    ? [...matchingRecents, ...filteredResults]
     : showFuzzySuggestions
       ? fuzzySuggestions
       : showDropdown
@@ -258,6 +346,15 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
     </button>
   );
 
+  const RecentBadge = () => (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded ml-2 flex-shrink-0">
+      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      {t('search.recentMatch')}
+    </span>
+  );
+
   return (
     <div className="city-search-container max-w-xl mx-auto" ref={containerRef}>
       <div className="relative">
@@ -304,9 +401,10 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
 
         {showSearchResults && (
           <div ref={dropdownRef} className="city-search-dropdown absolute top-full mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-10" role="listbox">
-            {results.map((city, index) => (
+            {/* Matching recent cities shown above API results */}
+            {matchingRecents.map((city, index) => (
               <button
-                key={city.id}
+                key={`recent-${city.id}`}
                 id={`city-option-${index}`}
                 data-dropdown-item
                 onClick={() => handleCityClick(city)}
@@ -320,14 +418,48 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                 aria-selected={index === highlightedIndex}
               >
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium dark:text-white">{city.name}</p>
+                  <div className="flex items-center">
+                    <p className="font-medium dark:text-white">{city.name}</p>
+                    <RecentBadge />
+                  </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {city.state && `${city.state}, `}{city.country}
+                    {city.searchedAt && (
+                      <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">{formatTimeAgo(city.searchedAt)}</span>
+                    )}
                   </p>
                 </div>
                 <WeatherPreview lat={city.lat} lon={city.lon} />
               </button>
             ))}
+            {/* API search results */}
+            {filteredResults.map((city, index) => {
+              const globalIndex = matchingRecents.length + index;
+              return (
+                <button
+                  key={city.id}
+                  id={`city-option-${globalIndex}`}
+                  data-dropdown-item
+                  onClick={() => handleCityClick(city)}
+                  onMouseEnter={() => setHighlightedIndex(globalIndex)}
+                  className={`w-full text-left px-4 py-3 transition border-b dark:border-gray-700 last:border-b-0 flex items-center ${
+                    globalIndex === highlightedIndex
+                      ? 'bg-blue-50 dark:bg-gray-700'
+                      : 'hover:bg-blue-50 dark:hover:bg-gray-700'
+                  }`}
+                  role="option"
+                  aria-selected={globalIndex === highlightedIndex}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium dark:text-white">{city.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {city.state && `${city.state}, `}{city.country}
+                    </p>
+                  </div>
+                  <WeatherPreview lat={city.lat} lon={city.lon} />
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -381,8 +513,17 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                 {geoError}
               </div>
             )}
-            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex items-center justify-between">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{dropdownLabel}</p>
+              {isShowingRecent && (
+                <button
+                  onClick={handleClearAllRecents}
+                  className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+                  aria-label={t('search.clearAllRecents')}
+                >
+                  {t('search.clearAllRecents')}
+                </button>
+              )}
             </div>
             {dropdownCities.map((city, index) => (
               <div
@@ -403,14 +544,17 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                   <p className="font-medium dark:text-white">{city.name}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {city.state && `${city.state}, `}{city.country}
+                    {city.searchedAt && (
+                      <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">{formatTimeAgo(city.searchedAt)}</span>
+                    )}
                   </p>
                 </div>
                 <WeatherPreview lat={city.lat} lon={city.lon} />
-                {isShowingRecent && onRemoveCity && (
+                {isShowingRecent && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onRemoveCity(city.id);
+                      handleRemoveCity(city.id);
                     }}
                     className="ml-2 p-1 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition flex-shrink-0"
                     aria-label={`Remove ${city.name} from recent searches`}

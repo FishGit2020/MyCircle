@@ -12,6 +12,7 @@ import {
   updateUserSpeedUnit,
   addRecentCity,
   removeRecentCity,
+  clearRecentCities,
   getRecentCities,
   toggleFavoriteCity,
   updateStockWatchlist,
@@ -37,6 +38,7 @@ interface AuthContextType {
   updateSpeedUnit: (unit: 'ms' | 'mph' | 'kmh') => Promise<void>;
   addCity: (city: Omit<RecentCity, 'searchedAt'>) => Promise<void>;
   removeCity: (cityId: string) => Promise<void>;
+  clearCities: () => Promise<void>;
   toggleFavorite: (city: FavoriteCity) => Promise<boolean>;
   syncStockWatchlist: (watchlist: WatchlistItem[]) => Promise<void>;
   syncPodcastSubscriptions: (subscriptionIds: string[]) => Promise<void>;
@@ -181,6 +183,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
+  const clearCities = useCallback(async () => {
+    if (user) {
+      await clearRecentCities(user.uid);
+      setRecentCities([]);
+    }
+  }, [user]);
+
   const toggleFavorite = useCallback(async (city: FavoriteCity): Promise<boolean> => {
     if (user) {
       const isNowFavorite = await toggleFavoriteCity(user.uid, city);
@@ -219,6 +228,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updateSpeedUnit,
         addCity,
         removeCity,
+        clearCities,
         toggleFavorite,
         syncStockWatchlist,
         syncPodcastSubscriptions,

@@ -254,6 +254,15 @@ export async function removeRecentCity(uid: string, cityId: string) {
   }
 }
 
+export async function clearRecentCities(uid: string) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    recentCities: [],
+    updatedAt: serverTimestamp(),
+  });
+}
+
 export async function toggleFavoriteCity(uid: string, city: FavoriteCity): Promise<boolean> {
   if (!db) return false;
   const userRef = doc(db, 'users', uid);
