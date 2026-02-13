@@ -224,6 +224,22 @@ Exposes `BibleReader` component via Module Federation.
 - **Daily devotional**: `DailyDevotional` component renders a curated reading plan (30 entries cycled by `dayOfYear % 30`). Each entry has a book, chapter, and theme. "Read Passage" button navigates to the passage and marks the day complete in `StorageKeys.BIBLE_DEVOTIONAL_LOG` (90-day rolling window to prevent unbounded growth).
 - Last read position tracking (`StorageKeys.BIBLE_LAST_READ`)
 
+### Worship Songs - `packages/worship-songs/`
+
+Exposes `WorshipSongs` component via Module Federation.
+
+**Key Behavior:**
+- Song management (add, edit, delete) with CRUD via `window.__worshipSongs` Firestore bridge
+- Two content formats: ChordPro (with bracket notation) and plain text
+- Real-time transposition with semitone +/- controls and direct key picker
+- Auto-scroll with adjustable speed (6 presets: 20-100ms/px), persisted via `StorageKeys.WORSHIP_SCROLL_SPEED`
+- Copy lyrics to clipboard (strips ChordPro brackets for clean output)
+- Print-friendly view via `window.print()`
+- **YouTube link integration**: Optional `youtubeUrl` field on `WorshipSong` type. `SongEditor` renders a URL input; `SongViewer` renders a styled red "Watch on YouTube" `<a>` tag (opens `target="_blank"`, `rel="noopener noreferrer"`) when URL is present, hidden otherwise.
+- Favorites system with `StorageKeys.WORSHIP_FAVORITES`
+- Offline cache via `StorageKeys.WORSHIP_SONGS_CACHE`
+- Tag-based filtering and full-text search
+
 ---
 
 ## Inter-MFE Communication
