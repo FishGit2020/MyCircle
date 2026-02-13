@@ -15,6 +15,7 @@ export const MFEvents = {
   USER_LOCATION_CHANGED: 'mf:user-location-changed',
   PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
   PODCAST_CLOSE_PLAYER: 'mf:podcast-close-player',
+  PODCAST_QUEUE_EPISODE: 'mf:podcast-queue-episode',
 } as const;
 
 // Window-level data-sync events (plain Event, no payload — used as invalidation signals)
@@ -33,6 +34,8 @@ export const StorageKeys = {
   LOCALE: 'weather-app-locale',
   STOCK_WATCHLIST: 'stock-tracker-watchlist',
   PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
+  PODCAST_PROGRESS: 'podcast-progress',
+  PODCAST_SPEED: 'podcast-speed',
   WEATHER_LIVE: 'weather-live-enabled',
   STOCK_LIVE: 'stock-live-enabled',
   DASHBOARD_WIDGETS: 'weather-dashboard-widgets',
