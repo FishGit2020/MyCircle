@@ -99,10 +99,12 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t('worship.requiredFieldLegend')}</p>
+
         {/* Title */}
         <div>
           <label htmlFor="song-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('worship.songTitle')} *
+            {t('worship.songTitle')} <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </label>
           <input
             id="song-title"
@@ -179,7 +181,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
         {/* Content */}
         <div>
           <label htmlFor="song-content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('worship.content')} *
+            {t('worship.content')} <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </label>
           <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
             {format === 'chordpro' ? t('worship.contentHintChordpro') : t('worship.contentHintText')}
