@@ -745,3 +745,10 @@ The AI chat endpoint verifies `x-recaptcha-token` header via `verifyRecaptchaTok
 
 ### Structured Logging
 All Firebase Cloud Functions use `firebase-functions/logger` (`logger.info`, `logger.warn`, `logger.error`) instead of `console.log/warn/error`. Structured metadata objects are attached to log messages for easier filtering and search in Google Cloud Logging (e.g., `logger.error('Stock proxy error', { path, error: err.message })`).
+
+### Sentry Error Tracking
+The shell host initializes `@sentry/react` in `main.tsx` before `createRoot()` (only when `VITE_SENTRY_DSN` is set and in production mode). Features:
+- **Browser Tracing**: Automatic performance monitoring for page loads and navigation
+- **Session Replay**: 10% of sessions recorded normally, 100% on error for debugging
+- **Error Boundary Capture**: `ErrorBoundary.tsx` calls `Sentry.captureException()` with React component stack context
+- **Trace Propagation**: Traces propagate to `localhost` and `mycircle-app.web.app`

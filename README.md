@@ -499,8 +499,15 @@ federation({
 | `VITE_FIREBASE_APP_ID` | Firebase app ID | For analytics |
 | `VITE_FIREBASE_MEASUREMENT_ID` | Google Analytics ID | For analytics |
 | `VITE_FIREBASE_VAPID_KEY` | FCM VAPID key | For push notifications |
+| `VITE_RECAPTCHA_SITE_KEY` | reCAPTCHA v3 site key | For bot protection |
+| `VITE_SENTRY_DSN` | Sentry DSN for error tracking | For monitoring |
 
 > **Note:** Firebase is optional — the app works without it (auth, push notifications, and profile sync are disabled).
+
+## Monitoring
+
+- **Sentry** (`@sentry/react`): Client-side error tracking with session replay. Initialized in `main.tsx` (production only). Errors from React `ErrorBoundary` components are automatically captured with component stack traces.
+- **Structured Logging**: Firebase Cloud Functions use `firebase-functions/logger` for structured, queryable logs in Google Cloud Logging.
 
 ## Testing
 
