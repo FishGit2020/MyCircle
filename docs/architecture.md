@@ -657,7 +657,7 @@ mycircle/
 |   |       +-- hooks/           # useWeatherData and other shared hooks
 |   |       +-- i18n/            # Internationalization (translations)
 |   |       +-- types/           # TypeScript interfaces
-|   |       +-- utils/           # Event bus, weather helpers
+|   |       +-- utils/           # Event bus, weather helpers, daily verse/devotional
 |   |       +-- data/            # Static data files
 |   |       +-- index.ts         # Barrel exports
 |   +-- shell/                   # Host micro frontend

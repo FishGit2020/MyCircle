@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, getDailyDevotional } from '@mycircle/shared';
 import { useVotd, useBiblePassage, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
 
@@ -87,46 +87,9 @@ function saveFontSize(size: number) {
   try { localStorage.setItem(StorageKeys.BIBLE_FONT_SIZE, String(size)); } catch { /* */ }
 }
 
-// --- Daily Devotional data ---
-// 30 curated devotional entries — cycled by day-of-year
-const DEVOTIONALS = [
-  { book: 'Psalms', chapter: 23, theme: 'The Lord is my shepherd' },
-  { book: 'John', chapter: 3, theme: 'For God so loved the world' },
-  { book: 'Romans', chapter: 8, theme: 'More than conquerors' },
-  { book: 'Philippians', chapter: 4, theme: 'Rejoice in the Lord always' },
-  { book: 'Isaiah', chapter: 40, theme: 'Those who hope in the Lord' },
-  { book: 'Matthew', chapter: 5, theme: 'The Beatitudes' },
-  { book: 'Genesis', chapter: 1, theme: 'In the beginning' },
-  { book: 'Proverbs', chapter: 3, theme: 'Trust in the Lord' },
-  { book: '1 Corinthians', chapter: 13, theme: 'Love is patient, love is kind' },
-  { book: 'Hebrews', chapter: 11, theme: 'Faith is confidence in what we hope for' },
-  { book: 'Ephesians', chapter: 6, theme: 'The armor of God' },
-  { book: 'James', chapter: 1, theme: 'Consider it pure joy' },
-  { book: 'Revelation', chapter: 21, theme: 'A new heaven and a new earth' },
-  { book: 'Psalms', chapter: 91, theme: 'He who dwells in the shelter of the Most High' },
-  { book: 'Matthew', chapter: 6, theme: 'Do not worry about tomorrow' },
-  { book: 'Romans', chapter: 12, theme: 'A living sacrifice' },
-  { book: 'Psalms', chapter: 119, theme: 'Your word is a lamp to my feet' },
-  { book: 'Colossians', chapter: 3, theme: 'Set your hearts on things above' },
-  { book: 'Joshua', chapter: 1, theme: 'Be strong and courageous' },
-  { book: 'Psalms', chapter: 46, theme: 'God is our refuge and strength' },
-  { book: 'Galatians', chapter: 5, theme: 'The fruit of the Spirit' },
-  { book: 'Luke', chapter: 15, theme: 'The prodigal son' },
-  { book: '2 Timothy', chapter: 1, theme: 'Fan into flame the gift of God' },
-  { book: 'Psalms', chapter: 139, theme: 'You knit me together' },
-  { book: 'Isaiah', chapter: 53, theme: 'He was pierced for our transgressions' },
-  { book: '1 Peter', chapter: 5, theme: 'Cast all your anxiety on Him' },
-  { book: 'Ecclesiastes', chapter: 3, theme: 'A time for everything' },
-  { book: 'Jeremiah', chapter: 29, theme: 'Plans to prosper you' },
-  { book: 'Matthew', chapter: 28, theme: 'Go and make disciples' },
-  { book: 'Psalms', chapter: 1, theme: 'Blessed is the one' },
-];
-
+// Daily devotional is now sourced from @mycircle/shared's getDailyDevotional()
 function getTodayDevotional() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  return DEVOTIONALS[dayOfYear % DEVOTIONALS.length];
+  return getDailyDevotional();
 }
 
 function getTodayKey(): string {
