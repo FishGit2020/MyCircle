@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
 import { SetContextLink } from '@apollo/client/link/context';
+import { createPersistedQueryLink } from '@apollo/client/link/persisted-queries';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
@@ -53,7 +54,17 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
     };
   });
 
-  const httpWithAuth = ApolloLink.from([authLink, appCheckLink, httpLink]);
+  // APQ: send a SHA-256 hash instead of the full query on subsequent requests
+  const persistedQueryLink = createPersistedQueryLink({
+    sha256: async (query: string) => {
+      const msgBuffer = new TextEncoder().encode(query);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    },
+  });
+
+  const httpWithAuth = ApolloLink.from([authLink, appCheckLink, persistedQueryLink, httpLink]);
 
   let wsLink: GraphQLWsLink | null = null;
 
