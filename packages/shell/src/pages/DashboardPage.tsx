@@ -1,50 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from '@weather/shared';
 import { useAuth } from '../context/AuthContext';
+import { useDailyVerse } from '../hooks/useDailyVerse';
 import UseMyLocation from '../components/UseMyLocation';
 import CitySearchWrapper from '../components/CitySearchWrapper';
 import FavoriteCities from '../components/FavoriteCities';
-
-const AFFIRMATIONS = [
-  "You are capable of achieving great things today.",
-  "Every day is a fresh start full of possibilities.",
-  "You bring value to everything you do.",
-  "Your potential is limitless — keep going.",
-  "Today is yours to shape however you choose.",
-  "You are stronger than any challenge ahead.",
-  "Small steps forward are still progress.",
-  "You deserve all the good that comes your way.",
-  "Your ideas matter and the world needs them.",
-  "Believe in the magic of new beginnings.",
-  "You are exactly where you need to be right now.",
-  "The best is yet to come.",
-  "You have the power to create positive change.",
-  "Trust yourself — you've got this.",
-  "Your journey is unique and worth celebrating.",
-  "Kindness starts with how you treat yourself.",
-  "You are making a difference, even when you can't see it.",
-  "Embrace today with courage and curiosity.",
-  "You are worthy of rest, joy, and success.",
-  "Let today be the day you shine.",
-  "Growth happens one brave step at a time.",
-  "You are resilient, creative, and unstoppable.",
-  "The sun always rises — and so will you.",
-  "Your presence brightens the world around you.",
-  "Today, choose progress over perfection.",
-  "You are enough, just as you are.",
-  "Great things are built with patience and heart.",
-  "Your story is still being written — make it beautiful.",
-  "You have survived every difficult day so far.",
-  "Let gratitude be your compass today.",
-  "You are a work of art in progress.",
-];
-
-function getDailyAffirmation(): string {
-  const now = new Date();
-  const dayIndex = (now.getFullYear() * 366 + now.getMonth() * 31 + now.getDate()) % AFFIRMATIONS.length;
-  return AFFIRMATIONS[dayIndex];
-}
 
 const WATCHLIST_STORAGE_KEY = 'stock-tracker-watchlist';
 const SUBSCRIPTIONS_KEY = 'podcast-subscriptions';
@@ -102,7 +63,7 @@ export default function DashboardPage() {
   const { user, favoriteCities, recentCities } = useAuth();
   const watchlist = getWatchlist();
   const subscribedIds = getSubscribedIds();
-  const affirmation = useMemo(() => getDailyAffirmation(), []);
+  const { verse, loading: verseLoading } = useDailyVerse();
 
   return (
     <div className="space-y-8">
@@ -114,11 +75,32 @@ export default function DashboardPage() {
         <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
           {t('home.subtitle')}
         </p>
-        {/* Daily affirmation */}
+        {/* Daily Bible verse */}
         <div className="max-w-lg mx-auto mb-6">
-          <p className="text-sm italic text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
-            &ldquo;{affirmation}&rdquo;
-          </p>
+          {verseLoading ? (
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
+              <div className="h-4 bg-blue-200 dark:bg-blue-800/40 rounded animate-pulse w-3/4 mx-auto" />
+            </div>
+          ) : (
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
+              <p className="text-sm italic text-blue-600 dark:text-blue-400">
+                &ldquo;{verse.text}&rdquo;
+              </p>
+              <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
+                — {verse.reference}{verse.version ? ` (${verse.version})` : ''}
+              </p>
+              {verse.permalink && (
+                <a
+                  href={verse.permalink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-500 mt-1 inline-block"
+                >
+                  Powered by BibleGateway.com
+                </a>
+              )}
+            </div>
+          )}
         </div>
         <UseMyLocation />
         <div className="mt-4 text-gray-400 dark:text-gray-500 text-sm">{t('home.orSearchBelow')}</div>
