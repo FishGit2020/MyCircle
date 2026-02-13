@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { ApolloProvider } from '@apollo/client/react';
 import * as Sentry from '@sentry/react';
-import { getApolloClient, I18nProvider, ToastProvider } from '@mycircle/shared';
+import { getApolloClient, I18nProvider, ToastProvider, reportWebVitals } from '@mycircle/shared';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { RemoteConfigProvider } from './context/RemoteConfigContext';
@@ -31,6 +31,9 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 }
 
 const client = getApolloClient();
+
+// Report Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
+reportWebVitals();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
