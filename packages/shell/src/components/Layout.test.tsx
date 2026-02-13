@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router';
 import Layout from './Layout';
 import { ThemeProvider } from '../context/ThemeContext';
 import { AuthProvider } from '../context/AuthContext';
+import { RemoteConfigProvider } from '../context/RemoteConfigContext';
 
 // Mock the firebase lib so AuthProvider doesn't need real Firebase
 vi.mock('../lib/firebase', () => ({
@@ -32,9 +33,11 @@ const renderWithRouter = (ui: React.ReactElement) => {
   return render(
     <ThemeProvider>
       <AuthProvider>
-        <MemoryRouter>
-          {ui}
-        </MemoryRouter>
+        <RemoteConfigProvider>
+          <MemoryRouter>
+            {ui}
+          </MemoryRouter>
+        </RemoteConfigProvider>
       </AuthProvider>
     </ThemeProvider>
   );

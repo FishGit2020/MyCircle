@@ -367,9 +367,20 @@ export async function mockAiChatAPI(page: Page) {
   });
 }
 
+/**
+ * Dismiss onboarding modal by setting localStorage before the page loads.
+ * This must be done via addInitScript so it runs before React hydrates.
+ */
+async function dismissOnboarding(page: Page) {
+  await page.addInitScript(() => {
+    localStorage.setItem('mycircle-onboarding-complete', 'true');
+  });
+}
+
 /** Extended test fixture that sets up all API mocks for every test. */
 export const test = base.extend<{ mockApi: void }>({
   mockApi: [async ({ page }, use) => {
+    await dismissOnboarding(page);
     await mockGraphQL(page);
     await mockStockAPI(page);
     await mockPodcastAPI(page);

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { ApolloProvider } from '@apollo/client/react';
-import { getApolloClient, I18nProvider } from '@mycircle/shared';
+import { getApolloClient, I18nProvider, ToastProvider } from '@mycircle/shared';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { RemoteConfigProvider } from './context/RemoteConfigContext';
@@ -10,6 +10,7 @@ import ThemeSync from './components/ThemeSync';
 import DataSync from './components/DataSync';
 import App from './App';
 import ReloadPrompt from './components/ReloadPrompt';
+import Onboarding from './components/Onboarding';
 import './index.css';
 
 const client = getApolloClient();
@@ -20,14 +21,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <AuthProvider>
           <RemoteConfigProvider>
-            <ThemeSync />
-            <DataSync />
-            <ApolloProvider client={client}>
-              <BrowserRouter>
-                <App />
-              </BrowserRouter>
-              <ReloadPrompt />
-            </ApolloProvider>
+            <ToastProvider>
+              <ThemeSync />
+              <DataSync />
+              <ApolloProvider client={client}>
+                <BrowserRouter>
+                  <App />
+                  <Onboarding />
+                </BrowserRouter>
+                <ReloadPrompt />
+              </ApolloProvider>
+            </ToastProvider>
           </RemoteConfigProvider>
         </AuthProvider>
       </ThemeProvider>
