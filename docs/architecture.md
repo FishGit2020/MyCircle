@@ -715,3 +715,28 @@ GitHub Actions workflows automate testing and deployment:
 | **E2E** | `.github/workflows/e2e.yml` | PR to `main` | Install → Playwright install → Build → E2E tests |
 
 All workflows use `pnpm/action-setup@v4`, `actions/setup-node@v4` with Node 22 and pnpm dependency caching. The deploy workflow uses `FirebaseExtended/action-hosting-deploy@v0` with a `FIREBASE_SERVICE_ACCOUNT` secret for authentication.
+
+---
+
+## Security
+
+### CORS
+All Cloud Functions (`graphql`, `stockProxy`, `podcastProxy`, `aiChat`) restrict CORS to whitelisted origins:
+- `https://mycircle-app.web.app`
+- `https://mycircle-app.firebaseapp.com`
+- `http://localhost:3000`
+
+### Rate Limiting
+Per-IP in-memory rate limiter using `NodeCache`:
+- **AI Chat**: 10 requests/minute
+- **Stock Proxy**: 60 requests/minute
+- **Podcast Proxy**: 60 requests/minute
+
+### Input Validation
+Zod schema validation on AI chat request body:
+- `message`: string, 1-5000 chars (required)
+- `history`: array of `{ role, content }` objects (optional)
+- `context`: arbitrary key-value object (optional)
+
+### reCAPTCHA v3
+The AI chat endpoint verifies `x-recaptcha-token` header via `verifyRecaptchaToken()`. Graceful: if token is missing, the request proceeds (backward compatibility during rollout). The client-side `useAiChat` hook obtains tokens via `getRecaptchaToken('ai_chat')` from `@mycircle/shared`.

@@ -36,6 +36,9 @@ vi.mock('firebase-functions/v2/https', () => ({
 vi.mock('firebase-functions/v2/scheduler', () => ({
   onSchedule: (_opts: any, handler: any) => handler,
 }));
+vi.mock('../recaptcha.js', () => ({
+  verifyRecaptchaToken: vi.fn().mockResolvedValue({ valid: true, score: 0.9 }),
+}));
 
 function createMockReq(overrides: Record<string, any> = {}) {
   return {
@@ -86,7 +89,7 @@ describe('aiChat', () => {
     const res = createMockRes();
     await aiChat(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'message is required' });
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Invalid request body' }));
   });
 
   it('returns 400 when message is not a string', async () => {
@@ -94,7 +97,7 @@ describe('aiChat', () => {
     const res = createMockRes();
     await aiChat(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'message is required' });
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Invalid request body' }));
   });
 
   it('returns 500 when GEMINI_API_KEY is not set', async () => {

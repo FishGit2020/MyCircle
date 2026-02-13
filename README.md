@@ -320,6 +320,17 @@ MyCircle uses **GitHub Actions** for continuous integration and deployment:
 
 All workflows use `pnpm/action-setup@v4` with Node 22 and pnpm caching for fast installs.
 
+## Security
+
+| Layer | Implementation |
+|-------|---------------|
+| **CORS** | Whitelisted origins only (`mycircle-app.web.app`, `mycircle-app.firebaseapp.com`, `localhost:3000`) |
+| **Rate Limiting** | Per-IP in-memory rate limiter: AI chat (10 req/min), Stock/Podcast proxies (60 req/min) |
+| **Input Validation** | Zod schema validation on AI chat request body (`message`, `history`, `context`) |
+| **reCAPTCHA** | v3 token verification on AI chat (graceful — skipped if token missing for backward compat) |
+| **Auth** | Firebase ID token required for stock, podcast, and AI chat endpoints |
+| **App Check** | Firebase App Check (reCAPTCHA Enterprise) on GraphQL endpoint |
+
 ## Deployment to Firebase
 
 ### Prerequisites
