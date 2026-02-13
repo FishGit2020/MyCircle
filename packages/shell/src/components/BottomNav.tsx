@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 
 const NAV_ITEMS = [
   { path: '/', labelKey: 'bottomNav.home' as const, icon: 'home' },
