@@ -1,6 +1,6 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, Auth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -299,6 +299,26 @@ export async function updatePodcastSubscriptions(uid: string, subscriptionIds: s
 export async function getRecentCities(uid: string): Promise<RecentCity[]> {
   const profile = await getUserProfile(uid);
   return profile?.recentCities || [];
+}
+
+// Feedback functions
+export interface FeedbackData {
+  category: 'bug' | 'feature' | 'general' | 'other';
+  rating: number;
+  message: string;
+}
+
+export async function submitFeedback(feedback: FeedbackData, user: { uid: string; email: string | null; displayName: string | null } | null) {
+  if (!db) return;
+  await addDoc(collection(db, 'feedback'), {
+    ...feedback,
+    uid: user?.uid ?? null,
+    email: user?.email ?? null,
+    displayName: user?.displayName ?? null,
+    page: window.location.pathname,
+    userAgent: navigator.userAgent,
+    createdAt: serverTimestamp(),
+  });
 }
 
 // Analytics functions

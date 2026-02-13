@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { StorageKeys } from '@weather/shared';
 
 type Theme = 'light' | 'dark';
 
@@ -13,7 +14,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('theme') as Theme;
+      const stored = localStorage.getItem(StorageKeys.THEME) as Theme;
       if (stored) return stored;
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
@@ -27,7 +28,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('theme', theme);
+    localStorage.setItem(StorageKeys.THEME, theme);
   }, [theme]);
 
   const toggleTheme = () => {

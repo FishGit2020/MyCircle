@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router';
-import { useWeatherData, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation } from '@weather/shared';
+import { useWeatherData, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys } from '@weather/shared';
 import CurrentWeather from './CurrentWeatherV1';
 import Forecast from './Forecast';
 import HourlyForecast from './HourlyForecast';
@@ -56,11 +56,11 @@ export default function WeatherDisplay() {
   const [widgets, setWidgets] = useState<WidgetVisibility>(loadWidgetVisibility);
 
   const [liveEnabled, setLiveEnabled] = useState(() => {
-    try { return localStorage.getItem('weather-live-enabled') === 'true'; } catch { return false; }
+    try { return localStorage.getItem(StorageKeys.WEATHER_LIVE) === 'true'; } catch { return false; }
   });
 
   useEffect(() => {
-    try { localStorage.setItem('weather-live-enabled', String(liveEnabled)); } catch { /* ignore */ }
+    try { localStorage.setItem(StorageKeys.WEATHER_LIVE, String(liveEnabled)); } catch { /* ignore */ }
   }, [liveEnabled]);
 
   const { current, forecast, hourly, loading, error, isLive, lastUpdate } = useWeatherData(

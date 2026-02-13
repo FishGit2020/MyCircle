@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { GET_STOCK_QUOTE } from '@weather/shared';
+import { GET_STOCK_QUOTE, StorageKeys } from '@weather/shared';
 import StockTracker from './StockTracker';
 
 // Mock localStorage
@@ -104,8 +104,8 @@ describe('StockTracker', () => {
 
     // Pre-populate watchlist with AAPL and enable live mode
     localStorageMock.getItem.mockImplementation((key: string) => {
-      if (key === 'stock-tracker-watchlist') return JSON.stringify([{ symbol: 'AAPL', companyName: 'Apple Inc.' }]);
-      if (key === 'stock-live-enabled') return 'true';
+      if (key === StorageKeys.STOCK_WATCHLIST) return JSON.stringify([{ symbol: 'AAPL', companyName: 'Apple Inc.' }]);
+      if (key === StorageKeys.STOCK_LIVE) return 'true';
       return null;
     });
 
@@ -157,8 +157,8 @@ describe('StockTracker', () => {
     ];
 
     localStorageMock.getItem.mockImplementation((key: string) => {
-      if (key === 'stock-tracker-watchlist') return JSON.stringify([{ symbol: 'AAPL', companyName: 'Apple Inc.' }]);
-      if (key === 'stock-live-enabled') return 'true';
+      if (key === StorageKeys.STOCK_WATCHLIST) return JSON.stringify([{ symbol: 'AAPL', companyName: 'Apple Inc.' }]);
+      if (key === StorageKeys.STOCK_LIVE) return 'true';
       return null;
     });
 

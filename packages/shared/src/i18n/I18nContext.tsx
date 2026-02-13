@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { translations, Locale, TranslationKey } from './translations';
-
-const STORAGE_KEY = 'weather-app-locale';
+import { StorageKeys } from '../utils/eventBus';
 
 function getInitialLocale(): Locale {
   if (typeof window === 'undefined') return 'en';
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(StorageKeys.LOCALE);
     if (stored === 'en' || stored === 'es') return stored;
   } catch { /* ignore */ }
   // Auto-detect from browser
@@ -29,7 +28,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
     try {
-      localStorage.setItem(STORAGE_KEY, newLocale);
+      localStorage.setItem(StorageKeys.LOCALE, newLocale);
     } catch { /* ignore */ }
   }, []);
 

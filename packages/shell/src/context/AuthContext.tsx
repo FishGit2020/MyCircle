@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { User } from 'firebase/auth';
+import { WindowEvents, StorageKeys } from '@weather/shared';
 import {
   subscribeToAuthChanges,
   signInWithGoogle,
@@ -82,24 +83,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           // Restore saved preferences to localStorage so shared hooks pick them up
           if (userProfile.tempUnit) {
-            localStorage.setItem('tempUnit', userProfile.tempUnit);
-            window.dispatchEvent(new Event('units-changed'));
+            localStorage.setItem(StorageKeys.TEMP_UNIT, userProfile.tempUnit);
+            window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
           }
           if (userProfile.speedUnit) {
-            localStorage.setItem('speedUnit', userProfile.speedUnit);
-            window.dispatchEvent(new Event('units-changed'));
+            localStorage.setItem(StorageKeys.SPEED_UNIT, userProfile.speedUnit);
+            window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
           }
 
           // Restore stock watchlist
           if (userProfile.stockWatchlist && userProfile.stockWatchlist.length > 0) {
-            localStorage.setItem('stock-tracker-watchlist', JSON.stringify(userProfile.stockWatchlist));
-            window.dispatchEvent(new Event('watchlist-changed'));
+            localStorage.setItem(StorageKeys.STOCK_WATCHLIST, JSON.stringify(userProfile.stockWatchlist));
+            window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
           }
 
           // Restore podcast subscriptions
           if (userProfile.podcastSubscriptions && userProfile.podcastSubscriptions.length > 0) {
-            localStorage.setItem('podcast-subscriptions', JSON.stringify(userProfile.podcastSubscriptions));
-            window.dispatchEvent(new Event('subscriptions-changed'));
+            localStorage.setItem(StorageKeys.PODCAST_SUBSCRIPTIONS, JSON.stringify(userProfile.podcastSubscriptions));
+            window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
           }
         }
       } else {

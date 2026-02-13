@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation, WindowEvents, StorageKeys } from '@weather/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
 import PodcastSearch from './PodcastSearch';
@@ -9,11 +9,9 @@ import EpisodeList from './EpisodeList';
 import AudioPlayer from './AudioPlayer';
 import './PodcastPlayer.css';
 
-const SUBSCRIPTIONS_KEY = 'podcast-subscriptions';
-
 function loadSubscriptions(): Set<string> {
   try {
-    const stored = localStorage.getItem(SUBSCRIPTIONS_KEY);
+    const stored = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
     if (stored) {
       return new Set(JSON.parse(stored).map(String));
     }
@@ -23,7 +21,7 @@ function loadSubscriptions(): Set<string> {
 
 function saveSubscriptions(ids: Set<string>) {
   try {
-    localStorage.setItem(SUBSCRIPTIONS_KEY, JSON.stringify([...ids]));
+    localStorage.setItem(StorageKeys.PODCAST_SUBSCRIPTIONS, JSON.stringify([...ids]));
   } catch { /* ignore */ }
 }
 
@@ -75,7 +73,7 @@ export default function PodcastPlayer() {
       }
       saveSubscriptions(next);
       // Notify shell for Firestore sync
-      window.dispatchEvent(new Event('subscriptions-changed'));
+      window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
       return next;
     });
   }, []);

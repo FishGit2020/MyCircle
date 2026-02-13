@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { WindowEvents, StorageKeys } from '@weather/shared';
 import { useAuth } from '../context/AuthContext';
 
 /**
@@ -14,7 +15,7 @@ export default function DataSync() {
 
     const handleWatchlistChanged = () => {
       try {
-        const raw = localStorage.getItem('stock-tracker-watchlist');
+        const raw = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
         const watchlist = raw ? JSON.parse(raw) : [];
         syncStockWatchlist(watchlist);
       } catch { /* ignore parse errors */ }
@@ -22,18 +23,18 @@ export default function DataSync() {
 
     const handleSubscriptionsChanged = () => {
       try {
-        const raw = localStorage.getItem('podcast-subscriptions');
+        const raw = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
         const subscriptionIds = raw ? JSON.parse(raw) : [];
         syncPodcastSubscriptions(subscriptionIds);
       } catch { /* ignore parse errors */ }
     };
 
-    window.addEventListener('watchlist-changed', handleWatchlistChanged);
-    window.addEventListener('subscriptions-changed', handleSubscriptionsChanged);
+    window.addEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
+    window.addEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
 
     return () => {
-      window.removeEventListener('watchlist-changed', handleWatchlistChanged);
-      window.removeEventListener('subscriptions-changed', handleSubscriptionsChanged);
+      window.removeEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
+      window.removeEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
     };
   }, [user, syncStockWatchlist, syncPodcastSubscriptions]);
 

@@ -19,15 +19,15 @@ test.describe('Homepage / Dashboard', () => {
     await expect(page.getByRole('heading', { name: /Welcome to MyCircle/i })).toBeVisible();
   });
 
-  test('has a city search input', async ({ page }) => {
-    await page.goto('/');
+  test('has a city search input on the weather page', async ({ page }) => {
+    await page.goto('/weather');
 
     const searchInput = page.getByPlaceholder(/search for a city/i);
     await expect(searchInput).toBeVisible({ timeout: 10_000 });
   });
 
-  test('shows "Use My Location" button', async ({ page }) => {
-    await page.goto('/');
+  test('shows "Use My Location" button on the weather page', async ({ page }) => {
+    await page.goto('/weather');
 
     await expect(page.getByRole('button', { name: /use my.*location/i })).toBeVisible();
   });

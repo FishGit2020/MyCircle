@@ -1,21 +1,21 @@
 import React, { useState, useCallback } from 'react';
-import { eventBus, MFEvents, SpeedUnit } from '@weather/shared';
+import { eventBus, MFEvents, WindowEvents, StorageKeys, SpeedUnit } from '@weather/shared';
 
 const SPEED_CYCLE: SpeedUnit[] = ['ms', 'kmh', 'mph'];
 const SPEED_LABELS: Record<SpeedUnit, string> = { ms: 'm/s', kmh: 'km/h', mph: 'mph' };
 
 export default function SpeedToggle() {
   const [speedUnit, setSpeedUnit] = useState<SpeedUnit>(() => {
-    try { return (localStorage.getItem('speedUnit') as SpeedUnit) || 'ms'; } catch { return 'ms'; }
+    try { return (localStorage.getItem(StorageKeys.SPEED_UNIT) as SpeedUnit) || 'ms'; } catch { return 'ms'; }
   });
 
   const toggle = useCallback(() => {
     const idx = SPEED_CYCLE.indexOf(speedUnit);
     const newUnit = SPEED_CYCLE[(idx + 1) % SPEED_CYCLE.length];
     setSpeedUnit(newUnit);
-    localStorage.setItem('speedUnit', newUnit);
+    localStorage.setItem(StorageKeys.SPEED_UNIT, newUnit);
     eventBus.publish(MFEvents.THEME_CHANGED, { speedUnit: newUnit });
-    window.dispatchEvent(new Event('units-changed'));
+    window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
   }, [speedUnit]);
 
   return (

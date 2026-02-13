@@ -1,12 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation, WindowEvents, StorageKeys } from '@weather/shared';
 import StockSearch from './StockSearch';
 import Watchlist from './Watchlist';
 import StockChart from './StockChart';
 import { useStockQuote, useStockCandles } from '../hooks/useStockData';
 import './StockTracker.css';
-
-const WATCHLIST_STORAGE_KEY = 'stock-tracker-watchlist';
 
 interface WatchlistItem {
   symbol: string;
@@ -15,7 +13,7 @@ interface WatchlistItem {
 
 function loadWatchlist(): WatchlistItem[] {
   try {
-    const stored = localStorage.getItem(WATCHLIST_STORAGE_KEY);
+    const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
     if (stored) {
       return JSON.parse(stored);
     }
@@ -25,7 +23,7 @@ function loadWatchlist(): WatchlistItem[] {
 
 function saveWatchlist(watchlist: WatchlistItem[]): void {
   try {
-    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(watchlist));
+    localStorage.setItem(StorageKeys.STOCK_WATCHLIST, JSON.stringify(watchlist));
   } catch { /* ignore */ }
 }
 
@@ -36,11 +34,11 @@ export default function StockTracker() {
   const [selectedName, setSelectedName] = useState<string>('');
 
   const [liveEnabled, setLiveEnabled] = useState(() => {
-    try { return localStorage.getItem('stock-live-enabled') === 'true'; } catch { return false; }
+    try { return localStorage.getItem(StorageKeys.STOCK_LIVE) === 'true'; } catch { return false; }
   });
 
   useEffect(() => {
-    try { localStorage.setItem('stock-live-enabled', String(liveEnabled)); } catch { /* ignore */ }
+    try { localStorage.setItem(StorageKeys.STOCK_LIVE, String(liveEnabled)); } catch { /* ignore */ }
   }, [liveEnabled]);
 
   const { quote: selectedQuote, loading: quoteLoading, lastUpdated, isLive } = useStockQuote(
@@ -52,7 +50,7 @@ export default function StockTracker() {
   // Persist watchlist to localStorage and notify shell for Firestore sync
   useEffect(() => {
     saveWatchlist(watchlist);
-    window.dispatchEvent(new Event('watchlist-changed'));
+    window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
   }, [watchlist]);
 
   const handleStockSelect = useCallback((symbol: string, description: string) => {

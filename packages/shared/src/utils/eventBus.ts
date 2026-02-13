@@ -15,6 +15,26 @@ export const MFEvents = {
   USER_LOCATION_CHANGED: 'mf:user-location-changed'
 } as const;
 
+// Window-level data-sync events (plain Event, no payload — used as invalidation signals)
+export const WindowEvents = {
+  UNITS_CHANGED: 'units-changed',
+  WATCHLIST_CHANGED: 'watchlist-changed',
+  SUBSCRIPTIONS_CHANGED: 'subscriptions-changed',
+} as const;
+
+// Centralized localStorage keys to avoid typo-prone string literals
+export const StorageKeys = {
+  TEMP_UNIT: 'tempUnit',
+  SPEED_UNIT: 'speedUnit',
+  THEME: 'theme',
+  LOCALE: 'weather-app-locale',
+  STOCK_WATCHLIST: 'stock-tracker-watchlist',
+  PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
+  WEATHER_LIVE: 'weather-live-enabled',
+  STOCK_LIVE: 'stock-live-enabled',
+  DASHBOARD_WIDGETS: 'weather-dashboard-widgets',
+} as const;
+
 export interface CitySelectedEvent {
   city: {
     id: string;

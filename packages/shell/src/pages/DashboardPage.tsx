@@ -1,15 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { useTranslation } from '@weather/shared';
+import { useTranslation, StorageKeys } from '@weather/shared';
 import { useAuth } from '../context/AuthContext';
 import { useDailyVerse } from '../hooks/useDailyVerse';
 
-const WATCHLIST_STORAGE_KEY = 'stock-tracker-watchlist';
-const SUBSCRIPTIONS_KEY = 'podcast-subscriptions';
-
 function getWatchlist(): Array<{ symbol: string; companyName: string }> {
   try {
-    const stored = localStorage.getItem(WATCHLIST_STORAGE_KEY);
+    const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
     if (stored) return JSON.parse(stored);
   } catch { /* ignore */ }
   return [];
@@ -17,7 +14,7 @@ function getWatchlist(): Array<{ symbol: string; companyName: string }> {
 
 function getSubscribedIds(): string[] {
   try {
-    const stored = localStorage.getItem(SUBSCRIPTIONS_KEY);
+    const stored = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
     if (stored) return JSON.parse(stored).map(String);
   } catch { /* ignore */ }
   return [];

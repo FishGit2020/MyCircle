@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 
 test.describe('City Search', () => {
   test('typing in search shows dropdown results', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/weather');
 
     const searchInput = page.getByPlaceholder(/search for a city/i);
     await searchInput.fill('London');
@@ -13,7 +13,7 @@ test.describe('City Search', () => {
   });
 
   test('clicking a search result navigates to weather page', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/weather');
 
     const searchInput = page.getByPlaceholder(/search for a city/i);
     await searchInput.fill('London');
@@ -27,7 +27,7 @@ test.describe('City Search', () => {
   });
 
   test('keyboard navigation works in dropdown', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/weather');
 
     const searchInput = page.getByPlaceholder(/search for a city/i);
     await searchInput.fill('London');
@@ -44,7 +44,7 @@ test.describe('City Search', () => {
   });
 
   test('shows popular cities when input is focused with no text', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/weather');
 
     const searchInput = page.getByPlaceholder(/search for a city/i);
     await expect(searchInput).toBeVisible({ timeout: 10_000 });

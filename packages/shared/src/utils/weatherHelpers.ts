@@ -1,3 +1,5 @@
+import { StorageKeys } from './eventBus';
+
 export function getWeatherIconUrl(iconCode: string): string {
   return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 }
@@ -28,8 +30,8 @@ export type SpeedUnit = 'ms' | 'mph' | 'kmh';
 
 export function getStoredUnits(): { tempUnit: TemperatureUnit; speedUnit: SpeedUnit } {
   try {
-    const tempUnit = (localStorage.getItem('tempUnit') as TemperatureUnit) || 'C';
-    const speedUnit = (localStorage.getItem('speedUnit') as SpeedUnit) || 'ms';
+    const tempUnit = (localStorage.getItem(StorageKeys.TEMP_UNIT) as TemperatureUnit) || 'C';
+    const speedUnit = (localStorage.getItem(StorageKeys.SPEED_UNIT) as SpeedUnit) || 'ms';
     return { tempUnit, speedUnit };
   } catch {
     return { tempUnit: 'C', speedUnit: 'ms' };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation, TranslationKey } from '@weather/shared';
+import { useTranslation, TranslationKey, StorageKeys } from '@weather/shared';
 
 export interface WidgetVisibility {
   currentWeather: boolean;
@@ -12,7 +12,6 @@ export interface WidgetVisibility {
   weatherMap: boolean;
 }
 
-const STORAGE_KEY = 'weather-dashboard-widgets';
 
 const WIDGET_KEYS: Array<keyof WidgetVisibility> = [
   'currentWeather',
@@ -49,7 +48,7 @@ const DEFAULT_VISIBILITY: WidgetVisibility = {
 
 export function loadWidgetVisibility(): WidgetVisibility {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(StorageKeys.DASHBOARD_WIDGETS);
     if (stored) {
       return { ...DEFAULT_VISIBILITY, ...JSON.parse(stored) };
     }
@@ -58,7 +57,7 @@ export function loadWidgetVisibility(): WidgetVisibility {
 }
 
 function saveWidgetVisibility(vis: WidgetVisibility) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(vis));
+  localStorage.setItem(StorageKeys.DASHBOARD_WIDGETS, JSON.stringify(vis));
 }
 
 interface Props {
