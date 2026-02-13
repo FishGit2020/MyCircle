@@ -20,7 +20,7 @@ export default defineConfig({
   // In CI: serve the production build (pnpm build must run first).
   // Locally: start the dev server with all MFEs via concurrently.
   webServer: {
-    command: process.env.CI ? 'pnpm start' : 'pnpm dev',
+    command: process.env.CI ? 'pnpm start:static' : 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

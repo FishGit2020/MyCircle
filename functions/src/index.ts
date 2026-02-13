@@ -19,6 +19,12 @@ if (getApps().length === 0) {
   initializeApp();
 }
 
+// Configurable base URLs — defaults to production, overridden in emulator via .env.emulator
+const OPENWEATHER_BASE = process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org';
+const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
+const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.com';
+const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podcastindex.org';
+
 // ─── CORS origins whitelist ─────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://mycircle-app.web.app',
@@ -295,7 +301,7 @@ export const checkWeatherAlerts = onSchedule(
     for (const [, city] of cityMap) {
       try {
         const response = await axios.get(
-          'https://api.openweathermap.org/data/2.5/weather',
+          `${OPENWEATHER_BASE}/data/2.5/weather`,
           { params: { lat: city.lat, lon: city.lon, appid: apiKey, units: 'metric' }, timeout: 5000 }
         );
 
@@ -399,7 +405,7 @@ export const stockProxy = onRequest(
     }
 
     const path = req.path.replace(/^\/stock\//, '');
-    const baseUrl = 'https://finnhub.io/api/v1';
+    const baseUrl = `${FINNHUB_BASE}/api/v1`;
     let url: string;
     let cacheKey: string;
     let cacheTTL: number;
@@ -767,7 +773,7 @@ async function executeGetWeather(city: string): Promise<string> {
 
   // First geocode the city
   const geoRes = await axios.get(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`,
+    `${OPENWEATHER_BASE}/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`,
     { timeout: 5000 }
   );
 
@@ -779,7 +785,7 @@ async function executeGetWeather(city: string): Promise<string> {
 
   // Get weather
   const weatherRes = await axios.get(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
+    `${OPENWEATHER_BASE}/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
     { timeout: 5000 }
   );
 
@@ -807,7 +813,7 @@ async function executeSearchCities(query: string): Promise<string> {
   if (!apiKey) return JSON.stringify({ error: 'Weather API not configured' });
 
   const res = await axios.get(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`,
+    `${OPENWEATHER_BASE}/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`,
     { timeout: 5000 }
   );
 
@@ -834,7 +840,7 @@ async function executeGetStockQuote(symbol: string): Promise<string> {
   if (cached) return cached;
 
   const res = await axios.get(
-    `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol.toUpperCase())}`,
+    `${FINNHUB_BASE}/api/v1/quote?symbol=${encodeURIComponent(symbol.toUpperCase())}`,
     { headers: { 'X-Finnhub-Token': apiKey }, timeout: 5000 }
   );
 
@@ -863,7 +869,7 @@ async function executeGetCryptoPrices(): Promise<string> {
 
   const ids = 'bitcoin,ethereum,solana,cardano,dogecoin';
   const res = await axios.get(
-    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
+    `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
     { timeout: 5000 }
   );
 
@@ -913,7 +919,7 @@ export const podcastProxy = onRequest(
     }
 
     const path = req.path.replace(/^\/podcast\//, '');
-    const baseUrl = 'https://api.podcastindex.org/api/1.0';
+    const baseUrl = `${PODCASTINDEX_BASE}/api/1.0`;
     let url: string;
     let cacheKey: string;
     let cacheTTL: number;

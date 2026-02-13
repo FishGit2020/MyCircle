@@ -2,6 +2,14 @@ import axios from 'axios';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
 
+// Configurable base URLs — defaults to production, overridden in emulator via .env.emulator
+const OPENWEATHER_BASE = process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org';
+const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
+const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.com';
+const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podcastindex.org';
+const BIBLE_API_BASE = process.env.BIBLE_API_BASE_URL || 'https://bible-api.com';
+const OPEN_METEO_BASE = process.env.OPEN_METEO_BASE_URL || 'https://archive-api.open-meteo.com';
+
 // Simple in-memory cache
 const weatherCache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
 const stockCache = new NodeCache({ stdTTL: 30, checkperiod: 10 });
@@ -67,7 +75,7 @@ interface City {
 // Weather API functions
 function createWeatherClient(apiKey: string) {
   return axios.create({
-    baseURL: 'https://api.openweathermap.org/data/2.5',
+    baseURL: `${OPENWEATHER_BASE}/data/2.5`,
     timeout: 5000,
     params: {
       appid: apiKey,
@@ -78,7 +86,7 @@ function createWeatherClient(apiKey: string) {
 
 function createGeoClient(apiKey: string) {
   return axios.create({
-    baseURL: 'https://api.openweathermap.org/geo/1.0',
+    baseURL: `${OPENWEATHER_BASE}/geo/1.0`,
     timeout: 5000,
     params: {
       appid: apiKey
@@ -164,7 +172,7 @@ async function getAirQuality(apiKey: string, lat: number, lon: number) {
   const cached = weatherCache.get<any>(cacheKey);
   if (cached) return cached;
 
-  const response = await axios.get('https://api.openweathermap.org/data/2.5/air_pollution', {
+  const response = await axios.get(`${OPENWEATHER_BASE}/data/2.5/air_pollution`, {
     params: { lat, lon, appid: apiKey },
     timeout: 5000,
   });
@@ -207,7 +215,7 @@ async function getHistoricalWeather(lat: number, lon: number, date: string) {
   const cached = weatherCache.get<any>(cacheKey);
   if (cached) return cached;
 
-  const response = await axios.get('https://archive-api.open-meteo.com/v1/archive', {
+  const response = await axios.get(`${OPEN_METEO_BASE}/v1/archive`, {
     params: {
       latitude: lat,
       longitude: lon,
@@ -277,7 +285,7 @@ async function getEarningsCalendar(apiKey: string, from: string, to: string) {
   const cached = stockCache.get<any[]>(cacheKey);
   if (cached) return cached;
 
-  const response = await axios.get('https://finnhub.io/api/v1/calendar/earnings', {
+  const response = await axios.get(`${FINNHUB_BASE}/api/v1/calendar/earnings`, {
     params: { from, to },
     headers: { 'X-Finnhub-Token': apiKey },
     timeout: 10000,
@@ -306,7 +314,7 @@ async function getCryptoPrices(ids: string[], vsCurrency: string = 'usd') {
   const cached = cryptoCache.get<any[]>(key);
   if (cached) return cached;
 
-  const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+  const response = await axios.get(`${COINGECKO_BASE}/api/v3/coins/markets`, {
     params: {
       vs_currency: vsCurrency,
       ids: ids.join(','),
@@ -341,7 +349,7 @@ async function searchStocks(apiKey: string, query: string) {
   const cached = stockCache.get<any>(cacheKey);
   if (cached) return cached;
 
-  const response = await axios.get(`https://finnhub.io/api/v1/search`, {
+  const response = await axios.get(`${FINNHUB_BASE}/api/v1/search`, {
     params: { q: query },
     headers: { 'X-Finnhub-Token': apiKey },
     timeout: 10000,
@@ -356,7 +364,7 @@ async function getStockQuote(apiKey: string, symbol: string) {
   const cached = stockCache.get<any>(cacheKey);
   if (cached) return cached;
 
-  const response = await axios.get(`https://finnhub.io/api/v1/quote`, {
+  const response = await axios.get(`${FINNHUB_BASE}/api/v1/quote`, {
     params: { symbol },
     headers: { 'X-Finnhub-Token': apiKey },
     timeout: 10000,
@@ -370,7 +378,7 @@ async function getStockCandles(apiKey: string, symbol: string, resolution: strin
   const cached = stockCache.get<any>(cacheKey);
   if (cached) return cached;
 
-  const response = await axios.get(`https://finnhub.io/api/v1/stock/candle`, {
+  const response = await axios.get(`${FINNHUB_BASE}/api/v1/stock/candle`, {
     params: { symbol, resolution, from, to },
     headers: { 'X-Finnhub-Token': apiKey },
     timeout: 10000,
@@ -414,7 +422,7 @@ async function searchPodcastsAPI(apiKey: string, apiSecret: string, query: strin
   if (cached) return cached;
 
   const headers = getPodcastIndexHeaders(apiKey, apiSecret);
-  const response = await axios.get(`https://api.podcastindex.org/api/1.0/search/byterm`, {
+  const response = await axios.get(`${PODCASTINDEX_BASE}/api/1.0/search/byterm`, {
     params: { q: query },
     headers,
     timeout: 10000,
@@ -430,7 +438,7 @@ async function getTrendingPodcastsAPI(apiKey: string, apiSecret: string) {
   if (cached) return cached;
 
   const headers = getPodcastIndexHeaders(apiKey, apiSecret);
-  const response = await axios.get(`https://api.podcastindex.org/api/1.0/podcasts/trending`, {
+  const response = await axios.get(`${PODCASTINDEX_BASE}/api/1.0/podcasts/trending`, {
     params: { max: 20 },
     headers,
     timeout: 10000,
@@ -446,7 +454,7 @@ async function getPodcastFeedAPI(apiKey: string, apiSecret: string, feedId: stri
   if (cached) return cached;
 
   const headers = getPodcastIndexHeaders(apiKey, apiSecret);
-  const response = await axios.get(`https://api.podcastindex.org/api/1.0/podcasts/byfeedid`, {
+  const response = await axios.get(`${PODCASTINDEX_BASE}/api/1.0/podcasts/byfeedid`, {
     params: { id: feedId },
     headers,
     timeout: 10000,
@@ -465,7 +473,7 @@ async function getPodcastEpisodesAPI(apiKey: string, apiSecret: string, feedId: 
   if (cached) return cached;
 
   const headers = getPodcastIndexHeaders(apiKey, apiSecret);
-  const response = await axios.get(`https://api.podcastindex.org/api/1.0/episodes/byfeedid`, {
+  const response = await axios.get(`${PODCASTINDEX_BASE}/api/1.0/episodes/byfeedid`, {
     params: { id: feedId, max: 20 },
     headers,
     timeout: 10000,
@@ -517,7 +525,7 @@ async function getBiblePassageAPI(reference: string, translation: string = 'web'
   if (cached) return cached;
 
   // bible-api.com accepts references like "john 3:16", "genesis 1:1-10", "psalm 23"
-  const response = await axios.get(`https://bible-api.com/${encodeURIComponent(reference)}`, {
+  const response = await axios.get(`${BIBLE_API_BASE}/${encodeURIComponent(reference)}`, {
     params: { translation },
     timeout: 10000,
   });

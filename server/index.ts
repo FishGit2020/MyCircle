@@ -16,6 +16,11 @@ import { resolvers, cleanupSubscriptions } from './graphql/resolvers.js';
 import { recaptchaMiddleware } from './middleware/recaptcha.js';
 import type { FunctionDeclaration } from '@google/genai';
 
+// Configurable base URLs — defaults to production, overridden in emulator via .env.emulator
+const OPENWEATHER_BASE = process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org';
+const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
+const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.com';
+
 const port = process.env.PORT || 3003;
 
 async function startServer() {
@@ -327,7 +332,7 @@ async function executeGetWeather(cache: NodeCache, city: string): Promise<string
   if (cached) return cached;
 
   const geoRes = await axios.get(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`,
+    `${OPENWEATHER_BASE}/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`,
     { timeout: 5000 }
   );
 
@@ -337,7 +342,7 @@ async function executeGetWeather(cache: NodeCache, city: string): Promise<string
 
   const { lat, lon, name, country } = geoRes.data[0];
   const weatherRes = await axios.get(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
+    `${OPENWEATHER_BASE}/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
     { timeout: 5000 }
   );
 
@@ -362,7 +367,7 @@ async function executeSearchCities(query: string): Promise<string> {
   if (!apiKey) return JSON.stringify({ error: 'Weather API not configured' });
 
   const res = await axios.get(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`,
+    `${OPENWEATHER_BASE}/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`,
     { timeout: 5000 }
   );
 
@@ -386,7 +391,7 @@ async function executeGetStockQuote(cache: NodeCache, symbol: string): Promise<s
   if (cached) return cached;
 
   const res = await axios.get(
-    `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol.toUpperCase())}`,
+    `${FINNHUB_BASE}/api/v1/quote?symbol=${encodeURIComponent(symbol.toUpperCase())}`,
     { headers: { 'X-Finnhub-Token': apiKey }, timeout: 5000 }
   );
 
@@ -412,7 +417,7 @@ async function executeGetCryptoPrices(cache: NodeCache): Promise<string> {
 
   const ids = 'bitcoin,ethereum,solana,cardano,dogecoin';
   const res = await axios.get(
-    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
+    `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
     { timeout: 5000 }
   );
 

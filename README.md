@@ -346,6 +346,11 @@ mycircle/
 | `pnpm test:coverage` | Run tests with coverage |
 | `pnpm test:mf` | Run tests across all MFE packages (parallel) |
 | `pnpm test:e2e` | Run Playwright end-to-end tests |
+| `pnpm test:e2e:emulator` | Run Playwright E2E tests against Firebase emulators |
+| `pnpm emulator:test` | Full emulator test run (mock API + emulators + seed + tests) |
+| `pnpm mock-api` | Start mock API server on port 4000 |
+| `pnpm seed:firestore` | Seed Firestore emulator with test data |
+| `pnpm start:static` | Serve production build (`dist/firebase/`) on port 3000 |
 | `pnpm typecheck` | TypeScript type checking |
 | `pnpm check:shared-versions` | Verify shared deps are consistent across MFEs |
 
@@ -357,7 +362,7 @@ MyCircle uses **GitHub Actions** for continuous integration and deployment:
 |----------|---------|--------------|
 | **CI** (`ci.yml`) | PR to `main` | Installs deps, checks shared dep versions, runs `typecheck:all`, runs `test:all` |
 | **Deploy** (`deploy.yml`) | Push to `main` | Builds the full app, deploys to Firebase Hosting (live channel) |
-| **E2E** (`e2e.yml`) | PR to `main` | Builds the app, installs Playwright browsers, runs `test:e2e` |
+| **E2E** (`e2e.yml`) | PR to `main` | Builds the app, installs Playwright browsers, runs `test:e2e` (mocked) and `emulator:test` (full-stack) |
 
 All workflows use `pnpm/action-setup@v4` with Node 22 and pnpm caching for fast installs.
 
@@ -593,9 +598,17 @@ pnpm test:mf           # All MFE packages
 pnpm test:all          # Root + all MFEs
 
 # End-to-end tests (Playwright)
-pnpm test:e2e          # Headless
+pnpm test:e2e          # Headless (browser-level mocks, no API server needed)
 pnpm test:e2e:headed   # With browser UI
 pnpm test:e2e:ui       # Playwright UI mode
+
+# Emulator E2E tests (full-stack: Firebase emulators + mock API server)
+pnpm emulator:test     # Orchestrated: starts mock API, emulators, seeds, runs tests
+# Or manually:
+pnpm mock-api &        # Start mock API server (port 4000)
+firebase emulators:start  # Start Firebase emulators (hosting:5000, functions:5001, etc.)
+pnpm seed:firestore    # Seed Firestore emulator
+pnpm test:e2e:emulator # Run emulator tests
 ```
 
 ## Troubleshooting
