@@ -16,6 +16,7 @@ const StockTrackerMF = lazy(() => import('stockTracker/StockTracker'));
 const PodcastPlayerMF = lazy(() => import('podcastPlayer/PodcastPlayer'));
 const AiAssistantMF = lazy(() => import('aiAssistant/AiAssistant'));
 const BibleReaderMF = lazy(() => import('bibleReader/BibleReader'));
+const WorshipSongsMF = lazy(() => import('worshipSongs/WorshipSongs'));
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -246,6 +247,23 @@ function BiblePage() {
   );
 }
 
+// Fallback for Worship Songs MFE
+const WorshipSongsFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Worship Songs module is loading...</p>
+  </div>
+);
+
+function WorshipPage() {
+  return (
+    <ErrorBoundary fallback={<WorshipSongsFallback />}>
+      <Suspense fallback={<Loading />}>
+        <WorshipSongsMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -268,6 +286,7 @@ export default function App() {
         <Route path="podcasts" element={<PodcastsPage />} />
         <Route path="ai" element={<AiPage />} />
         <Route path="bible" element={<BiblePage />} />
+        <Route path="worship" element={<WorshipPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />
       </Route>

@@ -31,6 +31,10 @@ const bibleReaderRemote = isProduction
   ? '/bible-reader/assets/remoteEntry.js'
   : 'http://localhost:3008/assets/remoteEntry.js';
 
+const worshipSongsRemote = isProduction
+  ? '/worship-songs/assets/remoteEntry.js'
+  : 'http://localhost:3009/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -42,7 +46,8 @@ export default defineConfig({
         stockTracker: stockTrackerRemote,
         podcastPlayer: podcastPlayerRemote,
         aiAssistant: aiAssistantRemote,
-        bibleReader: bibleReaderRemote
+        bibleReader: bibleReaderRemote,
+        worshipSongs: worshipSongsRemote
       },
       shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@weather/shared']
     }),

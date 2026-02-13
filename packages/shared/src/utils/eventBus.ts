@@ -22,6 +22,7 @@ export const WindowEvents = {
   UNITS_CHANGED: 'units-changed',
   WATCHLIST_CHANGED: 'watchlist-changed',
   SUBSCRIPTIONS_CHANGED: 'subscriptions-changed',
+  WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -35,6 +36,7 @@ export const StorageKeys = {
   WEATHER_LIVE: 'weather-live-enabled',
   STOCK_LIVE: 'stock-live-enabled',
   DASHBOARD_WIDGETS: 'weather-dashboard-widgets',
+  WORSHIP_SONGS_CACHE: 'worship-songs-cache',
 } as const;
 
 export interface CitySelectedEvent {

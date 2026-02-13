@@ -21,6 +21,13 @@ declare global {
     __REMOTE_CONFIG__?: Record<string, string>;
     __getFirebaseIdToken?: () => Promise<string | null>;
     __getAppCheckToken?: () => Promise<string | null>;
+    __worshipSongs?: {
+      getAll: () => Promise<any[]>;
+      get: (id: string) => Promise<any>;
+      add: (song: Record<string, any>) => Promise<string>;
+      update: (id: string, updates: Record<string, any>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+    };
   }
 }
 

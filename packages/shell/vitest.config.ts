@@ -25,7 +25,8 @@ export default defineConfig({
       'stockTracker/StockTracker': resolve(__dirname, './src/test/mocks/StockTrackerMock.tsx'),
       'podcastPlayer/PodcastPlayer': resolve(__dirname, './src/test/mocks/PodcastPlayerMock.tsx'),
       'aiAssistant/AiAssistant': resolve(__dirname, './src/test/mocks/AiAssistantMock.tsx'),
-      'bibleReader/BibleReader': resolve(__dirname, './src/test/mocks/BibleReaderMock.tsx')
+      'bibleReader/BibleReader': resolve(__dirname, './src/test/mocks/BibleReaderMock.tsx'),
+      'worshipSongs/WorshipSongs': resolve(__dirname, './src/test/mocks/WorshipSongsMock.tsx')
     }
   }
 });

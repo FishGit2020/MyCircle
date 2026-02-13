@@ -12,6 +12,7 @@ export default defineConfig({
       'podcastPlayer/PodcastPlayer': resolve(__dirname, './packages/shell/src/test/mocks/PodcastPlayerMock.tsx'),
       'aiAssistant/AiAssistant': resolve(__dirname, './packages/shell/src/test/mocks/AiAssistantMock.tsx'),
       'bibleReader/BibleReader': resolve(__dirname, './packages/shell/src/test/mocks/BibleReaderMock.tsx'),
+      'worshipSongs/WorshipSongs': resolve(__dirname, './packages/shell/src/test/mocks/WorshipSongsMock.tsx'),
       '@weather/shared': resolve(__dirname, './packages/shared/src'),
     }
   },
