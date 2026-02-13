@@ -23,6 +23,10 @@ vi.mock('../context/AuthContext', () => ({
 }));
 
 // Mock child components with simple placeholders
+vi.mock('../components/WidgetDashboard', () => ({
+  default: () => <div data-testid="widget-dashboard">WidgetDashboard</div>,
+}));
+
 vi.mock('../components/UseMyLocation', () => ({
   default: () => <div data-testid="use-my-location">UseMyLocation</div>,
 }));

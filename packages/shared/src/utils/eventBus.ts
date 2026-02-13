@@ -45,6 +45,7 @@ export const StorageKeys = {
   BIBLE_BOOKMARKS: 'bible-bookmarks',
   BIBLE_LAST_READ: 'bible-last-read',
   BIBLE_FONT_SIZE: 'bible-font-size',
+  WIDGET_LAYOUT: 'widget-dashboard-layout',
 } as const;
 
 export interface CitySelectedEvent {
