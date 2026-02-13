@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 
 interface ChatInputProps {
   onSend: (message: string) => void;

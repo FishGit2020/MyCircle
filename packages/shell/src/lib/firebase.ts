@@ -1,6 +1,6 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, Auth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -348,6 +348,58 @@ export function logEvent(eventName: string, params?: Record<string, any>) {
 export async function getFirebaseIdToken(): Promise<string | null> {
   if (!auth?.currentUser) return null;
   return auth.currentUser.getIdToken();
+}
+
+// Worship Songs — public read, auth-required write
+export async function getWorshipSongs() {
+  if (!db) return [];
+  const q = query(collection(db, 'worshipSongs'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function getWorshipSong(id: string) {
+  if (!db) return null;
+  const docRef = doc(db, 'worshipSongs', id);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) return null;
+  return { id: docSnap.id, ...docSnap.data() };
+}
+
+export async function addWorshipSong(song: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'worshipSongs'), {
+    ...song,
+    createdBy: auth?.currentUser?.uid ?? null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateWorshipSong(id: string, updates: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = doc(db, 'worshipSongs', id);
+  await updateDoc(docRef, {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteWorshipSong(id: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'worshipSongs', id));
+}
+
+// Expose worship songs API for MFEs
+if (firebaseEnabled) {
+  window.__worshipSongs = {
+    getAll: getWorshipSongs as any,
+    get: getWorshipSong as any,
+    add: addWorshipSong,
+    update: updateWorshipSong,
+    delete: deleteWorshipSong,
+  };
 }
 
 export { app, auth, db, perf, analytics, firebaseEnabled };

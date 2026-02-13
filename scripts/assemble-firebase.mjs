@@ -83,6 +83,12 @@ const bibleReaderDest = path.join(firebaseDir, 'bible-reader');
 console.log(`Copying bible-reader to ${bibleReaderDest}`);
 copyDir(bibleReaderDist, bibleReaderDest);
 
+// 8. Copy worship-songs MF to /worship-songs
+const worshipSongsDist = path.join(rootDir, 'packages', 'worship-songs', 'dist');
+const worshipSongsDest = path.join(firebaseDir, 'worship-songs');
+console.log(`Copying worship-songs to ${worshipSongsDest}`);
+copyDir(worshipSongsDist, worshipSongsDest);
+
 console.log('\nFirebase deployment directory assembled successfully!');
 console.log(`Output: ${firebaseDir}`);
 

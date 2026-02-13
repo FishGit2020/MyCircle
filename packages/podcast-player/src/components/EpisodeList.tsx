@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import type { Episode } from '../hooks/usePodcastData';
 
 interface EpisodeListProps {

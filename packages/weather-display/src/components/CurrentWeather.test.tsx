@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import CurrentWeather from './CurrentWeather';
-import { CurrentWeather as CurrentWeatherType } from '@weather/shared';
+import { CurrentWeather as CurrentWeatherType } from '@mycircle/shared';
 
 const mockWeatherData: CurrentWeatherType = {
   temp: 22,

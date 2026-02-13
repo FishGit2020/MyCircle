@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import UseMyLocation from '../components/UseMyLocation';
 import CitySearchWrapper from '../components/CitySearchWrapper';

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { WindowEvents, StorageKeys } from '@weather/shared';
+import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 
 /**

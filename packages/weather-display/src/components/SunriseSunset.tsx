@@ -1,5 +1,5 @@
 import React from 'react';
-import { CurrentWeather, useTranslation } from '@weather/shared';
+import { CurrentWeather, useTranslation } from '@mycircle/shared';
 
 interface Props {
   data: CurrentWeather;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CurrentWeather, useTranslation, TranslationKey } from '@weather/shared';
+import { CurrentWeather, useTranslation, TranslationKey } from '@mycircle/shared';
 
 interface Suggestion {
   icon: string;

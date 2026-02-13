@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { StorageKeys } from '@weather/shared';
+import { StorageKeys } from '@mycircle/shared';
 
 type Theme = 'light' | 'dark';
 

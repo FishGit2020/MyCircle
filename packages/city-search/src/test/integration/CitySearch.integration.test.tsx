@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import CitySearch from '../../components/CitySearch';
-import { SEARCH_CITIES, eventBus, MFEvents } from '@weather/shared';
+import { SEARCH_CITIES, eventBus, MFEvents } from '@mycircle/shared';
 
 const mockNavigate = vi.fn();
 

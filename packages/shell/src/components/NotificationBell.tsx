@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import { requestNotificationPermission, onForegroundMessage, subscribeToWeatherAlerts, unsubscribeFromWeatherAlerts } from '../lib/messaging';
 import { firebaseEnabled } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';

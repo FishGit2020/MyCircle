@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client/react';
-import { GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature } from '@weather/shared';
+import { GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature } from '@mycircle/shared';
 
 interface CurrentWeatherData {
   currentWeather: {

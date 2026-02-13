@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import { useTrendingPodcasts } from '../hooks/usePodcastData';
 import type { Podcast } from '../hooks/usePodcastData';
 import PodcastCard from './PodcastCard';

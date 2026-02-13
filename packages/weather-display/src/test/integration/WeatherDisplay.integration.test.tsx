@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import WeatherDisplay from '../../components/WeatherDisplay';
-import { GET_WEATHER, WEATHER_UPDATES } from '@weather/shared';
+import { GET_WEATHER, WEATHER_UPDATES } from '@mycircle/shared';
 
 const mockWeatherResponse = {
   weather: {

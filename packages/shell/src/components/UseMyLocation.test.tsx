@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import UseMyLocation from './UseMyLocation';
-import { REVERSE_GEOCODE } from '@weather/shared';
+import { REVERSE_GEOCODE } from '@mycircle/shared';
 
 const mockNavigate = vi.fn();
 

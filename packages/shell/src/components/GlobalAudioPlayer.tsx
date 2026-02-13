@@ -3,8 +3,8 @@ import {
   useTranslation,
   subscribeToMFEvent,
   MFEvents,
-} from '@weather/shared';
-import type { Episode, Podcast, PodcastPlayEpisodeEvent } from '@weather/shared';
+} from '@mycircle/shared';
+import type { Episode, Podcast, PodcastPlayEpisodeEvent } from '@mycircle/shared';
 
 const PLAYBACK_SPEEDS = [0.5, 1, 1.25, 1.5, 2];
 

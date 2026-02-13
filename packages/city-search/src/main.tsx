@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { ApolloProvider } from '@apollo/client/react';
-import { getApolloClient } from '@weather/shared';
+import { getApolloClient } from '@mycircle/shared';
 import CitySearch from './components/CitySearch';
 import './index.css';
 

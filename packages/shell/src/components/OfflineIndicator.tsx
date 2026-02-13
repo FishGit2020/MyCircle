@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 
 export default function OfflineIndicator() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);

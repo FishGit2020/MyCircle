@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation, WindowEvents, StorageKeys } from '@weather/shared';
+import { useTranslation, WindowEvents, StorageKeys } from '@mycircle/shared';
 import StockSearch from './StockSearch';
 import Watchlist from './Watchlist';
 import StockChart from './StockChart';

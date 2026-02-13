@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { User } from 'firebase/auth';
-import { WindowEvents, StorageKeys } from '@weather/shared';
+import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import {
   subscribeToAuthChanges,
   signInWithGoogle,

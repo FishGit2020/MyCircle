@@ -48,6 +48,10 @@
         "destination": "/bible-reader/index.html"
       },
       {
+        "source": "/worship-songs/**",
+        "destination": "/worship-songs/index.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

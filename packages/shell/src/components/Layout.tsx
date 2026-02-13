@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import ThemeToggle from './ThemeToggle';
 import UnitToggle from './UnitToggle';
 import SpeedToggle from './SpeedToggle';
@@ -104,6 +104,9 @@ export default function Layout() {
               <Link to="/bible" className={navLinkClass('/bible')}>
                 Bible
               </Link>
+              <Link to="/worship" className={navLinkClass('/worship')}>
+                {t('nav.worship')}
+              </Link>
               <Link to="/ai" className={navLinkClass('/ai')}>
                 {t('nav.ai')}
               </Link>
@@ -158,6 +161,9 @@ export default function Layout() {
               </Link>
               <Link to="/bible" className={mobileNavLinkClass('/bible')}>
                 Bible
+              </Link>
+              <Link to="/worship" className={mobileNavLinkClass('/worship')}>
+                {t('nav.worship')}
               </Link>
               <Link to="/ai" className={mobileNavLinkClass('/ai')}>
                 {t('nav.ai')}

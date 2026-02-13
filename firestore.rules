@@ -11,5 +11,11 @@ service cloud.firestore {
     match /feedback/{feedbackId} {
       allow create: if request.auth != null;
     }
+
+    // Worship songs - public read, authenticated write
+    match /worshipSongs/{songId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
   }
 }

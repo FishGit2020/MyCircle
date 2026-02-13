@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { GET_CURRENT_WEATHER, GET_FORECAST, getWeatherIconUrl, getWindDirection, useTranslation, useUnits, formatTemperature, formatWindSpeed, convertTemp, tempUnitSymbol } from '@weather/shared';
+import { GET_CURRENT_WEATHER, GET_FORECAST, getWeatherIconUrl, getWindDirection, useTranslation, useUnits, formatTemperature, formatWindSpeed, convertTemp, tempUnitSymbol } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { FavoriteCity, RecentCity } from '../lib/firebase';
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import { usePodcastSearch } from '../hooks/usePodcastData';
 import type { Podcast } from '../hooks/usePodcastData';
 

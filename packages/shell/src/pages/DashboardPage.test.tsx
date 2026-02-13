@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import DashboardPage from './DashboardPage';
 
-// Mock @weather/shared — useTranslation (identity) + Apollo hooks for useDailyVerse
-vi.mock('@weather/shared', () => ({
+// Mock @mycircle/shared — useTranslation (identity) + Apollo hooks for useDailyVerse
+vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

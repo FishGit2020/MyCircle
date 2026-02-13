@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { GET_STOCK_QUOTE, StorageKeys } from '@weather/shared';
+import { GET_STOCK_QUOTE, StorageKeys } from '@mycircle/shared';
 import StockTracker from './StockTracker';
 
 // Mock localStorage

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useLazyQuery } from '@apollo/client/react';
-import { SEARCH_CITIES, REVERSE_GEOCODE, City, eventBus, MFEvents, useTranslation, fuzzySearchCities, MAJOR_CITIES } from '@weather/shared';
+import { SEARCH_CITIES, REVERSE_GEOCODE, City, eventBus, MFEvents, useTranslation, fuzzySearchCities, MAJOR_CITIES } from '@mycircle/shared';
 import WeatherPreview from './WeatherPreview';
 import './CitySearch.css';
 

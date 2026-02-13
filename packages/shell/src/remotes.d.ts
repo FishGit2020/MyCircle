@@ -28,3 +28,8 @@ declare module 'bibleReader/BibleReader' {
   const BibleReader: React.ComponentType;
   export default BibleReader;
 }
+
+declare module 'worshipSongs/WorshipSongs' {
+  const WorshipSongs: React.ComponentType;
+  export default WorshipSongs;
+}

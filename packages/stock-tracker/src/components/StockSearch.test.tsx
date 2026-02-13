@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MockedProvider, MockedResponse } from '@apollo/client/testing/react';
 import StockSearch from './StockSearch';
-import { SEARCH_STOCKS } from '@weather/shared';
+import { SEARCH_STOCKS } from '@mycircle/shared';
 
 const mockSearchResults = [
   {

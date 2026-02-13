@@ -1,5 +1,5 @@
 {
-  "name": "@weather/ai-assistant",
+  "name": "@mycircle/ai-assistant",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.1.1",
-    "@weather/shared": "workspace:*",
+    "@mycircle/shared": "workspace:*",
     "graphql": "^16.12.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

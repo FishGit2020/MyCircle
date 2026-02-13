@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useLazyQuery } from '@apollo/client/react';
-import { REVERSE_GEOCODE, useTranslation } from '@weather/shared';
+import { REVERSE_GEOCODE, useTranslation } from '@mycircle/shared';
 
 interface ReverseGeocodeData {
   reverseGeocode: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { useTranslation, StorageKeys } from '@weather/shared';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { useDailyVerse } from '../hooks/useDailyVerse';
 
@@ -18,6 +18,14 @@ function getSubscribedIds(): string[] {
     if (stored) return JSON.parse(stored).map(String);
   } catch { /* ignore */ }
   return [];
+}
+
+function getWorshipSongCount(): number {
+  try {
+    const stored = localStorage.getItem(StorageKeys.WORSHIP_SONGS_CACHE);
+    if (stored) return JSON.parse(stored).length;
+  } catch { /* ignore */ }
+  return 0;
 }
 
 function FeatureCard({
@@ -57,6 +65,7 @@ export default function DashboardPage() {
   const { favoriteCities } = useAuth();
   const watchlist = getWatchlist();
   const subscribedIds = getSubscribedIds();
+  const worshipSongCount = getWorshipSongCount();
   const { verse, showVotd, toggleVotd, loading: verseLoading } = useDailyVerse();
 
   return (
@@ -102,7 +111,7 @@ export default function DashboardPage() {
       {/* Feature cards grid */}
       <section>
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">{t('dashboard.quickAccess')}</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           {/* Weather card */}
           <FeatureCard
             to="/weather"
@@ -189,6 +198,26 @@ export default function DashboardPage() {
             }
           >
             <p className="text-xs text-amber-600 dark:text-amber-400">Verse of the Day & more</p>
+          </FeatureCard>
+
+          {/* Worship card */}
+          <FeatureCard
+            to="/worship"
+            title={t('dashboard.worship')}
+            description={t('home.quickWorshipDesc')}
+            icon={
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            }
+          >
+            {worshipSongCount > 0 ? (
+              <p className="text-xs text-indigo-600 dark:text-indigo-400">
+                {t('worship.songCount').replace('{count}', String(worshipSongCount))}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-400 dark:text-gray-500">{t('worship.noSongs')}</p>
+            )}
           </FeatureCard>
 
           {/* AI card */}
