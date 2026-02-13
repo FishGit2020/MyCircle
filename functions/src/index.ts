@@ -1,5 +1,6 @@
 import { onRequest, onCall, HttpsError } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { logger } from 'firebase-functions';
 import { initializeApp, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
@@ -113,7 +114,7 @@ export const graphql = onRequest(
       try {
         await getAppCheck().verifyToken(appCheckToken);
       } catch (err) {
-        console.warn('App Check verification failed:', err);
+        logger.warn('App Check verification failed', { error: String(err) });
         res.status(403).json({
           errors: [{
             message: 'App Check verification failed',
@@ -160,7 +161,7 @@ export const graphql = onRequest(
         res.status(200).json({ data: null, errors: [{ message: 'Incremental delivery not supported' }] });
       }
     } catch (error: any) {
-      console.error('GraphQL error:', error);
+      logger.error('GraphQL execution error', { error: error.message });
       res.status(500).json({
         errors: [{ message: error.message || 'Internal server error' }]
       });
@@ -255,14 +256,14 @@ export const checkWeatherAlerts = onSchedule(
     const apiKey = process.env.OPENWEATHER_API_KEY || '';
 
     if (!apiKey) {
-      console.warn('OPENWEATHER_API_KEY not set — skipping weather alerts');
+      logger.warn('OPENWEATHER_API_KEY not set — skipping weather alerts');
       return;
     }
 
     // Fetch all subscriptions
     const snapshot = await db.collection('alertSubscriptions').get();
     if (snapshot.empty) {
-      console.log('No alert subscriptions found');
+      logger.info('No alert subscriptions found');
       return;
     }
 
@@ -285,7 +286,7 @@ export const checkWeatherAlerts = onSchedule(
       }
     }
 
-    console.log(`Checking weather for ${cityMap.size} unique cities`);
+    logger.info('Checking weather for subscribed cities', { cityCount: cityMap.size });
 
     // Check weather for each city
     const staleTokens: string[] = [];
@@ -304,7 +305,7 @@ export const checkWeatherAlerts = onSchedule(
           const severity = weather.find(w => SEVERE_WEATHER_IDS.has(w.id))!;
           const temp = Math.round(response.data.main.temp);
 
-          console.log(`Severe weather in ${city.name}: ${severity.description}`);
+          logger.info('Severe weather detected', { city: city.name, condition: severity.description });
 
           // Send FCM to all subscribed tokens for this city
           for (const token of city.tokens) {
@@ -332,18 +333,18 @@ export const checkWeatherAlerts = onSchedule(
                   err.code === 'messaging/invalid-registration-token') {
                 staleTokens.push(token);
               }
-              console.error(`Failed to send to token ${token.slice(0, 10)}...:`, err.message);
+              logger.error('Failed to send FCM notification', { tokenPrefix: token.slice(0, 10), error: err.message });
             }
           }
         }
       } catch (err: any) {
-        console.error(`Failed to fetch weather for ${city.name}:`, err.message);
+        logger.error('Failed to fetch weather for alert check', { city: city.name, error: err.message });
       }
     }
 
     // Clean up stale tokens
     if (staleTokens.length > 0) {
-      console.log(`Cleaning up ${staleTokens.length} stale tokens`);
+      logger.info('Cleaning up stale FCM tokens', { count: staleTokens.length });
       const batch = db.batch();
       for (const token of staleTokens) {
         const docs = await db.collection('alertSubscriptions').where('token', '==', token).get();
@@ -458,7 +459,7 @@ export const stockProxy = onRequest(
       stockCache.set(cacheKey, response.data, cacheTTL);
       res.status(200).json(response.data);
     } catch (err: any) {
-      console.error(`Stock proxy error (${path}):`, err.message);
+      logger.error('Stock proxy error', { path, error: err.message });
       res.status(err.response?.status || 500).json({
         error: err.response?.data?.error || err.message || 'Failed to fetch stock data',
       });
@@ -741,7 +742,7 @@ export const aiChat = onRequest(
       const text = response.text || 'Sorry, I could not generate a response.';
       res.status(200).json({ response: text });
     } catch (err: any) {
-      console.error('AI Chat error:', err);
+      logger.error('AI Chat error', { error: err.message || String(err), status: err.status });
       if (err.status === 429) {
         res.status(429).json({ error: 'Rate limit exceeded. Please try again in a moment.' });
         return;
@@ -967,7 +968,7 @@ export const podcastProxy = onRequest(
       podcastCache.set(cacheKey, data, cacheTTL);
       res.status(200).json(data);
     } catch (err: any) {
-      console.error(`Podcast proxy error (${path}):`, err.message);
+      logger.error('Podcast proxy error', { path, error: err.message });
       res.status(err.response?.status || 500).json({
         error: err.response?.data?.description || err.message || 'Failed to fetch podcast data',
       });

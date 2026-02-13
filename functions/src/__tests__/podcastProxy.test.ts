@@ -23,6 +23,9 @@ vi.mock('axios', () => ({
   default: { get: vi.fn() },
 }));
 
+vi.mock('firebase-functions', () => ({
+  logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+}));
 vi.mock('firebase-functions/v2/https', () => ({
   onRequest: (_opts: any, handler: any) => handler,
   onCall: (_opts: any, handler: any) => handler,
