@@ -241,7 +241,7 @@ mycircle/
 
 - Node.js 22+
 - pnpm 9+
-- API keys (see [Environment Variables](#environment-variables))
+- API keys (see [Environment Variables](#environment-variables) and the [API Key Guide](docs/api-keys.md) for step-by-step setup instructions)
 
 ### Setup
 
