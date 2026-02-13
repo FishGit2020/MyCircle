@@ -45,6 +45,7 @@ export const StorageKeys = {
   BIBLE_BOOKMARKS: 'bible-bookmarks',
   BIBLE_LAST_READ: 'bible-last-read',
   BIBLE_FONT_SIZE: 'bible-font-size',
+  BIBLE_NOTES: 'bible-notes',
   WIDGET_LAYOUT: 'widget-dashboard-layout',
   RECENT_CITIES: 'recent-cities',
 } as const;

@@ -209,6 +209,20 @@ Exposes `AiAssistant` component via Module Federation.
 - Suggested prompt chips: weather, stocks, crypto, navigation, comparison
 - Authenticated requests (Firebase ID token attached)
 
+### Bible Reader - `packages/bible-reader/`
+
+Exposes `BibleReader` component via Module Federation.
+
+**Key Behavior:**
+- Browse all 66 canonical Bible books (Old & New Testament) with search/filter
+- Chapter grid navigation with previous/next chapter controls
+- Verse of the Day via GraphQL (`bibleVotd` query) cached by day-of-year
+- Passage reading with font size adjustment (5 levels, persisted via `StorageKeys.BIBLE_FONT_SIZE`)
+- Bookmark system (create/remove, stored in `StorageKeys.BIBLE_BOOKMARKS`)
+- Copy passage text to clipboard
+- **Community notes**: Collapsible notes panel per passage (`book:chapter` key). Auto-saved to `StorageKeys.BIBLE_NOTES` with 800ms debounce. Notes are loaded when navigating to a passage and cleared preview shown in collapsed state.
+- Last read position tracking (`StorageKeys.BIBLE_LAST_READ`)
+
 ---
 
 ## Inter-MFE Communication
