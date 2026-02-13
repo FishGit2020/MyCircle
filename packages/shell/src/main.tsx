@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { RemoteConfigProvider } from './context/RemoteConfigContext';
 import ThemeSync from './components/ThemeSync';
+import DataSync from './components/DataSync';
 import App from './App';
 import './index.css';
 
@@ -19,6 +20,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <RemoteConfigProvider>
             <ThemeSync />
+            <DataSync />
             <ApolloProvider client={client}>
               <BrowserRouter>
                 <App />

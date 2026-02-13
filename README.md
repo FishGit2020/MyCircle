@@ -65,12 +65,12 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  ┌───────────┐ ┌─────────────┐ ┌─────────────────┐ ┌───────────────┐   │
 │  │   Shell   │ │ City Search │ │ Weather Display │ │ Stock Tracker │   │
 │  │  (Host)   │ │    (MFE)    │ │      (MFE)      │ │     (MFE)     │   │
-│  │ Port 3000 │ │  Port 3001  │ │   Port 3002     │ │  Port 3004    │   │
+│  │ Port 3000 │ │  Port 3001  │ │   Port 3002     │ │  Port 3005    │   │
 │  └───────────┘ └─────────────┘ └─────────────────┘ └───────────────┘   │
 │  ┌─────────────────┐ ┌──────────────┐                                   │
 │  │ Podcast Player  │ │ AI Assistant │                                   │
 │  │     (MFE)       │ │    (MFE)     │                                   │
-│  │   Port 3005     │ │  Port 3006   │                                   │
+│  │   Port 3006     │ │  Port 3007   │                                   │
 │  └─────────────────┘ └──────────────┘                                   │
 └──────────────────────────────────────────────────────────────────────────┘
                                 │

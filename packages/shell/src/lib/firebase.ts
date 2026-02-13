@@ -77,8 +77,15 @@ export interface UserProfile {
   speedUnit?: 'ms' | 'mph' | 'kmh';
   recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
+  stockWatchlist?: WatchlistItem[];
+  podcastSubscriptions?: string[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface WatchlistItem {
+  symbol: string;
+  companyName: string;
 }
 
 export interface FavoriteCity {
@@ -147,6 +154,8 @@ async function ensureUserProfile(user: User) {
       darkMode: false,
       recentCities: [],
       favoriteCities: [],
+      stockWatchlist: [],
+      podcastSubscriptions: [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -267,6 +276,24 @@ export async function toggleFavoriteCity(uid: string, city: FavoriteCity): Promi
     return !exists; // returns true if added, false if removed
   }
   return false;
+}
+
+export async function updateStockWatchlist(uid: string, watchlist: WatchlistItem[]) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    stockWatchlist: watchlist,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updatePodcastSubscriptions(uid: string, subscriptionIds: string[]) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    podcastSubscriptions: subscriptionIds,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export async function getRecentCities(uid: string): Promise<RecentCity[]> {
