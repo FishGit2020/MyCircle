@@ -319,6 +319,26 @@ const en = {
   'ai.toolGeneric': 'Tool',
   'ai.error': 'Failed to get response',
   'ai.rateLimited': 'Rate limited. Please wait a moment.',
+
+  // Feedback
+  'feedback.button': 'Feedback',
+  'feedback.title': 'Send Feedback',
+  'feedback.close': 'Close feedback form',
+  'feedback.category': 'Category',
+  'feedback.categoryGeneral': 'General',
+  'feedback.categoryBug': 'Bug Report',
+  'feedback.categoryFeature': 'Feature Request',
+  'feedback.categoryOther': 'Other',
+  'feedback.rating': 'Rating',
+  'feedback.ratingOptional': 'optional',
+  'feedback.ratingStars': '{count} star',
+  'feedback.ratingStarsPlural': '{count} stars',
+  'feedback.message': 'Message',
+  'feedback.messagePlaceholder': 'Tell us what you think...',
+  'feedback.submit': 'Submit Feedback',
+  'feedback.sending': 'Sending...',
+  'feedback.success': 'Thanks for your feedback!',
+  'feedback.error': 'Something went wrong. Please try again.',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -638,6 +658,26 @@ const es: Record<TranslationKey, string> = {
   'ai.toolGeneric': 'Herramienta',
   'ai.error': 'No se pudo obtener respuesta',
   'ai.rateLimited': 'L\u00edmite de velocidad. Espera un momento.',
+
+  // Feedback
+  'feedback.button': 'Comentarios',
+  'feedback.title': 'Enviar comentarios',
+  'feedback.close': 'Cerrar formulario de comentarios',
+  'feedback.category': 'Categor\u00eda',
+  'feedback.categoryGeneral': 'General',
+  'feedback.categoryBug': 'Reporte de error',
+  'feedback.categoryFeature': 'Solicitud de funci\u00f3n',
+  'feedback.categoryOther': 'Otro',
+  'feedback.rating': 'Calificaci\u00f3n',
+  'feedback.ratingOptional': 'opcional',
+  'feedback.ratingStars': '{count} estrella',
+  'feedback.ratingStarsPlural': '{count} estrellas',
+  'feedback.message': 'Mensaje',
+  'feedback.messagePlaceholder': 'Cu\u00e9ntanos qu\u00e9 piensas...',
+  'feedback.submit': 'Enviar comentarios',
+  'feedback.sending': 'Enviando...',
+  'feedback.success': '\u00a1Gracias por tus comentarios!',
+  'feedback.error': 'Algo sali\u00f3 mal. Int\u00e9ntalo de nuevo.',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {

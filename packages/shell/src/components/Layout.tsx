@@ -8,6 +8,7 @@ import UserMenu from './UserMenu';
 import NotificationBell from './NotificationBell';
 import OfflineIndicator from './OfflineIndicator';
 import LanguageSelector from './LanguageSelector';
+import FeedbackButton from './FeedbackButton';
 import { useRemoteConfigContext } from '../context/RemoteConfigContext';
 
 export default function Layout() {
@@ -166,6 +167,8 @@ export default function Layout() {
       <main id="main-content" className="flex-grow container mx-auto px-4 py-8">
         <Outlet />
       </main>
+
+      <FeedbackButton />
 
       <footer role="contentinfo" className="bg-gray-800 dark:bg-gray-950 text-white py-6 mt-12 transition-colors">
         <div className="container mx-auto px-4 text-center">
