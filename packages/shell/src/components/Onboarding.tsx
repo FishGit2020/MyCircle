@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 
 const ONBOARDING_KEY = 'mycircle-onboarding-complete';
 

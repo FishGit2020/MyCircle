@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 
 interface PaletteItem {
   id: string;
