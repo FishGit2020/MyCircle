@@ -300,11 +300,11 @@ mycircle/
 | Script | Description |
 |--------|-------------|
 | `pnpm dev` | Start all services for development |
-| `pnpm build` | Build shared + all micro frontends |
+| `pnpm build` | Build shared + all micro frontends (remotes in parallel) |
 | `pnpm test` | Run unit tests (Vitest, watch mode) |
 | `pnpm test:run` | Run unit tests once |
 | `pnpm test:coverage` | Run tests with coverage |
-| `pnpm test:mf` | Run tests across all MFE packages |
+| `pnpm test:mf` | Run tests across all MFE packages (parallel) |
 | `pnpm test:e2e` | Run Playwright end-to-end tests |
 | `pnpm typecheck` | TypeScript type checking |
 
