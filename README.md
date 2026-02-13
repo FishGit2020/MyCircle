@@ -29,6 +29,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Share weather (link or screenshot image)
 - Inline weather comparison (compare two cities side-by-side)
 - **Historical weather** — "This day last year" comparison using Open-Meteo archive API
+- **Air Quality Index** — real-time AQI with color-coded levels, expandable pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
 - Visible live/paused toggle with clear state indication
 
 ### Stocks
@@ -426,7 +427,7 @@ federation({
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `OPENWEATHER_API_KEY` | OpenWeather API key | Yes |
+| `OPENWEATHER_API_KEY` | OpenWeather API key (weather + air pollution) | Yes |
 | `FINNHUB_API_KEY` | Finnhub stock API key | For stocks |
 | `PODCASTINDEX_API_KEY` | PodcastIndex API key | For podcasts |
 | `PODCASTINDEX_API_SECRET` | PodcastIndex API secret | For podcasts |

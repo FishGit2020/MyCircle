@@ -50,6 +50,17 @@ export interface HourlyForecast {
   wind_speed: number;
 }
 
+export interface AirQuality {
+  aqi: number;
+  co: number;
+  no: number;
+  no2: number;
+  o3: number;
+  so2: number;
+  pm2_5: number;
+  pm10: number;
+}
+
 export interface HistoricalWeatherDay {
   date: string;
   temp_max: number;
