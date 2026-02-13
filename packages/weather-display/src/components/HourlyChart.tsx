@@ -5,7 +5,7 @@ interface Props {
   data: HourlyForecast[];
 }
 
-export default function HourlyChart({ data }: Props) {
+function HourlyChart({ data }: Props) {
   const { t, locale } = useTranslation();
   const { tempUnit } = useUnits();
   const hours = data.slice(0, 24);
@@ -112,3 +112,5 @@ export default function HourlyChart({ data }: Props) {
     </div>
   );
 }
+
+export default React.memo(HourlyChart);
