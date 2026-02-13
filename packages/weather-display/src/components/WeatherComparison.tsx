@@ -34,7 +34,30 @@ interface ForecastData {
   }>;
 }
 
-function CompareCard({ city }: { city: City }) {
+/** Side-by-side comparison metric bar */
+function CompareBar({ label, valueA, valueB, unit, max }: { label: string; valueA: number; valueB: number; unit: string; max: number }) {
+  const pctA = max > 0 ? Math.min((valueA / max) * 100, 100) : 0;
+  const pctB = max > 0 ? Math.min((valueB / max) * 100, 100) : 0;
+
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+        <span>{label}</span>
+        <span className="tabular-nums">{Math.round(valueA)}{unit} vs {Math.round(valueB)}{unit}</span>
+      </div>
+      <div className="flex gap-1 h-2">
+        <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-full bg-blue-400 rounded-full transition-all" style={{ width: `${pctA}%` }} />
+        </div>
+        <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-full bg-orange-400 rounded-full transition-all" style={{ width: `${pctB}%` }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CompareCard({ city, color }: { city: City; color: 'blue' | 'orange' }) {
   const { t } = useTranslation();
   const { tempUnit, speedUnit } = useUnits();
   const { data, loading } = useQuery<WeatherData>(GET_CURRENT_WEATHER, {
@@ -43,9 +66,10 @@ function CompareCard({ city }: { city: City }) {
   });
 
   const w = data?.currentWeather;
+  const borderColor = color === 'blue' ? 'border-t-blue-500' : 'border-t-orange-500';
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-lg">
+    <div className={`bg-white dark:bg-gray-800 rounded-xl p-5 shadow-lg border-t-4 ${borderColor}`}>
       <h4 className="text-lg font-bold text-gray-800 dark:text-white mb-1">{city.name}</h4>
       {city.country && (
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
@@ -91,6 +115,41 @@ function CompareCard({ city }: { city: City }) {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+/** Metric comparison bars for humidity, wind, cloudiness, pressure */
+function MetricComparison({ cityA, cityB }: { cityA: City; cityB: City }) {
+  const { t } = useTranslation();
+  const { speedUnit } = useUnits();
+  const { data: dataA } = useQuery<WeatherData>(GET_CURRENT_WEATHER, {
+    variables: { lat: cityA.lat, lon: cityA.lon },
+    fetchPolicy: 'cache-first',
+  });
+  const { data: dataB } = useQuery<WeatherData>(GET_CURRENT_WEATHER, {
+    variables: { lat: cityB.lat, lon: cityB.lon },
+    fetchPolicy: 'cache-first',
+  });
+
+  const wA = dataA?.currentWeather;
+  const wB = dataB?.currentWeather;
+
+  if (!wA || !wB) return null;
+
+  const speedUnitLabel = speedUnit === 'mph' ? 'mph' : speedUnit === 'kmh' ? 'km/h' : 'm/s';
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg space-y-3">
+      <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">{t('compare.metrics')}</h4>
+      <div className="flex items-center gap-3 mb-2 text-xs text-gray-500 dark:text-gray-400">
+        <span className="flex items-center gap-1"><span className="w-3 h-2 bg-blue-400 inline-block rounded" /> {cityA.name}</span>
+        <span className="flex items-center gap-1"><span className="w-3 h-2 bg-orange-400 inline-block rounded" /> {cityB.name}</span>
+      </div>
+      <CompareBar label={t('weather.humidity')} valueA={wA.humidity} valueB={wB.humidity} unit="%" max={100} />
+      <CompareBar label={t('weather.wind')} valueA={wA.wind.speed} valueB={wB.wind.speed} unit={` ${speedUnitLabel}`} max={Math.max(wA.wind.speed, wB.wind.speed, 1) * 1.2} />
+      <CompareBar label={t('weather.cloudiness')} valueA={wA.clouds.all} valueB={wB.clouds.all} unit="%" max={100} />
+      <CompareBar label={t('weather.pressure')} valueA={wA.pressure} valueB={wB.pressure} unit=" hPa" max={Math.max(wA.pressure, wB.pressure, 1) * 1.02} />
     </div>
   );
 }
@@ -198,12 +257,20 @@ interface WeatherComparisonProps {
 
 export default function WeatherComparison({ currentCity, availableCities }: WeatherComparisonProps) {
   const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(false);
+  const otherCities = availableCities.filter(c => c.id !== currentCity.id);
+  const [expanded, setExpanded] = useState(otherCities.length > 0);
   const [compareCity, setCompareCity] = useState<City | null>(null);
 
-  const otherCities = availableCities.filter(c => c.id !== currentCity.id);
-
   if (otherCities.length === 0) return null;
+
+  const handleSwap = () => {
+    // Cannot truly swap since currentCity is from URL,
+    // but we can cycle through available cities
+    if (!compareCity) return;
+    const currentIndex = otherCities.findIndex(c => c.id === compareCity.id);
+    const nextIndex = (currentIndex + 1) % otherCities.length;
+    setCompareCity(otherCities[nextIndex]);
+  };
 
   return (
     <section className="mt-6">
@@ -215,30 +282,52 @@ export default function WeatherComparison({ currentCity, availableCities }: Weat
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
         {t('compare.title')}
+        {otherCities.length > 0 && (
+          <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full">
+            {otherCities.length}
+          </span>
+        )}
       </button>
 
       {expanded && (
         <div className="mt-4 space-y-4 animate-fadeIn">
-          <select
-            value={compareCity?.id || ''}
-            onChange={(e) => {
-              const selected = otherCities.find(c => c.id === e.target.value);
-              setCompareCity(selected ?? null);
-            }}
-            className="w-full sm:w-64 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm"
-          >
-            <option value="">{t('compare.chooseCity')}</option>
-            {otherCities.map(c => (
-              <option key={c.id} value={c.id}>{c.name}{c.country ? `, ${c.country}` : ''}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <select
+              value={compareCity?.id || ''}
+              onChange={(e) => {
+                const selected = otherCities.find(c => c.id === e.target.value);
+                setCompareCity(selected ?? null);
+              }}
+              className="flex-1 sm:flex-none sm:w-64 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm"
+            >
+              <option value="">{t('compare.chooseCity')}</option>
+              {otherCities.map(c => (
+                <option key={c.id} value={c.id}>{c.name}{c.country ? `, ${c.country}` : ''}</option>
+              ))}
+            </select>
+
+            {/* Swap / cycle button */}
+            {compareCity && otherCities.length > 1 && (
+              <button
+                onClick={handleSwap}
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
+                aria-label={t('compare.swapCities')}
+                title={t('compare.swapCities')}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+              </button>
+            )}
+          </div>
 
           {compareCity && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <CompareCard city={currentCity} />
-                <CompareCard city={compareCity} />
+                <CompareCard city={currentCity} color="blue" />
+                <CompareCard city={compareCity} color="orange" />
               </div>
+              <MetricComparison cityA={currentCity} cityB={compareCity} />
               <MiniComparisonChart cityA={currentCity} cityB={compareCity} />
             </div>
           )}
