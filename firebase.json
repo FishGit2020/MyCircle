@@ -105,7 +105,8 @@
   },
   "emulators": {
     "functions": {
-      "port": 5001
+      "port": 5001,
+      "env": ".env.emulator"
     },
     "hosting": {
       "port": 5000

@@ -699,7 +699,10 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **Firebase Functions** | `functions/src/index.ts` | Production Cloud Functions (GraphQL, proxies, AI) |
 | **CI Workflow** | `.github/workflows/ci.yml` | PR checks: typecheck, lint, test |
 | **Deploy Workflow** | `.github/workflows/deploy.yml` | Firebase Hosting deployment on push to main |
-| **E2E Workflow** | `.github/workflows/e2e.yml` | Playwright E2E tests on PR |
+| **E2E Workflow** | `.github/workflows/e2e.yml` | Playwright E2E tests on PR (mocked + emulator) |
+| **Mock API Server** | `scripts/mock-api-server.mjs` | Simulates all 6 external APIs for emulator tests |
+| **Firestore Seed** | `scripts/seed-firestore.mjs` | Seeds Firestore emulator with test data |
+| **Emulator Env** | `.env.emulator` | Points Cloud Functions to mock API server |
 
 ---
 
@@ -775,11 +778,18 @@ mycircle/
 |       +-- resolvers.ts         # Self-contained resolvers
 |       +-- recaptcha.ts         # reCAPTCHA verification
 +-- e2e/                         # Playwright end-to-end tests
+|   +-- fixtures.ts              # Browser-level API mocks (page.route)
+|   +-- emulator/                # Full-stack emulator tests (no browser mocks)
+|   |   +-- fixtures.ts          # Emulator test setup (onboarding dismiss only)
+|   |   +-- smoke.spec.ts        # Smoke tests through emulated stack
 |   +-- integration/             # Integration tests against deployed app
 +-- scripts/
 |   +-- check-shared-versions.mjs # MFE shared dep version-drift check
 |   +-- assemble-firebase.mjs   # Firebase build assembly
 |   +-- generate-icons.mjs      # PWA icon generation
+|   +-- serve-static.mjs        # Serve dist/firebase on port 3000 for CI
+|   +-- mock-api-server.mjs     # Mock all external APIs on port 4000
+|   +-- seed-firestore.mjs      # Seed Firestore emulator with test data
 +-- .github/
 |   +-- workflows/
 |       +-- ci.yml              # PR checks (typecheck, test)
@@ -803,7 +813,8 @@ GitHub Actions workflows automate testing and deployment:
 |----------|------|---------|-------|
 | **CI** | `.github/workflows/ci.yml` | PR to `main` | Install → Check shared dep versions → Typecheck → Unit tests |
 | **Deploy** | `.github/workflows/deploy.yml` | Push to `main` | Install → Build → Firebase Hosting deploy |
-| **E2E** | `.github/workflows/e2e.yml` | PR to `main` | Install → Playwright install → Build → E2E tests |
+| **E2E (mocked)** | `.github/workflows/e2e.yml` (`e2e` job) | PR to `main` | Install → Playwright install → Build → E2E tests (browser-level mocks) |
+| **E2E (emulator)** | `.github/workflows/e2e.yml` (`e2e-emulator` job) | PR to `main` | Install → Java setup → Build → Mock API + Firebase emulators → Seed Firestore → Full-stack E2E tests |
 
 All workflows use `pnpm/action-setup@v4`, `actions/setup-node@v4` with Node 22 and pnpm dependency caching. The deploy workflow uses `FirebaseExtended/action-hosting-deploy@v0` with a `FIREBASE_SERVICE_ACCOUNT` secret for authentication.
 
