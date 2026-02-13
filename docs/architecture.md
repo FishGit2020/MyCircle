@@ -27,11 +27,16 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 |  |  (Host)   | |    (MFE)    | |      (MFE)      | |     (MFE)     |    |
 |  | Port 3000 | |  Port 3001  | |   Port 3002     | |  Port 3004    |    |
 |  +-----------+ +-------------+ +-----------------+ +---------------+    |
-|  +-----------------+ +--------------+                                    |
-|  | Podcast Player  | | AI Assistant |                                    |
-|  |     (MFE)       | |    (MFE)     |                                    |
-|  |   Port 3005     | |  Port 3006   |                                    |
-|  +-----------------+ +--------------+                                    |
+|  +-----------------+ +--------------+ +---------------+ +--------------+  |
+|  | Podcast Player  | | AI Assistant | | Bible Reader  | |   Worship    |  |
+|  |     (MFE)       | |    (MFE)     | |    (MFE)      | |    Songs     |  |
+|  |   Port 3005     | |  Port 3006   | |  Port 3008    | |  Port 3009   |  |
+|  +-----------------+ +--------------+ +---------------+ +--------------+  |
+|  +--------------+                                                          |
+|  |   Notebook   |                                                          |
+|  |    (MFE)     |                                                          |
+|  |  Port 3010   |                                                          |
+|  +--------------+                                                          |
 +──────────────────────────────────────────────────────────────────────────+
                                 |
                                 v
@@ -67,7 +72,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 
 ### MFE CSS Isolation
 
-All 7 MFE Tailwind configs set `corePlugins: { preflight: false }` to disable Tailwind's preflight (global CSS resets). The shell keeps preflight enabled as the single source of base styles. This prevents layout shifts caused by duplicate `*, html, body` resets being injected when MFE CSS loads at runtime via Module Federation.
+All 8 MFE Tailwind configs set `corePlugins: { preflight: false }` to disable Tailwind's preflight (global CSS resets). The shell keeps preflight enabled as the single source of base styles. This prevents layout shifts caused by duplicate `*, html, body` resets being injected when MFE CSS loads at runtime via Module Federation.
 
 ---
 
@@ -95,6 +100,9 @@ The orchestrator that loads and composes all remote micro frontends.
 /stocks            -> StockTracker MFE (lazy-loaded)
 /podcasts          -> PodcastPlayer MFE (lazy-loaded, discover + subscribed tabs)
 /ai                -> AiAssistant MFE (lazy-loaded)
+/bible             -> BibleReader MFE (lazy-loaded, daily devotionals)
+/worship           -> WorshipSongs MFE (lazy-loaded, chord editor)
+/notebook          -> Notebook MFE (lazy-loaded, personal notes)
 /compare           -> WeatherCompare (legacy, still accessible)
 /*                 -> 404 NotFound
 ```
@@ -251,6 +259,18 @@ Exposes `WorshipSongs` component via Module Federation.
 - Favorites system with `StorageKeys.WORSHIP_FAVORITES`
 - Offline cache via `StorageKeys.WORSHIP_SONGS_CACHE`
 - Tag-based filtering and full-text search
+
+### Notebook - `packages/notebook/`
+
+Exposes `Notebook` component via Module Federation.
+
+**Key Behavior:**
+- Personal note-taking (create, edit, delete) with user-scoped Firestore subcollection (`users/{uid}/notes`)
+- Search/filter notes by title or content
+- Note count cached to `StorageKeys.NOTEBOOK_CACHE` for dashboard tile
+- CRUD via `window.__notebook` Firestore bridge (same pattern as worship-songs)
+- `WindowEvents.NOTEBOOK_CHANGED` for cross-tab cache invalidation
+- Auth-gated: shows "Sign in" message when logged out
 
 ---
 
@@ -672,6 +692,9 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **WorshipSongs** | `packages/worship-songs/src/components/WorshipSongs.tsx` | Song library, search, and song viewer |
 | **SongEditor** | `packages/worship-songs/src/components/SongEditor.tsx` | Chord and lyrics editor |
 | **Metronome** | `packages/worship-songs/src/components/Metronome.tsx` | Built-in metronome with BPM control |
+| **Notebook** | `packages/notebook/src/components/Notebook.tsx` | Personal note-taking UI |
+| **NoteEditor** | `packages/notebook/src/components/NoteEditor.tsx` | Note create/edit form |
+| **useNotes** | `packages/notebook/src/hooks/useNotes.ts` | Notebook CRUD hook via window bridge |
 | **Web Vitals** | `packages/shared/src/utils/webVitals.ts` | Core Web Vitals reporting (LCP, CLS, INP) |
 | **Firebase Functions** | `functions/src/index.ts` | Production Cloud Functions (GraphQL, proxies, AI) |
 | **CI Workflow** | `.github/workflows/ci.yml` | PR checks: typecheck, lint, test |
@@ -730,8 +753,13 @@ mycircle/
 |   |       +-- hooks/
 |   |       +-- test/
 |   +-- worship-songs/           # Worship songs micro frontend
+|   |   +-- src/
+|   |       +-- components/      # WorshipSongs, SongViewer, SongEditor, Metronome
+|   |       +-- hooks/
+|   |       +-- test/
+|   +-- notebook/                # Notebook micro frontend
 |       +-- src/
-|           +-- components/      # WorshipSongs, SongViewer, SongEditor, Metronome
+|           +-- components/      # Notebook, NoteList, NoteEditor, NoteCard
 |           +-- hooks/
 |           +-- test/
 +-- server/                      # Local development GraphQL server

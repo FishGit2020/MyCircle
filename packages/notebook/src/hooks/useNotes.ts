@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, StorageKeys } from '@mycircle/shared';
+import { WindowEvents, StorageKeys, useTranslation } from '@mycircle/shared';
 import type { Note, NoteInput } from '../types';
 
 interface NotebookAPI {
@@ -11,6 +11,7 @@ interface NotebookAPI {
 }
 
 export function useNotes() {
+  const { t } = useTranslation();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,11 +33,11 @@ export function useNotes() {
         localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(result.length));
       } catch { /* ignore */ }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load notes');
+      setError(err instanceof Error ? err.message : t('notebook.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [api]);
+  }, [api, t]);
 
   useEffect(() => {
     loadNotes();

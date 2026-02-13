@@ -532,6 +532,7 @@ const en = {
   'notebook.lastEdited': 'Last edited',
   'notebook.loginToUse': 'Sign in to use your notebook',
   'notebook.noResults': 'No matching notes found',
+  'notebook.loadError': 'Failed to load notes',
 
   // PWA update prompt
   'pwa.newVersion': 'A new version is available',
@@ -688,6 +689,9 @@ const en = {
   'widgets.nothingPlaying': 'No podcast playing',
   'widgets.noFavoriteCity': 'Add a favorite city to see weather',
   'widgets.noStocks': 'Add stocks to your watchlist',
+  'widgets.notebook': 'Notebook',
+  'widgets.notebookDesc': 'Your personal notes',
+  'widgets.noNotes': 'No notes yet',
   'widgets.hidden': 'Hidden',
   'widgets.visible': 'Visible',
   'widgets.moveUp': 'Move widget up',
@@ -1230,6 +1234,7 @@ const es: Record<TranslationKey, string> = {
   'notebook.lastEdited': '\u00daltima edici\u00f3n',
   'notebook.loginToUse': 'Inicia sesi\u00f3n para usar tu bloc de notas',
   'notebook.noResults': 'No se encontraron notas',
+  'notebook.loadError': 'Error al cargar las notas',
 
   // PWA update prompt
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
@@ -1386,6 +1391,9 @@ const es: Record<TranslationKey, string> = {
   'widgets.nothingPlaying': 'No hay podcast en reproducción',
   'widgets.noFavoriteCity': 'Agrega una ciudad favorita para ver el clima',
   'widgets.noStocks': 'Agrega acciones a tu lista de seguimiento',
+  'widgets.notebook': 'Bloc de notas',
+  'widgets.notebookDesc': 'Tus notas personales',
+  'widgets.noNotes': 'A\u00fan no hay notas',
   'widgets.hidden': 'Oculto',
   'widgets.visible': 'Visible',
   'widgets.moveUp': 'Mover widget arriba',
