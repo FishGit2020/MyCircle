@@ -166,6 +166,35 @@ describe('AudioPlayer', () => {
     expect(screen.getByRole('region', { name: 'Now Playing' })).toBeInTheDocument();
   });
 
+  it('renders share button', () => {
+    renderWithProviders(
+      <AudioPlayer episode={mockEpisode} podcast={mockPodcast} onClose={vi.fn()} />
+    );
+    const shareButtons = screen.getAllByLabelText('Share episode');
+    expect(shareButtons.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('copies share text to clipboard when share button is clicked', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText }, share: undefined });
+
+    renderWithProviders(
+      <AudioPlayer episode={mockEpisode} podcast={mockPodcast} onClose={vi.fn()} />
+    );
+    const shareButtons = screen.getAllByLabelText('Share episode');
+    fireEvent.click(shareButtons[0]);
+
+    // Wait for async clipboard call
+    await vi.waitFor(() => {
+      expect(writeText).toHaveBeenCalledTimes(1);
+    });
+
+    const text = writeText.mock.calls[0][0] as string;
+    expect(text).toContain('Test Episode Title');
+    expect(text).toContain('Test Podcast');
+    expect(text).toContain('https://example.com/episode.mp3');
+  });
+
   it('attaches event listeners when episode changes from null to non-null', () => {
     const addEventSpy = vi.spyOn(HTMLAudioElement.prototype, 'addEventListener');
 

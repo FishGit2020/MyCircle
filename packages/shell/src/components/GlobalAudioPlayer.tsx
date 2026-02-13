@@ -77,6 +77,9 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
   const [showQueue, setShowQueue] = useState(false);
   const queueRef = useRef<HTMLDivElement>(null);
 
+  // Share
+  const [shareCopied, setShareCopied] = useState(false);
+
   // Sleep timer
   const [sleepMinutes, setSleepMinutes] = useState(0); // 0 = off
   const [sleepRemaining, setSleepRemaining] = useState(0); // seconds remaining
@@ -382,6 +385,29 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
     setShowSleepMenu(false);
   }, []);
 
+  const handleShare = useCallback(async () => {
+    if (!episode) return;
+    const timeStr = formatTime(currentTime);
+    const podcastName = podcast?.title || '';
+    const shareText = t('podcasts.shareText')
+      .replace('{episode}', episode.title)
+      .replace('{podcast}', podcastName)
+      .replace('{time}', timeStr);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: episode.title, text: shareText, url: episode.enclosureUrl });
+        return;
+      } catch { /* user cancelled or share failed — fall through to clipboard */ }
+    }
+
+    try {
+      await navigator.clipboard.writeText(`${shareText}\n${episode.enclosureUrl}`);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch { /* clipboard not available */ }
+  }, [episode, podcast, currentTime, t]);
+
   if (!episode) return null;
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -606,6 +632,27 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
             )}
           </div>
 
+          {/* Share button */}
+          <button
+            onClick={handleShare}
+            className={`p-1.5 rounded transition ${
+              shareCopied
+                ? 'text-green-500 dark:text-green-400'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+            aria-label={shareCopied ? t('podcasts.shareCopied') : t('podcasts.shareEpisode')}
+          >
+            {shareCopied ? (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+            )}
+          </button>
+
           <button
             onClick={handleClose}
             className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -702,6 +749,23 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
                 Q:{queue.length}
               </span>
             )}
+
+            {/* Mobile share */}
+            <button
+              onClick={handleShare}
+              className={`p-1.5 ${shareCopied ? 'text-green-500' : 'text-gray-400'}`}
+              aria-label={shareCopied ? t('podcasts.shareCopied') : t('podcasts.shareEpisode')}
+            >
+              {shareCopied ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+              )}
+            </button>
 
             <button
               onClick={handleClose}

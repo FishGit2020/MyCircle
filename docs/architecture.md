@@ -191,6 +191,7 @@ Exposes `PodcastPlayer` component via Module Federation.
 - Episode listing and detail view
 - Built-in audio player for episode playback
 - **Category/genre filtering**: `TrendingPodcasts` extracts categories from podcast data (comma-separated strings), sorts by frequency (top 12), renders filter chips. `PodcastCard` displays up to 2 category badges as purple chips.
+- **Share episode clip**: Both `AudioPlayer` and `GlobalAudioPlayer` include a share button that formats episode title, podcast name, and current timestamp. Uses `navigator.share()` (Web Share API) with `navigator.clipboard.writeText()` fallback. Visual feedback via green checkmark on clipboard copy.
 - Podcast subscriptions stored in localStorage (`podcast-subscriptions`)
 - Subscribed tab fetches feed details via `podcastFeed(feedId)` query
 - All podcast/episode IDs use GraphQL `ID` type (string) to handle large PodcastIndex IDs
