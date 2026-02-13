@@ -126,7 +126,7 @@ export const graphql = onRequest(
     }
 
     // Require auth for stock/podcast queries (expensive third-party APIs)
-    const opName = (req.body.operationName || '').toLowerCase();
+    const opName = (req.body.operationName || req.body.query?.match?.(/(?:query|mutation)\s+(\w+)/)?.[1] || '').toLowerCase();
     if (opName.includes('stock') || opName.includes('podcast')) {
       const uid = await verifyAuthToken(req);
       if (!uid) {
@@ -144,9 +144,10 @@ export const graphql = onRequest(
     try {
       const result = await server.executeOperation(
         {
-          query: body.query,
+          query: body.query || undefined,
           variables: body.variables,
-          operationName: body.operationName
+          operationName: body.operationName,
+          extensions: body.extensions,
         },
         {
           contextValue: { headers }

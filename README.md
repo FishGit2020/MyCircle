@@ -87,7 +87,8 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Firebase Auth (Google OAuth) with cross-device profile sync
 - Firebase App Check for API protection
 - Firebase Remote Config for feature flags
-- GraphQL API with Apollo Client caching
+- GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ)
+- **MFE CSS isolation** — Tailwind preflight disabled in MFE builds to prevent layout shifts from duplicate global resets
 
 ## Architecture
 
