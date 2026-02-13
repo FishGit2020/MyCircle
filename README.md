@@ -59,6 +59,15 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Community notes** — personal notes per passage (book + chapter), auto-saved with debounce to localStorage, collapsible notes panel with saved indicator
 - **Daily devotional** — curated 30-entry reading plan cycled by day-of-year, with themed passage and "Read Passage" button, completion tracking (green checkmark persisted in localStorage, 90-day rolling window)
 
+### Worship Songs
+- Add, edit, and browse worship songs with ChordPro or plain text format
+- Real-time transposition with direct key picker and semitone controls
+- Auto-scroll with adjustable speed for live performance
+- Copy lyrics to clipboard, print-friendly view
+- **YouTube link integration** — optional YouTube URL per song; renders a styled "Watch on YouTube" button in the song viewer that opens in a new tab
+- Favorites, search, tag filtering
+- Firestore persistence with offline localStorage cache
+
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers

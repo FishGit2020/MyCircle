@@ -8,6 +8,7 @@ export interface WorshipSong {
   format: SongFormat;
   content: string;
   notes: string;
+  youtubeUrl?: string;
   tags?: string[];
   createdAt: { seconds: number; nanoseconds: number };
   updatedAt: { seconds: number; nanoseconds: number };

@@ -498,6 +498,9 @@ const en = {
   'worship.scrollSpeed': 'Scroll speed',
   'worship.copyLyrics': 'Copy',
   'worship.copied': 'Copied',
+  'worship.youtubeUrl': 'YouTube URL',
+  'worship.youtubeUrlHint': 'Paste a YouTube link for a tutorial or worship video',
+  'worship.watchOnYoutube': 'Watch on YouTube',
 
   // PWA update prompt
   'pwa.newVersion': 'A new version is available',
@@ -1152,6 +1155,9 @@ const es: Record<TranslationKey, string> = {
   'worship.scrollSpeed': 'Velocidad de desplazamiento',
   'worship.copyLyrics': 'Copiar',
   'worship.copied': 'Copiado',
+  'worship.youtubeUrl': 'URL de YouTube',
+  'worship.youtubeUrlHint': 'Pega un enlace de YouTube para un tutorial o video de adoraci\u00f3n',
+  'worship.watchOnYoutube': 'Ver en YouTube',
 
   // PWA update prompt
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
