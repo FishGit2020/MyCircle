@@ -1,16 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery, GET_BIBLE_VOTD } from '@weather/shared';
 
 export interface DailyVerse {
   text: string;
   reference: string;
   version?: string;
-  permalink?: string;
+  copyright?: string;
 }
 
-const CACHE_KEY = 'daily-verse';
-
-// Curated fallback verses (one per day of month) for when the API is unreachable
-const FALLBACK_VERSES: DailyVerse[] = [
+// Curated daily verses — shown by default (fallback if GraphQL is unavailable)
+const DAILY_VERSES: DailyVerse[] = [
   { text: "For I know the plans I have for you, declares the LORD, plans to prosper you and not to harm you, plans to give you hope and a future.", reference: "Jeremiah 29:11" },
   { text: "Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.", reference: "Proverbs 3:5-6" },
   { text: "I can do all this through him who gives me strength.", reference: "Philippians 4:13" },
@@ -44,83 +43,54 @@ const FALLBACK_VERSES: DailyVerse[] = [
   { text: "May the God of hope fill you with all joy and peace as you trust in him, so that you may overflow with hope by the power of the Holy Spirit.", reference: "Romans 15:13" },
 ];
 
-function getTodayKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+function getDayOfYear(): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-function getFallbackVerse(): DailyVerse {
-  const day = new Date().getDate(); // 1-31
-  return FALLBACK_VERSES[(day - 1) % FALLBACK_VERSES.length];
+interface VotdResponse {
+  bibleVotd: {
+    text: string;
+    reference: string;
+    translation: string | null;
+    copyright: string | null;
+  };
 }
 
-function getCachedVerse(): DailyVerse | null {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const cached = JSON.parse(raw);
-    if (cached.date === getTodayKey() && cached.verse) {
-      return cached.verse as DailyVerse;
-    }
-  } catch { /* ignore */ }
-  return null;
-}
-
-function cacheVerse(verse: DailyVerse): void {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ date: getTodayKey(), verse }));
-  } catch { /* ignore */ }
-}
-
-function stripHtml(html: string): string {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  return div.textContent || div.innerText || '';
-}
-
-export function useDailyVerse(): { verse: DailyVerse; loading: boolean } {
-  const [verse, setVerse] = useState<DailyVerse>(() => getCachedVerse() || getFallbackVerse());
-  const [loading, setLoading] = useState(() => !getCachedVerse());
-
-  useEffect(() => {
-    const cached = getCachedVerse();
-    if (cached) {
-      setVerse(cached);
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    async function fetchVerse() {
-      try {
-        const res = await fetch('https://www.biblegateway.com/votd/get/?format=json');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const votd = data?.votd;
-        if (!votd?.content || !votd?.display_ref) throw new Error('Invalid response');
-
-        const fetched: DailyVerse = {
-          text: stripHtml(votd.content),
-          reference: votd.display_ref,
-          version: votd.version_id || votd.version,
-          permalink: votd.permalink,
-        };
-
-        if (!cancelled) {
-          cacheVerse(fetched);
-          setVerse(fetched);
-        }
-      } catch {
-        // API unreachable (CORS, network) — fallback is already set
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    fetchVerse();
-    return () => { cancelled = true; };
+export function useDailyVerse() {
+  const dailyVerse = useMemo(() => {
+    const day = new Date().getDate();
+    return DAILY_VERSES[(day - 1) % DAILY_VERSES.length];
   }, []);
 
-  return { verse, loading };
+  const [showVotd, setShowVotd] = useState(false);
+  const day = getDayOfYear();
+
+  // Fetch VOTD via GraphQL — only when showVotd is toggled on
+  const { data, loading: votdLoading } = useQuery<VotdResponse>(GET_BIBLE_VOTD, {
+    variables: { day },
+    skip: !showVotd,
+    fetchPolicy: 'cache-first',
+  });
+
+  const votd: DailyVerse | null = data?.bibleVotd
+    ? {
+        text: data.bibleVotd.text,
+        reference: data.bibleVotd.reference,
+        version: data.bibleVotd.translation || undefined,
+        copyright: data.bibleVotd.copyright || undefined,
+      }
+    : null;
+
+  const toggleVotd = useCallback(() => {
+    setShowVotd(prev => !prev);
+  }, []);
+
+  return {
+    verse: showVotd && votd ? votd : dailyVerse,
+    showVotd,
+    toggleVotd,
+    loading: showVotd && votdLoading,
+  };
 }

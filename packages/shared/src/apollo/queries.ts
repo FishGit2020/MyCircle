@@ -270,6 +270,30 @@ export const GET_PODCAST_FEED = gql`
   }
 `;
 
+// ─── Bible Queries ─────────────────────────────────────────
+
+export const GET_BIBLE_VOTD = gql`
+  query GetBibleVotd($day: Int!) {
+    bibleVotd(day: $day) {
+      text
+      reference
+      translation
+      copyright
+    }
+  }
+`;
+
+export const GET_BIBLE_PASSAGE = gql`
+  query GetBiblePassage($reference: String!, $translation: String) {
+    biblePassage(reference: $reference, translation: $translation) {
+      text
+      reference
+      translation
+      verseCount
+    }
+  }
+`;
+
 export const WEATHER_UPDATES = gql`
   ${WEATHER_CONDITION_FRAGMENT}
   subscription WeatherUpdates($lat: Float!, $lon: Float!) {

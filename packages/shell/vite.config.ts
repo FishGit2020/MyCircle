@@ -27,6 +27,10 @@ const aiAssistantRemote = isProduction
   ? '/ai-assistant/assets/remoteEntry.js'
   : 'http://localhost:3007/assets/remoteEntry.js';
 
+const bibleReaderRemote = isProduction
+  ? '/bible-reader/assets/remoteEntry.js'
+  : 'http://localhost:3008/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -37,7 +41,8 @@ export default defineConfig({
         weatherDisplay: weatherDisplayRemote,
         stockTracker: stockTrackerRemote,
         podcastPlayer: podcastPlayerRemote,
-        aiAssistant: aiAssistantRemote
+        aiAssistant: aiAssistantRemote,
+        bibleReader: bibleReaderRemote
       },
       shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@weather/shared']
     }),

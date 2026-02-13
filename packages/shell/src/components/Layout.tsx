@@ -85,11 +85,17 @@ export default function Layout() {
               <Link to="/" className={navLinkClass('/')}>
                 {t('nav.home')}
               </Link>
+              <Link to="/weather" className={navLinkClass('/weather')}>
+                {t('dashboard.weather')}
+              </Link>
               <Link to="/stocks" className={navLinkClass('/stocks')}>
                 {t('nav.stocks')}
               </Link>
               <Link to="/podcasts" className={navLinkClass('/podcasts')}>
                 {t('nav.podcasts')}
+              </Link>
+              <Link to="/bible" className={navLinkClass('/bible')}>
+                Bible
               </Link>
               <Link to="/ai" className={navLinkClass('/ai')}>
                 {t('nav.ai')}
@@ -134,11 +140,17 @@ export default function Layout() {
               <Link to="/" className={mobileNavLinkClass('/')}>
                 {t('nav.home')}
               </Link>
+              <Link to="/weather" className={mobileNavLinkClass('/weather')}>
+                {t('dashboard.weather')}
+              </Link>
               <Link to="/stocks" className={mobileNavLinkClass('/stocks')}>
                 {t('nav.stocks')}
               </Link>
               <Link to="/podcasts" className={mobileNavLinkClass('/podcasts')}>
                 {t('nav.podcasts')}
+              </Link>
+              <Link to="/bible" className={mobileNavLinkClass('/bible')}>
+                Bible
               </Link>
               <Link to="/ai" className={mobileNavLinkClass('/ai')}>
                 {t('nav.ai')}

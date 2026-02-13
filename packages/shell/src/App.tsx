@@ -7,6 +7,7 @@ import Loading from './components/Loading';
 import ErrorBoundary from './components/ErrorBoundary';
 import WeatherCompare from './components/WeatherCompare';
 import DashboardPage from './pages/DashboardPage';
+import WeatherLandingPage from './pages/WeatherLandingPage';
 import { useAuth } from './context/AuthContext';
 
 // Lazy load remote micro frontends
@@ -14,6 +15,7 @@ const WeatherDisplayMF = lazy(() => import('weatherDisplay/WeatherDisplay'));
 const StockTrackerMF = lazy(() => import('stockTracker/StockTracker'));
 const PodcastPlayerMF = lazy(() => import('podcastPlayer/PodcastPlayer'));
 const AiAssistantMF = lazy(() => import('aiAssistant/AiAssistant'));
+const BibleReaderMF = lazy(() => import('bibleReader/BibleReader'));
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -227,6 +229,23 @@ function AiPage() {
   );
 }
 
+// Fallback for Bible Reader MFE
+const BibleReaderFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Bible Reader module is loading...</p>
+  </div>
+);
+
+function BiblePage() {
+  return (
+    <ErrorBoundary fallback={<BibleReaderFallback />}>
+      <Suspense fallback={<Loading />}>
+        <BibleReaderMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -243,10 +262,12 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<DashboardPage />} />
+        <Route path="weather" element={<WeatherLandingPage />} />
         <Route path="weather/:coords" element={<WeatherPage />} />
         <Route path="stocks" element={<StocksPage />} />
         <Route path="podcasts" element={<PodcastsPage />} />
         <Route path="ai" element={<AiPage />} />
+        <Route path="bible" element={<BiblePage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />
       </Route>
