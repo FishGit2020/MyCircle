@@ -487,6 +487,10 @@ typePolicies: {
 
 All weather queries share a `WeatherConditionFragment` for consistent field selection.
 
+### Automatic Persisted Queries (APQ)
+
+The Apollo Client link chain includes `createPersistedQueryLink` which sends a SHA-256 hash instead of the full query string on repeat requests. On the first request for a given query, the full query text is sent alongside the hash. On subsequent requests, only the hash is sent — the server recognizes the hash and executes the cached query. This reduces payload size for frequently-used queries. Hashing uses the browser-native `crypto.subtle.digest('SHA-256', ...)` (no extra dependencies).
+
 ### useWeatherData Hook
 
 ```typescript
