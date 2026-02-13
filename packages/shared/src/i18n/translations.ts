@@ -334,6 +334,15 @@ const en = {
   'stocks.newsComingSoon': 'News feed coming soon',
   'stocks.newsDescription': 'Stay updated with the latest market news for your stocks.',
 
+  // Crypto Tracker
+  'crypto.title': 'Crypto',
+  'crypto.marketCap': 'Market Cap',
+  'crypto.volume24h': '24h Volume',
+  'crypto.rank': 'Rank',
+  'crypto.sparkline7d': '7-day trend',
+  'crypto.loadError': 'Failed to load crypto data',
+  'crypto.noPrices': 'No crypto prices available',
+
   // Podcast Player
   'podcasts.title': 'Podcasts',
   'podcasts.search': 'Search podcasts...',
@@ -944,6 +953,15 @@ const es: Record<TranslationKey, string> = {
   'stocks.news': 'Noticias',
   'stocks.newsComingSoon': 'Noticias pr\u00f3ximamente',
   'stocks.newsDescription': 'Mant\u00e9nte al d\u00eda con las \u00faltimas noticias del mercado.',
+
+  // Crypto Tracker
+  'crypto.title': 'Cripto',
+  'crypto.marketCap': 'Cap. de mercado',
+  'crypto.volume24h': 'Volumen 24h',
+  'crypto.rank': 'Rango',
+  'crypto.sparkline7d': 'Tendencia 7 d\u00edas',
+  'crypto.loadError': 'Error al cargar datos cripto',
+  'crypto.noPrices': 'No hay precios cripto disponibles',
 
   // Podcast Player
   'podcasts.title': 'Podcasts',
