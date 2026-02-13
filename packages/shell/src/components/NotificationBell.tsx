@@ -1,20 +1,28 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import { requestNotificationPermission, onForegroundMessage, subscribeToWeatherAlerts, unsubscribeFromWeatherAlerts } from '../lib/messaging';
 import { firebaseEnabled } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 
 const STORAGE_KEY = 'weather-alerts-enabled';
+const STOCK_ALERTS_KEY = 'stock-alerts-enabled';
+const PODCAST_ALERTS_KEY = 'podcast-alerts-enabled';
 
 export default function NotificationBell() {
   const { t } = useTranslation();
   const { favoriteCities } = useAuth();
-  const [enabled, setEnabled] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
+  const [weatherEnabled, setWeatherEnabled] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
+  const [stockEnabled, setStockEnabled] = useState(() => localStorage.getItem(STOCK_ALERTS_KEY) === 'true');
+  const [podcastEnabled, setPodcastEnabled] = useState(() => localStorage.getItem(PODCAST_ALERTS_KEY) === 'true');
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [toast, setToast] = useState<{ title?: string; body?: string } | null>(null);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
+  const [showPanel, setShowPanel] = useState(false);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const anyEnabled = weatherEnabled || stockEnabled || podcastEnabled;
 
   // Don't render if Firebase or Notification API isn't available
   if (!firebaseEnabled || typeof Notification === 'undefined') return null;
@@ -25,15 +33,59 @@ export default function NotificationBell() {
     feedbackTimer.current = setTimeout(() => setFeedback(null), 4000);
   };
 
-  const handleClick = useCallback(async () => {
+  // Close panel on outside click
+  useEffect(() => {
+    if (!showPanel) return;
+    const handler = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setShowPanel(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showPanel]);
+
+  // Close panel on Escape
+  useEffect(() => {
+    if (!showPanel) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowPanel(false);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showPanel]);
+
+  const ensureToken = useCallback(async (): Promise<string | null> => {
+    if (fcmToken) return fcmToken;
+    if (Notification.permission === 'denied') {
+      showFeedback(t('notifications.blocked'));
+      return null;
+    }
+    setLoading(true);
+    try {
+      const token = await requestNotificationPermission();
+      if (token) {
+        setFcmToken(token);
+        return token;
+      }
+      showFeedback(t('notifications.notConfigured'));
+      return null;
+    } catch {
+      showFeedback(t('notifications.failedToEnable'));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [fcmToken]);
+
+  const handleToggleWeather = useCallback(async () => {
     if (loading) return;
 
-    // Toggle OFF → unsubscribe
-    if (enabled && fcmToken) {
+    if (weatherEnabled && fcmToken) {
       setLoading(true);
       try {
         await unsubscribeFromWeatherAlerts(fcmToken);
-        setEnabled(false);
+        setWeatherEnabled(false);
         localStorage.setItem(STORAGE_KEY, 'false');
         showFeedback(t('notifications.disabled'));
       } catch {
@@ -44,83 +96,117 @@ export default function NotificationBell() {
       return;
     }
 
-    // Toggle ON → subscribe
     if (!favoriteCities || favoriteCities.length === 0) {
       showFeedback(t('notifications.addFavoritesFirst'));
       return;
     }
 
-    if (Notification.permission === 'denied') {
-      showFeedback(t('notifications.blocked'));
-      return;
-    }
+    const token = await ensureToken();
+    if (!token) return;
 
     setLoading(true);
     try {
-      const token = await requestNotificationPermission();
-      if (token) {
-        const cities = favoriteCities.map(c => ({ lat: c.lat, lon: c.lon, name: c.name }));
-        const ok = await subscribeToWeatherAlerts(token, cities);
-        if (ok) {
-          setFcmToken(token);
-          setEnabled(true);
-          localStorage.setItem(STORAGE_KEY, 'true');
-          showFeedback(t('notifications.enabled'));
-        } else {
-          showFeedback(t('notifications.subscriptionFailed'));
-        }
+      const cities = favoriteCities.map(c => ({ lat: c.lat, lon: c.lon, name: c.name }));
+      const ok = await subscribeToWeatherAlerts(token, cities);
+      if (ok) {
+        setWeatherEnabled(true);
+        localStorage.setItem(STORAGE_KEY, 'true');
+        showFeedback(t('notifications.enabled'));
       } else {
-        if (Notification.permission === 'denied') {
-          showFeedback(t('notifications.blocked'));
-        } else {
-          showFeedback(t('notifications.notConfigured'));
-        }
+        showFeedback(t('notifications.subscriptionFailed'));
       }
     } catch {
       showFeedback(t('notifications.failedToEnable'));
     } finally {
       setLoading(false);
     }
-  }, [enabled, loading, fcmToken, favoriteCities]);
+  }, [weatherEnabled, loading, fcmToken, favoriteCities, ensureToken]);
 
-  // Re-acquire FCM token on mount if alerts were previously enabled.
-  // Without this, fcmToken is null after a page refresh, and the
-  // toggle-off path (which needs the token to unsubscribe) can't fire.
+  const handleToggleStocks = useCallback(async () => {
+    if (loading) return;
+
+    const watchlist = getWatchlist();
+    if (!stockEnabled && watchlist.length === 0) {
+      showFeedback(t('notifications.noWatchlistForAlerts'));
+      return;
+    }
+
+    if (stockEnabled) {
+      setStockEnabled(false);
+      localStorage.setItem(STOCK_ALERTS_KEY, 'false');
+      showFeedback(t('notifications.disabled'));
+      return;
+    }
+
+    const token = await ensureToken();
+    if (!token) return;
+
+    setStockEnabled(true);
+    localStorage.setItem(STOCK_ALERTS_KEY, 'true');
+    showFeedback(t('notifications.enabled'));
+  }, [stockEnabled, loading, ensureToken]);
+
+  const handleTogglePodcasts = useCallback(async () => {
+    if (loading) return;
+
+    const subs = getSubscribedIds();
+    if (!podcastEnabled && subs.length === 0) {
+      showFeedback(t('notifications.noSubscriptionsForAlerts'));
+      return;
+    }
+
+    if (podcastEnabled) {
+      setPodcastEnabled(false);
+      localStorage.setItem(PODCAST_ALERTS_KEY, 'false');
+      showFeedback(t('notifications.disabled'));
+      return;
+    }
+
+    const token = await ensureToken();
+    if (!token) return;
+
+    setPodcastEnabled(true);
+    localStorage.setItem(PODCAST_ALERTS_KEY, 'true');
+    showFeedback(t('notifications.enabled'));
+  }, [podcastEnabled, loading, ensureToken]);
+
+  // Re-acquire FCM token on mount if any alerts were previously enabled
   useEffect(() => {
-    if (!enabled || fcmToken) return;
+    if (!anyEnabled || fcmToken) return;
     requestNotificationPermission().then(token => {
       if (token) setFcmToken(token);
     });
-  }, [enabled, fcmToken]);
+  }, [anyEnabled, fcmToken]);
 
-  // Re-subscribe when favorites change (if alerts are enabled)
+  // Re-subscribe weather when favorites change
   useEffect(() => {
-    if (!enabled || !fcmToken || !favoriteCities || favoriteCities.length === 0) return;
+    if (!weatherEnabled || !fcmToken || !favoriteCities || favoriteCities.length === 0) return;
     const cities = favoriteCities.map(c => ({ lat: c.lat, lon: c.lon, name: c.name }));
     subscribeToWeatherAlerts(fcmToken, cities);
-  }, [favoriteCities, enabled, fcmToken]);
+  }, [favoriteCities, weatherEnabled, fcmToken]);
 
-  // Listen for foreground messages when enabled
+  // Listen for foreground messages when any alert is enabled
   useEffect(() => {
-    if (!enabled) return;
+    if (!anyEnabled) return;
     return onForegroundMessage((payload) => {
       setToast(payload);
       setTimeout(() => setToast(null), 5000);
     });
-  }, [enabled]);
+  }, [anyEnabled]);
 
   return (
     <>
-      <div className="relative">
+      <div className="relative" ref={panelRef}>
         <button
-          onClick={handleClick}
+          onClick={() => setShowPanel(p => !p)}
           className={`relative p-2 rounded-lg transition-colors ${
-            enabled
+            anyEnabled
               ? 'text-blue-500 dark:text-blue-400'
               : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
-          aria-label={enabled ? t('notifications.enabled') : t('notifications.enable')}
-          title={enabled ? t('notifications.enabled') : t('notifications.enable')}
+          aria-label={t('notifications.preferences')}
+          aria-expanded={showPanel}
+          aria-haspopup="true"
         >
           {loading ? (
             <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -132,10 +218,66 @@ export default function NotificationBell() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
           )}
-          {enabled && (
+          {anyEnabled && (
             <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />
           )}
         </button>
+
+        {/* Notification preferences panel */}
+        {showPanel && (
+          <div
+            role="dialog"
+            aria-label={t('notifications.preferences')}
+            className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden"
+          >
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t('notifications.preferences')}
+              </h3>
+            </div>
+            <div className="p-2 space-y-1">
+              {/* Weather alerts */}
+              <NotificationToggle
+                label={t('notifications.weatherAlerts')}
+                description={t('notifications.weatherAlertsDesc')}
+                enabled={weatherEnabled}
+                onToggle={handleToggleWeather}
+                icon={
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                  </svg>
+                }
+                color="blue"
+              />
+              {/* Stock alerts */}
+              <NotificationToggle
+                label={t('notifications.stockAlerts')}
+                description={t('notifications.stockAlertsDesc')}
+                enabled={stockEnabled}
+                onToggle={handleToggleStocks}
+                icon={
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                }
+                color="green"
+              />
+              {/* Podcast alerts */}
+              <NotificationToggle
+                label={t('notifications.podcastAlerts')}
+                description={t('notifications.podcastAlertsDesc')}
+                enabled={podcastEnabled}
+                onToggle={handleTogglePodcasts}
+                icon={
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                }
+                color="purple"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Inline feedback tooltip */}
         {feedback && (
@@ -157,4 +299,74 @@ export default function NotificationBell() {
       )}
     </>
   );
+}
+
+// ─── Toggle Row Component ──────────────────────────────────────────────────
+
+function NotificationToggle({
+  label,
+  description,
+  enabled,
+  onToggle,
+  icon,
+  color,
+}: {
+  label: string;
+  description: string;
+  enabled: boolean;
+  onToggle: () => void;
+  icon: React.ReactNode;
+  color: 'blue' | 'green' | 'purple';
+}) {
+  const colorClasses = {
+    blue: 'bg-blue-50 dark:bg-blue-900/20 text-blue-500',
+    green: 'bg-green-50 dark:bg-green-900/20 text-green-500',
+    purple: 'bg-purple-50 dark:bg-purple-900/20 text-purple-500',
+  };
+
+  return (
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left"
+      role="switch"
+      aria-checked={enabled}
+    >
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${colorClasses[color]}`}>
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{description}</p>
+      </div>
+      <div
+        className={`w-9 h-5 rounded-full flex-shrink-0 transition-colors relative ${
+          enabled ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+        }`}
+      >
+        <div
+          className={`w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform shadow-sm ${
+            enabled ? 'translate-x-4' : 'translate-x-0.5'
+          }`}
+        />
+      </div>
+    </button>
+  );
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function getWatchlist(): Array<{ symbol: string }> {
+  try {
+    const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
+    if (stored) return JSON.parse(stored);
+  } catch { /* ignore */ }
+  return [];
+}
+
+function getSubscribedIds(): string[] {
+  try {
+    const stored = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
+    if (stored) return JSON.parse(stored).map(String);
+  } catch { /* ignore */ }
+  return [];
 }
