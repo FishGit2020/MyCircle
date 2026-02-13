@@ -391,6 +391,9 @@ const en = {
   'podcasts.allCategories': 'All',
   'podcasts.browseByGenre': 'Browse by Genre',
   'podcasts.noInCategory': 'No podcasts found in this category',
+  'podcasts.shareEpisode': 'Share episode',
+  'podcasts.shareCopied': 'Link copied!',
+  'podcasts.shareText': 'Listening to "{episode}" from {podcast} at {time}',
 
   // AI Assistant
   'ai.title': 'AI Assistant',
@@ -1029,6 +1032,9 @@ const es: Record<TranslationKey, string> = {
   'podcasts.allCategories': 'Todas',
   'podcasts.browseByGenre': 'Explorar por G\u00e9nero',
   'podcasts.noInCategory': 'No se encontraron podcasts en esta categor\u00eda',
+  'podcasts.shareEpisode': 'Compartir episodio',
+  'podcasts.shareCopied': '\u00a1Enlace copiado!',
+  'podcasts.shareText': 'Escuchando "{episode}" de {podcast} en {time}',
 
   // AI Assistant
   'ai.title': 'Asistente IA',

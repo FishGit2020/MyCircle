@@ -45,6 +45,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Episode playback with built-in audio player
 - **Persistent audio player** — continues playing across all routes (navigate to Stocks, Weather, etc. without interrupting playback)
 - **Category/genre filtering** — browse trending podcasts by genre with filter chips, category badges on cards
+- **Share episode clip** — share currently playing episode with timestamp via Web Share API or clipboard fallback
 - Podcast subscriptions with "My Subscriptions" tab
 - Subscribe/unsubscribe from any podcast feed
 
