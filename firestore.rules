@@ -17,5 +17,10 @@ service cloud.firestore {
       allow read: if true;
       allow create, update, delete: if request.auth != null;
     }
+
+    // Announcements - public read, admin-only write (via Firebase console/backend)
+    match /announcements/{announcementId} {
+      allow read: if true;
+    }
   }
 }

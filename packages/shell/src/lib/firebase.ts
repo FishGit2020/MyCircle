@@ -1,6 +1,6 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, Auth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -79,6 +79,7 @@ export interface UserProfile {
   favoriteCities: FavoriteCity[];
   stockWatchlist?: WatchlistItem[];
   podcastSubscriptions?: string[];
+  lastSeenAnnouncementId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -327,6 +328,40 @@ export async function submitFeedback(feedback: FeedbackData, user: { uid: string
     page: window.location.pathname,
     userAgent: navigator.userAgent,
     createdAt: serverTimestamp(),
+  });
+}
+
+// Announcements — public read collection for "What's New" feature
+export interface Announcement {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+  createdAt: Date;
+}
+
+export async function getAnnouncements(): Promise<Announcement[]> {
+  if (!db) return [];
+  const q = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(20));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => {
+    const data = d.data();
+    return {
+      id: d.id,
+      title: data.title,
+      description: data.description,
+      icon: data.icon,
+      createdAt: data.createdAt?.toDate?.() ?? new Date(),
+    };
+  });
+}
+
+export async function updateLastSeenAnnouncement(uid: string, announcementId: string) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    lastSeenAnnouncementId: announcementId,
+    updatedAt: serverTimestamp(),
   });
 }
 

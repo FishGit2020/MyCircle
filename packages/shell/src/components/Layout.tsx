@@ -4,6 +4,7 @@ import { useTranslation } from '@mycircle/shared';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
 import NotificationBell from './NotificationBell';
+import WhatsNewButton from './WhatsNewButton';
 import OfflineIndicator from './OfflineIndicator';
 import LanguageSelector from './LanguageSelector';
 import FeedbackButton from './FeedbackButton';
@@ -110,6 +111,7 @@ export default function Layout() {
               </button>
               <LanguageSelector />
               <ThemeToggle />
+              <WhatsNewButton />
               <NotificationBell />
               <UserMenu />
             </nav>
@@ -118,6 +120,7 @@ export default function Layout() {
             <div className="flex md:!hidden items-center space-x-2">
               <LanguageSelector />
               <ThemeToggle />
+              <WhatsNewButton />
               <NotificationBell />
               <UserMenu />
             </div>

@@ -81,6 +81,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Multi-language support (i18n: English, Spanish)
 - Temperature (°C / °F) and wind speed (m/s, mph, km/h) unit toggles
 - **Push notifications** — multi-category preferences (weather alerts, stock price alerts, podcast episodes) via Firebase Cloud Messaging
+- **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - Offline indicator & PWA support
 - Firebase Auth (Google OAuth) with cross-device profile sync
 - Firebase App Check for API protection
