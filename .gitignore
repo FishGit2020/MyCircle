@@ -38,6 +38,9 @@ nul
 /blob-report/
 /playwright/.cache/
 
+# Bundle analysis
+stats.html
+
 # Firebase
 .firebase/
 firebase-debug.log

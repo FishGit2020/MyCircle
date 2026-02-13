@@ -1,9 +1,11 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import federation from '@originjs/vite-plugin-federation';
 import { VitePWA } from 'vite-plugin-pwa';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 const isProduction = process.env.NODE_ENV === 'production';
+const isAnalyze = process.env.ANALYZE === 'true';
 
 // In production (Firebase), all MFs are served from the same origin
 // In development, each MF runs on its own port
@@ -51,6 +53,9 @@ export default defineConfig({
       },
       shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@mycircle/shared']
     }),
+    ...(isAnalyze
+      ? [visualizer({ open: true, filename: 'stats.html', gzipSize: true }) as PluginOption]
+      : []),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'icons/*.png'],
