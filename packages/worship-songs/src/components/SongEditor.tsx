@@ -20,6 +20,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
   const [content, setContent] = useState('');
   const [notes, setNotes] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [bpmInput, setBpmInput] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -33,6 +34,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
       setContent(song.content);
       setNotes(song.notes);
       setYoutubeUrl(song.youtubeUrl || '');
+      setBpmInput(song.bpm ? String(song.bpm) : '');
       setTagsInput(song.tags?.join(', ') || '');
     }
   }, [song]);
@@ -48,6 +50,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
         .map(s => s.trim())
         .filter(Boolean);
 
+      const parsedBpm = parseInt(bpmInput, 10);
       await onSave({
         title: title.trim(),
         artist: artist.trim(),
@@ -56,6 +59,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
         content,
         notes: notes.trim(),
         youtubeUrl: youtubeUrl.trim() || undefined,
+        bpm: parsedBpm >= 30 && parsedBpm <= 240 ? parsedBpm : undefined,
         tags: tags.length > 0 ? tags : undefined,
       });
     } catch (err) {
@@ -222,6 +226,26 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
             onChange={e => setYoutubeUrl(e.target.value)}
             placeholder="https://youtube.com/watch?v=..."
             className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+          />
+        </div>
+
+        {/* BPM */}
+        <div>
+          <label htmlFor="song-bpm" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t('worship.bpm')}
+          </label>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
+            {t('worship.bpmHint')}
+          </p>
+          <input
+            id="song-bpm"
+            type="number"
+            min={30}
+            max={240}
+            value={bpmInput}
+            onChange={e => setBpmInput(e.target.value)}
+            placeholder="120"
+            className="w-32 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
           />
         </div>
 

@@ -236,6 +236,7 @@ Exposes `WorshipSongs` component via Module Federation.
 - Copy lyrics to clipboard (strips ChordPro brackets for clean output)
 - Print-friendly view via `window.print()`
 - **YouTube link integration**: Optional `youtubeUrl` field on `WorshipSong` type. `SongEditor` renders a URL input; `SongViewer` renders a styled red "Watch on YouTube" `<a>` tag (opens `target="_blank"`, `rel="noopener noreferrer"`) when URL is present, hidden otherwise.
+- **Built-in metronome**: `Metronome` component uses Web Audio API (`AudioContext` + `OscillatorNode`) for precise click timing. Optional `bpm` field on `WorshipSong` (30-240 range). Features: start/stop toggle, +/- BPM buttons, direct BPM number input, tap tempo (4-tap rolling average with 2s timeout), visual beat indicator (green flash). Always rendered in `SongViewer` below controls bar.
 - Favorites system with `StorageKeys.WORSHIP_FAVORITES`
 - Offline cache via `StorageKeys.WORSHIP_SONGS_CACHE`
 - Tag-based filtering and full-text search

@@ -71,4 +71,23 @@ describe('SongViewer', () => {
     render(<SongViewer song={baseSong} isAuthenticated={false} onEdit={onEdit} onBack={onBack} />);
     expect(screen.queryByText('worship.editSong')).not.toBeInTheDocument();
   });
+
+  it('renders the metronome section', () => {
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    expect(screen.getByRole('group', { name: 'worship.metronome' })).toBeInTheDocument();
+    expect(screen.getByLabelText('worship.metronomeStart')).toBeInTheDocument();
+  });
+
+  it('uses song BPM as initial metronome tempo', () => {
+    const songWithBpm = { ...baseSong, bpm: 85 };
+    render(<SongViewer song={songWithBpm} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    const bpmInput = screen.getByRole('spinbutton', { name: 'worship.bpm' });
+    expect(bpmInput).toHaveValue(85);
+  });
+
+  it('defaults metronome to 120 BPM when song has no BPM', () => {
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    const bpmInput = screen.getByRole('spinbutton', { name: 'worship.bpm' });
+    expect(bpmInput).toHaveValue(120);
+  });
 });

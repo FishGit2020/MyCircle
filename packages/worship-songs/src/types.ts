@@ -9,6 +9,7 @@ export interface WorshipSong {
   content: string;
   notes: string;
   youtubeUrl?: string;
+  bpm?: number;
   tags?: string[];
   createdAt: { seconds: number; nanoseconds: number };
   updatedAt: { seconds: number; nanoseconds: number };
