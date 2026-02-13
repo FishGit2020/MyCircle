@@ -52,6 +52,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 ### Bible Reader
 - Browse all 66 canonical books (Old & New Testament)
 - Chapter selection grid and passage reading
+- **Bible version selector** — switch between WEB, KJV, BBE, OEB, Clementine (Latin), and Almeida (Portuguese) translations with localStorage persistence
 - Verse of the Day (bible-api.com)
 - Font size adjustment (14-22px) with persistence
 - Bookmarks with localStorage persistence

@@ -3,6 +3,28 @@ import { useTranslation, StorageKeys, getDailyDevotional } from '@mycircle/share
 import { useVotd, useBiblePassage, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
 
+// Available Bible versions from bible-api.com
+const BIBLE_VERSIONS = [
+  { id: 'web', label: 'WEB', name: 'World English Bible' },
+  { id: 'kjv', label: 'KJV', name: 'King James Version' },
+  { id: 'bbe', label: 'BBE', name: 'Bible in Basic English' },
+  { id: 'oeb-us', label: 'OEB', name: 'Open English Bible' },
+  { id: 'clementine', label: 'CLEM', name: 'Clementine Vulgate (Latin)' },
+  { id: 'almeida', label: 'ALM', name: 'Almeida (Portuguese)' },
+] as const;
+
+function loadBibleVersion(): string {
+  try {
+    const stored = localStorage.getItem(StorageKeys.BIBLE_TRANSLATION);
+    if (stored && BIBLE_VERSIONS.some(v => v.id === stored)) return stored;
+  } catch { /* */ }
+  return 'web';
+}
+
+function saveBibleVersion(version: string) {
+  try { localStorage.setItem(StorageKeys.BIBLE_TRANSLATION, version); } catch { /* */ }
+}
+
 // --- Bookmark helpers ---
 interface Bookmark {
   book: string;
@@ -627,16 +649,26 @@ export default function BibleReader() {
   const [currentChapters, setCurrentChapters] = useState(0);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [bookmarks] = useState(loadBookmarks);
+  const [bibleVersion, setBibleVersion] = useState(loadBibleVersion);
   const { loadPassage, passage, loading: passageLoading, error: passageError } = useBiblePassage();
 
   const lastRead = useMemo(() => loadLastRead(), []);
+
+  const handleVersionChange = useCallback((version: string) => {
+    setBibleVersion(version);
+    saveBibleVersion(version);
+    // Reload current passage with new version if viewing one
+    if (view === 'passage' && currentBook && currentChapter > 0) {
+      loadPassage(currentBook, currentChapter, version);
+    }
+  }, [view, currentBook, currentChapter, loadPassage]);
 
   const handleBookSelect = (book: string, chapters: number) => {
     setCurrentBook(book);
     setCurrentChapters(chapters);
     if (chapters === 1) {
       setCurrentChapter(1);
-      loadPassage(book, 1);
+      loadPassage(book, 1, bibleVersion);
       saveLastRead({ book, chapter: 1, chapters });
       setView('passage');
     } else {
@@ -646,7 +678,7 @@ export default function BibleReader() {
 
   const handleChapterSelect = (chapter: number) => {
     setCurrentChapter(chapter);
-    loadPassage(currentBook, chapter);
+    loadPassage(currentBook, chapter, bibleVersion);
     saveLastRead({ book: currentBook, chapter, chapters: currentChapters });
     setView('passage');
   };
@@ -654,7 +686,7 @@ export default function BibleReader() {
   const handleNavigateChapter = (chapter: number) => {
     if (chapter < 1 || chapter > currentChapters) return;
     setCurrentChapter(chapter);
-    loadPassage(currentBook, chapter);
+    loadPassage(currentBook, chapter, bibleVersion);
     saveLastRead({ book: currentBook, chapter, chapters: currentChapters });
   };
 
@@ -663,7 +695,7 @@ export default function BibleReader() {
     setCurrentBook(lastRead.book);
     setCurrentChapters(lastRead.chapters);
     setCurrentChapter(lastRead.chapter);
-    loadPassage(lastRead.book, lastRead.chapter);
+    loadPassage(lastRead.book, lastRead.chapter, bibleVersion);
     setView('passage');
   };
 
@@ -673,7 +705,7 @@ export default function BibleReader() {
     setCurrentBook(book);
     setCurrentChapters(bookData.chapters);
     setCurrentChapter(chapter);
-    loadPassage(book, chapter);
+    loadPassage(book, chapter, bibleVersion);
     saveLastRead({ book, chapter, chapters: bookData.chapters });
     setView('passage');
   };
@@ -684,7 +716,7 @@ export default function BibleReader() {
     setCurrentBook(bm.book);
     setCurrentChapters(bookData.chapters);
     setCurrentChapter(bm.chapter);
-    loadPassage(bm.book, bm.chapter);
+    loadPassage(bm.book, bm.chapter, bibleVersion);
     saveLastRead({ book: bm.book, chapter: bm.chapter, chapters: bookData.chapters });
     setView('passage');
   };
@@ -724,9 +756,29 @@ export default function BibleReader() {
       )}
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-          {t('bible.readScripture')}
-        </h2>
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+            {t('bible.readScripture')}
+          </h2>
+          <div className="flex items-center gap-2">
+            <label htmlFor="bible-version" className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+              {t('bible.version')}
+            </label>
+            <select
+              id="bible-version"
+              value={bibleVersion}
+              onChange={(e) => handleVersionChange(e.target.value)}
+              aria-label={t('bible.versionSelect')}
+              className="px-2 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              {BIBLE_VERSIONS.map(v => (
+                <option key={v.id} value={v.id}>
+                  {v.label} — {v.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         {view === 'books' && (
           <BookSelector onSelect={handleBookSelect} />

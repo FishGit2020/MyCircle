@@ -552,6 +552,8 @@ const en = {
   'bible.devotionalRead': 'Read Passage',
   'bible.devotionalCompleted': 'Completed',
   'bible.devotionalReflection': 'Reflect',
+  'bible.version': 'Version',
+  'bible.versionSelect': 'Select Bible version',
 
   // Toast messages
   'toast.addedToWatchlist': 'Added to watchlist',
@@ -1222,6 +1224,8 @@ const es: Record<TranslationKey, string> = {
   'bible.devotionalRead': 'Leer Pasaje',
   'bible.devotionalCompleted': 'Completado',
   'bible.devotionalReflection': 'Reflexiona',
+  'bible.version': 'Versi\u00f3n',
+  'bible.versionSelect': 'Seleccionar versi\u00f3n de la Biblia',
 
   // Toast messages
   'toast.addedToWatchlist': 'Agregado a la lista',
