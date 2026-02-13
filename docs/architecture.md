@@ -752,3 +752,6 @@ The shell host initializes `@sentry/react` in `main.tsx` before `createRoot()` (
 - **Session Replay**: 10% of sessions recorded normally, 100% on error for debugging
 - **Error Boundary Capture**: `ErrorBoundary.tsx` calls `Sentry.captureException()` with React component stack context
 - **Trace Propagation**: Traces propagate to `localhost` and `mycircle-app.web.app`
+
+### Web Vitals
+Core Web Vitals are measured using the `web-vitals` library via `reportWebVitals()` from `@mycircle/shared`. Metrics reported: LCP, CLS, INP, FCP, TTFB. Each metric includes the current route path for per-MFE analysis. In development, metrics are logged to the console. In production, metrics are sent via `navigator.sendBeacon('/api/vitals')`.

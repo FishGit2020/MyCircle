@@ -508,6 +508,7 @@ federation({
 
 - **Sentry** (`@sentry/react`): Client-side error tracking with session replay. Initialized in `main.tsx` (production only). Errors from React `ErrorBoundary` components are automatically captured with component stack traces.
 - **Structured Logging**: Firebase Cloud Functions use `firebase-functions/logger` for structured, queryable logs in Google Cloud Logging.
+- **Web Vitals**: Core Web Vitals (LCP, CLS, INP, FCP, TTFB) measured via `web-vitals` library. Reported per route for MFE-level performance analysis.
 
 ## Testing
 
