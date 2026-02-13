@@ -57,6 +57,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Bookmarks with localStorage persistence
 - Copy passage text to clipboard
 - **Community notes** — personal notes per passage (book + chapter), auto-saved with debounce to localStorage, collapsible notes panel with saved indicator
+- **Daily devotional** — curated 30-entry reading plan cycled by day-of-year, with themed passage and "Read Passage" button, completion tracking (green checkmark persisted in localStorage, 90-day rolling window)
 
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
