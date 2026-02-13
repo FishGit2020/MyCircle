@@ -70,6 +70,12 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Favorites, search, tag filtering
 - Firestore persistence with offline localStorage cache
 
+### Notebook
+- Personal note-taking with Firestore persistence (user-scoped subcollection)
+- Create, edit, and delete notes with search/filter
+- Privacy: each user can only see their own notes
+- Note count cached for dashboard tile
+
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
@@ -88,7 +94,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Firebase App Check for API protection
 - Firebase Remote Config for feature flags
 - GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ)
-- **MFE CSS isolation** — Tailwind preflight disabled in MFE builds to prevent layout shifts from duplicate global resets
+- **MFE CSS isolation** — Tailwind preflight disabled in 8 MFE builds to prevent layout shifts from duplicate global resets
 
 ## Architecture
 
@@ -103,11 +109,16 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │  (Host)   │ │    (MFE)    │ │      (MFE)      │ │     (MFE)     │   │
 │  │ Port 3000 │ │  Port 3001  │ │   Port 3002     │ │  Port 3005    │   │
 │  └───────────┘ └─────────────┘ └─────────────────┘ └───────────────┘   │
-│  ┌─────────────────┐ ┌──────────────┐                                   │
-│  │ Podcast Player  │ │ AI Assistant │                                   │
-│  │     (MFE)       │ │    (MFE)     │                                   │
-│  │   Port 3006     │ │  Port 3007   │                                   │
-│  └─────────────────┘ └──────────────┘                                   │
+│  ┌─────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌────────────┐  │
+│  │ Podcast Player  │ │ AI Assistant │ │ Bible Reader  │ │  Worship   │  │
+│  │     (MFE)       │ │    (MFE)     │ │    (MFE)      │ │   Songs    │  │
+│  │   Port 3006     │ │  Port 3007   │ │  Port 3008    │ │ Port 3009  │  │
+│  └─────────────────┘ └──────────────┘ └───────────────┘ └────────────┘  │
+│  ┌────────────┐                                                          │
+│  │  Notebook  │                                                          │
+│  │   (MFE)    │                                                          │
+│  │ Port 3010  │                                                          │
+│  └────────────┘                                                          │
 └──────────────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -136,6 +147,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **AI Assistant** | Conversational AI chat (Gemini) | `AiAssistant` |
 | **Bible Reader** | Bible reading with daily devotionals and community notes | `BibleReader` |
 | **Worship Songs** | Song library with lyrics, chord editor, YouTube links, metronome | `WorshipSongs` |
+| **Notebook** | Personal note-taking with search and Firestore sync | `Notebook` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Routes
@@ -149,6 +161,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | `/ai` | AI assistant |
 | `/bible` | Bible reader with daily devotionals |
 | `/worship` | Worship song library with metronome |
+| `/notebook` | Notebook — personal notes with create/edit/delete |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack
@@ -206,9 +219,24 @@ mycircle/
 │   │       ├── components/      # PodcastPlayer, episode list, audio player
 │   │       ├── hooks/
 │   │       └── test/
-│   └── ai-assistant/            # AI assistant MFE
+│   ├── ai-assistant/            # AI assistant MFE
+│   │   └── src/
+│   │       ├── components/      # AiAssistant, chat UI
+│   │       ├── hooks/
+│   │       └── test/
+│   ├── bible-reader/            # Bible reader MFE
+│   │   └── src/
+│   │       ├── components/      # BibleReader, DailyDevotional, CommunityNotes
+│   │       ├── hooks/
+│   │       └── test/
+│   ├── worship-songs/           # Worship songs MFE
+│   │   └── src/
+│   │       ├── components/      # WorshipSongs, SongViewer, SongEditor, Metronome
+│   │       ├── hooks/
+│   │       └── test/
+│   └── notebook/                # Notebook MFE
 │       └── src/
-│           ├── components/      # AiAssistant, chat UI
+│           ├── components/      # Notebook, NoteList, NoteEditor, NoteCard
 │           ├── hooks/
 │           └── test/
 ├── server/                      # Local development Express server
@@ -303,6 +331,9 @@ mycircle/
    - Stock Tracker MFE preview
    - Podcast Player MFE preview
    - AI Assistant MFE preview
+   - Bible Reader MFE preview
+   - Worship Songs MFE preview
+   - Notebook MFE preview
 
 ### Available Scripts
 
@@ -450,7 +481,7 @@ query SearchCities($query: String!) {
 
 ### How It Works
 
-1. **Shell (Host)** loads 7 remote modules at runtime via `remoteEntry.js`
+1. **Shell (Host)** loads 8 remote modules at runtime via `remoteEntry.js`
 2. Each **remote MFE** exposes its root component
 3. **Shared dependencies** (React, React DOM, Apollo Client) are deduplicated at runtime via `singleton: true` and `requiredVersion` constraints
 4. **pnpm catalogs** centralise version specifiers so all packages resolve the same version from a single source of truth in `pnpm-workspace.yaml`

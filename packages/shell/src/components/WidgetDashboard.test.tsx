@@ -10,6 +10,7 @@ vi.mock('@mycircle/shared', () => ({
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
     WIDGET_LAYOUT: 'widget-dashboard-layout',
     WORSHIP_SONGS_CACHE: 'worship-songs-cache',
+    NOTEBOOK_CACHE: 'notebook-cache',
   },
   MFEvents: {
     PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
@@ -51,12 +52,13 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders all four default widgets', () => {
+  it('renders all five default widgets', () => {
     renderWidget();
     expect(screen.getByText('widgets.weather')).toBeInTheDocument();
     expect(screen.getByText('widgets.stocks')).toBeInTheDocument();
     expect(screen.getByText('widgets.verse')).toBeInTheDocument();
     expect(screen.getByText('widgets.nowPlaying')).toBeInTheDocument();
+    expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
   });
 
   it('renders customize button', () => {
@@ -76,9 +78,9 @@ describe('WidgetDashboard', () => {
   it('shows visibility toggles in editing mode', () => {
     renderWidget();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // All four widgets should show "Visible" toggle
+    // All five widgets should show "Visible" toggle
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(4);
+    expect(visibleButtons.length).toBe(5);
   });
 
   it('can toggle widget visibility', () => {
@@ -95,8 +97,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(4);
-    expect(downButtons.length).toBe(4);
+    expect(upButtons.length).toBe(5);
+    expect(downButtons.length).toBe(5);
   });
 
   it('persists layout to localStorage', () => {
@@ -137,7 +139,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(4);
+    expect(allVisible.length).toBe(5);
   });
 
   it('has proper a11y labels on the section', () => {
