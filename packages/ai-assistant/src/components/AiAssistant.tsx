@@ -8,6 +8,7 @@ import '../index.css';
 const SUGGESTION_KEYS = [
   'ai.suggestWeather',
   'ai.suggestStocks',
+  'ai.suggestCrypto',
   'ai.suggestNavigate',
   'ai.suggestCompare',
 ] as const;

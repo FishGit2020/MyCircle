@@ -174,6 +174,32 @@ describe('AiAssistant', () => {
     expect(chatArea).toHaveAttribute('aria-live', 'polite');
   });
 
+  it('shows crypto suggestion prompt', () => {
+    renderWithProviders(<AiAssistant />);
+    expect(screen.getByText('How are crypto prices today?')).toBeInTheDocument();
+  });
+
+  it('displays crypto tool call badge', () => {
+    mockUseAiChat.mockReturnValue({
+      messages: [
+        {
+          id: '1',
+          role: 'assistant',
+          content: 'Bitcoin is at $95,000.',
+          toolCalls: [{ name: 'getCryptoPrices', args: {} }],
+          timestamp: Date.now(),
+        },
+      ],
+      loading: false,
+      error: null,
+      sendMessage: vi.fn(),
+      clearChat: vi.fn(),
+    });
+
+    renderWithProviders(<AiAssistant />);
+    expect(screen.getByText('Crypto prices')).toBeInTheDocument();
+  });
+
   it('does not show scrollbar on empty chat (overflow-hidden)', () => {
     renderWithProviders(<AiAssistant />);
     const chatArea = screen.getByRole('list', { name: 'Chat messages' });

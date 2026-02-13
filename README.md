@@ -51,7 +51,9 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
-- Context-aware responses (weather, stocks, navigation)
+- **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
+- Tool calling: weather lookup, city search, stock quotes, crypto prices (CoinGecko), page navigation
+- Suggested prompt chips with crypto, weather, stock, and navigation prompts
 
 ### General
 - Dark / light theme with system preference detection
