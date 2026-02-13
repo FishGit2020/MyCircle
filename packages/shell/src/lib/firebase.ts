@@ -435,6 +435,46 @@ export async function deleteWorshipSong(id: string) {
   await deleteDoc(doc(db, 'worshipSongs', id));
 }
 
+// Notebook — personal notes (user-scoped subcollection)
+export async function getUserNotes(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'notes'), orderBy('updatedAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function getUserNote(uid: string, noteId: string) {
+  if (!db) return null;
+  const docRef = doc(db, 'users', uid, 'notes', noteId);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) return null;
+  return { id: docSnap.id, ...docSnap.data() };
+}
+
+export async function addUserNote(uid: string, note: { title: string; content: string }) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'users', uid, 'notes'), {
+    ...note,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateUserNote(uid: string, noteId: string, updates: Partial<{ title: string; content: string }>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = doc(db, 'users', uid, 'notes', noteId);
+  await updateDoc(docRef, {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteUserNote(uid: string, noteId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
+}
+
 // Expose worship songs API for MFEs
 if (firebaseEnabled) {
   window.__worshipSongs = {
@@ -443,6 +483,26 @@ if (firebaseEnabled) {
     add: addWorshipSong,
     update: updateWorshipSong,
     delete: deleteWorshipSong,
+  };
+}
+
+// Expose notebook API for MFEs
+if (firebaseEnabled) {
+  window.__notebook = {
+    getAll: () => auth?.currentUser ? getUserNotes(auth.currentUser.uid) : Promise.resolve([]),
+    get: (id: string) => auth?.currentUser ? getUserNote(auth.currentUser.uid, id) : Promise.resolve(null),
+    add: (note: { title: string; content: string }) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addUserNote(auth.currentUser.uid, note);
+    },
+    update: (id: string, updates: Partial<{ title: string; content: string }>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateUserNote(auth.currentUser.uid, id, updates);
+    },
+    delete: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteUserNote(auth.currentUser.uid, id);
+    },
   };
 }
 

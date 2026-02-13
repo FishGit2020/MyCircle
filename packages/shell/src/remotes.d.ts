@@ -35,3 +35,8 @@ declare module 'worshipSongs/WorshipSongs' {
   const WorshipSongs: React.ComponentType;
   export default WorshipSongs;
 }
+
+declare module 'notebook/Notebook' {
+  const Notebook: React.ComponentType;
+  export default Notebook;
+}

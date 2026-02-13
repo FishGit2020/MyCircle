@@ -509,6 +509,30 @@ const en = {
   'worship.metronomeStop': 'Stop metronome',
   'worship.tapTempo': 'Tap tempo',
 
+  // Notebook
+  'nav.notebook': 'Notebook',
+  'dashboard.notebook': 'Notebook',
+  'home.quickNotebookDesc': 'Your personal notes',
+  'notebook.title': 'My Notebook',
+  'notebook.newNote': 'New Note',
+  'notebook.editNote': 'Edit Note',
+  'notebook.deleteNote': 'Delete Note',
+  'notebook.deleteConfirm': 'Are you sure you want to delete this note?',
+  'notebook.noteTitle': 'Title',
+  'notebook.noteTitlePlaceholder': 'Note title...',
+  'notebook.content': 'Content',
+  'notebook.contentPlaceholder': 'Write your note...',
+  'notebook.save': 'Save',
+  'notebook.saving': 'Saving...',
+  'notebook.cancel': 'Cancel',
+  'notebook.back': 'Back to Notes',
+  'notebook.noNotes': 'No notes yet. Create your first note!',
+  'notebook.searchPlaceholder': 'Search notes...',
+  'notebook.noteCount': '{count} notes',
+  'notebook.lastEdited': 'Last edited',
+  'notebook.loginToUse': 'Sign in to use your notebook',
+  'notebook.noResults': 'No matching notes found',
+
   // PWA update prompt
   'pwa.newVersion': 'A new version is available',
   'pwa.reload': 'Reload',
@@ -574,6 +598,7 @@ const en = {
   'breadcrumb.bible': 'Bible',
   'breadcrumb.worship': 'Worship',
   'breadcrumb.ai': 'AI Assistant',
+  'breadcrumb.notebook': 'Notebook',
 
   // Command palette
   'commandPalette.placeholder': 'Search cities, stocks, podcasts, Bible, songs...',
@@ -587,6 +612,7 @@ const en = {
   'commandPalette.goToBible': 'Go to Bible',
   'commandPalette.goToWorship': 'Go to Worship',
   'commandPalette.goToAi': 'Go to AI Assistant',
+  'commandPalette.goToNotebook': 'Go to Notebook',
 
   // Bottom nav
   'bottomNav.home': 'Home',
@@ -1181,6 +1207,30 @@ const es: Record<TranslationKey, string> = {
   'worship.metronomeStop': 'Detener metr\u00f3nomo',
   'worship.tapTempo': 'Toca tempo',
 
+  // Notebook
+  'nav.notebook': 'Bloc de notas',
+  'dashboard.notebook': 'Bloc de notas',
+  'home.quickNotebookDesc': 'Tus notas personales',
+  'notebook.title': 'Mi Bloc de Notas',
+  'notebook.newNote': 'Nueva Nota',
+  'notebook.editNote': 'Editar Nota',
+  'notebook.deleteNote': 'Eliminar Nota',
+  'notebook.deleteConfirm': '\u00bfEst\u00e1s seguro de que quieres eliminar esta nota?',
+  'notebook.noteTitle': 'T\u00edtulo',
+  'notebook.noteTitlePlaceholder': 'T\u00edtulo de la nota...',
+  'notebook.content': 'Contenido',
+  'notebook.contentPlaceholder': 'Escribe tu nota...',
+  'notebook.save': 'Guardar',
+  'notebook.saving': 'Guardando...',
+  'notebook.cancel': 'Cancelar',
+  'notebook.back': 'Volver a Notas',
+  'notebook.noNotes': 'No hay notas a\u00fan. \u00a1Crea tu primera nota!',
+  'notebook.searchPlaceholder': 'Buscar notas...',
+  'notebook.noteCount': '{count} notas',
+  'notebook.lastEdited': '\u00daltima edici\u00f3n',
+  'notebook.loginToUse': 'Inicia sesi\u00f3n para usar tu bloc de notas',
+  'notebook.noResults': 'No se encontraron notas',
+
   // PWA update prompt
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
   'pwa.reload': 'Recargar',
@@ -1246,6 +1296,7 @@ const es: Record<TranslationKey, string> = {
   'breadcrumb.bible': 'Biblia',
   'breadcrumb.worship': 'Adoraci\u00f3n',
   'breadcrumb.ai': 'Asistente IA',
+  'breadcrumb.notebook': 'Bloc de notas',
 
   // Command palette
   'commandPalette.placeholder': 'Buscar ciudades, acciones, podcasts, Biblia, canciones...',
@@ -1259,6 +1310,7 @@ const es: Record<TranslationKey, string> = {
   'commandPalette.goToBible': 'Ir a Biblia',
   'commandPalette.goToWorship': 'Ir a Adoraci\u00f3n',
   'commandPalette.goToAi': 'Ir a Asistente IA',
+  'commandPalette.goToNotebook': 'Ir a Bloc de notas',
 
   // Bottom nav
   'bottomNav.home': 'Inicio',

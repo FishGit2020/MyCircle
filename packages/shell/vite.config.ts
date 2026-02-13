@@ -37,6 +37,10 @@ const worshipSongsRemote = isProduction
   ? '/worship-songs/assets/remoteEntry.js'
   : 'http://localhost:3009/assets/remoteEntry.js';
 
+const notebookRemote = isProduction
+  ? '/notebook/assets/remoteEntry.js'
+  : 'http://localhost:3010/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -49,7 +53,8 @@ export default defineConfig({
         podcastPlayer: podcastPlayerRemote,
         aiAssistant: aiAssistantRemote,
         bibleReader: bibleReaderRemote,
-        worshipSongs: worshipSongsRemote
+        worshipSongs: worshipSongsRemote,
+        notebook: notebookRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
