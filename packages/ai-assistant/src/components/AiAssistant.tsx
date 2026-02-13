@@ -5,9 +5,16 @@ import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import '../index.css';
 
+const SUGGESTION_KEYS = [
+  'ai.suggestWeather',
+  'ai.suggestStocks',
+  'ai.suggestNavigate',
+  'ai.suggestCompare',
+] as const;
+
 export default function AiAssistant() {
   const { t } = useTranslation();
-  const { messages, loading, error, sendMessage, clearChat } = useAiChat();
+  const { messages, loading, error, canRetry, sendMessage, clearChat, retry } = useAiChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,6 +61,19 @@ export default function AiAssistant() {
             </svg>
             <p className="text-lg font-medium">{t('ai.emptyTitle')}</p>
             <p className="text-sm mt-2 max-w-sm">{t('ai.emptyHint')}</p>
+
+            {/* Suggested prompts */}
+            <div className="flex flex-wrap justify-center gap-2 mt-6 max-w-md">
+              {SUGGESTION_KEYS.map(key => (
+                <button
+                  key={key}
+                  onClick={() => sendMessage(t(key))}
+                  className="px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  {t(key)}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -79,10 +99,18 @@ export default function AiAssistant() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Error display */}
+      {/* Error display with retry */}
       {error && (
-        <div className="mb-3 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm" role="alert">
-          {error}
+        <div className="mb-3 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center justify-between gap-2" role="alert">
+          <span className="text-red-600 dark:text-red-400 text-sm">{error}</span>
+          {canRetry && (
+            <button
+              onClick={retry}
+              className="flex-shrink-0 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline transition-colors"
+            >
+              {t('ai.retry')}
+            </button>
+          )}
         </div>
       )}
 

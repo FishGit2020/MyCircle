@@ -345,6 +345,13 @@ const en = {
   'ai.toolGeneric': 'Tool',
   'ai.error': 'Failed to get response',
   'ai.rateLimited': 'Rate limited. Please wait a moment.',
+  'ai.copyMessage': 'Copy message',
+  'ai.copied': 'Copied!',
+  'ai.retry': 'Retry',
+  'ai.suggestWeather': "What's the weather in New York?",
+  'ai.suggestStocks': 'How is AAPL doing today?',
+  'ai.suggestNavigate': 'Take me to the podcasts page',
+  'ai.suggestCompare': 'Compare weather in London and Tokyo',
 
   // Feedback
   'feedback.button': 'Feedback',
@@ -847,6 +854,13 @@ const es: Record<TranslationKey, string> = {
   'ai.toolGeneric': 'Herramienta',
   'ai.error': 'No se pudo obtener respuesta',
   'ai.rateLimited': 'L\u00edmite de velocidad. Espera un momento.',
+  'ai.copyMessage': 'Copiar mensaje',
+  'ai.copied': '\u00a1Copiado!',
+  'ai.retry': 'Reintentar',
+  'ai.suggestWeather': '\u00bfC\u00f3mo est\u00e1 el clima en Nueva York?',
+  'ai.suggestStocks': '\u00bfC\u00f3mo va AAPL hoy?',
+  'ai.suggestNavigate': 'Ll\u00e9vame a la p\u00e1gina de podcasts',
+  'ai.suggestCompare': 'Compara el clima en Londres y Tokio',
 
   // Feedback
   'feedback.button': 'Comentarios',
