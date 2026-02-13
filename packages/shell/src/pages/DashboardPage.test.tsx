@@ -71,6 +71,16 @@ describe('DashboardPage', () => {
     expect(screen.getByText('dashboard.ai')).toBeInTheDocument();
   });
 
+  it('renders the feature cards grid with correct responsive classes', () => {
+    const { container } = renderDashboard();
+
+    const grid = container.querySelector('.grid');
+    expect(grid).toBeInTheDocument();
+    expect(grid?.className).toContain('grid-cols-1');
+    expect(grid?.className).toContain('sm:grid-cols-2');
+    expect(grid?.className).toContain('lg:grid-cols-6');
+  });
+
   it('does not render recent searches when recentCities is empty', () => {
     renderDashboard();
 
