@@ -100,7 +100,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
   return (
     <div>
       {/* Top bar */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4" data-print-hide>
         <button
           onClick={onBack}
           className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
@@ -156,7 +156,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
       </div>
 
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700" data-print-hide>
         {/* Transpose controls — only for ChordPro */}
         {isChordPro ? (
           <div className="flex items-center gap-2 flex-wrap">
@@ -279,6 +279,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
           {/* Print */}
           <button
             onClick={handlePrint}
+            aria-label={t('worship.print')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -290,12 +291,12 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
       </div>
 
       {/* Metronome */}
-      <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700" data-print-hide>
         <Metronome initialBpm={song.bpm} />
       </div>
 
       {/* Song content */}
-      <div ref={contentRef} className="mb-8">
+      <div ref={contentRef} className="mb-8" data-print-show>
         {isChordPro ? (
           <div className="space-y-1">
             {transposedContent.split('\n').map((line, i) => (
