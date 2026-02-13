@@ -13,8 +13,10 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### Dashboard
 - Dashboard homepage with quick-access cards for all features
+- **Customizable widget dashboard** — drag-and-drop reordering, visibility toggles, layout persistence
 - Weather favorites, stock watchlist, and podcast subscription previews
 - Recent city searches for quick navigation
+- **PWA Install Prompt** — Add to Home Screen banner with 7-day dismissal memory
 
 ### Weather
 - Search for cities worldwide with autocomplete
@@ -26,6 +28,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Favorite & recent cities (synced via Firestore)
 - Share weather (link or screenshot image)
 - Inline weather comparison (compare two cities side-by-side)
+- **Historical weather** — "This day last year" comparison using Open-Meteo archive API
 - Visible live/paused toggle with clear state indication
 
 ### Stocks
@@ -48,7 +51,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Dark / light theme with system preference detection
 - Multi-language support (i18n: English, Spanish)
 - Temperature (°C / °F) and wind speed (m/s, mph, km/h) unit toggles
-- Push notifications (Firebase Cloud Messaging)
+- **Push notifications** — multi-category preferences (weather alerts, stock price alerts, podcast episodes) via Firebase Cloud Messaging
 - Offline indicator & PWA support
 - Firebase Auth (Google OAuth) with cross-device profile sync
 - Firebase App Check for API protection

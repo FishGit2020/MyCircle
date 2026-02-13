@@ -65,6 +65,20 @@ export const GET_WEATHER = gql`
   }
 `;
 
+export const GET_HISTORICAL_WEATHER = gql`
+  query GetHistoricalWeather($lat: Float!, $lon: Float!, $date: String!) {
+    historicalWeather(lat: $lat, lon: $lon, date: $date) {
+      date
+      temp_max
+      temp_min
+      precipitation
+      wind_speed_max
+      weather_description
+      weather_icon
+    }
+  }
+`;
+
 export const GET_CURRENT_WEATHER = gql`
   ${WEATHER_CONDITION_FRAGMENT}
   query GetCurrentWeather($lat: Float!, $lon: Float!) {

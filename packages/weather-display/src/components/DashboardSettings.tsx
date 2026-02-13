@@ -10,6 +10,7 @@ export interface WidgetVisibility {
   whatToWear: boolean;
   sunriseSunset: boolean;
   weatherMap: boolean;
+  historicalWeather: boolean;
 }
 
 
@@ -22,6 +23,7 @@ const WIDGET_KEYS: Array<keyof WidgetVisibility> = [
   'whatToWear',
   'sunriseSunset',
   'weatherMap',
+  'historicalWeather',
 ];
 
 const WIDGET_LABEL_KEYS: Record<keyof WidgetVisibility, TranslationKey> = {
@@ -33,6 +35,7 @@ const WIDGET_LABEL_KEYS: Record<keyof WidgetVisibility, TranslationKey> = {
   whatToWear: 'dashboard.whatToWear',
   sunriseSunset: 'dashboard.sunriseSunset',
   weatherMap: 'dashboard.weatherMap',
+  historicalWeather: 'dashboard.historicalWeather',
 };
 
 const DEFAULT_VISIBILITY: WidgetVisibility = {
@@ -44,6 +47,7 @@ const DEFAULT_VISIBILITY: WidgetVisibility = {
   whatToWear: true,
   sunriseSunset: true,
   weatherMap: true,
+  historicalWeather: true,
 };
 
 export function loadWidgetVisibility(): WidgetVisibility {

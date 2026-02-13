@@ -63,6 +63,16 @@ export const typeDefs = `#graphql
     hourly: [HourlyForecast!]
   }
 
+  type HistoricalWeatherDay {
+    date: String!
+    temp_max: Float!
+    temp_min: Float!
+    precipitation: Float!
+    wind_speed_max: Float!
+    weather_description: String!
+    weather_icon: String!
+  }
+
   type City {
     id: String!
     name: String!
@@ -162,6 +172,7 @@ export const typeDefs = `#graphql
     currentWeather(lat: Float!, lon: Float!): CurrentWeather!
     forecast(lat: Float!, lon: Float!): [ForecastDay!]!
     hourlyForecast(lat: Float!, lon: Float!): [HourlyForecast!]!
+    historicalWeather(lat: Float!, lon: Float!, date: String!): HistoricalWeatherDay
     searchCities(query: String!, limit: Int = 5): [City!]!
     reverseGeocode(lat: Float!, lon: Float!): City
 

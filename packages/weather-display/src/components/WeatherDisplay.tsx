@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router';
-import { useWeatherData, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys } from '@mycircle/shared';
+import { useWeatherData, useHistoricalWeather, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys } from '@mycircle/shared';
 import CurrentWeather from './CurrentWeatherV1';
 import Forecast from './Forecast';
 import HourlyForecast from './HourlyForecast';
@@ -11,6 +11,7 @@ import SunriseSunset from './SunriseSunset';
 import WeatherMap from './WeatherMap';
 import DashboardSettings, { loadWidgetVisibility, WidgetVisibility } from './DashboardSettings';
 import WeatherComparison from './WeatherComparison';
+import HistoricalWeather from './HistoricalWeather';
 import './WeatherDisplay.css';
 
 function getRecentCitiesFromStorage(): Array<{ id: string; name: string; country?: string; lat: number; lon: number }> {
@@ -67,6 +68,11 @@ export default function WeatherDisplay() {
     location?.lat ?? null,
     location?.lon ?? null,
     liveEnabled
+  );
+
+  const { historical } = useHistoricalWeather(
+    location?.lat ?? null,
+    location?.lon ?? null
   );
 
   if (!location) {
@@ -217,6 +223,10 @@ export default function WeatherDisplay() {
           <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">{t('weather.7dayForecast')}</h3>
           <Forecast data={forecast} />
         </section>
+      )}
+
+      {widgets.historicalWeather && current && historical && (
+        <HistoricalWeather current={current} historical={historical} />
       )}
 
       {widgets.weatherMap && location && <WeatherMap lat={location.lat} lon={location.lon} />}
