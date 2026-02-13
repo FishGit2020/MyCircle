@@ -13,6 +13,26 @@ import BottomNav from './BottomNav';
 import PwaInstallPrompt from './PwaInstallPrompt';
 import { useRemoteConfigContext } from '../context/RemoteConfigContext';
 
+// Prefetch MFE remote modules on hover/focus to reduce perceived load time
+const prefetched = new Set<string>();
+const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
+  '/weather': () => import('weatherDisplay/WeatherDisplay'),
+  '/stocks': () => import('stockTracker/StockTracker'),
+  '/podcasts': () => import('podcastPlayer/PodcastPlayer'),
+  '/ai': () => import('aiAssistant/AiAssistant'),
+  '/bible': () => import('bibleReader/BibleReader'),
+  '/worship': () => import('worshipSongs/WorshipSongs'),
+};
+
+function prefetchRoute(path: string) {
+  if (prefetched.has(path)) return;
+  const loader = ROUTE_MODULE_MAP[path];
+  if (loader) {
+    prefetched.add(path);
+    loader().catch(() => {});
+  }
+}
+
 export default function Layout() {
   const { t } = useTranslation();
   const { config, loading: configLoading } = useRemoteConfigContext();
@@ -59,22 +79,22 @@ export default function Layout() {
               <Link to="/" className={navLinkClass('/')}>
                 {t('nav.home')}
               </Link>
-              <Link to="/weather" className={navLinkClass('/weather')}>
+              <Link to="/weather" className={navLinkClass('/weather')} onMouseEnter={() => prefetchRoute('/weather')} onFocus={() => prefetchRoute('/weather')}>
                 {t('dashboard.weather')}
               </Link>
-              <Link to="/stocks" className={navLinkClass('/stocks')}>
+              <Link to="/stocks" className={navLinkClass('/stocks')} onMouseEnter={() => prefetchRoute('/stocks')} onFocus={() => prefetchRoute('/stocks')}>
                 {t('nav.stocks')}
               </Link>
-              <Link to="/podcasts" className={navLinkClass('/podcasts')}>
+              <Link to="/podcasts" className={navLinkClass('/podcasts')} onMouseEnter={() => prefetchRoute('/podcasts')} onFocus={() => prefetchRoute('/podcasts')}>
                 {t('nav.podcasts')}
               </Link>
-              <Link to="/bible" className={navLinkClass('/bible')}>
+              <Link to="/bible" className={navLinkClass('/bible')} onMouseEnter={() => prefetchRoute('/bible')} onFocus={() => prefetchRoute('/bible')}>
                 Bible
               </Link>
-              <Link to="/worship" className={navLinkClass('/worship')}>
+              <Link to="/worship" className={navLinkClass('/worship')} onMouseEnter={() => prefetchRoute('/worship')} onFocus={() => prefetchRoute('/worship')}>
                 {t('nav.worship')}
               </Link>
-              <Link to="/ai" className={navLinkClass('/ai')}>
+              <Link to="/ai" className={navLinkClass('/ai')} onMouseEnter={() => prefetchRoute('/ai')} onFocus={() => prefetchRoute('/ai')}>
                 {t('nav.ai')}
               </Link>
               <button
