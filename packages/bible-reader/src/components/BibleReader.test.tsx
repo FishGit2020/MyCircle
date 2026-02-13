@@ -14,6 +14,11 @@ vi.mock('@mycircle/shared', () => ({
   useLazyQuery: vi.fn(),
   GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
   GET_BIBLE_PASSAGE: { kind: 'Document', definitions: [] },
+  StorageKeys: {
+    BIBLE_BOOKMARKS: 'bible-bookmarks',
+    BIBLE_LAST_READ: 'bible-last-read',
+    BIBLE_FONT_SIZE: 'bible-font-size',
+  },
 }));
 
 // Mock the hooks since they depend on Apollo
@@ -50,7 +55,7 @@ describe('BibleReader', () => {
       </MockedProvider>
     );
 
-    expect(screen.getByText('Verse of the Day')).toBeInTheDocument();
+    expect(screen.getByText('bible.verseOfDay')).toBeInTheDocument();
     expect(screen.getByText(/For God so loved the world/)).toBeInTheDocument();
     expect(screen.getByText(/John 3:16/)).toBeInTheDocument();
   });
@@ -62,8 +67,8 @@ describe('BibleReader', () => {
       </MockedProvider>
     );
 
-    expect(screen.getByText('Old Testament')).toBeInTheDocument();
-    expect(screen.getByText('New Testament')).toBeInTheDocument();
+    expect(screen.getByText('bible.oldTestament')).toBeInTheDocument();
+    expect(screen.getByText('bible.newTestament')).toBeInTheDocument();
     expect(screen.getByText('Genesis')).toBeInTheDocument();
     expect(screen.getByText('Revelation')).toBeInTheDocument();
   });
@@ -75,7 +80,7 @@ describe('BibleReader', () => {
       </MockedProvider>
     );
 
-    expect(screen.getByPlaceholderText('Search books...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('bible.searchBooks')).toBeInTheDocument();
   });
 
   it('filters books when searching', async () => {
@@ -86,7 +91,7 @@ describe('BibleReader', () => {
       </MockedProvider>
     );
 
-    await user.type(screen.getByPlaceholderText('Search books...'), 'john');
+    await user.type(screen.getByPlaceholderText('bible.searchBooks'), 'john');
     expect(screen.getByText('John')).toBeInTheDocument();
     expect(screen.getByText('1 John')).toBeInTheDocument();
     expect(screen.queryByText('Genesis')).not.toBeInTheDocument();
@@ -105,7 +110,7 @@ describe('BibleReader', () => {
     expect(screen.getByText('Genesis')).toBeInTheDocument();
     // Genesis has 50 chapters
     expect(screen.getByText('50')).toBeInTheDocument();
-    expect(screen.getByText('All Books')).toBeInTheDocument();
+    expect(screen.getByText('bible.allBooks')).toBeInTheDocument();
   });
 
   it('has back navigation from chapter selector', async () => {
@@ -117,10 +122,10 @@ describe('BibleReader', () => {
     );
 
     await user.click(screen.getByText('Genesis'));
-    expect(screen.getByText('All Books')).toBeInTheDocument();
+    expect(screen.getByText('bible.allBooks')).toBeInTheDocument();
 
-    await user.click(screen.getByText('All Books'));
-    expect(screen.getByText('Old Testament')).toBeInTheDocument();
+    await user.click(screen.getByText('bible.allBooks'));
+    expect(screen.getByText('bible.oldTestament')).toBeInTheDocument();
   });
 
   it('renders scripture attribution footer', () => {
@@ -130,7 +135,7 @@ describe('BibleReader', () => {
       </MockedProvider>
     );
 
-    expect(screen.getByText(/bible-api.com/)).toBeInTheDocument();
+    expect(screen.getByText('bible.attribution')).toBeInTheDocument();
   });
 
   it('renders VOTD loading state', async () => {
@@ -148,6 +153,6 @@ describe('BibleReader', () => {
     );
 
     // Should show loading skeleton, not the verse text
-    expect(screen.queryByText('Verse of the Day')).not.toBeInTheDocument();
+    expect(screen.queryByText('bible.verseOfDay')).not.toBeInTheDocument();
   });
 });

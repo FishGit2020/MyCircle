@@ -40,6 +40,9 @@ export const StorageKeys = {
   STOCK_LIVE: 'stock-live-enabled',
   DASHBOARD_WIDGETS: 'weather-dashboard-widgets',
   WORSHIP_SONGS_CACHE: 'worship-songs-cache',
+  BIBLE_BOOKMARKS: 'bible-bookmarks',
+  BIBLE_LAST_READ: 'bible-last-read',
+  BIBLE_FONT_SIZE: 'bible-font-size',
 } as const;
 
 export interface CitySelectedEvent {
