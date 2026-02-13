@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import ThemeToggle from './ThemeToggle';
 import UnitToggle from './UnitToggle';
 import SpeedToggle from './SpeedToggle';

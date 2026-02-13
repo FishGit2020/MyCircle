@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 
 interface SongListProps {

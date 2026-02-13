@@ -1,4 +1,4 @@
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import ToolCallDisplay from './ToolCallDisplay';
 import type { ChatMessage as ChatMessageType } from '../hooks/useAiChat';
 

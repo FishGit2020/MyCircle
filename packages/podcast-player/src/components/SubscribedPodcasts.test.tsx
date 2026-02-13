@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { MemoryRouter } from 'react-router';
-import { GET_PODCAST_FEED } from '@weather/shared';
+import { GET_PODCAST_FEED } from '@mycircle/shared';
 import SubscribedPodcasts from './SubscribedPodcasts';
 
 const mockFeed = {

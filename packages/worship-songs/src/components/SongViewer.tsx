@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 import { transposeContent, transposeChord } from '../utils/transpose';
 import ChordLine from './ChordLine';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { HourlyForecast, useTranslation, useUnits, convertTemp, tempUnitSymbol } from '@weather/shared';
+import { HourlyForecast, useTranslation, useUnits, convertTemp, tempUnitSymbol } from '@mycircle/shared';
 
 interface Props {
   data: HourlyForecast[];

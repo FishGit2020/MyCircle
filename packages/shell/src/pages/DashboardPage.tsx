@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { useTranslation, StorageKeys } from '@weather/shared';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { useDailyVerse } from '../hooks/useDailyVerse';
 

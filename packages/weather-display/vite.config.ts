@@ -13,7 +13,7 @@ export default defineConfig({
         './CurrentWeather': './src/components/CurrentWeatherV1.tsx',
         './Forecast': './src/components/Forecast.tsx'
       },
-      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@weather/shared']
+      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@mycircle/shared']
     })
   ],
   build: {

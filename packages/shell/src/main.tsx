@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { ApolloProvider } from '@apollo/client/react';
-import { getApolloClient, I18nProvider } from '@weather/shared';
+import { getApolloClient, I18nProvider } from '@mycircle/shared';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { RemoteConfigProvider } from './context/RemoteConfigContext';

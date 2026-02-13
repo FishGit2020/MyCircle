@@ -11,7 +11,7 @@ export default defineConfig({
       exposes: {
         './WorshipSongs': './src/components/WorshipSongs.tsx'
       },
-      shared: ['react', 'react-dom', 'react-router', '@weather/shared']
+      shared: ['react', 'react-dom', 'react-router', '@mycircle/shared']
     })
   ],
   build: {

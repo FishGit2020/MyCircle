@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useTranslation, Locale } from '@weather/shared';
+import { useTranslation, Locale } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 
 const LOCALES: { value: Locale; label: string }[] = [

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useQuery, SEARCH_STOCKS, GET_STOCK_QUOTE, GET_STOCK_CANDLES } from '@weather/shared';
+import { useQuery, SEARCH_STOCKS, GET_STOCK_QUOTE, GET_STOCK_CANDLES } from '@mycircle/shared';
 
 // --- Types ---
 

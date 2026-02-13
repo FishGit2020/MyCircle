@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, GET_PODCAST_FEED, useTranslation } from '@weather/shared';
+import { useQuery, GET_PODCAST_FEED, useTranslation } from '@mycircle/shared';
 import type { Podcast } from '../hooks/usePodcastData';
 
 interface SubscribedPodcastsProps {

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import CitySearch from './CitySearch';
-import { SEARCH_CITIES } from '@weather/shared';
+import { SEARCH_CITIES } from '@mycircle/shared';
 
 const mockNavigate = vi.fn();
 

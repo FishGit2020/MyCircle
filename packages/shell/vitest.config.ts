@@ -18,7 +18,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@weather/shared': resolve(__dirname, '../shared/src'),
+      '@mycircle/shared': resolve(__dirname, '../shared/src'),
       // Mock remote modules for testing
       'citySearch/CitySearch': resolve(__dirname, './src/test/mocks/CitySearchMock.tsx'),
       'weatherDisplay/WeatherDisplay': resolve(__dirname, './src/test/mocks/WeatherDisplayMock.tsx'),

@@ -11,7 +11,7 @@ export default defineConfig({
       exposes: {
         './AiAssistant': './src/components/AiAssistant.tsx'
       },
-      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@weather/shared']
+      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@mycircle/shared']
     })
   ],
   build: {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import { StockQuote } from '../hooks/useStockData';
 
 interface Props {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation, TranslationKey, StorageKeys } from '@weather/shared';
+import { useTranslation, TranslationKey, StorageKeys } from '@mycircle/shared';
 
 export interface WidgetVisibility {
   currentWeather: boolean;

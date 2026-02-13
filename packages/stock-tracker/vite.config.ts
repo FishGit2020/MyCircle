@@ -11,7 +11,7 @@ export default defineConfig({
       exposes: {
         './StockTracker': './src/components/StockTracker.tsx'
       },
-      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@weather/shared']
+      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@mycircle/shared']
     })
   ],
   build: {

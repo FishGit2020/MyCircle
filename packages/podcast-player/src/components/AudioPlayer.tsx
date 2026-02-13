@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import type { Episode, Podcast } from '../hooks/usePodcastData';
 
 interface AudioPlayerProps {

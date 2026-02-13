@@ -5,8 +5,8 @@ import { MockedProvider } from '@apollo/client/testing/react';
 import { MemoryRouter } from 'react-router';
 import WeatherComparison from './WeatherComparison';
 
-// Mock @weather/shared — identity t(), metric units, passthrough helpers
-vi.mock('@weather/shared', () => ({
+// Mock @mycircle/shared — identity t(), metric units, passthrough helpers
+vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     locale: 'en',

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents } from '@weather/shared';
+import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
 import PodcastSearch from './PodcastSearch';

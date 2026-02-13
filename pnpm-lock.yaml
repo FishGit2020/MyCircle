@@ -159,7 +159,7 @@ importers:
       '@apollo/client':
         specifier: ^4.1.1
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
@@ -226,7 +226,7 @@ importers:
       '@apollo/client':
         specifier: ^4.1.1
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
@@ -293,7 +293,7 @@ importers:
       '@apollo/client':
         specifier: ^4.1.1
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
@@ -357,7 +357,7 @@ importers:
 
   packages/podcast-player:
     dependencies:
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       react:
@@ -452,7 +452,7 @@ importers:
       '@apollo/client':
         specifier: ^4.1.1
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       firebase:
@@ -525,7 +525,7 @@ importers:
       '@apollo/client':
         specifier: ^4.1.1
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
@@ -592,7 +592,7 @@ importers:
       '@apollo/client':
         specifier: ^4.1.1
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
@@ -656,7 +656,7 @@ importers:
 
   packages/worship-songs:
     dependencies:
-      '@weather/shared':
+      '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       react:

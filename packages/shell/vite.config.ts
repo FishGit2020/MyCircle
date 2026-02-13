@@ -49,7 +49,7 @@ export default defineConfig({
         bibleReader: bibleReaderRemote,
         worshipSongs: worshipSongsRemote
       },
-      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@weather/shared']
+      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@mycircle/shared']
     }),
     VitePWA({
       registerType: 'autoUpdate',

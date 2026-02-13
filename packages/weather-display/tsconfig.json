@@ -16,8 +16,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@weather/shared": ["../shared/src"],
-      "@weather/shared/*": ["../shared/src/*"]
+      "@mycircle/shared": ["../shared/src"],
+      "@mycircle/shared/*": ["../shared/src/*"]
     }
   },
   "include": ["src"],

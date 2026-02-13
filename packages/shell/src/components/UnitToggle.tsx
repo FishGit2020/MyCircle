@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { eventBus, MFEvents, WindowEvents, StorageKeys } from '@weather/shared';
+import { eventBus, MFEvents, WindowEvents, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 
 export default function UnitToggle() {

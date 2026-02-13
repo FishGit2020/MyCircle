@@ -4,8 +4,8 @@ import {
   SEARCH_PODCASTS,
   GET_TRENDING_PODCASTS,
   GET_PODCAST_EPISODES,
-} from '@weather/shared';
-import type { Podcast, Episode, PodcastSearchResult } from '@weather/shared';
+} from '@mycircle/shared';
+import type { Podcast, Episode, PodcastSearchResult } from '@mycircle/shared';
 
 // Re-export types for backward compatibility
 export type { Podcast, Episode, PodcastSearchResult };

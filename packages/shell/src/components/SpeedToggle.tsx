@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { eventBus, MFEvents, WindowEvents, StorageKeys, SpeedUnit } from '@weather/shared';
+import { eventBus, MFEvents, WindowEvents, StorageKeys, SpeedUnit } from '@mycircle/shared';
 
 const SPEED_CYCLE: SpeedUnit[] = ['ms', 'kmh', 'mph'];
 const SPEED_LABELS: Record<SpeedUnit, string> = { ms: 'm/s', kmh: 'km/h', mph: 'mph' };

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useQuery, GET_BIBLE_VOTD } from '@weather/shared';
+import { useQuery, GET_BIBLE_VOTD } from '@mycircle/shared';
 
 export interface DailyVerse {
   text: string;

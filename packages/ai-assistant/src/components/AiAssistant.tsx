@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import { useAiChat } from '../hooks/useAiChat';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';

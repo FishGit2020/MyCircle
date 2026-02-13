@@ -1,4 +1,4 @@
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import type { ToolCall } from '../hooks/useAiChat';
 
 interface ToolCallDisplayProps {

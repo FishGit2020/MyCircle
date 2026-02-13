@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router';
-import { useWeatherData, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys } from '@weather/shared';
+import { useWeatherData, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys } from '@mycircle/shared';
 import CurrentWeather from './CurrentWeatherV1';
 import Forecast from './Forecast';
 import HourlyForecast from './HourlyForecast';

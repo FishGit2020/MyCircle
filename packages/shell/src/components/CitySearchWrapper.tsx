@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { eventBus, MFEvents } from '@weather/shared';
+import { eventBus, MFEvents } from '@mycircle/shared';
 import Loading from './Loading';
 import ErrorBoundary from './ErrorBoundary';
 

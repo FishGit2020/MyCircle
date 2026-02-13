@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, StorageKeys } from '@weather/shared';
+import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 
 // The shell exposes these on the window object

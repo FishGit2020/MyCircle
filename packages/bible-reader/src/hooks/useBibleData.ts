@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useQuery, useLazyQuery, GET_BIBLE_VOTD, GET_BIBLE_PASSAGE } from '@weather/shared';
+import { useQuery, useLazyQuery, GET_BIBLE_VOTD, GET_BIBLE_PASSAGE } from '@mycircle/shared';
 
 // --- Types ---
 

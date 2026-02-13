@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useState, useRef } from 'react';
 import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
-import { useTranslation } from '@weather/shared';
+import { useTranslation } from '@mycircle/shared';
 import { toPng } from 'html-to-image';
 import Layout from './components/Layout';
 import Loading from './components/Loading';

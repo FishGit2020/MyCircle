@@ -1,5 +1,5 @@
 import React from 'react';
-import { CurrentWeather, ForecastDay, useTranslation, TranslationKey } from '@weather/shared';
+import { CurrentWeather, ForecastDay, useTranslation, TranslationKey } from '@mycircle/shared';
 
 interface Alert {
   severity: 'warning' | 'watch' | 'info';

@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
 import BibleReader from './BibleReader';
 
-// Mock @weather/shared
-vi.mock('@weather/shared', () => ({
+// Mock @mycircle/shared
+vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: { language: 'en', changeLanguage: vi.fn() },

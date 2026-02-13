@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Forecast from './Forecast';
-import { ForecastDay } from '@weather/shared';
+import { ForecastDay } from '@mycircle/shared';
 
 const mockForecastData: ForecastDay[] = [
   {
