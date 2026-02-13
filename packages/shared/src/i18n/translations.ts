@@ -501,6 +501,12 @@ const en = {
   'worship.youtubeUrl': 'YouTube URL',
   'worship.youtubeUrlHint': 'Paste a YouTube link for a tutorial or worship video',
   'worship.watchOnYoutube': 'Watch on YouTube',
+  'worship.bpm': 'BPM',
+  'worship.bpmHint': 'Beats per minute (tempo)',
+  'worship.metronome': 'Metronome',
+  'worship.metronomeStart': 'Start metronome',
+  'worship.metronomeStop': 'Stop metronome',
+  'worship.tapTempo': 'Tap tempo',
 
   // PWA update prompt
   'pwa.newVersion': 'A new version is available',
@@ -1158,6 +1164,12 @@ const es: Record<TranslationKey, string> = {
   'worship.youtubeUrl': 'URL de YouTube',
   'worship.youtubeUrlHint': 'Pega un enlace de YouTube para un tutorial o video de adoraci\u00f3n',
   'worship.watchOnYoutube': 'Ver en YouTube',
+  'worship.bpm': 'BPM',
+  'worship.bpmHint': 'Pulsaciones por minuto (tempo)',
+  'worship.metronome': 'Metr\u00f3nomo',
+  'worship.metronomeStart': 'Iniciar metr\u00f3nomo',
+  'worship.metronomeStop': 'Detener metr\u00f3nomo',
+  'worship.tapTempo': 'Toca tempo',
 
   // PWA update prompt
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',

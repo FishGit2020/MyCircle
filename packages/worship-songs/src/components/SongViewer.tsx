@@ -3,6 +3,7 @@ import { useTranslation, StorageKeys } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 import { transposeContent, transposeChord } from '../utils/transpose';
 import ChordLine from './ChordLine';
+import Metronome from './Metronome';
 
 const ALL_KEYS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 const SCROLL_SPEEDS = [20, 30, 40, 50, 70, 100]; // ms per 1px — lower = faster
@@ -286,6 +287,11 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
             {t('worship.print')}
           </button>
         </div>
+      </div>
+
+      {/* Metronome */}
+      <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <Metronome initialBpm={song.bpm} />
       </div>
 
       {/* Song content */}

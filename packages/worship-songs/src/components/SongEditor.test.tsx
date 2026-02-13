@@ -20,6 +20,7 @@ const baseSong: WorshipSong = {
   content: '[G]Amazing [C]grace',
   notes: 'Play softly',
   youtubeUrl: 'https://youtube.com/watch?v=abc123',
+  bpm: 100,
   tags: ['hymn', 'classic'],
   createdAt: { seconds: 1700000000, nanoseconds: 0 },
   updatedAt: { seconds: 1700000000, nanoseconds: 0 },
@@ -82,5 +83,33 @@ describe('SongEditor', () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
     expect(screen.getByRole('textbox', { name: /worship\.songTitle/ })).toBeRequired();
     expect(screen.getByRole('textbox', { name: /worship\.content/ })).toBeRequired();
+  });
+
+  it('renders the BPM input field', () => {
+    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    expect(screen.getByLabelText('worship.bpm')).toBeInTheDocument();
+    expect(screen.getByText('worship.bpmHint')).toBeInTheDocument();
+  });
+
+  it('populates BPM when editing an existing song', () => {
+    render(<SongEditor song={baseSong} onSave={onSave} onDelete={onDelete} onCancel={onCancel} />);
+    const bpmInput = screen.getByLabelText('worship.bpm') as HTMLInputElement;
+    expect(bpmInput.value).toBe('100');
+  });
+
+  it('includes BPM in saved data', async () => {
+    const user = userEvent.setup();
+    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+
+    await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
+    await user.type(screen.getByRole('textbox', { name: /worship\.content/ }), 'Some lyrics');
+    await user.type(screen.getByLabelText('worship.bpm'), '95');
+    await user.click(screen.getByText('worship.save'));
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bpm: 95,
+      })
+    );
   });
 });
