@@ -457,6 +457,45 @@ interface Announcement {
 - **Read tracking:** Signed-in users store `lastSeenAnnouncementId` in their UserProfile; anonymous users use `localStorage('last-seen-announcement')`
 - **Query:** `orderBy('createdAt', 'desc'), limit(20)` — newest first, bounded
 
+### Firebase Firestore — Weather Alert Subscriptions
+
+**Collection path:** `alertSubscriptions/{docId}`
+
+```typescript
+interface AlertSubscription {
+  token: string;              // FCM device token
+  cities: Array<{
+    lat: number;
+    lon: number;
+    name: string;
+  }>;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+```
+
+- **Subscribe:** `subscribeToAlerts` callable function — upserts by FCM token
+- **Unsubscribe:** Call with empty `cities` array — deletes the document
+- **Scheduled check:** `checkWeatherAlerts` runs every 30 minutes, fetches weather for all subscribed cities, sends FCM notifications for severe conditions (thunderstorm, heavy rain/snow, tornado, squall — 19 OpenWeather condition IDs)
+- **Stale token cleanup:** Invalid/expired FCM tokens are batch-deleted after failed send attempts
+
+### Firebase Firestore — Notebook Notes
+
+**Collection path:** `users/{uid}/notes/{noteId}`
+
+```typescript
+interface Note {
+  title: string;
+  content: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+```
+
+- **Privacy:** Firestore rules scope reads/writes to the owning user (`request.auth.uid == uid`)
+- **Dashboard:** Note count is cached to `StorageKeys.NOTEBOOK_CACHE` in localStorage for the dashboard widget
+- **Window bridge:** `window.__notebook.getNoteCount()` provides note count to the Shell without direct MFE coupling
+
 ### Browser LocalStorage — Theme & Preferences
 
 | Key | Value | Purpose |
@@ -466,6 +505,8 @@ interface Announcement {
 | `'stock-live-enabled'` | `'true'` or `'false'` | Stock live polling toggle state |
 | `'stock-tracker-watchlist'` | JSON array | Stock watchlist items |
 | `'podcast-subscriptions'` | JSON array of string IDs | Subscribed podcast feed IDs |
+| `'podcast-speed'` | Number (e.g., `1.5`) | Podcast playback speed multiplier |
+| `'podcast-progress'` | JSON object | Per-episode playback progress (resume position) |
 | `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles |
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
 | `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |
@@ -474,6 +515,7 @@ interface Announcement {
 | `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle |
 | `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
 | `'bible-translation'` | Bible version ID (e.g., `'kjv'`) | Selected Bible version for passage reading |
+| `'notebook-cache'` | JSON `{ count: number }` | Notebook note count for dashboard widget |
 
 ### Browser SessionStorage — Geolocation
 
@@ -829,6 +871,63 @@ Three layers prevent shared dependency version drift across micro frontends:
 | **Singleton enforcement** | `singleton: true` + `requiredVersion` in every `vite.config.ts` shared config | Build / runtime |
 
 See [cicd.md](cicd.md) for a detailed CI/CD flow guide with setup instructions.
+
+---
+
+## Cloud Functions
+
+All Cloud Functions are defined in `functions/src/index.ts` and deployed via `firebase deploy --only functions`.
+
+| Function | Type | Route / Trigger | Memory | Timeout | Secrets |
+|----------|------|----------------|--------|---------|---------|
+| `graphql` | `onRequest` | `/graphql` | 512 MiB | 60s | OPENWEATHER, FINNHUB, PODCASTINDEX keys |
+| `stockProxy` | `onRequest` | `/stock/**` | 256 MiB | 30s | FINNHUB_API_KEY |
+| `podcastProxy` | `onRequest` | `/podcast/**` | 256 MiB | 30s | PODCASTINDEX keys |
+| `aiChat` | `onRequest` | `/ai/chat` (POST) | 256 MiB | 60s | GEMINI, OPENWEATHER, FINNHUB, RECAPTCHA keys |
+| `subscribeToAlerts` | `onCall` | Callable | Default | Default | — |
+| `checkWeatherAlerts` | `onSchedule` | Every 30 minutes | 256 MiB | 120s | OPENWEATHER_API_KEY |
+
+### Rate Limiting
+
+IP-based rate limiting via `node-cache` (in-memory, per-instance):
+
+| Function | Limit | Window |
+|----------|-------|--------|
+| `stockProxy` | 60 requests | 60 seconds |
+| `podcastProxy` | 60 requests | 60 seconds |
+| `aiChat` | 10 requests | 60 seconds |
+
+### Authentication
+
+- `stockProxy`, `podcastProxy`, `aiChat`: Require Firebase Auth ID token (`Authorization: Bearer <token>`)
+- `graphql`: Requires auth for stock/podcast operations (checked by operation name)
+- `subscribeToAlerts`: Enforces App Check
+- `graphql`: Optionally verifies App Check token if present
+
+### AI Chat Function Calling
+
+The `aiChat` function uses Gemini's function calling to execute tools:
+
+| Tool | Description | External API |
+|------|-------------|-------------|
+| `getWeather` | Geocode city + fetch current weather | OpenWeather |
+| `searchCities` | Search cities by name | OpenWeather Geo |
+| `getStockQuote` | Fetch stock price by symbol | Finnhub |
+| `getCryptoPrices` | Fetch top 5 crypto prices | CoinGecko |
+| `navigateTo` | Navigate user to an app page | — (client-side) |
+
+Context injection: The system instruction is enriched with user context (favorite cities, stock watchlist, podcast subscriptions, temperature unit, locale, current page) for personalized responses.
+
+### Configurable Base URLs
+
+All external API base URLs are configurable via environment variables (defaults to production):
+
+```
+OPENWEATHER_BASE_URL, FINNHUB_BASE_URL, COINGECKO_BASE_URL,
+PODCASTINDEX_BASE_URL, BIBLE_API_BASE_URL, OPEN_METEO_BASE_URL
+```
+
+This is used by the emulator testing infrastructure (`.env.emulator`) to redirect API calls to a local mock server on port 4000.
 
 ---
 

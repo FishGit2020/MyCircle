@@ -14,6 +14,7 @@ Step-by-step instructions for obtaining every API key used by MyCircle. All keys
 - [reCAPTCHA Enterprise](#recaptcha-enterprise)
 - [Sentry (Error Tracking)](#sentry)
 - [Summary of Variables](#summary)
+- [Emulator Testing](#emulator-testing-envemulator)
 
 ---
 
@@ -236,3 +237,19 @@ firebase functions:secrets:set PODCASTINDEX_API_KEY
 firebase functions:secrets:set PODCASTINDEX_API_SECRET
 firebase functions:secrets:set GEMINI_API_KEY
 ```
+
+### Emulator Testing (`.env.emulator`)
+
+When running Firebase emulators, API keys are replaced with dummy values and all external API base URLs are redirected to a local mock server (`scripts/mock-api-server.mjs` on port 4000). This file is auto-loaded by the functions emulator via `firebase.json` → `emulators.functions.env`.
+
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| `OPENWEATHER_BASE_URL` | `http://localhost:4000` | Redirect OpenWeather calls to mock |
+| `FINNHUB_BASE_URL` | `http://localhost:4000` | Redirect Finnhub calls to mock |
+| `COINGECKO_BASE_URL` | `http://localhost:4000` | Redirect CoinGecko calls to mock |
+| `PODCASTINDEX_BASE_URL` | `http://localhost:4000` | Redirect PodcastIndex calls to mock |
+| `BIBLE_API_BASE_URL` | `http://localhost:4000` | Redirect Bible API calls to mock |
+| `OPEN_METEO_BASE_URL` | `http://localhost:4000` | Redirect Open-Meteo calls to mock |
+| `*_API_KEY` / `*_API_SECRET` | `test-*-key` | Dummy keys (mock server ignores auth) |
+
+Run the full emulator test suite: `pnpm emulator:test`
