@@ -75,7 +75,7 @@ The orchestrator that loads and composes all remote micro frontends.
 
 **Responsibilities:**
 - Application routing (React Router v7)
-- Layout: sticky header with nav links, toggles, notifications, user menu
+- Layout: sticky header with nav links, toggles, notifications, "What's New" button, user menu
 - Authentication context (Firebase Auth)
 - Theme context (dark/light mode with system preference detection)
 - i18n / language selection
@@ -414,6 +414,25 @@ interface RecentCity {
 - Hard limit of 10 cities
 - Only saved when user is authenticated
 
+### Firebase Firestore — Announcements ("What's New")
+
+**Collection path:** `announcements/{id}`
+
+```typescript
+interface Announcement {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;       // 'feature' | 'fix' | 'improvement' | 'announcement'
+  createdAt: Timestamp;
+}
+```
+
+- **Read:** Public (no auth required) — anonymous users can view announcements
+- **Write:** Admin-only (Firebase console or backend) — no client writes
+- **Read tracking:** Signed-in users store `lastSeenAnnouncementId` in their UserProfile; anonymous users use `localStorage('last-seen-announcement')`
+- **Query:** `orderBy('createdAt', 'desc'), limit(20)` — newest first, bounded
+
 ### Browser LocalStorage — Theme & Preferences
 
 | Key | Value | Purpose |
@@ -429,6 +448,7 @@ interface RecentCity {
 | `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle |
 | `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle |
 | `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle |
+| `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
 
 ### Browser SessionStorage — Geolocation
 

@@ -49,6 +49,7 @@ export const StorageKeys = {
   BIBLE_DEVOTIONAL_LOG: 'bible-devotional-log',
   WIDGET_LAYOUT: 'widget-dashboard-layout',
   RECENT_CITIES: 'recent-cities',
+  LAST_SEEN_ANNOUNCEMENT: 'last-seen-announcement',
 } as const;
 
 export interface CitySelectedEvent {

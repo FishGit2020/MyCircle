@@ -664,6 +664,12 @@ const en = {
   'widgets.visible': 'Visible',
   'widgets.moveUp': 'Move widget up',
   'widgets.moveDown': 'Move widget down',
+
+  // What's New
+  'whatsNew.title': "What's New",
+  'whatsNew.close': 'Close',
+  'whatsNew.noUpdates': 'No announcements yet. Check back later!',
+  'whatsNew.newBadge': 'New updates available',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -1328,6 +1334,12 @@ const es: Record<TranslationKey, string> = {
   'widgets.visible': 'Visible',
   'widgets.moveUp': 'Mover widget arriba',
   'widgets.moveDown': 'Mover widget abajo',
+
+  // What's New
+  'whatsNew.title': 'Novedades',
+  'whatsNew.close': 'Cerrar',
+  'whatsNew.noUpdates': 'No hay anuncios a\u00fan. \u00a1Vuelve m\u00e1s tarde!',
+  'whatsNew.newBadge': 'Nuevas actualizaciones disponibles',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {
