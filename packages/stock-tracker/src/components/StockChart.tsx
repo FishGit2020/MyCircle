@@ -9,7 +9,7 @@ interface Props {
   onTimeframeChange?: (tf: Timeframe) => void;
 }
 
-export default function StockChart({ symbol, candles, timeframe = '1M', onTimeframeChange }: Props) {
+function StockChart({ symbol, candles, timeframe = '1M', onTimeframeChange }: Props) {
   const { t, locale } = useTranslation();
 
   if (!candles || candles.s === 'no_data' || !candles.c || candles.c.length < 2) {
@@ -228,3 +228,5 @@ export default function StockChart({ symbol, candles, timeframe = '1M', onTimefr
     </div>
   );
 }
+
+export default React.memo(StockChart);
