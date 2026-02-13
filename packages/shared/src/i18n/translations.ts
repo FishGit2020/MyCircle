@@ -102,6 +102,8 @@ const en = {
   'notifications.blocked': 'Notifications blocked by browser',
   'notifications.notConfigured': 'Push notifications not configured',
   'notifications.failedToEnable': 'Failed to enable notifications',
+  'notifications.disabled': 'Notifications disabled',
+  'notifications.failedToDisable': 'Failed to disable notifications',
   'notifications.addFavoritesFirst': 'Add favorite cities first to get weather alerts',
   'notifications.subscriptionFailed': 'Failed to subscribe to weather alerts',
 
@@ -419,6 +421,8 @@ const es: Record<TranslationKey, string> = {
   'notifications.blocked': 'Notificaciones bloqueadas por el navegador',
   'notifications.notConfigured': 'Notificaciones push no configuradas',
   'notifications.failedToEnable': 'Error al activar notificaciones',
+  'notifications.disabled': 'Notificaciones desactivadas',
+  'notifications.failedToDisable': 'Error al desactivar notificaciones',
   'notifications.addFavoritesFirst': 'Agrega ciudades favoritas primero para recibir alertas meteorol\u00f3gicas',
   'notifications.subscriptionFailed': 'Error al suscribirse a alertas meteorol\u00f3gicas',
 

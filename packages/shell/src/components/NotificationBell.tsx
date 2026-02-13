@@ -35,9 +35,9 @@ export default function NotificationBell() {
         await unsubscribeFromWeatherAlerts(fcmToken);
         setEnabled(false);
         localStorage.setItem(STORAGE_KEY, 'false');
-        showFeedback(t('notifications.enable'));
+        showFeedback(t('notifications.disabled'));
       } catch {
-        showFeedback(t('notifications.failedToEnable'));
+        showFeedback(t('notifications.failedToDisable'));
       } finally {
         setLoading(false);
       }
@@ -82,6 +82,16 @@ export default function NotificationBell() {
       setLoading(false);
     }
   }, [enabled, loading, fcmToken, favoriteCities]);
+
+  // Re-acquire FCM token on mount if alerts were previously enabled.
+  // Without this, fcmToken is null after a page refresh, and the
+  // toggle-off path (which needs the token to unsubscribe) can't fire.
+  useEffect(() => {
+    if (!enabled || fcmToken) return;
+    requestNotificationPermission().then(token => {
+      if (token) setFcmToken(token);
+    });
+  }, [enabled, fcmToken]);
 
   // Re-subscribe when favorites change (if alerts are enabled)
   useEffect(() => {
