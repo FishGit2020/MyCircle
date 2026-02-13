@@ -66,9 +66,8 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
 
   return (
     <nav
-      className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-transform ${
-        hasActivePlayer ? 'translate-y-0 mb-[72px]' : ''
-      }`}
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+      role="navigation"
       aria-label="Bottom navigation"
     >
       <div className="flex items-center justify-around h-14 px-1">

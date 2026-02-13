@@ -125,4 +125,14 @@ describe('GlobalAudioPlayer', () => {
 
     expect(screen.getByText('Test Podcast')).toBeInTheDocument();
   });
+
+  it('positions player above bottom nav on mobile with bottom-14', () => {
+    renderWithProviders(<GlobalAudioPlayer />);
+
+    act(() => { dispatchPlayEvent(); });
+
+    const region = screen.getByRole('region', { name: 'Now Playing' });
+    expect(region.className).toContain('bottom-14');
+    expect(region.className).toContain('md:bottom-0');
+  });
 });
