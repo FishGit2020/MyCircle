@@ -17,10 +17,9 @@ export default function PodcastCard({
 }: PodcastCardProps) {
   const { t } = useTranslation();
 
-  const episodeCountText = t('podcasts.episodeCount').replace(
-    '{count}',
-    String(podcast.episodeCount)
-  );
+  const episodeCountText = podcast.episodeCount != null
+    ? t('podcasts.episodeCount').replace('{count}', String(podcast.episodeCount))
+    : null;
 
   return (
     <div
@@ -85,9 +84,14 @@ export default function PodcastCard({
         )}
 
         <div className="flex items-center justify-between mt-2">
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-            {episodeCountText}
-          </span>
+          {episodeCountText != null && (
+            <span
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+              aria-label={episodeCountText}
+            >
+              {episodeCountText}
+            </span>
+          )}
 
           <button
             onClick={e => {
