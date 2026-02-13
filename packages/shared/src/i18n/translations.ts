@@ -445,6 +445,39 @@ const en = {
   'onboarding.skip': 'Skip',
   'onboarding.done': 'Done',
   'onboarding.stepOf': 'Step {current} of {total}',
+
+  // Weather map
+  'map.title': 'Weather Map',
+  'map.temperature': 'Temperature',
+  'map.rain': 'Rain',
+  'map.clouds': 'Clouds',
+  'map.wind': 'Wind',
+  'map.zoomIn': 'Zoom in',
+  'map.zoomOut': 'Zoom out',
+  'map.fullscreen': 'Fullscreen',
+  'map.exitFullscreen': 'Exit fullscreen',
+
+  // Weather alerts (extra keys)
+  'alert.uvWarning': 'UV Warning',
+  'alert.tempSwing': 'Temperature Swing',
+  'alert.dismiss': 'Dismiss alert',
+  'alert.showDismissed': 'Show dismissed alerts',
+  'alert.severity.warning': 'warning',
+  'alert.severity.watch': 'watch',
+  'alert.severity.info': 'info',
+
+  // Compare (extra keys)
+  'compare.metrics': 'Weather Metrics Comparison',
+  'compare.swapCities': 'Next city',
+
+  // What to Wear comfort labels
+  'wear.comfortExtremeCold': 'Extreme cold — bundle up!',
+  'wear.comfortCold': 'Cold — dress warmly',
+  'wear.comfortCool': 'Cool — light layers recommended',
+  'wear.comfortComfortable': 'Comfortable — enjoy!',
+  'wear.comfortWarm': 'Warm — dress light',
+  'wear.comfortHot': 'Hot — stay cool & hydrated',
+  'wear.suggestions': 'suggestions',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -890,6 +923,39 @@ const es: Record<TranslationKey, string> = {
   'onboarding.skip': 'Omitir',
   'onboarding.done': 'Listo',
   'onboarding.stepOf': 'Paso {current} de {total}',
+
+  // Weather map
+  'map.title': 'Mapa meteorol\u00f3gico',
+  'map.temperature': 'Temperatura',
+  'map.rain': 'Lluvia',
+  'map.clouds': 'Nubes',
+  'map.wind': 'Viento',
+  'map.zoomIn': 'Acercar',
+  'map.zoomOut': 'Alejar',
+  'map.fullscreen': 'Pantalla completa',
+  'map.exitFullscreen': 'Salir de pantalla completa',
+
+  // Weather alerts (extra keys)
+  'alert.uvWarning': 'Alerta UV',
+  'alert.tempSwing': 'Cambio de temperatura',
+  'alert.dismiss': 'Descartar alerta',
+  'alert.showDismissed': 'Mostrar alertas descartadas',
+  'alert.severity.warning': 'alerta',
+  'alert.severity.watch': 'aviso',
+  'alert.severity.info': 'info',
+
+  // Compare (extra keys)
+  'compare.metrics': 'Comparaci\u00f3n de m\u00e9tricas',
+  'compare.swapCities': 'Siguiente ciudad',
+
+  // What to Wear comfort labels
+  'wear.comfortExtremeCold': 'Fr\u00edo extremo \u2014 \u00a1abr\u00edgate bien!',
+  'wear.comfortCold': 'Fr\u00edo \u2014 viste abrigado',
+  'wear.comfortCool': 'Fresco \u2014 capas ligeras',
+  'wear.comfortComfortable': 'Agradable \u2014 \u00a1disfruta!',
+  'wear.comfortWarm': 'C\u00e1lido \u2014 viste ligero',
+  'wear.comfortHot': 'Caluroso \u2014 mantente fresco',
+  'wear.suggestions': 'sugerencias',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {

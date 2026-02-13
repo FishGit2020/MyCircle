@@ -69,13 +69,11 @@ describe('WeatherComparison', () => {
       />,
     );
 
-    // The button text comes from t('compare.title') which returns the key
-    expect(screen.getByRole('button', { name: 'compare.title' })).toBeInTheDocument();
+    // The button text comes from t('compare.title') + city count badge
+    expect(screen.getByRole('button', { name: /compare\.title/ })).toBeInTheDocument();
   });
 
-  it('expands the comparison section with a city select dropdown when the button is clicked', async () => {
-    const user = userEvent.setup();
-
+  it('auto-expands comparison and shows city select dropdown when other cities exist', () => {
     renderWithProviders(
       <WeatherComparison
         currentCity={currentCity}
@@ -83,13 +81,7 @@ describe('WeatherComparison', () => {
       />,
     );
 
-    // The select dropdown should not be visible before expanding
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
-
-    // Click the expand button
-    await user.click(screen.getByRole('button', { name: 'compare.title' }));
-
-    // After expanding, a <select> (combobox) should appear
+    // Comparison auto-expands when other cities are available
     const select = screen.getByRole('combobox');
     expect(select).toBeInTheDocument();
 
@@ -99,5 +91,25 @@ describe('WeatherComparison', () => {
     expect(options[0]).toHaveTextContent('compare.chooseCity');
     // Second option is the other city
     expect(options[1]).toHaveTextContent('Paris');
+  });
+
+  it('collapses comparison when toggle button is clicked', async () => {
+    const user = userEvent.setup();
+
+    renderWithProviders(
+      <WeatherComparison
+        currentCity={currentCity}
+        availableCities={[currentCity, otherCity]}
+      />,
+    );
+
+    // Initially expanded
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+
+    // Click the toggle button to collapse
+    await user.click(screen.getByRole('button', { name: /compare\.title/ }));
+
+    // After collapsing, select should not be visible
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 });
