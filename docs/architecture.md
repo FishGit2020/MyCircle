@@ -740,3 +740,8 @@ Zod schema validation on AI chat request body:
 
 ### reCAPTCHA v3
 The AI chat endpoint verifies `x-recaptcha-token` header via `verifyRecaptchaToken()`. Graceful: if token is missing, the request proceeds (backward compatibility during rollout). The client-side `useAiChat` hook obtains tokens via `getRecaptchaToken('ai_chat')` from `@mycircle/shared`.
+
+## Observability
+
+### Structured Logging
+All Firebase Cloud Functions use `firebase-functions/logger` (`logger.info`, `logger.warn`, `logger.error`) instead of `console.log/warn/error`. Structured metadata objects are attached to log messages for easier filtering and search in Google Cloud Logging (e.g., `logger.error('Stock proxy error', { path, error: err.message })`).
