@@ -163,7 +163,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 - **Monitoring:** Sentry (error tracking + session replay), Web Vitals (LCP, CLS, INP)
 - **CI/CD:** GitHub Actions (CI, deploy, E2E)
 - **Runtime:** Node.js 22
-- **Package Manager:** pnpm (workspaces)
+- **Package Manager:** pnpm (workspaces + catalogs)
 
 ## Project Structure
 
@@ -313,6 +313,7 @@ mycircle/
 | `pnpm test:mf` | Run tests across all MFE packages (parallel) |
 | `pnpm test:e2e` | Run Playwright end-to-end tests |
 | `pnpm typecheck` | TypeScript type checking |
+| `pnpm check:shared-versions` | Verify shared deps are consistent across MFEs |
 
 ## CI/CD
 
@@ -320,11 +321,13 @@ MyCircle uses **GitHub Actions** for continuous integration and deployment:
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| **CI** (`ci.yml`) | PR to `main` | Installs deps, runs `typecheck:all`, runs `test:all` |
+| **CI** (`ci.yml`) | PR to `main` | Installs deps, checks shared dep versions, runs `typecheck:all`, runs `test:all` |
 | **Deploy** (`deploy.yml`) | Push to `main` | Builds the full app, deploys to Firebase Hosting (live channel) |
 | **E2E** (`e2e.yml`) | PR to `main` | Builds the app, installs Playwright browsers, runs `test:e2e` |
 
 All workflows use `pnpm/action-setup@v4` with Node 22 and pnpm caching for fast installs.
+
+See [docs/cicd.md](docs/cicd.md) for a detailed CI/CD flow guide with setup instructions.
 
 ## Security
 
@@ -443,9 +446,11 @@ query SearchCities($query: String!) {
 
 ### How It Works
 
-1. **Shell (Host)** loads 5 remote modules at runtime via `remoteEntry.js`
+1. **Shell (Host)** loads 7 remote modules at runtime via `remoteEntry.js`
 2. Each **remote MFE** exposes its root component
-3. **Shared dependencies** (React, React DOM, Apollo Client) are deduplicated at runtime
+3. **Shared dependencies** (React, React DOM, Apollo Client) are deduplicated at runtime via `singleton: true` and `requiredVersion` constraints
+4. **pnpm catalogs** centralise version specifiers so all packages resolve the same version from a single source of truth in `pnpm-workspace.yaml`
+5. A **CI version-drift check** (`scripts/check-shared-versions.mjs`) fails the build if any package declares a mismatched version
 
 ### Configuration
 
@@ -460,8 +465,17 @@ federation({
     stockTracker:   '/stock-tracker/assets/remoteEntry.js',
     podcastPlayer:  '/podcast-player/assets/remoteEntry.js',
     aiAssistant:    '/ai-assistant/assets/remoteEntry.js',
+    bibleReader:    '/bible-reader/assets/remoteEntry.js',
+    worshipSongs:   '/worship-songs/assets/remoteEntry.js',
   },
-  shared: ['react', 'react-dom', 'react-router', '@apollo/client']
+  shared: {
+    react:              { singleton: true, requiredVersion: '^18.2.0' },
+    'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
+    'react-router':     { singleton: true, requiredVersion: '^7' },
+    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1' },
+    graphql:            { singleton: true, requiredVersion: '^16.12.0' },
+    '@mycircle/shared': { singleton: true },
+  }
 })
 ```
 
@@ -474,9 +488,26 @@ federation({
   exposes: {
     './CitySearch': './src/components/CitySearch.tsx'
   },
-  shared: ['react', 'react-dom', 'react-router', '@apollo/client']
+  shared: {
+    react:              { singleton: true, requiredVersion: '^18.2.0' },
+    'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
+    'react-router':     { singleton: true, requiredVersion: '^7' },
+    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1' },
+    graphql:            { singleton: true, requiredVersion: '^16.12.0' },
+    '@mycircle/shared': { singleton: true },
+  }
 })
 ```
+
+### Shared Dependency Safety
+
+Three layers prevent version drift across micro frontends:
+
+| Layer | What it does | When it catches issues |
+|-------|-------------|------------------------|
+| **pnpm catalogs** | All packages use `catalog:` references pointing to `pnpm-workspace.yaml` | `pnpm install` |
+| **CI check** | `scripts/check-shared-versions.mjs` compares version specifiers across all `packages/*/package.json` | PR pipeline |
+| **`singleton: true`** | Federation runtime errors if incompatible versions are loaded instead of silently duplicating | Build / runtime |
 
 ## Environment Variables
 

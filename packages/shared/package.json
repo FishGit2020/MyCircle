@@ -33,14 +33,14 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@apollo/client": "^4.1.1",
-    "graphql": "^16.12.0",
+    "@apollo/client": "catalog:",
+    "graphql": "catalog:",
     "graphql-tag": "^2.12.6",
     "graphql-ws": "^6.0.6"
   },
   "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",

@@ -11,7 +11,12 @@ export default defineConfig({
       exposes: {
         './WorshipSongs': './src/components/WorshipSongs.tsx'
       },
-      shared: ['react', 'react-dom', 'react-router', '@mycircle/shared']
+      shared: {
+        react:              { singleton: true, requiredVersion: '^18.2.0' },
+        'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
+        'react-router':     { singleton: true, requiredVersion: '^7' },
+        '@mycircle/shared': { singleton: true },
+      }
     })
   ],
   build: {

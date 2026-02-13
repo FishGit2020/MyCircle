@@ -52,6 +52,7 @@
     "firebase:emulators": "pnpm firebase:build && firebase emulators:start",
     "firebase:login": "firebase login",
     "analyze": "cross-env ANALYZE=true pnpm --filter @mycircle/shell build",
+    "check:shared-versions": "node scripts/check-shared-versions.mjs",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist dist functions/node_modules functions/lib",
     "clean:install": "pnpm clean && pnpm install",
     "prepare": "husky"

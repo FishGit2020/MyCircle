@@ -51,7 +51,14 @@ export default defineConfig({
         bibleReader: bibleReaderRemote,
         worshipSongs: worshipSongsRemote
       },
-      shared: ['react', 'react-dom', 'react-router', '@apollo/client', 'graphql', '@mycircle/shared']
+      shared: {
+        react:              { singleton: true, requiredVersion: '^18.2.0' },
+        'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
+        'react-router':     { singleton: true, requiredVersion: '^7' },
+        '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1' },
+        graphql:            { singleton: true, requiredVersion: '^16.12.0' },
+        '@mycircle/shared': { singleton: true },
+      }
     }),
     ...(isAnalyze
       ? [visualizer({ open: true, filename: 'stats.html', gzipSize: true }) as PluginOption]

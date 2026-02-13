@@ -4,6 +4,24 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@apollo/client':
+      specifier: ^4.1.1
+      version: 4.1.1
+    graphql:
+      specifier: ^16.12.0
+      version: 16.12.0
+    react:
+      specifier: ^18.2.0
+      version: 18.3.1
+    react-dom:
+      specifier: ^18.2.0
+      version: 18.3.1
+    react-router:
+      specifier: ^7
+      version: 7.13.0
+
 importers:
 
   .:
@@ -166,22 +184,22 @@ importers:
   packages/ai-assistant:
     dependencies:
       '@apollo/client':
-        specifier: ^4.1.1
+        specifier: 'catalog:'
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
-        specifier: ^16.12.0
+        specifier: 'catalog:'
         version: 16.12.0
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
@@ -233,22 +251,22 @@ importers:
   packages/bible-reader:
     dependencies:
       '@apollo/client':
-        specifier: ^4.1.1
+        specifier: 'catalog:'
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
-        specifier: ^16.12.0
+        specifier: 'catalog:'
         version: 16.12.0
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
@@ -300,22 +318,22 @@ importers:
   packages/city-search:
     dependencies:
       '@apollo/client':
-        specifier: ^4.1.1
+        specifier: 'catalog:'
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
-        specifier: ^16.12.0
+        specifier: 'catalog:'
         version: 16.12.0
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
@@ -370,13 +388,13 @@ importers:
         specifier: workspace:*
         version: link:../shared
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
@@ -428,10 +446,10 @@ importers:
   packages/shared:
     dependencies:
       '@apollo/client':
-        specifier: ^4.1.1
+        specifier: 'catalog:'
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       graphql:
-        specifier: ^16.12.0
+        specifier: 'catalog:'
         version: 16.12.0
       graphql-tag:
         specifier: ^2.12.6
@@ -440,10 +458,10 @@ importers:
         specifier: ^6.0.6
         version: 6.0.6(graphql@16.12.0)(ws@8.19.0)
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
     devDependencies:
       '@types/react':
@@ -459,7 +477,7 @@ importers:
   packages/shell:
     dependencies:
       '@apollo/client':
-        specifier: ^4.1.1
+        specifier: 'catalog:'
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
@@ -468,16 +486,16 @@ importers:
         specifier: ^12.9.0
         version: 12.9.0
       graphql:
-        specifier: ^16.12.0
+        specifier: 'catalog:'
         version: 16.12.0
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
@@ -532,22 +550,22 @@ importers:
   packages/stock-tracker:
     dependencies:
       '@apollo/client':
-        specifier: ^4.1.1
+        specifier: 'catalog:'
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
-        specifier: ^16.12.0
+        specifier: 'catalog:'
         version: 16.12.0
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
@@ -599,22 +617,22 @@ importers:
   packages/weather-display:
     dependencies:
       '@apollo/client':
-        specifier: ^4.1.1
+        specifier: 'catalog:'
         version: 4.1.1(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
-        specifier: ^16.12.0
+        specifier: 'catalog:'
         version: 16.12.0
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
@@ -669,13 +687,13 @@ importers:
         specifier: workspace:*
         version: link:../shared
       react:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.2.0
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-router:
-        specifier: ^7
+        specifier: 'catalog:'
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':

@@ -63,7 +63,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **Bot Protection** | Firebase App Check (reCAPTCHA Enterprise) |
 | **Feature Flags** | Firebase Remote Config |
 | **Runtime** | Node.js 22 |
-| **Package Manager** | pnpm (workspaces) |
+| **Package Manager** | pnpm (workspaces + catalogs) |
 
 ---
 
@@ -130,7 +130,14 @@ federation({
   exposes: {
     './CitySearch': './src/components/CitySearch.tsx'
   },
-  shared: ['react', 'react-dom', 'react-router-dom', '@apollo/client']
+  shared: {
+    react:              { singleton: true, requiredVersion: '^18.2.0' },
+    'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
+    'react-router':     { singleton: true, requiredVersion: '^7' },
+    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1' },
+    graphql:            { singleton: true, requiredVersion: '^16.12.0' },
+    '@mycircle/shared': { singleton: true },
+  }
 })
 ```
 
@@ -715,6 +722,7 @@ mycircle/
 +-- e2e/                         # Playwright end-to-end tests
 |   +-- integration/             # Integration tests against deployed app
 +-- scripts/
+|   +-- check-shared-versions.mjs # MFE shared dep version-drift check
 |   +-- assemble-firebase.mjs   # Firebase build assembly
 |   +-- generate-icons.mjs      # PWA icon generation
 +-- .github/
@@ -738,11 +746,23 @@ GitHub Actions workflows automate testing and deployment:
 
 | Workflow | File | Trigger | Steps |
 |----------|------|---------|-------|
-| **CI** | `.github/workflows/ci.yml` | PR to `main` | Install → Typecheck → Unit tests |
+| **CI** | `.github/workflows/ci.yml` | PR to `main` | Install → Check shared dep versions → Typecheck → Unit tests |
 | **Deploy** | `.github/workflows/deploy.yml` | Push to `main` | Install → Build → Firebase Hosting deploy |
 | **E2E** | `.github/workflows/e2e.yml` | PR to `main` | Install → Playwright install → Build → E2E tests |
 
 All workflows use `pnpm/action-setup@v4`, `actions/setup-node@v4` with Node 22 and pnpm dependency caching. The deploy workflow uses `FirebaseExtended/action-hosting-deploy@v0` with a `FIREBASE_SERVICE_ACCOUNT` secret for authentication.
+
+### Shared Dependency Safety
+
+Three layers prevent shared dependency version drift across micro frontends:
+
+| Layer | Mechanism | Catches issues at |
+|-------|-----------|-------------------|
+| **pnpm catalogs** | All packages use `catalog:` references in `package.json`, resolved from `pnpm-workspace.yaml` | Install time |
+| **CI check script** | `scripts/check-shared-versions.mjs` compares version specifiers across all `packages/*/package.json` | PR pipeline |
+| **Singleton enforcement** | `singleton: true` + `requiredVersion` in every `vite.config.ts` shared config | Build / runtime |
+
+See [cicd.md](cicd.md) for a detailed CI/CD flow guide with setup instructions.
 
 ---
 

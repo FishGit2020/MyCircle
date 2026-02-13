@@ -25,6 +25,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Check shared dependency versions
+        run: node scripts/check-shared-versions.mjs
+
       - name: Typecheck
         run: pnpm typecheck:all
 
