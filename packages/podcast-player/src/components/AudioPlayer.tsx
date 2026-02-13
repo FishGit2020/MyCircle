@@ -206,6 +206,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
               src={artworkSrc}
               alt=""
               className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+              loading="lazy"
             />
           )}
           <div className="min-w-0">
@@ -335,6 +336,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
               src={artworkSrc}
               alt=""
               className="w-10 h-10 rounded object-cover flex-shrink-0"
+              loading="lazy"
             />
           )}
           <div className="min-w-0 flex-1">
