@@ -538,6 +538,10 @@ const en = {
   'bible.notesPlaceholder': 'Write your notes for this passage...',
   'bible.notesSaved': 'Saved',
   'bible.notesCount': '{count} note(s)',
+  'bible.dailyDevotional': 'Daily Devotional',
+  'bible.devotionalRead': 'Read Passage',
+  'bible.devotionalCompleted': 'Completed',
+  'bible.devotionalReflection': 'Reflect',
 
   // Toast messages
   'toast.addedToWatchlist': 'Added to watchlist',
@@ -1188,6 +1192,10 @@ const es: Record<TranslationKey, string> = {
   'bible.notesPlaceholder': 'Escribe tus notas para este pasaje...',
   'bible.notesSaved': 'Guardado',
   'bible.notesCount': '{count} nota(s)',
+  'bible.dailyDevotional': 'Devocional Diario',
+  'bible.devotionalRead': 'Leer Pasaje',
+  'bible.devotionalCompleted': 'Completado',
+  'bible.devotionalReflection': 'Reflexiona',
 
   // Toast messages
   'toast.addedToWatchlist': 'Agregado a la lista',

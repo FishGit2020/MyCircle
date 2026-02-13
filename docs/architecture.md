@@ -221,6 +221,7 @@ Exposes `BibleReader` component via Module Federation.
 - Bookmark system (create/remove, stored in `StorageKeys.BIBLE_BOOKMARKS`)
 - Copy passage text to clipboard
 - **Community notes**: Collapsible notes panel per passage (`book:chapter` key). Auto-saved to `StorageKeys.BIBLE_NOTES` with 800ms debounce. Notes are loaded when navigating to a passage and cleared preview shown in collapsed state.
+- **Daily devotional**: `DailyDevotional` component renders a curated reading plan (30 entries cycled by `dayOfYear % 30`). Each entry has a book, chapter, and theme. "Read Passage" button navigates to the passage and marks the day complete in `StorageKeys.BIBLE_DEVOTIONAL_LOG` (90-day rolling window to prevent unbounded growth).
 - Last read position tracking (`StorageKeys.BIBLE_LAST_READ`)
 
 ---

@@ -87,6 +87,75 @@ function saveFontSize(size: number) {
   try { localStorage.setItem(StorageKeys.BIBLE_FONT_SIZE, String(size)); } catch { /* */ }
 }
 
+// --- Daily Devotional data ---
+// 30 curated devotional entries — cycled by day-of-year
+const DEVOTIONALS = [
+  { book: 'Psalms', chapter: 23, theme: 'The Lord is my shepherd' },
+  { book: 'John', chapter: 3, theme: 'For God so loved the world' },
+  { book: 'Romans', chapter: 8, theme: 'More than conquerors' },
+  { book: 'Philippians', chapter: 4, theme: 'Rejoice in the Lord always' },
+  { book: 'Isaiah', chapter: 40, theme: 'Those who hope in the Lord' },
+  { book: 'Matthew', chapter: 5, theme: 'The Beatitudes' },
+  { book: 'Genesis', chapter: 1, theme: 'In the beginning' },
+  { book: 'Proverbs', chapter: 3, theme: 'Trust in the Lord' },
+  { book: '1 Corinthians', chapter: 13, theme: 'Love is patient, love is kind' },
+  { book: 'Hebrews', chapter: 11, theme: 'Faith is confidence in what we hope for' },
+  { book: 'Ephesians', chapter: 6, theme: 'The armor of God' },
+  { book: 'James', chapter: 1, theme: 'Consider it pure joy' },
+  { book: 'Revelation', chapter: 21, theme: 'A new heaven and a new earth' },
+  { book: 'Psalms', chapter: 91, theme: 'He who dwells in the shelter of the Most High' },
+  { book: 'Matthew', chapter: 6, theme: 'Do not worry about tomorrow' },
+  { book: 'Romans', chapter: 12, theme: 'A living sacrifice' },
+  { book: 'Psalms', chapter: 119, theme: 'Your word is a lamp to my feet' },
+  { book: 'Colossians', chapter: 3, theme: 'Set your hearts on things above' },
+  { book: 'Joshua', chapter: 1, theme: 'Be strong and courageous' },
+  { book: 'Psalms', chapter: 46, theme: 'God is our refuge and strength' },
+  { book: 'Galatians', chapter: 5, theme: 'The fruit of the Spirit' },
+  { book: 'Luke', chapter: 15, theme: 'The prodigal son' },
+  { book: '2 Timothy', chapter: 1, theme: 'Fan into flame the gift of God' },
+  { book: 'Psalms', chapter: 139, theme: 'You knit me together' },
+  { book: 'Isaiah', chapter: 53, theme: 'He was pierced for our transgressions' },
+  { book: '1 Peter', chapter: 5, theme: 'Cast all your anxiety on Him' },
+  { book: 'Ecclesiastes', chapter: 3, theme: 'A time for everything' },
+  { book: 'Jeremiah', chapter: 29, theme: 'Plans to prosper you' },
+  { book: 'Matthew', chapter: 28, theme: 'Go and make disciples' },
+  { book: 'Psalms', chapter: 1, theme: 'Blessed is the one' },
+];
+
+function getTodayDevotional() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  return DEVOTIONALS[dayOfYear % DEVOTIONALS.length];
+}
+
+function getTodayKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+function isDevotionalCompleted(): boolean {
+  try {
+    const log = localStorage.getItem(StorageKeys.BIBLE_DEVOTIONAL_LOG);
+    if (!log) return false;
+    const parsed: string[] = JSON.parse(log);
+    return parsed.includes(getTodayKey());
+  } catch { return false; }
+}
+
+function markDevotionalCompleted() {
+  try {
+    const log = localStorage.getItem(StorageKeys.BIBLE_DEVOTIONAL_LOG);
+    const parsed: string[] = log ? JSON.parse(log) : [];
+    const key = getTodayKey();
+    if (!parsed.includes(key)) {
+      // Keep last 90 days to avoid unbounded growth
+      const updated = [...parsed.slice(-89), key];
+      localStorage.setItem(StorageKeys.BIBLE_DEVOTIONAL_LOG, JSON.stringify(updated));
+    }
+  } catch { /* */ }
+}
+
 // --- Sub-components ---
 
 function VotdSection() {
@@ -125,6 +194,60 @@ function VotdSection() {
       {verse.copyright && (
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{verse.copyright}</p>
       )}
+    </div>
+  );
+}
+
+function DailyDevotional({ onRead }: { onRead: (book: string, chapter: number) => void }) {
+  const { t } = useTranslation();
+  const devotional = getTodayDevotional();
+  const [completed, setCompleted] = useState(isDevotionalCompleted);
+
+  const handleRead = () => {
+    markDevotionalCompleted();
+    setCompleted(true);
+    onRead(devotional.book, devotional.chapter);
+  };
+
+  return (
+    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-5 border border-amber-200 dark:border-amber-800/40">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-sm font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">
+            {t('bible.dailyDevotional')}
+          </h2>
+          <p className="text-base font-medium text-gray-800 dark:text-white">
+            {devotional.book} {devotional.chapter}
+          </p>
+          <p className="text-sm text-amber-600 dark:text-amber-400 mt-1 italic">
+            &ldquo;{devotional.theme}&rdquo;
+          </p>
+        </div>
+        <button
+          onClick={handleRead}
+          className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+            completed
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800'
+              : 'bg-amber-600 dark:bg-amber-500 text-white hover:bg-amber-700 dark:hover:bg-amber-600'
+          }`}
+        >
+          {completed ? (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              {t('bible.devotionalCompleted')}
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              {t('bible.devotionalRead')}
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }
@@ -581,6 +704,17 @@ export default function BibleReader() {
     setView('passage');
   };
 
+  const handleDevotionalRead = (book: string, chapter: number) => {
+    const bookData = BIBLE_BOOKS.find(b => b.name === book);
+    if (!bookData) return;
+    setCurrentBook(book);
+    setCurrentChapters(bookData.chapters);
+    setCurrentChapter(chapter);
+    loadPassage(book, chapter);
+    saveLastRead({ book, chapter, chapters: bookData.chapters });
+    setView('passage');
+  };
+
   const handleBookmarkClick = (bm: Bookmark) => {
     const bookData = BIBLE_BOOKS.find(b => b.name === bm.book);
     if (!bookData) return;
@@ -595,6 +729,7 @@ export default function BibleReader() {
   return (
     <div className="space-y-6">
       <VotdSection />
+      <DailyDevotional onRead={handleDevotionalRead} />
 
       {/* Continue reading & bookmarks bar */}
       {view === 'books' && (lastRead || bookmarks.length > 0) && (

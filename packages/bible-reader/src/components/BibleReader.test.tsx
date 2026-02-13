@@ -19,6 +19,7 @@ vi.mock('@mycircle/shared', () => ({
     BIBLE_LAST_READ: 'bible-last-read',
     BIBLE_FONT_SIZE: 'bible-font-size',
     BIBLE_NOTES: 'bible-notes',
+    BIBLE_DEVOTIONAL_LOG: 'bible-devotional-log',
   },
 }));
 
@@ -279,5 +280,66 @@ describe('Community Notes', () => {
     await user.click(screen.getByText('bible.notes'));
 
     expect(screen.getByLabelText('bible.notes')).toBeInTheDocument();
+  });
+});
+
+describe('Daily Devotional', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.clearAllMocks();
+  });
+
+  it('renders the daily devotional card', () => {
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    expect(screen.getByText('bible.dailyDevotional')).toBeInTheDocument();
+    expect(screen.getByText('bible.devotionalRead')).toBeInTheDocument();
+  });
+
+  it('shows completed state after clicking Read Passage', async () => {
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await user.click(screen.getByText('bible.devotionalRead'));
+
+    expect(screen.getByText('bible.devotionalCompleted')).toBeInTheDocument();
+  });
+
+  it('saves completion to localStorage', async () => {
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await user.click(screen.getByText('bible.devotionalRead'));
+
+    const log = JSON.parse(localStorage.getItem('bible-devotional-log') || '[]');
+    const d = new Date();
+    const todayKey = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    expect(log).toContain(todayKey);
+  });
+
+  it('shows completed state when already completed today', () => {
+    const d = new Date();
+    const todayKey = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    localStorage.setItem('bible-devotional-log', JSON.stringify([todayKey]));
+
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    expect(screen.getByText('bible.devotionalCompleted')).toBeInTheDocument();
   });
 });
