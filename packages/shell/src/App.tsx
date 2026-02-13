@@ -1,7 +1,6 @@
 import React, { Suspense, lazy, useState, useRef } from 'react';
 import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
-import { toPng } from 'html-to-image';
 import Layout from './components/Layout';
 import Loading from './components/Loading';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -105,6 +104,7 @@ function ShareButton({ weatherRef }: { weatherRef: React.RefObject<HTMLDivElemen
     if (!weatherRef.current || capturing) return;
     setCapturing(true);
     try {
+      const { toPng } = await import('html-to-image');
       const dataUrl = await toPng(weatherRef.current, {
         backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
         pixelRatio: 2,
