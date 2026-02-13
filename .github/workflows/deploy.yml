@@ -32,8 +32,15 @@ jobs:
           workload_identity_provider: 'projects/441498720264/locations/global/workloadIdentityPools/github-actions/providers/github'
           service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
 
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          channelId: live
-          projectId: mycircle-dash
+      - name: Deploy to Firebase
+        run: npx firebase-tools deploy --project mycircle-dash
+
+      - name: Smoke test
+        run: |
+          sleep 10
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://mycircle-dash.web.app)
+          if [ "$STATUS" != "200" ]; then
+            echo "Smoke test failed — got HTTP $STATUS"
+            exit 1
+          fi
+          echo "Smoke test passed — HTTP $STATUS"
