@@ -343,6 +343,20 @@ const en = {
   'crypto.loadError': 'Failed to load crypto data',
   'crypto.noPrices': 'No crypto prices available',
 
+  // Earnings Calendar
+  'earnings.title': 'Earnings Calendar',
+  'earnings.thisWeek': 'This Week',
+  'earnings.nextWeek': 'Next Week',
+  'earnings.eps': 'EPS',
+  'earnings.revenue': 'Revenue',
+  'earnings.estimate': 'Est.',
+  'earnings.actual': 'Actual',
+  'earnings.beforeOpen': 'Before Open',
+  'earnings.afterClose': 'After Close',
+  'earnings.noEvents': 'No earnings reports this week',
+  'earnings.loadError': 'Failed to load earnings data',
+  'earnings.quarter': 'Q',
+
   // Podcast Player
   'podcasts.title': 'Podcasts',
   'podcasts.search': 'Search podcasts...',
@@ -962,6 +976,20 @@ const es: Record<TranslationKey, string> = {
   'crypto.sparkline7d': 'Tendencia 7 d\u00edas',
   'crypto.loadError': 'Error al cargar datos cripto',
   'crypto.noPrices': 'No hay precios cripto disponibles',
+
+  // Earnings Calendar
+  'earnings.title': 'Calendario de Resultados',
+  'earnings.thisWeek': 'Esta Semana',
+  'earnings.nextWeek': 'Pr\u00f3xima Semana',
+  'earnings.eps': 'BPA',
+  'earnings.revenue': 'Ingresos',
+  'earnings.estimate': 'Est.',
+  'earnings.actual': 'Real',
+  'earnings.beforeOpen': 'Pre-apertura',
+  'earnings.afterClose': 'Post-cierre',
+  'earnings.noEvents': 'Sin reportes de resultados esta semana',
+  'earnings.loadError': 'Error al cargar datos de resultados',
+  'earnings.quarter': 'T',
 
   // Podcast Player
   'podcasts.title': 'Podcasts',

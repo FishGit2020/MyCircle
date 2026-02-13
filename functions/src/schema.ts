@@ -123,6 +123,18 @@ export const typeDefs = `#graphql
     s: String!
   }
 
+  type EarningsEvent {
+    date: String!
+    epsActual: Float
+    epsEstimate: Float
+    revenueActual: Float
+    revenueEstimate: Float
+    symbol: String!
+    hour: String
+    quarter: Int
+    year: Int
+  }
+
   # ─── Crypto Types ──────────────────────────────────────────────
 
   type CryptoPrice {
@@ -208,6 +220,7 @@ export const typeDefs = `#graphql
     searchStocks(query: String!): [StockSearchResult!]!
     stockQuote(symbol: String!): StockQuote
     stockCandles(symbol: String!, resolution: String = "D", from: Int!, to: Int!): StockCandle
+    earningsCalendar(from: String!, to: String!): [EarningsEvent!]!
 
     # Podcast queries
     searchPodcasts(query: String!): PodcastSearchResponse!

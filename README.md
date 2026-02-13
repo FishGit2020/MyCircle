@@ -38,6 +38,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Symbol search and watchlist
 - Live polling with visible toggle control
 - **Crypto tracker** — live BTC, ETH, SOL, ADA, DOGE prices via CoinGecko API with 7-day sparkline, market cap, 24h volume, and expandable detail cards
+- **Earnings calendar** — weekly earnings report schedule via Finnhub API with EPS estimates/actuals, revenue, beat/miss highlighting, and week navigation
 
 ### Podcasts
 - Podcast discovery and search via PodcastIndex API
