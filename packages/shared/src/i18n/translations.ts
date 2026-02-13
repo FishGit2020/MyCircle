@@ -534,6 +534,10 @@ const en = {
   'bible.fontLarger': 'Larger text',
   'bible.passageError': 'Failed to load passage. Please try again.',
   'bible.attribution': 'Scripture text from bible-api.com (World English Bible)',
+  'bible.notes': 'My Notes',
+  'bible.notesPlaceholder': 'Write your notes for this passage...',
+  'bible.notesSaved': 'Saved',
+  'bible.notesCount': '{count} note(s)',
 
   // Toast messages
   'toast.addedToWatchlist': 'Added to watchlist',
@@ -1180,6 +1184,10 @@ const es: Record<TranslationKey, string> = {
   'bible.fontLarger': 'Texto m\u00e1s grande',
   'bible.passageError': 'No se pudo cargar el pasaje. Int\u00e9ntalo de nuevo.',
   'bible.attribution': 'Texto b\u00edblico de bible-api.com (World English Bible)',
+  'bible.notes': 'Mis Notas',
+  'bible.notesPlaceholder': 'Escribe tus notas para este pasaje...',
+  'bible.notesSaved': 'Guardado',
+  'bible.notesCount': '{count} nota(s)',
 
   // Toast messages
   'toast.addedToWatchlist': 'Agregado a la lista',

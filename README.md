@@ -49,6 +49,15 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Podcast subscriptions with "My Subscriptions" tab
 - Subscribe/unsubscribe from any podcast feed
 
+### Bible Reader
+- Browse all 66 canonical books (Old & New Testament)
+- Chapter selection grid and passage reading
+- Verse of the Day (bible-api.com)
+- Font size adjustment (14-22px) with persistence
+- Bookmarks with localStorage persistence
+- Copy passage text to clipboard
+- **Community notes** — personal notes per passage (book + chapter), auto-saved with debounce to localStorage, collapsible notes panel with saved indicator
+
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers

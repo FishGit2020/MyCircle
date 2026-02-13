@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
@@ -18,6 +18,7 @@ vi.mock('@mycircle/shared', () => ({
     BIBLE_BOOKMARKS: 'bible-bookmarks',
     BIBLE_LAST_READ: 'bible-last-read',
     BIBLE_FONT_SIZE: 'bible-font-size',
+    BIBLE_NOTES: 'bible-notes',
   },
 }));
 
@@ -48,6 +49,10 @@ vi.mock('../hooks/useBibleData', async () => {
 });
 
 describe('BibleReader', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('renders the Verse of the Day section', () => {
     render(
       <MockedProvider mocks={[]} addTypename={false}>
@@ -154,5 +159,125 @@ describe('BibleReader', () => {
 
     // Should show loading skeleton, not the verse text
     expect(screen.queryByText('bible.verseOfDay')).not.toBeInTheDocument();
+  });
+});
+
+describe('Community Notes', () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    vi.clearAllMocks();
+
+    // Reset useBiblePassage to return a loaded passage
+    const mod = await import('../hooks/useBibleData');
+    vi.mocked(mod.useBiblePassage).mockReturnValue({
+      passage: {
+        text: 'In the beginning God created the heavens and the earth.',
+        reference: 'Genesis 1',
+        translation: 'WEB',
+        verseCount: 31,
+      },
+      loading: false,
+      error: null,
+      selectedBook: 'Genesis',
+      selectedChapter: 1,
+      loadPassage: vi.fn(),
+    });
+    vi.mocked(mod.useVotd).mockReturnValue({
+      verse: { text: 'Test verse', reference: 'Test 1:1', translation: 'NIV', copyright: null },
+      loading: false,
+      error: null,
+    });
+  });
+
+  const navigateToPassage = async (user: ReturnType<typeof userEvent.setup>) => {
+    // Click Genesis -> Chapter 1 (Genesis has 50 chapters, so it shows ChapterSelector first)
+    await user.click(screen.getByText('Genesis'));
+    await user.click(screen.getByText('1'));
+  };
+
+  it('shows notes toggle button on passage view', async () => {
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await navigateToPassage(user);
+
+    expect(screen.getByText('bible.notes')).toBeInTheDocument();
+  });
+
+  it('expands notes section when toggle is clicked', async () => {
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await navigateToPassage(user);
+    await user.click(screen.getByText('bible.notes'));
+
+    expect(screen.getByPlaceholderText('bible.notesPlaceholder')).toBeInTheDocument();
+  });
+
+  it('saves note to localStorage with debounce', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await navigateToPassage(user);
+    await user.click(screen.getByText('bible.notes'));
+
+    const textarea = screen.getByPlaceholderText('bible.notesPlaceholder');
+    await user.type(textarea, 'My personal note');
+
+    // Advance past debounce
+    vi.advanceTimersByTime(1000);
+
+    const stored = JSON.parse(localStorage.getItem('bible-notes') || '{}');
+    expect(stored['Genesis:1']).toBeDefined();
+    expect(stored['Genesis:1'].text).toBe('My personal note');
+
+    vi.useRealTimers();
+  });
+
+  it('loads existing note when navigating to passage', async () => {
+    // Pre-populate a note
+    localStorage.setItem('bible-notes', JSON.stringify({
+      'Genesis:1': { text: 'Previously saved note', updatedAt: Date.now() },
+    }));
+
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await navigateToPassage(user);
+    await user.click(screen.getByText('bible.notes'));
+
+    const textarea = screen.getByPlaceholderText('bible.notesPlaceholder') as HTMLTextAreaElement;
+    expect(textarea.value).toBe('Previously saved note');
+  });
+
+  it('has accessible notes textarea with aria-label', async () => {
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await navigateToPassage(user);
+    await user.click(screen.getByText('bible.notes'));
+
+    expect(screen.getByLabelText('bible.notes')).toBeInTheDocument();
   });
 });

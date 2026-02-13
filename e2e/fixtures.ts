@@ -350,10 +350,48 @@ export async function mockGraphQL(page: Page) {
       });
     }
 
+    // ─── Bible GraphQL queries ──────────────────────────────
+
+    if (operationName === 'GetBibleVotd') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: { bibleVotd: mockBibleVotd },
+        }),
+      });
+    }
+
+    if (operationName === 'GetBiblePassage') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: { biblePassage: mockBiblePassage },
+        }),
+      });
+    }
+
     // Default: pass through
     return route.continue();
   });
 }
+
+// ─── Bible mock data ────────────────────────────────────────────
+
+export const mockBibleVotd = {
+  text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
+  reference: 'John 3:16',
+  translation: 'NIV',
+  copyright: null,
+};
+
+export const mockBiblePassage = {
+  text: 'In the beginning God created the heavens and the earth. The earth was formless and empty, and darkness was over the surface of the deep.',
+  reference: 'Genesis 1',
+  translation: 'WEB',
+  verseCount: 31,
+};
 
 // ─── AI Chat mock data ───────────────────────────────────────────
 

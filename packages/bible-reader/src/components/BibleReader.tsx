@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation, StorageKeys } from '@mycircle/shared';
 import { useVotd, useBiblePassage, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
@@ -38,6 +38,37 @@ function loadLastRead(): LastRead | null {
 
 function saveLastRead(data: LastRead) {
   try { localStorage.setItem(StorageKeys.BIBLE_LAST_READ, JSON.stringify(data)); } catch { /* */ }
+}
+
+// --- Notes helpers ---
+interface NoteEntry {
+  text: string;
+  updatedAt: number;
+}
+
+type NotesMap = Record<string, NoteEntry>;
+
+function loadNotes(): NotesMap {
+  try {
+    const stored = localStorage.getItem(StorageKeys.BIBLE_NOTES);
+    return stored ? JSON.parse(stored) : {};
+  } catch { return {}; }
+}
+
+function saveNote(key: string, text: string) {
+  try {
+    const notes = loadNotes();
+    if (text.trim()) {
+      notes[key] = { text: text.trim(), updatedAt: Date.now() };
+    } else {
+      delete notes[key];
+    }
+    localStorage.setItem(StorageKeys.BIBLE_NOTES, JSON.stringify(notes));
+  } catch { /* */ }
+}
+
+function getNoteKey(book: string, chapter: number): string {
+  return `${book}:${chapter}`;
 }
 
 // --- Font size helpers ---
@@ -218,8 +249,38 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
   const [fontSize, setFontSize] = useState(loadFontSize);
   const [copied, setCopied] = useState(false);
   const [bookmarks, setBookmarks] = useState(loadBookmarks);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const [noteSaved, setNoteSaved] = useState(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const isBookmarked = bookmarks.some(b => b.book === book && b.chapter === chapter);
+
+  // Load note when passage changes
+  useEffect(() => {
+    const key = getNoteKey(book, chapter);
+    const notes = loadNotes();
+    setNoteText(notes[key]?.text || '');
+    setNoteSaved(false);
+  }, [book, chapter]);
+
+  // Debounced auto-save for notes (800ms)
+  const handleNoteChange = useCallback((text: string) => {
+    setNoteText(text);
+    setNoteSaved(false);
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      saveNote(getNoteKey(book, chapter), text);
+      setNoteSaved(true);
+    }, 800);
+  }, [book, chapter]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
 
   const toggleBookmark = useCallback(() => {
     setBookmarks(prev => {
@@ -389,6 +450,53 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
               {t('bible.translation')}: {passage.translation}
               {passage.verseCount > 0 && ` — ${passage.verseCount} ${t('bible.verses')}`}
             </p>
+          )}
+        </div>
+      )}
+
+      {/* Notes section */}
+      {passage && !loading && (
+        <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setNotesOpen(prev => !prev)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-expanded={notesOpen}
+            aria-controls="passage-notes"
+          >
+            <span className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              {t('bible.notes')}
+              {noteText.trim() && !notesOpen && (
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">
+                  ({noteText.trim().length > 40 ? noteText.trim().slice(0, 40) + '...' : noteText.trim()})
+                </span>
+              )}
+            </span>
+            <span className="flex items-center gap-2">
+              {noteSaved && (
+                <span className="text-xs text-green-500 dark:text-green-400">{t('bible.notesSaved')}</span>
+              )}
+              <svg
+                className={`w-4 h-4 text-gray-400 transition-transform ${notesOpen ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </button>
+          {notesOpen && (
+            <div id="passage-notes" className="p-4">
+              <textarea
+                value={noteText}
+                onChange={e => handleNoteChange(e.target.value)}
+                placeholder={t('bible.notesPlaceholder')}
+                rows={4}
+                aria-label={t('bible.notes')}
+                className="w-full resize-y rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 placeholder-gray-400 dark:placeholder-gray-500"
+              />
+            </div>
           )}
         </div>
       )}
