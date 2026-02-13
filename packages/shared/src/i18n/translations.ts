@@ -424,6 +424,9 @@ const en = {
   'ai.suggestNavigate': 'Take me to the podcasts page',
   'ai.suggestCompare': 'Compare weather in London and Tokyo',
   'ai.suggestCrypto': 'How are crypto prices today?',
+  'ai.voiceInput': 'Voice input',
+  'ai.voiceListening': 'Listening...',
+  'ai.voiceNotSupported': 'Voice input is not supported in this browser',
 
   // Feedback
   'feedback.button': 'Feedback',
@@ -1067,6 +1070,9 @@ const es: Record<TranslationKey, string> = {
   'ai.suggestNavigate': 'Ll\u00e9vame a la p\u00e1gina de podcasts',
   'ai.suggestCompare': 'Compara el clima en Londres y Tokio',
   'ai.suggestCrypto': '\u00bfC\u00f3mo van los precios de cripto hoy?',
+  'ai.voiceInput': 'Entrada de voz',
+  'ai.voiceListening': 'Escuchando...',
+  'ai.voiceNotSupported': 'La entrada de voz no es compatible con este navegador',
 
   // Feedback
   'feedback.button': 'Comentarios',

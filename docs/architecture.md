@@ -205,6 +205,7 @@ Exposes `AiAssistant` component via Module Federation.
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses**: `useAiChat` hook calls `gatherUserContext()` on every message, collecting stock watchlist symbols, favorite/recent city names, podcast subscription count, locale, temperature unit, theme, and current page from localStorage. This context is sent in the request body and injected into Gemini's system instruction for personalized answers.
 - **Tool calling**: Gemini can invoke `getWeather`, `searchCities`, `getStockQuote`, `getCryptoPrices` (CoinGecko API with 2-min cache), and `navigateTo` tools. Tool calls are displayed as labeled badges (e.g., "Weather lookup", "Crypto prices") via `ToolCallDisplay`.
+- **Voice input**: `ChatInput` component includes a microphone button that uses the Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`). Lazy detection via `getSpeechRecognition()` ensures the button only renders when the browser supports it. Pulsing red animation indicates listening state. Transcribed speech is appended to the textarea.
 - Suggested prompt chips: weather, stocks, crypto, navigation, comparison
 - Authenticated requests (Firebase ID token attached)
 
