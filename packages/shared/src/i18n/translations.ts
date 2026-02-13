@@ -429,6 +429,13 @@ const en = {
   'pwa.reload': 'Reload',
   'pwa.dismiss': 'Dismiss',
 
+  // PWA install prompt
+  'pwa.installTitle': 'Install MyCircle',
+  'pwa.installMessage': 'Add MyCircle to your home screen for quick access and offline use.',
+  'pwa.install': 'Install',
+  'pwa.notNow': 'Not now',
+  'pwa.installed': 'App installed successfully!',
+
   // Bible
   'nav.bible': 'Bible',
   'bible.readScripture': 'Read Scripture',
@@ -992,6 +999,13 @@ const es: Record<TranslationKey, string> = {
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
   'pwa.reload': 'Recargar',
   'pwa.dismiss': 'Cerrar',
+
+  // PWA install prompt
+  'pwa.installTitle': 'Instalar MyCircle',
+  'pwa.installMessage': 'Agrega MyCircle a tu pantalla de inicio para acceso r\u00e1pido y uso sin conexi\u00f3n.',
+  'pwa.install': 'Instalar',
+  'pwa.notNow': 'Ahora no',
+  'pwa.installed': '\u00a1Aplicaci\u00f3n instalada exitosamente!',
 
   // Bible
   'nav.bible': 'Biblia',
