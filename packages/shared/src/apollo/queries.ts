@@ -228,6 +228,25 @@ export const GET_STOCK_CANDLES = gql`
   }
 `;
 
+// ─── Crypto Queries ─────────────────────────────────────────
+
+export const GET_CRYPTO_PRICES = gql`
+  query GetCryptoPrices($ids: [String!]!, $vsCurrency: String) {
+    cryptoPrices(ids: $ids, vsCurrency: $vsCurrency) {
+      id
+      symbol
+      name
+      image
+      current_price
+      market_cap
+      market_cap_rank
+      price_change_percentage_24h
+      total_volume
+      sparkline_7d
+    }
+  }
+`;
+
 // ─── Podcast Queries ────────────────────────────────────────
 
 export const SEARCH_PODCASTS = gql`

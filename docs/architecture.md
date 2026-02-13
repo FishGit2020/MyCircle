@@ -44,7 +44,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
                                 |
                                 v
 +──────────────────────────────────────────────────────────────────────────+
-|  OpenWeather API · Open-Meteo Archive · Finnhub API · PodcastIndex API · Gemini |
+|  OpenWeather API · Open-Meteo · Finnhub API · CoinGecko API · PodcastIndex · Gemini |
 +──────────────────────────────────────────────────────────────────────────+
 ```
 
@@ -55,7 +55,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **Frontend** | React 18, TypeScript, Tailwind CSS |
 | **Build** | Vite 5, Module Federation |
 | **API** | Apollo Server 5, GraphQL |
-| **Data Sources** | OpenWeather API (weather + air pollution), Open-Meteo Archive API, Finnhub API, PodcastIndex API, Google Gemini |
+| **Data Sources** | OpenWeather API (weather + air pollution), Open-Meteo Archive API, Finnhub API, CoinGecko API (crypto), PodcastIndex API, Google Gemini |
 | **Hosting** | Firebase Hosting + Cloud Functions |
 | **Auth** | Firebase Auth (Google OAuth) |
 | **Database** | Cloud Firestore (user profiles, favorites, preferences) |
@@ -164,8 +164,8 @@ Library consumed by all micro frontends. Not a standalone app.
 - Apollo Client factory & singleton (`createApolloClient`, `getApolloClient`)
 - GraphQL queries & fragments (`GET_WEATHER`, `SEARCH_CITIES`, etc.)
 - Event bus (`eventBus`, `MFEvents`, `subscribeToMFEvent`)
-- Types (`City`, `CurrentWeather`, `ForecastDay`, `HistoricalWeatherDay`, `AirQuality`, etc.)
-- Hooks (`useWeatherData`, `useHistoricalWeather`, `useAirQuality`)
+- Types (`City`, `CurrentWeather`, `ForecastDay`, `HistoricalWeatherDay`, `AirQuality`, `CryptoPrice`, etc.)
+- Hooks (`useWeatherData`, `useHistoricalWeather`, `useAirQuality`, `useCryptoPrices`)
 - i18n (`useTranslation`)
 - Utility functions (weather icons, formatting)
 
@@ -176,6 +176,8 @@ Exposes `StockTracker` component via Module Federation.
 **Key Behavior:**
 - Real-time stock quote lookup via Finnhub API (proxied through Cloud Functions)
 - Symbol search and watchlist management
+- **Crypto tracker** — live prices for BTC, ETH, SOL, ADA, DOGE via CoinGecko free API (`/coins/markets`), with 7-day sparkline, market cap, 24h volume, expandable detail cards, 60s polling
+- Crypto section visible on overview, hidden when a specific stock is selected
 - Authenticated requests (Firebase ID token attached)
 
 ### Podcast Player - `packages/podcast-player/`
@@ -439,6 +441,7 @@ typePolicies: {
 | `GET_HOURLY_FORECAST` | `lat, lon` | `HourlyForecast[]` |
 | `GET_HISTORICAL_WEATHER` | `lat, lon, date` | `HistoricalWeatherDay` (Open-Meteo archive) |
 | `GET_AIR_QUALITY` | `lat, lon` | `AirQuality` (OpenWeather Air Pollution API) |
+| `GET_CRYPTO_PRICES` | `ids[], vsCurrency` | `CryptoPrice[]` (CoinGecko) |
 | `SEARCH_CITIES` | `query, limit` | `City[]` |
 | `REVERSE_GEOCODE` | `lat, lon` | `City` |
 | `WEATHER_UPDATES` (subscription) | `lat, lon` | `WeatherUpdate` (real-time) |
@@ -569,6 +572,8 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **CurrentWeather** | `packages/weather-display/src/components/CurrentWeather.tsx` | Current conditions display |
 | **Forecast** | `packages/weather-display/src/components/Forecast.tsx` | 7-day forecast grid |
 | **StockTracker** | `packages/stock-tracker/src/components/StockTracker.tsx` | Stock quotes and watchlist |
+| **CryptoTracker** | `packages/stock-tracker/src/components/CryptoTracker.tsx` | Live crypto prices (CoinGecko) |
+| **useCryptoPrices** | `packages/shared/src/hooks/useCryptoPrices.ts` | Crypto price data fetching hook |
 | **GlobalAudioPlayer** | `packages/shell/src/components/GlobalAudioPlayer.tsx` | Persistent audio player (shell-level, survives route changes) |
 | **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, event publishing |
 | **AiAssistant** | `packages/ai-assistant/src/components/AiAssistant.tsx` | AI chat UI (Gemini) |

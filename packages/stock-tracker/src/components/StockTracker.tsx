@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation, WindowEvents, StorageKeys } from '@mycircle/shared';
 import StockSearch from './StockSearch';
+import CryptoTracker from './CryptoTracker';
 import Watchlist from './Watchlist';
 import StockChart from './StockChart';
 import { useStockQuote, useStockCandles, Timeframe } from '../hooks/useStockData';
@@ -162,6 +163,16 @@ export default function StockTracker() {
       <div className="mb-8">
         <StockSearch onSelect={handleStockSelect} />
       </div>
+
+      {/* Crypto Tracker */}
+      {!selectedSymbol && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            {t('crypto.title')}
+          </h2>
+          <CryptoTracker />
+        </div>
+      )}
 
       {/* Selected stock detail view */}
       {selectedSymbol && (

@@ -5,6 +5,7 @@ import NodeCache from 'node-cache';
 // Simple in-memory cache
 const weatherCache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
 const stockCache = new NodeCache({ stdTTL: 30, checkperiod: 10 });
+const cryptoCache = new NodeCache({ stdTTL: 60, checkperiod: 20 });
 const podcastCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 const bibleCache = new NodeCache({ stdTTL: 3600, checkperiod: 300 });
 
@@ -267,6 +268,41 @@ async function reverseGeocode(apiKey: string, lat: number, lon: number): Promise
     };
   }
   return null;
+}
+
+// ─── Crypto API helpers (CoinGecko — free, no API key) ───────
+
+async function getCryptoPrices(ids: string[], vsCurrency: string = 'usd') {
+  const key = `crypto:${ids.sort().join(',')}:${vsCurrency}`;
+  const cached = cryptoCache.get<any[]>(key);
+  if (cached) return cached;
+
+  const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+    params: {
+      vs_currency: vsCurrency,
+      ids: ids.join(','),
+      order: 'market_cap_desc',
+      sparkline: true,
+      price_change_percentage: '24h',
+    },
+    timeout: 10000,
+  });
+
+  const results = response.data.map((coin: any) => ({
+    id: coin.id,
+    symbol: coin.symbol,
+    name: coin.name,
+    image: coin.image,
+    current_price: coin.current_price,
+    market_cap: coin.market_cap,
+    market_cap_rank: coin.market_cap_rank,
+    price_change_percentage_24h: coin.price_change_percentage_24h,
+    total_volume: coin.total_volume,
+    sparkline_7d: coin.sparkline_in_7d?.price ?? [],
+  }));
+
+  cryptoCache.set(key, results, 60);
+  return results;
 }
 
 // ─── Stock API helpers (Finnhub) ─────────────────────────────
@@ -557,6 +593,12 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
       reverseGeocode: async (_: any, { lat, lon }: { lat: number; lon: number }) => {
         const apiKey = getApiKey();
         return await reverseGeocode(apiKey, lat, lon);
+      },
+
+      // ─── Crypto Resolvers ───────────────────────────────────
+
+      cryptoPrices: async (_: any, { ids, vsCurrency = 'usd' }: { ids: string[]; vsCurrency?: string }) => {
+        return await getCryptoPrices(ids, vsCurrency);
       },
 
       // ─── Stock Resolvers ────────────────────────────────────

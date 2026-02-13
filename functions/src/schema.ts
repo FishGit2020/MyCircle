@@ -123,6 +123,21 @@ export const typeDefs = `#graphql
     s: String!
   }
 
+  # ─── Crypto Types ──────────────────────────────────────────────
+
+  type CryptoPrice {
+    id: String!
+    symbol: String!
+    name: String!
+    image: String!
+    current_price: Float!
+    market_cap: Float!
+    market_cap_rank: Int
+    price_change_percentage_24h: Float
+    total_volume: Float!
+    sparkline_7d: [Float!]
+  }
+
   # ─── Podcast Types ─────────────────────────────────────────────
 
   type PodcastFeed {
@@ -188,7 +203,8 @@ export const typeDefs = `#graphql
     searchCities(query: String!, limit: Int = 5): [City!]!
     reverseGeocode(lat: Float!, lon: Float!): City
 
-    # Stock queries
+    # Stock & Crypto queries
+    cryptoPrices(ids: [String!]!, vsCurrency: String = "usd"): [CryptoPrice!]!
     searchStocks(query: String!): [StockSearchResult!]!
     stockQuote(symbol: String!): StockQuote
     stockCandles(symbol: String!, resolution: String = "D", from: Int!, to: Int!): StockCandle

@@ -33,10 +33,11 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Air Quality Index** — real-time AQI with color-coded levels, expandable pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
 - Visible live/paused toggle with clear state indication
 
-### Stocks
+### Stocks & Crypto
 - Real-time stock quotes via Finnhub API
 - Symbol search and watchlist
 - Live polling with visible toggle control
+- **Crypto tracker** — live BTC, ETH, SOL, ADA, DOGE prices via CoinGecko API with 7-day sparkline, market cap, 24h volume, and expandable detail cards
 
 ### Podcasts
 - Podcast discovery and search via PodcastIndex API
@@ -90,7 +91,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
                                 │
                                 ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  OpenWeather API  ·  Finnhub API  ·  PodcastIndex API  ·  Google Gemini │
+│  OpenWeather API · Finnhub API · CoinGecko API · PodcastIndex API · Gemini │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -122,7 +123,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 - **Frontend:** React 18, TypeScript, Tailwind CSS
 - **Build:** Vite 5, Module Federation
 - **API:** Apollo Server 5, GraphQL
-- **Data Sources:** OpenWeather API, Finnhub API, PodcastIndex API, Google Gemini
+- **Data Sources:** OpenWeather API, Finnhub API, CoinGecko API, PodcastIndex API, Google Gemini
 - **Auth:** Firebase Auth (Google OAuth)
 - **Database:** Cloud Firestore (user profiles, favorites, preferences)
 - **Hosting:** Firebase Hosting + Cloud Functions
