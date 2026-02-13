@@ -125,7 +125,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main id="main-content" className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-28 md:pb-24' : 'pb-20 md:pb-8'}`}>
+      <main id="main-content" className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-40 md:pb-24' : 'pb-20 md:pb-8'}`}>
         <Outlet />
       </main>
 
