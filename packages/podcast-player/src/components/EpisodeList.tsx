@@ -1,6 +1,7 @@
-import React from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useState, useMemo } from 'react';
+import { useTranslation, StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
 import type { Episode } from '../hooks/usePodcastData';
+import type { Podcast } from '@mycircle/shared';
 
 interface EpisodeListProps {
   episodes: Episode[];
@@ -9,6 +10,20 @@ interface EpisodeListProps {
   currentEpisodeId: string | number | null;
   isPlaying: boolean;
   onPlayEpisode: (episode: Episode) => void;
+  podcast?: Podcast | null;
+}
+
+interface EpisodeProgress {
+  position: number;
+  duration: number;
+}
+type ProgressMap = Record<string, EpisodeProgress>;
+
+function loadProgress(): ProgressMap {
+  try {
+    const stored = localStorage.getItem(StorageKeys.PODCAST_PROGRESS);
+    return stored ? JSON.parse(stored) : {};
+  } catch { return {}; }
 }
 
 function formatDuration(seconds: number): string {
@@ -38,8 +53,11 @@ export default function EpisodeList({
   currentEpisodeId,
   isPlaying,
   onPlayEpisode,
+  podcast,
 }: EpisodeListProps) {
   const { t } = useTranslation();
+  const [expandedId, setExpandedId] = useState<string | number | null>(null);
+  const progress = useMemo(() => loadProgress(), [currentEpisodeId]); // re-read when current episode changes
 
   if (loading) {
     return (
@@ -94,75 +112,147 @@ export default function EpisodeList({
       {episodes.map(episode => {
         const isCurrent = episode.id === currentEpisodeId;
         const isCurrentlyPlaying = isCurrent && isPlaying;
+        const isExpanded = expandedId === episode.id;
+        const ep = progress[String(episode.id)];
+        const hasProgress = ep && ep.position > 0 && ep.duration > 0;
+        const progressPercent = hasProgress ? Math.min((ep.position / ep.duration) * 100, 100) : 0;
+        const isComplete = hasProgress && ep.position >= ep.duration - 5;
 
         return (
           <div
             key={episode.id}
             role="listitem"
-            className={`flex items-center gap-3 p-3 rounded-lg border transition cursor-pointer ${
+            className={`rounded-lg border transition ${
               isCurrent
                 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
                 : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750'
             }`}
-            onClick={() => onPlayEpisode(episode)}
           >
-            <button
-              className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition ${
-                isCurrent
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400'
-              }`}
-              aria-label={
-                isCurrentlyPlaying
-                  ? `${t('podcasts.pauseEpisode')}: ${episode.title}`
-                  : `${t('podcasts.playEpisode')}: ${episode.title}`
-              }
-              onClick={e => {
-                e.stopPropagation();
-                onPlayEpisode(episode);
-              }}
+            <div
+              className="flex items-center gap-3 p-3 cursor-pointer"
+              onClick={() => onPlayEpisode(episode)}
             >
-              {isCurrentlyPlaying ? (
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
-            </button>
-
-            <div className="flex-1 min-w-0">
-              <p
-                className={`text-sm font-medium truncate ${
+              <button
+                className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition ${
                   isCurrent
-                    ? 'text-blue-700 dark:text-blue-300'
-                    : 'text-gray-900 dark:text-white'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400'
                 }`}
+                aria-label={
+                  isCurrentlyPlaying
+                    ? `${t('podcasts.pauseEpisode')}: ${episode.title}`
+                    : `${t('podcasts.playEpisode')}: ${episode.title}`
+                }
+                onClick={e => {
+                  e.stopPropagation();
+                  onPlayEpisode(episode);
+                }}
               >
-                {episode.title}
-              </p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {formatDate(episode.datePublished)}
-                </span>
-                {episode.duration > 0 && (
-                  <>
-                    <span className="text-xs text-gray-300 dark:text-gray-600">|</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDuration(episode.duration)}
-                    </span>
-                  </>
+                {isCurrentlyPlaying ? (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                )}
+              </button>
+
+              <div className="flex-1 min-w-0">
+                <p
+                  className={`text-sm font-medium truncate ${
+                    isCurrent
+                      ? 'text-blue-700 dark:text-blue-300'
+                      : 'text-gray-900 dark:text-white'
+                  }`}
+                >
+                  {episode.title}
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {formatDate(episode.datePublished)}
+                  </span>
+                  {episode.duration > 0 && (
+                    <>
+                      <span className="text-xs text-gray-300 dark:text-gray-600">|</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {formatDuration(episode.duration)}
+                      </span>
+                    </>
+                  )}
+                  {isComplete && (
+                    <>
+                      <span className="text-xs text-gray-300 dark:text-gray-600">|</span>
+                      <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                        {t('podcasts.completed')}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Progress bar */}
+                {hasProgress && !isComplete && (
+                  <div className="mt-1.5 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-400 dark:bg-blue-500 rounded-full transition-all"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1 flex-shrink-0">
+                {/* Show notes toggle */}
+                {episode.description && (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      setExpandedId(isExpanded ? null : episode.id);
+                    }}
+                    className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition rounded"
+                    aria-label={t('podcasts.showNotes')}
+                    aria-expanded={isExpanded}
+                  >
+                    <svg className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                )}
+
+                {/* Add to queue */}
+                {!isCurrent && (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      eventBus.publish(MFEvents.PODCAST_QUEUE_EPISODE, { episode, podcast: podcast ?? null });
+                    }}
+                    className="p-1.5 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition rounded"
+                    aria-label={t('podcasts.addToQueue')}
+                    title={t('podcasts.addToQueue')}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h10m-10 4h6" />
+                    </svg>
+                  </button>
+                )}
+
+                {isCurrent && isCurrentlyPlaying && (
+                  <div className="flex items-center gap-0.5 flex-shrink-0 ml-1" aria-hidden="true">
+                    <span className="w-0.5 h-3 bg-blue-500 dark:bg-blue-400 rounded-full animate-pulse" />
+                    <span className="w-0.5 h-4 bg-blue-500 dark:bg-blue-400 rounded-full animate-pulse delay-75" />
+                    <span className="w-0.5 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-pulse delay-150" />
+                  </div>
                 )}
               </div>
             </div>
 
-            {isCurrent && isCurrentlyPlaying && (
-              <div className="flex items-center gap-0.5 flex-shrink-0" aria-hidden="true">
-                <span className="w-0.5 h-3 bg-blue-500 dark:bg-blue-400 rounded-full animate-pulse" />
-                <span className="w-0.5 h-4 bg-blue-500 dark:bg-blue-400 rounded-full animate-pulse delay-75" />
-                <span className="w-0.5 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-pulse delay-150" />
+            {/* Expandable show notes */}
+            {isExpanded && episode.description && (
+              <div className="px-3 pb-3 pt-0 ml-[52px]">
+                <div className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-2">
+                  <p className="whitespace-pre-line">{episode.description}</p>
+                </div>
               </div>
             )}
           </div>

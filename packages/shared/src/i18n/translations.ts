@@ -316,6 +316,14 @@ const en = {
   'podcasts.episodeCount': '{count} episodes',
   'podcasts.closePlayer': 'Close player',
   'podcasts.seekPosition': 'Seek position',
+  'podcasts.sleepTimer': 'Sleep timer',
+  'podcasts.sleepOff': 'Off',
+  'podcasts.queue': 'Queue',
+  'podcasts.queueEmpty': 'Queue is empty',
+  'podcasts.addToQueue': 'Add to queue',
+  'podcasts.removeFromQueue': 'Remove from queue',
+  'podcasts.showNotes': 'Show notes',
+  'podcasts.completed': 'Played',
 
   // AI Assistant
   'ai.title': 'AI Assistant',
@@ -810,6 +818,14 @@ const es: Record<TranslationKey, string> = {
   'podcasts.episodeCount': '{count} episodios',
   'podcasts.closePlayer': 'Cerrar reproductor',
   'podcasts.seekPosition': 'Posici\u00f3n de b\u00fasqueda',
+  'podcasts.sleepTimer': 'Temporizador',
+  'podcasts.sleepOff': 'Apagado',
+  'podcasts.queue': 'Cola',
+  'podcasts.queueEmpty': 'La cola est\u00e1 vac\u00eda',
+  'podcasts.addToQueue': 'Agregar a la cola',
+  'podcasts.removeFromQueue': 'Quitar de la cola',
+  'podcasts.showNotes': 'Notas del episodio',
+  'podcasts.completed': 'Escuchado',
 
   // AI Assistant
   'ai.title': 'Asistente IA',

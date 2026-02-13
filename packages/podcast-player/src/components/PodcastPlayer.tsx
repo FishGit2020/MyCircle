@@ -213,6 +213,7 @@ export default function PodcastPlayer() {
               currentEpisodeId={currentEpisode?.id ?? null}
               isPlaying={isPlaying}
               onPlayEpisode={handlePlayEpisode}
+              podcast={selectedPodcast}
             />
           </div>
         </div>
