@@ -12,7 +12,9 @@ export const MFEvents = {
   WEATHER_LOADED: 'mf:weather-loaded',
   NAVIGATION_REQUEST: 'mf:navigation-request',
   THEME_CHANGED: 'mf:theme-changed',
-  USER_LOCATION_CHANGED: 'mf:user-location-changed'
+  USER_LOCATION_CHANGED: 'mf:user-location-changed',
+  PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
+  PODCAST_CLOSE_PLAYER: 'mf:podcast-close-player',
 } as const;
 
 // Window-level data-sync events (plain Event, no payload — used as invalidation signals)
@@ -49,6 +51,11 @@ export interface CitySelectedEvent {
 export interface NavigationRequestEvent {
   path: string;
   params?: Record<string, string>;
+}
+
+export interface PodcastPlayEpisodeEvent {
+  episode: import('../types/podcast').Episode;
+  podcast: import('../types/podcast').Podcast | null;
 }
 
 class EventBusImpl implements EventBus {

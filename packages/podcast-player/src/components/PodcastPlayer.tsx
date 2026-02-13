@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useTranslation, WindowEvents, StorageKeys } from '@weather/shared';
+import React, { useState, useCallback } from 'react';
+import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents } from '@weather/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
 import PodcastSearch from './PodcastSearch';
 import TrendingPodcasts from './TrendingPodcasts';
 import SubscribedPodcasts from './SubscribedPodcasts';
 import EpisodeList from './EpisodeList';
-import AudioPlayer from './AudioPlayer';
 import './PodcastPlayer.css';
 
 function loadSubscriptions(): Set<string> {
@@ -55,11 +54,13 @@ export default function PodcastPlayer() {
       setCurrentEpisode(episode);
       setIsPlaying(true);
     }
-  }, [currentEpisode?.id]);
+    eventBus.publish(MFEvents.PODCAST_PLAY_EPISODE, { episode, podcast: selectedPodcast });
+  }, [currentEpisode?.id, selectedPodcast]);
 
   const handleClosePlayer = useCallback(() => {
     setCurrentEpisode(null);
     setIsPlaying(false);
+    eventBus.publish(MFEvents.PODCAST_CLOSE_PLAYER);
   }, []);
 
   const handleToggleSubscribe = useCallback((podcast: Podcast) => {
@@ -78,14 +79,8 @@ export default function PodcastPlayer() {
     });
   }, []);
 
-  const hasAudioPlayer = currentEpisode !== null;
-
-  const podcastForPlayer = useMemo(() => {
-    return selectedPodcast;
-  }, [selectedPodcast]);
-
   return (
-    <div className={`max-w-6xl mx-auto px-4 py-6 ${hasAudioPlayer ? 'pb-28' : ''}`}>
+    <div className="max-w-6xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -235,12 +230,6 @@ export default function PodcastPlayer() {
         />
       )}
 
-      {/* Audio Player - fixed at bottom */}
-      <AudioPlayer
-        episode={currentEpisode}
-        podcast={podcastForPlayer}
-        onClose={handleClosePlayer}
-      />
     </div>
   );
 }

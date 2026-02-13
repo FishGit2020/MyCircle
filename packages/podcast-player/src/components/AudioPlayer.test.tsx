@@ -165,4 +165,33 @@ describe('AudioPlayer', () => {
     );
     expect(screen.getByRole('region', { name: 'Now Playing' })).toBeInTheDocument();
   });
+
+  it('attaches event listeners when episode changes from null to non-null', () => {
+    const addEventSpy = vi.spyOn(HTMLAudioElement.prototype, 'addEventListener');
+
+    const { rerender } = renderWithProviders(
+      <AudioPlayer episode={null} podcast={null} onClose={vi.fn()} />
+    );
+
+    // No audio element exists when episode is null, so no listeners added
+    const callsBefore = addEventSpy.mock.calls.length;
+
+    rerender(
+      <MemoryRouter>
+        <AudioPlayer episode={mockEpisode} podcast={mockPodcast} onClose={vi.fn()} />
+      </MemoryRouter>
+    );
+
+    // After episode is set, the audio element should have listeners attached
+    const callsAfter = addEventSpy.mock.calls.length;
+    expect(callsAfter).toBeGreaterThan(callsBefore);
+
+    // Verify the right event types were registered
+    const eventTypes = addEventSpy.mock.calls.map(call => call[0]);
+    expect(eventTypes).toContain('timeupdate');
+    expect(eventTypes).toContain('loadedmetadata');
+    expect(eventTypes).toContain('ended');
+
+    addEventSpy.mockRestore();
+  });
 });
