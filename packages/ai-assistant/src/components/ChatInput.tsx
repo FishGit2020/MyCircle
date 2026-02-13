@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 
 interface ChatInputProps {
@@ -15,11 +15,30 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
     inputRef.current?.focus();
   }, [disabled]);
 
+  // Auto-resize textarea to fit content
+  const autoResize = useCallback(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    // Clamp between 1 row (~44px) and 6 rows (~160px)
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  }, []);
+
+  useEffect(() => {
+    autoResize();
+  }, [value, autoResize]);
+
   const handleSubmit = () => {
     const trimmed = value.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setValue('');
+    // Reset height after clearing
+    requestAnimationFrame(() => {
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+      }
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
