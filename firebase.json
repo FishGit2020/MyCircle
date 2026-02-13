@@ -52,6 +52,10 @@
         "destination": "/worship-songs/index.html"
       },
       {
+        "source": "/notebook/**",
+        "destination": "/notebook/index.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

@@ -29,6 +29,14 @@ function getWorshipSongCount(): number {
   return 0;
 }
 
+function getNotebookCount(): number {
+  try {
+    const stored = localStorage.getItem(StorageKeys.NOTEBOOK_CACHE);
+    if (stored) return JSON.parse(stored);
+  } catch { /* ignore */ }
+  return 0;
+}
+
 function FeatureCard({
   to,
   title,
@@ -67,6 +75,7 @@ export default function DashboardPage() {
   const watchlist = getWatchlist();
   const subscribedIds = getSubscribedIds();
   const worshipSongCount = getWorshipSongCount();
+  const notebookCount = getNotebookCount();
   const { verse, showVotd, toggleVotd, shuffleVerse, loading: verseLoading } = useDailyVerse();
 
   return (
@@ -231,6 +240,26 @@ export default function DashboardPage() {
               </p>
             ) : (
               <p className="text-xs text-gray-400 dark:text-gray-500">{t('worship.noSongs')}</p>
+            )}
+          </FeatureCard>
+
+          {/* Notebook card */}
+          <FeatureCard
+            to="/notebook"
+            title={t('dashboard.notebook')}
+            description={t('home.quickNotebookDesc')}
+            icon={
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            }
+          >
+            {notebookCount > 0 ? (
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                {t('notebook.noteCount').replace('{count}', String(notebookCount))}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-400 dark:text-gray-500">{t('notebook.noNotes')}</p>
             )}
           </FeatureCard>
 
