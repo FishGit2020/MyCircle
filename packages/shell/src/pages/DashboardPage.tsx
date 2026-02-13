@@ -3,9 +3,6 @@ import { Link } from 'react-router';
 import { useTranslation } from '@weather/shared';
 import { useAuth } from '../context/AuthContext';
 import { useDailyVerse } from '../hooks/useDailyVerse';
-import UseMyLocation from '../components/UseMyLocation';
-import CitySearchWrapper from '../components/CitySearchWrapper';
-import FavoriteCities from '../components/FavoriteCities';
 
 const WATCHLIST_STORAGE_KEY = 'stock-tracker-watchlist';
 const SUBSCRIPTIONS_KEY = 'podcast-subscriptions';
@@ -60,14 +57,14 @@ function FeatureCard({
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { user, favoriteCities, recentCities } = useAuth();
+  const { favoriteCities } = useAuth();
   const watchlist = getWatchlist();
   const subscribedIds = getSubscribedIds();
-  const { verse, loading: verseLoading } = useDailyVerse();
+  const { verse, showVotd, toggleVotd, loading: verseLoading } = useDailyVerse();
 
   return (
     <div className="space-y-8">
-      {/* Hero section with search */}
+      {/* Hero section */}
       <section className="text-center mb-4">
         <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
           {t('home.title')}
@@ -76,45 +73,42 @@ export default function DashboardPage() {
           {t('home.subtitle')}
         </p>
         {/* Daily Bible verse */}
-        <div className="max-w-lg mx-auto mb-6">
-          {verseLoading ? (
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
+        <div className="max-w-lg mx-auto">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
+            {verseLoading ? (
               <div className="h-4 bg-blue-200 dark:bg-blue-800/40 rounded animate-pulse w-3/4 mx-auto" />
-            </div>
-          ) : (
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
-              <p className="text-sm italic text-blue-600 dark:text-blue-400">
-                &ldquo;{verse.text}&rdquo;
-              </p>
-              <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
-                — {verse.reference}{verse.version ? ` (${verse.version})` : ''}
-              </p>
-              {verse.permalink && (
-                <a
-                  href={verse.permalink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-500 mt-1 inline-block"
-                >
-                  Powered by BibleGateway.com
-                </a>
-              )}
-            </div>
-          )}
+            ) : (
+              <>
+                <p className="text-sm italic text-blue-600 dark:text-blue-400">
+                  &ldquo;{verse.text}&rdquo;
+                </p>
+                <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
+                  — {verse.reference}{verse.version ? ` (${verse.version})` : ''}
+                </p>
+                {verse.copyright && (
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                    {verse.copyright}
+                  </p>
+                )}
+              </>
+            )}
+            <button
+              onClick={toggleVotd}
+              className="mt-2 text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+            >
+              {showVotd ? 'Show daily verse' : "View today's verse (YouVersion)"}
+            </button>
+          </div>
         </div>
-        <UseMyLocation />
-        <div className="mt-4 text-gray-400 dark:text-gray-500 text-sm">{t('home.orSearchBelow')}</div>
       </section>
-
-      <CitySearchWrapper />
 
       {/* Feature cards grid */}
       <section>
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">{t('dashboard.quickAccess')}</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Weather card */}
           <FeatureCard
-            to={favoriteCities.length > 0 ? `/weather/${favoriteCities[0].lat},${favoriteCities[0].lon}?name=${encodeURIComponent(favoriteCities[0].name)}` : '/'}
+            to="/weather"
             title={t('dashboard.weather')}
             description={t('home.quickWeatherDesc')}
             icon={
@@ -186,6 +180,20 @@ export default function DashboardPage() {
             )}
           </FeatureCard>
 
+          {/* Bible card */}
+          <FeatureCard
+            to="/bible"
+            title="Bible"
+            description="Read scripture daily"
+            icon={
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            }
+          >
+            <p className="text-xs text-amber-600 dark:text-amber-400">Verse of the Day & more</p>
+          </FeatureCard>
+
           {/* AI card */}
           <FeatureCard
             to="/ai"
@@ -201,30 +209,6 @@ export default function DashboardPage() {
           </FeatureCard>
         </div>
       </section>
-
-      {/* Favorites section */}
-      <FavoriteCities />
-
-      {/* Recent searches */}
-      {recentCities.length > 0 && (
-        <section>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">{t('dashboard.recentSearches')}</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {recentCities.slice(0, 6).map(city => (
-              <Link
-                key={city.id}
-                to={`/weather/${city.lat},${city.lon}?name=${encodeURIComponent(city.name)}`}
-                className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition text-center"
-              >
-                <p className="text-sm font-medium text-gray-800 dark:text-white truncate">{city.name}</p>
-                {city.country && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{city.country}</p>
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

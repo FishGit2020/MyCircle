@@ -11,6 +11,7 @@ export default defineConfig({
       'stockTracker/StockTracker': resolve(__dirname, './packages/shell/src/test/mocks/StockTrackerMock.tsx'),
       'podcastPlayer/PodcastPlayer': resolve(__dirname, './packages/shell/src/test/mocks/PodcastPlayerMock.tsx'),
       'aiAssistant/AiAssistant': resolve(__dirname, './packages/shell/src/test/mocks/AiAssistantMock.tsx'),
+      'bibleReader/BibleReader': resolve(__dirname, './packages/shell/src/test/mocks/BibleReaderMock.tsx'),
       '@weather/shared': resolve(__dirname, './packages/shared/src'),
     }
   },

@@ -141,6 +141,22 @@ export const typeDefs = `#graphql
     count: Int!
   }
 
+  # ─── Bible Types ──────────────────────────────────────────────
+
+  type BibleVerse {
+    text: String!
+    reference: String!
+    translation: String
+    copyright: String
+  }
+
+  type BiblePassage {
+    text: String!
+    reference: String!
+    translation: String
+    verseCount: Int
+  }
+
   type Query {
     weather(lat: Float!, lon: Float!): WeatherData!
     currentWeather(lat: Float!, lon: Float!): CurrentWeather!
@@ -159,6 +175,10 @@ export const typeDefs = `#graphql
     trendingPodcasts: PodcastTrendingResponse!
     podcastEpisodes(feedId: ID!): PodcastEpisodesResponse!
     podcastFeed(feedId: ID!): PodcastFeed
+
+    # Bible queries
+    bibleVotd(day: Int!): BibleVerse!
+    biblePassage(reference: String!, translation: String): BiblePassage!
   }
 
   schema {

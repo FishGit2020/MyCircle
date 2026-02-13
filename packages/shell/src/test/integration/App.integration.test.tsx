@@ -61,14 +61,24 @@ describe('App Integration', () => {
       expect(screen.getByText('Welcome to MyCircle')).toBeInTheDocument();
     });
 
-    it('renders Use My Location button', async () => {
+    it('renders feature cards including weather', async () => {
       renderApp('/');
+
+      // Translation keys resolve to English: t('home.quickWeatherDesc') → 'Check forecasts for any city'
+      expect(screen.getByText('Check forecasts for any city')).toBeInTheDocument();
+      expect(screen.getByText('Read scripture daily')).toBeInTheDocument();
+    });
+  });
+
+  describe('Weather Landing Page', () => {
+    it('renders Use My Location button', async () => {
+      renderApp('/weather');
 
       expect(screen.getByText('Use my current location')).toBeInTheDocument();
     });
 
     it('loads city search micro frontend', async () => {
-      renderApp('/');
+      renderApp('/weather');
 
       await waitFor(() => {
         expect(screen.getByTestId('city-search-mfe')).toBeInTheDocument();

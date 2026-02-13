@@ -44,6 +44,10 @@
         "destination": "/ai-assistant/index.html"
       },
       {
+        "source": "/bible-reader/**",
+        "destination": "/bible-reader/index.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

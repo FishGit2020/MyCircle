@@ -77,6 +77,12 @@ const aiAssistantDest = path.join(firebaseDir, 'ai-assistant');
 console.log(`Copying ai-assistant to ${aiAssistantDest}`);
 copyDir(aiAssistantDist, aiAssistantDest);
 
+// 7. Copy bible-reader MF to /bible-reader
+const bibleReaderDist = path.join(rootDir, 'packages', 'bible-reader', 'dist');
+const bibleReaderDest = path.join(firebaseDir, 'bible-reader');
+console.log(`Copying bible-reader to ${bibleReaderDest}`);
+copyDir(bibleReaderDist, bibleReaderDest);
+
 console.log('\nFirebase deployment directory assembled successfully!');
 console.log(`Output: ${firebaseDir}`);
 

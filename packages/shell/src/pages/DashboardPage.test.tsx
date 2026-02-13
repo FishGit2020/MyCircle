@@ -3,11 +3,14 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import DashboardPage from './DashboardPage';
 
-// Mock @weather/shared useTranslation — identity function
+// Mock @weather/shared — useTranslation (identity) + Apollo hooks for useDailyVerse
 vi.mock('@weather/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+  // useDailyVerse calls useQuery(GET_BIBLE_VOTD, { skip: true }) on initial render
+  useQuery: () => ({ data: null, loading: false, error: null }),
+  GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
 }));
 
 // Mock useAuth — unauthenticated user with no cities
