@@ -102,6 +102,19 @@ export const mockPodcastSearch = {
   count: 2,
 };
 
+const trendingCategories = [
+  'Technology, Science',
+  'News, Politics',
+  'Comedy, Entertainment',
+  'Technology, Education',
+  'Science, Health',
+  'News, Business',
+  'Comedy, Society',
+  'Education, History',
+  'Health, Fitness',
+  'Entertainment, Music',
+];
+
 export const mockTrendingPodcasts = {
   feeds: Array.from({ length: 10 }, (_, i) => ({
     id: 200 + i,
@@ -111,7 +124,7 @@ export const mockTrendingPodcasts = {
     description: `Description for trending show ${i + 1}.`,
     feedUrl: `https://example.com/trending-${i}.xml`,
     episodeCount: 20 + i * 5,
-    categories: { '1': 'General' },
+    categories: trendingCategories[i],
   })),
 };
 
