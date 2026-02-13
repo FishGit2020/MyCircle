@@ -1,0 +1,337 @@
+# Micro Frontend Pitfalls & Solutions
+
+Lessons learned from building MyCircle's Vite Module Federation architecture with 8 independently-built micro frontends. Each pitfall below was encountered in production and includes the root cause, how it manifests, and the applied fix.
+
+---
+
+## Table of Contents
+
+- [1. CSS Cascade Order Conflict](#1-css-cascade-order-conflict)
+- [2. Duplicate Tailwind Preflight Resets](#2-duplicate-tailwind-preflight-resets)
+- [3. Prefetch Side Effects](#3-prefetch-side-effects)
+- [4. Scrollbar Layout Shift](#4-scrollbar-layout-shift)
+- [5. Global State Pollution](#5-global-state-pollution)
+- [6. Event Bus Memory Leaks](#6-event-bus-memory-leaks)
+- [7. localStorage Key Collisions](#7-localstorage-key-collisions)
+- [8. Body Scroll Lock Conflicts](#8-body-scroll-lock-conflicts)
+- [Quick Reference](#quick-reference)
+
+---
+
+## 1. CSS Cascade Order Conflict
+
+**Severity: High** | **File: `packages/shell/tailwind.config.js`**
+
+### The Problem
+
+When Module Federation dynamically loads an MFE, its CSS bundle is injected as a `<style>` tag **appended to `<head>`** — after the shell's CSS. If the MFE's CSS contains duplicate Tailwind utility classes, those duplicates appear later in the document cascade and can override the shell's styles.
+
+### How It Manifests
+
+The shell's `DashboardPage` uses:
+
+```
+grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6
+```
+
+On a desktop screen (>= 1024px), **both** `sm:` and `lg:` media queries are active. Since `sm:grid-cols-2` and `lg:grid-cols-6` have identical specificity (one class selector = `0-1-0`), the **last rule in document order wins**.
+
+Before MFE load (correct):
+```css
+/* Shell CSS */
+@media (min-width: 640px)  { .sm\:grid-cols-2 { grid-template-columns: repeat(2,...) } }
+@media (min-width: 1024px) { .lg\:grid-cols-6 { grid-template-columns: repeat(6,...) } }
+/* lg wins — correct! */
+```
+
+After MFE CSS is injected (broken):
+```css
+/* Shell CSS */
+@media (min-width: 640px)  { .sm\:grid-cols-2 { ... } }   /* position A */
+@media (min-width: 1024px) { .lg\:grid-cols-6 { ... } }   /* position B */
+
+/* MFE CSS (appended AFTER shell) */
+@media (min-width: 640px)  { .sm\:grid-cols-2 { ... } }   /* position C — NOW WINS */
+```
+
+Position C's `sm:grid-cols-2` overrides position B's `lg:grid-cols-6`. The 6-column grid collapses to 2 columns.
+
+### Which MFEs Trigger It
+
+Any MFE whose Tailwind bundle contains the same responsive utility class used in the shell:
+
+| MFE | Conflicting class | Source file |
+|-----|-------------------|-------------|
+| weather-display | `sm:grid-cols-2` | `HistoricalWeather.tsx` |
+| stock-tracker | `sm:grid-cols-2` | `Watchlist.tsx` |
+| worship-songs | `sm:grid-cols-2` | `SongList.tsx` |
+| notebook | `sm:grid-cols-2` | `NoteList.tsx` |
+
+### The Fix
+
+Add `important: '#root'` to the shell's Tailwind config:
+
+```js
+// packages/shell/tailwind.config.js
+export default {
+  important: '#root',   // <-- boosts specificity
+  // ...
+}
+```
+
+This wraps every shell utility in `#root`:
+
+```css
+/* Shell — specificity 1-1-0 (ID + class) */
+#root .lg\:grid-cols-6 { grid-template-columns: repeat(6,...) }
+
+/* MFE — specificity 0-1-0 (class only) */
+.sm\:grid-cols-2 { grid-template-columns: repeat(2,...) }
+```
+
+The shell's `1-1-0` always beats the MFE's `0-1-0`, regardless of document order.
+
+### Why Not `important: true`?
+
+Using `important: true` adds `!important` to every utility, which makes it very difficult to override styles intentionally (e.g., inline styles, conditional overrides). The selector approach is surgical — it boosts specificity without preventing overrides when needed.
+
+---
+
+## 2. Duplicate Tailwind Preflight Resets
+
+**Severity: Medium** | **File: all MFE `tailwind.config.js`**
+
+### The Problem
+
+Tailwind's `preflight` layer injects a CSS reset (based on modern-normalize). If every MFE includes its own preflight, you get 8+ copies of base CSS resets injected at different times, potentially causing:
+- Flash of unstyled content (FOUC) as resets cascade
+- Inconsistent base styles depending on MFE load order
+- Unnecessary CSS weight
+
+### The Fix
+
+Only the **shell** (host app) includes preflight. All MFEs disable it:
+
+```js
+// packages/<any-mfe>/tailwind.config.js
+export default {
+  // ...
+  corePlugins: {
+    preflight: false,   // Shell provides the single source of base styles
+  },
+}
+```
+
+### Rule of Thumb
+
+> The host app owns base styles. Remotes only generate utility classes.
+
+---
+
+## 3. Prefetch Side Effects
+
+**Severity: Medium** | **File: `packages/shell/src/components/Layout.tsx`**
+
+### The Problem
+
+The shell prefetches MFE modules on nav link hover/focus for faster perceived navigation:
+
+```ts
+const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
+  '/weather': () => import('weatherDisplay/WeatherDisplay'),
+  '/stocks':  () => import('stockTracker/StockTracker'),
+  // ...
+};
+
+function prefetchRoute(path: string) {
+  if (prefetched.has(path)) return;
+  prefetched.add(path);
+  ROUTE_MODULE_MAP[path]?.().catch(() => {});
+}
+```
+
+The `import()` call loads the MFE's `remoteEntry.js`, which pulls in **both JS and CSS bundles**. This means:
+- CSS cascade conflicts (Pitfall #1) trigger on hover, not just on navigation
+- The user never visits the page but the layout already breaks
+- Network requests fire for modules the user may never use
+
+### Mitigations
+
+1. **Fix Pitfall #1 first** — with `important: '#root'`, prefetch CSS injection is harmless
+2. Consider `requestIdleCallback` or `IntersectionObserver` instead of hover-based prefetch to reduce unnecessary loads
+3. The `prefetched` Set prevents duplicate loads, but the first load is enough to corrupt the cascade
+
+---
+
+## 4. Scrollbar Layout Shift
+
+**Severity: Low** | **File: `packages/shell/src/index.css`**
+
+### The Problem
+
+When navigating between pages, some pages have enough content to show a scrollbar and others don't. The scrollbar appearing/disappearing changes the viewport width, causing visible layout shifts (content jumps left/right).
+
+In an MFE architecture this is amplified because different remotes produce different content heights, making scrollbar toggling frequent.
+
+### The Fix
+
+```css
+/* packages/shell/src/index.css */
+html {
+  scrollbar-gutter: stable;
+}
+```
+
+This reserves space for the scrollbar even when it's not visible, eliminating the width shift.
+
+---
+
+## 5. Global State Pollution
+
+**Severity: High** | **Files: `packages/shared/src/utils/eventBus.ts`, MFE bridge APIs**
+
+### The Problem
+
+MFEs run in the same `window` context (not iframes). Any MFE can accidentally:
+- Overwrite global variables set by another MFE
+- Pollute `window` with side effects
+- Conflict on `document.body` style mutations
+
+### Patterns Used
+
+**Namespaced window bridges** — MFEs that need host-provided APIs use explicitly namespaced globals:
+
+```ts
+// Shell exposes:
+(window as any).__notebook = { getAll, get, add, update, delete };
+(window as any).__getFirebaseIdToken = () => user.getIdToken();
+
+// MFE consumes:
+const api = (window as any).__notebook as NotebookAPI | undefined;
+```
+
+**Centralized constants** — All event names and storage keys are defined once in the shared package:
+
+```ts
+export const MFEvents = {
+  CITY_SELECTED: 'mf:city-selected',
+  PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
+  // ...
+} as const;
+
+export const StorageKeys = {
+  STOCK_WATCHLIST: 'stock-tracker-watchlist',
+  NOTEBOOK_CACHE: 'notebook-cache',
+  // ...
+} as const;
+```
+
+### Rule of Thumb
+
+> Never use bare global names. Always namespace with a prefix (`mf:`, `__`, package name) and define constants in the shared package.
+
+---
+
+## 6. Event Bus Memory Leaks
+
+**Severity: Medium** | **File: `packages/shared/src/utils/eventBus.ts`**
+
+### The Problem
+
+Cross-MFE communication uses DOM `CustomEvent` and a local listener map. If an MFE subscribes to events but doesn't unsubscribe when it unmounts, listeners accumulate — especially when navigating back and forth between pages.
+
+### The Fix
+
+The `subscribeToMFEvent` helper returns an unsubscribe function designed for React's `useEffect` cleanup:
+
+```ts
+useEffect(() => {
+  const unsub = subscribeToMFEvent(MFEvents.PODCAST_PLAY_EPISODE, (data) => {
+    setCurrentEpisode(data);
+  });
+  return unsub;  // cleanup on unmount
+}, []);
+```
+
+Similarly, `WindowEvents` listeners must be cleaned up:
+
+```ts
+useEffect(() => {
+  const handler = () => loadNotes();
+  window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
+  return () => window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
+}, [loadNotes]);
+```
+
+### Rule of Thumb
+
+> Every `subscribe` / `addEventListener` in a `useEffect` must have a corresponding cleanup return. No exceptions.
+
+---
+
+## 7. localStorage Key Collisions
+
+**Severity: Medium** | **File: `packages/shared/src/utils/eventBus.ts` (StorageKeys)**
+
+### The Problem
+
+Multiple MFEs share `localStorage`. Without coordination, two MFEs could use the same key (e.g., `"cache"`) and silently overwrite each other's data.
+
+### The Fix
+
+All storage keys are defined in a single `StorageKeys` enum in the shared package:
+
+```ts
+export const StorageKeys = {
+  STOCK_WATCHLIST: 'stock-tracker-watchlist',
+  PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
+  WIDGET_LAYOUT: 'widget-dashboard-layout',
+  NOTEBOOK_CACHE: 'notebook-cache',
+  // ... 20+ keys, all in one place
+} as const;
+```
+
+Benefits:
+- TypeScript catches typos at compile time
+- Easy to audit all storage usage in one file
+- Key names are prefixed with their domain (`stock-`, `podcast-`, `bible-`, etc.)
+
+---
+
+## 8. Body Scroll Lock Conflicts
+
+**Severity: Low** | **File: `packages/shell/src/components/FeedbackButton.tsx`**
+
+### The Problem
+
+Modals often set `document.body.style.overflow = 'hidden'` to prevent background scrolling. In an MFE architecture, multiple components from different MFEs might try to lock/unlock body scroll simultaneously, leading to:
+- Scroll remaining locked after a modal closes (if another modal opened during)
+- Scroll unlocking prematurely (if two modals manage the same style)
+
+### Current Approach
+
+```ts
+useEffect(() => {
+  if (open) {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }
+}, [open]);
+```
+
+This works when only one modal can be open at a time. For multiple concurrent modals, consider a **reference-counting** approach or a shared `useBodyScrollLock` hook in the shared package.
+
+---
+
+## Quick Reference
+
+| Pitfall | Root Cause | Fix | Severity |
+|---------|-----------|-----|----------|
+| CSS cascade conflict | MFE CSS injected after shell, same utility classes | `important: '#root'` in shell Tailwind config | High |
+| Duplicate preflight | Multiple Tailwind base resets | `corePlugins: { preflight: false }` in MFEs | Medium |
+| Prefetch side effects | `import()` loads CSS as side effect | Fix cascade first; consider idle-time prefetch | Medium |
+| Scrollbar layout shift | Viewport width changes with scrollbar | `scrollbar-gutter: stable` on `html` | Low |
+| Global state pollution | Shared `window` context | Namespaced bridges + centralized constants | High |
+| Event bus memory leaks | Missing `useEffect` cleanup | Always return unsubscribe in cleanup | Medium |
+| Storage key collisions | Shared `localStorage` | Single `StorageKeys` enum in shared package | Medium |
+| Body scroll lock conflicts | Multiple modals managing `overflow` | Ref-counting or shared hook | Low |
