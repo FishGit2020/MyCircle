@@ -541,6 +541,29 @@ const en = {
   'wear.comfortWarm': 'Warm — dress light',
   'wear.comfortHot': 'Hot — stay cool & hydrated',
   'wear.suggestions': 'suggestions',
+
+  // Widget Dashboard
+  'widgets.title': 'My Widgets',
+  'widgets.customize': 'Customize',
+  'widgets.done': 'Done',
+  'widgets.reset': 'Reset layout',
+  'widgets.dragHint': 'Drag to reorder widgets',
+  'widgets.toggleVisibility': 'Toggle widget visibility',
+  'widgets.weather': 'Weather',
+  'widgets.weatherDesc': 'Current conditions for your favorite city',
+  'widgets.stocks': 'Stock Ticker',
+  'widgets.stocksDesc': 'Your watchlist at a glance',
+  'widgets.verse': 'Verse of the Day',
+  'widgets.verseDesc': 'Daily scripture inspiration',
+  'widgets.nowPlaying': 'Now Playing',
+  'widgets.nowPlayingDesc': 'Currently playing podcast',
+  'widgets.nothingPlaying': 'No podcast playing',
+  'widgets.noFavoriteCity': 'Add a favorite city to see weather',
+  'widgets.noStocks': 'Add stocks to your watchlist',
+  'widgets.hidden': 'Hidden',
+  'widgets.visible': 'Visible',
+  'widgets.moveUp': 'Move widget up',
+  'widgets.moveDown': 'Move widget down',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -1082,6 +1105,29 @@ const es: Record<TranslationKey, string> = {
   'wear.comfortWarm': 'C\u00e1lido \u2014 viste ligero',
   'wear.comfortHot': 'Caluroso \u2014 mantente fresco',
   'wear.suggestions': 'sugerencias',
+
+  // Widget Dashboard
+  'widgets.title': 'Mis Widgets',
+  'widgets.customize': 'Personalizar',
+  'widgets.done': 'Listo',
+  'widgets.reset': 'Restablecer diseño',
+  'widgets.dragHint': 'Arrastra para reordenar widgets',
+  'widgets.toggleVisibility': 'Alternar visibilidad del widget',
+  'widgets.weather': 'Clima',
+  'widgets.weatherDesc': 'Condiciones actuales de tu ciudad favorita',
+  'widgets.stocks': 'Acciones',
+  'widgets.stocksDesc': 'Tu lista de seguimiento de un vistazo',
+  'widgets.verse': 'Versículo del Día',
+  'widgets.verseDesc': 'Inspiración bíblica diaria',
+  'widgets.nowPlaying': 'Reproduciendo',
+  'widgets.nowPlayingDesc': 'Podcast en reproducción',
+  'widgets.nothingPlaying': 'No hay podcast en reproducción',
+  'widgets.noFavoriteCity': 'Agrega una ciudad favorita para ver el clima',
+  'widgets.noStocks': 'Agrega acciones a tu lista de seguimiento',
+  'widgets.hidden': 'Oculto',
+  'widgets.visible': 'Visible',
+  'widgets.moveUp': 'Mover widget arriba',
+  'widgets.moveDown': 'Mover widget abajo',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {

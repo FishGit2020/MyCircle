@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useTranslation, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { useDailyVerse } from '../hooks/useDailyVerse';
+import WidgetDashboard from '../components/WidgetDashboard';
 
 function getWatchlist(): Array<{ symbol: string; companyName: string }> {
   try {
@@ -117,6 +118,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Widget Dashboard */}
+      <WidgetDashboard />
 
       {/* Feature cards grid */}
       <section>
