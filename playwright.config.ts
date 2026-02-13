@@ -17,12 +17,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // The app uses micro frontends served on multiple ports.
-  // In dev mode: shell (3000), city-search preview (3001),
-  // weather-display preview (3002), GraphQL server (3003).
-  // We use `pnpm dev` which starts all of them via concurrently.
+  // In CI: serve the production build (pnpm build must run first).
+  // Locally: start the dev server with all MFEs via concurrently.
   webServer: {
-    command: 'pnpm dev',
+    command: process.env.CI ? 'pnpm start' : 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

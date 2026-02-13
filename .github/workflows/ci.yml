@@ -3,6 +3,12 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.vscode/**'
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -25,6 +31,9 @@ jobs:
 
       - name: Check shared dependency versions
         run: node scripts/check-shared-versions.mjs
+
+      - name: Build shared package
+        run: pnpm build:shared
 
       - name: Typecheck
         run: pnpm typecheck:all
