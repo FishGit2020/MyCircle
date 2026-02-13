@@ -331,6 +331,7 @@ MyCircle uses **GitHub Actions** for continuous integration and deployment:
 All workflows use `pnpm/action-setup@v4` with Node 22 and pnpm caching for fast installs.
 
 See [docs/cicd.md](docs/cicd.md) for a detailed CI/CD flow guide with setup instructions.
+See [docs/workload-identity-federation-setup.md](docs/workload-identity-federation-setup.md) for keyless Firebase deployment using Workload Identity Federation.
 
 ## Security
 
