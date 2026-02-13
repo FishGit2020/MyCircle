@@ -633,7 +633,16 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **GraphQL Server** | `server/index.ts` | Local dev Express + Apollo + WebSocket |
 | **GraphQL Schema** | `server/graphql/schema.ts` | Type definitions + subscription |
 | **GraphQL Resolvers** | `server/graphql/resolvers.ts` | Query + subscription resolvers |
+| **BibleReader** | `packages/bible-reader/src/components/BibleReader.tsx` | Bible reading UI with chapter navigation |
+| **DailyDevotional** | `packages/bible-reader/src/components/DailyDevotional.tsx` | Daily reading plan with progress tracking |
+| **WorshipSongs** | `packages/worship-songs/src/components/WorshipSongs.tsx` | Song library, search, and song viewer |
+| **SongEditor** | `packages/worship-songs/src/components/SongEditor.tsx` | Chord and lyrics editor |
+| **Metronome** | `packages/worship-songs/src/components/Metronome.tsx` | Built-in metronome with BPM control |
+| **Web Vitals** | `packages/shared/src/utils/webVitals.ts` | Core Web Vitals reporting (LCP, CLS, INP) |
 | **Firebase Functions** | `functions/src/index.ts` | Production Cloud Functions (GraphQL, proxies, AI) |
+| **CI Workflow** | `.github/workflows/ci.yml` | PR checks: typecheck, lint, test |
+| **Deploy Workflow** | `.github/workflows/deploy.yml` | Firebase Hosting deployment on push to main |
+| **E2E Workflow** | `.github/workflows/e2e.yml` | Playwright E2E tests on PR |
 
 ---
 
@@ -677,8 +686,18 @@ mycircle/
 |   |       +-- hooks/
 |   |       +-- test/
 |   +-- ai-assistant/            # AI assistant micro frontend
+|   |   +-- src/
+|   |       +-- components/      # AiAssistant, chat UI
+|   |       +-- hooks/
+|   |       +-- test/
+|   +-- bible-reader/            # Bible reader micro frontend
+|   |   +-- src/
+|   |       +-- components/      # BibleReader, DailyDevotional, CommunityNotes
+|   |       +-- hooks/
+|   |       +-- test/
+|   +-- worship-songs/           # Worship songs micro frontend
 |       +-- src/
-|           +-- components/      # AiAssistant, chat UI
+|           +-- components/      # WorshipSongs, SongViewer, SongEditor, Metronome
 |           +-- hooks/
 |           +-- test/
 +-- server/                      # Local development GraphQL server
@@ -698,6 +717,11 @@ mycircle/
 +-- scripts/
 |   +-- assemble-firebase.mjs   # Firebase build assembly
 |   +-- generate-icons.mjs      # PWA icon generation
++-- .github/
+|   +-- workflows/
+|       +-- ci.yml              # PR checks (typecheck, test)
+|       +-- deploy.yml          # Firebase deploy on push to main
+|       +-- e2e.yml             # Playwright E2E tests on PR
 +-- docs/
 |   +-- architecture.md         # This file
 +-- firebase.json               # Firebase hosting + functions config

@@ -131,6 +131,8 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Stock Tracker** | Real-time stock quotes and watchlist | `StockTracker` |
 | **Podcast Player** | Podcast search, discovery, and episode playback | `PodcastPlayer` |
 | **AI Assistant** | Conversational AI chat (Gemini) | `AiAssistant` |
+| **Bible Reader** | Bible reading with daily devotionals and community notes | `BibleReader` |
+| **Worship Songs** | Song library with lyrics, chord editor, YouTube links, metronome | `WorshipSongs` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Routes
@@ -142,6 +144,8 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | `/stocks` | Stock tracker |
 | `/podcasts` | Podcast player (discover + subscriptions tabs) |
 | `/ai` | AI assistant |
+| `/bible` | Bible reader with daily devotionals |
+| `/worship` | Worship song library with metronome |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack
@@ -156,6 +160,8 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 - **Push Notifications:** Firebase Cloud Messaging
 - **Bot Protection:** Firebase App Check (reCAPTCHA Enterprise)
 - **Feature Flags:** Firebase Remote Config
+- **Monitoring:** Sentry (error tracking + session replay), Web Vitals (LCP, CLS, INP)
+- **CI/CD:** GitHub Actions (CI, deploy, E2E)
 - **Runtime:** Node.js 22
 - **Package Manager:** pnpm (workspaces)
 
