@@ -1,31 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 
-// Mock firebase before importing the component
-vi.mock('../lib/firebase', () => ({
-  firebaseEnabled: true,
-  app: {},
-  auth: {},
-  db: {},
-  perf: null,
-  analytics: null,
-  identifyUser: vi.fn(),
-  clearUserIdentity: vi.fn(),
-  logEvent: vi.fn(),
-  subscribeToAuthChanges: (cb: (user: null) => void) => { cb(null); return () => {}; },
-  signInWithGoogle: vi.fn(),
-  logOut: vi.fn(),
-  getUserProfile: vi.fn().mockResolvedValue(null),
-  updateUserDarkMode: vi.fn(),
-  updateUserLocale: vi.fn(),
-  addRecentCity: vi.fn(),
-  removeRecentCity: vi.fn(),
-  getRecentCities: vi.fn().mockResolvedValue([]),
-  toggleFavoriteCity: vi.fn().mockResolvedValue(false),
-  updateStockWatchlist: vi.fn(),
-  updatePodcastSubscriptions: vi.fn(),
-  updateUserTempUnit: vi.fn(),
-  updateUserSpeedUnit: vi.fn(),
+// ─── Mocks ────────────────────────────────────────────────────────────────────
+
+vi.mock('@mycircle/shared', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+  StorageKeys: {
+    STOCK_WATCHLIST: 'stock-tracker-watchlist',
+    PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
+  },
+}));
+
+vi.mock('../lib/firebase', () => ({ firebaseEnabled: true }));
+
+let mockFavoriteCities: Array<{ lat: number; lon: number; name: string }> = [];
+
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({ favoriteCities: mockFavoriteCities }),
 }));
 
 const mockRequestPermission = vi.fn();
@@ -41,24 +32,20 @@ vi.mock('../lib/messaging', () => ({
 }));
 
 import NotificationBell from './NotificationBell';
-import { ThemeProvider } from '../context/ThemeContext';
-import { AuthProvider } from '../context/AuthContext';
 
-function renderBell() {
-  return render(
-    <ThemeProvider>
-      <AuthProvider>
-        <NotificationBell />
-      </AuthProvider>
-    </ThemeProvider>
-  );
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function openPanel() {
+  fireEvent.click(screen.getByRole('button', { name: 'notifications.preferences' }));
 }
+
+// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('NotificationBell', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    // Default: notifications supported and permission is "default"
+    mockFavoriteCities = [];
     Object.defineProperty(globalThis, 'Notification', {
       value: { permission: 'default', requestPermission: vi.fn() },
       writable: true,
@@ -66,54 +53,219 @@ describe('NotificationBell', () => {
     });
   });
 
-  it('renders the bell button', () => {
-    renderBell();
-    expect(screen.getByRole('button', { name: /enable notifications/i })).toBeInTheDocument();
+  // ── Rendering ─────────────────────────────────────────────────────────────
+
+  it('renders the bell button with aria-label', () => {
+    render(<NotificationBell />);
+    expect(screen.getByRole('button', { name: 'notifications.preferences' })).toBeInTheDocument();
   });
 
-  it('shows "Add favorite cities first" when no favorites and clicking enable', async () => {
-    renderBell();
-    fireEvent.click(screen.getByRole('button', { name: /enable notifications/i }));
+  it('bell button has aria-expanded=false initially', () => {
+    render(<NotificationBell />);
+    const btn = screen.getByRole('button', { name: 'notifications.preferences' });
+    expect(btn).toHaveAttribute('aria-expanded', 'false');
+    expect(btn).toHaveAttribute('aria-haspopup', 'true');
+  });
 
-    await waitFor(() => {
-      expect(screen.getByText('Add favorite cities first to get weather alerts')).toBeInTheDocument();
+  // ── Panel open / close ────────────────────────────────────────────────────
+
+  it('opens preferences panel on bell click', () => {
+    render(<NotificationBell />);
+    openPanel();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('bell button has aria-expanded=true when panel is open', () => {
+    render(<NotificationBell />);
+    const btn = screen.getByRole('button', { name: 'notifications.preferences' });
+    fireEvent.click(btn);
+    expect(btn).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('closes panel on Escape key', () => {
+    render(<NotificationBell />);
+    openPanel();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('closes panel on outside click', () => {
+    render(<NotificationBell />);
+    openPanel();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  // ── Toggle switches ───────────────────────────────────────────────────────
+
+  it('shows three notification toggle switches in the panel', () => {
+    render(<NotificationBell />);
+    openPanel();
+    const switches = screen.getAllByRole('switch');
+    expect(switches).toHaveLength(3);
+  });
+
+  it('all toggles are off by default (aria-checked=false)', () => {
+    render(<NotificationBell />);
+    openPanel();
+    screen.getAllByRole('switch').forEach(sw => {
+      expect(sw).toHaveAttribute('aria-checked', 'false');
     });
   });
 
-  it('shows "Notifications blocked by browser" when permission is denied', async () => {
-    // When no favorites exist, the component shows "add favorites first" before
-    // checking permission, so the denied-permission message only appears when
-    // the user has favorites. Without mocking the auth context to include favorites,
-    // we verify the no-favorites path is correct.
-    Object.defineProperty(globalThis, 'Notification', {
-      value: { permission: 'denied', requestPermission: vi.fn() },
-      writable: true,
-      configurable: true,
-    });
+  it('displays labels for each notification category', () => {
+    render(<NotificationBell />);
+    openPanel();
+    expect(screen.getByText('notifications.weatherAlerts')).toBeInTheDocument();
+    expect(screen.getByText('notifications.stockAlerts')).toBeInTheDocument();
+    expect(screen.getByText('notifications.podcastAlerts')).toBeInTheDocument();
+  });
 
-    renderBell();
-    fireEvent.click(screen.getByRole('button', { name: /enable notifications/i }));
+  it('displays descriptions for each notification category', () => {
+    render(<NotificationBell />);
+    openPanel();
+    expect(screen.getByText('notifications.weatherAlertsDesc')).toBeInTheDocument();
+    expect(screen.getByText('notifications.stockAlertsDesc')).toBeInTheDocument();
+    expect(screen.getByText('notifications.podcastAlertsDesc')).toBeInTheDocument();
+  });
 
-    // No favorites → shows favorites-first message (permission check comes after)
+  // ── Weather toggle ────────────────────────────────────────────────────────
+
+  it('shows feedback when toggling weather with no favorite cities', async () => {
+    render(<NotificationBell />);
+    openPanel();
+    fireEvent.click(screen.getAllByRole('switch')[0]);
+
     await waitFor(() => {
-      expect(screen.getByText('Add favorite cities first to get weather alerts')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('notifications.addFavoritesFirst');
     });
   });
 
-  it('shows "Push notifications not configured" when token is null and permission not denied', async () => {
-    // Need favorites so it doesn't bail early with "add favorites first"
-    // Since we're using AuthProvider with no real user, favoriteCities will be []
-    // So this test now needs to test the no-favorites path, or we need a different approach.
-    // Actually with no favorites, clicking shows "add favorites first" message.
-    // Let's just test that the denied-permission path still works:
-    mockRequestPermission.mockResolvedValue(null);
+  // ── Stock toggle ──────────────────────────────────────────────────────────
 
-    renderBell();
-    fireEvent.click(screen.getByRole('button', { name: /enable notifications/i }));
+  it('shows feedback when toggling stocks with empty watchlist', async () => {
+    render(<NotificationBell />);
+    openPanel();
+    fireEvent.click(screen.getAllByRole('switch')[1]);
 
-    // With no favorites, we get "add favorites first" before even requesting permission
     await waitFor(() => {
-      expect(screen.getByText('Add favorite cities first to get weather alerts')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('notifications.noWatchlistForAlerts');
+    });
+  });
+
+  it('enables stock alerts when watchlist has items', async () => {
+    localStorage.setItem('stock-tracker-watchlist', JSON.stringify([{ symbol: 'AAPL' }]));
+    mockRequestPermission.mockResolvedValue('fake-token');
+
+    render(<NotificationBell />);
+    openPanel();
+    const stockSwitch = screen.getAllByRole('switch')[1];
+    await act(async () => { fireEvent.click(stockSwitch); });
+
+    await waitFor(() => {
+      expect(stockSwitch).toHaveAttribute('aria-checked', 'true');
+    });
+  });
+
+  it('persists stock alert state to localStorage', async () => {
+    localStorage.setItem('stock-tracker-watchlist', JSON.stringify([{ symbol: 'AAPL' }]));
+    mockRequestPermission.mockResolvedValue('fake-token');
+
+    render(<NotificationBell />);
+    openPanel();
+    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[1]); });
+
+    await waitFor(() => {
+      expect(localStorage.getItem('stock-alerts-enabled')).toBe('true');
+    });
+  });
+
+  // ── Podcast toggle ────────────────────────────────────────────────────────
+
+  it('shows feedback when toggling podcasts with no subscriptions', async () => {
+    render(<NotificationBell />);
+    openPanel();
+    fireEvent.click(screen.getAllByRole('switch')[2]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('notifications.noSubscriptionsForAlerts');
+    });
+  });
+
+  it('enables podcast alerts when subscriptions exist', async () => {
+    localStorage.setItem('podcast-subscriptions', JSON.stringify(['123', '456']));
+    mockRequestPermission.mockResolvedValue('fake-token');
+
+    render(<NotificationBell />);
+    openPanel();
+    const podcastSwitch = screen.getAllByRole('switch')[2];
+    await act(async () => { fireEvent.click(podcastSwitch); });
+
+    await waitFor(() => {
+      expect(podcastSwitch).toHaveAttribute('aria-checked', 'true');
+    });
+  });
+
+  it('persists podcast alert state to localStorage', async () => {
+    localStorage.setItem('podcast-subscriptions', JSON.stringify(['123']));
+    mockRequestPermission.mockResolvedValue('fake-token');
+
+    render(<NotificationBell />);
+    openPanel();
+    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[2]); });
+
+    await waitFor(() => {
+      expect(localStorage.getItem('podcast-alerts-enabled')).toBe('true');
+    });
+  });
+
+  // ── Initial state from localStorage ───────────────────────────────────────
+
+  it('reads initial enabled state from localStorage', () => {
+    localStorage.setItem('weather-alerts-enabled', 'true');
+    localStorage.setItem('stock-alerts-enabled', 'true');
+
+    render(<NotificationBell />);
+    openPanel();
+    const switches = screen.getAllByRole('switch');
+    expect(switches[0]).toHaveAttribute('aria-checked', 'true');  // weather
+    expect(switches[1]).toHaveAttribute('aria-checked', 'true');  // stock
+    expect(switches[2]).toHaveAttribute('aria-checked', 'false'); // podcast
+  });
+
+  // ── Active indicator ──────────────────────────────────────────────────────
+
+  it('shows active indicator dot when any alert is enabled', () => {
+    localStorage.setItem('stock-alerts-enabled', 'true');
+    const { container } = render(<NotificationBell />);
+    const dot = container.querySelector('.bg-blue-500.rounded-full');
+    expect(dot).toBeInTheDocument();
+  });
+
+  it('does not show active indicator when no alerts are enabled', () => {
+    render(<NotificationBell />);
+    const bell = screen.getByRole('button', { name: 'notifications.preferences' });
+    const dot = bell.querySelector('.bg-blue-500.rounded-full');
+    expect(dot).not.toBeInTheDocument();
+  });
+
+  // ── Disable toggle ────────────────────────────────────────────────────────
+
+  it('disables stock alerts and saves to localStorage', async () => {
+    localStorage.setItem('stock-alerts-enabled', 'true');
+
+    render(<NotificationBell />);
+    openPanel();
+    const stockSwitch = screen.getAllByRole('switch')[1];
+    expect(stockSwitch).toHaveAttribute('aria-checked', 'true');
+
+    await act(async () => { fireEvent.click(stockSwitch); });
+
+    await waitFor(() => {
+      expect(stockSwitch).toHaveAttribute('aria-checked', 'false');
+      expect(localStorage.getItem('stock-alerts-enabled')).toBe('false');
     });
   });
 });

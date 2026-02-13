@@ -106,6 +106,15 @@ const en = {
   'notifications.failedToDisable': 'Failed to disable notifications',
   'notifications.addFavoritesFirst': 'Add favorite cities first to get weather alerts',
   'notifications.subscriptionFailed': 'Failed to subscribe to weather alerts',
+  'notifications.preferences': 'Notification Preferences',
+  'notifications.weatherAlerts': 'Weather Alerts',
+  'notifications.weatherAlertsDesc': 'Severe weather warnings for your favorite cities',
+  'notifications.stockAlerts': 'Stock Price Alerts',
+  'notifications.stockAlertsDesc': 'When watchlist stocks hit your price targets',
+  'notifications.podcastAlerts': 'New Episodes',
+  'notifications.podcastAlertsDesc': 'When subscribed podcasts release new episodes',
+  'notifications.noWatchlistForAlerts': 'Add stocks to your watchlist first',
+  'notifications.noSubscriptionsForAlerts': 'Subscribe to podcasts first',
 
   // Compare
   'compare.title': 'Compare Weather',
@@ -677,6 +686,15 @@ const es: Record<TranslationKey, string> = {
   'notifications.failedToDisable': 'Error al desactivar notificaciones',
   'notifications.addFavoritesFirst': 'Agrega ciudades favoritas primero para recibir alertas meteorol\u00f3gicas',
   'notifications.subscriptionFailed': 'Error al suscribirse a alertas meteorol\u00f3gicas',
+  'notifications.preferences': 'Preferencias de notificaciones',
+  'notifications.weatherAlerts': 'Alertas meteorol\u00f3gicas',
+  'notifications.weatherAlertsDesc': 'Avisos de clima severo para tus ciudades favoritas',
+  'notifications.stockAlerts': 'Alertas de precio',
+  'notifications.stockAlertsDesc': 'Cuando las acciones alcancen tu precio objetivo',
+  'notifications.podcastAlerts': 'Nuevos episodios',
+  'notifications.podcastAlertsDesc': 'Cuando tus podcasts suscritos publiquen nuevos episodios',
+  'notifications.noWatchlistForAlerts': 'Agrega acciones a tu lista primero',
+  'notifications.noSubscriptionsForAlerts': 'Suscr\u00edbete a podcasts primero',
 
   // Compare
   'compare.title': 'Comparar Clima',
