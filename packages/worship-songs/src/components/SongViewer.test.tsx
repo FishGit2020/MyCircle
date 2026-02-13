@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import SongViewer from './SongViewer';
 import type { WorshipSong } from '../types';
 
@@ -89,5 +89,33 @@ describe('SongViewer', () => {
     render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
     const bpmInput = screen.getByRole('spinbutton', { name: 'worship.bpm' });
     expect(bpmInput).toHaveValue(120);
+  });
+
+  it('print button calls window.print()', () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+
+    const printBtn = screen.getByRole('button', { name: 'worship.print' });
+    fireEvent.click(printBtn);
+    expect(printSpy).toHaveBeenCalledOnce();
+    printSpy.mockRestore();
+  });
+
+  it('print button has aria-label', () => {
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    const printBtn = screen.getByRole('button', { name: 'worship.print' });
+    expect(printBtn).toHaveAttribute('aria-label', 'worship.print');
+  });
+
+  it('marks non-printable sections with data-print-hide', () => {
+    const { container } = render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    const hiddenElements = container.querySelectorAll('[data-print-hide]');
+    expect(hiddenElements.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('marks song content with data-print-show', () => {
+    const { container } = render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    const showElements = container.querySelectorAll('[data-print-show]');
+    expect(showElements.length).toBe(1);
   });
 });

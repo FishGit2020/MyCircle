@@ -63,7 +63,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Add, edit, and browse worship songs with ChordPro or plain text format
 - Real-time transposition with direct key picker and semitone controls
 - Auto-scroll with adjustable speed for live performance
-- Copy lyrics to clipboard, print-friendly view
+- Copy lyrics to clipboard, **print support** — `@media print` CSS hides UI chrome and forces light theme for clean song output on paper
 - **YouTube link integration** — optional YouTube URL per song; renders a styled "Watch on YouTube" button in the song viewer that opens in a new tab
 - **Built-in metronome** — Web Audio API-powered metronome with BPM from song metadata (30-240 range), +/- controls, tap tempo (4-tap average), beat indicator flash, always visible in song viewer
 - Favorites, search, tag filtering

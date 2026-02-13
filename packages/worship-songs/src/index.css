@@ -1,3 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media print {
+  @page {
+    margin: 1cm;
+  }
+
+  /* Hide all UI chrome: nav, sidebar, bottom bar, audio player, buttons, controls */
+  nav,
+  header,
+  footer,
+  [data-print-hide],
+  button,
+  select,
+  input[type="range"],
+  a[target="_blank"] {
+    display: none !important;
+  }
+
+  /* Force light background and dark text for readability */
+  body,
+  html {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure song content area is visible and readable */
+  [data-print-show] {
+    display: block !important;
+    color: black !important;
+    background: white !important;
+  }
+
+  /* Chord notation should use monospace for alignment */
+  .chord-text {
+    font-family: 'Courier New', Courier, monospace !important;
+    color: #333 !important;
+    font-weight: bold !important;
+  }
+
+  /* Remove dark mode backgrounds */
+  * {
+    background-color: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    border-color: #ccc !important;
+  }
+
+  /* Preserve song content whitespace and formatting */
+  pre {
+    white-space: pre-wrap !important;
+    font-family: 'Courier New', Courier, monospace !important;
+  }
+}
