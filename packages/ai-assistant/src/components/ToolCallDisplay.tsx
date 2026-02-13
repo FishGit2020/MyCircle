@@ -9,6 +9,7 @@ const TOOL_ICONS: Record<string, string> = {
   getWeather: '\u2601\uFE0F',
   searchCities: '\uD83D\uDD0D',
   getStockQuote: '\uD83D\uDCC8',
+  getCryptoPrices: '\uD83E\uDE99',
   navigateTo: '\uD83E\uDDED',
 };
 
@@ -16,6 +17,7 @@ const TOOL_LABEL_KEYS: Record<string, string> = {
   getWeather: 'ai.toolWeather',
   searchCities: 'ai.toolCitySearch',
   getStockQuote: 'ai.toolStockQuote',
+  getCryptoPrices: 'ai.toolCrypto',
   navigateTo: 'ai.toolNavigate',
 };
 

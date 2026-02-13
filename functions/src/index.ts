@@ -492,9 +492,10 @@ export const aiChat = onRequest(
       return;
     }
 
-    const { message, history } = req.body as {
+    const { message, history, context } = req.body as {
       message: string;
       history?: { role: string; content: string }[];
+      context?: Record<string, unknown>;
     };
 
     if (!message || typeof message !== 'string') {
@@ -556,8 +557,17 @@ export const aiChat = onRequest(
         },
       };
 
+      const getCryptoPricesDecl: FunctionDeclaration = {
+        name: 'getCryptoPrices',
+        description: 'Get current prices for major cryptocurrencies (Bitcoin, Ethereum, Solana, etc.) from CoinGecko.',
+        parameters: {
+          type: Type.OBJECT,
+          properties: {},
+        },
+      };
+
       const tools = [
-        { functionDeclarations: [getWeatherDecl, searchCitiesDecl, getStockQuoteDecl, navigateToDecl] },
+        { functionDeclarations: [getWeatherDecl, searchCitiesDecl, getStockQuoteDecl, navigateToDecl, getCryptoPricesDecl] },
       ];
 
       // Build conversation history
@@ -572,13 +582,40 @@ export const aiChat = onRequest(
       }
       contents.push({ role: 'user', parts: [{ text: message }] });
 
+      // Build context-aware system instruction
+      let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
+
+      if (context && typeof context === 'object') {
+        const parts: string[] = [];
+        if (Array.isArray(context.favoriteCities) && context.favoriteCities.length > 0) {
+          parts.push(`Favorite cities: ${(context.favoriteCities as string[]).join(', ')}`);
+        }
+        if (Array.isArray(context.recentCities) && context.recentCities.length > 0) {
+          parts.push(`Recently searched cities: ${(context.recentCities as string[]).join(', ')}`);
+        }
+        if (Array.isArray(context.stockWatchlist) && context.stockWatchlist.length > 0) {
+          parts.push(`Stock watchlist: ${(context.stockWatchlist as string[]).join(', ')}`);
+        }
+        if (typeof context.podcastSubscriptions === 'number' && context.podcastSubscriptions > 0) {
+          parts.push(`Subscribed to ${context.podcastSubscriptions} podcasts`);
+        }
+        if (context.tempUnit) parts.push(`Preferred temperature unit: ${context.tempUnit === 'F' ? 'Fahrenheit' : 'Celsius'}`);
+        if (context.locale) parts.push(`Language: ${context.locale === 'es' ? 'Spanish' : 'English'}`);
+        if (context.currentPage) parts.push(`Currently on: ${context.currentPage}`);
+
+        if (parts.length > 0) {
+          systemInstruction += '\n\nUser context:\n' + parts.join('\n');
+          systemInstruction += '\n\nUse this context to personalize responses. For example, if the user asks "how is the weather?" you can check their favorite or recent cities. If they ask about stocks, reference their watchlist.';
+        }
+      }
+
       // Call Gemini
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents,
         config: {
           tools,
-          systemInstruction: 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather or stocks, use the tools to get real data.',
+          systemInstruction,
         },
       });
 
@@ -603,6 +640,8 @@ export const aiChat = onRequest(
               result = await executeSearchCities(args.query as string);
             } else if (fc.name === 'getStockQuote') {
               result = await executeGetStockQuote(args.symbol as string);
+            } else if (fc.name === 'getCryptoPrices') {
+              result = await executeGetCryptoPrices();
             } else if (fc.name === 'navigateTo') {
               result = JSON.stringify({ navigateTo: args.page });
             }
@@ -754,6 +793,34 @@ async function executeGetStockQuote(symbol: string): Promise<string> {
   });
 
   aiChatCache.set(cacheKey, result, 60); // cache 1 min
+  return result;
+}
+
+/**
+ * Execute getCryptoPrices tool: fetch top crypto prices from CoinGecko
+ */
+async function executeGetCryptoPrices(): Promise<string> {
+  const cacheKey = 'ai:crypto';
+  const cached = aiChatCache.get<string>(cacheKey);
+  if (cached) return cached;
+
+  const ids = 'bitcoin,ethereum,solana,cardano,dogecoin';
+  const res = await axios.get(
+    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
+    { timeout: 5000 }
+  );
+
+  const result = JSON.stringify(
+    res.data.map((c: any) => ({
+      name: c.name,
+      symbol: c.symbol.toUpperCase(),
+      price: c.current_price,
+      change24h: c.price_change_percentage_24h?.toFixed(2) + '%',
+      marketCap: c.market_cap,
+    }))
+  );
+
+  aiChatCache.set(cacheKey, result, 120); // cache 2 min
   return result;
 }
 

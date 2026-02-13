@@ -23,6 +23,60 @@ interface AiChatState {
 
 const STORAGE_KEY = 'ai-chat-history';
 
+/** Gather user context from localStorage for context-aware AI. */
+function gatherUserContext(): Record<string, unknown> {
+  const ctx: Record<string, unknown> = {};
+  try {
+    // Stock watchlist
+    const watchlist = localStorage.getItem('stock-watchlist');
+    if (watchlist) {
+      const parsed = JSON.parse(watchlist);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        ctx.stockWatchlist = parsed.map((w: any) => w.symbol || w).slice(0, 20);
+      }
+    }
+
+    // Podcast subscriptions
+    const subs = localStorage.getItem('podcast-subscriptions');
+    if (subs) {
+      const parsed = JSON.parse(subs);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        ctx.podcastSubscriptions = parsed.length;
+      }
+    }
+
+    // Favorite cities
+    const favs = localStorage.getItem('mycircle-favorite-cities');
+    if (favs) {
+      const parsed = JSON.parse(favs);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        ctx.favoriteCities = parsed.map((c: any) => c.name || c).slice(0, 10);
+      }
+    }
+
+    // Recent cities
+    const recents = localStorage.getItem('mycircle-recent-cities');
+    if (recents) {
+      const parsed = JSON.parse(recents);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        ctx.recentCities = parsed.map((c: any) => c.name || c).slice(0, 5);
+      }
+    }
+
+    // User preferences
+    const locale = localStorage.getItem('mycircle-locale');
+    if (locale) ctx.locale = locale;
+    const tempUnit = localStorage.getItem('mycircle-temp-unit');
+    if (tempUnit) ctx.tempUnit = tempUnit;
+    const theme = localStorage.getItem('mycircle-theme');
+    if (theme) ctx.theme = theme;
+
+    // Current page
+    ctx.currentPage = window.location.pathname;
+  } catch { /* ignore localStorage errors */ }
+  return ctx;
+}
+
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
@@ -87,6 +141,8 @@ export function useAiChat() {
         content: m.content,
       }));
 
+      const userContext = gatherUserContext();
+
       const idToken = await (window as any).__getFirebaseIdToken?.();
       const response = await fetch('/ai/chat', {
         method: 'POST',
@@ -94,7 +150,7 @@ export function useAiChat() {
           'Content-Type': 'application/json',
           ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {}),
         },
-        body: JSON.stringify({ message: content, history }),
+        body: JSON.stringify({ message: content, history, context: userContext }),
         signal: abortRef.current.signal,
       });
 

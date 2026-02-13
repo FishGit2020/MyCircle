@@ -412,6 +412,7 @@ const en = {
   'ai.toolCitySearch': 'City search',
   'ai.toolStockQuote': 'Stock quote',
   'ai.toolNavigate': 'Navigation',
+  'ai.toolCrypto': 'Crypto prices',
   'ai.toolGeneric': 'Tool',
   'ai.error': 'Failed to get response',
   'ai.rateLimited': 'Rate limited. Please wait a moment.',
@@ -422,6 +423,7 @@ const en = {
   'ai.suggestStocks': 'How is AAPL doing today?',
   'ai.suggestNavigate': 'Take me to the podcasts page',
   'ai.suggestCompare': 'Compare weather in London and Tokyo',
+  'ai.suggestCrypto': 'How are crypto prices today?',
 
   // Feedback
   'feedback.button': 'Feedback',
@@ -1053,6 +1055,7 @@ const es: Record<TranslationKey, string> = {
   'ai.toolCitySearch': 'B\u00fasqueda de ciudades',
   'ai.toolStockQuote': 'Cotizaci\u00f3n de acci\u00f3n',
   'ai.toolNavigate': 'Navegaci\u00f3n',
+  'ai.toolCrypto': 'Precios de cripto',
   'ai.toolGeneric': 'Herramienta',
   'ai.error': 'No se pudo obtener respuesta',
   'ai.rateLimited': 'L\u00edmite de velocidad. Espera un momento.',
@@ -1063,6 +1066,7 @@ const es: Record<TranslationKey, string> = {
   'ai.suggestStocks': '\u00bfC\u00f3mo va AAPL hoy?',
   'ai.suggestNavigate': 'Ll\u00e9vame a la p\u00e1gina de podcasts',
   'ai.suggestCompare': 'Compara el clima en Londres y Tokio',
+  'ai.suggestCrypto': '\u00bfC\u00f3mo van los precios de cripto hoy?',
 
   // Feedback
   'feedback.button': 'Comentarios',
