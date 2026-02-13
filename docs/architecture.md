@@ -65,6 +65,10 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **Runtime** | Node.js 22 |
 | **Package Manager** | pnpm (workspaces + catalogs) |
 
+### MFE CSS Isolation
+
+All 7 MFE Tailwind configs set `corePlugins: { preflight: false }` to disable Tailwind's preflight (global CSS resets). The shell keeps preflight enabled as the single source of base styles. This prevents layout shifts caused by duplicate `*, html, body` resets being injected when MFE CSS loads at runtime via Module Federation.
+
 ---
 
 ## Micro Frontends
@@ -518,6 +522,8 @@ All weather queries share a `WeatherConditionFragment` for consistent field sele
 ### Automatic Persisted Queries (APQ)
 
 The Apollo Client link chain includes `createPersistedQueryLink` which sends a SHA-256 hash instead of the full query string on repeat requests. On the first request for a given query, the full query text is sent alongside the hash. On subsequent requests, only the hash is sent — the server recognizes the hash and executes the cached query. This reduces payload size for frequently-used queries. Hashing uses the browser-native `crypto.subtle.digest('SHA-256', ...)` (no extra dependencies).
+
+The Cloud Functions GraphQL handler (`functions/src/index.ts`) passes `extensions` (containing the APQ hash) through to `server.executeOperation()`. Apollo Server 4's built-in APQ plugin handles the hash lookup with an in-memory cache. On cold starts, hash-only requests return `PersistedQueryNotFound`, the client retries with full query + hash, and subsequent hash-only requests succeed.
 
 ### useWeatherData Hook
 
