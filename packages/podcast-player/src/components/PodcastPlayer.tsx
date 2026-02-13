@@ -74,6 +74,8 @@ export default function PodcastPlayer() {
         next.add(id);
       }
       saveSubscriptions(next);
+      // Notify shell for Firestore sync
+      window.dispatchEvent(new Event('subscriptions-changed'));
       return next;
     });
   }, []);

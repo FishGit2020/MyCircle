@@ -49,9 +49,10 @@ export default function StockTracker() {
   );
   const { candles: selectedCandles, loading: candlesLoading } = useStockCandles(selectedSymbol);
 
-  // Persist watchlist to localStorage
+  // Persist watchlist to localStorage and notify shell for Firestore sync
   useEffect(() => {
     saveWatchlist(watchlist);
+    window.dispatchEvent(new Event('watchlist-changed'));
   }, [watchlist]);
 
   const handleStockSelect = useCallback((symbol: string, description: string) => {

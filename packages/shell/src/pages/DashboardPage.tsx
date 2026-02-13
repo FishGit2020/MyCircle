@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from '@weather/shared';
 import { useAuth } from '../context/AuthContext';
+import { useDailyVerse } from '../hooks/useDailyVerse';
 import UseMyLocation from '../components/UseMyLocation';
 import CitySearchWrapper from '../components/CitySearchWrapper';
 import FavoriteCities from '../components/FavoriteCities';
@@ -62,6 +63,7 @@ export default function DashboardPage() {
   const { user, favoriteCities, recentCities } = useAuth();
   const watchlist = getWatchlist();
   const subscribedIds = getSubscribedIds();
+  const { verse, loading: verseLoading } = useDailyVerse();
 
   return (
     <div className="space-y-8">
@@ -73,6 +75,33 @@ export default function DashboardPage() {
         <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
           {t('home.subtitle')}
         </p>
+        {/* Daily Bible verse */}
+        <div className="max-w-lg mx-auto mb-6">
+          {verseLoading ? (
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
+              <div className="h-4 bg-blue-200 dark:bg-blue-800/40 rounded animate-pulse w-3/4 mx-auto" />
+            </div>
+          ) : (
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
+              <p className="text-sm italic text-blue-600 dark:text-blue-400">
+                &ldquo;{verse.text}&rdquo;
+              </p>
+              <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
+                — {verse.reference}{verse.version ? ` (${verse.version})` : ''}
+              </p>
+              {verse.permalink && (
+                <a
+                  href={verse.permalink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-500 mt-1 inline-block"
+                >
+                  Powered by BibleGateway.com
+                </a>
+              )}
+            </div>
+          )}
+        </div>
         <UseMyLocation />
         <div className="mt-4 text-gray-400 dark:text-gray-500 text-sm">{t('home.orSearchBelow')}</div>
       </section>

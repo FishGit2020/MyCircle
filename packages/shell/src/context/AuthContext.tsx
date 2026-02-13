@@ -13,12 +13,15 @@ import {
   removeRecentCity,
   getRecentCities,
   toggleFavoriteCity,
+  updateStockWatchlist,
+  updatePodcastSubscriptions,
   identifyUser,
   clearUserIdentity,
   logEvent,
   UserProfile,
   RecentCity,
   FavoriteCity,
+  WatchlistItem,
 } from '../lib/firebase';
 
 interface AuthContextType {
@@ -34,6 +37,8 @@ interface AuthContextType {
   addCity: (city: Omit<RecentCity, 'searchedAt'>) => Promise<void>;
   removeCity: (cityId: string) => Promise<void>;
   toggleFavorite: (city: FavoriteCity) => Promise<boolean>;
+  syncStockWatchlist: (watchlist: WatchlistItem[]) => Promise<void>;
+  syncPodcastSubscriptions: (subscriptionIds: string[]) => Promise<void>;
   recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
   refreshProfile: () => Promise<void>;
@@ -83,6 +88,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userProfile.speedUnit) {
             localStorage.setItem('speedUnit', userProfile.speedUnit);
             window.dispatchEvent(new Event('units-changed'));
+          }
+
+          // Restore stock watchlist
+          if (userProfile.stockWatchlist && userProfile.stockWatchlist.length > 0) {
+            localStorage.setItem('stock-tracker-watchlist', JSON.stringify(userProfile.stockWatchlist));
+            window.dispatchEvent(new Event('watchlist-changed'));
+          }
+
+          // Restore podcast subscriptions
+          if (userProfile.podcastSubscriptions && userProfile.podcastSubscriptions.length > 0) {
+            localStorage.setItem('podcast-subscriptions', JSON.stringify(userProfile.podcastSubscriptions));
+            window.dispatchEvent(new Event('subscriptions-changed'));
           }
         }
       } else {
@@ -175,6 +192,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return false;
   }, [user]);
 
+  const syncStockWatchlist = useCallback(async (watchlist: WatchlistItem[]) => {
+    if (user) {
+      await updateStockWatchlist(user.uid, watchlist);
+    }
+  }, [user]);
+
+  const syncPodcastSubscriptions = useCallback(async (subscriptionIds: string[]) => {
+    if (user) {
+      await updatePodcastSubscriptions(user.uid, subscriptionIds);
+    }
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -190,6 +219,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         addCity,
         removeCity,
         toggleFavorite,
+        syncStockWatchlist,
+        syncPodcastSubscriptions,
         recentCities,
         favoriteCities,
         refreshProfile,
