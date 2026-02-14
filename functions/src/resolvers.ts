@@ -7,7 +7,7 @@ const OPENWEATHER_BASE = process.env.OPENWEATHER_BASE_URL || 'https://api.openwe
 const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
 const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.com';
 const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podcastindex.org';
-const BIBLE_API_BASE = process.env.BIBLE_API_BASE_URL || 'https://bible-api.com';
+const YOUVERSION_API_BASE = process.env.YOUVERSION_API_BASE_URL || 'https://api.youversion.com/v1';
 const OPEN_METEO_BASE = process.env.OPEN_METEO_BASE_URL || 'https://archive-api.open-meteo.com';
 
 // Simple in-memory cache
@@ -482,7 +482,111 @@ async function getPodcastEpisodesAPI(apiKey: string, apiSecret: string, feedId: 
   return response.data;
 }
 
-// ─── Bible helpers ──────────────────────────────────────────
+// ─── Bible helpers (YouVersion API) ─────────────────────────
+
+// USFM book abbreviations for all 66 canonical books
+const BOOK_ABBREVIATIONS: Record<string, string> = {
+  'Genesis': 'GEN', 'Exodus': 'EXO', 'Leviticus': 'LEV', 'Numbers': 'NUM', 'Deuteronomy': 'DEU',
+  'Joshua': 'JOS', 'Judges': 'JDG', 'Ruth': 'RUT', '1 Samuel': '1SA', '2 Samuel': '2SA',
+  '1 Kings': '1KI', '2 Kings': '2KI', '1 Chronicles': '1CH', '2 Chronicles': '2CH', 'Ezra': 'EZR',
+  'Nehemiah': 'NEH', 'Esther': 'EST', 'Job': 'JOB', 'Psalms': 'PSA', 'Proverbs': 'PRO',
+  'Ecclesiastes': 'ECC', 'Song of Solomon': 'SNG', 'Isaiah': 'ISA', 'Jeremiah': 'JER',
+  'Lamentations': 'LAM', 'Ezekiel': 'EZK', 'Daniel': 'DAN', 'Hosea': 'HOS', 'Joel': 'JOL',
+  'Amos': 'AMO', 'Obadiah': 'OBA', 'Jonah': 'JON', 'Micah': 'MIC', 'Nahum': 'NAM',
+  'Habakkuk': 'HAB', 'Zephaniah': 'ZEP', 'Haggai': 'HAG', 'Zechariah': 'ZEC', 'Malachi': 'MAL',
+  'Matthew': 'MAT', 'Mark': 'MRK', 'Luke': 'LUK', 'John': 'JHN', 'Acts': 'ACT', 'Romans': 'ROM',
+  '1 Corinthians': '1CO', '2 Corinthians': '2CO', 'Galatians': 'GAL', 'Ephesians': 'EPH',
+  'Philippians': 'PHP', 'Colossians': 'COL', '1 Thessalonians': '1TH', '2 Thessalonians': '2TH',
+  '1 Timothy': '1TI', '2 Timothy': '2TI', 'Titus': 'TIT', 'Philemon': 'PHM', 'Hebrews': 'HEB',
+  'James': 'JAS', '1 Peter': '1PE', '2 Peter': '2PE', '1 John': '1JN', '2 John': '2JN',
+  '3 John': '3JN', 'Jude': 'JUD', 'Revelation': 'REV',
+};
+
+/**
+ * Convert a human-readable reference like "John 3" or "Genesis 1:1-10" to USFM format.
+ * Examples: "John 3" → "JHN.3", "Genesis 1:1-10" → "GEN.1.1-GEN.1.10", "Psalms 23" → "PSA.23"
+ */
+function convertToUsfmRef(reference: string): string {
+  // Parse "Book Chapter" or "Book Chapter:Verse" or "Book Chapter:Start-End"
+  const match = reference.match(/^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$/);
+  if (!match) return reference;
+
+  const [, bookName, chapter, verseStart, verseEnd] = match;
+  const usfm = BOOK_ABBREVIATIONS[bookName];
+  if (!usfm) return reference;
+
+  if (verseStart && verseEnd) {
+    return `${usfm}.${chapter}.${verseStart}-${usfm}.${chapter}.${verseEnd}`;
+  }
+  if (verseStart) {
+    return `${usfm}.${chapter}.${verseStart}`;
+  }
+  return `${usfm}.${chapter}`;
+}
+
+// Cache for YouVersion versions list (24hr TTL)
+const youversionVersionsCache = new NodeCache({ stdTTL: 86400, checkperiod: 3600 });
+
+interface YouVersionBible {
+  id: number;
+  abbreviation: string;
+  title: string;
+}
+
+/** Fetch available English Bible versions from YouVersion API */
+async function getYouVersionBibles(apiKey: string): Promise<YouVersionBible[]> {
+  const cacheKey = 'youversion:bibles:en';
+  const cached = youversionVersionsCache.get<YouVersionBible[]>(cacheKey);
+  if (cached) return cached;
+
+  const response = await axios.get(`${YOUVERSION_API_BASE}/bibles`, {
+    params: { 'language_ranges[]': 'en', all_available: true },
+    headers: { 'X-YouVersion-App-Key': apiKey },
+    timeout: 10000,
+  });
+
+  const bibles: YouVersionBible[] = (response.data.data || response.data || []).map((b: any) => ({
+    id: b.id,
+    abbreviation: b.abbreviation || b.abbr || '',
+    title: b.title || b.name || '',
+  }));
+
+  youversionVersionsCache.set(cacheKey, bibles);
+  return bibles;
+}
+
+/** Fetch a passage from YouVersion API */
+async function getYouVersionPassage(
+  bibleId: number,
+  reference: string,
+  apiKey: string
+): Promise<{ text: string; reference: string; translation: string; verseCount: number; copyright: string | null }> {
+  const usfmRef = convertToUsfmRef(reference);
+  const cacheKey = `youversion:passage:${bibleId}:${usfmRef}`;
+  const cached = bibleCache.get<any>(cacheKey);
+  if (cached) return cached;
+
+  const response = await axios.get(
+    `${YOUVERSION_API_BASE}/bibles/${bibleId}/passages/${encodeURIComponent(usfmRef)}`,
+    {
+      params: { format: 'text' },
+      headers: { 'X-YouVersion-App-Key': apiKey },
+      timeout: 10000,
+    }
+  );
+
+  const data = response.data;
+  const result = {
+    text: (data.content || data.text || '').trim(),
+    reference: data.reference || reference,
+    translation: data.bible_abbreviation || data.translation || String(bibleId),
+    verseCount: data.verse_count || data.verses?.length || 0,
+    copyright: data.copyright || null,
+  };
+
+  bibleCache.set(cacheKey, result, 3600);
+  return result;
+}
 
 // Curated daily verses (one per day-of-year, wraps around)
 const DAILY_VERSES = [
@@ -519,31 +623,11 @@ const DAILY_VERSES = [
   { text: "May the God of hope fill you with all joy and peace as you trust in him, so that you may overflow with hope by the power of the Holy Spirit.", reference: "Romans 15:13" },
 ];
 
-async function getBiblePassageAPI(reference: string, translation: string = 'web'): Promise<{ text: string; reference: string; translation: string; verseCount: number }> {
-  const cacheKey = `bible:passage:${reference}:${translation}`;
-  const cached = bibleCache.get<any>(cacheKey);
-  if (cached) return cached;
-
-  // bible-api.com accepts references like "john 3:16", "genesis 1:1-10", "psalm 23"
-  const response = await axios.get(`${BIBLE_API_BASE}/${encodeURIComponent(reference)}`, {
-    params: { translation },
-    timeout: 10000,
-  });
-
-  const data = response.data;
-  const result = {
-    text: data.text?.trim() || '',
-    reference: data.reference || reference,
-    translation: data.translation_name || translation.toUpperCase(),
-    verseCount: data.verses?.length || 0,
-  };
-
-  bibleCache.set(cacheKey, result, 3600);
-  return result;
-}
+// Default Bible version (KJV = 1 on YouVersion)
+const DEFAULT_YOUVERSION_BIBLE_ID = 1;
 
 // Resolver factory
-export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => string, getPodcastKeys?: () => { apiKey: string; apiSecret: string }) {
+export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => string, getPodcastKeys?: () => { apiKey: string; apiSecret: string }, getYouVersionKey?: () => string) {
   return {
     Query: {
       weather: async (_: any, { lat, lon }: { lat: number; lon: number }) => {
@@ -692,13 +776,23 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
 
       // ─── Bible Resolvers ─────────────────────────────────────
 
+      bibleVersions: async () => {
+        const yvKey = getYouVersionKey?.() || '';
+        if (!yvKey) throw new Error('YOUVERSION_APP_KEY not configured');
+        return await getYouVersionBibles(yvKey);
+      },
+
       bibleVotd: async (_: any, { day }: { day: number }) => {
         const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
         return { ...DAILY_VERSES[index], translation: 'NIV', copyright: null };
       },
 
       biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {
-        return await getBiblePassageAPI(reference, translation || 'web');
+        const yvKey = getYouVersionKey?.() || '';
+        if (!yvKey) throw new Error('YOUVERSION_APP_KEY not configured');
+        const bibleId = translation ? parseInt(translation, 10) : DEFAULT_YOUVERSION_BIBLE_ID;
+        if (isNaN(bibleId)) throw new Error(`Invalid Bible version ID: ${translation}`);
+        return await getYouVersionPassage(bibleId, reference, yvKey);
       },
     }
   };

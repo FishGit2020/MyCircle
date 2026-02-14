@@ -1,24 +1,17 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation, StorageKeys, getDailyDevotional } from '@mycircle/shared';
-import { useVotd, useBiblePassage, BIBLE_BOOKS } from '../hooks/useBibleData';
+import { useVotd, useBiblePassage, useBibleVersions, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
 
-// Available Bible versions from bible-api.com
-const BIBLE_VERSIONS = [
-  { id: 'web', label: 'WEB', name: 'World English Bible' },
-  { id: 'kjv', label: 'KJV', name: 'King James Version' },
-  { id: 'bbe', label: 'BBE', name: 'Bible in Basic English' },
-  { id: 'oeb-us', label: 'OEB', name: 'Open English Bible' },
-  { id: 'clementine', label: 'CLEM', name: 'Clementine Vulgate (Latin)' },
-  { id: 'almeida', label: 'ALM', name: 'Almeida (Portuguese)' },
-] as const;
+// Default Bible version (KJV = 1 on YouVersion)
+const DEFAULT_VERSION_ID = '1';
 
 function loadBibleVersion(): string {
   try {
     const stored = localStorage.getItem(StorageKeys.BIBLE_TRANSLATION);
-    if (stored && BIBLE_VERSIONS.some(v => v.id === stored)) return stored;
+    if (stored) return stored;
   } catch { /* */ }
-  return 'web';
+  return DEFAULT_VERSION_ID;
 }
 
 function saveBibleVersion(version: string) {
@@ -559,6 +552,11 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
               {passage.verseCount > 0 && ` — ${passage.verseCount} ${t('bible.verses')}`}
             </p>
           )}
+          {passage.copyright && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 italic">
+              {passage.copyright}
+            </p>
+          )}
         </div>
       )}
 
@@ -651,6 +649,7 @@ export default function BibleReader() {
   const [bookmarks] = useState(loadBookmarks);
   const [bibleVersion, setBibleVersion] = useState(loadBibleVersion);
   const { loadPassage, passage, loading: passageLoading, error: passageError } = useBiblePassage();
+  const { versions: dynamicVersions, loading: versionsLoading, error: versionsError } = useBibleVersions();
 
   const lastRead = useMemo(() => loadLastRead(), []);
 
@@ -769,11 +768,18 @@ export default function BibleReader() {
               value={bibleVersion}
               onChange={(e) => handleVersionChange(e.target.value)}
               aria-label={t('bible.versionSelect')}
-              className="px-2 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              disabled={versionsLoading}
+              className="px-2 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
             >
-              {BIBLE_VERSIONS.map(v => (
-                <option key={v.id} value={v.id}>
-                  {v.label} — {v.name}
+              {versionsLoading && (
+                <option value={bibleVersion}>{t('bible.loadingVersions')}</option>
+              )}
+              {versionsError && dynamicVersions.length === 0 && (
+                <option value={DEFAULT_VERSION_ID}>KJV — King James Version</option>
+              )}
+              {dynamicVersions.map(v => (
+                <option key={v.id} value={String(v.id)}>
+                  {v.abbreviation} — {v.title}
                 </option>
               ))}
             </select>
@@ -808,7 +814,7 @@ export default function BibleReader() {
       </div>
 
       <p className="text-xs text-center text-gray-400 dark:text-gray-500">
-        {t('bible.attribution')}
+        {t('bible.attributionYouVersion')}
       </p>
     </div>
   );
