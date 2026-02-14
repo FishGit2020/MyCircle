@@ -381,7 +381,9 @@ MyCircle uses **GitHub Actions** for continuous integration and deployment:
 
 All workflows use `pnpm/action-setup@v4` with Node 22 and pnpm caching for fast installs.
 
-See [docs/cicd.md](docs/cicd.md) for a detailed CI/CD flow guide with setup instructions.
+The Deploy workflow authenticates via **Workload Identity Federation** (keyless). The service account requires IAM roles including Cloud Scheduler Admin (for scheduled functions) and Secret Manager Viewer (for function secrets). See the [WIF setup guide](docs/workload-identity-federation-setup.md) for the full role list. If the pipeline deploy fails with a 403, you can deploy locally via `pnpm firebase:deploy` as a fallback.
+
+See [docs/cicd.md](docs/cicd.md) for a detailed CI/CD flow guide with setup instructions and deploy troubleshooting.
 See [docs/workload-identity-federation-setup.md](docs/workload-identity-federation-setup.md) for keyless Firebase deployment using Workload Identity Federation.
 See [docs/announcements.md](docs/announcements.md) for how to add in-app "What's New" announcements.
 

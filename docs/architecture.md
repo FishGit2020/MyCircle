@@ -872,7 +872,9 @@ Three layers prevent shared dependency version drift across micro frontends:
 | **CI check script** | `scripts/check-shared-versions.mjs` compares version specifiers across all `packages/*/package.json` | PR pipeline |
 | **Singleton enforcement** | `singleton: true` + `requiredVersion` in every `vite.config.ts` shared config | Build / runtime |
 
-See [cicd.md](cicd.md) for a detailed CI/CD flow guide with setup instructions.
+The Deploy workflow authenticates via **Workload Identity Federation** (keyless) using a service account that requires specific IAM roles — notably **Cloud Scheduler Admin** for scheduled functions (`checkWeatherAlerts`) and **Secret Manager Viewer/Accessor** for function secrets. See [workload-identity-federation-setup.md](workload-identity-federation-setup.md) for the full role list and troubleshooting.
+
+See [cicd.md](cicd.md) for a detailed CI/CD flow guide with setup instructions and deploy troubleshooting.
 
 ---
 
