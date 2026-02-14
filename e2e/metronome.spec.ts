@@ -23,6 +23,7 @@ const mockSongWithoutBpm = {
 
 function setupWorshipMocks(page: import('@playwright/test').Page, songs = [mockSongWithBpm, mockSongWithoutBpm]) {
   return page.addInitScript((data) => {
+    (window as any).__getFirebaseIdToken = () => Promise.resolve('mock-token');
     (window as any).__worshipSongs = {
       getAll: () => Promise.resolve(data),
       get: (id: string) => Promise.resolve(data.find((s: any) => s.id === id) ?? null),
@@ -60,7 +61,7 @@ test.describe('Metronome', () => {
     await setupWorshipMocks(page);
     await page.goto('/worship');
     await page.getByText('Amazing Grace').click();
-    await page.getByText(/edit/i).click();
+    await page.getByRole('button', { name: /edit song/i }).click();
 
     const bpmInput = page.locator('#song-bpm');
     await expect(bpmInput).toBeVisible();

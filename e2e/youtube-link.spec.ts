@@ -23,6 +23,7 @@ const mockSongWithoutYoutube = {
 
 function setupWorshipMocks(page: import('@playwright/test').Page, songs = [mockSongWithYoutube, mockSongWithoutYoutube]) {
   return page.addInitScript((data) => {
+    (window as any).__getFirebaseIdToken = () => Promise.resolve('mock-token');
     (window as any).__worshipSongs = {
       getAll: () => Promise.resolve(data),
       get: (id: string) => Promise.resolve(data.find((s: any) => s.id === id) ?? null),
@@ -55,8 +56,8 @@ test.describe('YouTube Link Integration', () => {
     await setupWorshipMocks(page);
     await page.goto('/worship');
     await page.getByText('Amazing Grace').click();
-    // Click edit button
-    await page.getByText(/edit/i).click();
+    // Click edit button (requires authentication mock)
+    await page.getByRole('button', { name: /edit song/i }).click();
     const youtubeInput = page.locator('#song-youtube');
     await expect(youtubeInput).toBeVisible();
     await expect(youtubeInput).toHaveValue('https://youtube.com/watch?v=abc123');
