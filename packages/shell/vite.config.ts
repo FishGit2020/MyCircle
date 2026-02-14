@@ -1,8 +1,70 @@
-import { defineConfig, type PluginOption } from 'vite';
+import { defineConfig, type PluginOption, type ResolvedConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import federation from '@originjs/vite-plugin-federation';
 import { VitePWA } from 'vite-plugin-pwa';
 import { visualizer } from 'rollup-plugin-visualizer';
+
+// ---------------------------------------------------------------------------
+// Vite plugin: generate firebase-messaging-sw.js with env vars at build time
+// so we never commit the Firebase API key as a plain string in public/.
+// ---------------------------------------------------------------------------
+function firebaseMessagingSW(): PluginOption {
+  let env: Record<string, string> = {};
+
+  function generate(): string {
+    return [
+      '/* eslint-disable no-undef */',
+      '// Firebase Cloud Messaging service worker',
+      '// Generated at build time — config injected from VITE_FIREBASE_* env vars',
+      "importScripts('https://www.gstatic.com/firebasejs/11.9.0/firebase-app-compat.js');",
+      "importScripts('https://www.gstatic.com/firebasejs/11.9.0/firebase-messaging-compat.js');",
+      '',
+      'firebase.initializeApp({',
+      `  apiKey: ${JSON.stringify(env.VITE_FIREBASE_API_KEY || '')},`,
+      `  authDomain: ${JSON.stringify(env.VITE_FIREBASE_AUTH_DOMAIN || '')},`,
+      `  projectId: ${JSON.stringify(env.VITE_FIREBASE_PROJECT_ID || '')},`,
+      `  storageBucket: ${JSON.stringify(env.VITE_FIREBASE_STORAGE_BUCKET || '')},`,
+      `  messagingSenderId: ${JSON.stringify(env.VITE_FIREBASE_MESSAGING_SENDER_ID || '')},`,
+      `  appId: ${JSON.stringify(env.VITE_FIREBASE_APP_ID || '')},`,
+      '});',
+      '',
+      'const messaging = firebase.messaging();',
+      '',
+      '// Handle background messages (when the app is not in the foreground)',
+      'messaging.onBackgroundMessage((payload) => {',
+      "  const { title, body, icon } = payload.notification || {};",
+      "  self.registration.showNotification(title || 'Weather Alert', {",
+      "    body: body || 'You have a new weather notification.',",
+      "    icon: icon || '/favicon.ico',",
+      '  });',
+      '});',
+      '',
+    ].join('\n');
+  }
+
+  return {
+    name: 'firebase-messaging-sw',
+    configResolved(config: ResolvedConfig) {
+      env = config.env;
+    },
+    configureServer(server) {
+      // Serve the generated SW during local development
+      server.middlewares.use('/firebase-messaging-sw.js', (_req, res) => {
+        res.setHeader('Content-Type', 'application/javascript');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.end(generate());
+      });
+    },
+    generateBundle() {
+      // Emit the SW file into the build output
+      this.emitFile({
+        type: 'asset',
+        fileName: 'firebase-messaging-sw.js',
+        source: generate(),
+      });
+    },
+  };
+}
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isAnalyze = process.env.ANALYZE === 'true';
@@ -44,6 +106,7 @@ const notebookRemote = isProduction
 export default defineConfig({
   plugins: [
     react(),
+    firebaseMessagingSW(),
     federation({
       name: 'shell',
       remotes: {
@@ -111,6 +174,7 @@ export default defineConfig({
           /^\/api\//,
         ],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globIgnores: ['**/firebase-messaging-sw.js'],
         runtimeCaching: [
           {
             urlPattern: /\/remoteEntry\.js$/,
