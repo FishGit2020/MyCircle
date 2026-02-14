@@ -66,6 +66,27 @@ function firebaseMessagingSW(): PluginOption {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Vite plugin: listen for remote MFE rebuild notifications and trigger a
+// full browser reload via Vite's HMR WebSocket.  Only active in dev mode.
+// Usage: GET http://localhost:3000/__mfe-rebuilt?app=baby-tracker
+// ---------------------------------------------------------------------------
+function mfeReloadListener(): PluginOption {
+  return {
+    name: 'mfe-reload-listener',
+    configureServer(server) {
+      server.middlewares.use('/__mfe-rebuilt', (req, res) => {
+        const url = new URL(req.url || '/', 'http://localhost');
+        const app = url.searchParams.get('app') || 'unknown';
+        console.log(`[mfe-reload] Remote "${app}" rebuilt — sending full-reload`);
+        server.ws.send({ type: 'full-reload' });
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('ok');
+      });
+    },
+  };
+}
+
 const isProduction = process.env.NODE_ENV === 'production';
 const isAnalyze = process.env.ANALYZE === 'true';
 
@@ -111,6 +132,7 @@ export default defineConfig({
   plugins: [
     react(),
     firebaseMessagingSW(),
+    mfeReloadListener(),
     federation({
       name: 'shell',
       remotes: {
