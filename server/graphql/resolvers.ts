@@ -311,7 +311,7 @@ async function getYouVersionPassage(bibleId: number, reference: string) {
   return result;
 }
 
-const DEFAULT_YOUVERSION_BIBLE_ID = 1;
+const DEFAULT_YOUVERSION_BIBLE_ID = 111; // NIV 2011
 
 const DAILY_VERSES = [
   { text: "For I know the plans I have for you, declares the LORD, plans to prosper you and not to harm you, plans to give you hope and a future.", reference: "Jeremiah 29:11" },
