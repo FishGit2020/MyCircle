@@ -87,7 +87,7 @@ export default function WhatsNew({ announcements, open, onClose }: WhatsNewProps
         role="dialog"
         aria-modal="true"
         aria-labelledby="whats-new-title"
-        className="relative w-full md:max-w-lg md:mx-4 max-h-[85vh] md:max-h-[70vh] bg-white dark:bg-gray-800 rounded-t-2xl md:rounded-2xl shadow-xl flex flex-col animate-slide-up md:animate-none"
+        className="relative w-full md:max-w-lg md:mx-4 max-h-[85vh] md:max-h-[70vh] mb-14 md:mb-0 bg-white dark:bg-gray-800 rounded-t-2xl md:rounded-2xl shadow-xl flex flex-col animate-slide-up md:animate-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

@@ -14,11 +14,11 @@ const AQI_CONFIG: Array<{
   bgColor: string;
   barColor: string;
 }> = [
-  { label: 'weather.aqiGood', desc: 'weather.aqiGoodDesc', color: 'text-green-700 dark:text-green-300', bgColor: 'bg-green-100 dark:bg-green-900/30', barColor: 'bg-green-500' },
-  { label: 'weather.aqiFair', desc: 'weather.aqiFairDesc', color: 'text-yellow-700 dark:text-yellow-300', bgColor: 'bg-yellow-100 dark:bg-yellow-900/30', barColor: 'bg-yellow-500' },
-  { label: 'weather.aqiModerate', desc: 'weather.aqiModerateDesc', color: 'text-orange-700 dark:text-orange-300', bgColor: 'bg-orange-100 dark:bg-orange-900/30', barColor: 'bg-orange-500' },
-  { label: 'weather.aqiPoor', desc: 'weather.aqiPoorDesc', color: 'text-red-700 dark:text-red-300', bgColor: 'bg-red-100 dark:bg-red-900/30', barColor: 'bg-red-500' },
-  { label: 'weather.aqiVeryPoor', desc: 'weather.aqiVeryPoorDesc', color: 'text-purple-700 dark:text-purple-300', bgColor: 'bg-purple-100 dark:bg-purple-900/30', barColor: 'bg-purple-500' },
+  { label: 'weather.aqiGood', desc: 'weather.aqiGoodDesc', color: 'text-green-700 dark:text-green-300', bgColor: 'bg-green-100 dark:bg-green-900/40', barColor: 'bg-green-500' },
+  { label: 'weather.aqiFair', desc: 'weather.aqiFairDesc', color: 'text-yellow-700 dark:text-yellow-300', bgColor: 'bg-yellow-100 dark:bg-yellow-900/40', barColor: 'bg-yellow-500' },
+  { label: 'weather.aqiModerate', desc: 'weather.aqiModerateDesc', color: 'text-orange-700 dark:text-orange-300', bgColor: 'bg-orange-100 dark:bg-orange-900/40', barColor: 'bg-orange-500' },
+  { label: 'weather.aqiPoor', desc: 'weather.aqiPoorDesc', color: 'text-red-700 dark:text-red-300', bgColor: 'bg-red-100 dark:bg-red-900/40', barColor: 'bg-red-500' },
+  { label: 'weather.aqiVeryPoor', desc: 'weather.aqiVeryPoorDesc', color: 'text-purple-700 dark:text-purple-300', bgColor: 'bg-purple-100 dark:bg-purple-900/40', barColor: 'bg-purple-500' },
 ];
 
 const POLLUTANTS: Array<{ key: keyof Omit<AirQualityType, 'aqi'>; label: string; unit: string }> = [
