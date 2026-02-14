@@ -443,12 +443,12 @@ export async function mockGraphQL(page: Page) {
 
     // ─── Bible GraphQL queries ──────────────────────────────
 
-    if (operationName === 'GetBibleVotd') {
+    if (operationName === 'GetBibleVotd' || operationName === 'GetBibleVotdApi') {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          data: { bibleVotd: mockBibleVotd },
+          data: { bibleVotd: mockBibleVotd, bibleVotdApi: mockBibleVotd },
         }),
       });
     }

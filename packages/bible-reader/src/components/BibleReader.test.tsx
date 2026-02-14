@@ -381,7 +381,7 @@ describe('Bible Version Selector', () => {
     expect(screen.getByLabelText('bible.versionSelect')).toBeInTheDocument();
   });
 
-  it('defaults to KJV (id=1) when no version is stored', () => {
+  it('defaults to NIV (id=111) when no version is stored', () => {
     render(
       <MockedProvider mocks={[]} addTypename={false}>
         <BibleReader />
@@ -389,7 +389,7 @@ describe('Bible Version Selector', () => {
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
-    expect(select.value).toBe('1');
+    expect(select.value).toBe('111');
   });
 
   it('restores saved version from localStorage', () => {
