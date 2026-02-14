@@ -199,6 +199,7 @@ Cloud Functions that declare `secrets: [...]` require the secrets to exist in **
 | `PODCASTINDEX_API_SECRET` | graphql, podcastProxy |
 | `GEMINI_API_KEY` | aiChat |
 | `RECAPTCHA_SECRET_KEY` | aiChat |
+| `YOUVERSION_APP_KEY` | graphql (Bible verse of the day) |
 
 ### Creating secrets via gcloud CLI
 

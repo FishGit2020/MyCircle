@@ -260,6 +260,45 @@ For private repos, ensure **Actions** is enabled under **Settings â†’ Actions â†
 
 ---
 
+## Deploy Troubleshooting
+
+### Common IAM Permission Errors
+
+The deploy workflow authenticates via Workload Identity Federation as `firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com`. This service account requires specific IAM roles to deploy all resources. Missing roles cause 403 errors during the deploy step.
+
+| Error | Missing Role | Fix |
+|-------|-------------|-----|
+| `cloudscheduler.jobs.update` denied | **Cloud Scheduler Admin** (`roles/cloudscheduler.admin`) | Required for scheduled functions like `checkWeatherAlerts` |
+| `secretmanager.versions.get` denied | **Secret Manager Viewer** (`roles/secretmanager.viewer`) | Required to validate function secrets during deploy |
+| `iam.serviceAccounts.ActAs` denied | **Service Account User** (`roles/iam.serviceAccountUser`) | Required to deploy Cloud Functions (must be project-level) |
+| `firebaserules.googleapis.com` 403 | **Firebase Admin** (`roles/firebase.admin`) | Required to compile and deploy Firestore rules |
+
+To add a missing role:
+
+```bash
+SA="firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com"
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:$SA" --role="roles/<missing-role>"
+```
+
+> **Note:** IAM changes can take up to 7 minutes to propagate. If a deploy fails after adding a role, wait and re-run the workflow.
+
+For the full list of required IAM roles and detailed troubleshooting, see [docs/workload-identity-federation-setup.md](./workload-identity-federation-setup.md#required-iam-roles-for-the-service-account).
+
+### Local Deploy Fallback
+
+If the GitHub Actions deploy fails due to IAM issues, you can deploy locally using your personal Firebase credentials (which typically have Owner access):
+
+```bash
+# Full deploy (build + hosting + functions + firestore)
+pnpm firebase:deploy
+
+# Or deploy only functions
+pnpm firebase:deploy:functions
+```
+
+---
+
 ## Useful Links
 
 | Resource | URL |
