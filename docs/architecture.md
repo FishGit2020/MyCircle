@@ -856,11 +856,11 @@ GitHub Actions workflows automate testing and deployment:
 | Workflow | File | Trigger | Steps |
 |----------|------|---------|-------|
 | **CI** | `.github/workflows/ci.yml` | PR to `main` | Install → Check shared dep versions → Typecheck → Unit tests |
-| **Deploy** | `.github/workflows/deploy.yml` | Push to `main` | Install → Build → Firebase Hosting deploy |
+| **Deploy** | `.github/workflows/deploy.yml` | Push to `main` | Install → Build (with VITE_* secrets) → Deploy Hosting → Deploy Functions+Firestore → Smoke test |
 | **E2E (mocked)** | `.github/workflows/e2e.yml` (`e2e` job) | PR to `main` | Install → Playwright install → Build → E2E tests (browser-level mocks) |
 | **E2E (emulator)** | `.github/workflows/e2e.yml` (`e2e-emulator` job) | PR to `main` | Install → Java setup → Build → Mock API + Firebase emulators → Seed Firestore → Full-stack E2E tests |
 
-All workflows use `pnpm/action-setup@v4`, `actions/setup-node@v4` with Node 22 and pnpm dependency caching. The deploy workflow uses `FirebaseExtended/action-hosting-deploy@v0` with a `FIREBASE_SERVICE_ACCOUNT` secret for authentication.
+All workflows use `pnpm/action-setup@v4`, `actions/setup-node@v4` with Node 22 and pnpm dependency caching. The deploy workflow authenticates via **Workload Identity Federation** (`google-github-actions/auth@v2`) — no service account keys required. `VITE_FIREBASE_*` GitHub secrets are injected during the build step so Vite can embed Firebase client config.
 
 ### Shared Dependency Safety
 

@@ -34,9 +34,10 @@ MyCircle uses **GitHub Actions** for continuous integration, end-to-end testing,
        └──► Deploy  (deploy.yml)
              ├─ pnpm install --frozen-lockfile
              ├─ Build (shared → MFEs → shell → functions → assemble)
+             │    └─ VITE_FIREBASE_* secrets injected as env vars
              ├─ Authenticate via Workload Identity Federation
-             ├─ Deploy to Firebase Hosting (live channel)
-             ├─ Deploy Cloud Functions
+             ├─ Deploy Hosting (hosting-first for faster rollouts)
+             ├─ Deploy Functions + Firestore rules
              └─ Smoke test (HTTP 200 check)
 ```
 
@@ -126,15 +127,16 @@ Concurrency: only one E2E run per PR branch.
 
 ### Deploy — `.github/workflows/deploy.yml`
 
-**Trigger:** Push to `main` (i.e., merged PR) — runs on all changes including docs
+**Trigger:** Push to `main` (i.e., merged PR) — skipped if only docs/tests changed
 
 | Step | Command | Purpose |
 |------|---------|---------|
 | Checkout + Setup | Same as CI | — |
 | Build | `pnpm firebase:build` | Build shared → MFEs → Cloud Functions → assemble |
+| | *(with `VITE_FIREBASE_*` env vars from GitHub secrets)* | Vite embeds these at build time for Firebase client config |
 | Authenticate | `google-github-actions/auth@v2` | Keyless auth via Workload Identity Federation |
-| Deploy Hosting | `FirebaseExtended/action-hosting-deploy@v0` | Deploy static assets to Firebase Hosting live channel |
-| Deploy Functions | `firebase deploy --only functions` | Deploy Cloud Functions (GraphQL, proxies, AI chat) |
+| Deploy Hosting | `npx firebase-tools deploy --only hosting` | Deploy static assets to Firebase Hosting (runs first) |
+| Deploy Functions + Firestore | `npx firebase-tools deploy --only functions,firestore` | Deploy Cloud Functions + Firestore rules |
 | Smoke test | `curl` health check | Verify deployed site returns HTTP 200 |
 
 #### Authentication
@@ -148,7 +150,24 @@ The deploy workflow uses **Workload Identity Federation** (keyless) instead of a
     service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
 ```
 
-See [docs/workload-identity-federation-setup.md](./workload-identity-federation-setup.md) for the full setup guide. No repository secrets are required for deployment — only the `GITHUB_TOKEN` (provided automatically).
+See [docs/workload-identity-federation-setup.md](./workload-identity-federation-setup.md) for the full setup guide.
+
+#### Required GitHub Secrets
+
+The build step needs `VITE_*` secrets so Vite can embed Firebase client config at build time:
+
+| Secret | Example | Purpose |
+|--------|---------|---------|
+| `VITE_FIREBASE_API_KEY` | `AIzaSy...` | Firebase Web API key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `mycircle-dash.firebaseapp.com` | Firebase Auth domain |
+| `VITE_FIREBASE_PROJECT_ID` | `mycircle-dash` | Firebase project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | `mycircle-dash.firebasestorage.app` | Cloud Storage bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | `441498720264` | FCM sender ID |
+| `VITE_FIREBASE_APP_ID` | `1:441498...` | Firebase App ID |
+| `VITE_FIREBASE_MEASUREMENT_ID` | `G-3TTECZHFDV` | Google Analytics ID |
+| `VITE_FIREBASE_VAPID_KEY` | `BG0dnBc...` | FCM VAPID key for push notifications |
+
+> **Why secrets?** These values are client-side (visible in the deployed JS bundle), but storing them as secrets keeps them out of the repo and makes rotation easy. Set them via `gh secret set <NAME> --body "<VALUE>"`.
 
 ---
 
@@ -228,6 +247,7 @@ firebase functions:secrets:set FINNHUB_API_KEY
 firebase functions:secrets:set PODCASTINDEX_API_KEY
 firebase functions:secrets:set PODCASTINDEX_API_SECRET
 firebase functions:secrets:set GEMINI_API_KEY
+firebase functions:secrets:set YOUVERSION_APP_KEY
 ```
 
 - [Firebase Functions secrets](https://firebase.google.com/docs/functions/config-env#secret-manager)
