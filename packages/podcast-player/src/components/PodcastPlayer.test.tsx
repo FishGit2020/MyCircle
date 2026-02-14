@@ -57,6 +57,8 @@ const renderWithProviders = (ui: React.ReactElement) => {
 describe('PodcastPlayer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock Firebase auth so the Subscriptions tab is visible
+    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
   });
 
   it('renders the podcast player title', () => {
@@ -92,19 +94,21 @@ describe('PodcastPlayer', () => {
     expect(subscribeButtons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('renders discover and subscribed tabs', () => {
+  it('renders discover and subscribed tabs', async () => {
     renderWithProviders(<PodcastPlayer />);
     // Tab bar with "Trending" (discover) and "My Subscriptions" tabs
     const trendingTabs = screen.getAllByText('Trending');
     expect(trendingTabs.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('My Subscriptions')).toBeInTheDocument();
+    // Auth check is async — wait for subscriptions tab to appear
+    expect(await screen.findByText('My Subscriptions')).toBeInTheDocument();
   });
 
   it('switches to subscribed tab and shows empty state', async () => {
     const user = userEvent.setup();
     renderWithProviders(<PodcastPlayer />);
 
-    const subscribedTab = screen.getByText('My Subscriptions');
+    // Auth check is async — wait for the tab to appear
+    const subscribedTab = await screen.findByText('My Subscriptions');
     await user.click(subscribedTab);
 
     expect(screen.getByText('No subscriptions yet.')).toBeInTheDocument();
