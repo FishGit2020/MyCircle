@@ -463,8 +463,13 @@ export async function mockGraphQL(page: Page) {
       });
     }
 
-    // Default: pass through
-    return route.continue();
+    // Default: return empty data instead of forwarding to a potentially
+    // dead server (in CI static mode, port 3003 is not running).
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: null }),
+    });
   });
 }
 
