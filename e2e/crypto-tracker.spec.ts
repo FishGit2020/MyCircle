@@ -40,7 +40,7 @@ test.describe('Crypto Tracker', () => {
     await expect(cryptoHeading).toBeVisible({ timeout: 10000 });
 
     // Search for and select a stock
-    const searchInput = page.getByPlaceholderText(/search stocks/i);
+    const searchInput = page.getByPlaceholder(/search stocks/i);
     await searchInput.fill('AAPL');
 
     // Wait for search results and click first result

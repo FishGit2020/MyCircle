@@ -24,7 +24,7 @@ test.describe('Voice Input', () => {
   });
 
   test('has accessible chat input alongside voice button', async ({ page }) => {
-    await expect(page.getByPlaceholderText(/ask me about weather/i)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByPlaceholder(/ask me about weather/i)).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('button', { name: /send message/i })).toBeVisible();
   });
 });

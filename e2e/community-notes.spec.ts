@@ -26,7 +26,7 @@ test.describe('Community Notes (Bible)', () => {
     await expect(page.getByText('My Notes')).toBeVisible({ timeout: 10_000 });
     await page.getByText('My Notes').click();
 
-    const textarea = page.getByPlaceholderText(/Write your notes/i);
+    const textarea = page.getByPlaceholder(/Write your notes/i);
     await expect(textarea).toBeVisible();
     await textarea.fill('This is my personal note');
     await expect(textarea).toHaveValue('This is my personal note');

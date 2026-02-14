@@ -28,7 +28,7 @@ test.describe('Live Toggle Visibility', () => {
     // Click to enable live mode
     await toggleButton.click();
 
-    // Should show Live text
-    await expect(page.getByRole('button', { name: /Live/i })).toBeVisible();
+    // Should show Live text (isLive becomes true once enableRealtime + effectivePollInterval > 0)
+    await expect(page.getByRole('button', { name: /Live/i })).toBeVisible({ timeout: 5_000 });
   });
 });
