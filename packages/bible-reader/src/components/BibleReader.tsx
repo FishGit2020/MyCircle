@@ -195,16 +195,16 @@ function DailyDevotional({ onRead }: { onRead: (book: string, chapter: number) =
   };
 
   return (
-    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-5 border border-amber-200 dark:border-amber-800/40">
+    <div className="bg-amber-50 dark:bg-amber-900/40 rounded-xl p-5 border border-amber-200 dark:border-amber-700/60">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-1">
+          <h2 className="text-sm font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide mb-1">
             {t('bible.dailyDevotional')}
           </h2>
           <p className="text-base font-medium text-gray-800 dark:text-white">
             {devotional.book} {devotional.chapter}
           </p>
-          <p className="text-sm text-amber-600 dark:text-amber-400 mt-1 italic">
+          <p className="text-sm text-amber-600 dark:text-amber-200/90 mt-1 italic">
             &ldquo;{devotional.theme}&rdquo;
           </p>
         </div>
