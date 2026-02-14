@@ -70,8 +70,16 @@ if (firebaseEnabled) {
     const isEmulator = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       && window.location.port === '5000';
     if (isEmulator) {
-      if (db) connectFirestoreEmulator(db, 'localhost', 8080);
-      if (auth) connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+      try {
+        if (db) connectFirestoreEmulator(db, 'localhost', 8080);
+      } catch (e) {
+        console.warn('Firestore emulator already connected:', e);
+      }
+      try {
+        if (auth) connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+      } catch (e) {
+        console.warn('Auth emulator already connected:', e);
+      }
       // Expose test helper for emulator e2e auth tests
       (window as any).__signInForTest = (email: string, password: string) =>
         signInWithEmailAndPassword(auth!, email, password);
