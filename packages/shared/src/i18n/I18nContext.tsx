@@ -6,11 +6,12 @@ function getInitialLocale(): Locale {
   if (typeof window === 'undefined') return 'en';
   try {
     const stored = localStorage.getItem(StorageKeys.LOCALE);
-    if (stored === 'en' || stored === 'es') return stored;
+    if (stored === 'en' || stored === 'es' || stored === 'zh') return stored;
   } catch { /* ignore */ }
   // Auto-detect from browser
   const browserLang = navigator.language.slice(0, 2);
   if (browserLang === 'es') return 'es';
+  if (browserLang === 'zh') return 'zh';
   return 'en';
 }
 

@@ -87,7 +87,7 @@ The orchestrator that loads and composes all remote micro frontends.
 - Layout: sticky header with nav links, toggles, notifications, "What's New" button, user menu
 - Authentication context (Firebase Auth)
 - Theme context (dark/light mode with system preference detection)
-- i18n / language selection
+- i18n / language selection (English, Spanish, Chinese)
 - Unit toggles (temperature, wind speed)
 - Push notification management (Firebase Cloud Messaging)
 - Remote Config context (Firebase Remote Config)
