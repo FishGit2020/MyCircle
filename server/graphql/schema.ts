@@ -210,6 +210,13 @@ export const typeDefs = `#graphql
     reference: String!
     translation: String
     verseCount: Int
+    copyright: String
+  }
+
+  type BibleVersion {
+    id: Int!
+    abbreviation: String!
+    title: String!
   }
 
   type Query {
@@ -236,6 +243,7 @@ export const typeDefs = `#graphql
     podcastFeed(feedId: ID!): PodcastFeed
 
     # Bible queries
+    bibleVersions: [BibleVersion!]!
     bibleVotd(day: Int!): BibleVerse!
     biblePassage(reference: String!, translation: String): BiblePassage!
   }

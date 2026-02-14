@@ -354,6 +354,17 @@ export const GET_BIBLE_PASSAGE = gql`
       reference
       translation
       verseCount
+      copyright
+    }
+  }
+`;
+
+export const GET_BIBLE_VERSIONS = gql`
+  query GetBibleVersions {
+    bibleVersions {
+      id
+      abbreviation
+      title
     }
   }
 `;
