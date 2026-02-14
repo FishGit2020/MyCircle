@@ -14,6 +14,7 @@ Lessons learned from building MyCircle's Vite Module Federation architecture wit
 - [6. Event Bus Memory Leaks](#6-event-bus-memory-leaks)
 - [7. localStorage Key Collisions](#7-localstorage-key-collisions)
 - [8. Body Scroll Lock Conflicts](#8-body-scroll-lock-conflicts)
+- [9. Missing Test Aliases for New Remotes](#9-missing-test-aliases-for-new-remotes)
 - [Quick Reference](#quick-reference)
 
 ---
@@ -323,6 +324,70 @@ This works when only one modal can be open at a time. For multiple concurrent mo
 
 ---
 
+## 9. Missing Test Aliases for New Remotes
+
+**Severity: High** | **Files: `vitest.config.ts` (root), `packages/shell/vitest.config.ts`**
+
+### The Problem
+
+Module Federation remote imports (e.g., `import('babyTracker/BabyTracker')`) don't exist on disk — they're resolved at runtime by the federation plugin. During testing, Vitest uses `resolve.alias` entries to redirect these imports to local mock components.
+
+This project has **two** vitest configs that need these aliases:
+
+| Config | Used by | Command |
+|--------|---------|---------|
+| `vitest.config.ts` (root) | `pnpm test:run` | Runs all tests across the monorepo |
+| `packages/shell/vitest.config.ts` | `pnpm --filter @mycircle/shell test:run` | Runs only shell tests |
+
+The CI script `pnpm test:all` runs **both** (`pnpm test:run && pnpm test:mf`). If you add the alias to the shell config but forget the root config, shell tests pass locally via `pnpm test:mf` but fail in CI when the root config picks up `Layout.tsx`.
+
+### How It Manifests
+
+```
+Error: Failed to resolve import "babyTracker/BabyTracker" from
+  "packages/shell/src/components/Layout.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+```
+
+Tests pass locally with `pnpm --filter @mycircle/shell test:run` but fail in CI with `pnpm test:run`.
+
+### The Fix
+
+When adding a new MFE remote, update **both** configs and create a mock:
+
+1. **Create the mock** in `packages/shell/src/test/mocks/<Name>Mock.tsx`:
+
+```tsx
+export default function BabyTrackerMock() {
+  return <div data-testid="baby-tracker-mock">Baby Tracker</div>;
+}
+```
+
+2. **Add alias to shell config** (`packages/shell/vitest.config.ts`):
+
+```ts
+'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx'),
+```
+
+3. **Add alias to root config** (`vitest.config.ts`):
+
+```ts
+'babyTracker/BabyTracker': resolve(__dirname, './packages/shell/src/test/mocks/BabyTrackerMock.tsx'),
+```
+
+Note the path difference: the root config uses `./packages/shell/src/test/mocks/...` while the shell config uses `./src/test/mocks/...` (relative to each config's location).
+
+### Checklist for Adding a New MFE
+
+- [ ] Create `packages/<name>/` with its own `vitest.config.ts`
+- [ ] Create mock at `packages/shell/src/test/mocks/<Name>Mock.tsx`
+- [ ] Add alias to `packages/shell/vitest.config.ts`
+- [ ] Add alias to root `vitest.config.ts`
+- [ ] Add route entry to `Layout.tsx` `ROUTE_MODULE_MAP`
+- [ ] Verify with `pnpm test:run` (root) — not just `pnpm --filter @mycircle/shell test:run`
+
+---
+
 ## Quick Reference
 
 | Pitfall | Root Cause | Fix | Severity |
@@ -335,3 +400,4 @@ This works when only one modal can be open at a time. For multiple concurrent mo
 | Event bus memory leaks | Missing `useEffect` cleanup | Always return unsubscribe in cleanup | Medium |
 | Storage key collisions | Shared `localStorage` | Single `StorageKeys` enum in shared package | Medium |
 | Body scroll lock conflicts | Multiple modals managing `overflow` | Ref-counting or shared hook | Low |
+| Missing test aliases | New remote added to shell but not root vitest config | Update both `vitest.config.ts` files + create mock | High |
