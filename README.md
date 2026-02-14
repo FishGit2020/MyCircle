@@ -659,7 +659,25 @@ pnpm test:e2e:emulator # Run emulator tests
 - Ensure remote MFEs are built: `pnpm run build:remotes`
 - In development, remotes are served via `preview` mode (pre-built)
 
-### Firebase Deployment Issues
+### Firebase Auth Issues
+
+**`auth/unauthorized-domain` on Google sign-in**
+- Verify `VITE_FIREBASE_API_KEY` in `packages/shell/.env` belongs to the correct Firebase project
+- Test with: `curl "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig?key=YOUR_KEY"` — the response should show `mycircle-dash` authorized domains
+- If the key belongs to a different project, update it in `packages/shell/.env` and the `VITE_FIREBASE_API_KEY` GitHub secret, then redeploy
+- Also verify the domain is listed in Firebase Console → Authentication → Settings → Authorized domains
+
+**Firebase features not working locally**
+- Ensure `packages/shell/.env` has valid `VITE_FIREBASE_*` values
+- Firebase is optional — the app runs without it (auth disabled)
+
+### Cloud Functions / API Issues
+
+**API returning 401 (e.g., weather, stocks)**
+- Check for trailing whitespace/newlines in Firebase secrets: `firebase functions:secrets:access SECRET_NAME | xxd | tail -3`
+- If trailing bytes are present, re-set the secret cleanly: `printf 'your-key-value' | firebase functions:secrets:set SECRET_NAME --data-file=-`
+- After updating a secret, **redeploy the affected functions**: `firebase deploy --only functions --force`
+- Running function instances cache secrets — they won't pick up new secret versions until redeployed
 
 **Cloud Functions timeout during deployment**
 - Ensure lazy initialization pattern in `functions/src/index.ts`
@@ -669,9 +687,12 @@ pnpm test:e2e:emulator # Run emulator tests
 - Verify secrets are set: `firebase functions:secrets:access OPENWEATHER_API_KEY`
 - Check function config includes the secret in its `secrets` array
 
-**Firebase features not working locally**
-- Ensure `packages/shell/.env` has valid `VITE_FIREBASE_*` values
-- Firebase is optional — the app runs without it (auth disabled)
+### Deploy Pipeline Issues
+
+**403 IAM permission errors in GitHub Actions deploy**
+- The WIF service account needs specific IAM roles — see [deploy troubleshooting in cicd.md](docs/cicd.md#deploy-troubleshooting)
+- Common missing roles: Cloud Scheduler Admin, Secret Manager Viewer, Service Account User
+- Quick workaround: deploy locally with `pnpm firebase:deploy` (uses your personal Firebase credentials)
 
 ## License
 
