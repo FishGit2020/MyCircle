@@ -23,12 +23,16 @@ const mockRequestPermission = vi.fn();
 const mockOnForegroundMessage = vi.fn(() => () => {});
 const mockSubscribeToWeatherAlerts = vi.fn().mockResolvedValue(true);
 const mockUnsubscribeFromWeatherAlerts = vi.fn().mockResolvedValue(true);
+const mockSubscribeToTopic = vi.fn().mockResolvedValue(true);
+const mockUnsubscribeFromTopic = vi.fn().mockResolvedValue(true);
 
 vi.mock('../lib/messaging', () => ({
   requestNotificationPermission: () => mockRequestPermission(),
   onForegroundMessage: (...args: unknown[]) => mockOnForegroundMessage(...args),
   subscribeToWeatherAlerts: (...args: unknown[]) => mockSubscribeToWeatherAlerts(...args),
   unsubscribeFromWeatherAlerts: (...args: unknown[]) => mockUnsubscribeFromWeatherAlerts(...args),
+  subscribeToTopic: (...args: unknown[]) => mockSubscribeToTopic(...args),
+  unsubscribeFromTopic: (...args: unknown[]) => mockUnsubscribeFromTopic(...args),
 }));
 
 import NotificationBell from './NotificationBell';
@@ -100,11 +104,11 @@ describe('NotificationBell', () => {
 
   // ── Toggle switches ───────────────────────────────────────────────────────
 
-  it('shows three notification toggle switches in the panel', () => {
+  it('shows four notification toggle switches in the panel', () => {
     render(<NotificationBell />);
     openPanel();
     const switches = screen.getAllByRole('switch');
-    expect(switches).toHaveLength(3);
+    expect(switches).toHaveLength(4);
   });
 
   it('all toggles are off by default (aria-checked=false)', () => {
@@ -121,6 +125,7 @@ describe('NotificationBell', () => {
     expect(screen.getByText('notifications.weatherAlerts')).toBeInTheDocument();
     expect(screen.getByText('notifications.stockAlerts')).toBeInTheDocument();
     expect(screen.getByText('notifications.podcastAlerts')).toBeInTheDocument();
+    expect(screen.getByText('notifications.announcementAlerts')).toBeInTheDocument();
   });
 
   it('displays descriptions for each notification category', () => {
@@ -129,6 +134,7 @@ describe('NotificationBell', () => {
     expect(screen.getByText('notifications.weatherAlertsDesc')).toBeInTheDocument();
     expect(screen.getByText('notifications.stockAlertsDesc')).toBeInTheDocument();
     expect(screen.getByText('notifications.podcastAlertsDesc')).toBeInTheDocument();
+    expect(screen.getByText('notifications.announcementAlertsDesc')).toBeInTheDocument();
   });
 
   // ── Weather toggle ────────────────────────────────────────────────────────
@@ -233,6 +239,7 @@ describe('NotificationBell', () => {
     expect(switches[0]).toHaveAttribute('aria-checked', 'true');  // weather
     expect(switches[1]).toHaveAttribute('aria-checked', 'true');  // stock
     expect(switches[2]).toHaveAttribute('aria-checked', 'false'); // podcast
+    expect(switches[3]).toHaveAttribute('aria-checked', 'false'); // announcement
   });
 
   // ── Active indicator ──────────────────────────────────────────────────────
@@ -267,5 +274,59 @@ describe('NotificationBell', () => {
       expect(stockSwitch).toHaveAttribute('aria-checked', 'false');
       expect(localStorage.getItem('stock-alerts-enabled')).toBe('false');
     });
+  });
+
+  // ── Announcement toggle ────────────────────────────────────────────────
+
+  it('enables announcement alerts and calls subscribeToTopic', async () => {
+    mockRequestPermission.mockResolvedValue('fake-token');
+
+    render(<NotificationBell />);
+    openPanel();
+    const announcementSwitch = screen.getAllByRole('switch')[3];
+    await act(async () => { fireEvent.click(announcementSwitch); });
+
+    await waitFor(() => {
+      expect(announcementSwitch).toHaveAttribute('aria-checked', 'true');
+      expect(mockSubscribeToTopic).toHaveBeenCalledWith('fake-token', 'announcements');
+    });
+  });
+
+  it('persists announcement alert state to localStorage', async () => {
+    mockRequestPermission.mockResolvedValue('fake-token');
+
+    render(<NotificationBell />);
+    openPanel();
+    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[3]); });
+
+    await waitFor(() => {
+      expect(localStorage.getItem('announcement-alerts-enabled')).toBe('true');
+    });
+  });
+
+  it('disables announcement alerts and calls unsubscribeFromTopic', async () => {
+    localStorage.setItem('announcement-alerts-enabled', 'true');
+    mockRequestPermission.mockResolvedValue('fake-token');
+
+    await act(async () => { render(<NotificationBell />); });
+    openPanel();
+    const announcementSwitch = screen.getAllByRole('switch')[3];
+    expect(announcementSwitch).toHaveAttribute('aria-checked', 'true');
+
+    await act(async () => { fireEvent.click(announcementSwitch); });
+
+    await waitFor(() => {
+      expect(announcementSwitch).toHaveAttribute('aria-checked', 'false');
+      expect(localStorage.getItem('announcement-alerts-enabled')).toBe('false');
+    });
+  });
+
+  it('reads initial announcement enabled state from localStorage', () => {
+    localStorage.setItem('announcement-alerts-enabled', 'true');
+
+    render(<NotificationBell />);
+    openPanel();
+    const switches = screen.getAllByRole('switch');
+    expect(switches[3]).toHaveAttribute('aria-checked', 'true');
   });
 });

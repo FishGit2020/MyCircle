@@ -96,3 +96,35 @@ export async function unsubscribeFromWeatherAlerts(token: string): Promise<boole
     return false;
   }
 }
+
+/**
+ * Subscribe an FCM token to a topic via the `manageTopicSubscription` Cloud Function.
+ */
+export async function subscribeToTopic(token: string, topic: string): Promise<boolean> {
+  if (!app) return false;
+  try {
+    const functions = getFunctions(app);
+    const manageFn = httpsCallable(functions, 'manageTopicSubscription');
+    await manageFn({ token, topic, subscribe: true });
+    return true;
+  } catch (err) {
+    console.error(`Failed to subscribe to topic ${topic}:`, err);
+    return false;
+  }
+}
+
+/**
+ * Unsubscribe an FCM token from a topic via the `manageTopicSubscription` Cloud Function.
+ */
+export async function unsubscribeFromTopic(token: string, topic: string): Promise<boolean> {
+  if (!app) return false;
+  try {
+    const functions = getFunctions(app);
+    const manageFn = httpsCallable(functions, 'manageTopicSubscription');
+    await manageFn({ token, topic, subscribe: false });
+    return true;
+  } catch (err) {
+    console.error(`Failed to unsubscribe from topic ${topic}:`, err);
+    return false;
+  }
+}
