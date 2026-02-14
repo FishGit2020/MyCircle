@@ -56,6 +56,10 @@
         "destination": "/notebook/index.html"
       },
       {
+        "source": "/baby-tracker/**",
+        "destination": "/baby-tracker/index.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

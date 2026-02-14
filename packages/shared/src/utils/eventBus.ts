@@ -25,6 +25,7 @@ export const WindowEvents = {
   SUBSCRIPTIONS_CHANGED: 'subscriptions-changed',
   WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
   NOTEBOOK_CHANGED: 'notebook-changed',
+  BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -53,6 +54,7 @@ export const StorageKeys = {
   LAST_SEEN_ANNOUNCEMENT: 'last-seen-announcement',
   BIBLE_TRANSLATION: 'bible-translation',
   NOTEBOOK_CACHE: 'notebook-cache',
+  BABY_DUE_DATE: 'baby-due-date',
 } as const;
 
 export interface CitySelectedEvent {

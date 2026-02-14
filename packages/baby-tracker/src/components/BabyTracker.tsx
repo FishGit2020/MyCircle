@@ -1,0 +1,297 @@
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
+import { getGrowthDataForWeek, getTrimester } from '../data/babyGrowthData';
+import { pregnancyVerses } from '../data/pregnancyVerses';
+
+function getRandomVerseIndex(): number {
+  return Math.floor(Math.random() * pregnancyVerses.length);
+}
+
+function calculateGestationalWeek(dueDateStr: string): number {
+  const dueDate = new Date(dueDateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  const weeksUntilDue = (dueDate.getTime() - today.getTime()) / msPerWeek;
+  return Math.round((40 - weeksUntilDue) * 10) / 10;
+}
+
+function getWeeksRemaining(dueDateStr: string): number {
+  const dueDate = new Date(dueDateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  return Math.ceil((dueDate.getTime() - today.getTime()) / msPerWeek);
+}
+
+// Heart SVG icon used throughout the component
+function HeartIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </svg>
+  );
+}
+
+export default function BabyTracker() {
+  const { t } = useTranslation();
+  const [dueDate, setDueDate] = useState<string>('');
+  const [inputDate, setInputDate] = useState<string>('');
+  const [verseIndex, setVerseIndex] = useState(getRandomVerseIndex);
+
+  // Load due date from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
+    if (stored) {
+      setDueDate(stored);
+      setInputDate(stored);
+    }
+  }, []);
+
+  // Listen for external changes (e.g., Firestore restore on sign-in)
+  useEffect(() => {
+    function handleDueDateChanged() {
+      const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
+      if (stored) {
+        setDueDate(stored);
+        setInputDate(stored);
+      } else {
+        setDueDate('');
+        setInputDate('');
+      }
+    }
+    window.addEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleDueDateChanged);
+    return () => window.removeEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleDueDateChanged);
+  }, []);
+
+  const saveDueDate = useCallback(() => {
+    if (!inputDate) return;
+    localStorage.setItem(StorageKeys.BABY_DUE_DATE, inputDate);
+    setDueDate(inputDate);
+    window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+  }, [inputDate]);
+
+  const clearDueDate = useCallback(() => {
+    localStorage.removeItem(StorageKeys.BABY_DUE_DATE);
+    setDueDate('');
+    setInputDate('');
+    window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+  }, []);
+
+  const shuffleVerse = useCallback(() => {
+    setVerseIndex(prev => {
+      let next = getRandomVerseIndex();
+      while (next === prev && pregnancyVerses.length > 1) {
+        next = getRandomVerseIndex();
+      }
+      return next;
+    });
+  }, []);
+
+  const verse = pregnancyVerses[verseIndex];
+
+  // Computed pregnancy state
+  const gestationalWeek = useMemo(() => {
+    if (!dueDate) return null;
+    return calculateGestationalWeek(dueDate);
+  }, [dueDate]);
+
+  const currentWeek = gestationalWeek !== null ? Math.floor(gestationalWeek) : null;
+  const weeksRemaining = dueDate ? getWeeksRemaining(dueDate) : null;
+
+  const growthData = currentWeek !== null ? getGrowthDataForWeek(Math.min(Math.max(currentWeek, 1), 40)) : null;
+  const trimester = currentWeek !== null && currentWeek >= 1 && currentWeek <= 40 ? getTrimester(currentWeek) : null;
+  const progressPercent = currentWeek !== null ? Math.min(Math.max((currentWeek / 40) * 100, 0), 100) : 0;
+
+  const trimesterLabel = trimester === 1 ? t('baby.trimester1')
+    : trimester === 2 ? t('baby.trimester2')
+    : trimester === 3 ? t('baby.trimester3')
+    : '';
+
+  // Determine edge case states
+  const isPastDue = weeksRemaining !== null && weeksRemaining < 0;
+  const isDueToday = weeksRemaining === 0;
+  const isNotPregnantYet = currentWeek !== null && currentWeek < 0;
+  const isValidPregnancy = currentWeek !== null && currentWeek >= 1 && currentWeek <= 40;
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2">
+          <HeartIcon className="w-6 h-6 text-pink-500" />
+          {t('baby.title')}
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">{t('baby.subtitle')}</p>
+      </div>
+
+      {/* Verse Section */}
+      <section className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-5 border border-pink-200 dark:border-pink-800">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1">
+            <p className="text-pink-800 dark:text-pink-200 italic leading-relaxed">
+              &ldquo;{verse.text}&rdquo;
+            </p>
+            <p className="text-pink-600 dark:text-pink-400 text-sm font-semibold mt-2">
+              — {verse.reference}
+            </p>
+          </div>
+          <button
+            onClick={shuffleVerse}
+            className="shrink-0 p-2 rounded-lg text-pink-500 hover:bg-pink-100 dark:hover:bg-pink-800/40 transition-colors"
+            aria-label={t('baby.shuffleVerse')}
+            title={t('baby.shuffleVerse')}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      {/* Due Date Input */}
+      <section className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+          {t('baby.dueDate')}
+        </h2>
+        <div className="flex items-center gap-3">
+          <input
+            type="date"
+            value={inputDate}
+            onChange={(e) => setInputDate(e.target.value)}
+            className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none"
+            aria-label={t('baby.dueDate')}
+          />
+          <button
+            onClick={saveDueDate}
+            disabled={!inputDate}
+            className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+          >
+            {t('baby.save')}
+          </button>
+          {dueDate && (
+            <button
+              onClick={clearDueDate}
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors font-medium"
+            >
+              {t('baby.clear')}
+            </button>
+          )}
+        </div>
+      </section>
+
+      {/* Growth Display */}
+      {!dueDate && (
+        <section className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-8 text-center border border-gray-200 dark:border-gray-700">
+          <HeartIcon className="w-12 h-12 text-pink-300 dark:text-pink-700 mx-auto mb-3" />
+          <p className="text-gray-500 dark:text-gray-400">{t('baby.noDueDate')}</p>
+        </section>
+      )}
+
+      {isNotPregnantYet && (
+        <section className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-5 border border-yellow-200 dark:border-yellow-800">
+          <p className="text-yellow-700 dark:text-yellow-300 text-center">{t('baby.notPregnantYet')}</p>
+        </section>
+      )}
+
+      {(isPastDue || isDueToday) && (
+        <section className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-5 border border-pink-200 dark:border-pink-800 text-center">
+          <div className="text-4xl mb-2">🎉</div>
+          <p className="text-pink-700 dark:text-pink-300 font-semibold text-lg">
+            {isDueToday ? t('baby.dueToday') : t('baby.congratulations')}
+          </p>
+          {isPastDue && weeksRemaining !== null && (
+            <p className="text-pink-600 dark:text-pink-400 text-sm mt-1">
+              {Math.abs(weeksRemaining)} {t('baby.weeksPast')}
+            </p>
+          )}
+        </section>
+      )}
+
+      {isValidPregnancy && growthData && (
+        <section className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm space-y-5">
+          {/* Week + Trimester Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+                {t('baby.week')} {currentWeek}
+              </span>
+              <span className="text-gray-400 dark:text-gray-500 mx-2">·</span>
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                {trimesterLabel}
+              </span>
+            </div>
+            {weeksRemaining !== null && weeksRemaining > 0 && (
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {weeksRemaining} {t('baby.weeksRemaining')}
+              </span>
+            )}
+          </div>
+
+          {/* Progress Bar */}
+          <div>
+            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <span>{t('baby.progress')}</span>
+              <span>{Math.round(progressPercent)}%</span>
+            </div>
+            <div
+              className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={Math.round(progressPercent)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={t('baby.progress')}
+            >
+              <div
+                className="h-full bg-gradient-to-r from-pink-400 to-pink-600 rounded-full transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            {/* Trimester markers */}
+            <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500 mt-1 px-0.5">
+              <span>T1</span>
+              <span>T2</span>
+              <span>T3</span>
+            </div>
+          </div>
+
+          {/* Fruit Comparison */}
+          <div className="text-center py-4 bg-pink-50 dark:bg-pink-900/10 rounded-lg">
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
+              {t('baby.size')}
+            </p>
+            <p className="text-2xl font-bold text-pink-600 dark:text-pink-400 capitalize">
+              {growthData.fruit}
+            </p>
+          </div>
+
+          {/* Length & Weight */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                {t('baby.length')}
+              </p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+                {growthData.lengthCm} cm
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                ({growthData.lengthIn} in)
+              </p>
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                {t('baby.weight')}
+              </p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+                {growthData.weightG >= 1000 ? `${(growthData.weightG / 1000).toFixed(1)} kg` : `${growthData.weightG} g`}
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                ({growthData.weightOz >= 16 ? `${(growthData.weightOz / 16).toFixed(1)} lb` : `${growthData.weightOz} oz`})
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
