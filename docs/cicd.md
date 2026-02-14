@@ -29,7 +29,7 @@ MyCircle uses **GitHub Actions** for continuous integration, end-to-end testing,
 
   Both CI + E2E pass → PR can be merged (squash)
 
-  PR merged → push to main
+  PR merged → push to main                       ⬚ Skipped if only docs/tests changed
        │
        └──► Deploy  (deploy.yml)
              ├─ pnpm install --frozen-lockfile
@@ -46,20 +46,26 @@ MyCircle uses **GitHub Actions** for continuous integration, end-to-end testing,
 
 ## Path Filters
 
-CI and E2E workflows skip when a PR only changes non-code files:
+All three workflow types (CI, E2E, Deploy) skip when a push only changes non-app files:
 
 ```yaml
+# Common to CI, E2E, and Deploy
 paths-ignore:
   - '**.md'
   - 'docs/**'
   - 'LICENSE'
   - '.gitignore'
   - '.vscode/**'
+
+# Deploy also skips for test-only infrastructure
+  - '.env.emulator'
+  - 'e2e/**'
+  - 'playwright*.config.ts'
+  - 'scripts/mock-api-server.mjs'
+  - 'scripts/seed-firestore.mjs'
 ```
 
-If a PR touches both docs and code, the workflows still run.
-
-The Deploy workflow runs on **every** push to main regardless of paths.
+If a push touches both docs and code, the workflows still run.
 
 ---
 

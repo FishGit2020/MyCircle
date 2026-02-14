@@ -3,6 +3,17 @@ name: Deploy
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.vscode/**'
+      - '.env.emulator'
+      - 'e2e/**'
+      - 'playwright*.config.ts'
+      - 'scripts/mock-api-server.mjs'
+      - 'scripts/seed-firestore.mjs'
 
 permissions:
   contents: read
