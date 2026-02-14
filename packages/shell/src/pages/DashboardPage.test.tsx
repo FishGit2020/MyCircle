@@ -3,15 +3,12 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import DashboardPage from './DashboardPage';
 
-// Mock @mycircle/shared — useTranslation (identity) + Apollo hooks for useDailyVerse + daily verse utils
+// Mock @mycircle/shared — useTranslation (identity) + getDailyVerse (hardcoded) + StorageKeys
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-  // useDailyVerse calls useQuery(GET_BIBLE_VOTD) to fetch the verse of the day
-  useQuery: () => ({ data: null, loading: false, error: null }),
-  GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
-  getAllDailyVerses: () => [{ text: 'Test verse', reference: 'Test 1:1' }],
+  getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',

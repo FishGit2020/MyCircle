@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, getDailyVerse } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
-import { useDailyVerse } from '../hooks/useDailyVerse';
 import WidgetDashboard from '../components/WidgetDashboard';
 
 function getWatchlist(): Array<{ symbol: string; companyName: string }> {
@@ -76,7 +75,7 @@ export default function DashboardPage() {
   const subscribedIds = getSubscribedIds();
   const worshipSongCount = getWorshipSongCount();
   const notebookCount = getNotebookCount();
-  const { verse, shuffleVerse, loading: verseLoading } = useDailyVerse();
+  const verse = getDailyVerse();
 
   return (
     <div className="space-y-8">
@@ -91,23 +90,12 @@ export default function DashboardPage() {
         {/* Daily Bible verse */}
         <div className="max-w-lg mx-auto">
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
-            {verseLoading ? (
-              <div className="h-4 bg-blue-200 dark:bg-blue-800/40 rounded animate-pulse w-3/4 mx-auto" />
-            ) : (
-              <>
-                <p className="text-sm italic text-blue-600 dark:text-blue-400">
-                  &ldquo;{verse.text}&rdquo;
-                </p>
-                <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
-                  — {verse.reference}{verse.version ? ` (${verse.version})` : ''}
-                </p>
-                {verse.copyright && (
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
-                    {verse.copyright}
-                  </p>
-                )}
-              </>
-            )}
+            <p className="text-sm italic text-blue-600 dark:text-blue-400">
+              &ldquo;{verse.text}&rdquo;
+            </p>
+            <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
+              — {verse.reference}
+            </p>
           </div>
         </div>
       </section>

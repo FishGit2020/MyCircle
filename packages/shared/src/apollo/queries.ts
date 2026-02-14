@@ -347,6 +347,17 @@ export const GET_BIBLE_VOTD = gql`
   }
 `;
 
+export const GET_BIBLE_VOTD_API = gql`
+  query GetBibleVotdApi($day: Int!) {
+    bibleVotdApi(day: $day) {
+      text
+      reference
+      translation
+      copyright
+    }
+  }
+`;
+
 export const GET_BIBLE_PASSAGE = gql`
   query GetBiblePassage($reference: String!, $translation: String) {
     biblePassage(reference: $reference, translation: $translation) {

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useQuery, GET_BIBLE_VOTD, getAllDailyVerses } from '@mycircle/shared';
+import { useQuery, GET_BIBLE_VOTD_API, getAllDailyVerses } from '@mycircle/shared';
 import type { DailyVerse } from '@mycircle/shared';
 
 export type { DailyVerse };
@@ -10,8 +10,8 @@ function getDayOfYear(): number {
   return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-interface VotdResponse {
-  bibleVotd: {
+interface VotdApiResponse {
+  bibleVotdApi: {
     text: string;
     reference: string;
     translation: string | null;
@@ -23,18 +23,18 @@ export function useDailyVerse() {
   const allVerses = getAllDailyVerses();
   const day = getDayOfYear();
 
-  // Always fetch VOTD via GraphQL (day-based)
-  const { data, loading } = useQuery<VotdResponse>(GET_BIBLE_VOTD, {
+  // Fetch VOTD from YouVersion API (same source as Bible Reader)
+  const { data, loading } = useQuery<VotdApiResponse>(GET_BIBLE_VOTD_API, {
     variables: { day },
     fetchPolicy: 'cache-first',
   });
 
-  const votd: DailyVerse | null = data?.bibleVotd
+  const votd: DailyVerse | null = data?.bibleVotdApi
     ? {
-        text: data.bibleVotd.text,
-        reference: data.bibleVotd.reference,
-        version: data.bibleVotd.translation || undefined,
-        copyright: data.bibleVotd.copyright || undefined,
+        text: data.bibleVotdApi.text,
+        reference: data.bibleVotdApi.reference,
+        version: data.bibleVotdApi.translation || undefined,
+        copyright: data.bibleVotdApi.copyright || undefined,
       }
     : null;
 

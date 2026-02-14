@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useQuery, useLazyQuery, GET_BIBLE_VOTD, GET_BIBLE_PASSAGE, GET_BIBLE_VERSIONS } from '@mycircle/shared';
+import { useQuery, useLazyQuery, GET_BIBLE_VOTD_API, GET_BIBLE_PASSAGE, GET_BIBLE_VERSIONS } from '@mycircle/shared';
 
 // --- Types ---
 
@@ -24,8 +24,8 @@ export interface BibleVersion {
   title: string;
 }
 
-interface VotdResponse {
-  bibleVotd: BibleVerse;
+interface VotdApiResponse {
+  bibleVotdApi: BibleVerse;
 }
 
 interface PassageResponse {
@@ -68,16 +68,16 @@ function getDayOfYear(): number {
   return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-/** Hook to get the Verse of the Day via GraphQL */
+/** Hook to get the Verse of the Day via YouVersion API */
 export function useVotd() {
   const day = getDayOfYear();
-  const { data, loading, error } = useQuery<VotdResponse>(GET_BIBLE_VOTD, {
+  const { data, loading, error } = useQuery<VotdApiResponse>(GET_BIBLE_VOTD_API, {
     variables: { day },
     fetchPolicy: 'cache-first',
   });
 
   return {
-    verse: data?.bibleVotd ?? null,
+    verse: data?.bibleVotdApi ?? null,
     loading,
     error,
   };

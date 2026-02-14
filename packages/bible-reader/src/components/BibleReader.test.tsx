@@ -12,7 +12,7 @@ vi.mock('@mycircle/shared', () => ({
   }),
   useQuery: vi.fn(),
   useLazyQuery: vi.fn(),
-  GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
+  GET_BIBLE_VOTD_API: { kind: 'Document', definitions: [] },
   GET_BIBLE_PASSAGE: { kind: 'Document', definitions: [] },
   GET_BIBLE_VERSIONS: { kind: 'Document', definitions: [] },
   StorageKeys: {
