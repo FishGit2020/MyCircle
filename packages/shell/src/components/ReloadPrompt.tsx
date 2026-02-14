@@ -20,14 +20,14 @@ export default function ReloadPrompt() {
   return (
     <div
       role="alert"
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg bg-blue-600 text-white text-sm max-w-md"
+      className="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg bg-blue-600 text-white text-sm max-w-md"
     >
       <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
       </svg>
       <span className="flex-1">{t('pwa.newVersion')}</span>
       <button
-        onClick={() => updateServiceWorker()}
+        onClick={() => updateServiceWorker(true)}
         className="px-3 py-1 rounded bg-white text-blue-600 font-medium hover:bg-blue-50 transition"
       >
         {t('pwa.reload')}
