@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('City Search Autocomplete with Recents', () => {
   test.beforeEach(async ({ page }) => {
