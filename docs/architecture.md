@@ -60,7 +60,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **Frontend** | React 18, TypeScript, Tailwind CSS |
 | **Build** | Vite 5, Module Federation |
 | **API** | Apollo Server 5, GraphQL |
-| **Data Sources** | OpenWeather API (weather + air pollution), Open-Meteo Archive API, Finnhub API, CoinGecko API (crypto), PodcastIndex API, Google Gemini |
+| **Data Sources** | OpenWeather API (weather + air pollution), Open-Meteo Archive API, Finnhub API, CoinGecko API (crypto), PodcastIndex API, Google Gemini, [YouVersion API](https://developers.youversion.com/api/bibles) (Bible) |
 | **Hosting** | Firebase Hosting + Cloud Functions |
 | **Auth** | Firebase Auth (Google OAuth) |
 | **Database** | Cloud Firestore (user profiles, favorites, preferences) |
@@ -235,8 +235,10 @@ Exposes `BibleReader` component via Module Federation.
 **Key Behavior:**
 - Browse all 66 canonical Bible books (Old & New Testament) with search/filter
 - Chapter grid navigation with previous/next chapter controls
+- **Dynamic Bible versions**: 19+ English translations (KJV, NIV, AMP, NASB, etc.) fetched from YouVersion API via `bibleVersions` GraphQL query (24hr server-side cache)
 - Verse of the Day via GraphQL (`bibleVotd` query) cached by day-of-year
-- Passage reading with font size adjustment (5 levels, persisted via `StorageKeys.BIBLE_FONT_SIZE`)
+- Passage reading via YouVersion API (`biblePassage` query with USFM reference conversion), with copyright display
+- Font size adjustment (5 levels, persisted via `StorageKeys.BIBLE_FONT_SIZE`)
 - Bookmark system (create/remove, stored in `StorageKeys.BIBLE_BOOKMARKS`)
 - Copy passage text to clipboard
 - **Community notes**: Collapsible notes panel per passage (`book:chapter` key). Auto-saved to `StorageKeys.BIBLE_NOTES` with 800ms debounce. Notes are loaded when navigating to a passage and cleared preview shown in collapsed state.
@@ -514,7 +516,7 @@ interface Note {
 | `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle |
 | `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle |
 | `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
-| `'bible-translation'` | Bible version ID (e.g., `'kjv'`) | Selected Bible version for passage reading |
+| `'bible-translation'` | Bible version ID (e.g., `'1'` for KJV, `'111'` for NIV) | Selected YouVersion Bible version for passage reading |
 | `'notebook-cache'` | JSON `{ count: number }` | Notebook note count for dashboard widget |
 
 ### Browser SessionStorage — Geolocation
@@ -925,7 +927,7 @@ All external API base URLs are configurable via environment variables (defaults 
 
 ```
 OPENWEATHER_BASE_URL, FINNHUB_BASE_URL, COINGECKO_BASE_URL,
-PODCASTINDEX_BASE_URL, BIBLE_API_BASE_URL, OPEN_METEO_BASE_URL
+PODCASTINDEX_BASE_URL, YOUVERSION_API_BASE_URL, OPEN_METEO_BASE_URL
 ```
 
 This is used by the emulator testing infrastructure (`.env.emulator`) to redirect API calls to a local mock server on port 4000.

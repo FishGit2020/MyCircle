@@ -80,13 +80,15 @@ async function getServer() {
       const finnhubKey = process.env.FINNHUB_API_KEY || '';
       const podcastApiKey = process.env.PODCASTINDEX_API_KEY || '';
       const podcastApiSecret = process.env.PODCASTINDEX_API_SECRET || '';
+      const youversionKey = process.env.YOUVERSION_APP_KEY || '';
 
       const schema = makeExecutableSchema({
         typeDefs,
         resolvers: createResolvers(
           () => apiKey,
           () => finnhubKey,
-          () => ({ apiKey: podcastApiKey, apiSecret: podcastApiSecret })
+          () => ({ apiKey: podcastApiKey, apiSecret: podcastApiSecret }),
+          () => youversionKey
         )
       });
 
@@ -109,7 +111,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 60,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET']
+    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY']
   },
   async (req: Request, res: Response) => {
     const server = await getServer();

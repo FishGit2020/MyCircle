@@ -53,11 +53,12 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 ### Bible Reader
 - Browse all 66 canonical books (Old & New Testament)
 - Chapter selection grid and passage reading
-- **Bible version selector** — switch between WEB, KJV, BBE, OEB, Clementine (Latin), and Almeida (Portuguese) translations with localStorage persistence
-- Verse of the Day (bible-api.com)
+- **Dynamic Bible version selector** — 19+ English translations (KJV, NIV, AMP, NASB, etc.) fetched from YouVersion API with localStorage persistence
+- Verse of the Day
 - Font size adjustment (14-22px) with persistence
 - Bookmarks with localStorage persistence
 - Copy passage text to clipboard
+- Copyright notice display for licensed translations
 - **Community notes** — personal notes per passage (book + chapter), auto-saved with debounce to localStorage, collapsible notes panel with saved indicator
 - **Daily devotional** — curated 30-entry reading plan cycled by day-of-year, with themed passage and "Read Passage" button, completion tracking (green checkmark persisted in localStorage, 90-day rolling window)
 
@@ -610,7 +611,7 @@ These are only used when running Firebase emulators with the mock API server (se
 | `FINNHUB_BASE_URL` | `https://finnhub.io` | Redirect to mock server |
 | `COINGECKO_BASE_URL` | `https://api.coingecko.com` | Redirect to mock server |
 | `PODCASTINDEX_BASE_URL` | `https://api.podcastindex.org` | Redirect to mock server |
-| `BIBLE_API_BASE_URL` | `https://bible-api.com` | Redirect to mock server |
+| `YOUVERSION_API_BASE_URL` | `https://api.youversion.com/v1` | Redirect to mock server |
 | `OPEN_METEO_BASE_URL` | `https://archive-api.open-meteo.com` | Redirect to mock server |
 | `FIRESTORE_EMULATOR_HOST` | — | `localhost:8080` |
 | `FIREBASE_AUTH_EMULATOR_HOST` | — | `localhost:9099` |

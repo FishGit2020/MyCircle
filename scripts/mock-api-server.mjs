@@ -168,14 +168,24 @@ const podcastEpisodesResponse = {
   })),
 };
 
-// ─── Bible API Mock Data ──────────────────────────────────────────
+// ─── YouVersion Bible API Mock Data ───────────────────────────────
+
+const bibleBiblesResponse = {
+  data: [
+    { id: 1, abbreviation: 'KJV', title: 'King James Version' },
+    { id: 111, abbreviation: 'NIV', title: 'New International Version' },
+    { id: 1588, abbreviation: 'AMP', title: 'Amplified Bible' },
+    { id: 12, abbreviation: 'ASV', title: 'American Standard Version' },
+    { id: 100, abbreviation: 'NASB1995', title: 'New American Standard Bible 1995' },
+  ],
+};
 
 const biblePassageResponse = {
   reference: 'John 3:16',
-  text: 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.\n',
-  translation_id: 'web',
-  translation_name: 'World English Bible',
-  verses: [{ book_name: 'John', chapter: 3, verse: 16, text: 'For God so loved the world...' }],
+  content: 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.\n',
+  bible_abbreviation: 'KJV',
+  verse_count: 1,
+  copyright: null,
 };
 
 // ─── Open-Meteo Mock Data ─────────────────────────────────────────
@@ -248,14 +258,18 @@ app.get('/api/1.0/episodes/byfeedid', (req, res) => {
   res.json(podcastEpisodesResponse);
 });
 
-// Bible API — catch-all for /:reference
+// Open-Meteo Historical
 app.get('/v1/archive', (req, res) => {
   res.json(historicalWeatherResponse);
 });
 
-// Bible API — must be last to avoid matching other routes
-app.get('/:reference', (req, res) => {
-  const ref = decodeURIComponent(req.params.reference);
+// YouVersion Bible API
+app.get('/v1/bibles', (req, res) => {
+  res.json(bibleBiblesResponse);
+});
+
+app.get('/v1/bibles/:id/passages/:passageId', (req, res) => {
+  const ref = decodeURIComponent(req.params.passageId);
   res.json({ ...biblePassageResponse, reference: ref });
 });
 
