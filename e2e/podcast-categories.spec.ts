@@ -44,7 +44,7 @@ test.describe('Podcast Categories', () => {
   test('podcast cards display category badges', async ({ page }) => {
     // Category badges should be visible on cards (purple chips)
     // Trending Show 1 has "Technology, Science"
-    const card = page.getByRole('button', { name: /Trending Show 1/ });
+    const card = page.getByRole('button', { name: /Trending Show 1/ }).first();
     await expect(card).toBeVisible();
 
     // The card should contain category badge text

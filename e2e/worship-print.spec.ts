@@ -5,8 +5,8 @@ test.describe('Worship Songs — Print', () => {
     // Navigate to worship songs page
     await page.goto('/worship');
 
-    // Wait for the page to load
-    await page.waitForLoadState('networkidle');
+    // Wait for the page to fully render
+    await page.waitForSelector('h1', { timeout: 15_000 });
 
     // Check if there are any songs displayed; if a song viewer is available, test print
     const printCalled = await page.evaluate(() => {

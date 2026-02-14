@@ -524,10 +524,30 @@ async function dismissOnboarding(page: Page) {
   });
 }
 
+/**
+ * Mock Firebase auth so micro-frontends that check `__getFirebaseIdToken`
+ * (e.g. PodcastPlayer's subscriptions tab) treat the user as authenticated.
+ *
+ * Uses a getter so the mock value persists even after the shell's firebase.ts
+ * overwrites the property with the real implementation (which returns null
+ * because there's no actual Firebase user in E2E tests).
+ */
+async function mockFirebaseAuth(page: Page) {
+  await page.addInitScript(() => {
+    const mockFn = () => Promise.resolve('mock-token');
+    Object.defineProperty(window, '__getFirebaseIdToken', {
+      get: () => mockFn,
+      set: () => { /* silently ignore overwrites from firebase.ts */ },
+      configurable: true,
+    });
+  });
+}
+
 /** Extended test fixture that sets up all API mocks for every test. */
 export const test = base.extend<{ mockApi: void }>({
   mockApi: [async ({ page }, use) => {
     await dismissOnboarding(page);
+    await mockFirebaseAuth(page);
     await mockGraphQL(page);
     await mockStockAPI(page);
     await mockPodcastAPI(page);

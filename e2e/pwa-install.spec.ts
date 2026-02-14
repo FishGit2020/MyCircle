@@ -12,7 +12,7 @@ test.describe('PWA Install Prompt', () => {
   test('shows install banner when beforeinstallprompt fires', async ({ page }) => {
     await page.goto('/');
     // Wait for React app to mount so PwaInstallPrompt event listener is registered
-    await page.waitForSelector('input[role="combobox"]', { timeout: 15_000 });
+    await page.waitForSelector('h2', { timeout: 15_000 });
 
     // Simulate beforeinstallprompt event
     await page.evaluate(() => {
@@ -30,7 +30,7 @@ test.describe('PWA Install Prompt', () => {
 
   test('dismisses banner when Not Now is clicked', async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('input[role="combobox"]', { timeout: 15_000 });
+    await page.waitForSelector('h2', { timeout: 15_000 });
 
     await page.evaluate(() => {
       const event = new Event('beforeinstallprompt') as any;
@@ -51,7 +51,7 @@ test.describe('PWA Install Prompt', () => {
 
   test('banner does not reappear after dismissal on same session', async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('input[role="combobox"]', { timeout: 15_000 });
+    await page.waitForSelector('h2', { timeout: 15_000 });
 
     // First: fire event and dismiss
     await page.evaluate(() => {
@@ -66,7 +66,7 @@ test.describe('PWA Install Prompt', () => {
 
     // Reload page
     await page.reload();
-    await page.waitForSelector('input[role="combobox"]', { timeout: 15_000 });
+    await page.waitForSelector('h2', { timeout: 15_000 });
 
     // Fire event again
     await page.evaluate(() => {
