@@ -8,10 +8,9 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-  // useDailyVerse calls useQuery(GET_BIBLE_VOTD, { skip: true }) on initial render
+  // useDailyVerse calls useQuery(GET_BIBLE_VOTD) to fetch the verse of the day
   useQuery: () => ({ data: null, loading: false, error: null }),
   GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
-  getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
   getAllDailyVerses: () => [{ text: 'Test verse', reference: 'Test 1:1' }],
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-watchlist',
