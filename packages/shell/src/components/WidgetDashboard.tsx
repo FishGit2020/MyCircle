@@ -54,10 +54,7 @@ function WeatherWidget() {
   const city = favoriteCities[0];
 
   return (
-    <Link
-      to={city ? `/weather/${city.lat},${city.lon}` : '/weather'}
-      className="block"
-    >
+    <div>
       <div className="flex items-center gap-3 mb-2">
         <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-500">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -83,7 +80,7 @@ function WeatherWidget() {
       ) : (
         <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noFavoriteCity')}</p>
       )}
-    </Link>
+    </div>
   );
 }
 
@@ -99,7 +96,7 @@ function StockWidget() {
   }, []);
 
   return (
-    <Link to="/stocks" className="block">
+    <div>
       <div className="flex items-center gap-3 mb-2">
         <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-green-500">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -125,7 +122,7 @@ function StockWidget() {
       ) : (
         <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noStocks')}</p>
       )}
-    </Link>
+    </div>
   );
 }
 
@@ -146,7 +143,7 @@ function VerseWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.verseDesc')}</p>
         </div>
         <button
-          onClick={shuffleVerse}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); shuffleVerse(); }}
           className="text-xs text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
           aria-label={t('widgets.verse')}
         >
@@ -192,7 +189,7 @@ function NowPlayingWidget() {
   }, []);
 
   return (
-    <Link to="/podcasts" className="block">
+    <div>
       <div className="flex items-center gap-3 mb-2">
         <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-500">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -223,7 +220,7 @@ function NowPlayingWidget() {
       ) : (
         <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.nothingPlaying')}</p>
       )}
-    </Link>
+    </div>
   );
 }
 
@@ -239,7 +236,7 @@ function NotebookWidget() {
   }, []);
 
   return (
-    <Link to="/notebook" className="block">
+    <div>
       <div className="flex items-center gap-3 mb-2">
         <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -258,7 +255,7 @@ function NotebookWidget() {
       ) : (
         <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noNotes')}</p>
       )}
-    </Link>
+    </div>
   );
 }
 
@@ -272,10 +269,19 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   notebook: NotebookWidget,
 };
 
+const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string }> }) => string)> = {
+  weather: (ctx) => ctx.favoriteCities[0] ? `/weather/${ctx.favoriteCities[0].lat},${ctx.favoriteCities[0].lon}` : '/weather',
+  stocks: '/stocks',
+  verse: '/bible',
+  nowPlaying: '/podcasts',
+  notebook: '/notebook',
+};
+
 // ─── Main Dashboard Component ────────────────────────────────────────────────
 
 export default function WidgetDashboard() {
   const { t } = useTranslation();
+  const { favoriteCities } = useAuth();
   const [layout, setLayout] = useState<WidgetConfig[]>(loadLayout);
   const [editing, setEditing] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -471,13 +477,16 @@ export default function WidgetDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {visibleWidgets.map(widget => {
             const WidgetComponent = WIDGET_COMPONENTS[widget.id];
+            const routeDef = WIDGET_ROUTES[widget.id];
+            const to = typeof routeDef === 'function' ? routeDef({ favoriteCities }) : routeDef;
             return (
-              <div
+              <Link
                 key={widget.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
+                to={to}
+                className="block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
               >
                 <WidgetComponent />
-              </div>
+              </Link>
             );
           })}
         </div>
