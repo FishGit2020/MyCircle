@@ -266,7 +266,7 @@ async function getYouVersionBibles(): Promise<{ id: number; abbreviation: string
 
   const response = await axios.get(`${YOUVERSION_API_BASE}/bibles`, {
     params: { 'language_ranges[]': 'en', all_available: true },
-    headers: { 'X-YouVersion-App-Key': apiKey },
+    headers: { 'x-yvp-app-key': apiKey },
     timeout: 10000,
   });
 
@@ -293,7 +293,7 @@ async function getYouVersionPassage(bibleId: number, reference: string) {
     `${YOUVERSION_API_BASE}/bibles/${bibleId}/passages/${encodeURIComponent(usfmRef)}`,
     {
       params: { format: 'text' },
-      headers: { 'X-YouVersion-App-Key': apiKey },
+      headers: { 'x-yvp-app-key': apiKey },
       timeout: 10000,
     }
   );
