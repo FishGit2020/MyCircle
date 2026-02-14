@@ -1,5 +1,5 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, Auth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, User, Auth } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
@@ -110,13 +110,39 @@ export interface RecentCity {
 }
 
 // Auth functions
+
+// Handle redirect result on page load (fires after signInWithRedirect returns)
+if (auth) {
+  getRedirectResult(auth)
+    .then(async (result) => {
+      if (result?.user) {
+        await ensureUserProfile(result.user);
+      }
+    })
+    .catch((err) => {
+      console.warn('Redirect sign-in result error:', err);
+    });
+}
+
 export async function signInWithGoogle() {
   if (!auth || !googleProvider) return null;
   try {
     const result = await signInWithPopup(auth, googleProvider);
     await ensureUserProfile(result.user);
     return result.user;
-  } catch (error) {
+  } catch (error: any) {
+    // Popup blocked, App Check throttled, or Firefox cookie partitioning — fall back to redirect
+    const code = error?.code || '';
+    if (
+      code === 'auth/internal-error' ||
+      code === 'auth/popup-blocked' ||
+      code === 'auth/popup-closed-by-user' ||
+      code === 'auth/cancelled-popup-request'
+    ) {
+      console.warn('Popup sign-in failed, falling back to redirect:', code);
+      await signInWithRedirect(auth!, googleProvider!);
+      return null; // page will redirect
+    }
     console.error('Error signing in with Google:', error);
     throw error;
   }
