@@ -51,7 +51,7 @@
     "emulator:test": "concurrently -k -s first \"pnpm mock-api\" \"firebase emulators:exec --only functions,hosting,firestore,auth 'pnpm seed:firestore && pnpm test:e2e:emulator'\"",
     "firebase:build": "pnpm build:shared && pnpm firebase:build:mf && pnpm firebase:build:functions && pnpm firebase:assemble",
     "firebase:build:mf": "cross-env NODE_ENV=production pnpm --filter @mycircle/shell build && cross-env NODE_ENV=production pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
-    "firebase:build:functions": "cd functions && pnpm install && pnpm build",
+    "firebase:build:functions": "cd functions && pnpm install --force && pnpm build",
     "firebase:assemble": "node scripts/assemble-firebase.mjs",
     "firebase:deploy": "pnpm firebase:build && firebase deploy",
     "firebase:deploy:hosting": "pnpm firebase:build && firebase deploy --only hosting",
