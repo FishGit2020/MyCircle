@@ -588,6 +588,30 @@ async function getYouVersionPassage(
   return result;
 }
 
+/** Fetch Verse of the Day from YouVersion API */
+async function getYouVersionVotd(day: number, apiKey: string): Promise<{ text: string; reference: string; translation: string; copyright: string | null }> {
+  const cacheKey = `youversion:votd:${day}`;
+  const cached = bibleCache.get<any>(cacheKey);
+  if (cached) return cached;
+
+  const response = await axios.get(`${YOUVERSION_API_BASE}/verse-of-the-day/${day}`, {
+    headers: { 'X-YouVersion-App-Key': apiKey },
+    timeout: 10000,
+  });
+
+  const data = response.data;
+  const verse = data.verse || data;
+  const result = {
+    text: (verse.text || verse.content || '').trim(),
+    reference: verse.reference || verse.human_reference || '',
+    translation: verse.bible_abbreviation || verse.translation || 'NIV',
+    copyright: verse.copyright || null,
+  };
+
+  bibleCache.set(cacheKey, result, 3600);
+  return result;
+}
+
 // Curated daily verses (one per day-of-year, wraps around)
 const DAILY_VERSES = [
   { text: "For I know the plans I have for you, declares the LORD, plans to prosper you and not to harm you, plans to give you hope and a future.", reference: "Jeremiah 29:11" },
@@ -787,11 +811,17 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         return { ...DAILY_VERSES[index], translation: 'NIV', copyright: null };
       },
 
+      bibleVotdApi: async (_: any, { day }: { day: number }) => {
+        const yvKey = getYouVersionKey?.() || '';
+        if (!yvKey) throw new Error('YOUVERSION_APP_KEY not configured');
+        return await getYouVersionVotd(day, yvKey);
+      },
+
       biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {
         const yvKey = getYouVersionKey?.() || '';
         if (!yvKey) throw new Error('YOUVERSION_APP_KEY not configured');
-        const bibleId = translation ? parseInt(translation, 10) : DEFAULT_YOUVERSION_BIBLE_ID;
-        if (isNaN(bibleId)) throw new Error(`Invalid Bible version ID: ${translation}`);
+        const parsed = translation ? parseInt(translation, 10) : NaN;
+        const bibleId = isNaN(parsed) ? DEFAULT_YOUVERSION_BIBLE_ID : parsed;
         return await getYouVersionPassage(bibleId, reference, yvKey);
       },
     }
