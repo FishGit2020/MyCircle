@@ -285,6 +285,44 @@ gcloud projects add-iam-policy-binding mycircle-dash \
 
 For the full list of required IAM roles and detailed troubleshooting, see [docs/workload-identity-federation-setup.md](./workload-identity-federation-setup.md#required-iam-roles-for-the-service-account).
 
+### Trailing Newlines in Firebase Secrets
+
+Firebase secrets set via `firebase functions:secrets:set` from a terminal can accidentally include trailing newline or carriage return characters. This causes 401 errors from external APIs (OpenWeather, Finnhub, etc.) because the key sent in the request includes invisible whitespace.
+
+**Diagnose:** Check for trailing bytes after the key value:
+
+```bash
+firebase functions:secrets:access SECRET_NAME | xxd | tail -3
+# Clean: ends with the last hex char of the key + 0d0a (just the terminal CRLF)
+# Dirty: extra 0a, 0d, or 20 bytes before the terminal CRLF
+```
+
+**Fix:** Re-set the secret using `printf` (which does not add a trailing newline):
+
+```bash
+printf 'your-clean-key-value' | firebase functions:secrets:set SECRET_NAME --data-file=-
+# Then redeploy functions to pick up the new version:
+firebase deploy --only functions --force
+```
+
+> **Note:** Running function instances cache secrets at startup. After updating a secret, you **must** redeploy functions for the change to take effect.
+
+### Wrong Firebase API Key (auth/unauthorized-domain)
+
+If Google sign-in fails with `auth/unauthorized-domain` despite the domain being in the Firebase Auth authorized list, the `VITE_FIREBASE_API_KEY` may belong to a different Firebase project.
+
+**Diagnose:** Test which project the key belongs to:
+
+```bash
+curl "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig?key=YOUR_API_KEY"
+# Response should show mycircle-dash authorized domains
+```
+
+**Fix:** Get the correct key from Firebase Console → Project Settings → Your Apps → Web App, then update:
+- `packages/shell/.env` → `VITE_FIREBASE_API_KEY`
+- GitHub secret → `VITE_FIREBASE_API_KEY` (via `gh secret set`)
+- Redeploy: `pnpm firebase:deploy`
+
 ### Local Deploy Fallback
 
 If the GitHub Actions deploy fails due to IAM issues, you can deploy locally using your personal Firebase credentials (which typically have Owner access):
