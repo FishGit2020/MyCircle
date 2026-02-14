@@ -60,7 +60,7 @@ test.describe('Widget Dashboard', () => {
     await page.getByRole('button', { name: /done/i }).click();
 
     // The grid should have fewer visible widgets
-    const widgets = page.locator('[class*="grid"] > div');
+    const widgets = page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a');
     const visibleCount = await widgets.count();
     expect(visibleCount).toBe(4);
   });
@@ -75,7 +75,7 @@ test.describe('Widget Dashboard', () => {
     await page.getByRole('button', { name: /done/i }).click();
 
     // Count visible widgets
-    const widgets = page.locator('[class*="grid"] > div');
+    const widgets = page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a');
     const countBefore = await widgets.count();
     expect(countBefore).toBe(4);
 
@@ -86,7 +86,7 @@ test.describe('Widget Dashboard', () => {
     await page.waitForSelector('[class*="grid"]', { timeout: 10_000 });
 
     // Count should still be 4 (persisted)
-    const countAfter = await page.locator('[class*="grid"] > div').count();
+    const countAfter = await page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a').count();
     expect(countAfter).toBe(4);
   });
 });

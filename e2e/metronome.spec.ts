@@ -23,14 +23,19 @@ const mockSongWithoutBpm = {
 
 function setupWorshipMocks(page: import('@playwright/test').Page, songs = [mockSongWithBpm, mockSongWithoutBpm]) {
   return page.addInitScript((data) => {
-    (window as any).__getFirebaseIdToken = () => Promise.resolve('mock-token');
-    (window as any).__worshipSongs = {
+    // Use Object.defineProperty so the shell's firebase.ts cannot overwrite the mock
+    const api = {
       getAll: () => Promise.resolve(data),
       get: (id: string) => Promise.resolve(data.find((s: any) => s.id === id) ?? null),
       add: () => Promise.resolve('new-id'),
       update: () => Promise.resolve(),
       delete: () => Promise.resolve(),
     };
+    Object.defineProperty(window, '__worshipSongs', {
+      get: () => api,
+      set: () => {},
+      configurable: true,
+    });
   }, songs);
 }
 

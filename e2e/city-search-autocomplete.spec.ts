@@ -2,7 +2,7 @@ import { test, expect } from './fixtures';
 
 test.describe('City Search Autocomplete with Recents', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/weather');
     await page.waitForSelector('input[role="combobox"]', { timeout: 30000 });
   });
 
@@ -25,8 +25,8 @@ test.describe('City Search Autocomplete with Recents', () => {
     await page.waitForSelector('[role="option"]', { timeout: 10000 });
     await page.locator('[role="option"]').first().click();
 
-    // Navigate back to home
-    await page.goto('/');
+    // Navigate back to weather page
+    await page.goto('/weather');
     await page.waitForSelector('input[role="combobox"]', { timeout: 30000 });
 
     // Focus input - should show "Recent Searches" with Paris

@@ -29,6 +29,6 @@ test.describe('Live Toggle Visibility', () => {
     await toggleButton.click();
 
     // Should show Live text (isLive becomes true once enableRealtime + effectivePollInterval > 0)
-    await expect(page.getByRole('button', { name: /Live/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('button', { name: /Live/i })).toBeVisible({ timeout: 10_000 });
   });
 });

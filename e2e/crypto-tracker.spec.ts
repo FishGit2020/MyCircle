@@ -6,7 +6,7 @@ test.describe('Crypto Tracker', () => {
   });
 
   test('shows crypto section heading', async ({ page }) => {
-    const heading = page.getByRole('heading', { name: /crypto/i });
+    const heading = page.getByRole('button', { name: /crypto/i });
     await expect(heading).toBeVisible({ timeout: 10000 });
   });
 
@@ -36,7 +36,7 @@ test.describe('Crypto Tracker', () => {
 
   test('crypto section hides when a stock is selected', async ({ page }) => {
     // Wait for crypto section to appear
-    const cryptoHeading = page.getByRole('heading', { name: /crypto/i });
+    const cryptoHeading = page.getByRole('button', { name: /crypto/i });
     await expect(cryptoHeading).toBeVisible({ timeout: 10000 });
 
     // Search for and select a stock
