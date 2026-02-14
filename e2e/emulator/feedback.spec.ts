@@ -5,12 +5,17 @@ const FIRESTORE_URL = 'http://localhost:8080';
 const AUTH_URL = 'http://localhost:9099';
 const PROJECT_ID = 'mycircle-dash';
 
+// "Bearer owner" is a magic token recognised by the Firestore emulator that
+// bypasses security rules — needed because our feedback rules only allow create.
+const ADMIN_HEADERS = { Authorization: 'Bearer owner' };
+
 /**
  * Read all feedback documents from the Firestore emulator REST API.
  */
 async function getFirestoreFeedback(request: APIRequestContext) {
   const res = await request.get(
     `${FIRESTORE_URL}/v1/projects/${PROJECT_ID}/databases/(default)/documents/feedback`,
+    { headers: ADMIN_HEADERS },
   );
   const body = await res.json();
   return body.documents ?? [];
@@ -20,10 +25,10 @@ async function getFirestoreFeedback(request: APIRequestContext) {
  * Delete all feedback documents for test isolation.
  */
 async function clearFirestoreFeedback(request: APIRequestContext) {
-  const docs = await getFirestoreFeedback(request);
-  for (const doc of docs) {
-    await request.delete(`${FIRESTORE_URL}/v1/${doc.name}`);
-  }
+  // Use the emulator's bulk-clear endpoint (skips rules entirely)
+  await request.delete(
+    `${FIRESTORE_URL}/emulator/v1/projects/${PROJECT_ID}/databases/(default)/documents`,
+  );
 }
 
 test.describe('Feedback → Firestore Emulator', () => {
