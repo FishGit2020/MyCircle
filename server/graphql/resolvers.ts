@@ -594,8 +594,8 @@ export const resolvers = {
     },
 
     biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {
-      const bibleId = translation ? parseInt(translation, 10) : DEFAULT_YOUVERSION_BIBLE_ID;
-      if (isNaN(bibleId)) throw new Error(`Invalid Bible version ID: ${translation}`);
+      const parsed = translation ? parseInt(translation, 10) : NaN;
+      const bibleId = isNaN(parsed) ? DEFAULT_YOUVERSION_BIBLE_ID : parsed;
       return await getYouVersionPassage(bibleId, reference);
     },
   },
