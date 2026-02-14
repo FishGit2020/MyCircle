@@ -75,19 +75,27 @@ function EarningsRow({ event, onSymbolClick }: { event: EarningsEvent; onSymbolC
 export default function EarningsCalendar({ onSymbolClick }: { onSymbolClick?: (symbol: string) => void }) {
   const { t } = useTranslation();
   const [weekOffset, setWeekOffset] = useState(0);
+  const [filter, setFilter] = useState('');
   const { from, to } = useMemo(() => getWeekRange(weekOffset), [weekOffset]);
   const { earnings, loading, error } = useEarningsCalendar(from, to);
+
+  // Filter earnings by symbol
+  const filtered = useMemo(() => {
+    if (!filter.trim()) return earnings;
+    const q = filter.trim().toLowerCase();
+    return earnings.filter(e => e.symbol.toLowerCase().includes(q));
+  }, [earnings, filter]);
 
   // Group by date
   const grouped = useMemo(() => {
     const map = new Map<string, EarningsEvent[]>();
-    for (const event of earnings) {
+    for (const event of filtered) {
       const list = map.get(event.date) ?? [];
       list.push(event);
       map.set(event.date, list);
     }
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [earnings]);
+  }, [filtered]);
 
   if (error) {
     return (
@@ -99,8 +107,8 @@ export default function EarningsCalendar({ onSymbolClick }: { onSymbolClick?: (s
 
   return (
     <div>
-      {/* Week selector */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Week selector + event count */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setWeekOffset(prev => prev - 1)}
@@ -124,7 +132,26 @@ export default function EarningsCalendar({ onSymbolClick }: { onSymbolClick?: (s
             </svg>
           </button>
         </div>
+        {earnings.length > 0 && (
+          <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
+            {(t('earnings.eventCount' as any) as string).replace('{count}', String(earnings.length))}
+          </span>
+        )}
       </div>
+
+      {/* Search filter */}
+      {earnings.length > 0 && (
+        <div className="mb-4">
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder={t('earnings.searchPlaceholder' as any)}
+            className="w-full sm:w-64 px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            aria-label={t('earnings.searchPlaceholder' as any)}
+          />
+        </div>
+      )}
 
       {/* Loading */}
       {loading && earnings.length === 0 && (
@@ -146,30 +173,32 @@ export default function EarningsCalendar({ onSymbolClick }: { onSymbolClick?: (s
       )}
 
       {/* Earnings table grouped by date */}
-      {grouped.map(([date, events]) => (
-        <div key={date} className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2 px-1">
-            {formatDate(date)}
-          </h4>
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <table className="w-full" role="table">
-              <thead className="sr-only">
-                <tr>
-                  <th>Symbol</th>
-                  <th>Time</th>
-                  <th>{t('earnings.eps')}</th>
-                  <th>{t('earnings.revenue')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((event, i) => (
-                  <EarningsRow key={`${event.symbol}-${i}`} event={event} onSymbolClick={onSymbolClick} />
-                ))}
-              </tbody>
-            </table>
+      <div className="max-h-[400px] overflow-y-auto">
+        {grouped.map(([date, events]) => (
+          <div key={date} className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2 px-1">
+              {formatDate(date)}
+            </h4>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <table className="w-full" role="table">
+                <thead className="sr-only">
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Time</th>
+                    <th>{t('earnings.eps')}</th>
+                    <th>{t('earnings.revenue')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {events.map((event, i) => (
+                    <EarningsRow key={`${event.symbol}-${i}`} event={event} onSymbolClick={onSymbolClick} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

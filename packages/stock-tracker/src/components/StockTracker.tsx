@@ -62,6 +62,10 @@ export default function StockTracker() {
   const [buyPrice, setBuyPrice] = useState('');
   const [quantity, setQuantity] = useState('');
 
+  const [cryptoCollapsed, setCryptoCollapsed] = useState(() => {
+    try { return localStorage.getItem('stock-crypto-collapsed') === 'true'; } catch { return false; }
+  });
+
   const [liveEnabled, setLiveEnabled] = useState(() => {
     try { return localStorage.getItem(StorageKeys.STOCK_LIVE) === 'true'; } catch { return false; }
   });
@@ -165,13 +169,39 @@ export default function StockTracker() {
         <StockSearch onSelect={handleStockSelect} />
       </div>
 
-      {/* Crypto Tracker */}
+      {/* Watchlist */}
       {!selectedSymbol && (
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            {t('crypto.title')}
+            {t('stocks.watchlist')}
           </h2>
-          <CryptoTracker />
+          <Watchlist
+            watchlist={watchlist}
+            onToggleWatchlist={handleToggleWatchlist}
+            onSelectStock={handleWatchlistStockSelect}
+            liveEnabled={liveEnabled}
+          />
+        </div>
+      )}
+
+      {/* Crypto Tracker */}
+      {!selectedSymbol && (
+        <div className="mb-8">
+          <button
+            onClick={() => setCryptoCollapsed(prev => {
+              const next = !prev;
+              try { localStorage.setItem('stock-crypto-collapsed', String(next)); } catch { /* ignore */ }
+              return next;
+            })}
+            className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white mb-4 group"
+            aria-expanded={!cryptoCollapsed}
+          >
+            <svg className={`w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-transform ${cryptoCollapsed ? '' : 'rotate-90'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+            {t('crypto.title')}
+          </button>
+          {!cryptoCollapsed && <CryptoTracker />}
         </div>
       )}
 
@@ -484,18 +514,6 @@ export default function StockTracker() {
         </div>
       )}
 
-      {/* Watchlist */}
-      <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-          {t('stocks.watchlist')}
-        </h2>
-        <Watchlist
-          watchlist={watchlist}
-          onToggleWatchlist={handleToggleWatchlist}
-          onSelectStock={handleWatchlistStockSelect}
-          liveEnabled={liveEnabled}
-        />
-      </div>
     </div>
   );
 }
