@@ -97,6 +97,13 @@ test.describe('Feedback → Firestore Emulator', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
+    // Wait for firebase.ts module to execute and expose the test helper
+    await page.waitForFunction(
+      () => typeof (window as any).__signInForTest === 'function',
+      null,
+      { timeout: 10000 },
+    );
+
     // Sign in via the exposed test helper
     await page.evaluate(
       ({ email, password }) => (window as any).__signInForTest(email, password),

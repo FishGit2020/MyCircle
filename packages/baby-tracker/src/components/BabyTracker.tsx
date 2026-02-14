@@ -126,7 +126,7 @@ export default function BabyTracker() {
       </div>
 
       {/* Verse Section */}
-      <section className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-5 border border-pink-200 dark:border-pink-800">
+      <section className="bg-pink-50 dark:bg-pink-900/10 rounded-xl p-5 border border-pink-200 dark:border-pink-800">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <p className="text-pink-800 dark:text-pink-200 italic leading-relaxed">
@@ -195,7 +195,7 @@ export default function BabyTracker() {
       )}
 
       {(isPastDue || isDueToday) && (
-        <section className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-5 border border-pink-200 dark:border-pink-800 text-center">
+        <section className="bg-pink-50 dark:bg-pink-900/10 rounded-xl p-5 border border-pink-200 dark:border-pink-800 text-center">
           <div className="text-4xl mb-2">🎉</div>
           <p className="text-pink-700 dark:text-pink-300 font-semibold text-lg">
             {isDueToday ? t('baby.dueToday') : t('baby.congratulations')}
