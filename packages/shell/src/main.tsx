@@ -15,20 +15,18 @@ import Onboarding from './components/Onboarding';
 import './index.css';
 
 // Initialize Sentry before rendering
-if (import.meta.env.VITE_SENTRY_DSN) {
-  Sentry.init({
-    dsn: import.meta.env.VITE_SENTRY_DSN,
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration(),
-    ],
-    tracesSampleRate: 1.0,
-    tracePropagationTargets: ['localhost', /^https:\/\/mycircle-app\.web\.app/],
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-    enabled: import.meta.env.PROD,
-  });
-}
+Sentry.init({
+  dsn: 'https://87fdd6cb3be74b2284019ac9fdce801e@o4510878995251200.ingest.us.sentry.io/4510878996299776',
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  sendDefaultPii: true,
+  tracesSampleRate: 1.0,
+  tracePropagationTargets: ['localhost', /^https:\/\/mycircle-dash\.web\.app/],
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 const client = getApolloClient();
 
