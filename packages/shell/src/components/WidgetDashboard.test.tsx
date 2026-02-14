@@ -11,6 +11,7 @@ vi.mock('@mycircle/shared', () => ({
     WIDGET_LAYOUT: 'widget-dashboard-layout',
     WORSHIP_SONGS_CACHE: 'worship-songs-cache',
     NOTEBOOK_CACHE: 'notebook-cache',
+    BABY_DUE_DATE: 'baby-due-date',
   },
   MFEvents: {
     PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
@@ -52,13 +53,14 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders all five default widgets', () => {
+  it('renders all six default widgets', () => {
     renderWidget();
     expect(screen.getByText('widgets.weather')).toBeInTheDocument();
     expect(screen.getByText('widgets.stocks')).toBeInTheDocument();
     expect(screen.getByText('widgets.verse')).toBeInTheDocument();
     expect(screen.getByText('widgets.nowPlaying')).toBeInTheDocument();
     expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
+    expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
   });
 
   it('renders customize button', () => {
@@ -78,9 +80,9 @@ describe('WidgetDashboard', () => {
   it('shows visibility toggles in editing mode', () => {
     renderWidget();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // All five widgets should show "Visible" toggle
+    // All six widgets should show "Visible" toggle
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(5);
+    expect(visibleButtons.length).toBe(6);
   });
 
   it('can toggle widget visibility', () => {
@@ -97,8 +99,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(5);
-    expect(downButtons.length).toBe(5);
+    expect(upButtons.length).toBe(6);
+    expect(downButtons.length).toBe(6);
   });
 
   it('persists layout to localStorage', () => {
@@ -139,7 +141,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(5);
+    expect(allVisible.length).toBe(6);
   });
 
   it('has proper a11y labels on the section', () => {

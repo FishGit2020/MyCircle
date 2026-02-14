@@ -27,7 +27,8 @@ export default defineConfig({
       'aiAssistant/AiAssistant': resolve(__dirname, './src/test/mocks/AiAssistantMock.tsx'),
       'bibleReader/BibleReader': resolve(__dirname, './src/test/mocks/BibleReaderMock.tsx'),
       'worshipSongs/WorshipSongs': resolve(__dirname, './src/test/mocks/WorshipSongsMock.tsx'),
-      'notebook/Notebook': resolve(__dirname, './src/test/mocks/NotebookMock.tsx')
+      'notebook/Notebook': resolve(__dirname, './src/test/mocks/NotebookMock.tsx'),
+      'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx')
     }
   }
 });
