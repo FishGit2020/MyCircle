@@ -24,12 +24,11 @@ const mockSongWithoutBpm = {
 function setupWorshipMocks(page: import('@playwright/test').Page, songs = [mockSongWithBpm, mockSongWithoutBpm]) {
   return page.addInitScript((data) => {
     (window as any).__worshipSongs = {
-      getSongs: () => Promise.resolve(data),
-      getSong: (id: string) => Promise.resolve(data.find((s: any) => s.id === id) ?? null),
-      addSong: () => Promise.resolve('new-id'),
-      updateSong: () => Promise.resolve(),
-      deleteSong: () => Promise.resolve(),
-      isAuthenticated: () => true,
+      getAll: () => Promise.resolve(data),
+      get: (id: string) => Promise.resolve(data.find((s: any) => s.id === id) ?? null),
+      add: () => Promise.resolve('new-id'),
+      update: () => Promise.resolve(),
+      delete: () => Promise.resolve(),
     };
   }, songs);
 }

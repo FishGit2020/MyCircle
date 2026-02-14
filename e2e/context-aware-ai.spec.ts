@@ -20,7 +20,7 @@ test.describe('Context-Aware AI', () => {
   });
 
   test('has accessible chat input', async ({ page }) => {
-    const input = page.getByPlaceholderText(/ask me about weather/i);
+    const input = page.getByPlaceholder(/ask me about weather/i);
     await expect(input).toBeVisible({ timeout: 15_000 });
   });
 });

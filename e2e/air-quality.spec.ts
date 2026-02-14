@@ -31,8 +31,8 @@ test.describe('Air Quality Index Widget', () => {
   });
 
   test('can be toggled off via dashboard settings', async ({ page }) => {
-    // Open settings
-    const settingsBtn = page.locator('button', { hasText: '' }).filter({ has: page.locator('svg') }).last();
+    // Open settings (DashboardSettings has aria-label from i18n 'dashboard.settings')
+    const settingsBtn = page.getByRole('button', { name: /settings/i });
     await settingsBtn.click();
 
     // Find the air quality checkbox and uncheck it

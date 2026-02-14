@@ -27,7 +27,7 @@ test.describe('Earnings Calendar', () => {
     await expect(earningsHeading).toBeVisible({ timeout: 10000 });
 
     // Search and select a stock
-    const searchInput = page.getByPlaceholderText(/search stocks/i);
+    const searchInput = page.getByPlaceholder(/search stocks/i);
     await searchInput.fill('AAPL');
     const result = page.locator('[role="option"]').first();
     await expect(result).toBeVisible({ timeout: 10000 });
