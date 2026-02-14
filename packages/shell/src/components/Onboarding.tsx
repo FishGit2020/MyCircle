@@ -52,6 +52,36 @@ const STEPS = [
     ),
     color: 'from-amber-500/10 to-orange-500/10',
   },
+  {
+    titleKey: 'onboarding.step5Title' as const,
+    descKey: 'onboarding.step5Desc' as const,
+    icon: (
+      <svg className="w-16 h-16 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+      </svg>
+    ),
+    color: 'from-indigo-500/10 to-violet-500/10',
+  },
+  {
+    titleKey: 'onboarding.step6Title' as const,
+    descKey: 'onboarding.step6Desc' as const,
+    icon: (
+      <svg className="w-16 h-16 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+    ),
+    color: 'from-emerald-500/10 to-teal-500/10',
+  },
+  {
+    titleKey: 'onboarding.step7Title' as const,
+    descKey: 'onboarding.step7Desc' as const,
+    icon: (
+      <svg className="w-16 h-16 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+      </svg>
+    ),
+    color: 'from-rose-500/10 to-pink-500/10',
+  },
 ];
 
 export default function Onboarding() {
