@@ -5,20 +5,16 @@
  * exist, falls back to the appropriate index.html for SPA routes.
  */
 import express from 'express';
-import rateLimit from 'express-rate-limit';
 import { existsSync } from 'fs';
 import { join, resolve } from 'path';
 
 const app = express();
 const ROOT = resolve('dist/firebase');
 
-// Rate limiting — CI E2E server only; generous limit to avoid impacting tests
-app.use(rateLimit({ windowMs: 60_000, limit: 1000 }));
-
 // MFE sub-apps that have their own index.html
 const MFE_PREFIXES = [
   'city-search', 'weather-display', 'stock-tracker', 'podcast-player',
-  'ai-assistant', 'bible-reader', 'worship-songs', 'notebook',
+  'ai-assistant', 'bible-reader', 'worship-songs', 'notebook', 'baby-tracker',
 ];
 
 // Serve static files with correct MIME types
