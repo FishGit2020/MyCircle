@@ -541,7 +541,7 @@ async function getYouVersionBibles(apiKey: string): Promise<YouVersionBible[]> {
 
   const response = await axios.get(`${YOUVERSION_API_BASE}/bibles`, {
     params: { 'language_ranges[]': 'en', all_available: true },
-    headers: { 'X-YouVersion-App-Key': apiKey },
+    headers: { 'x-yvp-app-key': apiKey },
     timeout: 10000,
   });
 
@@ -570,7 +570,7 @@ async function getYouVersionPassage(
     `${YOUVERSION_API_BASE}/bibles/${bibleId}/passages/${encodeURIComponent(usfmRef)}`,
     {
       params: { format: 'text' },
-      headers: { 'X-YouVersion-App-Key': apiKey },
+      headers: { 'x-yvp-app-key': apiKey },
       timeout: 10000,
     }
   );
@@ -595,7 +595,7 @@ async function getYouVersionVotd(day: number, apiKey: string): Promise<{ text: s
   if (cached) return cached;
 
   const response = await axios.get(`${YOUVERSION_API_BASE}/verse-of-the-day/${day}`, {
-    headers: { 'X-YouVersion-App-Key': apiKey },
+    headers: { 'x-yvp-app-key': apiKey },
     timeout: 10000,
   });
 
