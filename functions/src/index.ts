@@ -131,13 +131,13 @@ export const graphql = onRequest(
       }
     }
 
-    // Require auth for stock/podcast queries (expensive third-party APIs)
+    // Require auth for stock queries (expensive Finnhub API)
     const opName = (req.body.operationName || req.body.query?.match?.(/(?:query|mutation)\s+(\w+)/)?.[1] || '').toLowerCase();
-    if (opName.includes('stock') || opName.includes('podcast')) {
+    if (opName.includes('stock')) {
       const uid = await verifyAuthToken(req);
       if (!uid) {
         res.status(401).json({
-          errors: [{ message: 'Authentication required for stock and podcast data', extensions: { code: 'UNAUTHENTICATED' } }]
+          errors: [{ message: 'Authentication required for stock data', extensions: { code: 'UNAUTHENTICATED' } }]
         });
         return;
       }
@@ -901,13 +901,6 @@ export const podcastProxy = onRequest(
     const apiSecret = process.env.PODCASTINDEX_API_SECRET;
     if (!apiKey || !apiSecret) {
       res.status(500).json({ error: 'PodcastIndex API credentials not configured' });
-      return;
-    }
-
-    // Require auth — podcast proxy uses PodcastIndex quota
-    const podcastUid = await verifyAuthToken(req);
-    if (!podcastUid) {
-      res.status(401).json({ error: 'Authentication required' });
       return;
     }
 

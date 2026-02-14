@@ -125,8 +125,6 @@ export default function FeedbackButton({ hasActivePlayer }: { hasActivePlayer?: 
       ? t('feedback.ratingStars').replace('{count}', '1')
       : t('feedback.ratingStarsPlural').replace('{count}', String(count));
 
-  if (!user) return null;
-
   return (
     <>
       {/* Floating trigger button */}

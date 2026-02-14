@@ -357,6 +357,8 @@ const en = {
   'earnings.noEvents': 'No earnings reports this week',
   'earnings.loadError': 'Failed to load earnings data',
   'earnings.quarter': 'Q',
+  'earnings.searchPlaceholder': 'Filter by symbol...',
+  'earnings.eventCount': '{count} earnings',
 
   // Podcast Player
   'podcasts.title': 'Podcasts',
@@ -509,6 +511,7 @@ const en = {
   'worship.metronomeStart': 'Start metronome',
   'worship.metronomeStop': 'Stop metronome',
   'worship.tapTempo': 'Tap tempo',
+  'worship.loadError': 'Unable to load this song. Please try again.',
 
   // Notebook
   'nav.notebook': 'Notebook',
@@ -662,6 +665,9 @@ const en = {
   // Compare (extra keys)
   'compare.metrics': 'Weather Metrics Comparison',
   'compare.swapCities': 'Next city',
+  'compare.searchCity': 'Search for a city to compare',
+  'compare.addCity': 'Add city',
+  'compare.compareButton': 'Compare',
 
   // What to Wear comfort labels
   'wear.comfortExtremeCold': 'Extreme cold — bundle up!',
@@ -1060,6 +1066,8 @@ const es: Record<TranslationKey, string> = {
   'earnings.noEvents': 'Sin reportes de resultados esta semana',
   'earnings.loadError': 'Error al cargar datos de resultados',
   'earnings.quarter': 'T',
+  'earnings.searchPlaceholder': 'Filtrar por s\u00edmbolo...',
+  'earnings.eventCount': '{count} resultados',
 
   // Podcast Player
   'podcasts.title': 'Podcasts',
@@ -1212,6 +1220,7 @@ const es: Record<TranslationKey, string> = {
   'worship.metronomeStart': 'Iniciar metr\u00f3nomo',
   'worship.metronomeStop': 'Detener metr\u00f3nomo',
   'worship.tapTempo': 'Toca tempo',
+  'worship.loadError': 'No se pudo cargar esta canci\u00f3n. Int\u00e9ntalo de nuevo.',
 
   // Notebook
   'nav.notebook': 'Bloc de notas',
@@ -1365,6 +1374,9 @@ const es: Record<TranslationKey, string> = {
   // Compare (extra keys)
   'compare.metrics': 'Comparaci\u00f3n de m\u00e9tricas',
   'compare.swapCities': 'Siguiente ciudad',
+  'compare.searchCity': 'Buscar una ciudad para comparar',
+  'compare.addCity': 'Agregar ciudad',
+  'compare.compareButton': 'Comparar',
 
   // What to Wear comfort labels
   'wear.comfortExtremeCold': 'Fr\u00edo extremo \u2014 \u00a1abr\u00edgate bien!',
@@ -1763,6 +1775,8 @@ const zh: Record<TranslationKey, string> = {
   'earnings.noEvents': '\u672c\u5468\u6ca1\u6709\u8d22\u62a5',
   'earnings.loadError': '\u52a0\u8f7d\u8d22\u62a5\u6570\u636e\u5931\u8d25',
   'earnings.quarter': '\u5b63\u5ea6',
+  'earnings.searchPlaceholder': '\u6309\u80a1\u7968\u4ee3\u7801\u7b5b\u9009...',
+  'earnings.eventCount': '{count} \u4e2a\u8d22\u62a5',
 
   // Podcast Player
   'podcasts.title': '\u64ad\u5ba2',
@@ -1915,6 +1929,7 @@ const zh: Record<TranslationKey, string> = {
   'worship.metronomeStart': '\u542f\u52a8\u8282\u62cd\u5668',
   'worship.metronomeStop': '\u505c\u6b62\u8282\u62cd\u5668',
   'worship.tapTempo': '\u6253\u62cd\u5b9a\u901f',
+  'worship.loadError': '\u65e0\u6cd5\u52a0\u8f7d\u6b64\u6b4c\u66f2\u3002\u8bf7\u91cd\u8bd5\u3002',
 
   // Notebook
   'nav.notebook': '\u7b14\u8bb0\u672c',
@@ -2068,6 +2083,9 @@ const zh: Record<TranslationKey, string> = {
   // Compare (extra keys)
   'compare.metrics': '\u5929\u6c14\u6307\u6807\u5bf9\u6bd4',
   'compare.swapCities': '\u4e0b\u4e00\u4e2a\u57ce\u5e02',
+  'compare.searchCity': '\u641c\u7d22\u57ce\u5e02\u8fdb\u884c\u5bf9\u6bd4',
+  'compare.addCity': '\u6dfb\u52a0\u57ce\u5e02',
+  'compare.compareButton': '\u5bf9\u6bd4',
 
   // What to Wear comfort labels
   'wear.comfortExtremeCold': '\u6781\u5bd2\u2014\u2014\u6ce8\u610f\u4fdd\u6696\uff01',

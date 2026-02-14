@@ -12,9 +12,15 @@ service cloud.firestore {
       }
     }
 
-    // Feedback collection - authenticated users can create only (write-only inbox)
+    // Feedback collection - anyone can submit feedback (write-only inbox)
     match /feedback/{feedbackId} {
-      allow create: if request.auth != null;
+      allow create: if request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 5000
+        && request.resource.data.category in ['general', 'bug', 'feature', 'other']
+        && request.resource.data.rating is number
+        && request.resource.data.rating >= 0
+        && request.resource.data.rating <= 5;
     }
 
     // Worship songs - public read, authenticated write

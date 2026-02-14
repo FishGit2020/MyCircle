@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
@@ -31,6 +31,24 @@ export default function PodcastPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [subscribedIds, setSubscribedIds] = useState<Set<string>>(loadSubscriptions);
   const [activeTab, setActiveTab] = useState<'discover' | 'subscribed'>('discover');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check auth state to conditionally show Subscriptions tab
+  useEffect(() => {
+    let mounted = true;
+    const checkAuth = async () => {
+      try {
+        const getToken = (window as any).__getFirebaseIdToken;
+        const token = getToken ? await getToken() : null;
+        if (mounted) setIsAuthenticated(!!token);
+      } catch {
+        if (mounted) setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+    const interval = setInterval(checkAuth, 5000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
 
   const feedId = selectedPodcast?.id ?? null;
   const {
@@ -102,21 +120,23 @@ export default function PodcastPlayer() {
           >
             {t('podcasts.trending')}
           </button>
-          <button
-            onClick={() => setActiveTab('subscribed')}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'subscribed'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-            }`}
-          >
-            {t('podcasts.subscriptions')}
-            {subscribedIds.size > 0 && (
-              <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
-                {subscribedIds.size}
-              </span>
-            )}
-          </button>
+          {isAuthenticated && (
+            <button
+              onClick={() => setActiveTab('subscribed')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'subscribed'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              {t('podcasts.subscriptions')}
+              {subscribedIds.size > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
+                  {subscribedIds.size}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       )}
 

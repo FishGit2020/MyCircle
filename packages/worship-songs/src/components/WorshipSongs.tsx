@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from '@mycircle/shared';
 import { useWorshipSongs } from '../hooks/useWorshipSongs';
 import type { WorshipSong } from '../types';
 import SongList from './SongList';
@@ -9,17 +10,26 @@ import '../index.css';
 type View = 'list' | 'view' | 'edit' | 'new';
 
 export default function WorshipSongs() {
+  const { t } = useTranslation();
   const { songs, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong } = useWorshipSongs();
   const [view, setView] = useState<View>('list');
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSelectSong = useCallback(async (id: string) => {
-    const song = await getSong(id);
-    if (song) {
-      setSelectedSong(song);
-      setView('view');
+    setErrorMsg(null);
+    try {
+      const song = await getSong(id);
+      if (song) {
+        setSelectedSong(song);
+        setView('view');
+      } else {
+        setErrorMsg(t('worship.loadError' as any));
+      }
+    } catch {
+      setErrorMsg(t('worship.loadError' as any));
     }
-  }, [getSong]);
+  }, [getSong, t]);
 
   const handleNewSong = useCallback(() => {
     setSelectedSong(null);
@@ -94,13 +104,23 @@ export default function WorshipSongs() {
 
     default:
       return (
-        <SongList
-          songs={songs}
-          loading={loading}
-          isAuthenticated={isAuthenticated}
-          onSelectSong={handleSelectSong}
-          onNewSong={handleNewSong}
-        />
+        <>
+          {errorMsg && (
+            <div role="alert" className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 flex items-center justify-between">
+              <span>{errorMsg}</span>
+              <button onClick={() => setErrorMsg(null)} className="ml-2 text-red-400 hover:text-red-600 dark:hover:text-red-200" aria-label="Dismiss">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+          )}
+          <SongList
+            songs={songs}
+            loading={loading}
+            isAuthenticated={isAuthenticated}
+            onSelectSong={handleSelectSong}
+            onNewSong={handleNewSong}
+          />
+        </>
       );
   }
 }

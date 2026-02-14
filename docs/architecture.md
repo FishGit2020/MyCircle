@@ -899,7 +899,8 @@ IP-based rate limiting via `node-cache` (in-memory, per-instance):
 
 ### Authentication
 
-- `stockProxy`, `podcastProxy`, `aiChat`: Require Firebase Auth ID token (`Authorization: Bearer <token>`)
+- `stockProxy`, `aiChat`: Require Firebase Auth ID token (`Authorization: Bearer <token>`)
+- `podcastProxy`: Public (no auth required) — allows unauthenticated podcast browsing with rate limiting
 - `graphql`: Requires auth for stock/podcast operations (checked by operation name)
 - `subscribeToAlerts`: Enforces App Check
 - `graphql`: Optionally verifies App Check token if present
