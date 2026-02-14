@@ -407,6 +407,7 @@ function normalizePodcastFeeds(data: any) {
 
 function getPodcastIndexHeaders(apiKey: string, apiSecret: string): Record<string, string> {
   const ts = Math.floor(Date.now() / 1000);
+  // CodeQL [js/weak-cryptographic-algorithm]: SHA-1 is required by PodcastIndex API auth spec — not used for password hashing
   const hash = crypto.createHash('sha1').update(`${apiKey}${apiSecret}${ts}`).digest('hex');
   return {
     'X-Auth-Key': apiKey,
