@@ -1,6 +1,6 @@
 // Site key configurable via VITE_RECAPTCHA_SITE_KEY env var.
 // Falls back to hardcoded default for backward compatibility.
-const RECAPTCHA_SITE_KEY = process.env.VITE_RECAPTCHA_SITE_KEY || '6Lcvm2ksAAAAAPQ63bPl94XAfS2gTn2Fu4zMmT4f';
+const RECAPTCHA_SITE_KEY = (typeof process !== 'undefined' && process.env?.VITE_RECAPTCHA_SITE_KEY) || '6Lcvm2ksAAAAAPQ63bPl94XAfS2gTn2Fu4zMmT4f';
 const LOAD_TIMEOUT_MS = 5000;
 
 declare global {
@@ -16,13 +16,19 @@ declare global {
  * Waits for the reCAPTCHA script to load (polls for window.grecaptcha).
  * Resolves false if the script doesn't load within the timeout (ad blocker, etc.).
  */
+function isRecaptchaReady(): boolean {
+  return typeof window !== 'undefined' &&
+    !!window.grecaptcha &&
+    typeof window.grecaptcha.ready === 'function';
+}
+
 function waitForRecaptcha(): Promise<boolean> {
   return new Promise((resolve) => {
     if (typeof window === 'undefined') {
       resolve(false);
       return;
     }
-    if (window.grecaptcha) {
+    if (isRecaptchaReady()) {
       resolve(true);
       return;
     }
@@ -31,7 +37,7 @@ function waitForRecaptcha(): Promise<boolean> {
     let elapsed = 0;
     const timer = setInterval(() => {
       elapsed += interval;
-      if (window.grecaptcha) {
+      if (isRecaptchaReady()) {
         clearInterval(timer);
         resolve(true);
       } else if (elapsed >= LOAD_TIMEOUT_MS) {

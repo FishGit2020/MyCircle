@@ -37,7 +37,8 @@ if (firebaseEnabled) {
   // App Check: verify requests come from our app, not bots/curl
   try {
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+      (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN =
+        import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
     }
     appCheck = initializeAppCheck(app, {
       provider: new ReCaptchaEnterpriseProvider('6Lcvm2ksAAAAAPQ63bPl94XAfS2gTn2Fu4zMmT4f'),
