@@ -1,11 +1,12 @@
-# Micro Frontend Pitfalls & Solutions
+# Micro Frontend Guide
 
-Lessons learned from building MyCircle's Vite Module Federation architecture with 8 independently-built micro frontends. Each pitfall below was encountered in production and includes the root cause, how it manifests, and the applied fix.
+Lessons learned from building MyCircle's Vite Module Federation architecture with 9 independently-built micro frontends. This guide captures pitfalls, limitations, and architectural knowledge accumulated during development.
 
 ---
 
 ## Table of Contents
 
+### Pitfalls & Solutions
 - [1. CSS Cascade Order Conflict](#1-css-cascade-order-conflict)
 - [2. Duplicate Tailwind Preflight Resets](#2-duplicate-tailwind-preflight-resets)
 - [3. Prefetch Side Effects](#3-prefetch-side-effects)
@@ -15,6 +16,9 @@ Lessons learned from building MyCircle's Vite Module Federation architecture wit
 - [7. localStorage Key Collisions](#7-localstorage-key-collisions)
 - [8. Body Scroll Lock Conflicts](#8-body-scroll-lock-conflicts)
 - [9. Missing Test Aliases for New Remotes](#9-missing-test-aliases-for-new-remotes)
+
+### Limitations & Architecture
+- [10. No Hot Reload for Remote MFEs in Dev Mode](#10-no-hot-reload-for-remote-mfes-in-dev-mode)
 - [Quick Reference](#quick-reference)
 
 ---
@@ -388,6 +392,63 @@ Note the path difference: the root config uses `./packages/shell/src/test/mocks/
 
 ---
 
+## 10. No Hot Reload for Remote MFEs in Dev Mode
+
+**Severity: N/A (architectural limitation)** | **Plugin: `@originjs/vite-plugin-federation` v1.3.5**
+
+### The Problem
+
+Vite's Hot Module Replacement (HMR) only works within a single dev server's WebSocket connection. In a Module Federation setup, the shell (host) and each remote MFE run on separate Vite servers (ports 3000–3011). When you edit a remote's source code, the host has no way to know that the remote changed — HMR events don't propagate across servers.
+
+### How `pnpm dev` Works
+
+The root `dev` script runs the **shell in `vite dev` mode** (with HMR) but all **remotes in `vite preview` mode** (serving pre-built static bundles):
+
+```
+pnpm build:remotes && concurrently \
+  "pnpm dev:shell"       \  # vite --port 3000        (dev mode, HMR works)
+  "pnpm preview:city"    \  # vite preview --port 3001 (static, no HMR)
+  "pnpm preview:weather" \  # vite preview --port 3002 (static, no HMR)
+  ...
+```
+
+This means:
+- **Shell code changes** → instant HMR in the browser
+- **Remote MFE changes** → no effect until you rebuild the remote and refresh
+
+### Why It's Designed This Way
+
+Running all 9 remotes in `vite dev` mode simultaneously would consume significant system resources. More importantly, `@originjs/vite-plugin-federation` requires remotes to generate a `remoteEntry.js` via `vite build` — the dev server's bundleless mode doesn't produce this manifest file.
+
+### Plugin Landscape (as of Feb 2026)
+
+| Plugin | Remote Dev HMR | Notes |
+|--------|---------------|-------|
+| `@originjs/vite-plugin-federation` (current) | No | Remotes must be built; host-side HMR only |
+| `@module-federation/vite` (official) | Roadmap | Docs list remote HMR as a future feature, not yet shipped |
+| `@antdevx/vite-plugin-hmr-sync` | Auto-refresh | Watches for rebuilds and triggers browser reload (not true HMR) |
+| Rsbuild + Module Federation | Yes | Full HMR, but requires migrating from Vite to Rsbuild |
+
+### Workarounds
+
+**For active development on a single remote**, rebuild on change and manually refresh:
+
+```bash
+# Terminal 1: pnpm dev (shell + all previews)
+# Terminal 2: watch and rebuild the remote you're editing
+pnpm --filter @mycircle/baby-tracker build --watch
+```
+
+After each rebuild, the preview server picks up the new files. Refresh the browser to load the updated remote.
+
+**For a smoother workflow**, consider adding `@antdevx/vite-plugin-hmr-sync` which automatically triggers a browser reload when a remote rebuilds — removing the manual refresh step.
+
+### Rule of Thumb
+
+> HMR works within a single Vite dev server. Across federated boundaries, expect rebuild + refresh. Focus `dev` mode on the package you're actively editing.
+
+---
+
 ## Quick Reference
 
 | Pitfall | Root Cause | Fix | Severity |
@@ -401,3 +462,4 @@ Note the path difference: the root config uses `./packages/shell/src/test/mocks/
 | Storage key collisions | Shared `localStorage` | Single `StorageKeys` enum in shared package | Medium |
 | Body scroll lock conflicts | Multiple modals managing `overflow` | Ref-counting or shared hook | Low |
 | Missing test aliases | New remote added to shell but not root vitest config | Update both `vitest.config.ts` files + create mock | High |
+| No remote HMR in dev | Federation remotes run on separate servers; HMR doesn't cross boundaries | Rebuild + refresh; or use `hmr-sync` plugin for auto-reload | Limitation |
