@@ -252,7 +252,32 @@ The WIF service account (`firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceacco
 
 > **Important:** The **Service Account User** role must be granted at the **project level** (in the IAM page), not on a specific service account resource. A project-level grant allows `actAs` on *all* service accounts in the project, including the App Engine default SA that Cloud Functions run as.
 
-### Adding roles via gcloud CLI
+### Cloud Functions v2 Service Agent Bindings (one-time setup)
+
+Cloud Functions v2 (used by this project) runs on Cloud Run and uses Eventarc/Pub/Sub for triggers. Google-managed service agents need specific IAM roles for this infrastructure to work. Firebase CLI tries to create these bindings automatically during deploy, but the deploy SA lacks `roles/resourcemanager.projectIamAdmin` to do so.
+
+Run these **once** as a project Owner:
+
+```bash
+# Pub/Sub service agent needs to create auth tokens for Eventarc
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:service-441498720264@gcp-sa-pubsub.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountTokenCreator"
+
+# Default Compute SA needs to invoke Cloud Run services (where v2 functions run)
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" \
+  --role="roles/run.invoker"
+
+# Default Compute SA needs to receive Eventarc events (scheduled triggers, etc.)
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" \
+  --role="roles/eventarc.eventReceiver"
+```
+
+> **Why is this separate?** These roles are on *Google-managed service agents*, not on the deploy SA. They enable the Cloud Functions v2 infrastructure (Cloud Run + Eventarc + Pub/Sub) to function. Without them, deploy fails with "We failed to modify the IAM policy for the project."
+
+### Adding roles for the deploy service account via gcloud CLI
 
 ```bash
 SA="firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com"
@@ -363,6 +388,19 @@ for the resource "projects/mycircle-dash/locations/us-central1/jobs/firebase-sch
 - Scheduled Cloud Functions (e.g., `checkWeatherAlerts`) are backed by Cloud Scheduler jobs
 - The deploying SA needs **Cloud Scheduler Admin** (`roles/cloudscheduler.admin`) to create/update these jobs
 - Only affects functions that use `onSchedule()` — HTTP and callable functions deploy without this role
+
+### "We failed to modify the IAM policy for the project" on functions deploy
+
+```
+Error: We failed to modify the IAM policy for the project. The functions
+deployment requires specific roles to be granted to service agents,
+otherwise the deployment will fail.
+```
+
+- Cloud Functions v2 requires IAM bindings on **Google-managed service agents** (not the deploy SA)
+- Firebase CLI tries to create these bindings automatically but the deploy SA lacks `roles/resourcemanager.projectIamAdmin`
+- **Fix:** Run the three `gcloud` commands in the [Cloud Functions v2 Service Agent Bindings](#cloud-functions-v2-service-agent-bindings-one-time-setup) section above as a project Owner
+- These are one-time bindings — once set, subsequent deploys won't need them again
 
 ### "403 — Cloud Billing API has not been used" or is disabled
 

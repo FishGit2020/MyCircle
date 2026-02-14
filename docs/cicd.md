@@ -272,6 +272,7 @@ The deploy workflow authenticates via Workload Identity Federation as `firebase-
 | `secretmanager.versions.get` denied | **Secret Manager Viewer** (`roles/secretmanager.viewer`) | Required to validate function secrets during deploy |
 | `iam.serviceAccounts.ActAs` denied | **Service Account User** (`roles/iam.serviceAccountUser`) | Required to deploy Cloud Functions (must be project-level) |
 | `firebaserules.googleapis.com` 403 | **Firebase Admin** (`roles/firebase.admin`) | Required to compile and deploy Firestore rules |
+| "We failed to modify the IAM policy" | **Service agent bindings** (see below) | Cloud Functions v2 infrastructure needs one-time IAM setup |
 
 To add a missing role:
 
@@ -279,6 +280,27 @@ To add a missing role:
 SA="firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com"
 gcloud projects add-iam-policy-binding mycircle-dash \
   --member="serviceAccount:$SA" --role="roles/<missing-role>"
+```
+
+### Cloud Functions v2 Service Agent Bindings
+
+Cloud Functions v2 runs on Cloud Run with Eventarc/Pub/Sub triggers. These **Google-managed service agents** need specific roles that Firebase CLI cannot auto-create without `roles/resourcemanager.projectIamAdmin`. Run these **once** as a project Owner:
+
+```bash
+# Pub/Sub service agent — creates auth tokens for Eventarc
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:service-441498720264@gcp-sa-pubsub.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountTokenCreator"
+
+# Default Compute SA — invokes Cloud Run services (where v2 functions run)
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" \
+  --role="roles/run.invoker"
+
+# Default Compute SA — receives Eventarc events (scheduled triggers, etc.)
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" \
+  --role="roles/eventarc.eventReceiver"
 ```
 
 > **Note:** IAM changes can take up to 7 minutes to propagate. If a deploy fails after adding a role, wait and re-run the workflow.

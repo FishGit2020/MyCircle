@@ -67,7 +67,7 @@ if (firebaseEnabled) {
 
   // Connect to Firebase emulators when served by the Hosting emulator (port 5000)
   if (typeof window !== 'undefined') {
-    const isEmulator = window.location.hostname === 'localhost'
+    const isEmulator = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       && window.location.port === '5000';
     if (isEmulator) {
       if (db) connectFirestoreEmulator(db, 'localhost', 8080);

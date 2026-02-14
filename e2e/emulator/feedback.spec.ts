@@ -36,7 +36,7 @@ test.describe('Feedback → Firestore Emulator', () => {
     await clearFirestoreFeedback(request);
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Open feedback modal
     await page.getByRole('button', { name: /feedback/i }).click();
@@ -95,7 +95,7 @@ test.describe('Feedback → Firestore Emulator', () => {
     );
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Sign in via the exposed test helper
     await page.evaluate(
@@ -136,7 +136,7 @@ test.describe('Feedback → Firestore Emulator', () => {
     await clearFirestoreFeedback(request);
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Open feedback modal
     await page.getByRole('button', { name: /feedback/i }).click();
