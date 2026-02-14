@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation, StorageKeys } from '@mycircle/shared';
-import { requestNotificationPermission, onForegroundMessage, subscribeToWeatherAlerts, unsubscribeFromWeatherAlerts } from '../lib/messaging';
+import { requestNotificationPermission, onForegroundMessage, subscribeToWeatherAlerts, unsubscribeFromWeatherAlerts, subscribeToTopic, unsubscribeFromTopic } from '../lib/messaging';
 import { firebaseEnabled } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 
 const STORAGE_KEY = 'weather-alerts-enabled';
 const STOCK_ALERTS_KEY = 'stock-alerts-enabled';
 const PODCAST_ALERTS_KEY = 'podcast-alerts-enabled';
+const ANNOUNCEMENT_ALERTS_KEY = 'announcement-alerts-enabled';
 
 export default function NotificationBell() {
   const { t } = useTranslation();
@@ -14,6 +15,7 @@ export default function NotificationBell() {
   const [weatherEnabled, setWeatherEnabled] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
   const [stockEnabled, setStockEnabled] = useState(() => localStorage.getItem(STOCK_ALERTS_KEY) === 'true');
   const [podcastEnabled, setPodcastEnabled] = useState(() => localStorage.getItem(PODCAST_ALERTS_KEY) === 'true');
+  const [announcementEnabled, setAnnouncementEnabled] = useState(() => localStorage.getItem(ANNOUNCEMENT_ALERTS_KEY) === 'true');
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [toast, setToast] = useState<{ title?: string; body?: string } | null>(null);
@@ -22,7 +24,7 @@ export default function NotificationBell() {
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const anyEnabled = weatherEnabled || stockEnabled || podcastEnabled;
+  const anyEnabled = weatherEnabled || stockEnabled || podcastEnabled || announcementEnabled;
 
   // Don't render if Firebase or Notification API isn't available
   if (!firebaseEnabled || typeof Notification === 'undefined') return null;
@@ -170,6 +172,44 @@ export default function NotificationBell() {
     showFeedback(t('notifications.enabled'));
   }, [podcastEnabled, loading, ensureToken]);
 
+  const handleToggleAnnouncements = useCallback(async () => {
+    if (loading) return;
+
+    if (announcementEnabled && fcmToken) {
+      setLoading(true);
+      try {
+        await unsubscribeFromTopic(fcmToken, 'announcements');
+        setAnnouncementEnabled(false);
+        localStorage.setItem(ANNOUNCEMENT_ALERTS_KEY, 'false');
+        showFeedback(t('notifications.disabled'));
+      } catch {
+        showFeedback(t('notifications.failedToDisable'));
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    const token = await ensureToken();
+    if (!token) return;
+
+    setLoading(true);
+    try {
+      const ok = await subscribeToTopic(token, 'announcements');
+      if (ok) {
+        setAnnouncementEnabled(true);
+        localStorage.setItem(ANNOUNCEMENT_ALERTS_KEY, 'true');
+        showFeedback(t('notifications.enabled'));
+      } else {
+        showFeedback(t('notifications.subscriptionFailed'));
+      }
+    } catch {
+      showFeedback(t('notifications.failedToEnable'));
+    } finally {
+      setLoading(false);
+    }
+  }, [announcementEnabled, loading, fcmToken, ensureToken]);
+
   // Re-acquire FCM token on mount if any alerts were previously enabled
   useEffect(() => {
     if (!anyEnabled || fcmToken) return;
@@ -184,6 +224,12 @@ export default function NotificationBell() {
     const cities = favoriteCities.map(c => ({ lat: c.lat, lon: c.lon, name: c.name }));
     subscribeToWeatherAlerts(fcmToken, cities);
   }, [favoriteCities, weatherEnabled, fcmToken]);
+
+  // Re-subscribe announcements topic on token refresh
+  useEffect(() => {
+    if (!announcementEnabled || !fcmToken) return;
+    subscribeToTopic(fcmToken, 'announcements');
+  }, [announcementEnabled, fcmToken]);
 
   // Listen for foreground messages when any alert is enabled
   useEffect(() => {
@@ -275,6 +321,19 @@ export default function NotificationBell() {
                 }
                 color="purple"
               />
+              {/* Announcement alerts */}
+              <NotificationToggle
+                label={t('notifications.announcementAlerts')}
+                description={t('notifications.announcementAlertsDesc')}
+                enabled={announcementEnabled}
+                onToggle={handleToggleAnnouncements}
+                icon={
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                  </svg>
+                }
+                color="amber"
+              />
             </div>
           </div>
         )}
@@ -316,12 +375,13 @@ function NotificationToggle({
   enabled: boolean;
   onToggle: () => void;
   icon: React.ReactNode;
-  color: 'blue' | 'green' | 'purple';
+  color: 'blue' | 'green' | 'purple' | 'amber';
 }) {
   const colorClasses = {
     blue: 'bg-blue-50 dark:bg-blue-900/20 text-blue-500',
     green: 'bg-green-50 dark:bg-green-900/20 text-green-500',
     purple: 'bg-purple-50 dark:bg-purple-900/20 text-purple-500',
+    amber: 'bg-amber-50 dark:bg-amber-900/20 text-amber-500',
   };
 
   return (

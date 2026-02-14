@@ -146,6 +146,8 @@ const en = {
   'notifications.podcastAlertsDesc': 'When subscribed podcasts release new episodes',
   'notifications.noWatchlistForAlerts': 'Add stocks to your watchlist first',
   'notifications.noSubscriptionsForAlerts': 'Subscribe to podcasts first',
+  'notifications.announcementAlerts': 'Announcements',
+  'notifications.announcementAlertsDesc': 'Get notified when new app updates are posted',
 
   // Compare
   'compare.title': 'Compare Weather',
@@ -900,6 +902,8 @@ const es: Record<TranslationKey, string> = {
   'notifications.podcastAlertsDesc': 'Cuando tus podcasts suscritos publiquen nuevos episodios',
   'notifications.noWatchlistForAlerts': 'Agrega acciones a tu lista primero',
   'notifications.noSubscriptionsForAlerts': 'Suscr\u00edbete a podcasts primero',
+  'notifications.announcementAlerts': 'Anuncios',
+  'notifications.announcementAlertsDesc': 'Recibe notificaciones de nuevas actualizaciones',
 
   // Compare
   'compare.title': 'Comparar Clima',
@@ -1654,6 +1658,8 @@ const zh: Record<TranslationKey, string> = {
   'notifications.podcastAlertsDesc': '\u5f53\u8ba2\u9605\u7684\u64ad\u5ba2\u53d1\u5e03\u65b0\u8282\u76ee\u65f6\u63d0\u9192',
   'notifications.noWatchlistForAlerts': '\u8bf7\u5148\u6dfb\u52a0\u80a1\u7968\u5230\u81ea\u9009\u5217\u8868',
   'notifications.noSubscriptionsForAlerts': '\u8bf7\u5148\u8ba2\u9605\u64ad\u5ba2',
+  'notifications.announcementAlerts': '\u516c\u544a\u901a\u77e5',
+  'notifications.announcementAlertsDesc': '\u5f53\u53d1\u5e03\u65b0\u7684\u5e94\u7528\u66f4\u65b0\u65f6\u63a5\u6536\u901a\u77e5',
 
   // Compare
   'compare.title': '\u5929\u6c14\u5bf9\u6bd4',
