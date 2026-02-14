@@ -18,7 +18,7 @@ vi.mock('@mycircle/shared', () => ({
   },
   subscribeToMFEvent: () => () => {},
   useQuery: () => ({ data: null, loading: false, error: null }),
-  GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
+  GET_BIBLE_VOTD_API: { kind: 'Document', definitions: [] },
   getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
   getAllDailyVerses: () => [{ text: 'Test verse', reference: 'Test 1:1' }],
 }));

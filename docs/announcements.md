@@ -40,17 +40,68 @@ Announcements are stored in the Firestore `announcements` collection. They are *
    - `createdAt` (timestamp): select current date/time
 5. Click **Save** — the badge appears for all users on next page load
 
-### Option B — Firebase CLI (for scripting / CI)
+### Option B — Firestore REST API (recommended for local dev)
+
+This uses your existing `firebase login` credentials — no service account needed.
+
+**Prerequisites:**
+
+- You must be logged in: `npx firebase-tools login`
+- Your account must have Firestore write access on the project
+
+**Steps:**
 
 ```bash
-# Install firebase-tools if needed
-npm i -g firebase-tools
+node -e "
+const os = require('os');
+const path = require('path');
+const fs = require('fs');
 
-# Add a document via the REST API
-firebase firestore:delete --help  # (no direct CLI create — use Admin SDK or REST)
+// 1. Read access token from Firebase CLI config
+const configPath = path.join(os.homedir(), '.config/configstore/firebase-tools.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+const accessToken = config.tokens.access_token;
+
+// 2. Build the announcement document
+const now = new Date().toISOString();
+const body = JSON.stringify({
+  fields: {
+    title:       { stringValue: 'YOUR TITLE HERE' },
+    description: { stringValue: 'YOUR DESCRIPTION HERE' },
+    icon:        { stringValue: 'announcement' },
+    createdAt:   { timestampValue: now }
+  }
+});
+
+// 3. POST to Firestore REST API
+fetch('https://firestore.googleapis.com/v1/projects/mycircle-dash/databases/(default)/documents/announcements', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer ' + accessToken,
+    'Content-Type': 'application/json'
+  },
+  body
+})
+.then(r => r.json())
+.then(data => {
+  if (data.error) { console.error('Error:', data.error.message); process.exit(1); }
+  console.log('Created announcement:', data.name.split('/').pop());
+})
+.catch(err => { console.error(err); process.exit(1); });
+"
 ```
 
-For scripted creation, use the Admin SDK in a Node script:
+> **Tip:** If the token is expired, run `npx firebase-tools login:use` to refresh it, then retry.
+
+### Option C — Admin SDK script (for CI / service accounts)
+
+Requires `GOOGLE_APPLICATION_CREDENTIALS` env var pointing to a service account JSON.
+
+```bash
+npx tsx scripts/seed-welcome-announcement.ts
+```
+
+Or write a custom script:
 
 ```typescript
 import { initializeApp, cert } from 'firebase-admin/app';

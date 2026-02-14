@@ -188,7 +188,7 @@ function DailyDevotional({ onRead }: { onRead: (book: string, chapter: number) =
   };
 
   return (
-    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-5 border border-amber-200 dark:border-amber-700/60">
+    <div className="bg-amber-50 dark:bg-amber-900/10 rounded-xl p-5 border border-amber-200 dark:border-amber-700/60">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <h2 className="text-sm font-semibold text-amber-700 dark:text-amber-100 uppercase tracking-wide mb-1">
