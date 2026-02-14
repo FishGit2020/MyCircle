@@ -170,7 +170,20 @@ export default function WeatherDisplay() {
       </Link>
 
       <div className="flex items-center justify-between relative z-10">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{cityName}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{cityName}</h2>
+          <a
+            href="#weather-compare"
+            onClick={(e) => { e.preventDefault(); document.getElementById('weather-compare')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition"
+            aria-label={t('compare.compareButton' as any)}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            {t('compare.compareButton' as any)}
+          </a>
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setLiveEnabled(prev => !prev)}

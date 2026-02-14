@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery } from '@apollo/client/react';
-import { GET_CURRENT_WEATHER, GET_FORECAST, getWeatherIconUrl, getWindDirection, useTranslation, useUnits, formatTemperature, formatWindSpeed, convertTemp, tempUnitSymbol } from '@mycircle/shared';
+import { useQuery, useLazyQuery } from '@apollo/client/react';
+import { GET_CURRENT_WEATHER, GET_FORECAST, SEARCH_CITIES, getWeatherIconUrl, getWindDirection, useTranslation, useUnits, formatTemperature, formatWindSpeed, convertTemp, tempUnitSymbol } from '@mycircle/shared';
 
 interface City {
   id: string;
@@ -250,6 +250,57 @@ function MiniComparisonChart({ cityA, cityB }: { cityA: City; cityB: City }) {
   );
 }
 
+/** Inline city search for comparing */
+function CitySearchInline({ onSelect }: { onSelect: (city: City) => void }) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
+  const [searchCities, { data, loading }] = useLazyQuery<{ searchCities: City[] }>(SEARCH_CITIES);
+
+  const handleSearch = (value: string) => {
+    setQuery(value);
+    if (value.trim().length >= 2) {
+      searchCities({ variables: { query: value.trim(), limit: 5 } });
+    }
+  };
+
+  const results = data?.searchCities ?? [];
+
+  return (
+    <div className="relative">
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => handleSearch(e.target.value)}
+        placeholder={t('compare.searchCity' as any)}
+        className="w-full sm:w-64 px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        aria-label={t('compare.searchCity' as any)}
+      />
+      {query.trim().length >= 2 && (
+        <div className="absolute z-10 mt-1 w-full sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+          {loading && (
+            <div className="px-3 py-2 text-sm text-gray-400 dark:text-gray-500 animate-pulse">...</div>
+          )}
+          {!loading && results.length === 0 && (
+            <div className="px-3 py-2 text-sm text-gray-400 dark:text-gray-500">No results</div>
+          )}
+          {results.map((city) => (
+            <button
+              key={city.id}
+              onClick={() => {
+                onSelect(city);
+                setQuery('');
+              }}
+              className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-700 dark:text-gray-300 transition-colors"
+            >
+              {city.name}{city.state ? `, ${city.state}` : ''}{city.country ? `, ${city.country}` : ''}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface WeatherComparisonProps {
   currentCity: City;
   availableCities: City[];
@@ -261,8 +312,6 @@ export default function WeatherComparison({ currentCity, availableCities }: Weat
   const [expanded, setExpanded] = useState(otherCities.length > 0);
   const [compareCity, setCompareCity] = useState<City | null>(null);
 
-  if (otherCities.length === 0) return null;
-
   const handleSwap = () => {
     // Cannot truly swap since currentCity is from URL,
     // but we can cycle through available cities
@@ -272,8 +321,13 @@ export default function WeatherComparison({ currentCity, availableCities }: Weat
     setCompareCity(otherCities[nextIndex]);
   };
 
+  const handleAddCity = (city: City) => {
+    setCompareCity(city);
+    setExpanded(true);
+  };
+
   return (
-    <section className="mt-6">
+    <section id="weather-compare" className="mt-6">
       <button
         onClick={() => setExpanded(prev => !prev)}
         className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition"
@@ -291,20 +345,23 @@ export default function WeatherComparison({ currentCity, availableCities }: Weat
 
       {expanded && (
         <div className="mt-4 space-y-4 animate-fadeIn">
-          <div className="flex items-center gap-2">
-            <select
-              value={compareCity?.id || ''}
-              onChange={(e) => {
-                const selected = otherCities.find(c => c.id === e.target.value);
-                setCompareCity(selected ?? null);
-              }}
-              className="flex-1 sm:flex-none sm:w-64 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm"
-            >
-              <option value="">{t('compare.chooseCity')}</option>
-              {otherCities.map(c => (
-                <option key={c.id} value={c.id}>{c.name}{c.country ? `, ${c.country}` : ''}</option>
-              ))}
-            </select>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Existing city dropdown (if cities available) */}
+            {otherCities.length > 0 && (
+              <select
+                value={compareCity?.id || ''}
+                onChange={(e) => {
+                  const selected = otherCities.find(c => c.id === e.target.value);
+                  setCompareCity(selected ?? null);
+                }}
+                className="flex-1 sm:flex-none sm:w-64 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white text-sm"
+              >
+                <option value="">{t('compare.chooseCity')}</option>
+                {otherCities.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}{c.country ? `, ${c.country}` : ''}</option>
+                ))}
+              </select>
+            )}
 
             {/* Swap / cycle button */}
             {compareCity && otherCities.length > 1 && (
@@ -319,6 +376,14 @@ export default function WeatherComparison({ currentCity, availableCities }: Weat
                 </svg>
               </button>
             )}
+          </div>
+
+          {/* Inline city search — always available */}
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+              {otherCities.length === 0 ? t('compare.searchCity' as any) : t('compare.addCity' as any)}
+            </p>
+            <CitySearchInline onSelect={handleAddCity} />
           </div>
 
           {compareCity && (
