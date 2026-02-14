@@ -14,6 +14,7 @@ export default defineConfig({
       'bibleReader/BibleReader': resolve(__dirname, './packages/shell/src/test/mocks/BibleReaderMock.tsx'),
       'worshipSongs/WorshipSongs': resolve(__dirname, './packages/shell/src/test/mocks/WorshipSongsMock.tsx'),
       'notebook/Notebook': resolve(__dirname, './packages/shell/src/test/mocks/NotebookMock.tsx'),
+      'babyTracker/BabyTracker': resolve(__dirname, './packages/shell/src/test/mocks/BabyTrackerMock.tsx'),
       '@weather/shared': resolve(__dirname, './packages/shared/src'),
     }
   },
