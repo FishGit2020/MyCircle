@@ -160,7 +160,7 @@ export default function WeatherDisplay() {
   return (
     <div className="weather-display-container space-y-6 animate-fadeIn" aria-live="polite">
       <Link
-        to="/"
+        to="/weather"
         className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
