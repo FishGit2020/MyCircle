@@ -14,6 +14,7 @@ vi.mock('@mycircle/shared', () => ({
   useLazyQuery: vi.fn(),
   GET_BIBLE_VOTD: { kind: 'Document', definitions: [] },
   GET_BIBLE_PASSAGE: { kind: 'Document', definitions: [] },
+  GET_BIBLE_VERSIONS: { kind: 'Document', definitions: [] },
   StorageKeys: {
     BIBLE_BOOKMARKS: 'bible-bookmarks',
     BIBLE_LAST_READ: 'bible-last-read',
@@ -24,6 +25,13 @@ vi.mock('@mycircle/shared', () => ({
   },
   getDailyDevotional: () => ({ book: 'Psalms', chapter: 23, theme: 'The Lord is my shepherd' }),
 }));
+
+// Mock versions data
+const MOCK_VERSIONS = [
+  { id: 1, abbreviation: 'KJV', title: 'King James Version' },
+  { id: 111, abbreviation: 'NIV', title: 'New International Version' },
+  { id: 1588, abbreviation: 'AMP', title: 'Amplified Bible' },
+];
 
 // Mock the hooks since they depend on Apollo
 vi.mock('../hooks/useBibleData', async () => {
@@ -47,6 +55,11 @@ vi.mock('../hooks/useBibleData', async () => {
       selectedBook: '',
       selectedChapter: 0,
       loadPassage: vi.fn(),
+    })),
+    useBibleVersions: vi.fn(() => ({
+      versions: MOCK_VERSIONS,
+      loading: false,
+      error: null,
     })),
   };
 });
@@ -143,7 +156,7 @@ describe('BibleReader', () => {
       </MockedProvider>
     );
 
-    expect(screen.getByText('bible.attribution')).toBeInTheDocument();
+    expect(screen.getByText('bible.attributionYouVersion')).toBeInTheDocument();
   });
 
   it('renders VOTD loading state', async () => {
@@ -176,8 +189,9 @@ describe('Community Notes', () => {
       passage: {
         text: 'In the beginning God created the heavens and the earth.',
         reference: 'Genesis 1',
-        translation: 'WEB',
+        translation: 'KJV',
         verseCount: 31,
+        copyright: null,
       },
       loading: false,
       error: null,
@@ -187,6 +201,11 @@ describe('Community Notes', () => {
     });
     vi.mocked(mod.useVotd).mockReturnValue({
       verse: { text: 'Test verse', reference: 'Test 1:1', translation: 'NIV', copyright: null },
+      loading: false,
+      error: null,
+    });
+    vi.mocked(mod.useBibleVersions).mockReturnValue({
+      versions: MOCK_VERSIONS,
       loading: false,
       error: null,
     });
@@ -362,7 +381,7 @@ describe('Bible Version Selector', () => {
     expect(screen.getByLabelText('bible.versionSelect')).toBeInTheDocument();
   });
 
-  it('defaults to WEB when no version is stored', () => {
+  it('defaults to KJV (id=1) when no version is stored', () => {
     render(
       <MockedProvider mocks={[]} addTypename={false}>
         <BibleReader />
@@ -370,11 +389,11 @@ describe('Bible Version Selector', () => {
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
-    expect(select.value).toBe('web');
+    expect(select.value).toBe('1');
   });
 
   it('restores saved version from localStorage', () => {
-    localStorage.setItem('bible-translation', 'kjv');
+    localStorage.setItem('bible-translation', '111');
 
     render(
       <MockedProvider mocks={[]} addTypename={false}>
@@ -383,7 +402,7 @@ describe('Bible Version Selector', () => {
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
-    expect(select.value).toBe('kjv');
+    expect(select.value).toBe('111');
   });
 
   it('persists version selection to localStorage', async () => {
@@ -394,11 +413,11 @@ describe('Bible Version Selector', () => {
       </MockedProvider>
     );
 
-    await user.selectOptions(screen.getByLabelText('bible.versionSelect'), 'kjv');
-    expect(localStorage.getItem('bible-translation')).toBe('kjv');
+    await user.selectOptions(screen.getByLabelText('bible.versionSelect'), '111');
+    expect(localStorage.getItem('bible-translation')).toBe('111');
   });
 
-  it('shows all version options', () => {
+  it('shows dynamic version options from YouVersion API', () => {
     render(
       <MockedProvider mocks={[]} addTypename={false}>
         <BibleReader />
@@ -406,10 +425,46 @@ describe('Bible Version Selector', () => {
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
-    expect(select.options.length).toBe(6);
-    // Check a few
-    expect(select.options[0].value).toBe('web');
-    expect(select.options[1].value).toBe('kjv');
+    expect(select.options.length).toBe(3);
+    expect(select.options[0].value).toBe('1');
+    expect(select.options[1].value).toBe('111');
+    expect(select.options[2].value).toBe('1588');
+  });
+
+  it('shows loading state while versions are loading', async () => {
+    const mod = await import('../hooks/useBibleData');
+    vi.mocked(mod.useBibleVersions).mockReturnValue({
+      versions: [],
+      loading: true,
+      error: null,
+    });
+
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
+    expect(select.disabled).toBe(true);
+  });
+
+  it('shows fallback KJV option when API fails', async () => {
+    const mod = await import('../hooks/useBibleData');
+    vi.mocked(mod.useBibleVersions).mockReturnValue({
+      versions: [],
+      loading: false,
+      error: new Error('API error'),
+    });
+
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
+    expect(select.options.length).toBeGreaterThanOrEqual(1);
   });
 
   it('reloads passage with new version when changed during passage view', async () => {
@@ -419,8 +474,9 @@ describe('Bible Version Selector', () => {
       passage: {
         text: 'In the beginning God created the heavens and the earth.',
         reference: 'Genesis 1',
-        translation: 'WEB',
+        translation: 'KJV',
         verseCount: 31,
+        copyright: null,
       },
       loading: false,
       error: null,
@@ -430,6 +486,11 @@ describe('Bible Version Selector', () => {
     });
     vi.mocked(mod.useVotd).mockReturnValue({
       verse: { text: 'Test', reference: 'Test 1:1', translation: 'NIV', copyright: null },
+      loading: false,
+      error: null,
+    });
+    vi.mocked(mod.useBibleVersions).mockReturnValue({
+      versions: MOCK_VERSIONS,
       loading: false,
       error: null,
     });
@@ -448,11 +509,51 @@ describe('Bible Version Selector', () => {
     // Clear mock calls from navigation
     mockLoadPassage.mockClear();
 
-    // Change version to KJV
-    await user.selectOptions(screen.getByLabelText('bible.versionSelect'), 'kjv');
+    // Change version to NIV (id=111)
+    await user.selectOptions(screen.getByLabelText('bible.versionSelect'), '111');
 
     // Should reload passage with new translation
-    expect(mockLoadPassage).toHaveBeenCalledWith('Genesis', 1, 'kjv');
+    expect(mockLoadPassage).toHaveBeenCalledWith('Genesis', 1, '111');
+  });
+
+  it('displays copyright notice when passage has copyright', async () => {
+    const mod = await import('../hooks/useBibleData');
+    vi.mocked(mod.useBiblePassage).mockReturnValue({
+      passage: {
+        text: 'In the beginning God created the heavens and the earth.',
+        reference: 'Genesis 1',
+        translation: 'NIV',
+        verseCount: 31,
+        copyright: 'Copyright 2011 by Biblica, Inc.',
+      },
+      loading: false,
+      error: null,
+      selectedBook: 'Genesis',
+      selectedChapter: 1,
+      loadPassage: vi.fn(),
+    });
+    vi.mocked(mod.useVotd).mockReturnValue({
+      verse: { text: 'Test', reference: 'Test 1:1', translation: 'NIV', copyright: null },
+      loading: false,
+      error: null,
+    });
+    vi.mocked(mod.useBibleVersions).mockReturnValue({
+      versions: MOCK_VERSIONS,
+      loading: false,
+      error: null,
+    });
+
+    const user = userEvent.setup();
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <BibleReader />
+      </MockedProvider>
+    );
+
+    await user.click(screen.getByText('Genesis'));
+    await user.click(screen.getByText('1'));
+
+    expect(screen.getByText('Copyright 2011 by Biblica, Inc.')).toBeInTheDocument();
   });
 
   it('has accessible label for version selector', () => {

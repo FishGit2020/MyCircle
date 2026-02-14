@@ -12,6 +12,7 @@ Step-by-step instructions for obtaining every API key used by MyCircle. All keys
 - [PodcastIndex](#podcastindex)
 - [Google Gemini (AI Assistant)](#google-gemini)
 - [reCAPTCHA Enterprise](#recaptcha-enterprise)
+- [YouVersion (Bible)](#youversion)
 - [Sentry (Error Tracking)](#sentry)
 - [Summary of Variables](#summary)
 - [Emulator Testing](#emulator-testing-envemulator)
@@ -178,6 +179,33 @@ RECAPTCHA_SECRET_KEY=6Le...
 
 ---
 
+## YouVersion
+
+Provides Bible versions and passage text for the Bible Reader feature.
+
+### Steps
+
+1. Go to the [YouVersion Developer Portal](https://developers.youversion.com/)
+2. Register as a developer and create a new application
+3. Once approved, copy your **App Key** from the dashboard
+4. The API provides 19+ English Bible translations including KJV, NIV, AMP, NASB
+
+### Env file
+
+Root `.env`:
+```
+YOUVERSION_APP_KEY=your_key_here
+```
+
+### API Reference
+
+- [YouVersion Bible API docs](https://developers.youversion.com/api/bibles)
+- List versions: `GET /v1/bibles?language_ranges[]=en&all_available=true`
+- Get passage: `GET /v1/bibles/{id}/passages/{passageId}?format=text`
+- Passage ID format: USFM — `JHN.3.16`, `GEN.1`, `PSA.23`
+
+---
+
 ## Sentry
 
 Optional error tracking and session replay for production monitoring.
@@ -209,6 +237,7 @@ VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 | `PODCASTINDEX_API_KEY` | PodcastIndex | For podcasts |
 | `PODCASTINDEX_API_SECRET` | PodcastIndex | For podcasts |
 | `GEMINI_API_KEY` | Google Gemini | For AI chat |
+| `YOUVERSION_APP_KEY` | YouVersion | For Bible reader |
 | `RECAPTCHA_SECRET_KEY` | reCAPTCHA Enterprise | For App Check |
 
 ### `packages/shell/.env` (Client-side — Browser)
@@ -236,6 +265,7 @@ firebase functions:secrets:set FINNHUB_API_KEY
 firebase functions:secrets:set PODCASTINDEX_API_KEY
 firebase functions:secrets:set PODCASTINDEX_API_SECRET
 firebase functions:secrets:set GEMINI_API_KEY
+firebase functions:secrets:set YOUVERSION_APP_KEY
 ```
 
 ### Emulator Testing (`.env.emulator`)
@@ -248,7 +278,7 @@ When running Firebase emulators, API keys are replaced with dummy values and all
 | `FINNHUB_BASE_URL` | `http://localhost:4000` | Redirect Finnhub calls to mock |
 | `COINGECKO_BASE_URL` | `http://localhost:4000` | Redirect CoinGecko calls to mock |
 | `PODCASTINDEX_BASE_URL` | `http://localhost:4000` | Redirect PodcastIndex calls to mock |
-| `BIBLE_API_BASE_URL` | `http://localhost:4000` | Redirect Bible API calls to mock |
+| `YOUVERSION_API_BASE_URL` | `http://localhost:4000` | Redirect YouVersion API calls to mock |
 | `OPEN_METEO_BASE_URL` | `http://localhost:4000` | Redirect Open-Meteo calls to mock |
 | `*_API_KEY` / `*_API_SECRET` | `test-*-key` | Dummy keys (mock server ignores auth) |
 

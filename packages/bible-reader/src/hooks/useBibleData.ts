@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useQuery, useLazyQuery, GET_BIBLE_VOTD, GET_BIBLE_PASSAGE } from '@mycircle/shared';
+import { useQuery, useLazyQuery, GET_BIBLE_VOTD, GET_BIBLE_PASSAGE, GET_BIBLE_VERSIONS } from '@mycircle/shared';
 
 // --- Types ---
 
@@ -15,6 +15,13 @@ export interface BiblePassage {
   reference: string;
   translation: string | null;
   verseCount: number;
+  copyright: string | null;
+}
+
+export interface BibleVersion {
+  id: number;
+  abbreviation: string;
+  title: string;
 }
 
 interface VotdResponse {
@@ -23,6 +30,10 @@ interface VotdResponse {
 
 interface PassageResponse {
   biblePassage: BiblePassage;
+}
+
+interface VersionsResponse {
+  bibleVersions: BibleVersion[];
 }
 
 // 66 canonical books with chapter counts
@@ -67,6 +78,19 @@ export function useVotd() {
 
   return {
     verse: data?.bibleVotd ?? null,
+    loading,
+    error,
+  };
+}
+
+/** Hook to fetch available Bible versions from YouVersion API */
+export function useBibleVersions() {
+  const { data, loading, error } = useQuery<VersionsResponse>(GET_BIBLE_VERSIONS, {
+    fetchPolicy: 'cache-first',
+  });
+
+  return {
+    versions: data?.bibleVersions ?? [],
     loading,
     error,
   };
