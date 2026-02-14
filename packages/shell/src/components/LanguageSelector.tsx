@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const LOCALES: { value: Locale; label: string }[] = [
   { value: 'en', label: 'EN' },
   { value: 'es', label: 'ES' },
+  { value: 'zh', label: '\u4e2d\u6587' },
 ];
 
 export default function LanguageSelector() {
@@ -16,7 +17,7 @@ export default function LanguageSelector() {
   useEffect(() => {
     if (user && profile?.locale && !initialSyncDone.current) {
       const profileLocale = profile.locale as Locale;
-      if ((profileLocale === 'en' || profileLocale === 'es') && profileLocale !== locale) {
+      if ((profileLocale === 'en' || profileLocale === 'es' || profileLocale === 'zh') && profileLocale !== locale) {
         setLocale(profileLocale);
       }
       initialSyncDone.current = true;
