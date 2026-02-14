@@ -108,14 +108,6 @@ export default function DashboardPage() {
                 )}
               </>
             )}
-            <div className="mt-2 flex items-center justify-center">
-              <button
-                onClick={shuffleVerse}
-                className="text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-              >
-                Random verse ›
-              </button>
-            </div>
           </div>
         </div>
       </section>
