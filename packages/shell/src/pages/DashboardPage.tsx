@@ -76,7 +76,7 @@ export default function DashboardPage() {
   const subscribedIds = getSubscribedIds();
   const worshipSongCount = getWorshipSongCount();
   const notebookCount = getNotebookCount();
-  const { verse, showVotd, toggleVotd, shuffleVerse, loading: verseLoading } = useDailyVerse();
+  const { verse, shuffleVerse, loading: verseLoading } = useDailyVerse();
 
   return (
     <div className="space-y-8">
@@ -108,21 +108,13 @@ export default function DashboardPage() {
                 )}
               </>
             )}
-            <div className="mt-2 flex items-center justify-center gap-3">
+            <div className="mt-2 flex items-center justify-center">
               <button
-                onClick={toggleVotd}
+                onClick={shuffleVerse}
                 className="text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
               >
-                {showVotd ? 'Show daily verse' : "View today's verse (YouVersion)"}
+                Random verse ›
               </button>
-              {!showVotd && (
-                <button
-                  onClick={shuffleVerse}
-                  className="text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                >
-                  Next verse ›
-                </button>
-              )}
             </div>
           </div>
         </div>

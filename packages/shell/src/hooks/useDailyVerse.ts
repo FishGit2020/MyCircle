@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useQuery, GET_BIBLE_VOTD, getDailyVerse, getAllDailyVerses } from '@mycircle/shared';
+import { useQuery, GET_BIBLE_VOTD, getAllDailyVerses } from '@mycircle/shared';
 import type { DailyVerse } from '@mycircle/shared';
 
 export type { DailyVerse };
@@ -21,25 +21,11 @@ interface VotdResponse {
 
 export function useDailyVerse() {
   const allVerses = getAllDailyVerses();
-  const initialVerse = getDailyVerse();
-  const initialIndex = allVerses.findIndex(
-    v => v.reference === initialVerse.reference
-  );
-
-  const [verseIndex, setVerseIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
-  const dailyVerse = allVerses[verseIndex];
-
-  const shuffleVerse = useCallback(() => {
-    setVerseIndex(prev => (prev + 1) % allVerses.length);
-  }, [allVerses.length]);
-
-  const [showVotd, setShowVotd] = useState(false);
   const day = getDayOfYear();
 
-  // Fetch VOTD via GraphQL — only when showVotd is toggled on
-  const { data, loading: votdLoading } = useQuery<VotdResponse>(GET_BIBLE_VOTD, {
+  // Always fetch VOTD via GraphQL (day-based)
+  const { data, loading } = useQuery<VotdResponse>(GET_BIBLE_VOTD, {
     variables: { day },
-    skip: !showVotd,
     fetchPolicy: 'cache-first',
   });
 
@@ -52,15 +38,20 @@ export function useDailyVerse() {
       }
     : null;
 
-  const toggleVotd = useCallback(() => {
-    setShowVotd(prev => !prev);
-  }, []);
+  // Fallback to local day-based verse while GraphQL loads
+  const dayIndex = day % allVerses.length;
+  const fallbackVerse = allVerses[dayIndex];
+
+  const [randomVerse, setRandomVerse] = useState<DailyVerse | null>(null);
+
+  const shuffleVerse = useCallback(() => {
+    const idx = Math.floor(Math.random() * allVerses.length);
+    setRandomVerse(allVerses[idx]);
+  }, [allVerses]);
 
   return {
-    verse: showVotd && votd ? votd : dailyVerse,
-    showVotd,
-    toggleVotd,
+    verse: randomVerse ?? (votd ?? fallbackVerse),
     shuffleVerse,
-    loading: showVotd && votdLoading,
+    loading: !randomVerse && loading,
   };
 }
