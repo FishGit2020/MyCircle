@@ -25,6 +25,16 @@ vi.mock('@mycircle/shared', () => ({
     kind: 'Document',
     definitions: [],
   },
+  SEARCH_CITIES: {
+    kind: 'Document',
+    definitions: [{
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'SearchCities' },
+      variableDefinitions: [],
+      selectionSet: { kind: 'SelectionSet', selections: [] },
+    }],
+  },
   getWeatherIconUrl: (icon: string) => `https://openweathermap.org/img/wn/${icon}@2x.png`,
   getWindDirection: (deg: number) => {
     const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -49,16 +59,18 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe('WeatherComparison', () => {
-  it('returns null when no other cities are available', () => {
-    const { container } = renderWithProviders(
+  it('renders collapsed toggle when no other cities are available', () => {
+    renderWithProviders(
       <WeatherComparison
         currentCity={currentCity}
         availableCities={[currentCity]}
       />,
     );
 
-    // Component returns null, so the container should be empty
-    expect(container.innerHTML).toBe('');
+    // Component renders a toggle button but no city count badge
+    expect(screen.getByRole('button', { name: /compare\.title/ })).toBeInTheDocument();
+    // Comparison is collapsed (no combobox/select visible)
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
   it('renders the "Compare Weather" button when other cities are available', () => {
