@@ -102,9 +102,17 @@ export function useWorshipSongs() {
     window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
   }, [loadSongs]);
 
-  const getSong = useCallback(async (id: string) => {
-    if (!window.__worshipSongs) return null;
-    return window.__worshipSongs.get(id);
+  const getSong = useCallback(async (id: string): Promise<WorshipSong | null> => {
+    if (!window.__worshipSongs) {
+      console.warn('Worship songs API not available');
+      return null;
+    }
+    try {
+      return await window.__worshipSongs.get(id);
+    } catch (err) {
+      console.error('Failed to get worship song:', id, err);
+      return null;
+    }
   }, []);
 
   return {

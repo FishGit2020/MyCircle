@@ -28,7 +28,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Geolocation ("Use My Location")
 - Favorite & recent cities (synced via Firestore)
 - Share weather (link or screenshot image)
-- Inline weather comparison (compare two cities side-by-side)
+- **Weather comparison** — compare two cities side-by-side with inline city search, prominent "Compare" button in header, always-visible comparison section
 - **Historical weather** — "This day last year" comparison using Open-Meteo archive API
 - **Air Quality Index** — real-time AQI with color-coded levels, expandable pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
 - Visible live/paused toggle with clear state indication
@@ -36,18 +36,18 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### Stocks & Crypto
 - Real-time stock quotes via Finnhub API
-- Symbol search and watchlist
+- Symbol search and **watchlist** (shown first for quick access)
 - Live polling with visible toggle control
-- **Crypto tracker** — live BTC, ETH, SOL, ADA, DOGE prices via CoinGecko API with 7-day sparkline, market cap, 24h volume, and expandable detail cards
-- **Earnings calendar** — weekly earnings report schedule via Finnhub API with EPS estimates/actuals, revenue, beat/miss highlighting, and week navigation
+- **Collapsible crypto tracker** — live BTC, ETH, SOL, ADA, DOGE prices via CoinGecko API with 7-day sparkline, market cap, 24h volume, and expandable detail cards; entire section collapses with persisted state
+- **Earnings calendar** — weekly earnings report schedule via Finnhub API with EPS estimates/actuals, revenue, beat/miss highlighting, week navigation, **symbol search filter**, event count badge, and scrollable list (max 400px)
 
 ### Podcasts
-- Podcast discovery and search via PodcastIndex API
+- **Podcast browsing without login** — discover trending podcasts and search without authentication
 - Episode playback with built-in audio player and adjustable playback speed
 - **Persistent audio player** — continues playing across all routes (navigate to Stocks, Weather, etc. without interrupting playback)
 - **Category/genre filtering** — browse trending podcasts by genre with filter chips, category badges on cards
 - **Share episode clip** — share currently playing episode with timestamp via Web Share API or clipboard fallback
-- Podcast subscriptions with "My Subscriptions" tab
+- Podcast subscriptions with "My Subscriptions" tab (visible only when signed in)
 - Subscribe/unsubscribe from any podcast feed
 
 ### Bible Reader
@@ -89,7 +89,8 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Multi-language support (i18n: English, Spanish, Chinese)
 - Temperature (°C / °F) and wind speed (m/s, mph, km/h) unit toggles
 - **Push notifications** — multi-category preferences (weather alerts, stock price alerts, podcast episodes) via Firebase Cloud Messaging
-- **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
+- **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal with mobile bottom-nav clearance; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
+- **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
 - Offline indicator & PWA support
 - Firebase Auth (Google OAuth) with cross-device profile sync
 - Firebase App Check for API protection

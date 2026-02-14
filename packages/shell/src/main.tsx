@@ -14,9 +14,11 @@ import ReloadPrompt from './components/ReloadPrompt';
 import Onboarding from './components/Onboarding';
 import './index.css';
 
-// Initialize Sentry before rendering
+// Initialize Sentry before rendering (production only)
+const SENTRY_DSN = 'https://87fdd6cb3be74b2284019ac9fdce801e@o4510878995251200.ingest.us.sentry.io/4510878996299776';
+
 Sentry.init({
-  dsn: 'https://87fdd6cb3be74b2284019ac9fdce801e@o4510878995251200.ingest.us.sentry.io/4510878996299776',
+  dsn: SENTRY_DSN,
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
@@ -26,6 +28,7 @@ Sentry.init({
   tracePropagationTargets: ['localhost', /^https:\/\/mycircle-dash\.web\.app/],
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
+  enabled: import.meta.env.PROD,
 });
 
 const client = getApolloClient();
