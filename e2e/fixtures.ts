@@ -43,6 +43,19 @@ export const mockSearchCities = [
   { id: '51.5,-0.08', name: 'London Bridge', country: 'GB', state: 'England', lat: 51.5, lon: -0.08 },
 ];
 
+// ─── Air Quality mock data ──────────────────────────────────────────
+
+export const mockAirQuality = {
+  aqi: 2,
+  co: 230.31,
+  no: 0.42,
+  no2: 12.76,
+  o3: 68.52,
+  so2: 1.85,
+  pm2_5: 8.3,
+  pm10: 14.2,
+};
+
 // ─── Stock mock data (Finnhub-shaped) ─────────────────────────────
 
 export const mockStockSearchResults = {
@@ -73,6 +86,54 @@ export const mockStockCandles = {
   v: Array.from({ length: 30 }, () => Math.floor(Math.random() * 1000000)),
   s: 'ok',
 };
+
+// ─── Earnings Calendar mock data ────────────────────────────────────
+
+const today = new Date();
+export const mockEarningsCalendar = Array.from({ length: 3 }, (_, i) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() + i);
+  return {
+    date: d.toISOString().split('T')[0],
+    epsActual: null,
+    epsEstimate: 1.52 + i * 0.1,
+    revenueActual: null,
+    revenueEstimate: 89_000_000_000 + i * 1_000_000_000,
+    symbol: ['AAPL', 'MSFT', 'GOOGL'][i],
+    hour: 'amc',
+    quarter: 1,
+    year: today.getFullYear(),
+  };
+});
+
+// ─── Crypto mock data ───────────────────────────────────────────────
+
+export const mockCryptoPrices = [
+  {
+    id: 'bitcoin',
+    symbol: 'btc',
+    name: 'Bitcoin',
+    image: 'https://example.com/btc.png',
+    current_price: 64235.0,
+    market_cap: 1_260_000_000_000,
+    market_cap_rank: 1,
+    price_change_percentage_24h: 2.35,
+    total_volume: 28_500_000_000,
+    sparkline_7d: Array.from({ length: 168 }, (_, i) => 62000 + Math.sin(i / 10) * 2000),
+  },
+  {
+    id: 'ethereum',
+    symbol: 'eth',
+    name: 'Ethereum',
+    image: 'https://example.com/eth.png',
+    current_price: 3456.78,
+    market_cap: 415_000_000_000,
+    market_cap_rank: 2,
+    price_change_percentage_24h: -1.12,
+    total_volume: 15_200_000_000,
+    sparkline_7d: Array.from({ length: 168 }, (_, i) => 3300 + Math.sin(i / 10) * 150),
+  },
+];
 
 // ─── Podcast mock data (PodcastIndex-shaped) ──────────────────────
 
@@ -258,6 +319,16 @@ export async function mockGraphQL(page: Page) {
       });
     }
 
+    if (operationName === 'GetAirQuality') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: { airQuality: mockAirQuality },
+        }),
+      });
+    }
+
     if (operationName === 'ReverseGeocode') {
       return route.fulfill({
         status: 200,
@@ -298,6 +369,26 @@ export async function mockGraphQL(page: Page) {
         contentType: 'application/json',
         body: JSON.stringify({
           data: { stockCandles: mockStockCandles },
+        }),
+      });
+    }
+
+    if (operationName === 'GetEarningsCalendar') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: { earningsCalendar: mockEarningsCalendar },
+        }),
+      });
+    }
+
+    if (operationName === 'GetCryptoPrices') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: { cryptoPrices: mockCryptoPrices },
         }),
       });
     }

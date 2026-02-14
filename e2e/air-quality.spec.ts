@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Air Quality Index Widget', () => {
   test.beforeEach(async ({ page }) => {
