@@ -115,7 +115,8 @@ export default function FeedbackButton({ hasActivePlayer }: { hasActivePlayer?: 
         closeModal();
         reset();
       }, 1500);
-    } catch {
+    } catch (err) {
+      console.error('[Feedback] submission failed:', err);
       setStatus('error');
     }
   };

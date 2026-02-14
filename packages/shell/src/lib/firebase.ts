@@ -1,6 +1,6 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, User, Auth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, User, Auth } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -64,6 +64,19 @@ if (firebaseEnabled) {
       return null;
     }
   };
+
+  // Connect to Firebase emulators when served by the Hosting emulator (port 5000)
+  if (typeof window !== 'undefined') {
+    const isEmulator = window.location.hostname === 'localhost'
+      && window.location.port === '5000';
+    if (isEmulator) {
+      if (db) connectFirestoreEmulator(db, 'localhost', 8080);
+      if (auth) connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+      // Expose test helper for emulator e2e auth tests
+      (window as any).__signInForTest = (email: string, password: string) =>
+        signInWithEmailAndPassword(auth!, email, password);
+    }
+  }
 }
 
 // User profile type
@@ -356,7 +369,7 @@ export interface FeedbackData {
 }
 
 export async function submitFeedback(feedback: FeedbackData, user: { uid: string; email: string | null; displayName: string | null } | null) {
-  if (!db) return;
+  if (!db) throw new Error('Firestore is not initialized');
   await addDoc(collection(db, 'feedback'), {
     ...feedback,
     uid: user?.uid ?? null,
