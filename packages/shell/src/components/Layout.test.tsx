@@ -27,6 +27,12 @@ vi.mock('../lib/firebase', () => ({
   removeRecentCity: vi.fn(),
   getRecentCities: vi.fn().mockResolvedValue([]),
   toggleFavoriteCity: vi.fn().mockResolvedValue(false),
+  updateStockWatchlist: vi.fn(),
+  updatePodcastSubscriptions: vi.fn(),
+  updateUserBabyDueDate: vi.fn(),
+  updateUserTempUnit: vi.fn(),
+  updateUserSpeedUnit: vi.fn(),
+  clearRecentCities: vi.fn(),
 }));
 
 const renderWithRouter = (ui: React.ReactElement) => {

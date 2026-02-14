@@ -95,6 +95,12 @@ const notebookDest = path.join(firebaseDir, 'notebook');
 console.log(`Copying notebook to ${notebookDest}`);
 copyDir(notebookDist, notebookDest);
 
+// 10. Copy baby-tracker MF to /baby-tracker
+const babyTrackerDist = path.join(rootDir, 'packages', 'baby-tracker', 'dist');
+const babyTrackerDest = path.join(firebaseDir, 'baby-tracker');
+console.log(`Copying baby-tracker to ${babyTrackerDest}`);
+copyDir(babyTrackerDist, babyTrackerDest);
+
 console.log('\nFirebase deployment directory assembled successfully!');
 console.log(`Output: ${firebaseDir}`);
 
