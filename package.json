@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.1.1",
-    "@apollo/server": "^5.2.0",
+    "@apollo/server": "^5.4.0",
     "@as-integrations/express4": "^1.1.2",
     "@google/genai": "^1.41.0",
     "@graphql-tools/schema": "^10.0.31",
