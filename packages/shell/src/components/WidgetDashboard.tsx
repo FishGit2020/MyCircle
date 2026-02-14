@@ -7,7 +7,7 @@ import { useDailyVerse } from '../hooks/useDailyVerse';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -20,6 +20,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'verse', visible: true },
   { id: 'nowPlaying', visible: true },
   { id: 'notebook', visible: true },
+  { id: 'babyTracker', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -259,6 +260,84 @@ function NotebookWidget() {
   );
 }
 
+// Inline fruit lookup for widget — small duplication acceptable since we can't import from baby-tracker MFE
+const BABY_FRUITS = [
+  '', 'poppy seed', 'poppy seed', 'poppy seed', 'poppy seed', 'sesame seed', 'lentil', 'blueberry',
+  'raspberry', 'grape', 'kumquat', 'fig', 'lime', 'lemon', 'peach', 'apple', 'avocado', 'pear',
+  'bell pepper', 'mango', 'banana', 'carrot', 'papaya', 'grapefruit', 'ear of corn', 'rutabaga',
+  'scallion bunch', 'cauliflower', 'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama',
+  'pineapple', 'cantaloupe', 'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek',
+  'mini watermelon', 'watermelon',
+];
+
+function BabyTrackerWidget() {
+  const { t } = useTranslation();
+  const [weekInfo, setWeekInfo] = useState<{ week: number; fruit: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
+      if (stored) {
+        const dueDate = new Date(stored + 'T00:00:00');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+        const weeksUntilDue = (dueDate.getTime() - today.getTime()) / msPerWeek;
+        const week = Math.floor(40 - weeksUntilDue);
+        if (week >= 1 && week <= 40) {
+          setWeekInfo({ week, fruit: BABY_FRUITS[week] || '' });
+        }
+      }
+    } catch { /* ignore */ }
+
+    function handleChange() {
+      try {
+        const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
+        if (stored) {
+          const dueDate = new Date(stored + 'T00:00:00');
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+          const weeksUntilDue = (dueDate.getTime() - today.getTime()) / msPerWeek;
+          const week = Math.floor(40 - weeksUntilDue);
+          if (week >= 1 && week <= 40) {
+            setWeekInfo({ week, fruit: BABY_FRUITS[week] || '' });
+          } else {
+            setWeekInfo(null);
+          }
+        } else {
+          setWeekInfo(null);
+        }
+      } catch { /* ignore */ }
+    }
+    window.addEventListener('baby-due-date-changed', handleChange);
+    return () => window.removeEventListener('baby-due-date-changed', handleChange);
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-pink-50 dark:bg-pink-900/30 flex items-center justify-center text-pink-500">
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.babyTracker')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.babyTrackerDesc')}</p>
+        </div>
+      </div>
+      {weekInfo ? (
+        <p className="text-sm text-pink-600 dark:text-pink-400 font-medium capitalize">
+          {t('baby.week')} {weekInfo.week} — {weekInfo.fruit}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noDueDate')}</p>
+      )}
+    </div>
+  );
+}
+
 // ─── Widget Registry ─────────────────────────────────────────────────────────
 
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
@@ -267,6 +346,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   verse: VerseWidget,
   nowPlaying: NowPlayingWidget,
   notebook: NotebookWidget,
+  babyTracker: BabyTrackerWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string }> }) => string)> = {
@@ -275,6 +355,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   verse: '/bible',
   nowPlaying: '/podcasts',
   notebook: '/notebook',
+  babyTracker: '/baby',
 };
 
 // ─── Main Dashboard Component ────────────────────────────────────────────────

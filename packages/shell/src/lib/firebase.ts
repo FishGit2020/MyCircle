@@ -81,6 +81,7 @@ export interface UserProfile {
   stockWatchlist?: WatchlistItem[];
   podcastSubscriptions?: string[];
   lastSeenAnnouncementId?: string;
+  babyDueDate?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -329,6 +330,15 @@ export async function updatePodcastSubscriptions(uid: string, subscriptionIds: s
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     podcastSubscriptions: subscriptionIds,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateUserBabyDueDate(uid: string, babyDueDate: string | null) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    babyDueDate: babyDueDate || null,
     updatedAt: serverTimestamp(),
   });
 }

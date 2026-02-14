@@ -40,3 +40,8 @@ declare module 'notebook/Notebook' {
   const Notebook: React.ComponentType;
   export default Notebook;
 }
+
+declare module 'babyTracker/BabyTracker' {
+  const BabyTracker: React.ComponentType;
+  export default BabyTracker;
+}

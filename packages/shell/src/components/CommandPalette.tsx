@@ -78,6 +78,11 @@ export default function CommandPalette() {
       action: () => { navigate('/notebook'); setOpen(false); }, category: 'navigation',
     },
     {
+      id: 'nav-baby', label: t('commandPalette.goToBaby'), description: '/baby',
+      icon: <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>,
+      action: () => { navigate('/baby'); setOpen(false); }, category: 'navigation',
+    },
+    {
       id: 'nav-ai', label: t('commandPalette.goToAi'), description: '/ai',
       icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>,
       action: () => { navigate('/ai'); setOpen(false); }, category: 'navigation',

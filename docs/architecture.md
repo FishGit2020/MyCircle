@@ -32,11 +32,11 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 |  |     (MFE)       | |    (MFE)     | |    (MFE)      | |    Songs     |  |
 |  |   Port 3005     | |  Port 3006   | |  Port 3008    | |  Port 3009   |  |
 |  +-----------------+ +--------------+ +---------------+ +--------------+  |
-|  +--------------+                                                          |
-|  |   Notebook   |                                                          |
-|  |    (MFE)     |                                                          |
-|  |  Port 3010   |                                                          |
-|  +--------------+                                                          |
+|  +--------------+ +---------------+                                        |
+|  |   Notebook   | | Baby Tracker  |                                        |
+|  |    (MFE)     | |    (MFE)      |                                        |
+|  |  Port 3010   | |  Port 3011    |                                        |
+|  +--------------+ +---------------+                                        |
 +──────────────────────────────────────────────────────────────────────────+
                                 |
                                 v
@@ -103,6 +103,7 @@ The orchestrator that loads and composes all remote micro frontends.
 /bible             -> BibleReader MFE (lazy-loaded, daily devotionals)
 /worship           -> WorshipSongs MFE (lazy-loaded, chord editor)
 /notebook          -> Notebook MFE (lazy-loaded, personal notes)
+/baby              -> BabyTracker MFE (lazy-loaded, baby growth tracker)
 /compare           -> WeatherCompare (legacy, still accessible)
 /*                 -> 404 NotFound
 ```
@@ -273,6 +274,20 @@ Exposes `Notebook` component via Module Federation.
 - CRUD via `window.__notebook` Firestore bridge (same pattern as worship-songs)
 - `WindowEvents.NOTEBOOK_CHANGED` for cross-tab cache invalidation
 - Auth-gated: shows "Sign in" message when logged out
+
+### Baby Tracker - `packages/baby-tracker/`
+
+Exposes `BabyTracker` component via Module Federation. Port **3011**.
+
+**Key Behavior:**
+- Week-by-week baby growth tracking with fruit size comparisons (40-week hardcoded data)
+- Encouraging pregnancy Bible verses (15 verses) with shuffle button
+- Due date input with dual persistence: `StorageKeys.BABY_DUE_DATE` (localStorage) + Firestore `babyDueDate` field
+- `WindowEvents.BABY_DUE_DATE_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
+- Gestational week = `40 - ceil(weeksUntilDue)`, trimester display, ARIA progress bar
+- No external API — all data hardcoded. Zero latency, offline-capable.
+- No Apollo/GraphQL dependency — lightweight package
+- Route: `/baby`
 
 ---
 
@@ -518,6 +533,7 @@ interface Note {
 | `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
 | `'bible-translation'` | Bible version ID (e.g., `'1'` for KJV, `'111'` for NIV) | Selected YouVersion Bible version for passage reading |
 | `'notebook-cache'` | JSON `{ count: number }` | Notebook note count for dashboard widget |
+| `'baby-due-date'` | ISO date string (e.g., `'2026-08-15'`) | Baby due date for growth tracking |
 
 ### Browser SessionStorage — Geolocation
 

@@ -103,6 +103,10 @@ const notebookRemote = isProduction
   ? '/notebook/assets/remoteEntry.js'
   : 'http://localhost:3010/assets/remoteEntry.js';
 
+const babyTrackerRemote = isProduction
+  ? '/baby-tracker/assets/remoteEntry.js'
+  : 'http://localhost:3011/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -117,7 +121,8 @@ export default defineConfig({
         aiAssistant: aiAssistantRemote,
         bibleReader: bibleReaderRemote,
         worshipSongs: worshipSongsRemote,
-        notebook: notebookRemote
+        notebook: notebookRemote,
+        babyTracker: babyTrackerRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

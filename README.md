@@ -78,6 +78,13 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Privacy: each user can only see their own notes
 - Note count cached for dashboard tile
 
+### Baby Growth Tracker
+- Week-by-week baby development tracking with fruit size comparisons
+- Encouraging pregnancy Bible verses with shuffle
+- Due date input with dual persistence (localStorage + Firestore)
+- Gestational week calculation, trimester display, progress bar
+- Dark mode, full i18n (English, Spanish, Chinese)
+
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
@@ -117,11 +124,11 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │     (MFE)       │ │    (MFE)     │ │    (MFE)      │ │   Songs    │  │
 │  │   Port 3006     │ │  Port 3007   │ │  Port 3008    │ │ Port 3009  │  │
 │  └─────────────────┘ └──────────────┘ └───────────────┘ └────────────┘  │
-│  ┌────────────┐                                                          │
-│  │  Notebook  │                                                          │
-│  │   (MFE)    │                                                          │
-│  │ Port 3010  │                                                          │
-│  └────────────┘                                                          │
+│  ┌────────────┐ ┌──────────────┐                                          │
+│  │  Notebook  │ │ Baby Tracker │                                          │
+│  │   (MFE)    │ │    (MFE)     │                                          │
+│  │ Port 3010  │ │  Port 3011   │                                          │
+│  └────────────┘ └──────────────┘                                          │
 └──────────────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -151,6 +158,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Bible Reader** | Bible reading with daily devotionals and community notes | `BibleReader` |
 | **Worship Songs** | Song library with lyrics, chord editor, YouTube links, metronome | `WorshipSongs` |
 | **Notebook** | Personal note-taking with search and Firestore sync | `Notebook` |
+| **Baby Tracker** | Baby growth tracking with weekly fruit comparisons and Bible verses | `BabyTracker` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
@@ -164,6 +172,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | **Podcasts** | Headphones | Latest episodes from subscribed feeds |
 | **Bible** | Book | Verse of the Day from curated collection |
 | **Notebook** | Pencil | Recent notes count from Firestore |
+| **Baby Tracker** | Heart | Current week + fruit comparison from localStorage |
 
 ### Routes
 
@@ -177,6 +186,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/bible` | Bible reader with daily devotionals |
 | `/worship` | Worship song library with metronome |
 | `/notebook` | Notebook — personal notes with create/edit/delete |
+| `/baby` | Baby growth tracker with weekly development |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack

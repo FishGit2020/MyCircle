@@ -17,6 +17,7 @@ import {
   toggleFavoriteCity,
   updateStockWatchlist,
   updatePodcastSubscriptions,
+  updateUserBabyDueDate,
   identifyUser,
   clearUserIdentity,
   logEvent,
@@ -42,6 +43,7 @@ interface AuthContextType {
   toggleFavorite: (city: FavoriteCity) => Promise<boolean>;
   syncStockWatchlist: (watchlist: WatchlistItem[]) => Promise<void>;
   syncPodcastSubscriptions: (subscriptionIds: string[]) => Promise<void>;
+  syncBabyDueDate: (date: string | null) => Promise<void>;
   recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
   refreshProfile: () => Promise<void>;
@@ -103,6 +105,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userProfile.podcastSubscriptions && userProfile.podcastSubscriptions.length > 0) {
             localStorage.setItem(StorageKeys.PODCAST_SUBSCRIPTIONS, JSON.stringify(userProfile.podcastSubscriptions));
             window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
+          }
+
+          // Restore baby due date
+          if (userProfile.babyDueDate) {
+            localStorage.setItem(StorageKeys.BABY_DUE_DATE, userProfile.babyDueDate);
+            window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
           }
         }
       } else {
@@ -214,6 +222,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
+  const syncBabyDueDate = useCallback(async (date: string | null) => {
+    if (user) {
+      await updateUserBabyDueDate(user.uid, date);
+    }
+  }, [user]);
+
+  // Auto-sync baby due date changes from localStorage to Firestore
+  useEffect(() => {
+    function handleBabyDueDateChanged() {
+      const date = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
+      if (user) {
+        updateUserBabyDueDate(user.uid, date);
+      }
+    }
+    window.addEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleBabyDueDateChanged);
+    return () => window.removeEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleBabyDueDateChanged);
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -232,6 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toggleFavorite,
         syncStockWatchlist,
         syncPodcastSubscriptions,
+        syncBabyDueDate,
         recentCities,
         favoriteCities,
         refreshProfile,
