@@ -150,9 +150,6 @@ importers:
       concurrently:
         specifier: ^9.2.1
         version: 9.2.1
-      express-rate-limit:
-        specifier: ^8.2.1
-        version: 8.2.1(express@4.22.1)
       firebase-tools:
         specifier: ^15.5.1
         version: 15.5.1(@types/node@20.19.30)(encoding@0.1.13)(typescript@5.9.3)
@@ -10168,11 +10165,6 @@ snapshots:
 
   exponential-backoff@3.1.3:
     optional: true
-
-  express-rate-limit@8.2.1(express@4.22.1):
-    dependencies:
-      express: 4.22.1
-      ip-address: 10.0.1
 
   express-rate-limit@8.2.1(express@5.2.1):
     dependencies:
