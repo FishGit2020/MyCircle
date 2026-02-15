@@ -7,13 +7,15 @@ interface NoteEditorProps {
   onSave: (id: string | null, data: { title: string; content: string }) => Promise<void>;
   onCancel: () => void;
   onDelete?: (id: string) => void;
+  onPublish?: (data: { title: string; content: string }) => Promise<void>;
 }
 
-export default function NoteEditor({ note, onSave, onCancel, onDelete }: NoteEditorProps) {
+export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish }: NoteEditorProps) {
   const { t } = useTranslation();
   const [title, setTitle] = useState(note?.title ?? '');
   const [content, setContent] = useState(note?.content ?? '');
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +25,18 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete }: NoteEdi
       await onSave(note?.id ?? null, { title: title.trim(), content: content.trim() });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!onPublish) return;
+    if (!title.trim() && !content.trim()) return;
+    if (!window.confirm(t('notebook.publishConfirm'))) return;
+    setPublishing(true);
+    try {
+      await onPublish({ title: title.trim(), content: content.trim() });
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -86,6 +100,16 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete }: NoteEdi
           >
             {t('notebook.cancel')}
           </button>
+          {onPublish && (
+            <button
+              type="button"
+              onClick={handlePublish}
+              disabled={publishing || saving || (!title.trim() && !content.trim())}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium text-sm"
+            >
+              {publishing ? t('notebook.publishing') : t('notebook.publish')}
+            </button>
+          )}
         </div>
 
         {note && onDelete && (

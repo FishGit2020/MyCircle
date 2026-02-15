@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from '@mycircle/shared';
-import type { Note } from '../types';
+import type { Note, PublicNote } from '../types';
 
 function formatDate(date: Note['updatedAt']): string {
   const d = date && typeof (date as any).toDate === 'function'
@@ -9,18 +9,27 @@ function formatDate(date: Note['updatedAt']): string {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function isPublicNote(note: Note): note is PublicNote {
+  return 'isPublic' in note && (note as PublicNote).isPublic === true;
+}
+
 interface NoteCardProps {
-  note: Note;
+  note: Note | PublicNote;
   onClick: () => void;
   onDelete: () => void;
 }
 
 export default function NoteCard({ note, onClick, onDelete }: NoteCardProps) {
   const { t } = useTranslation();
+  const isPublic = isPublicNote(note);
 
   return (
     <div
-      className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all cursor-pointer group"
+      className={`rounded-lg border p-4 hover:shadow-md transition-all cursor-pointer group ${
+        isPublic
+          ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600'
+          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600'
+      }`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -28,9 +37,16 @@ export default function NoteCard({ note, onClick, onDelete }: NoteCardProps) {
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-gray-900 dark:text-white truncate flex-1">
-          {note.title || t('notebook.noteTitle')}
-        </h3>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+            {note.title || t('notebook.noteTitle')}
+          </h3>
+          {isPublic && (
+            <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-green-100 dark:bg-green-800/40 text-green-700 dark:text-green-300 rounded">
+              {t('notebook.public')}
+            </span>
+          )}
+        </div>
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
           className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-all rounded"
@@ -45,9 +61,16 @@ export default function NoteCard({ note, onClick, onDelete }: NoteCardProps) {
       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
         {note.content ? note.content.slice(0, 120) : ''}
       </p>
-      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-        {t('notebook.lastEdited')} {formatDate(note.updatedAt)}
-      </p>
+      <div className="flex items-center justify-between mt-2">
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          {t('notebook.lastEdited')} {formatDate(note.updatedAt)}
+        </p>
+        {isPublic && note.createdBy && (
+          <p className="text-xs text-green-600 dark:text-green-400 font-medium">
+            {t('notebook.publishedBy').replace('{name}', note.createdBy.displayName)}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

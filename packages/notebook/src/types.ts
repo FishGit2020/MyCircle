@@ -10,3 +10,11 @@ export interface NoteInput {
   title: string;
   content: string;
 }
+
+export interface PublicNote extends Note {
+  isPublic: true;
+  createdBy: {
+    uid: string;
+    displayName: string;
+  };
+}

@@ -7,7 +7,7 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-  WindowEvents: { NOTEBOOK_CHANGED: 'notebook-changed' },
+  WindowEvents: { NOTEBOOK_CHANGED: 'notebook-changed', PUBLIC_NOTES_CHANGED: 'public-notes-changed' },
   StorageKeys: { NOTEBOOK_CACHE: 'notebook-cache' },
 }));
 
