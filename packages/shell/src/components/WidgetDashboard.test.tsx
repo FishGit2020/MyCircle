@@ -19,7 +19,10 @@ vi.mock('@mycircle/shared', () => ({
   },
   subscribeToMFEvent: () => () => {},
   useQuery: () => ({ data: null, loading: false, error: null }),
+  useLazyQuery: () => [vi.fn(), { data: null, loading: false }],
   GET_BIBLE_VOTD_API: { kind: 'Document', definitions: [] },
+  GET_CURRENT_WEATHER: { kind: 'Document', definitions: [] },
+  REVERSE_GEOCODE: { kind: 'Document', definitions: [] },
   getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
   getAllDailyVerses: () => [{ text: 'Test verse', reference: 'Test 1:1' }],
 }));
