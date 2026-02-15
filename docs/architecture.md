@@ -26,12 +26,12 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 |  +-----------+ +-------------+ +-----------------+ +---------------+    |
 |  |   Shell   | | City Search | | Weather Display | | Stock Tracker |    |
 |  |  (Host)   | |    (MFE)    | |      (MFE)      | |     (MFE)     |    |
-|  | Port 3000 | |  Port 3001  | |   Port 3002     | |  Port 3004    |    |
+|  | Port 3000 | |  Port 3001  | |   Port 3002     | |  Port 3005    |    |
 |  +-----------+ +-------------+ +-----------------+ +---------------+    |
 |  +-----------------+ +--------------+ +---------------+ +--------------+  |
 |  | Podcast Player  | | AI Assistant | | Bible Reader  | |   Worship    |  |
 |  |     (MFE)       | |    (MFE)     | |    (MFE)      | |    Songs     |  |
-|  |   Port 3005     | |  Port 3006   | |  Port 3008    | |  Port 3009   |  |
+|  |   Port 3006     | |  Port 3007   | |  Port 3008    | |  Port 3009   |  |
 |  +-----------------+ +--------------+ +---------------+ +--------------+  |
 |  +--------------+ +---------------+                                        |
 |  |   Notebook   | | Baby Tracker  |                                        |

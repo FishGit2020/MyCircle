@@ -361,6 +361,7 @@ mycircle/
    - Bible Reader MFE preview
    - Worship Songs MFE preview
    - Notebook MFE preview
+   - Baby Tracker MFE preview
 
 ### Available Scripts
 
@@ -379,7 +380,12 @@ mycircle/
 | `pnpm seed:firestore` | Seed Firestore emulator with test data |
 | `pnpm start:static` | Serve production build (`dist/firebase/`) on port 3000 |
 | `pnpm typecheck` | TypeScript type checking |
+| `pnpm typecheck:all` | TypeScript type checking across root + all packages |
 | `pnpm check:shared-versions` | Verify shared deps are consistent across MFEs |
+| `pnpm build:shared` | Build only the shared package |
+| `pnpm firebase:build` | Full production build (shared + MFEs + shell + functions) |
+| `pnpm firebase:deploy` | Full Firebase deployment (hosting + functions + firestore) |
+| `pnpm clean` | Remove all dist directories and node_modules |
 
 ## CI/CD
 
@@ -387,7 +393,7 @@ MyCircle uses **GitHub Actions** for continuous integration and deployment:
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| **CI** (`ci.yml`) | PR to `main` | Installs deps, checks shared dep versions, runs `typecheck:all`, runs `test:all` |
+| **CI** (`ci.yml`) | PR to `main` | Installs deps, checks shared dep versions, builds shared, runs `typecheck:all`, runs `test:all` |
 | **Deploy** (`deploy.yml`) | Push to `main` | Builds full app (with `VITE_*` secrets), deploys Hosting then Functions+Firestore, smoke test |
 | **E2E** (`e2e.yml`) | PR to `main` | Builds the app, installs Playwright browsers, runs `test:e2e` (mocked) and `emulator:test` (full-stack) |
 
