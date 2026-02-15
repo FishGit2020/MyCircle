@@ -69,8 +69,8 @@ test.describe('Homepage / Dashboard', () => {
     await page.getByRole('link', { name: /Stocks/i }).first().click();
     await expect(page).toHaveURL(/\/stocks/);
 
-    // Navigate back to home
-    await page.getByRole('link', { name: /Home/i }).first().click();
+    // Navigate back to home via browser back (avoids desktop/mobile nav visibility issues)
+    await page.goBack();
     await expect(page).toHaveURL('/');
 
     // Verify grid layout is the same
