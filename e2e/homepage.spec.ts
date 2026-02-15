@@ -68,8 +68,8 @@ test.describe('Homepage / Dashboard', () => {
     await page.getByRole('link', { name: /Stocks/i }).first().click();
     await expect(page).toHaveURL(/\/stocks/);
 
-    // Navigate back to home
-    await page.getByRole('link', { name: /Home/i }).first().click();
+    // Navigate back to home using the main navigation
+    await page.getByRole('navigation', { name: /main/i }).getByRole('link', { name: /home/i }).click();
     await expect(page).toHaveURL('/');
 
     // Wait for the dashboard grid to be visible again before measuring
