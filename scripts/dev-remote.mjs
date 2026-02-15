@@ -10,7 +10,7 @@ import { spawn } from 'child_process';
 import { existsSync, watch } from 'fs';
 import { resolve } from 'path';
 
-const name = process.argv[2];
+const name = process.argv.find((a, i) => i >= 2 && a !== '--');
 if (!name) {
   console.error('Usage: pnpm dev:remote -- <package-name>');
   process.exit(1);
