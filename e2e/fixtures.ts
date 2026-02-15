@@ -87,25 +87,6 @@ export const mockStockCandles = {
   s: 'ok',
 };
 
-// ─── Earnings Calendar mock data ────────────────────────────────────
-
-const today = new Date();
-export const mockEarningsCalendar = Array.from({ length: 3 }, (_, i) => {
-  const d = new Date(today);
-  d.setDate(d.getDate() + i);
-  return {
-    date: d.toISOString().split('T')[0],
-    epsActual: null,
-    epsEstimate: 1.52 + i * 0.1,
-    revenueActual: null,
-    revenueEstimate: 89_000_000_000 + i * 1_000_000_000,
-    symbol: ['AAPL', 'MSFT', 'GOOGL'][i],
-    hour: 'amc',
-    quarter: 1,
-    year: today.getFullYear(),
-  };
-});
-
 // ─── Crypto mock data ───────────────────────────────────────────────
 
 export const mockCryptoPrices = [
@@ -369,16 +350,6 @@ export async function mockGraphQL(page: Page) {
         contentType: 'application/json',
         body: JSON.stringify({
           data: { stockCandles: mockStockCandles },
-        }),
-      });
-    }
-
-    if (operationName === 'GetEarningsCalendar') {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          data: { earningsCalendar: mockEarningsCalendar },
         }),
       });
     }

@@ -130,18 +130,6 @@ export const typeDefs = `#graphql
     s: String!
   }
 
-  type EarningsEvent {
-    date: String!
-    epsActual: Float
-    epsEstimate: Float
-    revenueActual: Float
-    revenueEstimate: Float
-    symbol: String!
-    hour: String
-    quarter: Int
-    year: Int
-  }
-
   type CompanyNews {
     id: Int!
     category: String!
@@ -246,7 +234,6 @@ export const typeDefs = `#graphql
     searchStocks(query: String!): [StockSearchResult!]!
     stockQuote(symbol: String!): StockQuote
     stockCandles(symbol: String!, resolution: String = "D", from: Int!, to: Int!): StockCandle
-    earningsCalendar(from: String!, to: String!): [EarningsEvent!]!
     companyNews(symbol: String!, from: String!, to: String!): [CompanyNews!]!
 
     # Podcast queries

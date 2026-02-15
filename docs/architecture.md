@@ -189,7 +189,7 @@ Library consumed by all micro frontends. Not a standalone app.
 - GraphQL queries & fragments (`GET_WEATHER`, `SEARCH_CITIES`, etc.)
 - Event bus (`eventBus`, `MFEvents`, `subscribeToMFEvent`)
 - Types (`City`, `CurrentWeather`, `ForecastDay`, `HistoricalWeatherDay`, `AirQuality`, `CryptoPrice`, etc.)
-- Hooks (`useWeatherData`, `useHistoricalWeather`, `useAirQuality`, `useCryptoPrices`, `useEarningsCalendar`)
+- Hooks (`useWeatherData`, `useHistoricalWeather`, `useAirQuality`, `useCryptoPrices`)
 - i18n (`useTranslation`)
 - Utility functions (weather icons, formatting)
 
@@ -201,9 +201,7 @@ Exposes `StockTracker` component via Module Federation.
 - Real-time stock quote lookup via Finnhub API (proxied through Cloud Functions)
 - Symbol search and watchlist management
 - **Crypto tracker** — live prices for BTC, ETH, SOL, ADA, DOGE via CoinGecko free API (`/coins/markets`), with 7-day sparkline, market cap, 24h volume, expandable detail cards, 60s polling
-- **Earnings calendar** — weekly view of upcoming earnings reports via Finnhub `/calendar/earnings`, grouped by date, with EPS estimate/actual, revenue, beat/miss highlighting, and week navigation (prev/next)
 - **Company news** — recent news articles for selected stock via Finnhub `/company-news` (free tier), showing headline, source, relative timestamp, and thumbnail image with links to full articles (7-day window, 5-min server cache)
-- Crypto + earnings sections visible on overview, hidden when a specific stock is selected
 - Authenticated requests (Firebase ID token attached)
 
 ### Podcast Player - `packages/podcast-player/`
@@ -291,12 +289,12 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 
 **Key Behavior:**
 - Week-by-week baby growth tracking with fruit size comparisons (40-week hardcoded data)
-- Encouraging pregnancy Bible verses (15 verses) with shuffle button
+- Encouraging pregnancy Bible verses (15 references) fetched from YouVersion API with shuffle button
+- Estimated length/weight measurements with typical range (±15% length, ±20% weight)
 - Due date input with dual persistence: `StorageKeys.BABY_DUE_DATE` (localStorage) + Firestore `babyDueDate` field
 - `WindowEvents.BABY_DUE_DATE_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
 - Gestational week = `40 - ceil(weeksUntilDue)`, trimester display, ARIA progress bar
-- No external API — all data hardcoded. Zero latency, offline-capable.
-- No Apollo/GraphQL dependency — lightweight package
+- Uses Apollo `GET_BIBLE_PASSAGE` query for accurate verse text from YouVersion API
 - Route: `/baby`
 
 ---
@@ -647,7 +645,6 @@ interface Note {
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
 | `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |
 | `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle (Firestore sync when signed in) |
-| `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle (Firestore sync when signed in) |
 | `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle (Firestore sync when signed in) |
 | `'announcement-alerts-enabled'` | `'true'` / `'false'` | Announcement alert notifications toggle (Firestore sync when signed in) |
 | `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
@@ -713,7 +710,6 @@ typePolicies: {
 | `GET_HISTORICAL_WEATHER` | `lat, lon, date` | `HistoricalWeatherDay` (Open-Meteo archive) |
 | `GET_AIR_QUALITY` | `lat, lon` | `AirQuality` (OpenWeather Air Pollution API) |
 | `GET_CRYPTO_PRICES` | `ids[], vsCurrency` | `CryptoPrice[]` (CoinGecko) |
-| `GET_EARNINGS_CALENDAR` | `from, to` | `EarningsEvent[]` (Finnhub) |
 | `SEARCH_CITIES` | `query, limit` | `City[]` |
 | `REVERSE_GEOCODE` | `lat, lon` | `City` |
 | `WEATHER_UPDATES` (subscription) | `lat, lon` | `WeatherUpdate` (real-time) |
@@ -851,9 +847,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **Forecast** | `packages/weather-display/src/components/Forecast.tsx` | 7-day forecast grid |
 | **StockTracker** | `packages/stock-tracker/src/components/StockTracker.tsx` | Stock quotes and watchlist |
 | **CryptoTracker** | `packages/stock-tracker/src/components/CryptoTracker.tsx` | Live crypto prices (CoinGecko) |
-| **EarningsCalendar** | `packages/stock-tracker/src/components/EarningsCalendar.tsx` | Weekly earnings report schedule |
 | **useCryptoPrices** | `packages/shared/src/hooks/useCryptoPrices.ts` | Crypto price data fetching hook |
-| **useEarningsCalendar** | `packages/shared/src/hooks/useEarningsCalendar.ts` | Earnings calendar data fetching hook |
 | **GlobalAudioPlayer** | `packages/shell/src/components/GlobalAudioPlayer.tsx` | Persistent audio player (shell-level, survives route changes) |
 | **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, event publishing |
 | **AiAssistant** | `packages/ai-assistant/src/components/AiAssistant.tsx` | AI chat UI (Gemini) |

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useQuery, GET_BIBLE_PASSAGE } from '@mycircle/shared';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
 
@@ -94,6 +94,13 @@ export default function BabyTracker() {
 
   const verse = pregnancyVerses[verseIndex];
 
+  // Fetch verse text from YouVersion API
+  const { data: verseData, loading: verseLoading } = useQuery(GET_BIBLE_PASSAGE, {
+    variables: { reference: verse.reference },
+    fetchPolicy: 'cache-first',
+  });
+  const verseText = verseData?.biblePassage?.text || '';
+
   // Computed pregnancy state
   const gestationalAge = useMemo(() => {
     if (!dueDate) return null;
@@ -134,10 +141,14 @@ export default function BabyTracker() {
       <section className="bg-pink-50 dark:bg-pink-900/10 rounded-xl p-5 border border-pink-200 dark:border-pink-800">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <p className="text-pink-800 dark:text-pink-200 italic leading-relaxed">
-              &ldquo;{verse.text}&rdquo;
-            </p>
-            <p className="text-pink-600 dark:text-pink-400 text-sm font-semibold mt-2">
+            {verseLoading ? (
+              <div className="h-4 bg-pink-200 dark:bg-pink-800/40 rounded animate-pulse w-3/4" />
+            ) : verseText ? (
+              <p className="text-pink-800 dark:text-pink-200 italic leading-relaxed">
+                &ldquo;{verseText}&rdquo;
+              </p>
+            ) : null}
+            <p className={`text-pink-600 dark:text-pink-400 text-sm font-semibold ${verseText || verseLoading ? 'mt-2' : ''}`}>
               — {verse.reference}
             </p>
           </div>

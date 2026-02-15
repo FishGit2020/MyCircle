@@ -125,9 +125,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userProfile.weatherAlertsEnabled !== undefined) {
             localStorage.setItem(StorageKeys.WEATHER_ALERTS, String(userProfile.weatherAlertsEnabled));
           }
-          if (userProfile.stockAlertsEnabled !== undefined) {
-            localStorage.setItem(StorageKeys.STOCK_ALERTS, String(userProfile.stockAlertsEnabled));
-          }
           if (userProfile.podcastAlertsEnabled !== undefined) {
             localStorage.setItem(StorageKeys.PODCAST_ALERTS, String(userProfile.podcastAlertsEnabled));
           }
@@ -284,7 +281,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         updateUserNotificationAlerts(user.uid, {
           weatherAlertsEnabled: localStorage.getItem(StorageKeys.WEATHER_ALERTS) === 'true',
-          stockAlertsEnabled: localStorage.getItem(StorageKeys.STOCK_ALERTS) === 'true',
           podcastAlertsEnabled: localStorage.getItem(StorageKeys.PODCAST_ALERTS) === 'true',
           announcementAlertsEnabled: localStorage.getItem(StorageKeys.ANNOUNCEMENT_ALERTS) === 'true',
         });

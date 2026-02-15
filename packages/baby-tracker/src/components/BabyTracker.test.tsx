@@ -14,6 +14,11 @@ vi.mock('@mycircle/shared', () => ({
   WindowEvents: {
     BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
   },
+  useQuery: () => ({
+    data: { biblePassage: { text: 'Test verse text', reference: 'Psalm 139:13-14' } },
+    loading: false,
+  }),
+  GET_BIBLE_PASSAGE: { kind: 'Document', definitions: [] },
 }));
 
 describe('BabyTracker', () => {

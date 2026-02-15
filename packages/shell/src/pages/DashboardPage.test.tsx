@@ -3,12 +3,20 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import DashboardPage from './DashboardPage';
 
-// Mock @mycircle/shared — useTranslation (identity) + getDailyVerse (hardcoded)
+// Mock @mycircle/shared — useTranslation (identity) + getDailyVerse (reference-only)
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-  getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
+  getDailyVerse: () => ({ reference: 'Test 1:1' }),
+}));
+
+// Mock useDailyVerse hook — returns API verse with text
+vi.mock('../hooks/useDailyVerse', () => ({
+  useDailyVerse: () => ({
+    verse: { text: 'Test verse from API', reference: 'Test 1:1 (NIV)', copyright: null },
+    loading: false,
+  }),
 }));
 
 // Mock useAuth — unauthenticated user with no cities
@@ -43,9 +51,9 @@ describe('DashboardPage', () => {
     expect(screen.getByTestId('widget-dashboard')).toBeInTheDocument();
   });
 
-  it('renders the daily verse', () => {
+  it('renders the daily verse from API', () => {
     renderDashboard();
-    expect(screen.getByText(/Test verse/)).toBeInTheDocument();
+    expect(screen.getByText(/Test verse from API/)).toBeInTheDocument();
     expect(screen.getByText(/Test 1:1/)).toBeInTheDocument();
   });
 });

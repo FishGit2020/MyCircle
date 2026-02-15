@@ -26,8 +26,8 @@ vi.mock('@mycircle/shared', () => ({
   GET_BIBLE_VOTD_API: { kind: 'Document', definitions: [] },
   GET_CURRENT_WEATHER: { kind: 'Document', definitions: [] },
   REVERSE_GEOCODE: { kind: 'Document', definitions: [] },
-  getDailyVerse: () => ({ text: 'Test verse', reference: 'Test 1:1' }),
-  getAllDailyVerses: () => [{ text: 'Test verse', reference: 'Test 1:1' }],
+  getDailyVerse: () => ({ reference: 'Test 1:1' }),
+  getAllDailyVerses: () => [{ reference: 'Test 1:1' }],
 }));
 
 vi.mock('../context/AuthContext', () => ({

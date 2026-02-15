@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation, WindowEvents, StorageKeys } from '@mycircle/shared';
 import StockSearch from './StockSearch';
 import CryptoTracker from './CryptoTracker';
-import EarningsCalendar from './EarningsCalendar';
 import Watchlist from './Watchlist';
 import StockChart from './StockChart';
 import StockNews from './StockNews';
@@ -206,15 +205,6 @@ export default function StockTracker() {
         </div>
       )}
 
-      {/* Earnings Calendar */}
-      {!selectedSymbol && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            {t('earnings.title')}
-          </h2>
-          <EarningsCalendar onSymbolClick={(symbol) => handleStockSelect(symbol, symbol)} />
-        </div>
-      )}
 
       {/* Selected stock detail view */}
       {selectedSymbol && (

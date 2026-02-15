@@ -148,7 +148,10 @@ export default function Layout() {
       <FeedbackButton hasActivePlayer={hasActivePlayer} />
       <PwaInstallPrompt />
 
-      <footer role="contentinfo" className="bg-gray-800 dark:bg-gray-950 text-white py-6 pb-20 md:pb-6 mt-12 transition-colors">
+      <footer
+        role="contentinfo"
+        className={`bg-gray-800 dark:bg-gray-950 text-white py-6 ${hasActivePlayer ? 'pb-40' : 'pb-20'} md:pb-6 mt-12 transition-colors`}
+      >
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
             {t('footer.dataProvider')}{' '}

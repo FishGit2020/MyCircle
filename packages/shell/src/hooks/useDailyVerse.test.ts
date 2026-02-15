@@ -7,7 +7,6 @@ describe('dailyVerse shared utility', () => {
     const v1 = getDailyVerse(date);
     const v2 = getDailyVerse(date);
     expect(v1.reference).toBe(v2.reference);
-    expect(v1.text).toBe(v2.text);
   });
 
   it('getDailyDevotional returns a consistent result for a given date', () => {
@@ -42,7 +41,6 @@ describe('dailyVerse shared utility', () => {
   it('getAllDailyVerses returns the full array', () => {
     const verses = getAllDailyVerses();
     expect(verses.length).toBeGreaterThan(0);
-    expect(verses[0]).toHaveProperty('text');
     expect(verses[0]).toHaveProperty('reference');
   });
 
