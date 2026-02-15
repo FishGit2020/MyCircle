@@ -104,6 +104,10 @@ export interface UserProfile {
   lastSeenAnnouncementId?: string;
   babyDueDate?: string;
   bottomNavOrder?: string[];
+  weatherAlertsEnabled?: boolean;
+  stockAlertsEnabled?: boolean;
+  podcastAlertsEnabled?: boolean;
+  announcementAlertsEnabled?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -372,6 +376,17 @@ export async function updateUserBottomNavOrder(uid: string, order: string[] | nu
     bottomNavOrder: order || null,
     updatedAt: serverTimestamp(),
   });
+}
+
+export async function updateUserNotificationAlerts(uid: string, alerts: {
+  weatherAlertsEnabled: boolean;
+  stockAlertsEnabled: boolean;
+  podcastAlertsEnabled: boolean;
+  announcementAlertsEnabled: boolean;
+}) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, { ...alerts, updatedAt: serverTimestamp() });
 }
 
 export async function getRecentCities(uid: string): Promise<RecentCity[]> {

@@ -19,6 +19,7 @@ import {
   updatePodcastSubscriptions,
   updateUserBabyDueDate,
   updateUserBottomNavOrder,
+  updateUserNotificationAlerts,
   identifyUser,
   clearUserIdentity,
   logEvent,
@@ -119,6 +120,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(StorageKeys.BOTTOM_NAV_ORDER, JSON.stringify(userProfile.bottomNavOrder));
             window.dispatchEvent(new Event(WindowEvents.BOTTOM_NAV_ORDER_CHANGED));
           }
+
+          // Restore notification alert preferences
+          if (userProfile.weatherAlertsEnabled !== undefined) {
+            localStorage.setItem(StorageKeys.WEATHER_ALERTS, String(userProfile.weatherAlertsEnabled));
+          }
+          if (userProfile.stockAlertsEnabled !== undefined) {
+            localStorage.setItem(StorageKeys.STOCK_ALERTS, String(userProfile.stockAlertsEnabled));
+          }
+          if (userProfile.podcastAlertsEnabled !== undefined) {
+            localStorage.setItem(StorageKeys.PODCAST_ALERTS, String(userProfile.podcastAlertsEnabled));
+          }
+          if (userProfile.announcementAlertsEnabled !== undefined) {
+            localStorage.setItem(StorageKeys.ANNOUNCEMENT_ALERTS, String(userProfile.announcementAlertsEnabled));
+          }
+          window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
         }
       } else {
         clearUserIdentity();
@@ -260,6 +276,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     window.addEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
     return () => window.removeEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
+  }, [user]);
+
+  // Auto-sync notification alert preferences from localStorage to Firestore
+  useEffect(() => {
+    function handleNotificationAlertsChanged() {
+      if (user) {
+        updateUserNotificationAlerts(user.uid, {
+          weatherAlertsEnabled: localStorage.getItem(StorageKeys.WEATHER_ALERTS) === 'true',
+          stockAlertsEnabled: localStorage.getItem(StorageKeys.STOCK_ALERTS) === 'true',
+          podcastAlertsEnabled: localStorage.getItem(StorageKeys.PODCAST_ALERTS) === 'true',
+          announcementAlertsEnabled: localStorage.getItem(StorageKeys.ANNOUNCEMENT_ALERTS) === 'true',
+        });
+      }
+    }
+    window.addEventListener(WindowEvents.NOTIFICATION_ALERTS_CHANGED, handleNotificationAlertsChanged);
+    return () => window.removeEventListener(WindowEvents.NOTIFICATION_ALERTS_CHANGED, handleNotificationAlertsChanged);
   }, [user]);
 
   return (
