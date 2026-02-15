@@ -15,10 +15,20 @@ describe('babyGrowthData', () => {
     for (const week of babyGrowthData) {
       expect(week).toHaveProperty('week');
       expect(week).toHaveProperty('fruit');
+      expect(week).toHaveProperty('animal');
+      expect(week).toHaveProperty('vegetable');
       expect(week).toHaveProperty('lengthCm');
       expect(week).toHaveProperty('weightG');
       expect(week).toHaveProperty('lengthIn');
       expect(week).toHaveProperty('weightOz');
+    }
+  });
+
+  it('each entry has non-empty comparison strings', () => {
+    for (const week of babyGrowthData) {
+      expect(week.fruit.length).toBeGreaterThan(0);
+      expect(week.animal.length).toBeGreaterThan(0);
+      expect(week.vegetable.length).toBeGreaterThan(0);
     }
   });
 

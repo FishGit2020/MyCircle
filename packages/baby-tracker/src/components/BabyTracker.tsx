@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
-import { getGrowthDataForWeek, getTrimester } from '../data/babyGrowthData';
+import { getGrowthDataForWeek, getTrimester, ComparisonCategory } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
 
 function getRandomVerseIndex(): number {
@@ -41,6 +41,7 @@ export default function BabyTracker() {
   const [dueDate, setDueDate] = useState<string>('');
   const [inputDate, setInputDate] = useState<string>('');
   const [verseIndex, setVerseIndex] = useState(getRandomVerseIndex);
+  const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
 
   // Load due date from localStorage on mount
   useEffect(() => {
@@ -264,13 +265,31 @@ export default function BabyTracker() {
             </div>
           </div>
 
-          {/* Fruit Comparison */}
+          {/* Size Comparison */}
           <div className="text-center py-4 bg-pink-50 dark:bg-pink-900/10 rounded-lg">
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
               {t('baby.size')}
             </p>
+            {/* Category toggle buttons */}
+            <div className="flex justify-center gap-1.5 mb-3" role="radiogroup" aria-label={t('baby.compareCategory')}>
+              {(['fruit', 'animal', 'vegetable'] as ComparisonCategory[]).map(cat => (
+                <button
+                  key={cat}
+                  role="radio"
+                  aria-checked={compareCategory === cat}
+                  onClick={() => setCompareCategory(cat)}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                    compareCategory === cat
+                      ? 'bg-pink-500 text-white dark:bg-pink-600'
+                      : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-pink-100 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600'
+                  }`}
+                >
+                  {t(`baby.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any)}
+                </button>
+              ))}
+            </div>
             <p className="text-2xl font-bold text-pink-600 dark:text-pink-400 capitalize">
-              {growthData.fruit}
+              {growthData[compareCategory]}
             </p>
           </div>
 
