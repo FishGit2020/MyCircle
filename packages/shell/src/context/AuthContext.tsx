@@ -18,6 +18,7 @@ import {
   updateStockWatchlist,
   updatePodcastSubscriptions,
   updateUserBabyDueDate,
+  updateUserBottomNavOrder,
   identifyUser,
   clearUserIdentity,
   logEvent,
@@ -111,6 +112,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userProfile.babyDueDate) {
             localStorage.setItem(StorageKeys.BABY_DUE_DATE, userProfile.babyDueDate);
             window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+          }
+
+          // Restore bottom nav order
+          if (userProfile.bottomNavOrder && userProfile.bottomNavOrder.length > 0) {
+            localStorage.setItem(StorageKeys.BOTTOM_NAV_ORDER, JSON.stringify(userProfile.bottomNavOrder));
+            window.dispatchEvent(new Event(WindowEvents.BOTTOM_NAV_ORDER_CHANGED));
           }
         }
       } else {
@@ -238,6 +245,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     window.addEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleBabyDueDateChanged);
     return () => window.removeEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleBabyDueDateChanged);
+  }, [user]);
+
+  // Auto-sync bottom nav order changes from localStorage to Firestore
+  useEffect(() => {
+    function handleBottomNavOrderChanged() {
+      const stored = localStorage.getItem(StorageKeys.BOTTOM_NAV_ORDER);
+      if (user) {
+        try {
+          const order = stored ? JSON.parse(stored) : null;
+          updateUserBottomNavOrder(user.uid, order);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
+    return () => window.removeEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
   }, [user]);
 
   return (
