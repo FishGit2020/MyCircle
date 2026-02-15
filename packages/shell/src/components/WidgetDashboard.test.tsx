@@ -5,6 +5,8 @@ import WidgetDashboard from './WidgetDashboard';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  useUnits: () => ({ tempUnit: 'C', speedUnit: 'ms', setTempUnit: vi.fn(), setSpeedUnit: vi.fn() }),
+  formatTemperature: (temp: number, unit?: string) => unit === 'F' ? `${Math.round(temp * 9/5 + 32)}°F` : `${Math.round(temp)}°C`,
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',

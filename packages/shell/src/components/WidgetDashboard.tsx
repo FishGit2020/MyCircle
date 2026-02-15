@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router';
-import { useTranslation, StorageKeys, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery } from '@mycircle/shared';
+import { useTranslation, StorageKeys, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery, useUnits, formatTemperature } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { useDailyVerse } from '../hooks/useDailyVerse';
@@ -76,6 +76,7 @@ function getWeatherIcon(weatherMain: string): string {
 
 function WeatherWidget() {
   const { t } = useTranslation();
+  const { tempUnit } = useUnits();
   const { favoriteCities } = useAuth();
   const [geoCity, setGeoCity] = useState<string | null>(null);
   const [geoError, setGeoError] = useState(false);
@@ -148,12 +149,12 @@ function WeatherWidget() {
                   {geoCity || t('widgets.yourLocation')}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {Math.round(current.temp)}°C · {weatherMain}
+                  {formatTemperature(current.temp, tempUnit)} · {weatherMain}
                 </p>
               </div>
             </div>
             <span className="text-lg font-semibold text-gray-900 dark:text-white">
-              {Math.round(current.temp)}°
+              {formatTemperature(current.temp, tempUnit)}
             </span>
           </div>
           <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5">
