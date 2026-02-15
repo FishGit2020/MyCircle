@@ -47,8 +47,8 @@ test.describe('Persistent Podcast Audio Player', () => {
     await page.waitForURL('**/stocks');
 
     // Close the player from the stocks page
-    // The player has desktop and mobile layouts — use CSS :visible pseudo-class to target the visible one
-    await page.locator('[aria-label="Close player"]:visible').first().click();
+    const closeButtons = page.getByRole('button', { name: /close player/i });
+    await closeButtons.first().click();
 
     // Player should no longer be visible
     await expect(page.getByRole('region', { name: /now playing/i })).not.toBeVisible({ timeout: 5_000 });
