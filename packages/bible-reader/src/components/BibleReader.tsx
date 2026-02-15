@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { useTranslation, StorageKeys, getDailyDevotional } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, getDailyDevotional } from '@mycircle/shared';
 import { useVotd, useBiblePassage, useBibleVersions, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
 
@@ -34,7 +34,10 @@ function loadBookmarks(): Bookmark[] {
 }
 
 function saveBookmarks(bookmarks: Bookmark[]) {
-  try { localStorage.setItem(StorageKeys.BIBLE_BOOKMARKS, JSON.stringify(bookmarks)); } catch { /* */ }
+  try {
+    localStorage.setItem(StorageKeys.BIBLE_BOOKMARKS, JSON.stringify(bookmarks));
+    window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
+  } catch { /* */ }
 }
 
 // --- Last read helpers ---

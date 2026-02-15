@@ -29,6 +29,7 @@ export const WindowEvents = {
   BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
   BOTTOM_NAV_ORDER_CHANGED: 'bottom-nav-order-changed',
   NOTIFICATION_ALERTS_CHANGED: 'notification-alerts-changed',
+  BIBLE_BOOKMARKS_CHANGED: 'bible-bookmarks-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals

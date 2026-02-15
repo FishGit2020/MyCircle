@@ -107,6 +107,7 @@ export interface UserProfile {
   weatherAlertsEnabled?: boolean;
   podcastAlertsEnabled?: boolean;
   announcementAlertsEnabled?: boolean;
+  bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -373,6 +374,15 @@ export async function updateUserBottomNavOrder(uid: string, order: string[] | nu
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     bottomNavOrder: order || null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateBibleBookmarks(uid: string, bookmarks: Array<{ book: string; chapter: number; label: string; timestamp: number }>) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    bibleBookmarks: bookmarks,
     updatedAt: serverTimestamp(),
   });
 }
