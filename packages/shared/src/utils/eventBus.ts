@@ -25,6 +25,7 @@ export const WindowEvents = {
   SUBSCRIPTIONS_CHANGED: 'subscriptions-changed',
   WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
   NOTEBOOK_CHANGED: 'notebook-changed',
+  PUBLIC_NOTES_CHANGED: 'public-notes-changed',
   BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
   BOTTOM_NAV_ORDER_CHANGED: 'bottom-nav-order-changed',
   NOTIFICATION_ALERTS_CHANGED: 'notification-alerts-changed',

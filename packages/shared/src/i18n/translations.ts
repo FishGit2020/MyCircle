@@ -539,6 +539,15 @@ const en = {
   'notebook.loginToUse': 'Sign in to use your notebook',
   'notebook.noResults': 'No matching notes found',
   'notebook.loadError': 'Failed to load notes',
+  'notebook.myNotes': 'My Notes',
+  'notebook.publicNotes': 'Public Notes',
+  'notebook.publish': 'Publish',
+  'notebook.publishing': 'Publishing...',
+  'notebook.publishConfirm': 'Publish this note publicly? This cannot be undone.',
+  'notebook.publishedBy': 'by {name}',
+  'notebook.noPublicNotes': 'No public notes yet. Be the first to share!',
+  'notebook.publishSuccess': 'Note published successfully',
+  'notebook.public': 'Public',
 
   // PWA update prompt
   'pwa.newVersion': 'A new version is available',
@@ -1345,6 +1354,15 @@ const es: Record<TranslationKey, string> = {
   'notebook.loginToUse': 'Inicia sesi\u00f3n para usar tu bloc de notas',
   'notebook.noResults': 'No se encontraron notas',
   'notebook.loadError': 'Error al cargar las notas',
+  'notebook.myNotes': 'Mis Notas',
+  'notebook.publicNotes': 'Notas P\u00fablicas',
+  'notebook.publish': 'Publicar',
+  'notebook.publishing': 'Publicando...',
+  'notebook.publishConfirm': '\u00bfPublicar esta nota p\u00fablicamente? Esto no se puede deshacer.',
+  'notebook.publishedBy': 'por {name}',
+  'notebook.noPublicNotes': 'No hay notas p\u00fablicas a\u00fan. \u00a1S\u00e9 el primero en compartir!',
+  'notebook.publishSuccess': 'Nota publicada exitosamente',
+  'notebook.public': 'P\u00fablico',
 
   // PWA update prompt
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
@@ -2151,6 +2169,15 @@ const zh: Record<TranslationKey, string> = {
   'notebook.loginToUse': '\u767b\u5f55\u540e\u4f7f\u7528\u7b14\u8bb0\u672c',
   'notebook.noResults': '\u672a\u627e\u5230\u5339\u914d\u7684\u7b14\u8bb0',
   'notebook.loadError': '\u52a0\u8f7d\u7b14\u8bb0\u5931\u8d25',
+  'notebook.myNotes': '\u6211\u7684\u7b14\u8bb0',
+  'notebook.publicNotes': '\u516c\u5f00\u7b14\u8bb0',
+  'notebook.publish': '\u53d1\u5e03',
+  'notebook.publishing': '\u53d1\u5e03\u4e2d...',
+  'notebook.publishConfirm': '\u786e\u5b9a\u8981\u516c\u5f00\u53d1\u5e03\u8fd9\u7bc7\u7b14\u8bb0\u5417\uff1f\u6b64\u64cd\u4f5c\u4e0d\u53ef\u64a4\u9500\u3002',
+  'notebook.publishedBy': '\u7531 {name} \u53d1\u5e03',
+  'notebook.noPublicNotes': '\u8fd8\u6ca1\u6709\u516c\u5f00\u7b14\u8bb0\u3002\u6210\u4e3a\u7b2c\u4e00\u4e2a\u5206\u4eab\u8005\uff01',
+  'notebook.publishSuccess': '\u7b14\u8bb0\u53d1\u5e03\u6210\u529f',
+  'notebook.public': '\u516c\u5f00',
 
   // PWA update prompt
   'pwa.newVersion': '\u65b0\u7248\u672c\u53ef\u7528',

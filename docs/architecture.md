@@ -273,6 +273,11 @@ Exposes `Notebook` component via Module Federation.
 
 **Key Behavior:**
 - Personal note-taking (create, edit, delete) with user-scoped Firestore subcollection (`users/{uid}/notes`)
+- **Public Notes:** publish notes to shared `publicNotes` top-level collection, visible to all authenticated users
+- "My Notes" / "Public Notes" tab navigation in the Notebook UI
+- Publish button in NoteEditor creates a copy in `publicNotes` with `createdBy: { uid, displayName }`
+- Public notes show green card styling with creator badge; publishing is irreversible
+- `WindowEvents.PUBLIC_NOTES_CHANGED` for public notes cache invalidation
 - Search/filter notes by title or content
 - Note count cached to `StorageKeys.NOTEBOOK_CACHE` for dashboard tile
 - CRUD via `window.__notebook` Firestore bridge (same pattern as worship-songs)
@@ -622,6 +627,7 @@ interface Note {
 ```
 
 - **Privacy:** Firestore rules scope reads/writes to the owning user (`request.auth.uid == uid`)
+- **Public Notes:** `publicNotes/{noteId}` top-level collection — any authenticated user can read/write. Each doc includes `isPublic: true`, `createdBy: { uid, displayName }`, `createdAt`, `updatedAt`. Publishing is one-way (cannot revert to private).
 - **Dashboard:** Note count is cached to `StorageKeys.NOTEBOOK_CACHE` in localStorage for the dashboard widget
 - **Window bridge:** `window.__notebook.getNoteCount()` provides note count to the Shell without direct MFE coupling
 
@@ -867,9 +873,10 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **WorshipSongs** | `packages/worship-songs/src/components/WorshipSongs.tsx` | Song library, search, and song viewer |
 | **SongEditor** | `packages/worship-songs/src/components/SongEditor.tsx` | Chord and lyrics editor |
 | **Metronome** | `packages/worship-songs/src/components/Metronome.tsx` | Built-in metronome with BPM control |
-| **Notebook** | `packages/notebook/src/components/Notebook.tsx` | Personal note-taking UI |
-| **NoteEditor** | `packages/notebook/src/components/NoteEditor.tsx` | Note create/edit form |
-| **useNotes** | `packages/notebook/src/hooks/useNotes.ts` | Notebook CRUD hook via window bridge |
+| **Notebook** | `packages/notebook/src/components/Notebook.tsx` | Personal & public note-taking UI with tab navigation |
+| **NoteEditor** | `packages/notebook/src/components/NoteEditor.tsx` | Note create/edit form with publish button |
+| **useNotes** | `packages/notebook/src/hooks/useNotes.ts` | Private notebook CRUD hook via window bridge |
+| **usePublicNotes** | `packages/notebook/src/hooks/usePublicNotes.ts` | Public notes CRUD hook via window bridge |
 | **Web Vitals** | `packages/shared/src/utils/webVitals.ts` | Core Web Vitals reporting (LCP, CLS, INP) |
 | **Firebase Functions** | `functions/src/index.ts` | Production Cloud Functions (GraphQL, proxies, AI) |
 | **CI Workflow** | `.github/workflows/ci.yml` | PR checks: typecheck, lint, test |

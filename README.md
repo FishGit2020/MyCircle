@@ -78,6 +78,8 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Personal note-taking with Firestore persistence (user-scoped subcollection)
 - Create, edit, and delete notes with search/filter
 - Privacy: each user can only see their own notes
+- **Public Notes**: publish notes to a shared `publicNotes` collection visible to all authenticated users
+- Creator badge and green card styling distinguish public notes
 - Note count cached for dashboard tile
 
 ### Baby Growth Tracker
@@ -159,7 +161,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **AI Assistant** | Conversational AI chat (Gemini) | `AiAssistant` |
 | **Bible Reader** | Bible reading with daily devotionals and community notes | `BibleReader` |
 | **Worship Songs** | Song library with lyrics, chord editor, YouTube links, metronome | `WorshipSongs` |
-| **Notebook** | Personal note-taking with search and Firestore sync | `Notebook` |
+| **Notebook** | Personal & public note-taking with search and Firestore sync | `Notebook` |
 | **Baby Tracker** | Baby growth tracking with weekly fruit comparisons and Bible verses | `BabyTracker` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 

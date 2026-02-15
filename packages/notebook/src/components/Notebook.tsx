@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
+import { usePublicNotes } from '../hooks/usePublicNotes';
 import NoteList from './NoteList';
 import NoteEditor from './NoteEditor';
-import type { Note } from '../types';
+import type { Note, PublicNote } from '../types';
 
 type View = 'list' | 'new' | 'edit';
+type Tab = 'my' | 'public';
 
 export default function Notebook() {
   const { t } = useTranslation();
   const { notes, loading, error, saveNote, deleteNote } = useNotes();
+  const { notes: publicNotes, loading: publicLoading, error: publicError, publishNote, updateNote: updatePublicNote, deleteNote: deletePublicNote } = usePublicNotes();
   const [view, setView] = useState<View>('list');
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [tab, setTab] = useState<Tab>('my');
+  const [selectedNote, setSelectedNote] = useState<Note | PublicNote | null>(null);
 
   // Auth check — shell exposes __getFirebaseIdToken when user is logged in
   const hasAuth = typeof (window as any).__getFirebaseIdToken === 'function';
@@ -28,7 +32,10 @@ export default function Notebook() {
     );
   }
 
-  if (loading) {
+  const isLoading = tab === 'my' ? loading : publicLoading;
+  const currentError = tab === 'my' ? error : publicError;
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16" role="status" aria-live="polite">
         <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -36,16 +43,20 @@ export default function Notebook() {
     );
   }
 
-  if (error) {
+  if (currentError) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-500 dark:text-red-400">{error}</p>
+        <p className="text-red-500 dark:text-red-400">{currentError}</p>
       </div>
     );
   }
 
   const handleSave = async (id: string | null, data: { title: string; content: string }) => {
-    await saveNote(id, data);
+    if (tab === 'public' && id) {
+      await updatePublicNote(id, data);
+    } else {
+      await saveNote(id, data);
+    }
     setView('list');
     setSelectedNote(null);
   };
@@ -54,11 +65,21 @@ export default function Notebook() {
     if (view === 'edit') {
       if (!window.confirm(t('notebook.deleteConfirm'))) return;
     }
-    await deleteNote(id);
+    if (tab === 'public') {
+      await deletePublicNote(id);
+    } else {
+      await deleteNote(id);
+    }
     if (view === 'edit') {
       setView('list');
       setSelectedNote(null);
     }
+  };
+
+  const handlePublish = async (data: { title: string; content: string }) => {
+    await publishNote(data);
+    setView('list');
+    setSelectedNote(null);
   };
 
   if (view === 'new' || view === 'edit') {
@@ -68,16 +89,44 @@ export default function Notebook() {
         onSave={handleSave}
         onCancel={() => { setView('list'); setSelectedNote(null); }}
         onDelete={view === 'edit' ? handleDelete : undefined}
+        onPublish={tab === 'my' ? handlePublish : undefined}
       />
     );
   }
 
+  const tabItems: { key: Tab; label: string }[] = [
+    { key: 'my', label: t('notebook.myNotes') },
+    { key: 'public', label: t('notebook.publicNotes') },
+  ];
+
   return (
-    <NoteList
-      notes={notes}
-      onSelect={(note) => { setSelectedNote(note); setView('edit'); }}
-      onNew={() => setView('new')}
-      onDelete={handleDelete}
-    />
+    <div className="space-y-4">
+      {/* Tab bar */}
+      <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700" role="tablist" aria-label={t('notebook.title')}>
+        {tabItems.map(({ key, label }) => (
+          <button
+            key={key}
+            role="tab"
+            aria-selected={tab === key}
+            onClick={() => { setTab(key); setView('list'); setSelectedNote(null); }}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              tab === key
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <NoteList
+        notes={tab === 'my' ? notes : publicNotes}
+        onSelect={(note) => { setSelectedNote(note); setView('edit'); }}
+        onNew={() => setView('new')}
+        onDelete={handleDelete}
+        isPublicView={tab === 'public'}
+      />
+    </div>
   );
 }

@@ -558,6 +558,40 @@ export async function deleteUserNote(uid: string, noteId: string) {
   await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
 }
 
+// Public Notes — shared notes visible to all authenticated users
+export async function getPublicNotes() {
+  if (!db) return [];
+  const q = query(collection(db, 'publicNotes'), orderBy('updatedAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function addPublicNote(uid: string, displayName: string, note: { title: string; content: string }) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'publicNotes'), {
+    ...note,
+    isPublic: true,
+    createdBy: { uid, displayName },
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updatePublicNote(noteId: string, updates: Partial<{ title: string; content: string }>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = doc(db, 'publicNotes', noteId);
+  await updateDoc(docRef, {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deletePublicNote(noteId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'publicNotes', noteId));
+}
+
 // Expose worship songs API for MFEs
 if (firebaseEnabled) {
   window.__worshipSongs = {
@@ -585,6 +619,21 @@ if (firebaseEnabled) {
     delete: (id: string) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deleteUserNote(auth.currentUser.uid, id);
+    },
+    // Public notes
+    getAllPublic: () => getPublicNotes(),
+    publish: (note: { title: string; content: string }) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const displayName = auth.currentUser.displayName || auth.currentUser.email || 'Anonymous';
+      return addPublicNote(auth.currentUser.uid, displayName, note);
+    },
+    updatePublic: (id: string, updates: Partial<{ title: string; content: string }>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updatePublicNote(id, updates);
+    },
+    deletePublic: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deletePublicNote(id);
     },
   };
 }
