@@ -244,6 +244,21 @@ export const GET_EARNINGS_CALENDAR = gql`
   }
 `;
 
+export const GET_COMPANY_NEWS = gql`
+  query GetCompanyNews($symbol: String!, $from: String!, $to: String!) {
+    companyNews(symbol: $symbol, from: $from, to: $to) {
+      id
+      category
+      datetime
+      headline
+      image
+      source
+      summary
+      url
+    }
+  }
+`;
+
 // ─── Crypto Queries ─────────────────────────────────────────
 
 export const GET_CRYPTO_PRICES = gql`

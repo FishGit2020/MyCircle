@@ -202,6 +202,7 @@ Exposes `StockTracker` component via Module Federation.
 - Symbol search and watchlist management
 - **Crypto tracker** — live prices for BTC, ETH, SOL, ADA, DOGE via CoinGecko free API (`/coins/markets`), with 7-day sparkline, market cap, 24h volume, expandable detail cards, 60s polling
 - **Earnings calendar** — weekly view of upcoming earnings reports via Finnhub `/calendar/earnings`, grouped by date, with EPS estimate/actual, revenue, beat/miss highlighting, and week navigation (prev/next)
+- **Company news** — recent news articles for selected stock via Finnhub `/company-news` (free tier), showing headline, source, relative timestamp, and thumbnail image with links to full articles (7-day window, 5-min server cache)
 - Crypto + earnings sections visible on overview, hidden when a specific stock is selected
 - Authenticated requests (Firebase ID token attached)
 

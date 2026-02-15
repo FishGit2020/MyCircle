@@ -142,6 +142,18 @@ export const typeDefs = `#graphql
     year: Int
   }
 
+  type CompanyNews {
+    id: Int!
+    category: String!
+    datetime: Int!
+    headline: String!
+    image: String
+    source: String!
+    summary: String!
+    url: String!
+    related: String
+  }
+
   # ─── Crypto Types ──────────────────────────────────────────────
 
   type CryptoPrice {
@@ -235,6 +247,7 @@ export const typeDefs = `#graphql
     stockQuote(symbol: String!): StockQuote
     stockCandles(symbol: String!, resolution: String = "D", from: Int!, to: Int!): StockCandle
     earningsCalendar(from: String!, to: String!): [EarningsEvent!]!
+    companyNews(symbol: String!, from: String!, to: String!): [CompanyNews!]!
 
     # Podcast queries
     searchPodcasts(query: String!): PodcastSearchResponse!
