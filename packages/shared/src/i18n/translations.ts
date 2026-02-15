@@ -802,6 +802,10 @@ const en = {
   'baby.shuffleVerse': 'New verse',
   'baby.pastDue': 'Past Due Date',
   'baby.dueToday': 'Due Today!',
+  'baby.compareCategory': 'Size comparison category',
+  'baby.categoryFruit': 'Fruit',
+  'baby.categoryAnimal': 'Animal',
+  'baby.categoryVegetable': 'Vegetable',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -1604,6 +1608,10 @@ const es: Record<TranslationKey, string> = {
   'baby.shuffleVerse': 'Nuevo vers\u00edculo',
   'baby.pastDue': 'Fecha de Parto Pasada',
   'baby.dueToday': '\u00a1Hoy es el D\u00eda!',
+  'baby.compareCategory': 'Categor\u00eda de comparaci\u00f3n de tama\u00f1o',
+  'baby.categoryFruit': 'Fruta',
+  'baby.categoryAnimal': 'Animal',
+  'baby.categoryVegetable': 'Verdura',
 };
 
 const zh: Record<TranslationKey, string> = {
@@ -2406,6 +2414,10 @@ const zh: Record<TranslationKey, string> = {
   'baby.shuffleVerse': '\u65b0\u7ecf\u6587',
   'baby.pastDue': '\u8fc7\u671f',
   'baby.dueToday': '\u4eca\u5929\u5230\u671f\uff01',
+  'baby.compareCategory': '\u5927\u5c0f\u5bf9\u6bd4\u7c7b\u522b',
+  'baby.categoryFruit': '\u6c34\u679c',
+  'baby.categoryAnimal': '\u52a8\u7269',
+  'baby.categoryVegetable': '\u852c\u83dc',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {
