@@ -279,8 +279,6 @@ async function reverseGeocode(apiKey: string, lat: number, lon: number): Promise
 }
 
 // ─── Company News (Finnhub) ─────────────────────────────
-// (Earnings calendar removed — stock alerts feature simplified)
-}
 
 async function getCompanyNews(apiKey: string, symbol: string, from: string, to: string) {
   const cacheKey = `stock:news:${symbol}:${from}:${to}`;
