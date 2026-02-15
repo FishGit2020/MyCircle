@@ -6,6 +6,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 
 - [High-Level Architecture](#high-level-architecture)
 - [Micro Frontends](#micro-frontends)
+- [MFE Prefetch Strategy](#mfe-prefetch-strategy)
 - [Inter-MFE Communication](#inter-mfe-communication)
 - [Data Flow](#data-flow)
 - [Persistence & Storage](#persistence--storage)
@@ -291,6 +292,114 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 - No external API — all data hardcoded. Zero latency, offline-capable.
 - No Apollo/GraphQL dependency — lightweight package
 - Route: `/baby`
+
+---
+
+## MFE Prefetch Strategy
+
+The shell uses a three-layer loading strategy to balance initial page load speed with fast subsequent navigation between micro frontends.
+
+### Layer 1 — Hover/Focus Prefetch
+
+**File:** `packages/shell/src/components/Layout.tsx`
+
+When a user hovers or focuses a navigation link, the shell fires a dynamic `import()` for that MFE's remote module. A `Set<string>` prevents duplicate loads.
+
+```typescript
+const prefetched = new Set<string>();
+const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
+  '/weather': () => import('weatherDisplay/WeatherDisplay'),
+  '/stocks':  () => import('stockTracker/StockTracker'),
+  '/podcasts': () => import('podcastPlayer/PodcastPlayer'),
+  '/ai':      () => import('aiAssistant/AiAssistant'),
+  '/bible':   () => import('bibleReader/BibleReader'),
+  '/worship': () => import('worshipSongs/WorshipSongs'),
+  '/notebook': () => import('notebook/Notebook'),
+  '/baby':    () => import('babyTracker/BabyTracker'),
+};
+
+function prefetchRoute(path: string) {
+  if (prefetched.has(path)) return;
+  prefetched.add(path);
+  ROUTE_MODULE_MAP[path]?.().catch(() => {});  // Fire and forget
+}
+```
+
+Each nav link triggers prefetch on `onMouseEnter` and `onFocus`:
+
+```tsx
+<Link to="/weather" onMouseEnter={() => prefetchRoute('/weather')} onFocus={() => prefetchRoute('/weather')}>
+```
+
+**What happens on prefetch:**
+
+```
+1. prefetchRoute('/weather') called
+2. import('weatherDisplay/WeatherDisplay') initiated
+3. Module Federation downloads remoteEntry.js from the remote server
+4. remoteEntry.js registers shared dependency versions & exports
+5. Component JS bundle downloaded
+6. CSS bundle downloaded and injected into <head>
+7. Promise resolves; module cached in browser and prefetched Set
+8. If user clicks the link → React Suspense resolves instantly (no spinner)
+```
+
+### Layer 2 — Lazy Loading with React.lazy + Suspense
+
+**File:** `packages/shell/src/App.tsx`
+
+All MFE routes use `React.lazy()` for code splitting. If the module was already prefetched (Layer 1), navigation is instant. Otherwise, `Suspense` shows a loading fallback while the module downloads.
+
+```typescript
+const WeatherDisplayMF = lazy(() => import('weatherDisplay/WeatherDisplay'));
+
+<ErrorBoundary fallback={<WeatherDisplayFallback />}>
+  <Suspense fallback={<Loading />}>
+    <WeatherDisplayMF />
+  </Suspense>
+</ErrorBoundary>
+```
+
+### Layer 3 — PWA Service Worker Caching
+
+**File:** `packages/shell/vite.config.ts` (Workbox runtime caching)
+
+The PWA service worker caches `remoteEntry.js` files with a `NetworkFirst` strategy. On repeat visits, cached manifests are served instantly while a fresh copy is fetched in the background.
+
+```typescript
+{
+  urlPattern: /\/remoteEntry\.js$/,
+  handler: 'NetworkFirst',
+  options: {
+    cacheName: 'mfe-remote-entries',
+    expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 },
+    cacheableResponse: { statuses: [0, 200] },
+  },
+}
+```
+
+### Build Configuration
+
+All packages (shell + 9 MFEs) set `modulePreload: false` in their Vite build config:
+
+```typescript
+build: { modulePreload: false }
+```
+
+This prevents Vite from injecting `<link rel="modulepreload">` tags in HTML, which would conflict with Module Federation's own module loading mechanism. Prefetch is instead controlled explicitly via the `import()` calls in Layer 1.
+
+### Trade-offs
+
+| Benefit | Cost |
+|---------|------|
+| Near-instant navigation after hover | Network bandwidth for modules user may not visit |
+| No loading spinner on click | CSS injected on hover can cause cascade conflicts (see [Pitfall #3](mfe-guide.md#3-prefetch-side-effects)) |
+| SW cache speeds up repeat visits | Stale SW can serve outdated remoteEntry.js (see [Pitfall #11](mfe-guide.md#11-pwa-service-worker-interference-in-dev-mode)) |
+
+### Future Considerations
+
+- `requestIdleCallback` — prefetch during browser idle time instead of on hover
+- `IntersectionObserver` — prefetch when nav links scroll into the viewport
 
 ---
 

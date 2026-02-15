@@ -244,7 +244,7 @@ export const typeDefs = `#graphql
 
     # Bible queries
     bibleVersions: [BibleVersion!]!
-    bibleVotd(day: Int!): BibleVerse!
+    bibleVotdApi(day: Int!): BibleVerse!
     biblePassage(reference: String!, translation: String): BiblePassage!
   }
 

@@ -96,6 +96,11 @@ export default function DashboardPage() {
             <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
               — {verse.reference}
             </p>
+            {verse.copyright && (
+              <p className="text-[10px] text-blue-400/60 dark:text-blue-500/50 mt-1 leading-tight">
+                {verse.copyright}
+              </p>
+            )}
           </div>
         </div>
       </section>

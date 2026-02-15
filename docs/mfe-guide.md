@@ -19,6 +19,7 @@ Lessons learned from building MyCircle's Vite Module Federation architecture wit
 
 ### Limitations & Architecture
 - [10. No Hot Reload for Remote MFEs in Dev Mode](#10-no-hot-reload-for-remote-mfes-in-dev-mode)
+- [11. PWA Service Worker Interference in Dev Mode](#11-pwa-service-worker-interference-in-dev-mode)
 - [Quick Reference](#quick-reference)
 
 ---
@@ -429,23 +430,91 @@ Running all 9 remotes in `vite dev` mode simultaneously would consume significan
 | `@antdevx/vite-plugin-hmr-sync` | Auto-refresh | Watches for rebuilds and triggers browser reload (not true HMR) |
 | Rsbuild + Module Federation | Yes | Full HMR, but requires migrating from Vite to Rsbuild |
 
-### Workarounds
+### Workaround: `pnpm dev:remote`
 
-**For active development on a single remote**, rebuild on change and manually refresh:
+The `dev:remote` script (`scripts/dev-remote.mjs`) automates the rebuild-and-reload cycle. It runs `vite build --watch` for a single remote and automatically triggers a browser reload when the build finishes.
+
+**Setup — two terminals required:**
 
 ```bash
-# Terminal 1: pnpm dev (shell + all previews)
-# Terminal 2: watch and rebuild the remote you're editing
-pnpm --filter @mycircle/baby-tracker build --watch
+# Terminal 1: start the full dev environment (shell + all preview servers)
+pnpm dev
+
+# Terminal 2: watch the remote you're actively editing
+pnpm dev:remote -- worship-songs
 ```
 
-After each rebuild, the preview server picks up the new files. Refresh the browser to load the updated remote.
+Replace `worship-songs` with any package folder name: `city-search`, `weather-display`, `stock-tracker`, `podcast-player`, `ai-assistant`, `bible-reader`, `notebook`, `baby-tracker`.
 
-**For a smoother workflow**, consider adding `@antdevx/vite-plugin-hmr-sync` which automatically triggers a browser reload when a remote rebuilds — removing the manual refresh step.
+**How it works:**
+
+```
+Save file → Vite rebuild (--watch) → dist/assets/remoteEntry.js changes
+  → fs.watch detects it → fetches localhost:3000/__mfe-rebuilt → browser reloads
+```
+
+1. Runs `pnpm --filter @mycircle/<name> build --watch` to rebuild on every file save
+2. Watches the `dist/assets/` directory for `remoteEntry.js` changes (with 500ms debounce)
+3. Sends an HTTP request to the shell's `/__mfe-rebuilt` endpoint, which triggers a browser reload
+
+**Important notes:**
+
+- This is **not true HMR** — the browser does a full page reload, so in-memory state (form inputs, scroll position) is lost
+- The shell must be running on port 3000 (`pnpm dev` in Terminal 1). If the shell isn't running, you'll see `Could not reach shell` warnings — the rebuild still works, you just need to manually refresh
+- Only use `dev:remote` for the **one package you're actively editing**. All other remotes stay on their preview servers serving their last build
 
 ### Rule of Thumb
 
-> HMR works within a single Vite dev server. Across federated boundaries, expect rebuild + refresh. Focus `dev` mode on the package you're actively editing.
+> HMR works within a single Vite dev server. Across federated boundaries, use `pnpm dev:remote` for automatic rebuild + reload. Focus on the package you're actively editing.
+
+---
+
+## 11. PWA Service Worker Interference in Dev Mode
+
+**Severity: Medium** | **File: shell PWA config (`vite-plugin-pwa`)**
+
+### The Problem
+
+The shell uses `vite-plugin-pwa` with Workbox to cache assets for offline support. The service worker **persists in the browser** across sessions. If a previous production build (or a stale dev session) registered a service worker, it will intercept all requests to `localhost:3000` and serve cached HTML — even after you restart the dev server.
+
+### How It Manifests
+
+After running `pnpm dev`, the page at `localhost:3000` is **blank**. The console shows:
+
+```
+workbox Precaching did not find a match for /@vite-plugin-pwa/pwa-entry-point-loaded
+GET http://localhost:3000/@vite/client net::ERR_CONNECTION_REFUSED
+GET http://localhost:3000/src/main.tsx net::ERR_CONNECTION_REFUSED
+```
+
+The service worker is serving a cached `index.html` from a previous build that references dev-mode scripts (`/@vite/client`, `/src/main.tsx`), but those paths only exist when a Vite dev server is actively running.
+
+### The Fix
+
+Unregister the stale service worker using any of these methods:
+
+**Option A — DevTools (quickest):**
+
+1. Open DevTools → **Application** tab → **Service Workers** (left sidebar)
+2. Check **"Bypass for network"** to skip the SW during dev, or click **"Unregister"** to remove it entirely
+
+**Option B — Console one-liner:**
+
+```js
+navigator.serviceWorker.getRegistrations().then(r => r.forEach(sw => sw.unregister()))
+```
+
+Then hard-refresh with `Ctrl+Shift+R`.
+
+**Option C — Clear all site data:**
+
+1. DevTools → **Application** → **Storage** (left sidebar)
+2. Click **"Clear site data"** (clears SW + cache + localStorage)
+3. Refresh the page
+
+### Rule of Thumb
+
+> If `localhost:3000` shows a blank page after starting `pnpm dev`, the first thing to check is a stale PWA service worker. Unregister it and hard-refresh.
 
 ---
 
@@ -462,4 +531,5 @@ After each rebuild, the preview server picks up the new files. Refresh the brows
 | Storage key collisions | Shared `localStorage` | Single `StorageKeys` enum in shared package | Medium |
 | Body scroll lock conflicts | Multiple modals managing `overflow` | Ref-counting or shared hook | Low |
 | Missing test aliases | New remote added to shell but not root vitest config | Update both `vitest.config.ts` files + create mock | High |
-| No remote HMR in dev | Federation remotes run on separate servers; HMR doesn't cross boundaries | Rebuild + refresh; or use `hmr-sync` plugin for auto-reload | Limitation |
+| No remote HMR in dev | Federation remotes run on separate servers; HMR doesn't cross boundaries | `pnpm dev:remote -- <name>` for auto rebuild + reload | Limitation |
+| PWA service worker stale cache | Service worker serves cached HTML from previous build | Unregister SW in DevTools → Application → Service Workers | Medium |

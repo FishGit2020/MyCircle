@@ -129,7 +129,7 @@ function StockWidget() {
 
 function VerseWidget() {
   const { t } = useTranslation();
-  const { verse, shuffleVerse, loading } = useDailyVerse();
+  const { verse, loading } = useDailyVerse();
 
   return (
     <div>
@@ -139,23 +139,14 @@ function VerseWidget() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
         </div>
-        <div className="flex-1">
+        <div>
           <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.verse')}</h4>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.verseDesc')}</p>
         </div>
-        <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); shuffleVerse(); }}
-          className="text-xs text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
-          aria-label={t('widgets.verse')}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
       </div>
       {loading ? (
         <div className="h-4 bg-amber-200 dark:bg-amber-800/40 rounded animate-pulse w-3/4" />
-      ) : (
+      ) : verse ? (
         <div className="bg-amber-50/50 dark:bg-amber-900/10 rounded-lg p-2.5">
           <p className="text-sm italic text-amber-700 dark:text-amber-300 leading-relaxed">
             &ldquo;{verse.text}&rdquo;
@@ -164,7 +155,7 @@ function VerseWidget() {
             — {verse.reference}
           </p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -349,8 +340,8 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   babyTracker: BabyTrackerWidget,
 };
 
-const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string }> }) => string)> = {
-  weather: (ctx) => ctx.favoriteCities[0] ? `/weather/${ctx.favoriteCities[0].lat},${ctx.favoriteCities[0].lon}` : '/weather',
+const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
+  weather: (ctx) => ctx.favoriteCities[0] ? `/weather/${ctx.favoriteCities[0].lat},${ctx.favoriteCities[0].lon}?name=${encodeURIComponent(ctx.favoriteCities[0].name)}` : '/weather',
   stocks: '/stocks',
   verse: '/bible',
   nowPlaying: '/podcasts',

@@ -589,7 +589,7 @@ export const resolvers = {
       return await getYouVersionBibles();
     },
 
-    bibleVotd: async (_: any, { day }: { day: number }) => {
+    bibleVotdApi: async (_: any, { day }: { day: number }) => {
       const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
       return { ...DAILY_VERSES[index], translation: 'NIV', copyright: null };
     },

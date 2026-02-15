@@ -148,7 +148,7 @@ export default function Layout() {
       <FeedbackButton hasActivePlayer={hasActivePlayer} />
       <PwaInstallPrompt />
 
-      <footer role="contentinfo" className="bg-gray-800 dark:bg-gray-950 text-white py-6 mt-12 transition-colors">
+      <footer role="contentinfo" className="bg-gray-800 dark:bg-gray-950 text-white py-6 pb-20 md:pb-6 mt-12 transition-colors">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
             {t('footer.dataProvider')}{' '}
@@ -169,7 +169,7 @@ export default function Layout() {
             >
               Finnhub
             </a>
-            {', & '}
+            {', '}
             <a
               href="https://podcastindex.org"
               target="_blank"
@@ -177,6 +177,15 @@ export default function Layout() {
               className="text-blue-400 hover:underline"
             >
               PodcastIndex
+            </a>
+            {' & '}
+            <a
+              href="https://developers.youversion.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:underline"
+            >
+              YouVersion
             </a>
           </p>
           <p className="text-xs text-gray-400 mt-2">
