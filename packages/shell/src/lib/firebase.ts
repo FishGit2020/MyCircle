@@ -103,6 +103,7 @@ export interface UserProfile {
   podcastSubscriptions?: string[];
   lastSeenAnnouncementId?: string;
   babyDueDate?: string;
+  bottomNavOrder?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -360,6 +361,15 @@ export async function updateUserBabyDueDate(uid: string, babyDueDate: string | n
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     babyDueDate: babyDueDate || null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateUserBottomNavOrder(uid: string, order: string[] | null) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    bottomNavOrder: order || null,
     updatedAt: serverTimestamp(),
   });
 }

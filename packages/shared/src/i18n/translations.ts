@@ -630,6 +630,14 @@ const en = {
   'bottomNav.stocks': 'Stocks',
   'bottomNav.podcasts': 'Podcasts',
   'bottomNav.more': 'More',
+  'bottomNav.editOrder': 'Edit Order',
+  'bottomNav.editDone': 'Done',
+  'bottomNav.editTitle': 'Customize Navigation',
+  'bottomNav.mainBarSection': 'Main Bar',
+  'bottomNav.moreSection': 'More Menu',
+  'bottomNav.moveUp': 'Move up',
+  'bottomNav.moveDown': 'Move down',
+  'bottomNav.reset': 'Reset',
 
   // Onboarding
   'onboarding.welcome': 'Welcome to MyCircle!',
@@ -1386,6 +1394,14 @@ const es: Record<TranslationKey, string> = {
   'bottomNav.stocks': 'Acciones',
   'bottomNav.podcasts': 'Podcasts',
   'bottomNav.more': 'M\u00e1s',
+  'bottomNav.editOrder': 'Editar orden',
+  'bottomNav.editDone': 'Listo',
+  'bottomNav.editTitle': 'Personalizar navegaci\u00f3n',
+  'bottomNav.mainBarSection': 'Barra principal',
+  'bottomNav.moreSection': 'Men\u00fa m\u00e1s',
+  'bottomNav.moveUp': 'Subir',
+  'bottomNav.moveDown': 'Bajar',
+  'bottomNav.reset': 'Restablecer',
 
   // Onboarding
   'onboarding.welcome': '\u00a1Bienvenido a MyCircle!',
@@ -2142,6 +2158,14 @@ const zh: Record<TranslationKey, string> = {
   'bottomNav.stocks': '\u80a1\u7968',
   'bottomNav.podcasts': '\u64ad\u5ba2',
   'bottomNav.more': '\u66f4\u591a',
+  'bottomNav.editOrder': '\u7f16\u8f91\u987a\u5e8f',
+  'bottomNav.editDone': '\u5b8c\u6210',
+  'bottomNav.editTitle': '\u81ea\u5b9a\u4e49\u5bfc\u822a',
+  'bottomNav.mainBarSection': '\u4e3b\u5bfc\u822a\u680f',
+  'bottomNav.moreSection': '\u66f4\u591a\u83dc\u5355',
+  'bottomNav.moveUp': '\u4e0a\u79fb',
+  'bottomNav.moveDown': '\u4e0b\u79fb',
+  'bottomNav.reset': '\u91cd\u7f6e',
 
   // Onboarding
   'onboarding.welcome': '\u6b22\u8fce\u6765\u5230 MyCircle\uff01',

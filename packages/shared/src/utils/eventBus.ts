@@ -26,6 +26,7 @@ export const WindowEvents = {
   WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
   NOTEBOOK_CHANGED: 'notebook-changed',
   BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
+  BOTTOM_NAV_ORDER_CHANGED: 'bottom-nav-order-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -55,6 +56,7 @@ export const StorageKeys = {
   BIBLE_TRANSLATION: 'bible-translation',
   NOTEBOOK_CACHE: 'notebook-cache',
   BABY_DUE_DATE: 'baby-due-date',
+  BOTTOM_NAV_ORDER: 'bottom-nav-order',
 } as const;
 
 export interface CitySelectedEvent {
