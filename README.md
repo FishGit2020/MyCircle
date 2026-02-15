@@ -284,7 +284,8 @@ mycircle/
 │   ├── assemble-firebase.mjs    # Firebase build assembly
 │   └── generate-icons.mjs       # PWA icon generation
 ├── docs/
-│   └── architecture.md          # Detailed architecture analysis
+│   ├── architecture.md          # Detailed architecture analysis
+│   └── agent-guide.md           # AI agent development guide (i18n, a11y, theme, responsive, CI)
 ├── firebase.json                # Firebase hosting + functions config
 ├── firestore.rules              # Firestore security rules
 ├── pnpm-workspace.yaml          # Workspace package declarations
