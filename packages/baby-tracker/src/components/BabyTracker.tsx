@@ -7,13 +7,16 @@ function getRandomVerseIndex(): number {
   return Math.floor(Math.random() * pregnancyVerses.length);
 }
 
-function calculateGestationalWeek(dueDateStr: string): number {
+function calculateGestationalAge(dueDateStr: string): { weeks: number; days: number; totalDays: number } {
   const dueDate = new Date(dueDateStr + 'T00:00:00');
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-  const weeksUntilDue = (dueDate.getTime() - today.getTime()) / msPerWeek;
-  return Math.round((40 - weeksUntilDue) * 10) / 10;
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const daysUntilDue = Math.round((dueDate.getTime() - today.getTime()) / msPerDay);
+  const totalDays = 280 - daysUntilDue; // 40 weeks = 280 days
+  const weeks = Math.floor(totalDays / 7);
+  const days = totalDays % 7;
+  return { weeks, days, totalDays };
 }
 
 function getWeeksRemaining(dueDateStr: string): number {
@@ -91,12 +94,13 @@ export default function BabyTracker() {
   const verse = pregnancyVerses[verseIndex];
 
   // Computed pregnancy state
-  const gestationalWeek = useMemo(() => {
+  const gestationalAge = useMemo(() => {
     if (!dueDate) return null;
-    return calculateGestationalWeek(dueDate);
+    return calculateGestationalAge(dueDate);
   }, [dueDate]);
 
-  const currentWeek = gestationalWeek !== null ? Math.floor(gestationalWeek) : null;
+  const currentWeek = gestationalAge !== null ? gestationalAge.weeks : null;
+  const currentDays = gestationalAge !== null ? gestationalAge.days : null;
   const weeksRemaining = dueDate ? getWeeksRemaining(dueDate) : null;
 
   const growthData = currentWeek !== null ? getGrowthDataForWeek(Math.min(Math.max(currentWeek, 1), 40)) : null;
@@ -216,6 +220,11 @@ export default function BabyTracker() {
               <span className="text-3xl font-bold text-pink-600 dark:text-pink-400">
                 {t('baby.week')} {currentWeek}
               </span>
+              {currentDays !== null && currentDays > 0 && (
+                <span className="text-lg font-semibold text-pink-400 dark:text-pink-500 ml-1">
+                  +{currentDays}d
+                </span>
+              )}
               <span className="text-gray-400 dark:text-gray-500 mx-2">·</span>
               <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 {trimesterLabel}

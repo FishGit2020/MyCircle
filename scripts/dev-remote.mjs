@@ -8,7 +8,7 @@
  */
 import { spawn } from 'child_process';
 import { existsSync, watch } from 'fs';
-import { resolve } from 'path';
+import { resolve, basename, dirname } from 'path';
 
 const name = process.argv.find((a, i) => i >= 2 && a !== '--');
 if (!name) {
@@ -47,16 +47,23 @@ child.on('exit', (code) => {
 // ── 2. Watch remoteEntry.js for changes and notify the shell ────────────
 let debounceTimer = null;
 
+const remoteEntryDir = dirname(remoteEntry);
+const remoteEntryName = basename(remoteEntry);
+
 function waitForRemoteEntry() {
-  if (!existsSync(remoteEntry)) {
-    // remoteEntry doesn't exist yet (first build in progress) — retry shortly
+  if (!existsSync(remoteEntryDir)) {
+    // dist/assets doesn't exist yet (first build in progress) — retry shortly
     setTimeout(waitForRemoteEntry, 1000);
     return;
   }
 
-  console.log(`[dev-remote] Watching ${remoteEntry}`);
+  console.log(`[dev-remote] Watching directory ${remoteEntryDir} for ${remoteEntryName} changes`);
 
-  watch(remoteEntry, () => {
+  // Watch the directory instead of the file — fs.watch() on a single file
+  // throws EPERM on Windows when Vite replaces the file via atomic rename.
+  watch(remoteEntryDir, (eventType, filename) => {
+    if (filename !== remoteEntryName) return;
+
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
       try {
