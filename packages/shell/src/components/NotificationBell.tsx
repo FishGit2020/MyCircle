@@ -8,7 +8,6 @@ export default function NotificationBell() {
   const { t } = useTranslation();
   const { favoriteCities } = useAuth();
   const [weatherEnabled, setWeatherEnabled] = useState(() => localStorage.getItem(StorageKeys.WEATHER_ALERTS) === 'true');
-  const [stockEnabled, setStockEnabled] = useState(() => localStorage.getItem(StorageKeys.STOCK_ALERTS) === 'true');
   const [podcastEnabled, setPodcastEnabled] = useState(() => localStorage.getItem(StorageKeys.PODCAST_ALERTS) === 'true');
   const [announcementEnabled, setAnnouncementEnabled] = useState(() => localStorage.getItem(StorageKeys.ANNOUNCEMENT_ALERTS) === 'true');
   const [loading, setLoading] = useState(false);
@@ -19,7 +18,7 @@ export default function NotificationBell() {
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const anyEnabled = weatherEnabled || stockEnabled || podcastEnabled || announcementEnabled;
+  const anyEnabled = weatherEnabled || podcastEnabled || announcementEnabled;
 
   // Don't render if Firebase or Notification API isn't available
   if (!firebaseEnabled || typeof Notification === 'undefined') return null;
@@ -120,32 +119,6 @@ export default function NotificationBell() {
       setLoading(false);
     }
   }, [weatherEnabled, loading, fcmToken, favoriteCities, ensureToken]);
-
-  const handleToggleStocks = useCallback(async () => {
-    if (loading) return;
-
-    const watchlist = getWatchlist();
-    if (!stockEnabled && watchlist.length === 0) {
-      showFeedback(t('notifications.noWatchlistForAlerts'));
-      return;
-    }
-
-    if (stockEnabled) {
-      setStockEnabled(false);
-      localStorage.setItem(StorageKeys.STOCK_ALERTS, 'false');
-      window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
-      showFeedback(t('notifications.disabled'));
-      return;
-    }
-
-    const token = await ensureToken();
-    if (!token) return;
-
-    setStockEnabled(true);
-    localStorage.setItem(StorageKeys.STOCK_ALERTS, 'true');
-    window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
-    showFeedback(t('notifications.enabled'));
-  }, [stockEnabled, loading, ensureToken]);
 
   const handleTogglePodcasts = useCallback(async () => {
     if (loading) return;
@@ -298,19 +271,6 @@ export default function NotificationBell() {
                 }
                 color="blue"
               />
-              {/* Stock alerts */}
-              <NotificationToggle
-                label={t('notifications.stockAlerts')}
-                description={t('notifications.stockAlertsDesc')}
-                enabled={stockEnabled}
-                onToggle={handleToggleStocks}
-                icon={
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                }
-                color="green"
-              />
               {/* Podcast alerts */}
               <NotificationToggle
                 label={t('notifications.podcastAlerts')}
@@ -417,14 +377,6 @@ function NotificationToggle({
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function getWatchlist(): Array<{ symbol: string }> {
-  try {
-    const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
-    if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
-  return [];
-}
 
 function getSubscribedIds(): string[] {
   try {

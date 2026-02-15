@@ -1,10 +1,13 @@
 import React from 'react';
 import { useTranslation, getDailyVerse } from '@mycircle/shared';
 import WidgetDashboard from '../components/WidgetDashboard';
+import { useDailyVerse } from '../hooks/useDailyVerse';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const verse = getDailyVerse();
+  const { verse: apiVerse, loading } = useDailyVerse();
+  const localVerse = getDailyVerse();
+  const verse = apiVerse || localVerse;
 
   return (
     <div className="space-y-8">
@@ -19,10 +22,14 @@ export default function DashboardPage() {
         {/* Daily Bible verse */}
         <div className="max-w-lg mx-auto">
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
-            <p className="text-sm italic text-blue-600 dark:text-blue-400">
-              &ldquo;{verse.text}&rdquo;
-            </p>
-            <p className="text-xs text-blue-500 dark:text-blue-300 mt-1.5 font-medium">
+            {loading ? (
+              <div className="h-4 bg-blue-200 dark:bg-blue-800/40 rounded animate-pulse w-3/4 mx-auto" />
+            ) : verse.text ? (
+              <p className="text-sm italic text-blue-600 dark:text-blue-400">
+                &ldquo;{verse.text}&rdquo;
+              </p>
+            ) : null}
+            <p className={`text-xs text-blue-500 dark:text-blue-300 font-medium ${verse.text || loading ? 'mt-1.5' : ''}`}>
               — {verse.reference}
             </p>
             {verse.copyright && (

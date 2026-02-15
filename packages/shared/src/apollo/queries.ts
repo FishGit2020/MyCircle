@@ -228,22 +228,6 @@ export const GET_STOCK_CANDLES = gql`
   }
 `;
 
-export const GET_EARNINGS_CALENDAR = gql`
-  query GetEarningsCalendar($from: String!, $to: String!) {
-    earningsCalendar(from: $from, to: $to) {
-      date
-      epsActual
-      epsEstimate
-      revenueActual
-      revenueEstimate
-      symbol
-      hour
-      quarter
-      year
-    }
-  }
-`;
-
 export const GET_COMPANY_NEWS = gql`
   query GetCompanyNews($symbol: String!, $from: String!, $to: String!) {
     companyNews(symbol: $symbol, from: $from, to: $to) {

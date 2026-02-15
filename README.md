@@ -41,7 +41,6 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Symbol search and **watchlist** (shown first for quick access)
 - Live polling with visible toggle control
 - **Collapsible crypto tracker** — live BTC, ETH, SOL, ADA, DOGE prices via CoinGecko API with 7-day sparkline, market cap, 24h volume, and expandable detail cards; entire section collapses with persisted state
-- **Earnings calendar** — weekly earnings report schedule via Finnhub API with EPS estimates/actuals, revenue, beat/miss highlighting, week navigation, **symbol search filter**, event count badge, and scrollable list (max 400px)
 
 ### Podcasts
 - **Podcast browsing without login** — discover trending podcasts and search without authentication
@@ -84,7 +83,8 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### Baby Growth Tracker
 - Week-by-week baby development tracking with fruit size comparisons
-- Encouraging pregnancy Bible verses with shuffle
+- Encouraging pregnancy Bible verses fetched from YouVersion API with shuffle
+- Estimated length/weight measurements with typical range display
 - Due date input with dual persistence (localStorage + Firestore)
 - Gestational week calculation, trimester display, progress bar
 - Dark mode, full i18n (English, Spanish, Chinese)
@@ -100,7 +100,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Dark / light theme with system preference detection
 - Multi-language support (i18n: English, Spanish, Chinese)
 - Temperature (°C / °F) and wind speed (m/s, mph, km/h) unit toggles
-- **Push notifications** — multi-category preferences (weather alerts, stock price alerts, podcast episodes, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
+- **Push notifications** — multi-category preferences (weather alerts, podcast episodes, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
 - **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal with mobile bottom-nav clearance; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
 - Offline indicator & PWA support

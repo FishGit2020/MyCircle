@@ -105,7 +105,6 @@ export interface UserProfile {
   babyDueDate?: string;
   bottomNavOrder?: string[];
   weatherAlertsEnabled?: boolean;
-  stockAlertsEnabled?: boolean;
   podcastAlertsEnabled?: boolean;
   announcementAlertsEnabled?: boolean;
   createdAt: Date;
@@ -380,7 +379,6 @@ export async function updateUserBottomNavOrder(uid: string, order: string[] | nu
 
 export async function updateUserNotificationAlerts(uid: string, alerts: {
   weatherAlertsEnabled: boolean;
-  stockAlertsEnabled: boolean;
   podcastAlertsEnabled: boolean;
   announcementAlertsEnabled: boolean;
 }) {

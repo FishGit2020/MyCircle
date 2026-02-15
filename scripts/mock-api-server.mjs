@@ -85,12 +85,6 @@ const stockCandlesResponse = {
   s: 'ok',
 };
 
-const earningsResponse = {
-  earningsCalendar: [
-    { date: '2025-01-30', epsActual: 2.18, epsEstimate: 2.10, symbol: 'AAPL', hour: 'amc', quarter: 1, year: 2025 },
-  ],
-};
-
 // ─── CoinGecko Mock Data ──────────────────────────────────────────
 
 const cryptoMarketsResponse = [
@@ -235,10 +229,6 @@ app.get('/api/v1/stock/profile2', (req, res) => {
 app.get('/api/v1/stock/candle', (req, res) => {
   res.json(stockCandlesResponse);
 });
-app.get('/api/v1/calendar/earnings', (req, res) => {
-  res.json(earningsResponse);
-});
-
 // CoinGecko
 app.get('/api/v3/coins/markets', (req, res) => {
   res.json(cryptoMarketsResponse);

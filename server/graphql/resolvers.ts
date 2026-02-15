@@ -221,38 +221,6 @@ async function getHistoricalWeather(lat: number, lon: number, date: string) {
   return result;
 }
 
-// ─── Earnings Calendar (Finnhub) ─────────────────────────────
-
-async function getEarningsCalendar(from: string, to: string) {
-  const apiKey = process.env.FINNHUB_API_KEY;
-  if (!apiKey) throw new Error('FINNHUB_API_KEY not configured');
-
-  const cacheKey = `earnings:${from}:${to}`;
-  const cached = stockCache.get<any[]>(cacheKey);
-  if (cached) return cached;
-
-  const response = await axios.get('https://finnhub.io/api/v1/calendar/earnings', {
-    params: { from, to },
-    headers: { 'X-Finnhub-Token': apiKey },
-    timeout: 10000,
-  });
-
-  const events = (response.data.earningsCalendar ?? []).map((e: any) => ({
-    date: e.date,
-    epsActual: e.epsActual ?? null,
-    epsEstimate: e.epsEstimate ?? null,
-    revenueActual: e.revenueActual ?? null,
-    revenueEstimate: e.revenueEstimate ?? null,
-    symbol: e.symbol,
-    hour: e.hour ?? null,
-    quarter: e.quarter ?? null,
-    year: e.year ?? null,
-  }));
-
-  stockCache.set(cacheKey, events, 600);
-  return events;
-}
-
 // ─── Bible API helpers (YouVersion) ──────────────────────────
 
 // USFM book abbreviations for all 66 canonical books
@@ -343,38 +311,39 @@ async function getYouVersionPassage(bibleId: number, reference: string) {
 
 const DEFAULT_YOUVERSION_BIBLE_ID = 111; // NIV 2011
 
+// Curated verse references — text is fetched from YouVersion API at runtime
 const DAILY_VERSES = [
-  { text: "For I know the plans I have for you, declares the LORD, plans to prosper you and not to harm you, plans to give you hope and a future.", reference: "Jeremiah 29:11" },
-  { text: "Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.", reference: "Proverbs 3:5-6" },
-  { text: "I can do all this through him who gives me strength.", reference: "Philippians 4:13" },
-  { text: "The LORD is my shepherd, I lack nothing.", reference: "Psalm 23:1" },
-  { text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the LORD your God will be with you wherever you go.", reference: "Joshua 1:9" },
-  { text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.", reference: "Romans 8:28" },
-  { text: "The LORD is my light and my salvation — whom shall I fear? The LORD is the stronghold of my life — of whom shall I be afraid?", reference: "Psalm 27:1" },
-  { text: "But those who hope in the LORD will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.", reference: "Isaiah 40:31" },
-  { text: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", reference: "Philippians 4:6" },
-  { text: "So do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you; I will uphold you with my righteous right hand.", reference: "Isaiah 41:10" },
-  { text: "Come to me, all you who are weary and burdened, and I will give you rest.", reference: "Matthew 11:28" },
-  { text: "The LORD bless you and keep you; the LORD make his face shine on you and be gracious to you.", reference: "Numbers 6:24-25" },
-  { text: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.", reference: "John 3:16" },
-  { text: "Delight yourself in the LORD, and he will give you the desires of your heart.", reference: "Psalm 37:4" },
-  { text: "The name of the LORD is a fortified tower; the righteous run to it and are safe.", reference: "Proverbs 18:10" },
-  { text: "He has made everything beautiful in its time. He has also set eternity in the human heart.", reference: "Ecclesiastes 3:11" },
-  { text: "Cast all your anxiety on him because he cares for you.", reference: "1 Peter 5:7" },
-  { text: "This is the day that the LORD has made; let us rejoice and be glad in it.", reference: "Psalm 118:24" },
-  { text: "But the fruit of the Spirit is love, joy, peace, forbearance, kindness, goodness, faithfulness, gentleness and self-control.", reference: "Galatians 5:22-23" },
-  { text: "Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the LORD your God will be with you wherever you go.", reference: "Joshua 1:9" },
-  { text: "The LORD is close to the brokenhearted and saves those who are crushed in spirit.", reference: "Psalm 34:18" },
-  { text: "Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!", reference: "2 Corinthians 5:17" },
-  { text: "Commit to the LORD whatever you do, and he will establish your plans.", reference: "Proverbs 16:3" },
-  { text: "God is our refuge and strength, an ever-present help in trouble.", reference: "Psalm 46:1" },
-  { text: "In their hearts humans plan their course, but the LORD establishes their steps.", reference: "Proverbs 16:9" },
-  { text: "The steadfast love of the LORD never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.", reference: "Lamentations 3:22-23" },
-  { text: "Peace I leave with you; my peace I give you. I do not give to you as the world gives. Do not let your hearts be troubled and do not be afraid.", reference: "John 14:27" },
-  { text: "For we walk by faith, not by sight.", reference: "2 Corinthians 5:7" },
-  { text: "Be still, and know that I am God.", reference: "Psalm 46:10" },
-  { text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud.", reference: "1 Corinthians 13:4" },
-  { text: "May the God of hope fill you with all joy and peace as you trust in him, so that you may overflow with hope by the power of the Holy Spirit.", reference: "Romans 15:13" },
+  { reference: "Jeremiah 29:11" },
+  { reference: "Proverbs 3:5-6" },
+  { reference: "Philippians 4:13" },
+  { reference: "Psalm 23:1" },
+  { reference: "Joshua 1:9" },
+  { reference: "Romans 8:28" },
+  { reference: "Psalm 27:1" },
+  { reference: "Isaiah 40:31" },
+  { reference: "Philippians 4:6" },
+  { reference: "Isaiah 41:10" },
+  { reference: "Matthew 11:28" },
+  { reference: "Numbers 6:24-25" },
+  { reference: "John 3:16" },
+  { reference: "Psalm 37:4" },
+  { reference: "Proverbs 18:10" },
+  { reference: "Ecclesiastes 3:11" },
+  { reference: "1 Peter 5:7" },
+  { reference: "Psalm 118:24" },
+  { reference: "Galatians 5:22-23" },
+  { reference: "Joshua 1:9" },
+  { reference: "Psalm 34:18" },
+  { reference: "2 Corinthians 5:17" },
+  { reference: "Proverbs 16:3" },
+  { reference: "Psalm 46:1" },
+  { reference: "Proverbs 16:9" },
+  { reference: "Lamentations 3:22-23" },
+  { reference: "John 14:27" },
+  { reference: "2 Corinthians 5:7" },
+  { reference: "Psalm 46:10" },
+  { reference: "1 Corinthians 13:4" },
+  { reference: "Romans 15:13" },
 ];
 
 // ─── Podcast API helpers (PodcastIndex) ──────────────────────
@@ -569,10 +538,6 @@ export const resolvers = {
       return await getStockCandles(symbol, resolution, from, to);
     },
 
-    earningsCalendar: async (_: any, { from, to }: { from: string; to: string }) => {
-      return await getEarningsCalendar(from, to);
-    },
-
     companyNews: async (_: any, { symbol, from, to }: { symbol: string; from: string; to: string }) => {
       return await getCompanyNews(symbol, from, to);
     },
@@ -631,9 +596,9 @@ export const resolvers = {
         const passage = await getYouVersionPassage(DEFAULT_YOUVERSION_BIBLE_ID, curated.reference);
         return { text: passage.text, reference: passage.reference, translation: passage.translation, copyright: passage.copyright };
       } catch {
-        console.warn('[bibleVotdApi] biblePassage fallback failed for', curated.reference, '— using hardcoded text');
+        console.warn('[bibleVotdApi] biblePassage fallback failed for', curated.reference, '— returning reference only');
       }
-      return { ...curated, translation: 'NIV', copyright: null };
+      return { text: '', reference: curated.reference, translation: 'NIV', copyright: null };
     },
 
     biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {

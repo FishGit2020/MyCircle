@@ -6,10 +6,8 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   StorageKeys: {
-    STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
     WEATHER_ALERTS: 'weather-alerts-enabled',
-    STOCK_ALERTS: 'stock-alerts-enabled',
     PODCAST_ALERTS: 'podcast-alerts-enabled',
     ANNOUNCEMENT_ALERTS: 'announcement-alerts-enabled',
   },
@@ -111,11 +109,11 @@ describe('NotificationBell', () => {
 
   // ── Toggle switches ───────────────────────────────────────────────────────
 
-  it('shows four notification toggle switches in the panel', () => {
+  it('shows three notification toggle switches in the panel', () => {
     render(<NotificationBell />);
     openPanel();
     const switches = screen.getAllByRole('switch');
-    expect(switches).toHaveLength(4);
+    expect(switches).toHaveLength(3);
   });
 
   it('all toggles are off by default (aria-checked=false)', () => {
@@ -130,7 +128,6 @@ describe('NotificationBell', () => {
     render(<NotificationBell />);
     openPanel();
     expect(screen.getByText('notifications.weatherAlerts')).toBeInTheDocument();
-    expect(screen.getByText('notifications.stockAlerts')).toBeInTheDocument();
     expect(screen.getByText('notifications.podcastAlerts')).toBeInTheDocument();
     expect(screen.getByText('notifications.announcementAlerts')).toBeInTheDocument();
   });
@@ -139,7 +136,6 @@ describe('NotificationBell', () => {
     render(<NotificationBell />);
     openPanel();
     expect(screen.getByText('notifications.weatherAlertsDesc')).toBeInTheDocument();
-    expect(screen.getByText('notifications.stockAlertsDesc')).toBeInTheDocument();
     expect(screen.getByText('notifications.podcastAlertsDesc')).toBeInTheDocument();
     expect(screen.getByText('notifications.announcementAlertsDesc')).toBeInTheDocument();
   });
@@ -156,51 +152,12 @@ describe('NotificationBell', () => {
     });
   });
 
-  // ── Stock toggle ──────────────────────────────────────────────────────────
-
-  it('shows feedback when toggling stocks with empty watchlist', async () => {
-    render(<NotificationBell />);
-    openPanel();
-    fireEvent.click(screen.getAllByRole('switch')[1]);
-
-    await waitFor(() => {
-      expect(screen.getByRole('status')).toHaveTextContent('notifications.noWatchlistForAlerts');
-    });
-  });
-
-  it('enables stock alerts when watchlist has items', async () => {
-    localStorage.setItem('stock-tracker-watchlist', JSON.stringify([{ symbol: 'AAPL' }]));
-    mockRequestPermission.mockResolvedValue('fake-token');
-
-    render(<NotificationBell />);
-    openPanel();
-    const stockSwitch = screen.getAllByRole('switch')[1];
-    await act(async () => { fireEvent.click(stockSwitch); });
-
-    await waitFor(() => {
-      expect(stockSwitch).toHaveAttribute('aria-checked', 'true');
-    });
-  });
-
-  it('persists stock alert state to localStorage', async () => {
-    localStorage.setItem('stock-tracker-watchlist', JSON.stringify([{ symbol: 'AAPL' }]));
-    mockRequestPermission.mockResolvedValue('fake-token');
-
-    render(<NotificationBell />);
-    openPanel();
-    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[1]); });
-
-    await waitFor(() => {
-      expect(localStorage.getItem('stock-alerts-enabled')).toBe('true');
-    });
-  });
-
   // ── Podcast toggle ────────────────────────────────────────────────────────
 
   it('shows feedback when toggling podcasts with no subscriptions', async () => {
     render(<NotificationBell />);
     openPanel();
-    fireEvent.click(screen.getAllByRole('switch')[2]);
+    fireEvent.click(screen.getAllByRole('switch')[1]);
 
     await waitFor(() => {
       expect(screen.getByRole('status')).toHaveTextContent('notifications.noSubscriptionsForAlerts');
@@ -213,7 +170,7 @@ describe('NotificationBell', () => {
 
     render(<NotificationBell />);
     openPanel();
-    const podcastSwitch = screen.getAllByRole('switch')[2];
+    const podcastSwitch = screen.getAllByRole('switch')[1];
     await act(async () => { fireEvent.click(podcastSwitch); });
 
     await waitFor(() => {
@@ -227,7 +184,7 @@ describe('NotificationBell', () => {
 
     render(<NotificationBell />);
     openPanel();
-    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[2]); });
+    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[1]); });
 
     await waitFor(() => {
       expect(localStorage.getItem('podcast-alerts-enabled')).toBe('true');
@@ -238,21 +195,19 @@ describe('NotificationBell', () => {
 
   it('reads initial enabled state from localStorage', () => {
     localStorage.setItem('weather-alerts-enabled', 'true');
-    localStorage.setItem('stock-alerts-enabled', 'true');
 
     render(<NotificationBell />);
     openPanel();
     const switches = screen.getAllByRole('switch');
     expect(switches[0]).toHaveAttribute('aria-checked', 'true');  // weather
-    expect(switches[1]).toHaveAttribute('aria-checked', 'true');  // stock
-    expect(switches[2]).toHaveAttribute('aria-checked', 'false'); // podcast
-    expect(switches[3]).toHaveAttribute('aria-checked', 'false'); // announcement
+    expect(switches[1]).toHaveAttribute('aria-checked', 'false'); // podcast
+    expect(switches[2]).toHaveAttribute('aria-checked', 'false'); // announcement
   });
 
   // ── Active indicator ──────────────────────────────────────────────────────
 
   it('shows active indicator dot when any alert is enabled', () => {
-    localStorage.setItem('stock-alerts-enabled', 'true');
+    localStorage.setItem('weather-alerts-enabled', 'true');
     const { container } = render(<NotificationBell />);
     const dot = container.querySelector('.bg-blue-500.rounded-full');
     expect(dot).toBeInTheDocument();
@@ -265,24 +220,6 @@ describe('NotificationBell', () => {
     expect(dot).not.toBeInTheDocument();
   });
 
-  // ── Disable toggle ────────────────────────────────────────────────────────
-
-  it('disables stock alerts and saves to localStorage', async () => {
-    localStorage.setItem('stock-alerts-enabled', 'true');
-
-    render(<NotificationBell />);
-    openPanel();
-    const stockSwitch = screen.getAllByRole('switch')[1];
-    expect(stockSwitch).toHaveAttribute('aria-checked', 'true');
-
-    await act(async () => { fireEvent.click(stockSwitch); });
-
-    await waitFor(() => {
-      expect(stockSwitch).toHaveAttribute('aria-checked', 'false');
-      expect(localStorage.getItem('stock-alerts-enabled')).toBe('false');
-    });
-  });
-
   // ── Announcement toggle ────────────────────────────────────────────────
 
   it('enables announcement alerts and calls subscribeToTopic', async () => {
@@ -290,7 +227,7 @@ describe('NotificationBell', () => {
 
     render(<NotificationBell />);
     openPanel();
-    const announcementSwitch = screen.getAllByRole('switch')[3];
+    const announcementSwitch = screen.getAllByRole('switch')[2];
     await act(async () => { fireEvent.click(announcementSwitch); });
 
     await waitFor(() => {
@@ -304,7 +241,7 @@ describe('NotificationBell', () => {
 
     render(<NotificationBell />);
     openPanel();
-    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[3]); });
+    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[2]); });
 
     await waitFor(() => {
       expect(localStorage.getItem('announcement-alerts-enabled')).toBe('true');
@@ -317,7 +254,7 @@ describe('NotificationBell', () => {
 
     await act(async () => { render(<NotificationBell />); });
     openPanel();
-    const announcementSwitch = screen.getAllByRole('switch')[3];
+    const announcementSwitch = screen.getAllByRole('switch')[2];
     expect(announcementSwitch).toHaveAttribute('aria-checked', 'true');
 
     await act(async () => { fireEvent.click(announcementSwitch); });
@@ -334,6 +271,6 @@ describe('NotificationBell', () => {
     render(<NotificationBell />);
     openPanel();
     const switches = screen.getAllByRole('switch');
-    expect(switches[3]).toHaveAttribute('aria-checked', 'true');
+    expect(switches[2]).toHaveAttribute('aria-checked', 'true');
   });
 });
