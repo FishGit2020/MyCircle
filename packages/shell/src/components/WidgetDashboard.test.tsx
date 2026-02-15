@@ -14,6 +14,7 @@ vi.mock('@mycircle/shared', () => ({
     WORSHIP_SONGS_CACHE: 'worship-songs-cache',
     NOTEBOOK_CACHE: 'notebook-cache',
     BABY_DUE_DATE: 'baby-due-date',
+    BABY_COMPARE_CATEGORY: 'baby-compare-category',
   },
   MFEvents: {
     PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
