@@ -282,13 +282,28 @@ function NowPlayingWidget() {
     return () => { unsubPlay(); unsubClose(); };
   }, []);
 
+  const isPlaying = !!episode;
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-500">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          </svg>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+          isPlaying
+            ? 'bg-purple-500 text-white animate-pulse'
+            : 'bg-purple-50 dark:bg-purple-900/30 text-purple-500'
+        }`}>
+          {isPlaying ? (
+            /* Animated equalizer bars when playing */
+            <div className="flex items-end gap-0.5 h-4" aria-hidden="true">
+              <span className="w-1 bg-white rounded-full animate-bounce" style={{ height: '60%', animationDelay: '0ms', animationDuration: '600ms' }} />
+              <span className="w-1 bg-white rounded-full animate-bounce" style={{ height: '100%', animationDelay: '150ms', animationDuration: '600ms' }} />
+              <span className="w-1 bg-white rounded-full animate-bounce" style={{ height: '40%', animationDelay: '300ms', animationDuration: '600ms' }} />
+            </div>
+          ) : (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+          )}
         </div>
         <div>
           <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.nowPlaying')}</h4>
@@ -296,19 +311,21 @@ function NowPlayingWidget() {
         </div>
       </div>
       {episode ? (
-        <div className="flex items-center gap-2">
-          {episode.image && (
-            <img
-              src={episode.image}
-              alt=""
-              className="w-10 h-10 rounded object-cover flex-shrink-0"
-            />
-          )}
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{episode.title}</p>
-            {podcast && (
-              <p className="text-xs text-purple-600 dark:text-purple-400 truncate">{podcast.title}</p>
+        <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/20 rounded-lg p-2.5">
+          <div className="flex items-center gap-2">
+            {episode.image && (
+              <img
+                src={episode.image}
+                alt=""
+                className="w-10 h-10 rounded object-cover flex-shrink-0 ring-2 ring-purple-300 dark:ring-purple-600"
+              />
             )}
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{episode.title}</p>
+              {podcast && (
+                <p className="text-xs text-purple-600 dark:text-purple-400 truncate">{podcast.title}</p>
+              )}
+            </div>
           </div>
         </div>
       ) : (
