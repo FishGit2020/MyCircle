@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router';
-import { useTranslation, StorageKeys, subscribeToMFEvent, MFEvents } from '@mycircle/shared';
+import { useTranslation, StorageKeys, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { useDailyVerse } from '../hooks/useDailyVerse';
@@ -49,10 +49,72 @@ function saveLayout(layout: WidgetConfig[]) {
 
 // ─── Individual Widgets ──────────────────────────────────────────────────────
 
+/** Get a brief clothing tip based on temperature */
+function getClothingTip(temp: number, weatherMain: string): string {
+  const isRainy = /rain|drizzle|thunderstorm/i.test(weatherMain);
+  const isSnowy = /snow/i.test(weatherMain);
+  if (isSnowy) return 'widgets.tipSnow';
+  if (isRainy) return 'widgets.tipRain';
+  if (temp <= 0) return 'widgets.tipFreezing';
+  if (temp <= 10) return 'widgets.tipCold';
+  if (temp <= 20) return 'widgets.tipCool';
+  if (temp <= 28) return 'widgets.tipWarm';
+  return 'widgets.tipHot';
+}
+
+/** Get a weather condition icon */
+function getWeatherIcon(weatherMain: string): string {
+  const main = weatherMain.toLowerCase();
+  if (main.includes('thunder')) return '\u26C8\uFE0F';
+  if (main.includes('rain') || main.includes('drizzle')) return '\u{1F327}\uFE0F';
+  if (main.includes('snow')) return '\u{1F328}\uFE0F';
+  if (main.includes('cloud')) return '\u2601\uFE0F';
+  if (main === 'clear') return '\u2600\uFE0F';
+  if (main.includes('fog') || main.includes('mist') || main.includes('haze')) return '\u{1F32B}\uFE0F';
+  return '\u{1F324}\uFE0F';
+}
+
 function WeatherWidget() {
   const { t } = useTranslation();
   const { favoriteCities } = useAuth();
-  const city = favoriteCities[0];
+  const [geoCity, setGeoCity] = useState<string | null>(null);
+  const [geoError, setGeoError] = useState(false);
+  const [geoLoading, setGeoLoading] = useState(false);
+
+  const [fetchWeather, { data: weatherData }] = useLazyQuery(GET_CURRENT_WEATHER);
+  const [fetchGeocode, { data: geocodeData }] = useLazyQuery(REVERSE_GEOCODE);
+
+  // Update city name when geocode completes
+  useEffect(() => {
+    if (geocodeData?.reverseGeocode?.name) {
+      setGeoCity(geocodeData.reverseGeocode.name);
+    }
+  }, [geocodeData]);
+
+  // Auto-fetch current location weather on mount
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setGeoError(true);
+      return;
+    }
+    setGeoLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        fetchWeather({ variables: { lat: latitude, lon: longitude } });
+        fetchGeocode({ variables: { lat: latitude, lon: longitude } });
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoError(true);
+        setGeoLoading(false);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+    );
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const current = weatherData?.currentWeather;
+  const weatherMain = current?.weather?.[0]?.main || '';
 
   return (
     <div>
@@ -67,7 +129,47 @@ function WeatherWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.weatherDesc')}</p>
         </div>
       </div>
-      {city ? (
+
+      {/* Current location weather */}
+      {geoLoading && (
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.locating')}</span>
+        </div>
+      )}
+
+      {current && (
+        <div className="bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-900/20 dark:to-sky-900/20 rounded-lg p-2.5 mb-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg" role="img" aria-label={weatherMain}>{getWeatherIcon(weatherMain)}</span>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {geoCity || t('widgets.yourLocation')}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {Math.round(current.temp)}°C · {weatherMain}
+                </p>
+              </div>
+            </div>
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">
+              {Math.round(current.temp)}°
+            </span>
+          </div>
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5">
+            {t(getClothingTip(current.temp, weatherMain) as any)}
+          </p>
+        </div>
+      )}
+
+      {geoError && !current && (
+        <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
+          {t('widgets.enableLocation')}
+        </p>
+      )}
+
+      {/* Favorite cities */}
+      {favoriteCities.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
           {favoriteCities.slice(0, 3).map(c => (
             <span key={c.id} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
@@ -78,9 +180,9 @@ function WeatherWidget() {
             <span className="text-xs text-gray-400">+{favoriteCities.length - 3}</span>
           )}
         </div>
-      ) : (
+      ) : !current ? (
         <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noFavoriteCity')}</p>
-      )}
+      ) : null}
     </div>
   );
 }

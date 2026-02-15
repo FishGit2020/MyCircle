@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router';
-import { useWeatherData, useHistoricalWeather, useAirQuality, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys } from '@mycircle/shared';
+import { useWeatherData, useHistoricalWeather, useAirQuality, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys, REVERSE_GEOCODE, useLazyQuery } from '@mycircle/shared';
 import CurrentWeather from './CurrentWeatherV1';
 import Forecast from './Forecast';
 import HourlyForecast from './HourlyForecast';
@@ -30,9 +30,18 @@ function getRecentCitiesFromStorage(): Array<{ id: string; name: string; country
 export default function WeatherDisplay() {
   const { coords } = useParams<{ coords: string }>();
   const [searchParams] = useSearchParams();
-  const cityName = searchParams.get('name') || 'Unknown Location';
+  const nameParam = searchParams.get('name');
+  const [resolvedName, setResolvedName] = useState<string | null>(null);
+  const cityName = nameParam || resolvedName || 'Unknown Location';
 
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [fetchGeocode] = useLazyQuery(REVERSE_GEOCODE, {
+    onCompleted: (data: any) => {
+      if (data?.reverseGeocode?.name) {
+        setResolvedName(data.reverseGeocode.name);
+      }
+    },
+  });
 
   // Parse coordinates from URL
   useEffect(() => {
@@ -40,9 +49,13 @@ export default function WeatherDisplay() {
       const [lat, lon] = coords.split(',').map(Number);
       if (!isNaN(lat) && !isNaN(lon)) {
         setLocation({ lat, lon });
+        // If no name in URL, resolve via reverse geocode
+        if (!nameParam) {
+          fetchGeocode({ variables: { lat, lon } });
+        }
       }
     }
-  }, [coords]);
+  }, [coords, nameParam, fetchGeocode]);
 
   // Listen for city selection events from other micro frontends
   useEffect(() => {
