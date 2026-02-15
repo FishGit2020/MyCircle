@@ -371,59 +371,81 @@ function NotebookWidget() {
   );
 }
 
-// Inline fruit lookup for widget — small duplication acceptable since we can't import from baby-tracker MFE
-const BABY_FRUITS = [
-  '', 'poppy seed', 'poppy seed', 'poppy seed', 'poppy seed', 'sesame seed', 'lentil', 'blueberry',
-  'raspberry', 'grape', 'kumquat', 'fig', 'lime', 'lemon', 'peach', 'apple', 'avocado', 'pear',
-  'bell pepper', 'mango', 'banana', 'carrot', 'papaya', 'grapefruit', 'ear of corn', 'rutabaga',
-  'scallion bunch', 'cauliflower', 'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama',
-  'pineapple', 'cantaloupe', 'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek',
-  'mini watermelon', 'watermelon',
-];
+// Inline size lookups for widget — duplication necessary since we can't import from baby-tracker MFE
+type CompareCategory = 'fruit' | 'animal' | 'vegetable';
+const BABY_SIZES: Record<CompareCategory, string[]> = {
+  fruit: [
+    '', 'poppy seed', 'poppy seed', 'poppy seed', 'poppy seed', 'sesame seed', 'lentil', 'blueberry',
+    'raspberry', 'grape', 'kumquat', 'fig', 'lime', 'lemon', 'peach', 'apple', 'avocado', 'pear',
+    'bell pepper', 'mango', 'banana', 'carrot', 'papaya', 'grapefruit', 'ear of corn', 'rutabaga',
+    'scallion bunch', 'cauliflower', 'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama',
+    'pineapple', 'cantaloupe', 'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek',
+    'mini watermelon', 'watermelon',
+  ],
+  animal: [
+    '', 'flea', 'flea', 'flea', 'ant', 'tadpole', 'ladybug', 'bee', 'tree frog', 'goldfish',
+    'hummingbird', 'mouse', 'hamster', 'gerbil', 'chipmunk', 'hedgehog', 'duckling', 'baby rabbit',
+    'guinea pig', 'ferret', 'kitten', 'sugar glider', 'chinchilla', 'prairie dog', 'cottontail rabbit',
+    'barn owl', 'groundhog', 'toy poodle', 'red panda', 'jackrabbit', 'small cat', 'raccoon',
+    'cocker spaniel', 'armadillo', 'fox cub', 'beagle puppy', 'otter', 'koala', 'red fox', 'corgi',
+    'small lamb',
+  ],
+  vegetable: [
+    '', 'grain of salt', 'grain of salt', 'mustard seed', 'peppercorn', 'sesame seed', 'lentil',
+    'kidney bean', 'chickpea', 'olive', 'Brussels sprout', 'baby carrot', 'jalape\u00f1o',
+    'snap pea pod', 'tomato', 'artichoke', 'beet', 'turnip', 'bell pepper', 'zucchini', 'sweet potato',
+    'carrot', 'spaghetti squash', 'potato', 'ear of corn', 'rutabaga', 'scallion bunch', 'cauliflower',
+    'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama', 'celery stalk', 'cantaloupe',
+    'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek', 'pumpkin', 'watermelon',
+  ],
+};
+const CATEGORY_ICONS: Record<CompareCategory, string> = { fruit: '\uD83C\uDF4E', animal: '\uD83D\uDC3E', vegetable: '\uD83E\uDD66' };
+const CATEGORIES: CompareCategory[] = ['fruit', 'animal', 'vegetable'];
 
 function BabyTrackerWidget() {
   const { t } = useTranslation();
-  const [weekInfo, setWeekInfo] = useState<{ week: number; fruit: string } | null>(null);
+  const [weekInfo, setWeekInfo] = useState<{ week: number; day: number } | null>(null);
+  const [category, setCategory] = useState<CompareCategory>(() => {
+    try {
+      const stored = localStorage.getItem(StorageKeys.BABY_COMPARE_CATEGORY);
+      if (stored && (stored === 'fruit' || stored === 'animal' || stored === 'vegetable')) return stored;
+    } catch { /* ignore */ }
+    return 'fruit';
+  });
+
+  const handleCategoryChange = useCallback((cat: CompareCategory) => {
+    setCategory(cat);
+    try { localStorage.setItem(StorageKeys.BABY_COMPARE_CATEGORY, cat); } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
-      if (stored) {
-        const dueDate = new Date(stored + 'T00:00:00');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-        const weeksUntilDue = (dueDate.getTime() - today.getTime()) / msPerWeek;
-        const week = Math.floor(40 - weeksUntilDue);
-        if (week >= 1 && week <= 40) {
-          setWeekInfo({ week, fruit: BABY_FRUITS[week] || '' });
-        }
-      }
-    } catch { /* ignore */ }
-
-    function handleChange() {
+    function compute() {
       try {
         const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
         if (stored) {
           const dueDate = new Date(stored + 'T00:00:00');
           const today = new Date();
           today.setHours(0, 0, 0, 0);
-          const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-          const weeksUntilDue = (dueDate.getTime() - today.getTime()) / msPerWeek;
-          const week = Math.floor(40 - weeksUntilDue);
+          const msPerDay = 24 * 60 * 60 * 1000;
+          const totalDaysPregnant = Math.floor((today.getTime() - (dueDate.getTime() - 40 * 7 * msPerDay)) / msPerDay);
+          const week = Math.floor(totalDaysPregnant / 7);
+          const day = totalDaysPregnant % 7;
           if (week >= 1 && week <= 40) {
-            setWeekInfo({ week, fruit: BABY_FRUITS[week] || '' });
+            setWeekInfo({ week, day });
           } else {
             setWeekInfo(null);
           }
         } else {
           setWeekInfo(null);
         }
-      } catch { /* ignore */ }
+      } catch { setWeekInfo(null); }
     }
-    window.addEventListener('baby-due-date-changed', handleChange);
-    return () => window.removeEventListener('baby-due-date-changed', handleChange);
+    compute();
+    window.addEventListener('baby-due-date-changed', compute);
+    return () => window.removeEventListener('baby-due-date-changed', compute);
   }, []);
+
+  const sizeLabel = weekInfo ? (BABY_SIZES[category][weekInfo.week] || '') : '';
 
   return (
     <div>
@@ -439,9 +461,27 @@ function BabyTrackerWidget() {
         </div>
       </div>
       {weekInfo ? (
-        <p className="text-sm text-pink-600 dark:text-pink-400 font-medium capitalize">
-          {t('baby.week')} {weekInfo.week} — {weekInfo.fruit}
-        </p>
+        <>
+          <p className="text-sm text-pink-600 dark:text-pink-400 font-medium capitalize">
+            {t('baby.week')} {weekInfo.week}{weekInfo.day > 0 ? ` + ${weekInfo.day} ${t('baby.days')}` : ''} — {sizeLabel}
+          </p>
+          <div className="flex gap-1 mt-1.5">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCategoryChange(cat); }}
+                className={`text-xs px-1.5 py-0.5 rounded-full transition-colors ${
+                  category === cat
+                    ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                }`}
+                aria-label={t(`baby.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any)}
+              >
+                {CATEGORY_ICONS[cat]}
+              </button>
+            ))}
+          </div>
+        </>
       ) : (
         <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noDueDate')}</p>
       )}

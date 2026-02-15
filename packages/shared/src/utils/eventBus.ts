@@ -58,9 +58,9 @@ export const StorageKeys = {
   BIBLE_TRANSLATION: 'bible-translation',
   NOTEBOOK_CACHE: 'notebook-cache',
   BABY_DUE_DATE: 'baby-due-date',
+  BABY_COMPARE_CATEGORY: 'baby-compare-category',
   BOTTOM_NAV_ORDER: 'bottom-nav-order',
   WEATHER_ALERTS: 'weather-alerts-enabled',
-  STOCK_ALERTS: 'stock-alerts-enabled',
   PODCAST_ALERTS: 'podcast-alerts-enabled',
   ANNOUNCEMENT_ALERTS: 'announcement-alerts-enabled',
 } as const;
