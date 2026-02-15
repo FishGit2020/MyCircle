@@ -72,6 +72,36 @@ async function getStockCandles(symbol: string, resolution: string, from: number,
   return response.data;
 }
 
+async function getCompanyNews(symbol: string, from: string, to: string) {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) throw new Error('FINNHUB_API_KEY not configured');
+
+  const cacheKey = `stock:news:${symbol}:${from}:${to}`;
+  const cached = stockCache.get<any[]>(cacheKey);
+  if (cached) return cached;
+
+  const response = await axios.get('https://finnhub.io/api/v1/company-news', {
+    params: { symbol, from, to },
+    headers: { 'X-Finnhub-Token': apiKey },
+    timeout: 10000,
+  });
+
+  const articles = (response.data ?? []).slice(0, 10).map((a: any) => ({
+    id: a.id,
+    category: a.category || 'company',
+    datetime: a.datetime,
+    headline: a.headline || '',
+    image: a.image || null,
+    source: a.source || '',
+    summary: a.summary || '',
+    url: a.url || '',
+    related: a.related || null,
+  }));
+
+  stockCache.set(cacheKey, articles, 300);
+  return articles;
+}
+
 // ─── Crypto API helpers (CoinGecko — free, no API key) ───────
 
 async function getCryptoPrices(ids: string[], vsCurrency: string = 'usd') {
@@ -541,6 +571,10 @@ export const resolvers = {
 
     earningsCalendar: async (_: any, { from, to }: { from: string; to: string }) => {
       return await getEarningsCalendar(from, to);
+    },
+
+    companyNews: async (_: any, { symbol, from, to }: { symbol: string; from: string; to: string }) => {
+      return await getCompanyNews(symbol, from, to);
     },
 
     // ─── Podcast Resolvers ──────────────────────────────────

@@ -334,8 +334,8 @@ const en = {
   'stocks.quantityPlaceholder': 'Qty',
   'stocks.save': 'Save',
   'stocks.news': 'News',
-  'stocks.newsComingSoon': 'News feed coming soon',
-  'stocks.newsDescription': 'Stay updated with the latest market news for your stocks.',
+  'stocks.newsNoArticles': 'No recent news available for this stock.',
+  'stocks.newsReadMore': 'Read more',
 
   // Crypto Tracker
   'crypto.title': 'Crypto',
@@ -1149,8 +1149,8 @@ const es: Record<TranslationKey, string> = {
   'stocks.quantityPlaceholder': 'Cant.',
   'stocks.save': 'Guardar',
   'stocks.news': 'Noticias',
-  'stocks.newsComingSoon': 'Noticias pr\u00f3ximamente',
-  'stocks.newsDescription': 'Mant\u00e9nte al d\u00eda con las \u00faltimas noticias del mercado.',
+  'stocks.newsNoArticles': 'No hay noticias recientes disponibles para esta acci\u00f3n.',
+  'stocks.newsReadMore': 'Leer m\u00e1s',
 
   // Crypto Tracker
   'crypto.title': 'Cripto',
@@ -1964,8 +1964,8 @@ const zh: Record<TranslationKey, string> = {
   'stocks.quantityPlaceholder': '\u6570\u91cf',
   'stocks.save': '\u4fdd\u5b58',
   'stocks.news': '\u65b0\u95fb',
-  'stocks.newsComingSoon': '\u65b0\u95fb\u529f\u80fd\u5373\u5c06\u4e0a\u7ebf',
-  'stocks.newsDescription': '\u968f\u65f6\u4e86\u89e3\u60a8\u5173\u6ce8\u80a1\u7968\u7684\u6700\u65b0\u5e02\u573a\u65b0\u95fb\u3002',
+  'stocks.newsNoArticles': '\u6682\u65e0\u8be5\u80a1\u7968\u7684\u8fd1\u671f\u65b0\u95fb\u3002',
+  'stocks.newsReadMore': '\u9605\u8bfb\u66f4\u591a',
 
   // Crypto Tracker
   'crypto.title': '\u52a0\u5bc6\u8d27\u5e01',

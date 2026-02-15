@@ -156,7 +156,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Shell** | Host app — routing, layout, auth, theme, notifications | — |
 | **City Search** | City search with autocomplete & recent cities | `CitySearch` |
 | **Weather Display** | Current weather, hourly & 7-day forecast, sun/visibility, clothing tips | `WeatherDisplay` |
-| **Stock Tracker** | Real-time stock quotes and watchlist | `StockTracker` |
+| **Stock Tracker** | Real-time stock quotes, watchlist, and company news | `StockTracker` |
 | **Podcast Player** | Podcast search, discovery, and episode playback | `PodcastPlayer` |
 | **AI Assistant** | Conversational AI chat (Gemini) | `AiAssistant` |
 | **Bible Reader** | Bible reading with daily devotionals and community notes | `BibleReader` |
