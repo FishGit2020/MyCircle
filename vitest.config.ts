@@ -15,6 +15,7 @@ export default defineConfig({
       'worshipSongs/WorshipSongs': resolve(__dirname, './packages/shell/src/test/mocks/WorshipSongsMock.tsx'),
       'notebook/Notebook': resolve(__dirname, './packages/shell/src/test/mocks/NotebookMock.tsx'),
       'babyTracker/BabyTracker': resolve(__dirname, './packages/shell/src/test/mocks/BabyTrackerMock.tsx'),
+      'virtual:pwa-register/react': resolve(__dirname, './packages/shell/src/test/mocks/pwaRegisterReactMock.ts'),
       '@weather/shared': resolve(__dirname, './packages/shared/src'),
     }
   },
