@@ -61,9 +61,8 @@ test.describe('Homepage / Dashboard', () => {
   test('tile layout remains stable after navigation', async ({ page }) => {
     await page.goto('/');
 
-    // Get initial grid column count
-    const grid = page.locator('.grid').first();
-    const initialCols = await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns);
+    // Get initial grid column count (use a fresh locator each time)
+    const initialCols = await page.locator('.grid').first().evaluate(el => getComputedStyle(el).gridTemplateColumns);
 
     // Navigate away to a different page
     await page.getByRole('link', { name: /Stocks/i }).first().click();
@@ -73,8 +72,11 @@ test.describe('Homepage / Dashboard', () => {
     await page.getByRole('link', { name: /Home/i }).first().click();
     await expect(page).toHaveURL('/');
 
-    // Verify grid layout is the same
-    const afterCols = await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns);
+    // Wait for the dashboard grid to be visible again before measuring
+    await expect(page.locator('.grid').first()).toBeVisible({ timeout: 10000 });
+
+    // Verify grid layout is the same (use a fresh locator after navigation)
+    const afterCols = await page.locator('.grid').first().evaluate(el => getComputedStyle(el).gridTemplateColumns);
     expect(afterCols).toBe(initialCols);
   });
 });

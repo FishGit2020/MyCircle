@@ -46,9 +46,9 @@ test.describe('Persistent Podcast Audio Player', () => {
     await page.getByRole('navigation', { name: /main/i }).getByRole('link', { name: /stocks/i }).click();
     await page.waitForURL('**/stocks');
 
-    // Close the player from the stocks page
-    const closeButtons = page.getByRole('button', { name: /close player/i });
-    await closeButtons.first().click();
+    // Close the player from the stocks page (use visible filter to avoid hidden mobile/desktop variant)
+    const closeButton = page.getByRole('button', { name: /close player/i }).locator('visible=true').first();
+    await closeButton.click();
 
     // Player should no longer be visible
     await expect(page.getByRole('region', { name: /now playing/i })).not.toBeVisible({ timeout: 5_000 });
