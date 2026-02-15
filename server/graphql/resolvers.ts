@@ -591,7 +591,15 @@ export const resolvers = {
 
     bibleVotdApi: async (_: any, { day }: { day: number }) => {
       const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
-      return { ...DAILY_VERSES[index], translation: 'NIV', copyright: null };
+      const curated = DAILY_VERSES[index];
+      // Try fetching fresh verse text via biblePassage API
+      try {
+        const passage = await getYouVersionPassage(DEFAULT_YOUVERSION_BIBLE_ID, curated.reference);
+        return { text: passage.text, reference: passage.reference, translation: passage.translation, copyright: passage.copyright };
+      } catch {
+        console.warn('[bibleVotdApi] biblePassage fallback failed for', curated.reference, '— using hardcoded text');
+      }
+      return { ...curated, translation: 'NIV', copyright: null };
     },
 
     biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {

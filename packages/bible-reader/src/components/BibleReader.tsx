@@ -769,7 +769,7 @@ export default function BibleReader() {
               onChange={(e) => handleVersionChange(e.target.value)}
               aria-label={t('bible.versionSelect')}
               disabled={versionsLoading}
-              className="px-2 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
+              className="max-w-[200px] truncate px-2 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
             >
               {versionsLoading && (
                 <option value={bibleVersion}>{t('bible.loadingVersions')}</option>
