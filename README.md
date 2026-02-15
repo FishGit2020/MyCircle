@@ -16,6 +16,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Customizable widget dashboard** — drag-and-drop reordering, visibility toggles, layout persistence
 - Weather favorites, stock watchlist, and podcast subscription previews
 - Recent city searches for quick navigation
+- **Customizable bottom navigation** — reorderable nav items with drag-and-drop, persisted per user (Firestore when signed in, localStorage fallback)
 - **PWA Install Prompt** — Add to Home Screen banner with 7-day dismissal memory
 
 ### Weather
@@ -25,6 +26,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - 7-day forecast and 48-hour hourly forecast
 - Sun & visibility details (sunrise, sunset, daylight, visibility)
 - "What to Wear" clothing suggestions
+- **Activity suggestions** — weather-based outdoor/indoor activity recommendations (hiking, swimming, skiing, etc.) with collapsible card UI
 - Geolocation ("Use My Location")
 - Favorite & recent cities (synced via Firestore)
 - Share weather (link or screenshot image)

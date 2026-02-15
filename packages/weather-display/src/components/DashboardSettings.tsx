@@ -12,6 +12,7 @@ export interface WidgetVisibility {
   weatherMap: boolean;
   historicalWeather: boolean;
   airQuality: boolean;
+  activitySuggestions: boolean;
 }
 
 
@@ -26,6 +27,7 @@ const WIDGET_KEYS: Array<keyof WidgetVisibility> = [
   'weatherMap',
   'historicalWeather',
   'airQuality',
+  'activitySuggestions',
 ];
 
 const WIDGET_LABEL_KEYS: Record<keyof WidgetVisibility, TranslationKey> = {
@@ -39,6 +41,7 @@ const WIDGET_LABEL_KEYS: Record<keyof WidgetVisibility, TranslationKey> = {
   weatherMap: 'dashboard.weatherMap',
   historicalWeather: 'dashboard.historicalWeather',
   airQuality: 'dashboard.airQuality',
+  activitySuggestions: 'dashboard.activitySuggestions',
 };
 
 const DEFAULT_VISIBILITY: WidgetVisibility = {
@@ -52,6 +55,7 @@ const DEFAULT_VISIBILITY: WidgetVisibility = {
   weatherMap: true,
   historicalWeather: true,
   airQuality: true,
+  activitySuggestions: true,
 };
 
 export function loadWidgetVisibility(): WidgetVisibility {
