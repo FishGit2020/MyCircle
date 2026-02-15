@@ -28,7 +28,8 @@ export default defineConfig({
       'bibleReader/BibleReader': resolve(__dirname, './src/test/mocks/BibleReaderMock.tsx'),
       'worshipSongs/WorshipSongs': resolve(__dirname, './src/test/mocks/WorshipSongsMock.tsx'),
       'notebook/Notebook': resolve(__dirname, './src/test/mocks/NotebookMock.tsx'),
-      'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx')
+      'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx'),
+      'virtual:pwa-register/react': resolve(__dirname, './src/test/mocks/pwaRegisterReactMock.ts')
     }
   }
 });

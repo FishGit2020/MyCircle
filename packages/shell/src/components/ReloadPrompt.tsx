@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useTranslation } from '@mycircle/shared';
 
@@ -15,6 +16,27 @@ export default function ReloadPrompt() {
     },
   });
 
+  // Proactively listen for controller change so the page reloads
+  // even if the SW activates before the user clicks "Reload"
+  useEffect(() => {
+    if (!needRefresh) return;
+    const sw = navigator.serviceWorker;
+    if (!sw) return;
+    const onControllerChange = () => window.location.reload();
+    sw.addEventListener('controllerchange', onControllerChange);
+    return () => sw.removeEventListener('controllerchange', onControllerChange);
+  }, [needRefresh]);
+
+  const handleReload = async () => {
+    try {
+      await updateServiceWorker(true);
+      // Fallback: if controllerchange never fires, force reload after 2s
+      setTimeout(() => window.location.reload(), 2000);
+    } catch {
+      window.location.reload();
+    }
+  };
+
   if (!needRefresh) return null;
 
   return (
@@ -27,7 +49,7 @@ export default function ReloadPrompt() {
       </svg>
       <span className="flex-1">{t('pwa.newVersion')}</span>
       <button
-        onClick={() => updateServiceWorker(true)}
+        onClick={handleReload}
         className="px-3 py-1 rounded bg-white text-blue-600 font-medium hover:bg-blue-50 transition"
       >
         {t('pwa.reload')}
