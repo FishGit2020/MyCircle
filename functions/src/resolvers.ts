@@ -818,12 +818,22 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           try {
             return await getYouVersionVotd(day, yvKey);
           } catch {
-            // YouVersion API failed — fall back to local curated verses
+            console.warn('[bibleVotdApi] YouVersion VOTD API failed for day', day, '— trying biblePassage fallback');
           }
         }
-        // Fallback: use local curated DAILY_VERSES
+        // Fallback 1: try fetching verse text via biblePassage API using curated reference
         const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
-        return { ...DAILY_VERSES[index], translation: 'NIV', copyright: null };
+        const curated = DAILY_VERSES[index];
+        if (yvKey) {
+          try {
+            const passage = await getYouVersionPassage(DEFAULT_YOUVERSION_BIBLE_ID, curated.reference, yvKey);
+            return { text: passage.text, reference: passage.reference, translation: passage.translation, copyright: passage.copyright };
+          } catch {
+            console.warn('[bibleVotdApi] biblePassage fallback failed for', curated.reference, '— using hardcoded text');
+          }
+        }
+        // Fallback 2: use hardcoded curated verse text
+        return { ...curated, translation: 'NIV', copyright: null };
       },
 
       biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {
