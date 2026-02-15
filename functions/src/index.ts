@@ -28,8 +28,8 @@ const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podc
 
 // ─── CORS origins whitelist ─────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  'https://mycircle-app.web.app',
-  'https://mycircle-app.firebaseapp.com',
+  'https://mycircle-dash.web.app',
+  'https://mycircle-dash.firebaseapp.com',
   'http://localhost:3000',
 ];
 

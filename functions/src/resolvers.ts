@@ -814,8 +814,16 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
 
       bibleVotdApi: async (_: any, { day }: { day: number }) => {
         const yvKey = getYouVersionKey?.() || '';
-        if (!yvKey) throw new Error('YOUVERSION_APP_KEY not configured');
-        return await getYouVersionVotd(day, yvKey);
+        if (yvKey) {
+          try {
+            return await getYouVersionVotd(day, yvKey);
+          } catch {
+            // YouVersion API failed — fall back to local curated verses
+          }
+        }
+        // Fallback: use local curated DAILY_VERSES
+        const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
+        return { ...DAILY_VERSES[index], translation: 'NIV', copyright: null };
       },
 
       biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {
