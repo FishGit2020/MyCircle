@@ -67,12 +67,10 @@ describe('App Integration', () => {
       expect(screen.getByText('Welcome to MyCircle')).toBeInTheDocument();
     });
 
-    it('renders feature cards including weather', async () => {
+    it('renders the subtitle', async () => {
       renderApp('/');
 
-      // Translation keys resolve to English: t('home.quickWeatherDesc') → 'Check forecasts for any city'
-      expect(screen.getByText('Check forecasts for any city')).toBeInTheDocument();
-      expect(screen.getByText('Read scripture daily')).toBeInTheDocument();
+      expect(screen.getByText(/Weather, stocks, podcasts, and more/)).toBeInTheDocument();
     });
   });
 

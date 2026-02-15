@@ -98,7 +98,7 @@ The orchestrator that loads and composes all remote micro frontends.
 
 **Route Structure:**
 ```
-/                  -> DashboardPage (quick access cards, city search, favorites, recents)
+/                  -> DashboardPage (hero section, widget dashboard)
 /weather/:coords   -> WeatherDisplay MFE (lazy-loaded, includes inline comparison)
 /stocks            -> StockTracker MFE (lazy-loaded)
 /podcasts          -> PodcastPlayer MFE (lazy-loaded, discover + subscribed tabs)
