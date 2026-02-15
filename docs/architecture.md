@@ -74,6 +74,8 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 
 All 8 MFE Tailwind configs set `corePlugins: { preflight: false }` to disable Tailwind's preflight (global CSS resets). The shell keeps preflight enabled as the single source of base styles. This prevents layout shifts caused by duplicate `*, html, body` resets being injected when MFE CSS loads at runtime via Module Federation.
 
+All MFE Tailwind configs also set `important: '#root'` (matching the shell's config) so that `dark:` variant selectors compile with sufficient CSS specificity to override light-mode styles injected by the shell.
+
 ---
 
 ## Micro Frontends
@@ -162,7 +164,7 @@ Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
 - Extracts `lat,lon` from URL params (`/weather/:coords`)
 - Listens for `CITY_SELECTED` DOM events from other MFEs
 - Uses `useWeatherData(lat, lon, true)` hook with real-time subscriptions
-- Renders: `CurrentWeather`, `HourlyForecast`, `Forecast`, `HistoricalWeather`, `AirQuality`
+- Renders: `CurrentWeather`, `HourlyForecast`, `Forecast`, `HistoricalWeather`, `AirQuality`, `ActivitySuggestions`
 - **Historical weather comparison** — "This day last year" using Open-Meteo archive API via `useHistoricalWeather` hook
 - **Air Quality Index** — real-time AQI (1-5 European scale) with color-coded levels (Good/Fair/Moderate/Poor/Very Poor), expandable pollutant breakdown via `useAirQuality` hook
 - Shows a "Live" badge when WebSocket subscription is active
@@ -175,6 +177,7 @@ Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
 | **Forecast** | 7-day grid with date, icon, max/min temps, description, rain probability |
 | **HistoricalWeather** | Side-by-side comparison of today vs same day last year (temp high/low, precipitation, wind, weather condition) |
 | **AirQuality** | AQI level badge, color-coded scale bar, expandable pollutant grid (PM2.5, PM10, O₃, NO₂, SO₂, CO) |
+| **ActivitySuggestions** | Weather-based outdoor/indoor activity recommendations with collapsible card UI |
 
 ### Shared Package - `packages/shared/`
 
@@ -524,7 +527,7 @@ interface Note {
 | `'podcast-subscriptions'` | JSON array of string IDs | Subscribed podcast feed IDs |
 | `'podcast-speed'` | Number (e.g., `1.5`) | Podcast playback speed multiplier |
 | `'podcast-progress'` | JSON object | Per-episode playback progress (resume position) |
-| `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles |
+| `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles (incl. activitySuggestions) |
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
 | `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |
 | `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle |
@@ -534,6 +537,7 @@ interface Note {
 | `'bible-translation'` | Bible version ID (e.g., `'1'` for KJV, `'111'` for NIV) | Selected YouVersion Bible version for passage reading |
 | `'notebook-cache'` | JSON `{ count: number }` | Notebook note count for dashboard widget |
 | `'baby-due-date'` | ISO date string (e.g., `'2026-08-15'`) | Baby due date for growth tracking |
+| `'bottom-nav-order'` | JSON array of path strings | Mobile bottom nav item order (Firestore sync when signed in) |
 
 ### Browser SessionStorage — Geolocation
 
@@ -743,6 +747,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **useHistoricalWeather** | `packages/shared/src/hooks/useHistoricalWeather.ts` | Historical weather (Open-Meteo) |
 | **useAirQuality** | `packages/shared/src/hooks/useAirQuality.ts` | Air quality data (OpenWeather Air Pollution) |
 | **AirQuality** | `packages/weather-display/src/components/AirQuality.tsx` | AQI display with pollutant breakdown |
+| **ActivitySuggestions** | `packages/weather-display/src/components/ActivitySuggestions.tsx` | Weather-based activity recommendations |
 | **i18n** | `packages/shared/src/i18n/` | Translation files and hook |
 | **GraphQL Server** | `server/index.ts` | Local dev Express + Apollo + WebSocket |
 | **GraphQL Schema** | `server/graphql/schema.ts` | Type definitions + subscription |

@@ -13,6 +13,7 @@ import DashboardSettings, { loadWidgetVisibility, WidgetVisibility } from './Das
 import WeatherComparison from './WeatherComparison';
 import HistoricalWeather from './HistoricalWeather';
 import AirQuality from './AirQuality';
+import ActivitySuggestions from './ActivitySuggestions';
 import './WeatherDisplay.css';
 
 function getRecentCitiesFromStorage(): Array<{ id: string; name: string; country?: string; lat: number; lon: number }> {
@@ -220,6 +221,8 @@ export default function WeatherDisplay() {
       {widgets.sunriseSunset && current && <SunriseSunset data={current} />}
 
       {widgets.whatToWear && current && <WhatToWear data={current} />}
+
+      {widgets.activitySuggestions && current && <ActivitySuggestions data={current} />}
 
       {hourly && hourly.length > 0 && (widgets.hourlyForecast || widgets.hourlyChart) && (
         <section>
