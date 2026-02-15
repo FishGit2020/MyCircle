@@ -98,7 +98,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Dark / light theme with system preference detection
 - Multi-language support (i18n: English, Spanish, Chinese)
 - Temperature (°C / °F) and wind speed (m/s, mph, km/h) unit toggles
-- **Push notifications** — multi-category preferences (weather alerts, stock price alerts, podcast episodes) via Firebase Cloud Messaging
+- **Push notifications** — multi-category preferences (weather alerts, stock price alerts, podcast episodes, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
 - **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal with mobile bottom-nav clearance; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
 - Offline indicator & PWA support

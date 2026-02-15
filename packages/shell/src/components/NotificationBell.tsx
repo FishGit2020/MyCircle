@@ -1,21 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
 import { requestNotificationPermission, onForegroundMessage, subscribeToWeatherAlerts, unsubscribeFromWeatherAlerts, subscribeToTopic, unsubscribeFromTopic } from '../lib/messaging';
 import { firebaseEnabled } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 
-const STORAGE_KEY = 'weather-alerts-enabled';
-const STOCK_ALERTS_KEY = 'stock-alerts-enabled';
-const PODCAST_ALERTS_KEY = 'podcast-alerts-enabled';
-const ANNOUNCEMENT_ALERTS_KEY = 'announcement-alerts-enabled';
-
 export default function NotificationBell() {
   const { t } = useTranslation();
   const { favoriteCities } = useAuth();
-  const [weatherEnabled, setWeatherEnabled] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
-  const [stockEnabled, setStockEnabled] = useState(() => localStorage.getItem(STOCK_ALERTS_KEY) === 'true');
-  const [podcastEnabled, setPodcastEnabled] = useState(() => localStorage.getItem(PODCAST_ALERTS_KEY) === 'true');
-  const [announcementEnabled, setAnnouncementEnabled] = useState(() => localStorage.getItem(ANNOUNCEMENT_ALERTS_KEY) === 'true');
+  const [weatherEnabled, setWeatherEnabled] = useState(() => localStorage.getItem(StorageKeys.WEATHER_ALERTS) === 'true');
+  const [stockEnabled, setStockEnabled] = useState(() => localStorage.getItem(StorageKeys.STOCK_ALERTS) === 'true');
+  const [podcastEnabled, setPodcastEnabled] = useState(() => localStorage.getItem(StorageKeys.PODCAST_ALERTS) === 'true');
+  const [announcementEnabled, setAnnouncementEnabled] = useState(() => localStorage.getItem(StorageKeys.ANNOUNCEMENT_ALERTS) === 'true');
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [toast, setToast] = useState<{ title?: string; body?: string } | null>(null);
@@ -88,7 +83,8 @@ export default function NotificationBell() {
       try {
         await unsubscribeFromWeatherAlerts(fcmToken);
         setWeatherEnabled(false);
-        localStorage.setItem(STORAGE_KEY, 'false');
+        localStorage.setItem(StorageKeys.WEATHER_ALERTS, 'false');
+        window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
         showFeedback(t('notifications.disabled'));
       } catch {
         showFeedback(t('notifications.failedToDisable'));
@@ -112,7 +108,8 @@ export default function NotificationBell() {
       const ok = await subscribeToWeatherAlerts(token, cities);
       if (ok) {
         setWeatherEnabled(true);
-        localStorage.setItem(STORAGE_KEY, 'true');
+        localStorage.setItem(StorageKeys.WEATHER_ALERTS, 'true');
+        window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
         showFeedback(t('notifications.enabled'));
       } else {
         showFeedback(t('notifications.subscriptionFailed'));
@@ -135,7 +132,8 @@ export default function NotificationBell() {
 
     if (stockEnabled) {
       setStockEnabled(false);
-      localStorage.setItem(STOCK_ALERTS_KEY, 'false');
+      localStorage.setItem(StorageKeys.STOCK_ALERTS, 'false');
+      window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
       showFeedback(t('notifications.disabled'));
       return;
     }
@@ -144,7 +142,8 @@ export default function NotificationBell() {
     if (!token) return;
 
     setStockEnabled(true);
-    localStorage.setItem(STOCK_ALERTS_KEY, 'true');
+    localStorage.setItem(StorageKeys.STOCK_ALERTS, 'true');
+    window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
     showFeedback(t('notifications.enabled'));
   }, [stockEnabled, loading, ensureToken]);
 
@@ -159,7 +158,8 @@ export default function NotificationBell() {
 
     if (podcastEnabled) {
       setPodcastEnabled(false);
-      localStorage.setItem(PODCAST_ALERTS_KEY, 'false');
+      localStorage.setItem(StorageKeys.PODCAST_ALERTS, 'false');
+      window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
       showFeedback(t('notifications.disabled'));
       return;
     }
@@ -168,7 +168,8 @@ export default function NotificationBell() {
     if (!token) return;
 
     setPodcastEnabled(true);
-    localStorage.setItem(PODCAST_ALERTS_KEY, 'true');
+    localStorage.setItem(StorageKeys.PODCAST_ALERTS, 'true');
+    window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
     showFeedback(t('notifications.enabled'));
   }, [podcastEnabled, loading, ensureToken]);
 
@@ -180,7 +181,8 @@ export default function NotificationBell() {
       try {
         await unsubscribeFromTopic(fcmToken, 'announcements');
         setAnnouncementEnabled(false);
-        localStorage.setItem(ANNOUNCEMENT_ALERTS_KEY, 'false');
+        localStorage.setItem(StorageKeys.ANNOUNCEMENT_ALERTS, 'false');
+        window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
         showFeedback(t('notifications.disabled'));
       } catch {
         showFeedback(t('notifications.failedToDisable'));
@@ -198,7 +200,8 @@ export default function NotificationBell() {
       const ok = await subscribeToTopic(token, 'announcements');
       if (ok) {
         setAnnouncementEnabled(true);
-        localStorage.setItem(ANNOUNCEMENT_ALERTS_KEY, 'true');
+        localStorage.setItem(StorageKeys.ANNOUNCEMENT_ALERTS, 'true');
+        window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
         showFeedback(t('notifications.enabled'));
       } else {
         showFeedback(t('notifications.subscriptionFailed'));

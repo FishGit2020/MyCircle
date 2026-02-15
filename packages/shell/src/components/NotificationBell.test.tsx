@@ -8,6 +8,13 @@ vi.mock('@mycircle/shared', () => ({
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
+    WEATHER_ALERTS: 'weather-alerts-enabled',
+    STOCK_ALERTS: 'stock-alerts-enabled',
+    PODCAST_ALERTS: 'podcast-alerts-enabled',
+    ANNOUNCEMENT_ALERTS: 'announcement-alerts-enabled',
+  },
+  WindowEvents: {
+    NOTIFICATION_ALERTS_CHANGED: 'notification-alerts-changed',
   },
 }));
 

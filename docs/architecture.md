@@ -530,9 +530,10 @@ interface Note {
 | `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles (incl. activitySuggestions) |
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
 | `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |
-| `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle |
-| `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle |
-| `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle |
+| `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle (Firestore sync when signed in) |
+| `'stock-alerts-enabled'` | `'true'` / `'false'` | Stock alert notifications toggle (Firestore sync when signed in) |
+| `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle (Firestore sync when signed in) |
+| `'announcement-alerts-enabled'` | `'true'` / `'false'` | Announcement alert notifications toggle (Firestore sync when signed in) |
 | `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
 | `'bible-translation'` | Bible version ID (e.g., `'1'` for KJV, `'111'` for NIV) | Selected YouVersion Bible version for passage reading |
 | `'notebook-cache'` | JSON `{ count: number }` | Notebook note count for dashboard widget |
