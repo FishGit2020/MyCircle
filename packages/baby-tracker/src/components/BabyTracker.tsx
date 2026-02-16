@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation, StorageKeys, WindowEvents, useQuery, GET_BIBLE_PASSAGE } from '@mycircle/shared';
-import { getGrowthDataForWeek, getTrimester, ComparisonCategory } from '../data/babyGrowthData';
+import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
 
 function getRandomVerseIndex(): number {
@@ -330,20 +330,75 @@ export default function BabyTracker() {
             </div>
           </div>
 
-          {/* Development Milestone */}
-          <div className="bg-blue-50 dark:bg-blue-900/10 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
-            <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">
-                  {t('baby.milestone')}
-                </p>
-                <p className="text-sm text-blue-600 dark:text-blue-400 leading-relaxed">
-                  {t(`baby.milestone${currentWeek}` as any)}
-                </p>
-              </div>
+          {/* Development Timeline */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              {t('baby.developmentTimeline')}
+            </h3>
+            <div className="relative">
+              {/* Vertical line */}
+              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+
+              {developmentStages.map((stage) => {
+                const currentStage = getStageForWeek(currentWeek!);
+                const isCompleted = currentWeek! > stage.weekEnd;
+                const isCurrent = currentStage?.id === stage.id;
+                const isUpcoming = currentWeek! < stage.weekStart;
+
+                return (
+                  <div key={stage.id} className="relative flex items-start gap-3 pb-4 last:pb-0">
+                    {/* Timeline dot */}
+                    <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-full shrink-0 text-sm ${
+                      isCompleted
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                        : isCurrent
+                        ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 ring-2 ring-pink-400 dark:ring-pink-500'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
+                    }`}>
+                      {isCompleted ? (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <span>{stage.icon}</span>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className={`flex-1 min-w-0 ${isUpcoming ? 'opacity-50' : ''}`}>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-sm font-semibold ${
+                          isCurrent ? 'text-pink-700 dark:text-pink-300' :
+                          isCompleted ? 'text-green-700 dark:text-green-300' :
+                          'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {t(stage.nameKey as any)}
+                        </span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          {t('baby.stageWeeks').replace('{start}', String(stage.weekStart)).replace('{end}', String(stage.weekEnd))}
+                        </span>
+                        {isCurrent && (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400">
+                            {t('baby.stageCurrent')}
+                          </span>
+                        )}
+                        {isCompleted && (
+                          <span className="text-xs text-green-500 dark:text-green-400">
+                            {t('baby.stageCompleted')}
+                          </span>
+                        )}
+                      </div>
+                      {(isCurrent || isCompleted) && (
+                        <p className={`text-xs mt-1 leading-relaxed ${
+                          isCurrent ? 'text-pink-600 dark:text-pink-400' : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {t(stage.descKey as any)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

@@ -66,3 +66,33 @@ export function getTrimester(week: number): 1 | 2 | 3 {
   if (week <= 26) return 2;
   return 3;
 }
+
+// Development stages — grouped by biological systems rather than individual weeks
+export interface DevelopmentStage {
+  id: number;
+  weekStart: number;
+  weekEnd: number;
+  /** i18n key suffix — e.g. 'baby.stage1' */
+  nameKey: string;
+  /** i18n key suffix — e.g. 'baby.stage1Desc' */
+  descKey: string;
+  /** Emoji icon for the stage */
+  icon: string;
+}
+
+export const developmentStages: DevelopmentStage[] = [
+  { id: 1,  weekStart: 1,  weekEnd: 3,  nameKey: 'baby.stage1',  descKey: 'baby.stage1Desc',  icon: '🌱' },
+  { id: 2,  weekStart: 4,  weekEnd: 6,  nameKey: 'baby.stage2',  descKey: 'baby.stage2Desc',  icon: '💓' },
+  { id: 3,  weekStart: 7,  weekEnd: 10, nameKey: 'baby.stage3',  descKey: 'baby.stage3Desc',  icon: '🫀' },
+  { id: 4,  weekStart: 11, weekEnd: 14, nameKey: 'baby.stage4',  descKey: 'baby.stage4Desc',  icon: '✋' },
+  { id: 5,  weekStart: 15, weekEnd: 18, nameKey: 'baby.stage5',  descKey: 'baby.stage5Desc',  icon: '👂' },
+  { id: 6,  weekStart: 19, weekEnd: 22, nameKey: 'baby.stage6',  descKey: 'baby.stage6Desc',  icon: '🧠' },
+  { id: 7,  weekStart: 23, weekEnd: 26, nameKey: 'baby.stage7',  descKey: 'baby.stage7Desc',  icon: '👁️' },
+  { id: 8,  weekStart: 27, weekEnd: 30, nameKey: 'baby.stage8',  descKey: 'baby.stage8Desc',  icon: '🛡️' },
+  { id: 9,  weekStart: 31, weekEnd: 34, nameKey: 'baby.stage9',  descKey: 'baby.stage9Desc',  icon: '🫁' },
+  { id: 10, weekStart: 35, weekEnd: 40, nameKey: 'baby.stage10', descKey: 'baby.stage10Desc', icon: '🎉' },
+];
+
+export function getStageForWeek(week: number): DevelopmentStage | null {
+  return developmentStages.find(s => week >= s.weekStart && week <= s.weekEnd) || null;
+}
