@@ -5,7 +5,6 @@ import { BrowserRouter } from 'react-router';
 import { ApolloProvider } from '@apollo/client/react';
 import { getApolloClient } from '@mycircle/shared';
 import CitySearch from './components/CitySearch';
-import './index.css';
 
 const client = getApolloClient();
 

@@ -108,7 +108,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Firebase App Check for API protection
 - Firebase Remote Config for feature flags
 - GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ)
-- **MFE CSS isolation** — Tailwind preflight disabled in 8 MFE builds to prevent layout shifts from duplicate global resets
+- **Centralized Tailwind CSS** — single Tailwind build in the shell host scans all MFE sources, eliminating duplicate utility classes and specificity conflicts
 
 ## Architecture
 
