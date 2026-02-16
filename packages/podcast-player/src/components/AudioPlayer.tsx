@@ -190,6 +190,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
         aria-valuenow={Math.round(currentTime)}
         aria-valuemin={0}
         aria-valuemax={Math.round(duration)}
+        aria-valuetext={`${formatTime(currentTime)} / ${formatTime(duration)}`}
       >
         <div
           className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-150 group-hover:bg-blue-600 dark:group-hover:bg-blue-300"

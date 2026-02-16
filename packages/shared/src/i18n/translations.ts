@@ -816,6 +816,10 @@ const en = {
   'commandPalette.navigate': 'navigate',
   'commandPalette.select': 'select',
   'commandPalette.close': 'close',
+  'app.loading': 'Loading…',
+  'auth.userMenu': 'User menu',
+  'stocks.priceUp': 'up',
+  'stocks.priceDown': 'down',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -1632,6 +1636,10 @@ const es: Record<TranslationKey, string> = {
   'commandPalette.navigate': 'navegar',
   'commandPalette.select': 'seleccionar',
   'commandPalette.close': 'cerrar',
+  'app.loading': 'Cargando\u2026',
+  'auth.userMenu': 'Men\u00fa de usuario',
+  'stocks.priceUp': 'al alza',
+  'stocks.priceDown': 'a la baja',
 };
 
 const zh: Record<TranslationKey, string> = {
@@ -2448,6 +2456,10 @@ const zh: Record<TranslationKey, string> = {
   'commandPalette.navigate': '\u5bfc\u822a',
   'commandPalette.select': '\u9009\u62e9',
   'commandPalette.close': '\u5173\u95ed',
+  'app.loading': '\u52a0\u8f7d\u4e2d\u2026',
+  'auth.userMenu': '\u7528\u6237\u83dc\u5355',
+  'stocks.priceUp': '\u4e0a\u6da8',
+  'stocks.priceDown': '\u4e0b\u8dcc',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {

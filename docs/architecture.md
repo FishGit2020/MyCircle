@@ -77,6 +77,20 @@ Tailwind CSS is built exclusively in the shell host. The shell's `tailwind.confi
 
 This eliminates duplicate utility class injection, prevents specificity conflicts between MFE CSS bundles, and reduces total CSS payload. The only MFE-level CSS that remains is `worship-songs/src/index.css`, which contains `@media print` rules for print-friendly song output (no Tailwind directives).
 
+### Accessibility (a11y)
+
+The shell and MFE components follow WCAG 2.1 patterns:
+
+- **Loading states** — `role="status"` with `aria-live="polite"` and sr-only text so screen readers announce loading transitions
+- **Offline indicator** — `role="alert"` for immediate AT announcement when connectivity changes
+- **User menu** — `aria-label`, `aria-expanded`, `aria-haspopup` on the avatar button; `role="menu"` / `role="menuitem"` on the dropdown
+- **Stock price changes** — sr-only directional text ("up" / "down") alongside color-coded badges, so the information isn't color-dependent
+- **Audio progress bar** — `aria-valuetext` with human-readable time (`"2:30 / 45:00"`) instead of raw seconds
+- **Horizontal scroll regions** — `role="region"` with `aria-label` and `tabIndex={0}` for keyboard-focusable scroll containers (e.g., hourly forecast)
+- **Toast notifications** — `role="alert"` with `aria-live="assertive"` for foreground push notification toasts
+- **Skip-to-content** link in Layout.tsx for keyboard users
+- **Focus indicators** — `focus:ring-2 focus:ring-blue-500` on interactive elements
+
 ---
 
 ## Micro Frontends
