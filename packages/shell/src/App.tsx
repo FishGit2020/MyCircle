@@ -321,11 +321,18 @@ export default function App() {
         <Route path="weather" element={<WeatherLandingPage />} />
         <Route path="weather/:coords" element={<WeatherPage />} />
         <Route path="stocks" element={<StocksPage />} />
+        <Route path="stocks/:symbol" element={<StocksPage />} />
         <Route path="podcasts" element={<PodcastsPage />} />
+        <Route path="podcasts/:podcastId" element={<PodcastsPage />} />
         <Route path="ai" element={<AiPage />} />
         <Route path="bible" element={<BiblePage />} />
         <Route path="worship" element={<WorshipPage />} />
+        <Route path="worship/new" element={<WorshipPage />} />
+        <Route path="worship/:songId" element={<WorshipPage />} />
+        <Route path="worship/:songId/edit" element={<WorshipPage />} />
         <Route path="notebook" element={<NotebookPage />} />
+        <Route path="notebook/new" element={<NotebookPage />} />
+        <Route path="notebook/:noteId" element={<NotebookPage />} />
         <Route path="baby" element={<BabyPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />

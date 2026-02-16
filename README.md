@@ -194,12 +194,19 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 |------|------|
 | `/` | Dashboard — quick access cards, city search, favorites, recents |
 | `/weather/:lat,:lon` | Weather detail (with inline comparison) |
-| `/stocks` | Stock tracker |
+| `/stocks` | Stock tracker — watchlist + crypto overview |
+| `/stocks/:symbol` | Stock drill-down — quote, chart, news |
 | `/podcasts` | Podcast player (discover + subscriptions tabs) |
+| `/podcasts/:podcastId` | Podcast drill-down — episode list |
 | `/ai` | AI assistant |
 | `/bible` | Bible reader with daily devotionals |
-| `/worship` | Worship song library with metronome |
-| `/notebook` | Notebook — personal notes with create/edit/delete |
+| `/worship` | Worship song library — song list |
+| `/worship/new` | New worship song editor |
+| `/worship/:songId` | Worship song viewer |
+| `/worship/:songId/edit` | Worship song editor |
+| `/notebook` | Notebook — personal notes list |
+| `/notebook/new` | New note editor |
+| `/notebook/:noteId` | Note editor |
 | `/baby` | Baby growth tracker with weekly development |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 

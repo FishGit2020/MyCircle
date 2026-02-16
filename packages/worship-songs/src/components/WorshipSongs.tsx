@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { useWorshipSongs } from '../hooks/useWorshipSongs';
 import type { WorshipSong } from '../types';
@@ -11,67 +12,88 @@ type View = 'list' | 'view' | 'edit' | 'new';
 
 export default function WorshipSongs() {
   const { t } = useTranslation();
+  const { songId } = useParams<{ songId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { songs, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong } = useWorshipSongs();
-  const [view, setView] = useState<View>('list');
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [songLoading, setSongLoading] = useState(false);
 
-  const handleSelectSong = useCallback(async (id: string) => {
+  // Derive view from URL
+  const isNewRoute = location.pathname === '/worship/new';
+  const isEditRoute = songId != null && location.pathname.endsWith('/edit');
+  const view: View = isNewRoute ? 'new' : isEditRoute ? 'edit' : songId ? 'view' : 'list';
+
+  // Fetch song data when URL changes to a song detail/edit route
+  useEffect(() => {
+    if (!songId || isNewRoute) {
+      setSelectedSong(null);
+      return;
+    }
+    let cancelled = false;
+    setSongLoading(true);
     setErrorMsg(null);
-    try {
-      const song = await getSong(id);
+    getSong(songId).then(song => {
+      if (cancelled) return;
+      setSongLoading(false);
       if (song) {
         setSelectedSong(song);
-        setView('view');
       } else {
         setErrorMsg(t('worship.loadError' as any));
+        navigate('/worship', { replace: true });
       }
-    } catch {
+    }).catch(() => {
+      if (cancelled) return;
+      setSongLoading(false);
       setErrorMsg(t('worship.loadError' as any));
-    }
-  }, [getSong, t]);
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [songId, isNewRoute]);
+
+  const handleSelectSong = useCallback((id: string) => {
+    navigate(`/worship/${id}`);
+  }, [navigate]);
 
   const handleNewSong = useCallback(() => {
-    setSelectedSong(null);
-    setView('new');
-  }, []);
+    navigate('/worship/new');
+  }, [navigate]);
 
   const handleEdit = useCallback(() => {
-    setView('edit');
-  }, []);
+    if (selectedSong) navigate(`/worship/${selectedSong.id}/edit`);
+  }, [selectedSong, navigate]);
 
   const handleBack = useCallback(() => {
-    setView('list');
-    setSelectedSong(null);
-  }, []);
+    navigate('/worship');
+  }, [navigate]);
 
   const handleSaveNew = useCallback(async (data: Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt'>) => {
     const id = await addSong(data);
-    const song = await getSong(id);
-    if (song) {
-      setSelectedSong(song);
-      setView('view');
-    } else {
-      setView('list');
-    }
-  }, [addSong, getSong]);
+    navigate(`/worship/${id}`);
+  }, [addSong, navigate]);
 
   const handleSaveEdit = useCallback(async (data: Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!selectedSong) return;
     await updateSong(selectedSong.id, data);
     const updated = await getSong(selectedSong.id);
-    if (updated) {
-      setSelectedSong(updated);
-    }
-    setView('view');
-  }, [selectedSong, updateSong, getSong]);
+    if (updated) setSelectedSong(updated);
+    navigate(`/worship/${selectedSong.id}`);
+  }, [selectedSong, updateSong, getSong, navigate]);
 
   const handleDelete = useCallback(async () => {
     if (!selectedSong) return;
     await deleteSong(selectedSong.id);
-    setSelectedSong(null);
-    setView('list');
-  }, [selectedSong, deleteSong]);
+    navigate('/worship');
+  }, [selectedSong, deleteSong, navigate]);
+
+  if (songLoading && (view === 'view' || view === 'edit')) {
+    return (
+      <div className="flex items-center justify-center py-16" role="status">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   switch (view) {
     case 'view':
@@ -98,7 +120,7 @@ export default function WorshipSongs() {
           song={selectedSong}
           onSave={handleSaveEdit}
           onDelete={handleDelete}
-          onCancel={() => setView('view')}
+          onCancel={() => navigate(`/worship/${selectedSong.id}`)}
         />
       ) : null;
 

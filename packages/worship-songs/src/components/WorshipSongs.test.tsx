@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import WorshipSongs from './WorshipSongs';
 
 const mockSongs = [
@@ -42,9 +43,20 @@ beforeEach(() => {
   localStorage.clear();
 });
 
+const renderWithRouter = (initialPath = '/worship') => render(
+  <MemoryRouter initialEntries={[initialPath]}>
+    <Routes>
+      <Route path="/worship" element={<WorshipSongs />} />
+      <Route path="/worship/new" element={<WorshipSongs />} />
+      <Route path="/worship/:songId" element={<WorshipSongs />} />
+      <Route path="/worship/:songId/edit" element={<WorshipSongs />} />
+    </Routes>
+  </MemoryRouter>
+);
+
 describe('WorshipSongs', () => {
   it('renders song list on mount', async () => {
-    render(<WorshipSongs />);
+    renderWithRouter();
     await waitFor(() => {
       expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
       expect(screen.getByText('10000 Reasons')).toBeInTheDocument();
@@ -52,7 +64,7 @@ describe('WorshipSongs', () => {
   });
 
   it('shows loading state then resolves', async () => {
-    render(<WorshipSongs />);
+    renderWithRouter();
     await waitFor(() => {
       expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
     });
@@ -60,7 +72,7 @@ describe('WorshipSongs', () => {
 
   it('navigates to song viewer when a song is clicked', async () => {
     const user = userEvent.setup();
-    render(<WorshipSongs />);
+    renderWithRouter();
 
     await waitFor(() => {
       expect(screen.getByText('Amazing Grace')).toBeInTheDocument();

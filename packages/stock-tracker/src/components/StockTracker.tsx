@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useTranslation, WindowEvents, StorageKeys } from '@mycircle/shared';
 import StockSearch from './StockSearch';
 import CryptoTracker from './CryptoTracker';
@@ -50,9 +51,14 @@ function saveAlerts(alerts: PriceAlert[]): void {
 
 export default function StockTracker() {
   const { t } = useTranslation();
+  const { symbol: routeSymbol } = useParams<{ symbol: string }>();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const selectedSymbol = routeSymbol ?? null;
+  const selectedName = searchParams.get('name') ?? routeSymbol ?? '';
+
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(loadWatchlist);
-  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
-  const [selectedName, setSelectedName] = useState<string>('');
   const [timeframe, setTimeframe] = useState<Timeframe>('1M');
   const [alerts, setAlerts] = useState<PriceAlert[]>(loadAlerts);
   const [showAlertForm, setShowAlertForm] = useState(false);
@@ -89,13 +95,16 @@ export default function StockTracker() {
   // Persist alerts
   useEffect(() => { saveAlerts(alerts); }, [alerts]);
 
-  const handleStockSelect = useCallback((symbol: string, description: string) => {
-    setSelectedSymbol(symbol);
-    setSelectedName(description);
+  // Reset form state when navigating to a different stock
+  useEffect(() => {
     setTimeframe('1M');
     setShowAlertForm(false);
     setShowPortfolioForm(false);
-  }, []);
+  }, [routeSymbol]);
+
+  const handleStockSelect = useCallback((symbol: string, description: string) => {
+    navigate(`/stocks/${symbol}?name=${encodeURIComponent(description)}`);
+  }, [navigate]);
 
   const handleToggleWatchlist = useCallback((symbol: string) => {
     setWatchlist(prev => {
@@ -108,17 +117,12 @@ export default function StockTracker() {
 
   const handleWatchlistStockSelect = useCallback((symbol: string) => {
     const item = watchlist.find(w => w.symbol === symbol);
-    setSelectedSymbol(symbol);
-    setSelectedName(item?.companyName ?? symbol);
-    setTimeframe('1M');
-  }, [watchlist]);
+    navigate(`/stocks/${symbol}?name=${encodeURIComponent(item?.companyName ?? symbol)}`);
+  }, [watchlist, navigate]);
 
   const handleBackToOverview = useCallback(() => {
-    setSelectedSymbol(null);
-    setSelectedName('');
-    setShowAlertForm(false);
-    setShowPortfolioForm(false);
-  }, []);
+    navigate('/stocks');
+  }, [navigate]);
 
   const handleAddAlert = useCallback(() => {
     if (!selectedSymbol || !alertPrice) return;

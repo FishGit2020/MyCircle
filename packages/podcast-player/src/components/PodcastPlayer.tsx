@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router';
 import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
@@ -26,6 +27,9 @@ function saveSubscriptions(ids: Set<string>) {
 
 export default function PodcastPlayer() {
   const { t } = useTranslation();
+  const { podcastId } = useParams<{ podcastId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [selectedPodcast, setSelectedPodcast] = useState<Podcast | null>(null);
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -50,7 +54,20 @@ export default function PodcastPlayer() {
     return () => { mounted = false; clearInterval(interval); };
   }, []);
 
-  const feedId = selectedPodcast?.id ?? null;
+  // Sync URL params → selectedPodcast state
+  useEffect(() => {
+    if (!podcastId) {
+      setSelectedPodcast(null);
+    } else if ((location.state as any)?.podcast) {
+      setSelectedPodcast((location.state as any).podcast);
+    } else {
+      // Direct URL without state — redirect to browse
+      navigate('/podcasts', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [podcastId]);
+
+  const feedId = selectedPodcast?.id ?? (podcastId ? Number(podcastId) : null);
   const {
     data: episodes,
     loading: episodesLoading,
@@ -58,12 +75,12 @@ export default function PodcastPlayer() {
   } = usePodcastEpisodes(feedId);
 
   const handleSelectPodcast = useCallback((podcast: Podcast) => {
-    setSelectedPodcast(podcast);
-  }, []);
+    navigate(`/podcasts/${podcast.id}`, { state: { podcast } });
+  }, [navigate]);
 
   const handleBack = useCallback(() => {
-    setSelectedPodcast(null);
-  }, []);
+    navigate('/podcasts');
+  }, [navigate]);
 
   const handlePlayEpisode = useCallback((episode: Episode) => {
     if (currentEpisode?.id === episode.id) {

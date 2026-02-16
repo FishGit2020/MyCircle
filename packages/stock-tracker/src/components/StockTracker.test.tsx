@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import { GET_STOCK_QUOTE, StorageKeys } from '@mycircle/shared';
 import StockTracker from './StockTracker';
 
@@ -23,23 +24,26 @@ describe('StockTracker', () => {
     localStorageMock.clear();
   });
 
+  const renderTracker = (initialPath = '/stocks') => render(
+    <MockedProvider mocks={[]} addTypename={false}>
+      <MemoryRouter initialEntries={[initialPath]}>
+        <Routes>
+          <Route path="/stocks" element={<StockTracker />} />
+          <Route path="/stocks/:symbol" element={<StockTracker />} />
+        </Routes>
+      </MemoryRouter>
+    </MockedProvider>
+  );
+
   it('renders title and watchlist section', () => {
-    render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <StockTracker />
-      </MockedProvider>
-    );
+    renderTracker();
 
     expect(screen.getByText('Stock Tracker')).toBeInTheDocument();
     expect(screen.getByText('Watchlist')).toBeInTheDocument();
   });
 
   it('shows empty watchlist message when no stocks are saved', () => {
-    render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <StockTracker />
-      </MockedProvider>
-    );
+    renderTracker();
 
     expect(screen.getByText('No stocks in your watchlist yet.')).toBeInTheDocument();
     expect(screen.getByText('Search for stocks and add them to your watchlist.')).toBeInTheDocument();
@@ -78,7 +82,12 @@ describe('StockTracker', () => {
 
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <StockTracker />
+        <MemoryRouter initialEntries={['/stocks']}>
+          <Routes>
+            <Route path="/stocks" element={<StockTracker />} />
+            <Route path="/stocks/:symbol" element={<StockTracker />} />
+          </Routes>
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -92,11 +101,7 @@ describe('StockTracker', () => {
   });
 
   it('shows Paused when live is disabled', () => {
-    render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <StockTracker />
-      </MockedProvider>
-    );
+    renderTracker();
 
     expect(screen.queryByText('LIVE')).not.toBeInTheDocument();
   });
