@@ -85,7 +85,7 @@ export default function StockNews({ symbol }: StockNewsProps) {
               rel="noopener noreferrer"
               className="flex gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
             >
-              {article.image ? (
+              {article.image?.trim() ? (
                 <img
                   src={article.image}
                   alt=""
