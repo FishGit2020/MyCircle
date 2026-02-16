@@ -124,4 +124,36 @@ describe('SongEditor', () => {
       })
     );
   });
+
+  it('disables save button when required fields are empty', () => {
+    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    expect(screen.getByText('worship.save').closest('button')).toBeDisabled();
+  });
+
+  it('shows helper text when save is disabled due to missing fields', () => {
+    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    expect(screen.getByText('worship.fillRequiredFields')).toBeInTheDocument();
+  });
+
+  it('shows inline validation on title after blur when empty', async () => {
+    const user = userEvent.setup();
+    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+
+    const titleInput = screen.getByRole('textbox', { name: /worship\.songTitle/ });
+    await user.click(titleInput);
+    await user.tab(); // blur
+    expect(screen.getByText('worship.fieldRequired')).toBeInTheDocument();
+    expect(titleInput).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('hides helper text when all required fields are filled', async () => {
+    const user = userEvent.setup();
+    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+
+    await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
+    await user.type(screen.getByRole('textbox', { name: /worship\.content/ }), 'Some lyrics');
+
+    expect(screen.queryByText('worship.fillRequiredFields')).not.toBeInTheDocument();
+    expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+  });
 });
