@@ -3,7 +3,6 @@ import { useTranslation } from '@mycircle/shared';
 import { useAiChat } from '../hooks/useAiChat';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
-import '../index.css';
 
 const SUGGESTION_KEYS = [
   'ai.suggestWeather',

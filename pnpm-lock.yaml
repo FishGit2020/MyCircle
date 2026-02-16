@@ -235,9 +235,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -296,9 +293,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -363,9 +357,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -430,9 +421,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -491,9 +479,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -552,9 +537,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -726,9 +708,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -793,9 +772,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -854,9 +830,6 @@ importers:
       postcss:
         specifier: ^8.4.33
         version: 8.5.6
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.19(tsx@4.21.0)(yaml@2.8.2)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3

@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route } from 'react-router';
 import { ApolloProvider } from '@apollo/client/react';
 import { getApolloClient } from '@mycircle/shared';
 import WeatherDisplay from './components/WeatherDisplay';
-import './index.css';
 
 const client = getApolloClient();
 

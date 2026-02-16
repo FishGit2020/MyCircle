@@ -71,11 +71,11 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **Runtime** | Node.js 22 |
 | **Package Manager** | pnpm (workspaces + catalogs) |
 
-### MFE CSS Isolation
+### Centralized Tailwind CSS
 
-All 8 MFE Tailwind configs set `corePlugins: { preflight: false }` to disable Tailwind's preflight (global CSS resets). The shell keeps preflight enabled as the single source of base styles. This prevents layout shifts caused by duplicate `*, html, body` resets being injected when MFE CSS loads at runtime via Module Federation.
+Tailwind CSS is built exclusively in the shell host. The shell's `tailwind.config.js` scans all 9 MFE `src/` directories in its `content` array, producing a single CSS bundle that covers every utility class used across the entire app. MFE packages do not have their own Tailwind configs, `@tailwind` directives, or `tailwindcss` devDependencies — they rely entirely on the shell's CSS output at runtime.
 
-All MFE Tailwind configs also set `important: '#root'` (matching the shell's config) so that `dark:` variant selectors compile with sufficient CSS specificity to override light-mode styles injected by the shell.
+This eliminates duplicate utility class injection, prevents specificity conflicts between MFE CSS bundles, and reduces total CSS payload. The only MFE-level CSS that remains is `worship-songs/src/index.css`, which contains `@media print` rules for print-friendly song output (no Tailwind directives).
 
 ---
 
