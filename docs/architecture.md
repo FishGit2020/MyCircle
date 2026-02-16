@@ -92,7 +92,7 @@ The shell and MFE components follow WCAG 2.1 patterns:
 - **Focus management** — `useFocusOnRouteChange` hook moves focus to `#main-content` on route change so screen readers announce the new page
 - **Breadcrumbs** — `<nav aria-label="Breadcrumb">` with `aria-current="page"` on the current segment, rendered below the header on feature pages
 - **Focus indicators** — `focus:ring-2 focus:ring-blue-500` on interactive elements
-- **Color contrast** — text/background combinations meet WCAG AA 4.5:1 minimum (e.g., `text-gray-600` on `bg-gray-100`, `text-white` on `bg-blue-600`, `text-blue-700` on `bg-blue-50`)
+- **Color contrast** — text/background combinations meet WCAG AA 4.5:1 minimum (e.g., `text-gray-500` on white for widget placeholders ≥ 5.28:1, `text-blue-600` on `bg-gray-50` for buttons ≥ 5.41:1, `text-blue-300` on `bg-gray-700` for footer badges ≥ 6.86:1)
 - **Touch targets** — interactive elements (e.g., onboarding step dots) use a minimum 24×24px tap area, with visual size kept small via inner spans
 - **Geolocation** — auto-location only fires when the user has previously granted permission (via Permissions API); first-time users must click "Use My Location"
 
@@ -267,7 +267,7 @@ Exposes `BibleReader` component via Module Federation.
 - Browse all 66 canonical Bible books (Old & New Testament) with search/filter
 - Chapter grid navigation with previous/next chapter controls
 - **Dynamic Bible versions**: 19+ English translations (KJV, NIV, AMP, NASB, etc.) fetched from YouVersion API via `bibleVersions` GraphQL query (24hr server-side cache)
-- Verse of the Day via GraphQL (`bibleVotd` query) cached by day-of-year
+- Verse of the Day via GraphQL (`bibleVotd` query) cached by day-of-year; query is skipped when `VITE_GRAPHQL_URL` is unset to avoid console errors from failed network requests (falls back to local verse data)
 - Passage reading via YouVersion API (`biblePassage` query with USFM reference conversion), with copyright display
 - Font size adjustment (5 levels, persisted via `StorageKeys.BIBLE_FONT_SIZE`)
 - Bookmark system (create/remove, stored in `StorageKeys.BIBLE_BOOKMARKS`, synced to Firestore per user via `BIBLE_BOOKMARKS_CHANGED` event)
@@ -436,13 +436,13 @@ The PWA service worker caches `remoteEntry.js` files with a `NetworkFirst` strat
 
 ### Build Configuration
 
-All packages (shell + 9 MFEs) set `modulePreload: false` in their Vite build config:
+All packages (shell + 9 MFEs) set `modulePreload: false` in their Vite build config. All packages also use `minify: 'esbuild'` for production JS minification:
 
 ```typescript
-build: { modulePreload: false }
+build: { modulePreload: false, minify: 'esbuild' }
 ```
 
-This prevents Vite from injecting `<link rel="modulepreload">` tags in HTML, which would conflict with Module Federation's own module loading mechanism. Prefetch is instead controlled explicitly via the `import()` calls in Layer 1.
+`modulePreload: false` prevents Vite from injecting `<link rel="modulepreload">` tags in HTML, which would conflict with Module Federation's own module loading mechanism. Prefetch is instead controlled explicitly via the `import()` calls in Layer 1. `minify: 'esbuild'` ensures all federated remote chunks are minified, reducing bundle sizes without affecting module resolution (Module Federation uses explicit `exposes` config).
 
 ### Trade-offs
 

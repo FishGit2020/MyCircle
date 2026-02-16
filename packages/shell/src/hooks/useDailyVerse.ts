@@ -24,6 +24,7 @@ export function useDailyVerse() {
   const { data, loading } = useQuery<VotdApiResponse>(GET_BIBLE_VOTD_API, {
     variables: { day },
     fetchPolicy: 'cache-first',
+    skip: !import.meta.env.VITE_GRAPHQL_URL,
   });
 
   const verse: DailyVerse | null = data?.bibleVotdApi

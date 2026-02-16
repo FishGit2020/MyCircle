@@ -33,7 +33,7 @@ export default function DashboardPage() {
               — {verse.reference}
             </p>
             {verse.copyright && (
-              <p className="text-[10px] text-blue-400/60 dark:text-blue-500/50 mt-1 leading-tight">
+              <p className="text-[10px] text-blue-500/80 dark:text-blue-400/70 mt-1 leading-tight">
                 {verse.copyright}
               </p>
             )}
