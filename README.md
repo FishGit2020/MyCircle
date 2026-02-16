@@ -74,13 +74,13 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Built-in metronome** — Web Audio API-powered metronome with BPM from song metadata (30-240 range), +/- controls, tap tempo (4-tap average), beat indicator flash, always visible in song viewer
 - **Capo calculator** — collapsible panel showing all capo positions with resulting chord shapes, easy guitar keys (C, G, D, A, E) highlighted, one-click capo selection that adjusts displayed chords to shape key
 - Favorites, search, tag filtering
-- Firestore persistence with offline localStorage cache
+- **Real-time sync** — Firestore `onSnapshot` pushes changes instantly across devices/tabs; localStorage cache used as initial data
 
 ### Notebook
 - Personal note-taking with Firestore persistence (user-scoped subcollection)
 - Create, edit, and delete notes with search/filter
 - Privacy: each user can only see their own notes
-- **Public Notes**: publish notes to a shared `publicNotes` collection visible to all authenticated users
+- **Public Notes**: publish notes to a shared `publicNotes` collection visible to all authenticated users, with **real-time sync** via Firestore `onSnapshot`
 - Creator badge and green card styling distinguish public notes
 - Note count cached for dashboard tile
 
