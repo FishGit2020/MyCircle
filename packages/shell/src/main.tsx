@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { RemoteConfigProvider } from './context/RemoteConfigContext';
 import { ThemeSync, DataSync, ReloadPrompt, Onboarding } from './components/sync';
+import { logEvent } from './lib/firebase';
 import App from './App';
 import './index.css';
 
@@ -30,8 +31,8 @@ import './index.css';
 
 const client = getApolloClient();
 
-// Report Core Web Vitals (LCP, CLS, INP, FCP, TTFB)
-reportWebVitals();
+// Report Core Web Vitals (LCP, CLS, INP, FCP, TTFB) to Google Analytics
+reportWebVitals(logEvent);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
