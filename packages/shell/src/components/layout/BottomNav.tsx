@@ -218,7 +218,7 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
                       <button
                         onClick={() => moveItem(idx, -1)}
                         disabled={idx === 0}
-                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 transition"
+                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 transition rounded-lg active:bg-gray-100 dark:active:bg-gray-700"
                         aria-label={t('bottomNav.moveUp')}
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -228,7 +228,7 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
                       <button
                         onClick={() => moveItem(idx, 1)}
                         disabled={idx === orderedPaths.length - 1}
-                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 transition"
+                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 transition rounded-lg active:bg-gray-100 dark:active:bg-gray-700"
                         aria-label={t('bottomNav.moveDown')}
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -250,6 +250,7 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       role="navigation"
       aria-label="Bottom navigation"
     >
@@ -268,7 +269,7 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
               aria-current={active ? 'page' : undefined}
             >
               <NavIcon icon={item.icon} />
-              <span className="text-[10px] font-medium leading-none">{t(item.labelKey)}</span>
+              <span className="text-[11px] font-medium leading-none">{t(item.labelKey)}</span>
             </Link>
           );
         })}
@@ -288,12 +289,12 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
             </svg>
-            <span className="text-[10px] font-medium leading-none">{t('bottomNav.more')}</span>
+            <span className="text-[11px] font-medium leading-none">{t('bottomNav.more')}</span>
           </button>
 
           {/* More popup */}
           {moreOpen && (
-            <div className="absolute bottom-full mb-2 right-0 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1 overflow-hidden">
+            <div className="absolute bottom-full mb-2 right-0 w-48 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1 overflow-hidden">
               {moreItems.map(item => {
                 const active = isActive(item.path);
                 return (
