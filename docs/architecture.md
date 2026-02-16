@@ -291,7 +291,7 @@ Exposes `WorshipSongs` component via Module Federation.
 - **Built-in metronome**: `Metronome` component uses Web Audio API (`AudioContext` + `OscillatorNode`) for precise click timing. Optional `bpm` field on `WorshipSong` (30-240 range). Features: start/stop toggle, +/- BPM buttons, direct BPM number input, tap tempo (4-tap rolling average with 2s timeout), visual beat indicator (green flash). Always rendered in `SongViewer` below controls bar.
 - **Capo calculator**: `CapoCalculator` component in `SongViewer` (ChordPro only). Collapsible panel showing fret positions 1-9 with resulting chord shape keys. Easy guitar keys (C, G, D, A, E) highlighted with green styling. Selecting a capo position adjusts displayed chords to the shape key (transposes content by `semitones - capoFret`). Formula: `shapeKey = transposeChord(soundingKey, -capoFret)`. Shows instruction panel when active and suggested easy-key positions when inactive.
 - Favorites system with `StorageKeys.WORSHIP_FAVORITES`
-- Offline cache via `StorageKeys.WORSHIP_SONGS_CACHE`
+- **Real-time sync** via Firestore `onSnapshot` — changes by any user push instantly to all connected clients; `useWorshipSongs` hook prefers `subscribe()` over one-shot `getAll()`, with localStorage cache as initial data
 - Tag-based filtering and full-text search
 
 ### Notebook - `packages/notebook/`
@@ -304,7 +304,7 @@ Exposes `Notebook` component via Module Federation.
 - "My Notes" / "Public Notes" tab navigation in the Notebook UI
 - Publish button in NoteEditor creates a copy in `publicNotes` with `createdBy: { uid, displayName }`
 - Public notes show green card styling with creator badge; publishing is irreversible
-- `WindowEvents.PUBLIC_NOTES_CHANGED` for public notes cache invalidation
+- **Real-time sync** for public notes via Firestore `onSnapshot` — `usePublicNotes` hook prefers `subscribePublic()` over one-shot `getAllPublic()`, falls back gracefully
 - Search/filter notes by title or content
 - Note count cached to `StorageKeys.NOTEBOOK_CACHE` for dashboard tile
 - CRUD via `window.__notebook` Firestore bridge (same pattern as worship-songs)

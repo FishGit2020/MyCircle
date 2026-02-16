@@ -12,6 +12,7 @@ declare global {
       add: (song: Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
       update: (id: string, updates: Partial<WorshipSong>) => Promise<void>;
       delete: (id: string) => Promise<void>;
+      subscribe?: (callback: (songs: WorshipSong[]) => void) => () => void;
     };
   }
 }
@@ -53,7 +54,7 @@ export function useWorshipSongs() {
     return () => { mounted = false; clearInterval(interval); };
   }, []);
 
-  // Load songs
+  // Load songs — one-shot fallback when subscribe is unavailable
   const loadSongs = useCallback(async () => {
     setLoading(true);
     try {
@@ -69,12 +70,18 @@ export function useWorshipSongs() {
     }
   }, []);
 
+  // Use real-time subscription if available, fall back to one-shot fetch
   useEffect(() => {
+    if (window.__worshipSongs?.subscribe) {
+      const unsubscribe = window.__worshipSongs.subscribe((data) => {
+        setSongs(data);
+        setCachedSongs(data);
+        setLoading(false);
+      });
+      return unsubscribe;
+    }
+    // Fallback: one-shot fetch + event listener
     loadSongs();
-  }, [loadSongs]);
-
-  // Listen for external changes
-  useEffect(() => {
     const handler = () => { loadSongs(); };
     window.addEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, handler);
     return () => window.removeEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, handler);
@@ -83,24 +90,22 @@ export function useWorshipSongs() {
   const addSong = useCallback(async (song: Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!window.__worshipSongs) throw new Error('Worship songs API not available');
     const id = await window.__worshipSongs.add(song);
-    await loadSongs();
+    // Real-time listener will auto-update; dispatch event for non-real-time consumers
     window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
     return id;
-  }, [loadSongs]);
+  }, []);
 
   const updateSong = useCallback(async (id: string, updates: Partial<WorshipSong>) => {
     if (!window.__worshipSongs) throw new Error('Worship songs API not available');
     await window.__worshipSongs.update(id, updates);
-    await loadSongs();
     window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-  }, [loadSongs]);
+  }, []);
 
   const deleteSong = useCallback(async (id: string) => {
     if (!window.__worshipSongs) throw new Error('Worship songs API not available');
     await window.__worshipSongs.delete(id);
-    await loadSongs();
     window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-  }, [loadSongs]);
+  }, []);
 
   const getSong = useCallback(async (id: string): Promise<WorshipSong | null> => {
     if (!window.__worshipSongs) {

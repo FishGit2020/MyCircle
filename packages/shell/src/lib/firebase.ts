@@ -1,6 +1,6 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -548,6 +548,18 @@ export async function deleteWorshipSong(id: string) {
   await deleteDoc(doc(db, 'worshipSongs', id));
 }
 
+/** Subscribe to real-time worship songs updates via Firestore onSnapshot */
+export function subscribeToWorshipSongs(callback: (songs: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'worshipSongs'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const songs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(songs);
+  }, (error) => {
+    console.warn('Worship songs snapshot error:', error);
+  });
+}
+
 // Notebook — personal notes (user-scoped subcollection)
 export async function getUserNotes(uid: string) {
   if (!db) return [];
@@ -622,6 +634,18 @@ export async function deletePublicNote(noteId: string) {
   await deleteDoc(doc(db, 'publicNotes', noteId));
 }
 
+/** Subscribe to real-time public notes updates via Firestore onSnapshot */
+export function subscribeToPublicNotes(callback: (notes: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'publicNotes'), orderBy('updatedAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(notes);
+  }, (error) => {
+    console.warn('Public notes snapshot error:', error);
+  });
+}
+
 // Expose worship songs API for MFEs
 if (firebaseEnabled) {
   window.__worshipSongs = {
@@ -630,6 +654,7 @@ if (firebaseEnabled) {
     add: addWorshipSong,
     update: updateWorshipSong,
     delete: deleteWorshipSong,
+    subscribe: subscribeToWorshipSongs,
   };
 }
 
@@ -652,6 +677,7 @@ if (firebaseEnabled) {
     },
     // Public notes
     getAllPublic: () => getPublicNotes(),
+    subscribePublic: subscribeToPublicNotes,
     publish: (note: { title: string; content: string }) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       const displayName = auth.currentUser.displayName || auth.currentUser.email || 'Anonymous';
