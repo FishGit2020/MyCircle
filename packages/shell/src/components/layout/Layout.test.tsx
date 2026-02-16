@@ -99,4 +99,12 @@ describe('Layout', () => {
     expect(owmLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
+  it('renders search buttons for both desktop and mobile', () => {
+    renderWithRouter(<Layout />);
+
+    const searchButtons = screen.getAllByRole('button', { name: /search/i });
+    // Desktop search button + mobile search button
+    expect(searchButtons.length).toBeGreaterThanOrEqual(2);
+  });
+
 });

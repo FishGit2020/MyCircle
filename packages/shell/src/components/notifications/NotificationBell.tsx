@@ -221,7 +221,7 @@ export default function NotificationBell() {
       <div className="relative" ref={panelRef}>
         <button
           onClick={() => setShowPanel(p => !p)}
-          className={`relative p-2 rounded-lg transition-colors ${
+          className={`relative p-2.5 rounded-lg transition-colors ${
             anyEnabled
               ? 'text-blue-500 dark:text-blue-400'
               : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
