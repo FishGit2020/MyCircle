@@ -684,10 +684,10 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
             </p>
           </div>
 
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
               onClick={skipBack}
-              className="p-1.5 text-gray-600 dark:text-gray-300"
+              className="p-2.5 text-gray-600 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-700 rounded-full transition"
               aria-label={t('podcasts.skipBack')}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -697,7 +697,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
 
             <button
               onClick={togglePlayPause}
-              className="p-2 bg-blue-500 text-white rounded-full"
+              className="p-3 bg-blue-500 text-white rounded-full active:bg-blue-600 transition"
               aria-label={isPlaying ? t('podcasts.pauseEpisode') : t('podcasts.playEpisode')}
             >
               {isPlaying ? (
@@ -713,7 +713,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
 
             <button
               onClick={skipForward}
-              className="p-1.5 text-gray-600 dark:text-gray-300"
+              className="p-2.5 text-gray-600 dark:text-gray-300 active:bg-gray-100 dark:active:bg-gray-700 rounded-full transition"
               aria-label={t('podcasts.skipForward')}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -753,7 +753,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
             {/* Mobile share */}
             <button
               onClick={handleShare}
-              className={`p-1.5 ${shareCopied ? 'text-green-500' : 'text-gray-400'}`}
+              className={`p-2 rounded-full transition ${shareCopied ? 'text-green-500' : 'text-gray-400 active:bg-gray-100 dark:active:bg-gray-700'}`}
               aria-label={shareCopied ? t('podcasts.shareCopied') : t('podcasts.shareEpisode')}
             >
               {shareCopied ? (
@@ -769,7 +769,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
 
             <button
               onClick={handleClose}
-              className="p-1.5 text-gray-400"
+              className="p-2 text-gray-400 active:bg-gray-100 dark:active:bg-gray-700 rounded-full transition"
               aria-label={t('podcasts.closePlayer')}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
