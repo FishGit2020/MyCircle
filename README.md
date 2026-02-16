@@ -118,6 +118,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Keyboard shortcuts** — `Ctrl/Cmd+K` command palette, `Ctrl/Cmd+D` dark mode toggle, `g` then letter for quick navigation (e.g., `g w` for Weather), `?` for shortcuts help
 - **Accessibility** — ARIA live regions for loading/offline states, `role="alert"` for toast notifications, `aria-expanded`/`aria-haspopup` on menus, sr-only text for color-dependent stock indicators, `aria-valuetext` on audio progress bars, keyboard-focusable scroll regions
 - **Performance** — `React.memo` on list item components (PodcastCard, StockCard, CryptoCard), paginated episode list with "Show more" button, `useCallback` for stable handler references
+- **Lighthouse CI** — automated Lighthouse scoring on every PR (accessibility ≥ 90 required, performance/SEO/best-practices ≥ 80-90 warned)
 
 ## Architecture
 

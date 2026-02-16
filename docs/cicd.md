@@ -21,13 +21,18 @@ MyCircle uses **GitHub Actions** for continuous integration, end-to-end testing,
        │     ├─ Serve dist/firebase/ via express.static
        │     └─ Playwright E2E tests (browser-mocked)
        │
-       └──► E2E Emulator (e2e.yml → e2e-emulator job)   ⚪ Optional
-             ├─ Build full app + setup Java
-             ├─ Start mock API server + Firebase emulators
-             ├─ Seed Firestore emulator
-             └─ Playwright E2E tests (full-stack, no browser mocks)
+       ├──► E2E Emulator (e2e.yml → e2e-emulator job)   ⚪ Optional
+       │     ├─ Build full app + setup Java
+       │     ├─ Start mock API server + Firebase emulators
+       │     ├─ Seed Firestore emulator
+       │     └─ Playwright E2E tests (full-stack, no browser mocks)
+       │
+       └──► Lighthouse CI (lighthouse.yml)   ⚪ Informational
+             ├─ Build shared + MFEs + shell
+             ├─ Run Lighthouse against shell dist
+             └─ Assert: a11y ≥ 90 (error), perf/BP/SEO ≥ 80-90 (warn)
 
-  Both CI + E2E pass → PR can be merged (squash)
+  CI + E2E pass → PR can be merged (squash)
 
   PR merged → push to main                       ⬚ Skipped if only docs/tests changed
        │
@@ -124,6 +129,32 @@ This workflow runs two parallel jobs:
 > **Full-stack testing:** Unlike the mocked `e2e` job, emulator tests make real requests through the full chain: Browser → Hosting Emulator → Functions Emulator → Mock API Server. No browser-level mocking.
 
 Concurrency: only one E2E run per PR branch.
+
+### Lighthouse CI — `.github/workflows/lighthouse.yml`
+
+**Trigger:** Pull request to `main` (code changes only)
+
+| Step | Command | Purpose |
+|------|---------|---------|
+| Checkout + Setup | Same as CI | — |
+| Build shared | `pnpm build:shared` | Compile shared package |
+| Build shell + MFEs | `pnpm firebase:build:mf` | Production build of all frontends |
+| Lighthouse CI | `lhci autorun` | Run Lighthouse against `packages/shell/dist` |
+
+**Score thresholds** (defined in `.lighthouserc.json`):
+
+| Category | Level | Min Score |
+|----------|-------|-----------|
+| Performance | warn | 80 |
+| Accessibility | **error** | 90 |
+| Best Practices | warn | 90 |
+| SEO | warn | 90 |
+
+> **Accessibility is the only hard gate** (`error` level) — PRs that drop accessibility below 90 will fail CI. Other categories use `warn` to surface regressions without blocking merges.
+
+Results are uploaded to Lighthouse's temporary public storage and linked in the workflow output.
+
+Concurrency: only one Lighthouse run per PR branch.
 
 ### Deploy — `.github/workflows/deploy.yml`
 
