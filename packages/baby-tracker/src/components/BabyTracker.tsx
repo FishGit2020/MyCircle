@@ -329,6 +329,23 @@ export default function BabyTracker() {
               </p>
             </div>
           </div>
+
+          {/* Development Milestone */}
+          <div className="bg-blue-50 dark:bg-blue-900/10 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-blue-500 dark:text-blue-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                  {t('baby.milestone')}
+                </p>
+                <p className="text-sm text-blue-600 dark:text-blue-400 leading-relaxed">
+                  {t(`baby.milestone${currentWeek}` as any)}
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
       )}
     </div>
