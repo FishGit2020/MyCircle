@@ -469,6 +469,18 @@ build: { modulePreload: false, minify: 'esbuild' }
 | No loading spinner on click | CSS injected on hover can cause cascade conflicts (see [Pitfall #3](mfe-guide.md#3-prefetch-side-effects)) |
 | SW cache speeds up repeat visits | Stale SW can serve outdated remoteEntry.js (see [Pitfall #11](mfe-guide.md#11-pwa-service-worker-interference-in-dev-mode)) |
 
+### Reload Prompt Optimization
+
+`ReloadPrompt.tsx` detects new service worker versions and prompts the user to reload:
+
+| Mechanism | Value | Purpose |
+|-----------|-------|---------|
+| Polling interval | 30 s | Checks `registration.update()` periodically |
+| `visibilitychange` listener | on tab focus | Triggers immediate check when user returns to tab |
+| Fallback reload timeout | 1 s | Force-reloads if `controllerchange` event never fires |
+
+The `visibilitychange` listener is the most impactful optimization — users returning to a tab after a deploy see the reload prompt almost instantly instead of waiting up to 30 seconds.
+
 ### Future Considerations
 
 - `requestIdleCallback` — prefetch during browser idle time instead of on hover
@@ -850,6 +862,16 @@ AuthProvider:
 ```
 
 Password reset is also available via `sendPasswordResetEmail(auth, email)`.
+
+### Sign-Out & Cache Clearing
+
+When a user signs out, `signOutUser()` performs three cleanup steps:
+
+1. **Firebase sign-out** — `logOut()` clears the Firebase auth session.
+2. **localStorage cleanup** — iterates `Object.values(StorageKeys)` and removes all user-specific keys. Device-level keys (`THEME`, `LOCALE`, `WEATHER_ALERTS`, `PODCAST_ALERTS`, `ANNOUNCEMENT_ALERTS`) are preserved so the next user inherits the device's display and notification preferences.
+3. **Apollo cache reset** — `getApolloClient().clearStore()` wipes cached GraphQL responses (e.g., daily verse) so the next session starts fresh.
+
+This prevents stale data (watchlists, bookmarks, baby tracker settings, widget layouts) from leaking between accounts on a shared device.
 
 ### Profile Operations
 
