@@ -134,12 +134,13 @@ This shows which routes have the slowest Largest Contentful Paint.
 
 ---
 
-## Step 4: Set Up Custom Alerts (Optional)
+## Step 4: Set Up Custom Insights Alerts (Optional)
 
-Get notified when performance degrades.
+Get notified when performance degrades. GA4 uses **Custom Insights** for alerting (not "Custom Alerts").
 
-1. Go to **GA4 > Admin > Custom alerts** (under Data display)
-2. Create alerts for each Core Web Vital threshold:
+1. Go to **GA4 > Reports > Home**, scroll to **Insights & recommendations**
+2. Click **View all insights** > **Create** > **Create custom insight**
+3. Set **Evaluation frequency** to **Daily** and configure each alert:
 
 ### Poor LCP Alert
 - Name: `Poor LCP Spike`
