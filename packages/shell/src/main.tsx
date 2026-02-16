@@ -7,11 +7,8 @@ import { getApolloClient, I18nProvider, ToastProvider, reportWebVitals } from '@
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { RemoteConfigProvider } from './context/RemoteConfigContext';
-import ThemeSync from './components/ThemeSync';
-import DataSync from './components/DataSync';
+import { ThemeSync, DataSync, ReloadPrompt, Onboarding } from './components/sync';
 import App from './App';
-import ReloadPrompt from './components/ReloadPrompt';
-import Onboarding from './components/Onboarding';
 import './index.css';
 
 // Sentry disabled — will re-enable in a dedicated PR to investigate compatibility with Google OAuth popup flow

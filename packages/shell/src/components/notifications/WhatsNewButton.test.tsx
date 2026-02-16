@@ -11,7 +11,7 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('../hooks/useAnnouncements', () => ({
+vi.mock('../../hooks/useAnnouncements', () => ({
   useAnnouncements: () => ({
     announcements: mockAnnouncements,
     loading: false,

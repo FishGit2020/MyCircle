@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import WhatsNew from './WhatsNew';
-import { useAnnouncements } from '../hooks/useAnnouncements';
+import { useAnnouncements } from '../../hooks/useAnnouncements';
 
 export default function WhatsNewButton() {
   const { t } = useTranslation();

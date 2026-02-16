@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation, getDailyVerse } from '@mycircle/shared';
-import WidgetDashboard from '../components/WidgetDashboard';
+import { WidgetDashboard } from '../components/widgets';
 import { useDailyVerse } from '../hooks/useDailyVerse';
 
 export default function DashboardPage() {

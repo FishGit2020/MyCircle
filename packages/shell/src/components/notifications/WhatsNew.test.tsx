@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import WhatsNew from './WhatsNew';
-import type { Announcement } from '../hooks/useAnnouncements';
+import type { Announcement } from '../../hooks/useAnnouncements';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),

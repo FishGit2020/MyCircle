@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import { submitFeedback, FeedbackData, logEvent } from '../lib/firebase';
-import { useAuth } from '../context/AuthContext';
+import { submitFeedback, FeedbackData, logEvent } from '../../lib/firebase';
+import { useAuth } from '../../context/AuthContext';
 
 type Category = FeedbackData['category'];
 

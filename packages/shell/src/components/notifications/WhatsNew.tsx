@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import { Announcement } from '../hooks/useAnnouncements';
+import { Announcement } from '../../hooks/useAnnouncements';
 
 interface WhatsNewProps {
   announcements: Announcement[];

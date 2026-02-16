@@ -221,12 +221,20 @@ mycircle/
 │   │       ├── hooks/           # useWeatherData and other shared hooks
 │   │       ├── i18n/            # Internationalization (translations)
 │   │       ├── types/           # TypeScript interfaces
-│   │       ├── utils/           # Event bus, weather helpers
+│   │       ├── utils/           # Event bus, weather helpers, getErrorMessage
 │   │       └── data/            # Static data files
 │   ├── shell/                   # Host micro frontend
 │   │   └── src/
-│   │       ├── components/      # Layout, CitySearchWrapper, UserMenu, toggles, etc.
+│   │       ├── components/
+│   │       │   ├── layout/      # Layout, BottomNav, ThemeToggle, UserMenu, etc.
+│   │       │   ├── widgets/     # WidgetDashboard, CitySearchWrapper, FavoriteCities
+│   │       │   ├── notifications/ # NotificationBell, WhatsNew, WhatsNewButton
+│   │       │   ├── player/      # GlobalAudioPlayer
+│   │       │   ├── common/      # Loading, ErrorBoundary
+│   │       │   ├── settings/    # UnitToggle, SpeedToggle
+│   │       │   └── sync/        # ThemeSync, DataSync, ReloadPrompt, Onboarding
 │   │       ├── context/         # AuthContext, ThemeContext, RemoteConfigContext
+│   │       ├── hooks/           # useDailyVerse, useAnnouncements
 │   │       ├── lib/             # Firebase SDK integration (auth, Firestore, FCM)
 │   │       └── App.tsx          # Routes & provider hierarchy
 │   ├── city-search/             # City search MFE

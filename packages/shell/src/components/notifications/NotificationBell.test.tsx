@@ -16,11 +16,11 @@ vi.mock('@mycircle/shared', () => ({
   },
 }));
 
-vi.mock('../lib/firebase', () => ({ firebaseEnabled: true }));
+vi.mock('../../lib/firebase', () => ({ firebaseEnabled: true }));
 
 let mockFavoriteCities: Array<{ lat: number; lon: number; name: string }> = [];
 
-vi.mock('../context/AuthContext', () => ({
+vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({ favoriteCities: mockFavoriteCities }),
 }));
 
@@ -31,7 +31,7 @@ const mockUnsubscribeFromWeatherAlerts = vi.fn().mockResolvedValue(true);
 const mockSubscribeToTopic = vi.fn().mockResolvedValue(true);
 const mockUnsubscribeFromTopic = vi.fn().mockResolvedValue(true);
 
-vi.mock('../lib/messaging', () => ({
+vi.mock('../../lib/messaging', () => ({
   requestNotificationPermission: () => mockRequestPermission(),
   onForegroundMessage: (...args: unknown[]) => mockOnForegroundMessage(...args),
   subscribeToWeatherAlerts: (...args: unknown[]) => mockSubscribeToWeatherAlerts(...args),

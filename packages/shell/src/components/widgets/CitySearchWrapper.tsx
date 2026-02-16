@@ -1,8 +1,7 @@
 import React, { Suspense, lazy, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { eventBus, MFEvents } from '@mycircle/shared';
-import Loading from './Loading';
-import ErrorBoundary from './ErrorBoundary';
+import { Loading, ErrorBoundary } from '../common';
 
 const CitySearchMF = lazy(() => import('citySearch/CitySearch'));
 
