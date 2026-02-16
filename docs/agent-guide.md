@@ -364,6 +364,20 @@ pnpm --filter @mycircle/shell test:run
    pnpm --filter @mycircle/shared build
    ```
 
+5. **Delete e2e tests when removing features** — e2e tests live in the top-level `e2e/` directory, separate from component code. When deleting a feature, always search the whole repo (including `e2e/`) for references to the removed feature. Orphaned e2e tests cause persistent CI failures that are easy to miss.
+
+6. **Always set `type="button"` on non-submit buttons** — HTML `<button>` elements without an explicit `type` attribute default to `type="submit"`, which can accidentally trigger form submissions. This is especially common inside or near `<form>` elements and causes subtle bugs in tests that look for submit buttons:
+
+   ```tsx
+   // ✅ Correct — explicit type prevents accidental form submission
+   <button type="button" onClick={handleClose}>Close</button>
+   <button type="button" onClick={() => setTab('signUp')}>Sign Up</button>
+   <button type="submit">Submit Form</button>
+
+   // ❌ Wrong — defaults to type="submit", may trigger form unexpectedly
+   <button onClick={handleClose}>Close</button>
+   ```
+
 ### If CI Fails
 
 ```bash
