@@ -9,7 +9,7 @@ interface PodcastCardProps {
   onToggleSubscribe: (podcast: Podcast) => void;
 }
 
-export default function PodcastCard({
+function PodcastCard({
   podcast,
   onSelect,
   isSubscribed,
@@ -116,3 +116,5 @@ export default function PodcastCard({
     </div>
   );
 }
+
+export default React.memo(PodcastCard);

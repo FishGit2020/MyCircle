@@ -13,7 +13,7 @@ interface Props {
   sparklineData?: number[];
 }
 
-function MiniSparkline({ data }: { data: number[] }) {
+const MiniSparkline = React.memo(function MiniSparkline({ data }: { data: number[] }) {
   if (data.length < 2) return null;
 
   const width = 80;
@@ -54,9 +54,9 @@ function MiniSparkline({ data }: { data: number[] }) {
       />
     </svg>
   );
-}
+});
 
-export default function StockCard({
+function StockCard({
   symbol,
   companyName,
   quote,
@@ -169,3 +169,5 @@ export default function StockCard({
     </div>
   );
 }
+
+export default React.memo(StockCard);
