@@ -42,6 +42,12 @@ export default function HourlyForecast({ data }: Props) {
                 {Math.round(hour.pop * 100)}%
               </p>
             )}
+
+            {hour.wind_speed > 0 && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                {Math.round(hour.wind_speed)} m/s
+              </p>
+            )}
           </div>
         ))}
       </div>

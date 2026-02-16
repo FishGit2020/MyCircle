@@ -23,7 +23,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Enhanced city autocomplete** — inline recent city matching during search, localStorage fallback for non-auth users, "Clear all" recents
 - Search for cities worldwide with autocomplete
 - Current weather conditions with real-time live polling
-- 7-day forecast and 48-hour hourly forecast
+- **7-day forecast** with expandable daily details (day/night temps, humidity, wind speed) and 48-hour hourly forecast with wind speed indicators
 - Sun & visibility details (sunrise, sunset, daylight, visibility)
 - "What to Wear" clothing suggestions
 - **Activity suggestions** — weather-based outdoor/indoor activity recommendations (hiking, swimming, skiing, etc.) with collapsible card UI
@@ -34,6 +34,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Historical weather** — "This day last year" comparison using Open-Meteo archive API
 - **Air Quality Index** — real-time AQI with color-coded levels, expandable pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
 - Visible live/paused toggle with clear state indication
+- **Widget settings** — show/hide individual weather widgets with Show All, Hide All, and Reset to defaults controls
 - **Weather alerts** — subscribe to severe weather push notifications for your favorite cities; Cloud Function checks conditions every 30 minutes and sends FCM alerts for thunderstorms, heavy rain/snow, tornadoes, and other severe events
 
 ### Stocks & Crypto

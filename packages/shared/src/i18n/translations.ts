@@ -100,6 +100,12 @@ const en = {
   'dashboard.weatherMap': 'Weather Map',
   'dashboard.historicalWeather': 'This Day Last Year',
   'dashboard.airQuality': 'Air Quality',
+  'dashboard.showAll': 'Show All',
+  'dashboard.hideAll': 'Hide All',
+  'dashboard.resetDefaults': 'Reset',
+  'weather.dayTemp': 'Day',
+  'weather.nightTemp': 'Night',
+  'weather.forecastDetails': 'Details',
 
   // Air Quality
   'weather.airQuality': 'Air Quality Index',
@@ -952,6 +958,12 @@ const es: Record<TranslationKey, string> = {
   'dashboard.weatherMap': 'Mapa meteorol\u00f3gico',
   'dashboard.historicalWeather': 'Este d\u00eda el a\u00f1o pasado',
   'dashboard.airQuality': 'Calidad del aire',
+  'dashboard.showAll': 'Mostrar todo',
+  'dashboard.hideAll': 'Ocultar todo',
+  'dashboard.resetDefaults': 'Restablecer',
+  'weather.dayTemp': 'D\u00eda',
+  'weather.nightTemp': 'Noche',
+  'weather.forecastDetails': 'Detalles',
 
   // Air Quality
   'weather.airQuality': '\u00cdndice de calidad del aire',
@@ -1804,6 +1816,12 @@ const zh: Record<TranslationKey, string> = {
   'dashboard.weatherMap': '\u5929\u6c14\u5730\u56fe',
   'dashboard.historicalWeather': '\u53bb\u5e74\u4eca\u65e5',
   'dashboard.airQuality': '\u7a7a\u6c14\u8d28\u91cf',
+  'dashboard.showAll': '\u5168\u90e8\u663e\u793a',
+  'dashboard.hideAll': '\u5168\u90e8\u9690\u85cf',
+  'dashboard.resetDefaults': '\u91cd\u7f6e',
+  'weather.dayTemp': '\u767d\u5929',
+  'weather.nightTemp': '\u591c\u665a',
+  'weather.forecastDetails': '\u8be6\u60c5',
 
   // Air Quality
   'weather.airQuality': '\u7a7a\u6c14\u8d28\u91cf\u6307\u6570',
