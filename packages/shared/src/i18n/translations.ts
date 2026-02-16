@@ -11,6 +11,8 @@ const en = {
   'nav.ai': 'AI',
   'nav.compare': 'Compare',
   'nav.skipToContent': 'Skip to content',
+  'nav.breadcrumbLabel': 'Breadcrumb',
+  'nav.recentlyVisited': 'Recently Visited',
 
   // Home page
   'home.title': 'Welcome to MyCircle',
@@ -623,6 +625,7 @@ const en = {
   'commandPalette.goToWorship': 'Go to Worship',
   'commandPalette.goToAi': 'Go to AI Assistant',
   'commandPalette.goToNotebook': 'Go to Notebook',
+  'commandPalette.recentPages': 'Recent Pages',
 
   // Bottom nav
   'bottomNav.home': 'Home',
@@ -869,6 +872,8 @@ const es: Record<TranslationKey, string> = {
   'nav.ai': 'IA',
   'nav.compare': 'Comparar',
   'nav.skipToContent': 'Saltar al contenido',
+  'nav.breadcrumbLabel': 'Ruta de navegaci\u00f3n',
+  'nav.recentlyVisited': 'Visitados recientemente',
 
   // Home page
   'home.title': 'Bienvenido a MyCircle',
@@ -1481,6 +1486,7 @@ const es: Record<TranslationKey, string> = {
   'commandPalette.goToWorship': 'Ir a Adoraci\u00f3n',
   'commandPalette.goToAi': 'Ir a Asistente IA',
   'commandPalette.goToNotebook': 'Ir a Bloc de notas',
+  'commandPalette.recentPages': 'P\u00e1ginas recientes',
 
   // Bottom nav
   'bottomNav.home': 'Inicio',
@@ -1727,6 +1733,8 @@ const zh: Record<TranslationKey, string> = {
   'nav.ai': 'AI',
   'nav.compare': '\u5bf9\u6bd4',
   'nav.skipToContent': '\u8df3\u8f6c\u5230\u5185\u5bb9',
+  'nav.breadcrumbLabel': '\u9762\u5305\u5c51\u5bfc\u822a',
+  'nav.recentlyVisited': '\u6700\u8fd1\u8bbf\u95ee',
 
   // Home page
   'home.title': '\u6b22\u8fce\u6765\u5230 MyCircle',
@@ -2339,6 +2347,7 @@ const zh: Record<TranslationKey, string> = {
   'commandPalette.goToWorship': '\u524d\u5f80\u6572\u62dc',
   'commandPalette.goToAi': '\u524d\u5f80 AI \u52a9\u624b',
   'commandPalette.goToNotebook': '\u524d\u5f80\u7b14\u8bb0\u672c',
+  'commandPalette.recentPages': '\u6700\u8fd1\u9875\u9762',
 
   // Bottom nav
   'bottomNav.home': '\u9996\u9875',

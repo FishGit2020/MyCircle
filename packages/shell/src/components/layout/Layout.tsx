@@ -8,6 +8,7 @@ import FeedbackButton from './FeedbackButton';
 import OfflineIndicator from './OfflineIndicator';
 import CommandPalette from './CommandPalette';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
+import Breadcrumbs from './Breadcrumbs';
 import BottomNav from './BottomNav';
 import PwaInstallPrompt from './PwaInstallPrompt';
 import { NotificationBell } from '../notifications';
@@ -16,6 +17,8 @@ import { GlobalAudioPlayer } from '../player';
 import { useRemoteConfigContext } from '../../context/RemoteConfigContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { useFocusOnRouteChange } from '../../hooks/useFocusOnRouteChange';
+import { useRecentlyVisited } from '../../hooks/useRecentlyVisited';
 
 // Prefetch MFE remote modules on hover/focus to reduce perceived load time
 const prefetched = new Set<string>();
@@ -51,6 +54,9 @@ export default function Layout() {
     onToggleTheme: toggleTheme,
     onShowHelp: useCallback(() => setShortcutsOpen(true), []),
   });
+
+  useFocusOnRouteChange();
+  const { recent } = useRecentlyVisited();
 
   const handlePlayerStateChange = useCallback((active: boolean) => {
     setHasActivePlayer(active);
@@ -146,6 +152,8 @@ export default function Layout() {
         </div>
       </header>
 
+      <Breadcrumbs />
+
       <main
         id="main-content"
         className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'md:pb-24' : 'md:pb-8'}`}
@@ -157,7 +165,7 @@ export default function Layout() {
       <GlobalAudioPlayer onPlayerStateChange={handlePlayerStateChange} />
 
       <BottomNav hasActivePlayer={hasActivePlayer} />
-      <CommandPalette />
+      <CommandPalette recentPages={recent} />
       <KeyboardShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
 
       <FeedbackButton hasActivePlayer={hasActivePlayer} />

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
+import type { RecentPage } from '../../hooks/useRecentlyVisited';
 
 interface PaletteItem {
   id: string;
@@ -8,12 +9,35 @@ interface PaletteItem {
   description?: string;
   icon: React.ReactNode;
   action: () => void;
-  category: 'navigation' | 'search';
+  category: 'navigation' | 'recent';
 }
 
-export default function CommandPalette() {
+interface Props {
+  recentPages?: RecentPage[];
+}
+
+/** Map route paths to their i18n label keys */
+const ROUTE_LABEL_KEYS: Record<string, string> = {
+  '/weather': 'commandPalette.goToWeather',
+  '/stocks': 'commandPalette.goToStocks',
+  '/podcasts': 'commandPalette.goToPodcasts',
+  '/bible': 'commandPalette.goToBible',
+  '/worship': 'commandPalette.goToWorship',
+  '/notebook': 'commandPalette.goToNotebook',
+  '/baby': 'commandPalette.goToBaby',
+  '/ai': 'commandPalette.goToAi',
+};
+
+const clockIcon = (
+  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
+export default function CommandPalette({ recentPages = [] }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -40,6 +64,26 @@ export default function CommandPalette() {
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [open]);
+
+  // Build recent items from the recentPages prop (exclude current page)
+  const recentItems: PaletteItem[] = useMemo(() =>
+    recentPages
+      .filter(p => p.path !== location.pathname)
+      .slice(0, 3)
+      .map(p => {
+        const basePath = '/' + p.path.split('/').filter(Boolean)[0];
+        const labelKey = ROUTE_LABEL_KEYS[basePath];
+        return {
+          id: `recent-${p.path}`,
+          label: labelKey ? t(labelKey) : p.path,
+          description: p.path,
+          icon: clockIcon,
+          action: () => { navigate(p.path); setOpen(false); },
+          category: 'recent' as const,
+        };
+      }),
+    [recentPages, location.pathname, navigate, t]
+  );
 
   const navItems: PaletteItem[] = [
     {
@@ -89,34 +133,46 @@ export default function CommandPalette() {
     },
   ];
 
+  // Combine recent + nav for filtering; when searching, search across all items
+  const allItems = [...recentItems, ...navItems];
+
   const filtered = query.trim()
-    ? navItems.filter(item =>
+    ? allItems.filter(item =>
         item.label.toLowerCase().includes(query.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(query.toLowerCase()))
       )
-    : navItems;
+    : allItems;
+
+  // Split filtered results into recent and nav sections
+  const filteredRecent = filtered.filter(i => i.category === 'recent');
+  const filteredNav = filtered.filter(i => i.category === 'navigation');
+
+  // Flat list for keyboard navigation
+  const flatList = [...filteredRecent, ...filteredNav];
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(prev => Math.min(prev + 1, filtered.length - 1));
+      setSelectedIndex(prev => Math.min(prev + 1, flatList.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedIndex(prev => Math.max(prev - 1, 0));
-    } else if (e.key === 'Enter' && filtered[selectedIndex]) {
-      filtered[selectedIndex].action();
+    } else if (e.key === 'Enter' && flatList[selectedIndex]) {
+      flatList[selectedIndex].action();
     }
-  }, [filtered, selectedIndex]);
+  }, [flatList, selectedIndex]);
 
   // Scroll selected item into view
   useEffect(() => {
     if (listRef.current) {
-      const el = listRef.current.children[selectedIndex] as HTMLElement | undefined;
+      const el = listRef.current.querySelector(`[data-palette-index="${selectedIndex}"]`) as HTMLElement | null;
       el?.scrollIntoView({ block: 'nearest' });
     }
   }, [selectedIndex]);
 
   if (!open) return null;
+
+  let globalIndex = 0;
 
   return (
     <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh]">
@@ -146,31 +202,71 @@ export default function CommandPalette() {
 
         {/* Results */}
         <div ref={listRef} className="max-h-72 overflow-y-auto py-2">
-          {filtered.length === 0 ? (
+          {flatList.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-gray-400">{t('commandPalette.noResults')}</p>
           ) : (
             <>
-              <p className="px-4 py-1 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                {t('commandPalette.quickActions')}
-              </p>
-              {filtered.map((item, i) => (
-                <button
-                  key={item.id}
-                  onClick={item.action}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
-                    i === selectedIndex
-                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                  }`}
-                  onMouseEnter={() => setSelectedIndex(i)}
-                >
-                  <span className="flex-shrink-0 text-gray-400 dark:text-gray-500">{item.icon}</span>
-                  <span className="flex-1 font-medium">{item.label}</span>
-                  {item.description && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{item.description}</span>
-                  )}
-                </button>
-              ))}
+              {/* Recent pages section */}
+              {filteredRecent.length > 0 && (
+                <>
+                  <p className="px-4 py-1 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    {t('commandPalette.recentPages')}
+                  </p>
+                  {filteredRecent.map((item) => {
+                    const idx = globalIndex++;
+                    return (
+                      <button
+                        key={item.id}
+                        data-palette-index={idx}
+                        onClick={item.action}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
+                          idx === selectedIndex
+                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        }`}
+                        onMouseEnter={() => setSelectedIndex(idx)}
+                      >
+                        <span className="flex-shrink-0 text-gray-400 dark:text-gray-500">{item.icon}</span>
+                        <span className="flex-1 font-medium">{item.label}</span>
+                        {item.description && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{item.description}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </>
+              )}
+
+              {/* Navigation section */}
+              {filteredNav.length > 0 && (
+                <>
+                  <p className="px-4 py-1 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    {t('commandPalette.quickActions')}
+                  </p>
+                  {filteredNav.map((item) => {
+                    const idx = globalIndex++;
+                    return (
+                      <button
+                        key={item.id}
+                        data-palette-index={idx}
+                        onClick={item.action}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
+                          idx === selectedIndex
+                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        }`}
+                        onMouseEnter={() => setSelectedIndex(idx)}
+                      >
+                        <span className="flex-shrink-0 text-gray-400 dark:text-gray-500">{item.icon}</span>
+                        <span className="flex-1 font-medium">{item.label}</span>
+                        {item.description && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{item.description}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </>
+              )}
             </>
           )}
         </div>

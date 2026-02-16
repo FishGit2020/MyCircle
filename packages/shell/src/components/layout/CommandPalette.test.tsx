@@ -6,6 +6,7 @@ const mockNavigate = vi.fn();
 
 vi.mock('react-router', () => ({
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/', search: '', hash: '', state: null, key: 'default' }),
 }));
 
 vi.mock('@mycircle/shared', () => ({
@@ -124,5 +125,39 @@ describe('CommandPalette', () => {
     expect(screen.getByText('commandPalette.navigate')).toBeInTheDocument();
     expect(screen.getByText('commandPalette.select')).toBeInTheDocument();
     expect(screen.getByText('commandPalette.close')).toBeInTheDocument();
+  });
+
+  it('shows recent pages section when recentPages prop is provided', () => {
+    const recentPages = [
+      { path: '/weather', visitedAt: Date.now() },
+      { path: '/stocks', visitedAt: Date.now() - 1000 },
+    ];
+    render(<CommandPalette recentPages={recentPages} />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByText('commandPalette.recentPages')).toBeInTheDocument();
+  });
+
+  it('does not show recent pages section when recentPages is empty', () => {
+    render(<CommandPalette recentPages={[]} />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.queryByText('commandPalette.recentPages')).not.toBeInTheDocument();
+  });
+
+  it('navigates to recent page on Enter', () => {
+    const recentPages = [
+      { path: '/bible', visitedAt: Date.now() },
+    ];
+    render(<CommandPalette recentPages={recentPages} />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    const input = screen.getByPlaceholderText('commandPalette.placeholder');
+    // First item should be the recent page
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/bible');
   });
 });
