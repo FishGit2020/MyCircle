@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router';
 import { useTranslation, StorageKeys, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery, useUnits, formatTemperature } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
-import { useAuth } from '../context/AuthContext';
-import { useDailyVerse } from '../hooks/useDailyVerse';
+import { useAuth } from '../../context/AuthContext';
+import { useDailyVerse } from '../../hooks/useDailyVerse';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

@@ -2,12 +2,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import Layout from './Layout';
-import { ThemeProvider } from '../context/ThemeContext';
-import { AuthProvider } from '../context/AuthContext';
-import { RemoteConfigProvider } from '../context/RemoteConfigContext';
+import { ThemeProvider } from '../../context/ThemeContext';
+import { AuthProvider } from '../../context/AuthContext';
+import { RemoteConfigProvider } from '../../context/RemoteConfigContext';
 
 // Mock the firebase lib so AuthProvider doesn't need real Firebase
-vi.mock('../lib/firebase', () => ({
+vi.mock('../../lib/firebase', () => ({
   firebaseEnabled: false,
   app: null,
   auth: null,

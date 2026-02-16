@@ -191,7 +191,7 @@ Library consumed by all micro frontends. Not a standalone app.
 - Types (`City`, `CurrentWeather`, `ForecastDay`, `HistoricalWeatherDay`, `AirQuality`, `CryptoPrice`, etc.)
 - Hooks (`useWeatherData`, `useHistoricalWeather`, `useAirQuality`, `useCryptoPrices`)
 - i18n (`useTranslation`)
-- Utility functions (weather icons, formatting)
+- Utility functions (weather icons, formatting, `getErrorMessage`)
 
 ### Stock Tracker - `packages/stock-tracker/`
 
@@ -305,7 +305,7 @@ The shell uses a three-layer loading strategy to balance initial page load speed
 
 ### Layer 1 — Hover/Focus Prefetch
 
-**File:** `packages/shell/src/components/Layout.tsx`
+**File:** `packages/shell/src/components/layout/Layout.tsx`
 
 When a user hovers or focuses a navigation link, the shell fires a dynamic `import()` for that MFE's remote module. A `Set<string>` prevents duplicate loads.
 
@@ -822,24 +822,24 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | Component | File Path | Purpose |
 |-----------|-----------|---------|
 | **App (Shell)** | `packages/shell/src/App.tsx` | Routing, lazy MFE loading |
-| **Layout** | `packages/shell/src/components/Layout.tsx` | Header, nav, toggles, footer |
-| **CitySearchWrapper** | `packages/shell/src/components/CitySearchWrapper.tsx` | MFE host, event listener, city persistence |
-| **UseMyLocation** | `packages/shell/src/components/UseMyLocation.tsx` | Geolocation + reverse geocode |
-| **FavoriteCities** | `packages/shell/src/components/FavoriteCities.tsx` | Favorited cities grid |
-| **WeatherCompare** | `packages/shell/src/components/WeatherCompare.tsx` | Legacy multi-city comparison page |
+| **Layout** | `packages/shell/src/components/layout/Layout.tsx` | Header, nav, toggles, footer |
+| **CitySearchWrapper** | `packages/shell/src/components/widgets/CitySearchWrapper.tsx` | MFE host, event listener, city persistence |
+| **UseMyLocation** | `packages/shell/src/components/widgets/UseMyLocation.tsx` | Geolocation + reverse geocode |
+| **FavoriteCities** | `packages/shell/src/components/widgets/FavoriteCities.tsx` | Favorited cities grid |
+| **WeatherCompare** | `packages/shell/src/components/widgets/WeatherCompare.tsx` | Legacy multi-city comparison page |
 | **WeatherComparison** | `packages/weather-display/src/components/WeatherComparison.tsx` | Inline weather comparison (within weather detail) |
 | **HistoricalWeather** | `packages/weather-display/src/components/HistoricalWeather.tsx` | "This day last year" side-by-side comparison |
-| **WidgetDashboard** | `packages/shell/src/components/WidgetDashboard.tsx` | Drag-and-drop customizable widget grid |
-| **PwaInstallPrompt** | `packages/shell/src/components/PwaInstallPrompt.tsx` | Add to Home Screen banner |
+| **WidgetDashboard** | `packages/shell/src/components/widgets/WidgetDashboard.tsx` | Drag-and-drop customizable widget grid |
+| **PwaInstallPrompt** | `packages/shell/src/components/layout/PwaInstallPrompt.tsx` | Add to Home Screen banner |
 | **DashboardPage** | `packages/shell/src/pages/DashboardPage.tsx` | Dashboard homepage with quick access cards |
 | **SubscribedPodcasts** | `packages/podcast-player/src/components/SubscribedPodcasts.tsx` | Subscribed podcasts tab view |
-| **NotificationBell** | `packages/shell/src/components/NotificationBell.tsx` | Push notification UI |
-| **LanguageSelector** | `packages/shell/src/components/LanguageSelector.tsx` | i18n language picker |
-| **UnitToggle / SpeedToggle** | `packages/shell/src/components/UnitToggle.tsx` | °C/°F and wind speed toggles |
+| **NotificationBell** | `packages/shell/src/components/notifications/NotificationBell.tsx` | Push notification UI |
+| **LanguageSelector** | `packages/shell/src/components/layout/LanguageSelector.tsx` | i18n language picker |
+| **UnitToggle / SpeedToggle** | `packages/shell/src/components/settings/UnitToggle.tsx` | °C/°F and wind speed toggles |
 | **AuthContext** | `packages/shell/src/context/AuthContext.tsx` | User state, recent/favorite cities, profile ops |
 | **ThemeContext** | `packages/shell/src/context/ThemeContext.tsx` | Theme state, localStorage, system pref |
 | **RemoteConfigContext** | `packages/shell/src/context/RemoteConfigContext.tsx` | Firebase Remote Config feature flags |
-| **ThemeSync** | `packages/shell/src/components/ThemeSync.tsx` | Auth -> theme sync |
+| **ThemeSync** | `packages/shell/src/components/sync/ThemeSync.tsx` | Auth -> theme sync |
 | **Firebase Lib** | `packages/shell/src/lib/firebase.ts` | Firestore CRUD, auth, FCM, App Check |
 | **CitySearch** | `packages/city-search/src/components/CitySearch.tsx` | Search UI, debounce, event publishing |
 | **WeatherDisplay** | `packages/weather-display/src/components/WeatherDisplay.tsx` | Weather UI, event listener, subscriptions |
@@ -848,7 +848,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **StockTracker** | `packages/stock-tracker/src/components/StockTracker.tsx` | Stock quotes and watchlist |
 | **CryptoTracker** | `packages/stock-tracker/src/components/CryptoTracker.tsx` | Live crypto prices (CoinGecko) |
 | **useCryptoPrices** | `packages/shared/src/hooks/useCryptoPrices.ts` | Crypto price data fetching hook |
-| **GlobalAudioPlayer** | `packages/shell/src/components/GlobalAudioPlayer.tsx` | Persistent audio player (shell-level, survives route changes) |
+| **GlobalAudioPlayer** | `packages/shell/src/components/player/GlobalAudioPlayer.tsx` | Persistent audio player (shell-level, survives route changes) |
 | **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, event publishing |
 | **AiAssistant** | `packages/ai-assistant/src/components/AiAssistant.tsx` | AI chat UI (Gemini) |
 | **Event Bus** | `packages/shared/src/utils/eventBus.ts` | Cross-MFE communication |
@@ -899,8 +899,16 @@ mycircle/
 |   |       +-- index.ts         # Barrel exports
 |   +-- shell/                   # Host micro frontend
 |   |   +-- src/
-|   |       +-- components/      # Layout, toggles, UserMenu, NotificationBell, etc.
+|   |       +-- components/
+|   |       |   +-- layout/      # Layout, BottomNav, ThemeToggle, UserMenu, etc.
+|   |       |   +-- widgets/     # WidgetDashboard, CitySearchWrapper, FavoriteCities, etc.
+|   |       |   +-- notifications/ # NotificationBell, WhatsNew, WhatsNewButton
+|   |       |   +-- player/      # GlobalAudioPlayer
+|   |       |   +-- common/      # Loading, ErrorBoundary
+|   |       |   +-- settings/    # UnitToggle, SpeedToggle
+|   |       |   +-- sync/        # ThemeSync, DataSync, ReloadPrompt, Onboarding
 |   |       +-- context/         # AuthContext, ThemeContext, RemoteConfigContext
+|   |       +-- hooks/           # useDailyVerse, useAnnouncements
 |   |       +-- lib/             # Firebase integration (auth, Firestore, FCM, App Check)
 |   |       +-- App.tsx          # Routes & providers
 |   +-- city-search/             # City search micro frontend

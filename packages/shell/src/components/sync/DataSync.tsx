@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { WindowEvents, StorageKeys } from '@mycircle/shared';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 /**
  * Invisible component that bridges MFE localStorage events to Firestore.

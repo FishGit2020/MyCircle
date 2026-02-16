@@ -1,6 +1,6 @@
 import React from 'react';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();

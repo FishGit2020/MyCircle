@@ -2,11 +2,8 @@ import React from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
-import UseMyLocation from '../components/UseMyLocation';
-import CitySearchWrapper from '../components/CitySearchWrapper';
-import FavoriteCities from '../components/FavoriteCities';
-import UnitToggle from '../components/UnitToggle';
-import SpeedToggle from '../components/SpeedToggle';
+import { UseMyLocation, CitySearchWrapper, FavoriteCities } from '../components/widgets';
+import { UnitToggle, SpeedToggle } from '../components/settings';
 
 export default function WeatherLandingPage() {
   const { t } = useTranslation();

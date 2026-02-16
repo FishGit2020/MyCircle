@@ -49,3 +49,6 @@ ui-debug.log
 .runtimeconfig.json
 functions/lib/
 auth-users.json
+
+# Stray scripts
+replace_weather.ps1

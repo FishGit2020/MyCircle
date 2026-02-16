@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
-import { requestNotificationPermission, onForegroundMessage, subscribeToWeatherAlerts, unsubscribeFromWeatherAlerts, subscribeToTopic, unsubscribeFromTopic } from '../lib/messaging';
-import { firebaseEnabled } from '../lib/firebase';
-import { useAuth } from '../context/AuthContext';
+import { requestNotificationPermission, onForegroundMessage, subscribeToWeatherAlerts, unsubscribeFromWeatherAlerts, subscribeToTopic, unsubscribeFromTopic } from '../../lib/messaging';
+import { firebaseEnabled } from '../../lib/firebase';
+import { useAuth } from '../../context/AuthContext';
 
 export default function NotificationBell() {
   const { t } = useTranslation();

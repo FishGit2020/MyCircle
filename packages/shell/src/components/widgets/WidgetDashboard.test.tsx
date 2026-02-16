@@ -30,7 +30,7 @@ vi.mock('@mycircle/shared', () => ({
   getAllDailyVerses: () => [{ reference: 'Test 1:1' }],
 }));
 
-vi.mock('../context/AuthContext', () => ({
+vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     favoriteCities: [],

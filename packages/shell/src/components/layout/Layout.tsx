@@ -3,16 +3,16 @@ import { Outlet, Link, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
-import NotificationBell from './NotificationBell';
-import WhatsNewButton from './WhatsNewButton';
-import OfflineIndicator from './OfflineIndicator';
 import LanguageSelector from './LanguageSelector';
 import FeedbackButton from './FeedbackButton';
-import GlobalAudioPlayer from './GlobalAudioPlayer';
+import OfflineIndicator from './OfflineIndicator';
 import CommandPalette from './CommandPalette';
 import BottomNav from './BottomNav';
 import PwaInstallPrompt from './PwaInstallPrompt';
-import { useRemoteConfigContext } from '../context/RemoteConfigContext';
+import { NotificationBell } from '../notifications';
+import { WhatsNewButton } from '../notifications';
+import { GlobalAudioPlayer } from '../player';
+import { useRemoteConfigContext } from '../../context/RemoteConfigContext';
 
 // Prefetch MFE remote modules on hover/focus to reduce perceived load time
 const prefetched = new Set<string>();

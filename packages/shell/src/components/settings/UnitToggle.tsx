@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { eventBus, MFEvents, WindowEvents, StorageKeys } from '@mycircle/shared';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function UnitToggle() {
   const { user, updateTempUnit } = useAuth();

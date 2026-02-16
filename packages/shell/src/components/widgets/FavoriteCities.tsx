@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@apollo/client/react';
 import { GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature, useTranslation } from '@mycircle/shared';
-import { useAuth } from '../context/AuthContext';
-import { FavoriteCity } from '../lib/firebase';
+import { useAuth } from '../../context/AuthContext';
+import { FavoriteCity } from '../../lib/firebase';
 
 interface WeatherCardData {
   currentWeather: {

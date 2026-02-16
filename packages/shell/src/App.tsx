@@ -1,12 +1,10 @@
 import React, { Suspense, lazy, useState, useRef } from 'react';
 import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
-import Layout from './components/Layout';
-import Loading from './components/Loading';
-import ErrorBoundary from './components/ErrorBoundary';
-import UnitToggle from './components/UnitToggle';
-import SpeedToggle from './components/SpeedToggle';
-import WeatherCompare from './components/WeatherCompare';
+import { Layout } from './components/layout';
+import { Loading, ErrorBoundary } from './components/common';
+import { UnitToggle, SpeedToggle } from './components/settings';
+import { WeatherCompare } from './components/widgets';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
 import { useAuth } from './context/AuthContext';
