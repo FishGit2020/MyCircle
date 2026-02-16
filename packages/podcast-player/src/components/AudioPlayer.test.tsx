@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import AudioPlayer from './AudioPlayer';
@@ -60,6 +60,7 @@ const renderWithProviders = (ui: React.ReactElement) => {
 describe('AudioPlayer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   it('renders nothing when no episode is provided', () => {
@@ -193,6 +194,42 @@ describe('AudioPlayer', () => {
     expect(text).toContain('Test Episode Title');
     expect(text).toContain('Test Podcast');
     expect(text).toContain('https://example.com/episode.mp3');
+  });
+
+  it('persists playback speed to localStorage on change', () => {
+    renderWithProviders(
+      <AudioPlayer episode={mockEpisode} podcast={mockPodcast} onClose={vi.fn()} />
+    );
+    // Click the desktop speed button then select 1.5x
+    const speedButtons = screen.getAllByLabelText('Playback speed');
+    fireEvent.click(speedButtons[0]);
+    fireEvent.click(screen.getByText('1.5x'));
+
+    expect(localStorage.getItem('podcast-speed')).toBe('1.5');
+  });
+
+  it('restores saved playback speed from localStorage', () => {
+    localStorage.setItem('podcast-speed', '2');
+    renderWithProviders(
+      <AudioPlayer episode={mockEpisode} podcast={mockPodcast} onClose={vi.fn()} />
+    );
+    // Both desktop and mobile speed buttons should show 2x
+    const speedButtons = screen.getAllByLabelText('Playback speed');
+    expect(speedButtons[0].textContent).toBe('2x');
+  });
+
+  it('saves progress to localStorage on close', () => {
+    renderWithProviders(
+      <AudioPlayer episode={mockEpisode} podcast={mockPodcast} onClose={vi.fn()} />
+    );
+    const closeButtons = screen.getAllByLabelText('Close player');
+    fireEvent.click(closeButtons[0]);
+
+    const saved = localStorage.getItem('podcast-progress');
+    expect(saved).not.toBeNull();
+    const data = JSON.parse(saved!);
+    expect(data.episodeId).toBe(mockEpisode.id);
+    expect(typeof data.currentTime).toBe('number');
   });
 
   it('attaches event listeners when episode changes from null to non-null', () => {
