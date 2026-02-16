@@ -24,6 +24,11 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
   const [tagsInput, setTagsInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [touched, setTouched] = useState<{ title: boolean; content: boolean }>({ title: false, content: false });
+
+  const titleEmpty = !title.trim();
+  const contentEmpty = !content.trim();
+  const canSave = !saving && !titleEmpty && !contentEmpty;
 
   useEffect(() => {
     if (song) {
@@ -112,8 +117,18 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
             required
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            onBlur={() => setTouched(prev => ({ ...prev, title: true }))}
+            aria-invalid={touched.title && titleEmpty ? 'true' : undefined}
+            aria-describedby={touched.title && titleEmpty ? 'song-title-error' : undefined}
+            className={`w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+              touched.title && titleEmpty ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+            }`}
           />
+          {touched.title && titleEmpty && (
+            <p id="song-title-error" role="alert" className="mt-1 text-xs text-red-600 dark:text-red-400">
+              {t('worship.fieldRequired')}
+            </p>
+          )}
         </div>
 
         {/* Artist */}
@@ -191,9 +206,19 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
             required
             value={content}
             onChange={e => setContent(e.target.value)}
+            onBlur={() => setTouched(prev => ({ ...prev, content: true }))}
+            aria-invalid={touched.content && contentEmpty ? 'true' : undefined}
+            aria-describedby={touched.content && contentEmpty ? 'song-content-error' : undefined}
             rows={12}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-mono text-sm leading-relaxed resize-y"
+            className={`w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none font-mono text-sm leading-relaxed resize-y ${
+              touched.content && contentEmpty ? 'border-red-500 dark:border-red-400' : 'border-gray-300 dark:border-gray-600'
+            }`}
           />
+          {touched.content && contentEmpty && (
+            <p id="song-content-error" role="alert" className="mt-1 text-xs text-red-600 dark:text-red-400">
+              {t('worship.fieldRequired')}
+            </p>
+          )}
         </div>
 
         {/* Notes */}
@@ -267,10 +292,16 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 pt-2">
+        <div className="space-y-2 pt-2">
+          {!canSave && !saving && (titleEmpty || contentEmpty) && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              {t('worship.fillRequiredFields')}
+            </p>
+          )}
+          <div className="flex items-center gap-3">
           <button
             type="submit"
-            disabled={saving || !title.trim() || !content.trim()}
+            disabled={!canSave}
             className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? t('worship.saving') : t('worship.save')}
@@ -317,6 +348,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
               )}
             </div>
           )}
+          </div>
         </div>
       </form>
     </div>
