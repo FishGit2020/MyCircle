@@ -329,6 +329,11 @@ A breadcrumb trail renders below the header on all feature pages (`/weather`, `/
 
 Tracks the last 5 visited routes (excluding `/` and `/compare`) in `StorageKeys.RECENTLY_VISITED`. Surfaces recent pages in the command palette (Ctrl+K) as a "Recent Pages" section above the navigation items.
 
+### Cross-Package Content Search
+**File:** `packages/shell/src/hooks/useSearchableContent.ts`
+
+Reads user-owned data from localStorage (stock watchlist, Bible bookmarks) and surfaces them as searchable items in the command palette (Ctrl+K). Content is read fresh each time the palette opens via a `useMemo` dependency on the `open` state, avoiding the need for cross-package event listeners. Results appear in a "Your Content" section between "Recent Pages" and "Quick Actions".
+
 ### Focus Management
 **File:** `packages/shell/src/hooks/useFocusOnRouteChange.ts`
 

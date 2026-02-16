@@ -11,6 +11,10 @@ vi.mock('react-router', () => ({
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  StorageKeys: {
+    STOCK_WATCHLIST: 'stock-tracker-watchlist',
+    BIBLE_BOOKMARKS: 'bible-bookmarks',
+  },
 }));
 
 beforeEach(() => {
@@ -159,5 +163,47 @@ describe('CommandPalette', () => {
     // First item should be the recent page
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(mockNavigate).toHaveBeenCalledWith('/bible');
+  });
+
+  it('shows content section when stocks exist in localStorage', () => {
+    localStorage.setItem('stock-tracker-watchlist', JSON.stringify([
+      { symbol: 'AAPL', companyName: 'Apple Inc' },
+    ]));
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByText('commandPalette.yourContent')).toBeInTheDocument();
+    expect(screen.getByText('AAPL')).toBeInTheDocument();
+    localStorage.removeItem('stock-tracker-watchlist');
+  });
+
+  it('shows bookmark content when Bible bookmarks exist', () => {
+    localStorage.setItem('bible-bookmarks', JSON.stringify([
+      { book: 'John', chapter: 3, label: 'John 3:16' },
+    ]));
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByText('John 3:16')).toBeInTheDocument();
+    localStorage.removeItem('bible-bookmarks');
+  });
+
+  it('filters content items by query', () => {
+    localStorage.setItem('stock-tracker-watchlist', JSON.stringify([
+      { symbol: 'AAPL', companyName: 'Apple Inc' },
+      { symbol: 'MSFT', companyName: 'Microsoft Corp' },
+    ]));
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    const input = screen.getByPlaceholderText('commandPalette.placeholder');
+    fireEvent.change(input, { target: { value: 'Apple' } });
+
+    expect(screen.getByText('AAPL')).toBeInTheDocument();
+    expect(screen.queryByText('MSFT')).not.toBeInTheDocument();
+    localStorage.removeItem('stock-tracker-watchlist');
   });
 });

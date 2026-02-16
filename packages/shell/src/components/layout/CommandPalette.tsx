@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import type { RecentPage } from '../../hooks/useRecentlyVisited';
+import { useSearchableContent } from '../../hooks/useSearchableContent';
 
 interface PaletteItem {
   id: string;
@@ -9,7 +10,7 @@ interface PaletteItem {
   description?: string;
   icon: React.ReactNode;
   action: () => void;
-  category: 'navigation' | 'recent';
+  category: 'navigation' | 'recent' | 'content';
 }
 
 interface Props {
@@ -85,6 +86,29 @@ export default function CommandPalette({ recentPages = [] }: Props) {
     [recentPages, location.pathname, navigate, t]
   );
 
+  // Cross-package content search (stocks, bookmarks)
+  const searchableContent = useSearchableContent(open);
+  const contentItems: PaletteItem[] = useMemo(() => {
+    const stockIcon = (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+    );
+    const bookmarkIcon = (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+    );
+    return searchableContent.map(item => ({
+      id: `content-${item.id}`,
+      label: item.label,
+      description: item.description,
+      icon: item.type === 'stock' ? stockIcon : bookmarkIcon,
+      action: () => { navigate(item.route); setOpen(false); },
+      category: 'content' as const,
+    }));
+  }, [searchableContent, navigate]);
+
   const navItems: PaletteItem[] = [
     {
       id: 'nav-home', label: t('bottomNav.home'), description: '/',
@@ -133,8 +157,8 @@ export default function CommandPalette({ recentPages = [] }: Props) {
     },
   ];
 
-  // Combine recent + nav for filtering; when searching, search across all items
-  const allItems = [...recentItems, ...navItems];
+  // Combine recent + content + nav for filtering
+  const allItems = [...recentItems, ...contentItems, ...navItems];
 
   const filtered = query.trim()
     ? allItems.filter(item =>
@@ -143,12 +167,13 @@ export default function CommandPalette({ recentPages = [] }: Props) {
       )
     : allItems;
 
-  // Split filtered results into recent and nav sections
+  // Split filtered results into sections
   const filteredRecent = filtered.filter(i => i.category === 'recent');
+  const filteredContent = filtered.filter(i => i.category === 'content');
   const filteredNav = filtered.filter(i => i.category === 'navigation');
 
   // Flat list for keyboard navigation
-  const flatList = [...filteredRecent, ...filteredNav];
+  const flatList = [...filteredRecent, ...filteredContent, ...filteredNav];
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
@@ -213,6 +238,37 @@ export default function CommandPalette({ recentPages = [] }: Props) {
                     {t('commandPalette.recentPages')}
                   </p>
                   {filteredRecent.map((item) => {
+                    const idx = globalIndex++;
+                    return (
+                      <button
+                        key={item.id}
+                        data-palette-index={idx}
+                        onClick={item.action}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
+                          idx === selectedIndex
+                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        }`}
+                        onMouseEnter={() => setSelectedIndex(idx)}
+                      >
+                        <span className="flex-shrink-0 text-gray-400 dark:text-gray-500">{item.icon}</span>
+                        <span className="flex-1 font-medium">{item.label}</span>
+                        {item.description && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">{item.description}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </>
+              )}
+
+              {/* Content section (stocks, bookmarks) */}
+              {filteredContent.length > 0 && (
+                <>
+                  <p className="px-4 py-1 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                    {t('commandPalette.yourContent')}
+                  </p>
+                  {filteredContent.map((item) => {
                     const idx = globalIndex++;
                     return (
                       <button
