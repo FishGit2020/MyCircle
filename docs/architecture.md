@@ -382,7 +382,7 @@ const WeatherDisplayMF = lazy(() => import('weatherDisplay/WeatherDisplay'));
 
 **File:** `packages/shell/vite.config.ts` (Workbox runtime caching)
 
-The PWA service worker caches `remoteEntry.js` files with a `NetworkFirst` strategy. On repeat visits, cached manifests are served instantly while a fresh copy is fetched in the background.
+The PWA service worker caches `remoteEntry.js` files with a `NetworkFirst` strategy. On repeat visits, cached manifests are served instantly while a fresh copy is fetched in the background. External images (podcast artwork, weather icons) are cached with `CacheFirst` (30-day TTL, 200 max entries) so they remain visible offline.
 
 ```typescript
 {

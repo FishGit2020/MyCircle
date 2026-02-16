@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import type { Episode, Podcast } from '../hooks/usePodcastData';
 
 interface AudioPlayerProps {
@@ -9,6 +9,31 @@ interface AudioPlayerProps {
 }
 
 const PLAYBACK_SPEEDS = [0.5, 1, 1.25, 1.5, 2];
+const PROGRESS_SAVE_INTERVAL = 5000; // Save progress every 5 seconds
+
+function loadSavedSpeed(): number {
+  try {
+    const saved = localStorage.getItem(StorageKeys.PODCAST_SPEED);
+    if (saved) {
+      const speed = parseFloat(saved);
+      if (PLAYBACK_SPEEDS.includes(speed)) return speed;
+    }
+  } catch { /* ignore */ }
+  return 1;
+}
+
+function loadSavedProgress(episodeId: number): number {
+  try {
+    const saved = localStorage.getItem(StorageKeys.PODCAST_PROGRESS);
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data.episodeId === episodeId && typeof data.currentTime === 'number') {
+        return data.currentTime;
+      }
+    }
+  } catch { /* ignore */ }
+  return 0;
+}
 
 function formatTime(seconds: number): string {
   if (!isFinite(seconds) || seconds < 0) return '0:00';
@@ -27,7 +52,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [playbackSpeed, setPlaybackSpeed] = useState(loadSavedSpeed);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const speedMenuRef = useRef<HTMLDivElement>(null);
@@ -38,6 +63,13 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
 
     audio.src = episode.enclosureUrl;
     audio.playbackRate = playbackSpeed;
+
+    // Restore saved progress for this episode
+    const savedTime = loadSavedProgress(episode.id);
+    if (savedTime > 0) {
+      audio.currentTime = savedTime;
+    }
+
     const playPromise = audio.play();
     if (playPromise && typeof playPromise.then === 'function') {
       playPromise.then(() => {
@@ -50,6 +82,23 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     return () => {
       audio.pause();
     };
+  }, [episode?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist playback progress periodically
+  useEffect(() => {
+    if (!episode) return;
+    const interval = setInterval(() => {
+      const audio = audioRef.current;
+      if (audio && audio.currentTime > 0) {
+        try {
+          localStorage.setItem(
+            StorageKeys.PODCAST_PROGRESS,
+            JSON.stringify({ episodeId: episode.id, currentTime: audio.currentTime })
+          );
+        } catch { /* ignore */ }
+      }
+    }, PROGRESS_SAVE_INTERVAL);
+    return () => clearInterval(interval);
   }, [episode?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -131,11 +180,21 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     }
     setPlaybackSpeed(speed);
     setShowSpeedMenu(false);
+    try {
+      localStorage.setItem(StorageKeys.PODCAST_SPEED, String(speed));
+    } catch { /* ignore */ }
   }, []);
 
   const handleClose = useCallback(() => {
     const audio = audioRef.current;
-    if (audio) {
+    if (audio && episode) {
+      // Save final progress before closing
+      try {
+        localStorage.setItem(
+          StorageKeys.PODCAST_PROGRESS,
+          JSON.stringify({ episodeId: episode.id, currentTime: audio.currentTime })
+        );
+      } catch { /* ignore */ }
       audio.pause();
       audio.src = '';
     }
@@ -143,7 +202,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
     setCurrentTime(0);
     setDuration(0);
     onClose();
-  }, [onClose]);
+  }, [onClose, episode]);
 
   const handleShare = useCallback(async () => {
     if (!episode) return;
