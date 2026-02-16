@@ -195,7 +195,7 @@ function WeatherWidget() {
           )}
         </div>
       ) : !current ? (
-        <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noFavoriteCity')}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noFavoriteCity')}</p>
       ) : null}
     </div>
   );
@@ -237,7 +237,7 @@ function StockWidget() {
           )}
         </div>
       ) : (
-        <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noStocks')}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noStocks')}</p>
       )}
     </div>
   );
@@ -343,7 +343,7 @@ function NowPlayingWidget() {
           </div>
         </div>
       ) : (
-        <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.nothingPlaying')}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.nothingPlaying')}</p>
       )}
     </div>
   );
@@ -378,7 +378,7 @@ function NotebookWidget() {
           {t('notebook.noteCount').replace('{count}', String(noteCount))}
         </p>
       ) : (
-        <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noNotes')}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noNotes')}</p>
       )}
     </div>
   );
@@ -496,7 +496,7 @@ function BabyTrackerWidget() {
           </div>
         </>
       ) : (
-        <p className="text-xs text-gray-400 dark:text-gray-500">{t('widgets.noDueDate')}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noDueDate')}</p>
       )}
     </div>
   );
@@ -626,7 +626,7 @@ export default function WidgetDashboard() {
           )}
           <button
             onClick={() => setEditing(e => !e)}
-            className="text-sm font-medium text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
             aria-pressed={editing}
           >
             {editing ? t('widgets.done') : t('widgets.customize')}
@@ -664,7 +664,7 @@ export default function WidgetDashboard() {
               >
                 <div className="flex items-center gap-2 mb-2">
                   {/* Drag handle */}
-                  <span className="text-gray-400 dark:text-gray-500 select-none" aria-hidden="true">
+                  <span className="text-gray-500 dark:text-gray-400 select-none" aria-hidden="true">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
                       <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />

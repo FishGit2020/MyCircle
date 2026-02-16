@@ -246,7 +246,7 @@ export default function Layout() {
                   key={key}
                   className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-700 text-gray-300"
                 >
-                  {key}: <span className="ml-1 font-mono text-blue-400">{value}</span>
+                  {key}: <span className="ml-1 font-mono text-blue-300">{value}</span>
                 </span>
               ))}
             </div>
