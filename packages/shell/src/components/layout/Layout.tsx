@@ -7,12 +7,15 @@ import LanguageSelector from './LanguageSelector';
 import FeedbackButton from './FeedbackButton';
 import OfflineIndicator from './OfflineIndicator';
 import CommandPalette from './CommandPalette';
+import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 import BottomNav from './BottomNav';
 import PwaInstallPrompt from './PwaInstallPrompt';
 import { NotificationBell } from '../notifications';
 import { WhatsNewButton } from '../notifications';
 import { GlobalAudioPlayer } from '../player';
 import { useRemoteConfigContext } from '../../context/RemoteConfigContext';
+import { useTheme } from '../../context/ThemeContext';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 
 // Prefetch MFE remote modules on hover/focus to reduce perceived load time
 const prefetched = new Set<string>();
@@ -39,8 +42,15 @@ function prefetchRoute(path: string) {
 export default function Layout() {
   const { t } = useTranslation();
   const { config, loading: configLoading } = useRemoteConfigContext();
+  const { toggleTheme } = useTheme();
   const [hasActivePlayer, setHasActivePlayer] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const location = useLocation();
+
+  useKeyboardShortcuts({
+    onToggleTheme: toggleTheme,
+    onShowHelp: useCallback(() => setShortcutsOpen(true), []),
+  });
 
   const handlePlayerStateChange = useCallback((active: boolean) => {
     setHasActivePlayer(active);
@@ -92,7 +102,7 @@ export default function Layout() {
                 {t('nav.podcasts')}
               </Link>
               <Link to="/bible" className={navLinkClass('/bible')} onMouseEnter={() => prefetchRoute('/bible')} onFocus={() => prefetchRoute('/bible')}>
-                Bible
+                {t('nav.bible')}
               </Link>
               <Link to="/worship" className={navLinkClass('/worship')} onMouseEnter={() => prefetchRoute('/worship')} onFocus={() => prefetchRoute('/worship')}>
                 {t('nav.worship')}
@@ -114,7 +124,7 @@ export default function Layout() {
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <span className="hidden lg:inline">Search</span>
+                <span className="hidden lg:inline">{t('search.search')}</span>
                 <kbd className="hidden lg:inline px-1 py-0.5 bg-white dark:bg-gray-800 rounded text-[10px] border border-gray-200 dark:border-gray-600">Ctrl+K</kbd>
               </button>
               <LanguageSelector />
@@ -148,6 +158,7 @@ export default function Layout() {
 
       <BottomNav hasActivePlayer={hasActivePlayer} />
       <CommandPalette />
+      <KeyboardShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
 
       <FeedbackButton hasActivePlayer={hasActivePlayer} />
       <PwaInstallPrompt />

@@ -109,6 +109,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Firebase Remote Config for feature flags
 - GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ)
 - **Centralized Tailwind CSS** — single Tailwind build in the shell host scans all MFE sources, eliminating duplicate utility classes and specificity conflicts
+- **Keyboard shortcuts** — `Ctrl/Cmd+K` command palette, `Ctrl/Cmd+D` dark mode toggle, `g` then letter for quick navigation (e.g., `g w` for Weather), `?` for shortcuts help
 
 ## Architecture
 
