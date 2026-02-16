@@ -42,7 +42,10 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 focus:outline-none"
+        className="flex items-center space-x-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label={t('auth.userMenu')}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         {user.photoURL ? (
           <img
@@ -58,7 +61,7 @@ export default function UserMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+        <div role="menu" className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
           <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
             <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
               {user.displayName || 'User'}
@@ -68,6 +71,7 @@ export default function UserMenu() {
             </p>
           </div>
           <button
+            role="menuitem"
             onClick={() => {
               signOut();
               setIsOpen(false);

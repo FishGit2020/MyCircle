@@ -314,7 +314,7 @@ export default function NotificationBell() {
 
       {/* Foreground toast notification */}
       {toast && (
-        <div className="fixed top-4 right-4 z-[100] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 max-w-sm animate-slide-in">
+        <div role="alert" aria-live="assertive" className="fixed top-4 right-4 z-[100] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 max-w-sm animate-slide-in">
           {toast.title && <p className="font-semibold dark:text-white">{toast.title}</p>}
           {toast.body && <p className="text-sm text-gray-600 dark:text-gray-300">{toast.body}</p>}
         </div>
