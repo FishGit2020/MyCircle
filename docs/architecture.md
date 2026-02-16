@@ -1153,3 +1153,6 @@ The shell host initializes `@sentry/react` in `main.tsx` before `createRoot()` (
 
 ### Web Vitals
 Core Web Vitals are measured using the `web-vitals` library via `reportWebVitals()` from `@mycircle/shared`. Metrics reported: LCP, CLS, INP, FCP, TTFB. Each metric includes the current route path for per-MFE analysis. In development, metrics are logged to the console. In production, metrics are sent via `navigator.sendBeacon('/api/vitals')`.
+
+### Lighthouse CI
+Every pull request triggers a Lighthouse CI run (`.github/workflows/lighthouse.yml`) that builds the shell and audits it against four categories. Accessibility is gated at ≥ 90 (`error` level), while performance, best practices, and SEO use `warn` at ≥ 80-90. Results are uploaded to Lighthouse's temporary public storage. Configuration lives in `.lighthouserc.json`.
