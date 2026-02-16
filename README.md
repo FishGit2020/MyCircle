@@ -128,7 +128,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Navigation & discovery** — breadcrumb trail on all feature pages, recently-visited pages in command palette (Ctrl+K), **cross-package content search** (stocks, Bible bookmarks searchable from Ctrl+K palette), focus management on route change for screen readers
 - **Keyboard shortcuts** — `Ctrl/Cmd+K` command palette, `Ctrl/Cmd+D` dark mode toggle, `g` then letter for quick navigation (e.g., `g w` for Weather), `?` for shortcuts help
 - **Accessibility** — ARIA live regions for loading/offline states, `role="alert"` for toast notifications, `aria-expanded`/`aria-haspopup` on menus, sr-only text for color-dependent stock indicators, `aria-valuetext` on audio progress bars, keyboard-focusable scroll regions, WCAG AA color contrast compliance (≥ 4.5:1 on all text elements including widget placeholders, buttons, and footer badges), 24px minimum touch targets
-- **Performance** — production JS minification via esbuild (shell host + all 9 remote MFEs), CSS code splitting, `React.memo` on list item components (PodcastCard, StockCard, CryptoCard), paginated episode list with "Show more" button, `useCallback` for stable handler references
+- **Performance** — production JS minification via esbuild with `drop: ['console', 'debugger']` and `legalComments: 'none'` (shell host + all 9 remote MFEs), CSS minification via cssnano in PostCSS pipeline, lazy federation shared deps (`eager: false` on `@apollo/client` and `graphql`), CSS code splitting, `React.memo` on list item components (PodcastCard, StockCard, CryptoCard), paginated episode list with "Show more" button, `useCallback` for stable handler references
 - **Lighthouse CI** — automated Lighthouse scoring on every PR (accessibility ≥ 90 required, performance/SEO/best-practices ≥ 80-90 warned)
 
 ## Architecture
@@ -597,8 +597,8 @@ federation({
     react:              { singleton: true, requiredVersion: '^18.2.0' },
     'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
     'react-router':     { singleton: true, requiredVersion: '^7' },
-    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1' },
-    graphql:            { singleton: true, requiredVersion: '^16.12.0' },
+    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1', eager: false },
+    graphql:            { singleton: true, requiredVersion: '^16.12.0', eager: false },
     '@mycircle/shared': { singleton: true },
   }
 })
@@ -617,8 +617,8 @@ federation({
     react:              { singleton: true, requiredVersion: '^18.2.0' },
     'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
     'react-router':     { singleton: true, requiredVersion: '^7' },
-    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1' },
-    graphql:            { singleton: true, requiredVersion: '^16.12.0' },
+    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1', eager: false },
+    graphql:            { singleton: true, requiredVersion: '^16.12.0', eager: false },
     '@mycircle/shared': { singleton: true },
   }
 })
