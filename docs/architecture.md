@@ -183,13 +183,14 @@ Exposes `WeatherDisplay`, `CurrentWeather`, and `Forecast` components.
 - **Historical weather comparison** — "This day last year" using Open-Meteo archive API via `useHistoricalWeather` hook
 - **Air Quality Index** — real-time AQI (1-5 European scale) with color-coded levels (Good/Fair/Moderate/Poor/Very Poor), expandable pollutant breakdown via `useAirQuality` hook
 - Shows a "Live" badge when WebSocket subscription is active
+- **DashboardSettings** widget visibility panel with Show All / Hide All / Reset to defaults quick actions
 
 **Data Displayed:**
 | Component | Data Points |
 |-----------|------------|
 | **CurrentWeather** | Temperature, feels-like, weather icon, description, humidity, wind speed + direction, pressure, cloudiness |
-| **HourlyForecast** | 48-hour forecast with temp, icon, rain probability |
-| **Forecast** | 7-day grid with date, icon, max/min temps, description, rain probability |
+| **HourlyForecast** | 48-hour forecast with temp, icon, rain probability, wind speed |
+| **Forecast** | 7-day grid with date, icon, max/min temps, description, rain probability; expandable details showing day/night temps, humidity, wind speed |
 | **HistoricalWeather** | Side-by-side comparison of today vs same day last year (temp high/low, precipitation, wind, weather condition) |
 | **AirQuality** | AQI level badge, color-coded scale bar, expandable pollutant grid (PM2.5, PM10, O₃, NO₂, SO₂, CO) |
 | **ActivitySuggestions** | Weather-based outdoor/indoor activity recommendations with collapsible card UI |

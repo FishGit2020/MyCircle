@@ -100,6 +100,17 @@ export default function DashboardSettings({ visibility, onChange }: Props) {
     saveWidgetVisibility(updated);
   };
 
+  const setAll = (value: boolean) => {
+    const updated = Object.fromEntries(WIDGET_KEYS.map(k => [k, value])) as WidgetVisibility;
+    onChange(updated);
+    saveWidgetVisibility(updated);
+  };
+
+  const resetDefaults = () => {
+    onChange(DEFAULT_VISIBILITY);
+    saveWidgetVisibility(DEFAULT_VISIBILITY);
+  };
+
   return (
     <div className="relative z-50" ref={panelRef}>
       <button
@@ -119,6 +130,26 @@ export default function DashboardSettings({ visibility, onChange }: Props) {
           <p className="px-3 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
             {t('dashboard.showWidgets')}
           </p>
+          <div className="flex items-center gap-1 px-3 py-1.5 border-b border-gray-100 dark:border-gray-700 mb-1">
+            <button
+              onClick={() => setAll(true)}
+              className="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              {t('dashboard.showAll')}
+            </button>
+            <button
+              onClick={() => setAll(false)}
+              className="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              {t('dashboard.hideAll')}
+            </button>
+            <button
+              onClick={resetDefaults}
+              className="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition ml-auto"
+            >
+              {t('dashboard.resetDefaults')}
+            </button>
+          </div>
           {WIDGET_KEYS.map((key) => (
             <label
               key={key}
