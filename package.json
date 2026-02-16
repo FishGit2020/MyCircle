@@ -8,7 +8,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "dev": "pnpm build:remotes && concurrently -n server,shell,city,weather,stock,podcast,ai,bible,worship,notebook,baby -c blue,green,yellow,magenta,cyan,white,red,#d97706,#8b5cf6,#10b981,#ec4899 \"pnpm dev:server\" \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\"",
+    "dev": "pnpm build:remotes && concurrently -n server,shell,city,weather,stock,podcast,ai,bible,worship,notebook,baby,child-dev -c blue,green,yellow,magenta,cyan,white,red,#d97706,#8b5cf6,#10b981,#ec4899,#14b8a6 \"pnpm dev:server\" \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\"",
     "dev:server": "tsx server/index.ts",
     "dev:shell": "pnpm --filter @mycircle/shell dev",
     "dev:city": "pnpm --filter @mycircle/city-search dev",
@@ -20,6 +20,7 @@
     "dev:worship": "pnpm --filter @mycircle/worship-songs dev",
     "dev:notebook": "pnpm --filter @mycircle/notebook dev",
     "dev:baby": "pnpm --filter @mycircle/baby-tracker dev",
+    "dev:child-dev": "pnpm --filter @mycircle/child-development dev",
     "dev:remote": "node scripts/dev-remote.mjs",
     "preview:city": "pnpm --filter @mycircle/city-search preview",
     "preview:weather": "pnpm --filter @mycircle/weather-display preview",
@@ -30,8 +31,9 @@
     "preview:worship": "pnpm --filter @mycircle/worship-songs preview",
     "preview:notebook": "pnpm --filter @mycircle/notebook preview",
     "preview:baby": "pnpm --filter @mycircle/baby-tracker preview",
+    "preview:child-dev": "pnpm --filter @mycircle/child-development preview",
     "build:remotes": "pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
-    "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\"",
+    "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\"",
     "build": "pnpm build:shared && pnpm build:mf",
     "build:shared": "pnpm --filter @mycircle/shared build",
     "build:mf": "pnpm --filter @mycircle/shell build && pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",

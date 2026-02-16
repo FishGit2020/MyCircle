@@ -13,6 +13,7 @@ export default {
     "../stock-tracker/src/**/*.{js,ts,jsx,tsx}",
     "../weather-display/src/**/*.{js,ts,jsx,tsx}",
     "../worship-songs/src/**/*.{js,ts,jsx,tsx}",
+    "../child-development/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',
   theme: {

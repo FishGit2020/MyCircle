@@ -93,6 +93,17 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Development timeline** — 10-stage visual timeline showing completed milestones (green checkmarks), currently developing stage (highlighted with badge), and upcoming stages; grouped by biological systems (heart, senses, brain, etc.) rather than individual weeks
 - Dark mode, full i18n (English, Spanish, Chinese)
 
+### Child Development Tracker
+- Postnatal developmental milestone tracking from birth through age 5
+- 6 developmental domains: Physical & Motor, Speech & Language, Cognitive, Social-Emotional, Health & Growth, Feeding & Sensory
+- 270 milestones across 9 age ranges with color-coded domain cards and SVG progress rings
+- **Tracking mode** — interactive checklist to mark completed milestones, persisted in localStorage
+- **Reference mode** — informational bullet list for browsing milestones
+- Auto-calculated age from birth date, current age range highlighted
+- Red flag indicators for milestones that warrant pediatrician consultation
+- Encouraging Bible verses for parents with shuffle
+- Dark mode, full i18n (English, Spanish, Chinese)
+
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
@@ -138,11 +149,11 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │     (MFE)       │ │    (MFE)     │ │    (MFE)      │ │   Songs    │  │
 │  │   Port 3006     │ │  Port 3007   │ │  Port 3008    │ │ Port 3009  │  │
 │  └─────────────────┘ └──────────────┘ └───────────────┘ └────────────┘  │
-│  ┌────────────┐ ┌──────────────┐                                          │
-│  │  Notebook  │ │ Baby Tracker │                                          │
-│  │   (MFE)    │ │    (MFE)     │                                          │
-│  │ Port 3010  │ │  Port 3011   │                                          │
-│  └────────────┘ └──────────────┘                                          │
+│  ┌────────────┐ ┌──────────────┐ ┌───────────────────┐                     │
+│  │  Notebook  │ │ Baby Tracker │ │ Child Development │                     │
+│  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │                     │
+│  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │                     │
+│  └────────────┘ └──────────────┘ └───────────────────┘                     │
 └──────────────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -173,6 +184,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Worship Songs** | Song library with lyrics, chord editor, YouTube links, metronome | `WorshipSongs` |
 | **Notebook** | Personal & public note-taking with search and Firestore sync | `Notebook` |
 | **Baby Tracker** | Baby growth tracking with weekly fruit comparisons and Bible verses | `BabyTracker` |
+| **Child Development** | Postnatal milestone tracker (birth–5 years) across 6 domains | `ChildDevelopment` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
@@ -187,6 +199,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | **Bible** | Book | Verse of the Day from curated collection |
 | **Notebook** | Pencil | Recent notes count from Firestore |
 | **Baby Tracker** | Heart | Current week + fruit comparison from localStorage |
+| **Child Dev** | Shield | Child name + age + milestone progress from localStorage |
 
 ### Routes
 
@@ -208,6 +221,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/notebook/new` | New note editor |
 | `/notebook/:noteId` | Note editor |
 | `/baby` | Baby growth tracker with weekly development |
+| `/child-dev` | Child development milestone tracker (birth–5 years) |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack

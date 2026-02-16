@@ -7,7 +7,7 @@ import { useDailyVerse } from '../../hooks/useDailyVerse';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -21,6 +21,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'nowPlaying', visible: true },
   { id: 'notebook', visible: true },
   { id: 'babyTracker', visible: true },
+  { id: 'childDev', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -502,6 +503,81 @@ function BabyTrackerWidget() {
   );
 }
 
+function ChildDevWidget() {
+  const { t } = useTranslation();
+  const [childName, setChildName] = useState<string | null>(null);
+  const [ageMonths, setAgeMonths] = useState<number | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+
+  useEffect(() => {
+    function compute() {
+      try {
+        const name = localStorage.getItem(StorageKeys.CHILD_NAME);
+        const birthRaw = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
+        const milestonesStr = localStorage.getItem(StorageKeys.CHILD_MILESTONES);
+        setChildName(name);
+        if (birthRaw) {
+          let birthStr: string;
+          try { birthStr = atob(birthRaw); } catch { birthStr = birthRaw; }
+          const birth = new Date(birthStr + 'T00:00:00');
+          const today = new Date();
+          const months = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
+          setAgeMonths(Math.max(0, months));
+        } else {
+          setAgeMonths(null);
+        }
+        if (milestonesStr) {
+          const checked: string[] = JSON.parse(milestonesStr);
+          // 270 total milestones
+          setProgress(Math.round((checked.length / 270) * 100));
+        } else {
+          setProgress(0);
+        }
+      } catch { setChildName(null); setAgeMonths(null); }
+    }
+    compute();
+    window.addEventListener('child-data-changed', compute);
+    return () => window.removeEventListener('child-data-changed', compute);
+  }, []);
+
+  const ageDisplay = ageMonths !== null
+    ? ageMonths >= 24
+      ? `${Math.floor(ageMonths / 12)}y ${ageMonths % 12}m`
+      : `${ageMonths}m`
+    : null;
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.childDev')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.childDevDesc')}</p>
+        </div>
+      </div>
+      {childName && ageDisplay ? (
+        <div className="bg-teal-50/50 dark:bg-teal-900/10 rounded-lg p-2.5">
+          <p className="text-sm font-medium text-teal-700 dark:text-teal-300">
+            {childName} — {ageDisplay}
+          </p>
+          <div className="mt-1.5 flex items-center gap-2">
+            <div className="flex-1 h-1.5 bg-teal-200 dark:bg-teal-800 rounded-full overflow-hidden">
+              <div className="h-full bg-teal-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+            </div>
+            <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">{progress}%</span>
+          </div>
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noChildData')}</p>
+      )}
+    </div>
+  );
+}
+
 // ─── Widget Registry ─────────────────────────────────────────────────────────
 
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
@@ -511,6 +587,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   nowPlaying: NowPlayingWidget,
   notebook: NotebookWidget,
   babyTracker: BabyTrackerWidget,
+  childDev: ChildDevWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -520,6 +597,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   nowPlaying: '/podcasts',
   notebook: '/notebook',
   babyTracker: '/baby',
+  childDev: '/child-dev',
 };
 
 // ─── Main Dashboard Component ────────────────────────────────────────────────

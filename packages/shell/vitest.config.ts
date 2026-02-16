@@ -29,6 +29,7 @@ export default defineConfig({
       'worshipSongs/WorshipSongs': resolve(__dirname, './src/test/mocks/WorshipSongsMock.tsx'),
       'notebook/Notebook': resolve(__dirname, './src/test/mocks/NotebookMock.tsx'),
       'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx'),
+      'childDevelopment/ChildDevelopment': resolve(__dirname, './src/test/mocks/ChildDevelopmentMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './src/test/mocks/pwaRegisterReactMock.ts')
     }
   }

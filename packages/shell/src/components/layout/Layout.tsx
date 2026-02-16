@@ -31,6 +31,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/worship': () => import('worshipSongs/WorshipSongs'),
   '/notebook': () => import('notebook/Notebook'),
   '/baby': () => import('babyTracker/BabyTracker'),
+  '/child-dev': () => import('childDevelopment/ChildDevelopment'),
 };
 
 function prefetchRoute(path: string) {
@@ -118,6 +119,9 @@ export default function Layout() {
               </Link>
               <Link to="/baby" className={navLinkClass('/baby')} onMouseEnter={() => prefetchRoute('/baby')} onFocus={() => prefetchRoute('/baby')}>
                 {t('nav.baby')}
+              </Link>
+              <Link to="/child-dev" className={navLinkClass('/child-dev')} onMouseEnter={() => prefetchRoute('/child-dev')} onFocus={() => prefetchRoute('/child-dev')}>
+                {t('nav.childDev')}
               </Link>
               <Link to="/ai" className={navLinkClass('/ai')} onMouseEnter={() => prefetchRoute('/ai')} onFocus={() => prefetchRoute('/ai')}>
                 {t('nav.ai')}

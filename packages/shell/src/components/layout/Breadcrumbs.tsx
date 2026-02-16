@@ -12,6 +12,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   worship: 'nav.worship',
   notebook: 'nav.notebook',
   baby: 'nav.baby',
+  'child-dev': 'nav.childDev',
   compare: 'nav.compare',
 };
 

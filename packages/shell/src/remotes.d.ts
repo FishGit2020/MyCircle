@@ -45,3 +45,8 @@ declare module 'babyTracker/BabyTracker' {
   const BabyTracker: React.ComponentType;
   export default BabyTracker;
 }
+
+declare module 'childDevelopment/ChildDevelopment' {
+  const ChildDevelopment: React.ComponentType;
+  export default ChildDevelopment;
+}
