@@ -24,6 +24,7 @@ const en = {
   'home.quickPodcastsDesc': 'Discover and listen to podcasts',
 
   // Search
+  'search.search': 'Search',
   'search.placeholder': 'Search for a city...',
   'search.noResults': 'No cities found',
   'search.noResultsHint': 'Try a different search term',
@@ -794,6 +795,27 @@ const en = {
   'baby.categoryFruit': 'Fruit',
   'baby.categoryAnimal': 'Animal',
   'baby.categoryVegetable': 'Vegetable',
+
+  // Keyboard Shortcuts
+  'shortcuts.title': 'Keyboard Shortcuts',
+  'shortcuts.navigation': 'Navigation',
+  'shortcuts.actions': 'Actions',
+  'shortcuts.commandPalette': 'Command palette',
+  'shortcuts.toggleTheme': 'Toggle dark mode',
+  'shortcuts.goHome': 'Go to Home',
+  'shortcuts.goWeather': 'Go to Weather',
+  'shortcuts.goStocks': 'Go to Stocks',
+  'shortcuts.goPodcasts': 'Go to Podcasts',
+  'shortcuts.goBible': 'Go to Bible',
+  'shortcuts.goWorship': 'Go to Worship',
+  'shortcuts.goNotebook': 'Go to Notebook',
+  'shortcuts.goBaby': 'Go to Baby',
+  'shortcuts.goAi': 'Go to AI',
+  'shortcuts.showShortcuts': 'Show shortcuts',
+  'shortcuts.closeModal': 'Close modal / dialog',
+  'commandPalette.navigate': 'navigate',
+  'commandPalette.select': 'select',
+  'commandPalette.close': 'close',
 } as const;
 
 const es: Record<TranslationKey, string> = {
@@ -818,6 +840,7 @@ const es: Record<TranslationKey, string> = {
   'home.quickPodcastsDesc': 'Descubre y escucha podcasts',
 
   // Search
+  'search.search': 'Buscar',
   'search.placeholder': 'Buscar una ciudad...',
   'search.noResults': 'No se encontraron ciudades',
   'search.noResultsHint': 'Prueba con otro t\u00e9rmino de b\u00fasqueda',
@@ -1588,6 +1611,27 @@ const es: Record<TranslationKey, string> = {
   'baby.categoryFruit': 'Fruta',
   'baby.categoryAnimal': 'Animal',
   'baby.categoryVegetable': 'Verdura',
+
+  // Keyboard Shortcuts
+  'shortcuts.title': 'Atajos de teclado',
+  'shortcuts.navigation': 'Navegaci\u00f3n',
+  'shortcuts.actions': 'Acciones',
+  'shortcuts.commandPalette': 'Paleta de comandos',
+  'shortcuts.toggleTheme': 'Alternar modo oscuro',
+  'shortcuts.goHome': 'Ir a Inicio',
+  'shortcuts.goWeather': 'Ir a Clima',
+  'shortcuts.goStocks': 'Ir a Acciones',
+  'shortcuts.goPodcasts': 'Ir a Podcasts',
+  'shortcuts.goBible': 'Ir a Biblia',
+  'shortcuts.goWorship': 'Ir a Adoraci\u00f3n',
+  'shortcuts.goNotebook': 'Ir a Bloc de notas',
+  'shortcuts.goBaby': 'Ir a Beb\u00e9',
+  'shortcuts.goAi': 'Ir a IA',
+  'shortcuts.showShortcuts': 'Mostrar atajos',
+  'shortcuts.closeModal': 'Cerrar modal / di\u00e1logo',
+  'commandPalette.navigate': 'navegar',
+  'commandPalette.select': 'seleccionar',
+  'commandPalette.close': 'cerrar',
 };
 
 const zh: Record<TranslationKey, string> = {
@@ -1612,6 +1656,7 @@ const zh: Record<TranslationKey, string> = {
   'home.quickPodcastsDesc': '\u53d1\u73b0\u548c\u6536\u542c\u64ad\u5ba2',
 
   // Search
+  'search.search': '\u641c\u7d22',
   'search.placeholder': '\u641c\u7d22\u57ce\u5e02...',
   'search.noResults': '\u672a\u627e\u5230\u57ce\u5e02',
   'search.noResultsHint': '\u8bf7\u5c1d\u8bd5\u5176\u4ed6\u641c\u7d22\u8bcd',
@@ -2382,6 +2427,27 @@ const zh: Record<TranslationKey, string> = {
   'baby.categoryFruit': '\u6c34\u679c',
   'baby.categoryAnimal': '\u52a8\u7269',
   'baby.categoryVegetable': '\u852c\u83dc',
+
+  // Keyboard Shortcuts
+  'shortcuts.title': '\u952e\u76d8\u5feb\u6377\u952e',
+  'shortcuts.navigation': '\u5bfc\u822a',
+  'shortcuts.actions': '\u64cd\u4f5c',
+  'shortcuts.commandPalette': '\u547d\u4ee4\u9762\u677f',
+  'shortcuts.toggleTheme': '\u5207\u6362\u6697\u8272\u6a21\u5f0f',
+  'shortcuts.goHome': '\u524d\u5f80\u9996\u9875',
+  'shortcuts.goWeather': '\u524d\u5f80\u5929\u6c14',
+  'shortcuts.goStocks': '\u524d\u5f80\u80a1\u7968',
+  'shortcuts.goPodcasts': '\u524d\u5f80\u64ad\u5ba2',
+  'shortcuts.goBible': '\u524d\u5f80\u5723\u7ecf',
+  'shortcuts.goWorship': '\u524d\u5f80\u656c\u62dc',
+  'shortcuts.goNotebook': '\u524d\u5f80\u7b14\u8bb0\u672c',
+  'shortcuts.goBaby': '\u524d\u5f80\u5b9d\u5b9d',
+  'shortcuts.goAi': '\u524d\u5f80 AI',
+  'shortcuts.showShortcuts': '\u663e\u793a\u5feb\u6377\u952e',
+  'shortcuts.closeModal': '\u5173\u95ed\u5f39\u7a97',
+  'commandPalette.navigate': '\u5bfc\u822a',
+  'commandPalette.select': '\u9009\u62e9',
+  'commandPalette.close': '\u5173\u95ed',
 };
 
 export const translations: Record<Locale, Record<TranslationKey, string>> = {

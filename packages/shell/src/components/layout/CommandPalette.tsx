@@ -179,15 +179,15 @@ export default function CommandPalette() {
         <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 flex items-center gap-4 text-xs text-gray-400">
           <span className="flex items-center gap-1">
             <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px]">&uarr;&darr;</kbd>
-            navigate
+            {t('commandPalette.navigate')}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px]">&crarr;</kbd>
-            select
+            {t('commandPalette.select')}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px]">esc</kbd>
-            close
+            {t('commandPalette.close')}
           </span>
         </div>
       </div>
