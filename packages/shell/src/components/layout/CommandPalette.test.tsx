@@ -1,0 +1,128 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import CommandPalette from './CommandPalette';
+
+const mockNavigate = vi.fn();
+
+vi.mock('react-router', () => ({
+  useNavigate: () => mockNavigate,
+}));
+
+vi.mock('@mycircle/shared', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  // scrollIntoView is not available in jsdom
+  Element.prototype.scrollIntoView = vi.fn();
+});
+
+describe('CommandPalette', () => {
+  it('does not render palette by default', () => {
+    render(<CommandPalette />);
+    expect(screen.queryByPlaceholderText('commandPalette.placeholder')).not.toBeInTheDocument();
+  });
+
+  it('opens on Ctrl+K', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByPlaceholderText('commandPalette.placeholder')).toBeInTheDocument();
+  });
+
+  it('closes on Escape', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByPlaceholderText('commandPalette.placeholder')).toBeInTheDocument();
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    expect(screen.queryByPlaceholderText('commandPalette.placeholder')).not.toBeInTheDocument();
+  });
+
+  it('shows all nav items when no query', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByText('bottomNav.home')).toBeInTheDocument();
+    expect(screen.getByText('commandPalette.goToWeather')).toBeInTheDocument();
+    expect(screen.getByText('commandPalette.goToStocks')).toBeInTheDocument();
+  });
+
+  it('filters items by query', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    const input = screen.getByPlaceholderText('commandPalette.placeholder');
+    fireEvent.change(input, { target: { value: 'weather' } });
+
+    expect(screen.getByText('commandPalette.goToWeather')).toBeInTheDocument();
+    expect(screen.queryByText('commandPalette.goToStocks')).not.toBeInTheDocument();
+  });
+
+  it('shows no results message for non-matching query', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    const input = screen.getByPlaceholderText('commandPalette.placeholder');
+    fireEvent.change(input, { target: { value: 'zzzznotfound' } });
+
+    expect(screen.getByText('commandPalette.noResults')).toBeInTheDocument();
+  });
+
+  it('navigates on Enter key', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    const input = screen.getByPlaceholderText('commandPalette.placeholder');
+
+    // First item is home (/)
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+  });
+
+  it('navigates with arrow keys and Enter', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    const input = screen.getByPlaceholderText('commandPalette.placeholder');
+
+    // Arrow down to second item (weather)
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/weather');
+  });
+
+  it('closes palette when backdrop is clicked', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByPlaceholderText('commandPalette.placeholder')).toBeInTheDocument();
+
+    // Click the backdrop (first child div with bg-black/50)
+    const backdrop = document.querySelector('.bg-black\\/50');
+    if (backdrop) fireEvent.click(backdrop);
+    expect(screen.queryByPlaceholderText('commandPalette.placeholder')).not.toBeInTheDocument();
+  });
+
+  it('displays footer navigation hints', () => {
+    render(<CommandPalette />);
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+    });
+    expect(screen.getByText('commandPalette.navigate')).toBeInTheDocument();
+    expect(screen.getByText('commandPalette.select')).toBeInTheDocument();
+    expect(screen.getByText('commandPalette.close')).toBeInTheDocument();
+  });
+});
