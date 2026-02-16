@@ -57,7 +57,14 @@ export default function EpisodeList({
 }: EpisodeListProps) {
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(20);
   const progress = useMemo(() => loadProgress(), [currentEpisodeId]); // re-read when current episode changes
+
+  const visibleEpisodes = useMemo(
+    () => episodes.slice(0, visibleCount),
+    [episodes, visibleCount]
+  );
+  const hasMore = episodes.length > visibleCount;
 
   if (loading) {
     return (
@@ -109,7 +116,7 @@ export default function EpisodeList({
 
   return (
     <div className="space-y-2 max-h-[60vh] overflow-y-auto" role="list" aria-label={t('podcasts.episodes')}>
-      {episodes.map(episode => {
+      {visibleEpisodes.map(episode => {
         const isCurrent = episode.id === currentEpisodeId;
         const isCurrentlyPlaying = isCurrent && isPlaying;
         const isExpanded = expandedId === episode.id;
@@ -258,6 +265,14 @@ export default function EpisodeList({
           </div>
         );
       })}
+      {hasMore && (
+        <button
+          onClick={() => setVisibleCount(prev => prev + 20)}
+          className="w-full py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+        >
+          {t('podcasts.showMore')} ({episodes.length - visibleCount} {t('podcasts.episodes').toLowerCase()})
+        </button>
+      )}
     </div>
   );
 }

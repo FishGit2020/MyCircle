@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTranslation, useCryptoPrices } from '@mycircle/shared';
 import type { CryptoPrice } from '@mycircle/shared';
 
@@ -54,7 +54,7 @@ function MiniSparkline({ data, positive }: { data: number[]; positive: boolean }
   );
 }
 
-function CryptoCard({ coin, expanded, onToggle }: {
+const CryptoCard = React.memo(function CryptoCard({ coin, expanded, onToggle }: {
   coin: CryptoPrice;
   expanded: boolean;
   onToggle: () => void;
@@ -144,12 +144,16 @@ function CryptoCard({ coin, expanded, onToggle }: {
       )}
     </div>
   );
-}
+});
 
 export default function CryptoTracker() {
   const { t } = useTranslation();
   const { prices, loading, error } = useCryptoPrices();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const handleToggle = useCallback((coinId: string) => {
+    setExpandedId(prev => prev === coinId ? null : coinId);
+  }, []);
 
   if (error) {
     return (
@@ -196,7 +200,7 @@ export default function CryptoTracker() {
           <CryptoCard
             coin={coin}
             expanded={expandedId === coin.id}
-            onToggle={() => setExpandedId(prev => prev === coin.id ? null : coin.id)}
+            onToggle={() => handleToggle(coin.id)}
           />
         </div>
       ))}
