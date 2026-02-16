@@ -1,5 +1,5 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, User, Auth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
@@ -173,6 +173,28 @@ export async function signInWithGoogle() {
     console.error('Error signing in with Google:', error);
     throw error;
   }
+}
+
+export async function signUpWithEmail(email: string, password: string, displayName?: string) {
+  if (!auth) throw new Error('Firebase not initialized');
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  if (displayName) {
+    await updateProfile(result.user, { displayName });
+  }
+  await ensureUserProfile(result.user);
+  return result.user;
+}
+
+export async function signInWithEmail(email: string, password: string) {
+  if (!auth) throw new Error('Firebase not initialized');
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  await ensureUserProfile(result.user);
+  return result.user;
+}
+
+export async function resetPassword(email: string) {
+  if (!auth) throw new Error('Firebase not initialized');
+  await sendPasswordResetEmail(auth, email);
 }
 
 export async function logOut() {

@@ -4,6 +4,9 @@ import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import {
   subscribeToAuthChanges,
   signInWithGoogle,
+  signInWithEmail as firebaseSignInWithEmail,
+  signUpWithEmail as firebaseSignUpWithEmail,
+  resetPassword as firebaseResetPassword,
   logOut,
   getUserProfile,
   updateUserDarkMode,
@@ -35,6 +38,9 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   signIn: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateDarkMode: (darkMode: boolean) => Promise<void>;
   updateLocale: (locale: string) => Promise<void>;
@@ -77,10 +83,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(firebaseUser);
       if (firebaseUser) {
         // Link analytics sessions to this authenticated user
+        const method = firebaseUser.providerData[0]?.providerId === 'password' ? 'email' : 'google';
         identifyUser(firebaseUser.uid, {
-          sign_in_method: 'google',
+          sign_in_method: method,
         });
-        logEvent('login', { method: 'google' });
+        logEvent('login', { method });
 
         const userProfile = await getUserProfile(firebaseUser.uid);
         setProfile(userProfile);
@@ -157,6 +164,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signInWithGoogle();
     } catch (error) {
       console.error('Sign in failed:', error);
+      throw error;
+    }
+  };
+
+  const signInWithEmailFn = async (email: string, password: string) => {
+    try {
+      await firebaseSignInWithEmail(email, password);
+    } catch (error) {
+      console.error('Email sign in failed:', error);
+      throw error;
+    }
+  };
+
+  const signUpWithEmailFn = async (email: string, password: string, displayName?: string) => {
+    try {
+      await firebaseSignUpWithEmail(email, password, displayName);
+    } catch (error) {
+      console.error('Email sign up failed:', error);
+      throw error;
+    }
+  };
+
+  const resetPasswordFn = async (email: string) => {
+    try {
+      await firebaseResetPassword(email);
+    } catch (error) {
+      console.error('Password reset failed:', error);
       throw error;
     }
   };
@@ -319,6 +353,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile,
         loading,
         signIn,
+        signInWithEmail: signInWithEmailFn,
+        signUpWithEmail: signUpWithEmailFn,
+        resetPassword: resetPasswordFn,
         signOut: signOutUser,
         updateDarkMode,
         updateLocale,

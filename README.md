@@ -109,7 +109,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
 - Offline indicator & PWA support
 - **Mobile UX** — safe area insets for notched devices (iPhone X+), enlarged touch targets (40-48px) on audio player controls and nav editor, active state feedback on mobile buttons
-- Firebase Auth (Google OAuth) with cross-device profile sync
+- Firebase Auth (Google OAuth + email/password) with cross-device profile sync
 - Firebase App Check for API protection
 - Firebase Remote Config for feature flags
 - GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ)
@@ -216,7 +216,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 - **Build:** Vite 5, Module Federation
 - **API:** Apollo Server 5, GraphQL
 - **Data Sources:** OpenWeather API, Finnhub API, CoinGecko API, PodcastIndex API, Google Gemini
-- **Auth:** Firebase Auth (Google OAuth)
+- **Auth:** Firebase Auth (Google OAuth + email/password)
 - **Database:** Cloud Firestore (user profiles, favorites, preferences)
 - **Hosting:** Firebase Hosting + Cloud Functions
 - **Push Notifications:** Firebase Cloud Messaging

@@ -63,7 +63,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 | **API** | Apollo Server 5, GraphQL |
 | **Data Sources** | OpenWeather API (weather + air pollution), Open-Meteo Archive API, Finnhub API, CoinGecko API (crypto), PodcastIndex API, Google Gemini, [YouVersion API](https://developers.youversion.com/api/bibles) (Bible) |
 | **Hosting** | Firebase Hosting + Cloud Functions |
-| **Auth** | Firebase Auth (Google OAuth) |
+| **Auth** | Firebase Auth (Google OAuth + email/password) |
 | **Database** | Cloud Firestore (user profiles, favorites, preferences) |
 | **Push Notifications** | Firebase Cloud Messaging |
 | **Bot Protection** | Firebase App Check (reCAPTCHA Enterprise) |
@@ -808,11 +808,15 @@ function useWeatherData(lat, lon, enableRealtime) {
 
 ### Auth Flow
 
+Users can sign in via **Google OAuth** or **email/password**. An `AuthModal` component provides both options in a tabbed dialog.
+
 ```
-User clicks "Sign In"
+User clicks "Sign In" → AuthModal opens
      |
-     v
-signInWithPopup(auth, GoogleAuthProvider)
+     ├── Google tab:    signInWithPopup(auth, GoogleAuthProvider)
+     ├── Email sign-in: signInWithEmailAndPassword(auth, email, password)
+     └── Email sign-up: createUserWithEmailAndPassword(auth, email, password)
+                        + updateProfile(user, { displayName })
      |
      v
 ensureUserProfile(user)          // Creates Firestore doc if first login
@@ -827,6 +831,8 @@ AuthProvider:
   +-- setProfile(profile)
   +-- setRecentCities(profile.recentCities)
 ```
+
+Password reset is also available via `sendPasswordResetEmail(auth, email)`.
 
 ### Profile Operations
 
@@ -888,6 +894,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **NotificationBell** | `packages/shell/src/components/notifications/NotificationBell.tsx` | Push notification UI |
 | **LanguageSelector** | `packages/shell/src/components/layout/LanguageSelector.tsx` | i18n language picker |
 | **UnitToggle / SpeedToggle** | `packages/shell/src/components/settings/UnitToggle.tsx` | °C/°F and wind speed toggles |
+| **AuthModal** | `packages/shell/src/components/layout/AuthModal.tsx` | Sign in/up dialog (Google + email/password) |
 | **AuthContext** | `packages/shell/src/context/AuthContext.tsx` | User state, recent/favorite cities, profile ops |
 | **ThemeContext** | `packages/shell/src/context/ThemeContext.tsx` | Theme state, localStorage, system pref |
 | **RemoteConfigContext** | `packages/shell/src/context/RemoteConfigContext.tsx` | Firebase Remote Config feature flags |

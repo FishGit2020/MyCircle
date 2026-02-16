@@ -3,6 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import UserMenu from './UserMenu';
 
 const mockSignIn = vi.fn();
+const mockSignInWithEmail = vi.fn();
+const mockSignUpWithEmail = vi.fn();
+const mockResetPassword = vi.fn();
 const mockSignOut = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
@@ -17,6 +20,9 @@ vi.mock('../../context/AuthContext', () => ({
     user: mockUser,
     loading: mockLoading,
     signIn: mockSignIn,
+    signInWithEmail: mockSignInWithEmail,
+    signUpWithEmail: mockSignUpWithEmail,
+    resetPassword: mockResetPassword,
     signOut: mockSignOut,
   }),
 }));
@@ -40,10 +46,11 @@ describe('UserMenu', () => {
     expect(signInBtn).toBeInTheDocument();
   });
 
-  it('calls signIn when sign in button is clicked', () => {
+  it('opens auth modal when sign in button is clicked', () => {
     render(<UserMenu />);
     fireEvent.click(screen.getByText('auth.signIn'));
-    expect(mockSignIn).toHaveBeenCalledOnce();
+    // AuthModal renders a dialog
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('shows user avatar when signed in with photo', () => {
