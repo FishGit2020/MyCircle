@@ -80,9 +80,9 @@ export default function Layout() {
         {t('nav.skipToContent')}
       </a>
       <OfflineIndicator />
-      <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors">
+      <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 overflow-hidden">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
               <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,7 @@ export default function Layout() {
             </nav>
 
             {/* Mobile controls (bottom nav replaces hamburger) */}
-            <div className="flex md:!hidden items-center space-x-2">
+            <div className="flex md:!hidden items-center space-x-1 flex-shrink-0">
               <LanguageSelector />
               <ThemeToggle />
               <WhatsNewButton />
