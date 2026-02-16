@@ -545,6 +545,7 @@ const en = {
   // PWA update prompt
   'pwa.newVersion': 'A new version is available',
   'pwa.reload': 'Reload',
+  'pwa.reloading': 'Reloading\u2026',
   'pwa.dismiss': 'Dismiss',
 
   // PWA install prompt
@@ -1405,6 +1406,7 @@ const es: Record<TranslationKey, string> = {
   // PWA update prompt
   'pwa.newVersion': 'Una nueva versi\u00f3n est\u00e1 disponible',
   'pwa.reload': 'Recargar',
+  'pwa.reloading': 'Recargando\u2026',
   'pwa.dismiss': 'Cerrar',
 
   // PWA install prompt
@@ -2265,6 +2267,7 @@ const zh: Record<TranslationKey, string> = {
   // PWA update prompt
   'pwa.newVersion': '\u65b0\u7248\u672c\u53ef\u7528',
   'pwa.reload': '\u91cd\u65b0\u52a0\u8f7d',
+  'pwa.reloading': '\u91cd\u65b0\u52a0\u8f7d\u4e2d\u2026',
   'pwa.dismiss': '\u5173\u95ed',
 
   // PWA install prompt
