@@ -87,6 +87,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Estimated length/weight measurements with typical range display
 - Due date input with dual persistence (localStorage + Firestore)
 - Gestational week calculation, trimester display, progress bar
+- **Development milestones** — week-by-week developmental milestone descriptions (heart beating, eyes opening, lungs maturing, etc.) shown alongside growth data
 - Dark mode, full i18n (English, Spanish, Chinese)
 
 ### AI Assistant
