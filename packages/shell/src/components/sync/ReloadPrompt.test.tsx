@@ -86,8 +86,8 @@ describe('ReloadPrompt', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('pwa.reload'));
     });
-    // Fallback timer set for 3 seconds
-    act(() => { vi.advanceTimersByTime(3000); });
+    // Fallback timer set for 1 second
+    act(() => { vi.advanceTimersByTime(1000); });
     expect(window.location.reload).toHaveBeenCalled();
   });
 

@@ -118,9 +118,9 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Push notifications** — multi-category preferences (weather alerts, podcast episodes, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
 - **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal with mobile bottom-nav clearance; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
-- Offline indicator & PWA support
+- Offline indicator & PWA support with **fast update detection** (30s polling + visibility-change check, 1s fallback reload)
 - **Mobile UX** — safe area insets for notched devices (iPhone X+), enlarged touch targets (40-48px) on audio player controls and nav editor, active state feedback on mobile buttons
-- Firebase Auth (Google OAuth + email/password) with cross-device profile sync
+- Firebase Auth (Google OAuth + email/password) with cross-device profile sync; **sign-out clears user-specific localStorage and Apollo cache** to prevent data leaking between accounts
 - Firebase App Check for API protection
 - Firebase Remote Config for feature flags
 - GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ); daily verse query skipped when `VITE_GRAPHQL_URL` is unset (falls back to local data)

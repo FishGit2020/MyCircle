@@ -10,9 +10,15 @@ export default function ReloadPrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegisteredSW(_swUrl, registration) {
-      // Check for SW updates every 60 seconds
       if (registration) {
-        setInterval(() => registration.update(), 60_000);
+        // Check for SW updates every 30 seconds
+        setInterval(() => registration.update(), 30_000);
+        // Check for updates when user returns to the tab
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            registration.update();
+          }
+        });
       }
     },
   });
@@ -32,8 +38,8 @@ export default function ReloadPrompt() {
     setReloading(true);
     try {
       await updateServiceWorker(true);
-      // Fallback: if controllerchange never fires, force reload after 3s
-      setTimeout(() => window.location.reload(), 3000);
+      // Fallback: if controllerchange never fires, force reload after 1s
+      setTimeout(() => window.location.reload(), 1000);
     } catch {
       window.location.reload();
     }

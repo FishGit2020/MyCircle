@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { User } from 'firebase/auth';
-import { WindowEvents, StorageKeys } from '@mycircle/shared';
+import { WindowEvents, StorageKeys, getApolloClient } from '@mycircle/shared';
 import {
   subscribeToAuthChanges,
   signInWithGoogle,
@@ -198,6 +198,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOutUser = async () => {
     try {
       await logOut();
+
+      // Clear user-specific localStorage keys, preserving device-level preferences
+      const keysToPreserve = new Set([
+        StorageKeys.THEME,
+        StorageKeys.LOCALE,
+        StorageKeys.WEATHER_ALERTS,
+        StorageKeys.PODCAST_ALERTS,
+        StorageKeys.ANNOUNCEMENT_ALERTS,
+      ]);
+      Object.values(StorageKeys).forEach((key) => {
+        if (!keysToPreserve.has(key)) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // Clear Apollo GraphQL cache to prevent stale queries from previous user
+      await getApolloClient().clearStore();
+
       setProfile(null);
       setRecentCities([]);
       setFavoriteCities([]);
