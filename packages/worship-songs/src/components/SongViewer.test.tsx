@@ -118,4 +118,15 @@ describe('SongViewer', () => {
     const showElements = container.querySelectorAll('[data-print-show]');
     expect(showElements.length).toBe(1);
   });
+
+  it('renders capo calculator section for ChordPro songs', () => {
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    expect(screen.getByText('worship.capoCalculator')).toBeInTheDocument();
+  });
+
+  it('does not render capo calculator for plain text songs', () => {
+    const textSong = { ...baseSong, format: 'text' as const };
+    render(<SongViewer song={textSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    expect(screen.queryByText('worship.capoCalculator')).not.toBeInTheDocument();
+  });
 });

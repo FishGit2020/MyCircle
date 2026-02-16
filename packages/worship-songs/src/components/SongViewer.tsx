@@ -4,6 +4,7 @@ import type { WorshipSong } from '../types';
 import { transposeContent, transposeChord } from '../utils/transpose';
 import ChordLine from './ChordLine';
 import Metronome from './Metronome';
+import CapoCalculator from './CapoCalculator';
 
 const ALL_KEYS = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 const SCROLL_SPEEDS = [20, 30, 40, 50, 70, 100]; // ms per 1px — lower = faster
@@ -46,6 +47,7 @@ interface SongViewerProps {
 export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: SongViewerProps) {
   const { t } = useTranslation();
   const [semitones, setSemitones] = useState(0);
+  const [capoFret, setCapoFret] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
   const [autoScroll, setAutoScroll] = useState(false);
   const [scrollSpeed, setScrollSpeed] = useState(loadScrollSpeed);
@@ -54,8 +56,13 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
   const scrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const isChordPro = song.format === 'chordpro';
-  const transposedContent = isChordPro ? transposeContent(song.content, semitones) : song.content;
-  const currentKey = isChordPro ? getKeyName(song.originalKey, semitones) : song.originalKey;
+  // soundingKey = the actual pitch the audience hears (original + transpose)
+  const soundingKey = isChordPro ? getKeyName(song.originalKey, semitones) : song.originalKey;
+  // When capo is active, display chord shapes offset back by capoFret
+  const transposedContent = isChordPro ? transposeContent(song.content, semitones - capoFret) : song.content;
+  // shapeKey = the chord shapes the guitarist plays (soundingKey transposed back by capo)
+  const shapeKey = capoFret > 0 && isChordPro ? getKeyName(soundingKey, -capoFret) : null;
+  const currentKey = soundingKey;
 
   // Auto-scroll with adjustable speed
   useEffect(() => {
@@ -140,6 +147,11 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
           <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">
             {t('worship.currentKey')}: {currentKey}
           </span>
+          {shapeKey && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-medium">
+              {t('worship.capoFret').replace('{n}', String(capoFret))} &rarr; {shapeKey}
+            </span>
+          )}
           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
             isChordPro
               ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
@@ -205,6 +217,17 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
           <p className="text-xs text-gray-400 dark:text-gray-500 italic">
             {t('worship.noTransposeText')}
           </p>
+        )}
+
+        {/* Capo calculator — only for ChordPro */}
+        {isChordPro && (
+          <div className="w-full" data-print-hide>
+            <CapoCalculator
+              soundingKey={soundingKey}
+              capoFret={capoFret}
+              onCapoChange={setCapoFret}
+            />
+          </div>
         )}
 
         <div className="flex items-center gap-2 ml-auto flex-wrap">

@@ -276,6 +276,7 @@ Exposes `WorshipSongs` component via Module Federation.
 - Print-friendly view via `window.print()`
 - **YouTube link integration**: Optional `youtubeUrl` field on `WorshipSong` type. `SongEditor` renders a URL input; `SongViewer` renders a styled red "Watch on YouTube" `<a>` tag (opens `target="_blank"`, `rel="noopener noreferrer"`) when URL is present, hidden otherwise.
 - **Built-in metronome**: `Metronome` component uses Web Audio API (`AudioContext` + `OscillatorNode`) for precise click timing. Optional `bpm` field on `WorshipSong` (30-240 range). Features: start/stop toggle, +/- BPM buttons, direct BPM number input, tap tempo (4-tap rolling average with 2s timeout), visual beat indicator (green flash). Always rendered in `SongViewer` below controls bar.
+- **Capo calculator**: `CapoCalculator` component in `SongViewer` (ChordPro only). Collapsible panel showing fret positions 1-9 with resulting chord shape keys. Easy guitar keys (C, G, D, A, E) highlighted with green styling. Selecting a capo position adjusts displayed chords to the shape key (transposes content by `semitones - capoFret`). Formula: `shapeKey = transposeChord(soundingKey, -capoFret)`. Shows instruction panel when active and suggested easy-key positions when inactive.
 - Favorites system with `StorageKeys.WORSHIP_FAVORITES`
 - Offline cache via `StorageKeys.WORSHIP_SONGS_CACHE`
 - Tag-based filtering and full-text search
@@ -882,6 +883,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **WorshipSongs** | `packages/worship-songs/src/components/WorshipSongs.tsx` | Song library, search, and song viewer |
 | **SongEditor** | `packages/worship-songs/src/components/SongEditor.tsx` | Chord and lyrics editor |
 | **Metronome** | `packages/worship-songs/src/components/Metronome.tsx` | Built-in metronome with BPM control |
+| **CapoCalculator** | `packages/worship-songs/src/components/CapoCalculator.tsx` | Capo position calculator with easy key suggestions |
 | **Notebook** | `packages/notebook/src/components/Notebook.tsx` | Personal & public note-taking UI with tab navigation |
 | **NoteEditor** | `packages/notebook/src/components/NoteEditor.tsx` | Note create/edit form with publish button |
 | **useNotes** | `packages/notebook/src/hooks/useNotes.ts` | Private notebook CRUD hook via window bridge |

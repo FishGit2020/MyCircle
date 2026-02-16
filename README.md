@@ -71,6 +71,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Copy lyrics to clipboard, **print support** — `@media print` CSS hides UI chrome and forces light theme for clean song output on paper
 - **YouTube link integration** — optional YouTube URL per song; renders a styled "Watch on YouTube" button in the song viewer that opens in a new tab
 - **Built-in metronome** — Web Audio API-powered metronome with BPM from song metadata (30-240 range), +/- controls, tap tempo (4-tap average), beat indicator flash, always visible in song viewer
+- **Capo calculator** — collapsible panel showing all capo positions with resulting chord shapes, easy guitar keys (C, G, D, A, E) highlighted, one-click capo selection that adjusts displayed chords to shape key
 - Favorites, search, tag filtering
 - Firestore persistence with offline localStorage cache
 
