@@ -86,9 +86,29 @@ describe('ReloadPrompt', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('pwa.reload'));
     });
-    // Fallback timer set for 2 seconds
-    act(() => { vi.advanceTimersByTime(2000); });
+    // Fallback timer set for 3 seconds
+    act(() => { vi.advanceTimersByTime(3000); });
     expect(window.location.reload).toHaveBeenCalled();
+  });
+
+  it('shows reloading state and disables button after clicking reload', async () => {
+    mockNeedRefresh = true;
+    render(<ReloadPrompt />);
+    await act(async () => {
+      fireEvent.click(screen.getByText('pwa.reload'));
+    });
+    expect(screen.getByText('pwa.reloading')).toBeInTheDocument();
+    expect(screen.getByText('pwa.reloading').closest('button')).toBeDisabled();
+  });
+
+  it('hides dismiss button while reloading', async () => {
+    mockNeedRefresh = true;
+    render(<ReloadPrompt />);
+    expect(screen.getByLabelText('pwa.dismiss')).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByText('pwa.reload'));
+    });
+    expect(screen.queryByLabelText('pwa.dismiss')).not.toBeInTheDocument();
   });
 
   it('calls setNeedRefresh(false) when dismiss button is clicked', () => {
