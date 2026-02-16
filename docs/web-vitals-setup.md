@@ -134,32 +134,22 @@ This shows which routes have the slowest Largest Contentful Paint.
 
 ---
 
-## Step 4: Set Up Custom Insights Alerts (Optional)
+## Step 4: Monitoring Strategy
 
-Get notified when performance degrades. GA4 uses **Custom Insights** for alerting (not "Custom Alerts").
+GA4 Custom Insights does not support filtering by custom event parameters, so automated per-metric alerting isn't possible through the GA4 UI alone.
 
-1. Go to **GA4 > Reports > Home**, scroll to **Insights & recommendations**
-2. Click **View all insights** > **Create** > **Create custom insight**
-3. Set **Evaluation frequency** to **Daily** and configure each alert:
+**Recommended approach:** Check the Exploration report from Step 3 weekly. The `Web Vital Rating` column split (good / needs-improvement / poor) gives you an at-a-glance view of performance health per route.
 
-### Poor LCP Alert
-- Name: `Poor LCP Spike`
-- Condition: Event name = `web_vitals`
-- Filter: `metric_name` = `LCP` AND `metric_rating` = `poor`
-- Trigger: Event count > **20** per day
-- Notification: Email
+**For automated alerting**, use one of these approaches:
 
-### Poor CLS Alert
-- Name: `Poor CLS Spike`
-- Condition: Event name = `web_vitals`
-- Filter: `metric_name` = `CLS` AND `metric_rating` = `poor`
-- Trigger: Event count > **15** per day
+### Option A: BigQuery + Cloud Scheduler (requires Blaze plan)
+Export GA4 data to BigQuery (see Step 5), then create a scheduled query that checks for poor vitals and sends email via Cloud Functions.
 
-### Poor INP Alert
-- Name: `Poor INP Spike`
-- Condition: Event name = `web_vitals`
-- Filter: `metric_name` = `INP` AND `metric_rating` = `poor`
-- Trigger: Event count > **15** per day
+### Option B: Lighthouse CI in GitHub Actions
+Add [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) to your CI pipeline to catch performance regressions before they reach production. This is a **proactive** approach vs. GA4's reactive monitoring.
+
+### Option C: Google Search Console
+For real-user Core Web Vitals data aggregated by Google, check **Search Console > Core Web Vitals** report. This uses Chrome UX Report (CrUX) data from real users and flags poor URLs.
 
 ---
 
