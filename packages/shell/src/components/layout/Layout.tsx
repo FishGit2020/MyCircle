@@ -84,13 +84,13 @@ export default function Layout() {
         <div className="container mx-auto px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-2 overflow-hidden">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
-              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+            <Link to="/" className="flex items-center space-x-2 min-w-0 flex-shrink md:flex-shrink-0">
+              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
                 <circle cx="12" cy="12" r="4" />
                 <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white">MyCircle</h1>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white truncate">MyCircle</h1>
             </Link>
 
             {/* Desktop nav (hidden on mobile) */}
@@ -141,10 +141,19 @@ export default function Layout() {
             </nav>
 
             {/* Mobile controls (bottom nav replaces hamburger) */}
-            <div className="flex md:!hidden items-center space-x-1 flex-shrink-0">
+            <div className="flex md:!hidden items-center gap-1 flex-shrink-0">
               <LanguageSelector />
               <ThemeToggle />
               <WhatsNewButton />
+              <button
+                onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+                className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label={t('search.search')}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
               <NotificationBell />
               <UserMenu />
             </div>

@@ -42,7 +42,7 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex items-center justify-center p-1.5 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         aria-label={t('auth.userMenu')}
         aria-expanded={isOpen}
         aria-haspopup="true"
