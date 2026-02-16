@@ -60,6 +60,10 @@
         "destination": "/baby-tracker/index.html"
       },
       {
+        "source": "/child-development/**",
+        "destination": "/child-development/index.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

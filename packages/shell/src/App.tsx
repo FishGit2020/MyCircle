@@ -18,6 +18,7 @@ const BibleReaderMF = lazy(() => import('bibleReader/BibleReader'));
 const WorshipSongsMF = lazy(() => import('worshipSongs/WorshipSongs'));
 const NotebookMF = lazy(() => import('notebook/Notebook'));
 const BabyTrackerMF = lazy(() => import('babyTracker/BabyTracker'));
+const ChildDevelopmentMF = lazy(() => import('childDevelopment/ChildDevelopment'));
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -302,6 +303,23 @@ function BabyPage() {
   );
 }
 
+// Fallback for Child Development MFE
+const ChildDevelopmentFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Child Development module is loading...</p>
+  </div>
+);
+
+function ChildDevPage() {
+  return (
+    <ErrorBoundary fallback={<ChildDevelopmentFallback />}>
+      <Suspense fallback={<Loading />}>
+        <ChildDevelopmentMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -334,6 +352,7 @@ export default function App() {
         <Route path="notebook/new" element={<NotebookPage />} />
         <Route path="notebook/:noteId" element={<NotebookPage />} />
         <Route path="baby" element={<BabyPage />} />
+        <Route path="child-dev" element={<ChildDevPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />
       </Route>

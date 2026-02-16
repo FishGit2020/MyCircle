@@ -51,7 +51,7 @@ test.describe('Widget Dashboard', () => {
     // Find visibility toggle buttons
     const visibleButtons = page.getByRole('button', { name: /toggle widget/i });
     const count = await visibleButtons.count();
-    expect(count).toBe(6);
+    expect(count).toBe(7);
 
     // Toggle the first widget off
     await visibleButtons.first().click();
@@ -62,7 +62,7 @@ test.describe('Widget Dashboard', () => {
     // The grid should have fewer visible widgets
     const widgets = page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a');
     const visibleCount = await widgets.count();
-    expect(visibleCount).toBe(5);
+    expect(visibleCount).toBe(6);
   });
 
   test('widget layout persists after page reload', async ({ page }) => {
@@ -77,7 +77,7 @@ test.describe('Widget Dashboard', () => {
     // Count visible widgets
     const widgets = page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a');
     const countBefore = await widgets.count();
-    expect(countBefore).toBe(5);
+    expect(countBefore).toBe(6);
 
     // Reload the page
     await page.reload();
@@ -87,6 +87,6 @@ test.describe('Widget Dashboard', () => {
 
     // Count should still be 5 (persisted)
     const countAfter = await page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a').count();
-    expect(countAfter).toBe(5);
+    expect(countAfter).toBe(6);
   });
 });

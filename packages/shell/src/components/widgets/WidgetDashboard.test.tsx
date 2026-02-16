@@ -88,7 +88,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     // All six widgets should show "Visible" toggle
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(6);
+    expect(visibleButtons.length).toBe(7);
   });
 
   it('can toggle widget visibility', () => {
@@ -105,8 +105,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(6);
-    expect(downButtons.length).toBe(6);
+    expect(upButtons.length).toBe(7);
+    expect(downButtons.length).toBe(7);
   });
 
   it('persists layout to localStorage', () => {
@@ -147,7 +147,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(6);
+    expect(allVisible.length).toBe(7);
   });
 
   it('has proper a11y labels on the section', () => {

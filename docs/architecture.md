@@ -33,11 +33,11 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 |  |     (MFE)       | |    (MFE)     | |    (MFE)      | |    Songs     |  |
 |  |   Port 3006     | |  Port 3007   | |  Port 3008    | |  Port 3009   |  |
 |  +-----------------+ +--------------+ +---------------+ +--------------+  |
-|  +--------------+ +---------------+                                        |
-|  |   Notebook   | | Baby Tracker  |                                        |
-|  |    (MFE)     | |    (MFE)      |                                        |
-|  |  Port 3010   | |  Port 3011    |                                        |
-|  +--------------+ +---------------+                                        |
+|  +--------------+ +---------------+ +-------------------+                  |
+|  |   Notebook   | | Baby Tracker  | | Child Development |                  |
+|  |    (MFE)     | |    (MFE)      | |       (MFE)       |                  |
+|  |  Port 3010   | |  Port 3011    | |    Port 3012      |                  |
+|  +--------------+ +---------------+ +-------------------+                  |
 +──────────────────────────────────────────────────────────────────────────+
                                 |
                                 v
@@ -133,6 +133,7 @@ The orchestrator that loads and composes all remote micro frontends.
 /notebook/new           -> Notebook MFE (new note editor)
 /notebook/:noteId       -> Notebook MFE (drill-down: note editor)
 /baby                   -> BabyTracker MFE (lazy-loaded, baby growth tracker)
+/child-dev              -> ChildDevelopment MFE (lazy-loaded, milestone tracker)
 /compare                -> WeatherCompare (legacy, still accessible)
 /*                      -> 404 NotFound
 ```
@@ -324,6 +325,22 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 - Gestational week = `40 - ceil(weeksUntilDue)`, trimester display, ARIA progress bar
 - Uses Apollo `GET_BIBLE_PASSAGE` query for accurate verse text from YouVersion API
 - Route: `/baby`
+
+### Child Development - `packages/child-development/`
+
+Exposes `ChildDevelopment` component via Module Federation. Port **3012**.
+
+**Key Behavior:**
+- Postnatal developmental milestone tracking from birth through age 5 (270 milestones)
+- 6 developmental domains (Physical, Speech, Cognitive, Social, Health, Sensory) with color-coded cards and SVG progress rings
+- 9 age ranges (0–3m, 3–6m, 6–9m, 9–12m, 12–18m, 18–24m, 2–3y, 3–4y, 4–5y)
+- Tracking mode (checkboxes) vs. Reference mode (informational bullets)
+- Auto-calculated age from birth date with current age range highlighting
+- Red flag indicators (~11% of milestones) for pediatrician consultation
+- Encouraging Bible verses (15 references) for parents with shuffle
+- Persistence: `StorageKeys.CHILD_NAME`, `CHILD_BIRTH_DATE`, `CHILD_MILESTONES` (localStorage)
+- `WindowEvents.CHILD_DATA_CHANGED` bridges MFE ↔ shell for cross-tab sync
+- Route: `/child-dev`
 
 ---
 
