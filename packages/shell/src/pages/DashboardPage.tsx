@@ -29,7 +29,7 @@ export default function DashboardPage() {
                 &ldquo;{verse.text}&rdquo;
               </p>
             ) : null}
-            <p className={`text-xs text-blue-500 dark:text-blue-300 font-medium ${verse.text || loading ? 'mt-1.5' : ''}`}>
+            <p className={`text-xs text-blue-700 dark:text-blue-300 font-medium ${verse.text || loading ? 'mt-1.5' : ''}`}>
               — {verse.reference}
             </p>
             {verse.copyright && (
