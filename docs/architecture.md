@@ -117,17 +117,24 @@ The orchestrator that loads and composes all remote micro frontends.
 
 **Route Structure:**
 ```
-/                  -> DashboardPage (hero section, widget dashboard)
-/weather/:coords   -> WeatherDisplay MFE (lazy-loaded, includes inline comparison)
-/stocks            -> StockTracker MFE (lazy-loaded)
-/podcasts          -> PodcastPlayer MFE (lazy-loaded, discover + subscribed tabs)
-/ai                -> AiAssistant MFE (lazy-loaded)
-/bible             -> BibleReader MFE (lazy-loaded, daily devotionals)
-/worship           -> WorshipSongs MFE (lazy-loaded, chord editor)
-/notebook          -> Notebook MFE (lazy-loaded, personal notes)
-/baby              -> BabyTracker MFE (lazy-loaded, baby growth tracker)
-/compare           -> WeatherCompare (legacy, still accessible)
-/*                 -> 404 NotFound
+/                       -> DashboardPage (hero section, widget dashboard)
+/weather/:coords        -> WeatherDisplay MFE (lazy-loaded, includes inline comparison)
+/stocks                 -> StockTracker MFE (lazy-loaded, watchlist + crypto)
+/stocks/:symbol         -> StockTracker MFE (drill-down: quote, chart, news)
+/podcasts               -> PodcastPlayer MFE (lazy-loaded, discover + subscribed tabs)
+/podcasts/:podcastId    -> PodcastPlayer MFE (drill-down: episodes list)
+/ai                     -> AiAssistant MFE (lazy-loaded)
+/bible                  -> BibleReader MFE (lazy-loaded, daily devotionals)
+/worship                -> WorshipSongs MFE (lazy-loaded, song list)
+/worship/new            -> WorshipSongs MFE (new song editor)
+/worship/:songId        -> WorshipSongs MFE (drill-down: song viewer)
+/worship/:songId/edit   -> WorshipSongs MFE (song editor)
+/notebook               -> Notebook MFE (lazy-loaded, personal notes)
+/notebook/new           -> Notebook MFE (new note editor)
+/notebook/:noteId       -> Notebook MFE (drill-down: note editor)
+/baby                   -> BabyTracker MFE (lazy-loaded, baby growth tracker)
+/compare                -> WeatherCompare (legacy, still accessible)
+/*                      -> 404 NotFound
 ```
 
 **Provider Hierarchy:**

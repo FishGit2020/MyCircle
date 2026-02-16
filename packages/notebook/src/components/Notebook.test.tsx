@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import Notebook from './Notebook';
 
 // Mock @mycircle/shared
@@ -11,10 +12,20 @@ vi.mock('@mycircle/shared', () => ({
   StorageKeys: { NOTEBOOK_CACHE: 'notebook-cache' },
 }));
 
+const renderWithRouter = (initialPath = '/notebook') => render(
+  <MemoryRouter initialEntries={[initialPath]}>
+    <Routes>
+      <Route path="/notebook" element={<Notebook />} />
+      <Route path="/notebook/new" element={<Notebook />} />
+      <Route path="/notebook/:noteId" element={<Notebook />} />
+    </Routes>
+  </MemoryRouter>
+);
+
 describe('Notebook', () => {
   it('shows login message when not authenticated', () => {
     // No __getFirebaseIdToken or __notebook on window → unauthenticated state
-    render(<Notebook />);
+    renderWithRouter();
     expect(screen.getByText('notebook.loginToUse')).toBeInTheDocument();
   });
 });

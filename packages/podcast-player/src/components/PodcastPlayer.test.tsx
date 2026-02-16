@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import PodcastPlayer from './PodcastPlayer';
 
 // Mock the usePodcastData hooks
@@ -46,10 +46,15 @@ vi.mock('../hooks/usePodcastData', () => ({
   }),
 }));
 
-const renderWithProviders = (ui: React.ReactElement) => {
+const renderWithProviders = () => {
   return render(
     <MockedProvider mocks={[]} addTypename={false}>
-      <MemoryRouter>{ui}</MemoryRouter>
+      <MemoryRouter initialEntries={['/podcasts']}>
+        <Routes>
+          <Route path="/podcasts" element={<PodcastPlayer />} />
+          <Route path="/podcasts/:podcastId" element={<PodcastPlayer />} />
+        </Routes>
+      </MemoryRouter>
     </MockedProvider>
   );
 };
@@ -62,40 +67,40 @@ describe('PodcastPlayer', () => {
   });
 
   it('renders the podcast player title', () => {
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
     expect(screen.getByText('Podcasts')).toBeInTheDocument();
   });
 
   it('renders the search input', () => {
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
     expect(screen.getByPlaceholderText('Search podcasts...')).toBeInTheDocument();
   });
 
   it('renders trending section header', () => {
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
     expect(screen.getAllByText('Trending').length).toBeGreaterThan(0);
   });
 
   it('renders trending podcast cards', () => {
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
     expect(screen.getByText('Test Podcast')).toBeInTheDocument();
     expect(screen.getByText('Another Podcast')).toBeInTheDocument();
   });
 
   it('displays podcast authors', () => {
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
     expect(screen.getByText('Test Author')).toBeInTheDocument();
     expect(screen.getByText('Another Author')).toBeInTheDocument();
   });
 
   it('renders subscribe buttons for each podcast', () => {
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
     const subscribeButtons = screen.getAllByText('Subscribe');
     expect(subscribeButtons.length).toBeGreaterThanOrEqual(2);
   });
 
   it('renders discover and subscribed tabs', async () => {
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
     // Tab bar with "Trending" (discover) and "My Subscriptions" tabs
     const trendingTabs = screen.getAllByText('Trending');
     expect(trendingTabs.length).toBeGreaterThanOrEqual(1);
@@ -105,7 +110,7 @@ describe('PodcastPlayer', () => {
 
   it('switches to subscribed tab and shows empty state', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
 
     // Auth check is async — wait for the tab to appear
     const subscribedTab = await screen.findByText('My Subscriptions');
@@ -116,7 +121,7 @@ describe('PodcastPlayer', () => {
 
   it('uses string IDs for subscription management', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<PodcastPlayer />);
+    renderWithProviders();
 
     // Subscribe to a podcast
     const subscribeButtons = screen.getAllByText('Subscribe');

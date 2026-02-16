@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
 import { usePublicNotes } from '../hooks/usePublicNotes';
@@ -11,11 +12,29 @@ type Tab = 'my' | 'public';
 
 export default function Notebook() {
   const { t } = useTranslation();
+  const { noteId } = useParams<{ noteId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { notes, loading, error, saveNote, deleteNote } = useNotes();
   const { notes: publicNotes, loading: publicLoading, error: publicError, publishNote, updateNote: updatePublicNote, deleteNote: deletePublicNote } = usePublicNotes();
-  const [view, setView] = useState<View>('list');
   const [tab, setTab] = useState<Tab>('my');
-  const [selectedNote, setSelectedNote] = useState<Note | PublicNote | null>(null);
+
+  // Derive view from URL
+  const isNewRoute = location.pathname === '/notebook/new';
+  const view: View = isNewRoute ? 'new' : noteId ? 'edit' : 'list';
+
+  // Find selected note from loaded data
+  const selectedNote = noteId
+    ? (notes.find(n => n.id === noteId) || publicNotes.find(n => n.id === noteId) || null)
+    : null;
+
+  // Auto-detect tab when navigating to a public note
+  useEffect(() => {
+    if (noteId && !isNewRoute) {
+      const isPublic = publicNotes.some(n => n.id === noteId);
+      if (isPublic) setTab('public');
+    }
+  }, [noteId, isNewRoute, publicNotes]);
 
   // Auth check — shell exposes __getFirebaseIdToken when user is logged in
   const hasAuth = typeof (window as any).__getFirebaseIdToken === 'function';
@@ -57,8 +76,7 @@ export default function Notebook() {
     } else {
       await saveNote(id, data);
     }
-    setView('list');
-    setSelectedNote(null);
+    navigate('/notebook');
   };
 
   const handleDelete = async (id: string) => {
@@ -71,15 +89,13 @@ export default function Notebook() {
       await deleteNote(id);
     }
     if (view === 'edit') {
-      setView('list');
-      setSelectedNote(null);
+      navigate('/notebook');
     }
   };
 
   const handlePublish = async (data: { title: string; content: string }) => {
     await publishNote(data);
-    setView('list');
-    setSelectedNote(null);
+    navigate('/notebook');
   };
 
   if (view === 'new' || view === 'edit') {
@@ -87,7 +103,7 @@ export default function Notebook() {
       <NoteEditor
         note={view === 'edit' ? selectedNote : null}
         onSave={handleSave}
-        onCancel={() => { setView('list'); setSelectedNote(null); }}
+        onCancel={() => navigate('/notebook')}
         onDelete={view === 'edit' ? handleDelete : undefined}
         onPublish={tab === 'my' ? handlePublish : undefined}
       />
@@ -108,7 +124,7 @@ export default function Notebook() {
             key={key}
             role="tab"
             aria-selected={tab === key}
-            onClick={() => { setTab(key); setView('list'); setSelectedNote(null); }}
+            onClick={() => { setTab(key); if (view !== 'list') navigate('/notebook'); }}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               tab === key
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -122,8 +138,8 @@ export default function Notebook() {
 
       <NoteList
         notes={tab === 'my' ? notes : publicNotes}
-        onSelect={(note) => { setSelectedNote(note); setView('edit'); }}
-        onNew={() => setView('new')}
+        onSelect={(note) => navigate(`/notebook/${note.id}`)}
+        onNew={() => navigate('/notebook/new')}
         onDelete={handleDelete}
         isPublicView={tab === 'public'}
       />
