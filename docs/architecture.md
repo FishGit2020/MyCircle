@@ -92,6 +92,9 @@ The shell and MFE components follow WCAG 2.1 patterns:
 - **Focus management** — `useFocusOnRouteChange` hook moves focus to `#main-content` on route change so screen readers announce the new page
 - **Breadcrumbs** — `<nav aria-label="Breadcrumb">` with `aria-current="page"` on the current segment, rendered below the header on feature pages
 - **Focus indicators** — `focus:ring-2 focus:ring-blue-500` on interactive elements
+- **Color contrast** — text/background combinations meet WCAG AA 4.5:1 minimum (e.g., `text-gray-600` on `bg-gray-100`, `text-white` on `bg-blue-600`, `text-blue-700` on `bg-blue-50`)
+- **Touch targets** — interactive elements (e.g., onboarding step dots) use a minimum 24×24px tap area, with visual size kept small via inner spans
+- **Geolocation** — auto-location only fires when the user has previously granted permission (via Permissions API); first-time users must click "Use My Location"
 
 ---
 

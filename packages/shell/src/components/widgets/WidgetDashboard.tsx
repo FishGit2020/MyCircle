@@ -92,26 +92,39 @@ function WeatherWidget() {
     }
   }, [geocodeData]);
 
-  // Auto-fetch current location weather on mount
+  // Auto-fetch current location weather only if permission was previously granted
   useEffect(() => {
     if (!navigator.geolocation) {
       setGeoError(true);
       return;
     }
-    setGeoLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        fetchWeather({ variables: { lat: latitude, lon: longitude } });
-        fetchGeocode({ variables: { lat: latitude, lon: longitude } });
-        setGeoLoading(false);
-      },
-      () => {
-        setGeoError(true);
-        setGeoLoading(false);
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
-    );
+
+    const fetchLocation = () => {
+      setGeoLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          fetchWeather({ variables: { lat: latitude, lon: longitude } });
+          fetchGeocode({ variables: { lat: latitude, lon: longitude } });
+          setGeoLoading(false);
+        },
+        () => {
+          setGeoError(true);
+          setGeoLoading(false);
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+      );
+    };
+
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'granted') {
+          fetchLocation();
+        }
+        // If 'prompt' or 'denied', don't auto-request — let user click UseMyLocation
+      });
+    }
+    // Fallback: if Permissions API not supported, don't auto-request
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = weatherData?.currentWeather;

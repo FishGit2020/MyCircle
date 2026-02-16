@@ -284,8 +284,8 @@ export default defineConfig({
   build: {
     modulePreload: false,
     target: 'esnext',
-    minify: false,
-    cssCodeSplit: false
+    minify: 'esbuild',
+    cssCodeSplit: true
   },
   server: {
     port: 3000,

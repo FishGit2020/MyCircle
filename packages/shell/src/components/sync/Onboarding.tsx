@@ -140,20 +140,22 @@ export default function Onboarding() {
         </div>
 
         {/* Progress dots */}
-        <div className="flex justify-center gap-2 py-4">
+        <div className="flex justify-center gap-0.5 py-4">
           {STEPS.map((_, i) => (
             <button
               key={i}
               onClick={() => setStep(i)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
+              className="flex items-center justify-center w-6 h-6"
+              aria-label={t('onboarding.stepOf').replace('{current}', String(i + 1)).replace('{total}', String(STEPS.length))}
+            >
+              <span className={`block w-2.5 h-2.5 rounded-full transition-all ${
                 i === step
                   ? 'bg-blue-500 scale-110'
                   : i < step
                   ? 'bg-blue-300 dark:bg-blue-600'
                   : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-              aria-label={t('onboarding.stepOf').replace('{current}', String(i + 1)).replace('{total}', String(STEPS.length))}
-            />
+              }`} />
+            </button>
           ))}
         </div>
 
