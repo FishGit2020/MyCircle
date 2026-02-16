@@ -89,6 +89,8 @@ The shell and MFE components follow WCAG 2.1 patterns:
 - **Horizontal scroll regions** — `role="region"` with `aria-label` and `tabIndex={0}` for keyboard-focusable scroll containers (e.g., hourly forecast)
 - **Toast notifications** — `role="alert"` with `aria-live="assertive"` for foreground push notification toasts
 - **Skip-to-content** link in Layout.tsx for keyboard users
+- **Focus management** — `useFocusOnRouteChange` hook moves focus to `#main-content` on route change so screen readers announce the new page
+- **Breadcrumbs** — `<nav aria-label="Breadcrumb">` with `aria-current="page"` on the current segment, rendered below the header on feature pages
 - **Focus indicators** — `focus:ring-2 focus:ring-blue-500` on interactive elements
 
 ---
@@ -312,6 +314,25 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 - Gestational week = `40 - ceil(weeksUntilDue)`, trimester display, ARIA progress bar
 - Uses Apollo `GET_BIBLE_PASSAGE` query for accurate verse text from YouVersion API
 - Route: `/baby`
+
+---
+
+## Navigation & Discovery
+
+### Breadcrumbs
+**File:** `packages/shell/src/components/layout/Breadcrumbs.tsx`
+
+A breadcrumb trail renders below the header on all feature pages (`/weather`, `/stocks`, etc.), showing "Home / Weather". Uses `useLocation()` to derive the current route segment and maps it to the i18n label key via `ROUTE_LABEL_KEYS`. Hidden on the home page.
+
+### Recently Visited Pages
+**File:** `packages/shell/src/hooks/useRecentlyVisited.ts`
+
+Tracks the last 5 visited routes (excluding `/` and `/compare`) in `StorageKeys.RECENTLY_VISITED`. Surfaces recent pages in the command palette (Ctrl+K) as a "Recent Pages" section above the navigation items.
+
+### Focus Management
+**File:** `packages/shell/src/hooks/useFocusOnRouteChange.ts`
+
+Moves focus to `#main-content` on route change (skipping initial render) so screen readers announce the new page content. Sets `tabindex="-1"` for programmatic focus.
 
 ---
 

@@ -64,6 +64,7 @@ export const StorageKeys = {
   WEATHER_ALERTS: 'weather-alerts-enabled',
   PODCAST_ALERTS: 'podcast-alerts-enabled',
   ANNOUNCEMENT_ALERTS: 'announcement-alerts-enabled',
+  RECENTLY_VISITED: 'recently-visited',
 } as const;
 
 export interface CitySelectedEvent {
