@@ -774,6 +774,7 @@ const es: Record<TranslationKey, string> = {
   'widgets.notebook': 'Bloc de notas',
   'widgets.notebookDesc': 'Tus notas personales',
   'widgets.noNotes': 'A\u00fan no hay notas',
+  'widgets.publicNoteCount': '{count} notas p\u00fablicas compartidas',
   'widgets.hidden': 'Oculto',
   'widgets.visible': 'Visible',
   'widgets.moveUp': 'Mover widget arriba',

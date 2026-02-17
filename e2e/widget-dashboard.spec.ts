@@ -51,7 +51,7 @@ test.describe('Widget Dashboard', () => {
     // All 8 widgets should show visibility toggle buttons in edit mode
     const visibleButtons = page.getByRole('button', { name: /toggle widget/i });
     const count = await visibleButtons.count();
-    expect(count).toBe(8);
+    expect(count).toBe(9);
   });
 
   test('widget visibility change persists after page reload', async ({ page }) => {

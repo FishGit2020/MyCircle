@@ -772,6 +772,7 @@ const en = {
   'widgets.notebook': 'Notebook',
   'widgets.notebookDesc': 'Your personal notes',
   'widgets.noNotes': 'No notes yet',
+  'widgets.publicNoteCount': '{count} public notes shared',
   'widgets.hidden': 'Hidden',
   'widgets.visible': 'Visible',
   'widgets.moveUp': 'Move widget up',
