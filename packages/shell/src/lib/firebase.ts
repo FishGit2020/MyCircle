@@ -683,6 +683,52 @@ export function subscribeToPublicNotes(callback: (notes: Array<Record<string, an
   });
 }
 
+// Chinese Characters — public read, auth-required write
+export async function getChineseCharacters() {
+  if (!db) return [];
+  const q = query(collection(db, 'chineseCharacters'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function addChineseCharacter(char: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const user = auth?.currentUser;
+  const docRef = await addDoc(collection(db, 'chineseCharacters'), {
+    ...char,
+    createdBy: { uid: user?.uid ?? 'anonymous', displayName: user?.displayName || user?.email || 'Anonymous' },
+    createdAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateChineseCharacter(id: string, updates: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const user = auth?.currentUser;
+  const docRef = doc(db, 'chineseCharacters', id);
+  await updateDoc(docRef, {
+    ...updates,
+    editedBy: { uid: user?.uid ?? 'anonymous', displayName: user?.displayName || user?.email || 'Anonymous' },
+    editedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteChineseCharacter(id: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'chineseCharacters', id));
+}
+
+export function subscribeToChineseCharacters(callback: (chars: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'chineseCharacters'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const chars = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(chars);
+  }, (error) => {
+    log.warn('Chinese characters snapshot error:', error);
+  });
+}
+
 // Expose worship songs API for MFEs
 if (firebaseEnabled) {
   window.__worshipSongs = {
@@ -728,6 +774,17 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deletePublicNote(id);
     },
+  };
+}
+
+// Expose Chinese characters API for MFEs
+if (firebaseEnabled) {
+  window.__chineseCharacters = {
+    getAll: getChineseCharacters as any,
+    add: addChineseCharacter,
+    update: updateChineseCharacter,
+    delete: deleteChineseCharacter,
+    subscribe: subscribeToChineseCharacters,
   };
 }
 

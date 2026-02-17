@@ -16,6 +16,7 @@ vi.mock('@mycircle/shared', () => ({
     ENGLISH_PROGRESS_CHANGED: 'english-progress-changed',
     CHINESE_PROGRESS_CHANGED: 'chinese-progress-changed',
     BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
+    BIBLE_BOOKMARKS_CHANGED: 'bible-bookmarks-changed',
   },
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
@@ -29,6 +30,7 @@ vi.mock('@mycircle/shared', () => ({
     CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
     CHILD_NAME: 'child-name',
     CHILD_BIRTH_DATE: 'child-birth-date',
+    BIBLE_BOOKMARKS: 'bible-bookmarks',
   },
   MFEvents: {
     PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
@@ -78,7 +80,7 @@ describe('WidgetDashboard', () => {
     renderWidget();
     expect(screen.getByText('widgets.weather')).toBeInTheDocument();
     expect(screen.getByText('widgets.stocks')).toBeInTheDocument();
-    expect(screen.getByText('widgets.verse')).toBeInTheDocument();
+    expect(screen.getByText('widgets.bible')).toBeInTheDocument();
     expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
     expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
     expect(screen.getByText('widgets.childDev')).toBeInTheDocument();

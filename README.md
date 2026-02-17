@@ -110,10 +110,14 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### Chinese Learning
 - Learn Chinese characters through interactive flashcards and handwriting practice
-- ~50 characters/phrases across 8 categories: Family, Feelings, Food & Drink, Body & Actions, Around the House, Nature & Animals, Numbers, Common Phrases
+- **Firestore-backed characters** — characters stored in Firestore (public read, authenticated write); real-time updates via `onSnapshot`
+- ~50 default characters/phrases across 8 categories: Family, Feelings, Food & Drink, Body & Actions, Around the House, Nature & Animals, Numbers, Common Phrases
+- **Character CRUD** — authenticated users can add, edit, and delete characters with creator/editor metadata
+- **Pinyin keyboard** — compact toolbar with tone-marked vowels (ā á ǎ à, etc.) for easy pinyin input
+- **Character editor** — modal with character, pinyin (with keyboard), meaning, and category fields; delete with confirmation
 - **Flashcard system** — front shows character, tap to flip for pinyin + meaning; mark as mastered to track progress
 - **Practice canvas** — Pointer Events drawing with reference watermark, undo/clear support; works on mouse, touch, and stylus
-- **Character grid** — browse all characters grouped by category with mastered indicators
+- **Character grid** — browse all characters grouped by category with mastered indicators; edit/delete controls on hover (auth-gated)
 - Progress persisted to localStorage and synced to Firestore
 
 ### English Learning
@@ -136,7 +140,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Multi-language support (i18n: English, Spanish, Chinese)
 - Temperature (°C / °F) and wind speed (m/s, mph, km/h) unit toggles
 - **Push notifications** — multi-category preferences (weather alerts, podcast episodes, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
-- **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal with mobile bottom-nav clearance; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
+- **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge; auto-popup toast for unread announcements (1.5s delay, one-time per batch); dedicated `/whats-new` page with all announcements, NEW badges on unread, blue highlight; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
 - **Offline sync** — Firestore offline persistence via `persistentLocalCache` with multi-tab support; floating `SyncIndicator` shows offline/synced status
 - Offline indicator & PWA support with **fast update detection** (30s polling + visibility-change check, `skipWaiting` for immediate SW activation)

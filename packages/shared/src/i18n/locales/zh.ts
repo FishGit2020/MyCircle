@@ -769,6 +769,11 @@ const zh: Record<TranslationKey, string> = {
   'widgets.nowPlaying': '\u6b63\u5728\u64ad\u653e',
   'widgets.nowPlayingDesc': '\u5f53\u524d\u64ad\u653e\u7684\u64ad\u5ba2',
   'widgets.nothingPlaying': '\u6ca1\u6709\u6b63\u5728\u64ad\u653e\u7684\u64ad\u5ba2',
+  'widgets.discoverPodcasts': '\u70b9\u51fb\u53d1\u73b0\u5e76\u8ba2\u9605\u64ad\u5ba2',
+  'widgets.bible': '\u5723\u7ecf',
+  'widgets.bibleDesc': '\u4f60\u7684\u4e66\u7b7e',
+  'widgets.noBookmarks': '\u8fd8\u6ca1\u6709\u4e66\u7b7e \u2014 \u6253\u5f00\u5723\u7ecf\u4fdd\u5b58\u7ecf\u6587',
+  'widgets.moreBookmarks': '\u66f4\u591a',
   'widgets.noFavoriteCity': '\u6dfb\u52a0\u6536\u85cf\u57ce\u5e02\u4ee5\u67e5\u770b\u5929\u6c14',
   'widgets.noStocks': '\u6dfb\u52a0\u80a1\u7968\u5230\u81ea\u9009\u5217\u8868',
   'widgets.notebook': '\u7b14\u8bb0\u672c',
@@ -798,6 +803,10 @@ const zh: Record<TranslationKey, string> = {
   'whatsNew.close': '\u5173\u95ed',
   'whatsNew.noUpdates': '\u6682\u65e0\u516c\u544a\u3002\u8bf7\u7a0d\u540e\u67e5\u770b\uff01',
   'whatsNew.newBadge': '\u6709\u65b0\u7684\u66f4\u65b0',
+  'whatsNew.viewAll': '\u67e5\u770b\u6240\u6709\u66f4\u65b0',
+  'whatsNew.new': '\u65b0',
+  'whatsNew.noAnnouncements': '\u6682\u65e0\u516c\u544a',
+  'whatsNew.dismiss': '\u5173\u95ed',
 
   // Baby Tracker
   'nav.baby': '\u5b9d\u5b9d',
@@ -1313,6 +1322,24 @@ const zh: Record<TranslationKey, string> = {
   'english.category.people': '\u4eba\u7269\u4e0e\u5bb6\u4eba',
   'english.category.time': '\u65f6\u95f4\u4e0e\u5929\u6c14',
   'english.category.emergency': '\u7d27\u6025\u60c5\u51b5',
+
+  // Chinese Characters CRUD
+  'chinese.addCharacter': '\u6dfb\u52a0\u5b57\u7b26',
+  'chinese.editCharacter': '\u7f16\u8f91\u5b57\u7b26',
+  'chinese.deleteCharacter': '\u5220\u9664\u5b57\u7b26',
+  'chinese.deleteConfirm': '\u5220\u9664\u6b64\u5b57\u7b26\uff1f\u6b64\u64cd\u4f5c\u65e0\u6cd5\u64a4\u6d88\u3002',
+  'chinese.character': '\u5b57\u7b26',
+  'chinese.pinyin': '\u62fc\u97f3',
+  'chinese.meaning': '\u542b\u4e49',
+  'chinese.categoryLabel': '\u5206\u7c7b',
+  'chinese.save': '\u4fdd\u5b58',
+  'chinese.cancel': '\u53d6\u6d88',
+  'chinese.pinyinKeyboard': '\u62fc\u97f3\u952e\u76d8',
+  'chinese.createdBy': '\u6dfb\u52a0\u8005',
+  'chinese.editedBy': '\u7f16\u8f91\u8005',
+  'chinese.noCharacters': '\u8fd8\u6ca1\u6709\u5b57\u7b26\u3002\u6dfb\u52a0\u4e00\u4e2a\u5f00\u59cb\u5427\uff01',
+  'chinese.signInToAdd': '\u767b\u5f55\u540e\u6dfb\u52a0\u5b57\u7b26',
+  'chinese.loading': '\u52a0\u8f7d\u5b57\u7b26\u4e2d...',
 };
 
 export default zh;

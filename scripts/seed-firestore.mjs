@@ -66,6 +66,22 @@ async function seed() {
     updatedAt: new Date(),
   });
 
+  // Chinese characters (sample set for testing)
+  const chineseChars = [
+    { character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family' },
+    { character: '\u7238\u7238', pinyin: 'b\u00e0ba', meaning: 'dad', category: 'family' },
+    { character: '\u4f60\u597d', pinyin: 'n\u01d0h\u01ceo', meaning: 'hello', category: 'phrases' },
+    { character: '\u8c22\u8c22', pinyin: 'xi\u00e8xie', meaning: 'thank you', category: 'phrases' },
+    { character: '\u6c34', pinyin: 'shu\u01d0', meaning: 'water', category: 'food' },
+  ];
+  for (const char of chineseChars) {
+    await db.collection('chineseCharacters').add({
+      ...char,
+      createdBy: { uid: 'system', displayName: 'MyCircle' },
+      createdAt: new Date(),
+    });
+  }
+
   console.log('Firestore seeded successfully.');
 }
 

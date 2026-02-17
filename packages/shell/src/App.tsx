@@ -7,6 +7,7 @@ import { UnitToggle, SpeedToggle } from './components/settings';
 import { WeatherCompare } from './components/widgets';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
+import WhatsNewPage from './pages/WhatsNewPage';
 import { useAuth } from './context/AuthContext';
 
 // Lazy load remote micro frontends
@@ -391,6 +392,7 @@ export default function App() {
         <Route path="child-dev" element={<ChildDevPage />} />
         <Route path="chinese" element={<ChinesePage />} />
         <Route path="english" element={<EnglishPage />} />
+        <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />
       </Route>

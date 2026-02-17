@@ -768,7 +768,12 @@ const es: Record<TranslationKey, string> = {
   'widgets.verseDesc': 'Inspiración bíblica diaria',
   'widgets.nowPlaying': 'Reproduciendo',
   'widgets.nowPlayingDesc': 'Podcast en reproducción',
-  'widgets.nothingPlaying': 'No hay podcast en reproducción',
+  'widgets.nothingPlaying': 'No hay podcast en reproducci\u00f3n',
+  'widgets.discoverPodcasts': 'Toca para descubrir y suscribirte a podcasts',
+  'widgets.bible': 'Biblia',
+  'widgets.bibleDesc': 'Tus marcadores guardados',
+  'widgets.noBookmarks': 'Sin marcadores a\u00fan \u2014 abre la Biblia para guardar pasajes',
+  'widgets.moreBookmarks': 'm\u00e1s',
   'widgets.noFavoriteCity': 'Agrega una ciudad favorita para ver el clima',
   'widgets.noStocks': 'Agrega acciones a tu lista de seguimiento',
   'widgets.notebook': 'Bloc de notas',
@@ -798,6 +803,10 @@ const es: Record<TranslationKey, string> = {
   'whatsNew.close': 'Cerrar',
   'whatsNew.noUpdates': 'No hay anuncios a\u00fan. \u00a1Vuelve m\u00e1s tarde!',
   'whatsNew.newBadge': 'Nuevas actualizaciones disponibles',
+  'whatsNew.viewAll': 'Ver Todas las Actualizaciones',
+  'whatsNew.new': 'NUEVO',
+  'whatsNew.noAnnouncements': 'No hay anuncios a\u00fan',
+  'whatsNew.dismiss': 'Cerrar',
 
   // Baby Tracker
   'nav.baby': 'Beb\u00e9',
@@ -1313,6 +1322,24 @@ const es: Record<TranslationKey, string> = {
   'english.category.people': 'Personas y Familia',
   'english.category.time': 'Hora y Clima',
   'english.category.emergency': 'Emergencias',
+
+  // Chinese Characters CRUD
+  'chinese.addCharacter': 'Agregar Car\u00e1cter',
+  'chinese.editCharacter': 'Editar Car\u00e1cter',
+  'chinese.deleteCharacter': 'Eliminar Car\u00e1cter',
+  'chinese.deleteConfirm': '\u00bfEliminar este car\u00e1cter? Esta acci\u00f3n no se puede deshacer.',
+  'chinese.character': 'Car\u00e1cter',
+  'chinese.pinyin': 'Pinyin',
+  'chinese.meaning': 'Significado',
+  'chinese.categoryLabel': 'Categor\u00eda',
+  'chinese.save': 'Guardar',
+  'chinese.cancel': 'Cancelar',
+  'chinese.pinyinKeyboard': 'Teclado Pinyin',
+  'chinese.createdBy': 'Agregado por',
+  'chinese.editedBy': 'Editado por',
+  'chinese.noCharacters': 'No hay caracteres a\u00fan. \u00a1Agrega uno para comenzar!',
+  'chinese.signInToAdd': 'Inicia sesi\u00f3n para agregar caracteres',
+  'chinese.loading': 'Cargando caracteres...',
 };
 
 export default es;

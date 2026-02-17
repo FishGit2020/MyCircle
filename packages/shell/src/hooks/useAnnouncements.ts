@@ -10,6 +10,7 @@ export function useAnnouncements() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasUnread, setHasUnread] = useState(false);
+  const [lastSeenId, setLastSeenId] = useState<string | null>(null);
 
   // Determine the last-seen ID from profile (signed-in) or localStorage (anonymous)
   const getLastSeenId = useCallback((): string | null => {
@@ -29,8 +30,9 @@ export function useAnnouncements() {
           setAnnouncements(items);
           // Check for unread: if there are announcements and the first (newest) one
           // is not the last-seen one, there are unread announcements
-          const lastSeenId = getLastSeenId();
-          const hasNew = items.length > 0 && items[0].id !== lastSeenId;
+          const seenId = getLastSeenId();
+          setLastSeenId(seenId);
+          const hasNew = items.length > 0 && items[0].id !== seenId;
           setHasUnread(hasNew);
         }
       } catch {
@@ -49,6 +51,7 @@ export function useAnnouncements() {
 
     // Persist to localStorage (works for everyone)
     localStorage.setItem(StorageKeys.LAST_SEEN_ANNOUNCEMENT, latestId);
+    setLastSeenId(latestId);
 
     // If signed in, also persist to Firestore
     if (user) {
@@ -62,5 +65,5 @@ export function useAnnouncements() {
     setHasUnread(false);
   }, [announcements, user]);
 
-  return { announcements, loading, hasUnread, markAllSeen };
+  return { announcements, loading, hasUnread, markAllSeen, lastSeenId };
 }

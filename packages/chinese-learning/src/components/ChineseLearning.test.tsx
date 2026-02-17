@@ -1,29 +1,51 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChineseLearning from './ChineseLearning';
 
-describe('ChineseLearning', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
+const mockCharacters = [
+  { id: 'f01', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'f02', character: '\u7238\u7238', pinyin: 'b\u00e0ba', meaning: 'dad', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'num01', character: '\u4e00', pinyin: 'y\u012b', meaning: 'one', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'num02', character: '\u4e8c', pinyin: '\u00e8r', meaning: 'two', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'p01', character: '\u4f60\u597d', pinyin: 'n\u01d0h\u01ceo', meaning: 'hello', category: 'phrases', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+];
 
-  it('renders the title and grid view by default', () => {
+beforeEach(() => {
+  localStorage.clear();
+  window.__chineseCharacters = {
+    getAll: vi.fn().mockResolvedValue(mockCharacters),
+    add: vi.fn().mockResolvedValue('new-id'),
+    update: vi.fn().mockResolvedValue(undefined),
+    delete: vi.fn().mockResolvedValue(undefined),
+    subscribe: vi.fn((cb) => {
+      cb(mockCharacters);
+      return vi.fn();
+    }),
+  };
+  window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+});
+
+describe('ChineseLearning', () => {
+  it('renders the title and grid view by default', async () => {
     render(<ChineseLearning />);
-    expect(screen.getByText('Learn Chinese')).toBeInTheDocument();
-    expect(screen.getByText('All Characters')).toBeInTheDocument();
-    // Should show category headers
+    await waitFor(() => {
+      expect(screen.getByText('Learn Chinese')).toBeInTheDocument();
+    });
     expect(screen.getByText('Family')).toBeInTheDocument();
     expect(screen.getByText('Numbers')).toBeInTheDocument();
   });
 
-  it('shows mastered count as 0/N initially', () => {
+  it('shows mastered count as 0/N initially', async () => {
     render(<ChineseLearning />);
-    expect(screen.getByText(/Mastered: 0 \//)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Mastered: 0 \/ 5/)).toBeInTheDocument();
+    });
   });
 
   it('switches to flashcard view', async () => {
     const user = userEvent.setup();
     render(<ChineseLearning />);
+    await waitFor(() => expect(screen.getByText('Flashcards')).toBeInTheDocument());
 
     await user.click(screen.getByText('Flashcards'));
     expect(screen.getByTestId('flashcard')).toBeInTheDocument();
@@ -32,24 +54,26 @@ describe('ChineseLearning', () => {
   it('clicking a character in grid switches to flashcard view', async () => {
     const user = userEvent.setup();
     render(<ChineseLearning />);
+    await waitFor(() => expect(screen.getByText('\u5988\u5988')).toBeInTheDocument());
 
-    // Click on the first character (妈妈)
-    await user.click(screen.getAllByText('妈妈')[0]);
+    await user.click(screen.getAllByText('\u5988\u5988')[0]);
     expect(screen.getByTestId('flashcard')).toBeInTheDocument();
   });
 
   it('can mark a character as mastered from flashcard view', async () => {
     const user = userEvent.setup();
     render(<ChineseLearning />);
+    await waitFor(() => expect(screen.getByText('Flashcards')).toBeInTheDocument());
 
     await user.click(screen.getByText('Flashcards'));
     await user.click(screen.getByTestId('toggle-mastered'));
-    expect(screen.getByText(/Mastered: 1 \//)).toBeInTheDocument();
+    expect(screen.getByText(/Mastered: 1 \/ 5/)).toBeInTheDocument();
   });
 
   it('persists progress to localStorage', async () => {
     const user = userEvent.setup();
     render(<ChineseLearning />);
+    await waitFor(() => expect(screen.getByText('Flashcards')).toBeInTheDocument());
 
     await user.click(screen.getByText('Flashcards'));
     await user.click(screen.getByTestId('toggle-mastered'));
@@ -58,14 +82,16 @@ describe('ChineseLearning', () => {
     expect(stored.masteredIds).toHaveLength(1);
   });
 
-  it('restores progress from localStorage', () => {
+  it('restores progress from localStorage', async () => {
     localStorage.setItem('chinese-learning-progress', JSON.stringify({
       masteredIds: ['f01', 'f02'],
       lastDate: '2026-01-01',
     }));
 
     render(<ChineseLearning />);
-    expect(screen.getByText(/Mastered: 2 \//)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Mastered: 2 \/ 5/)).toBeInTheDocument();
+    });
   });
 
   it('resets progress when reset is clicked', async () => {
@@ -76,20 +102,75 @@ describe('ChineseLearning', () => {
 
     const user = userEvent.setup();
     render(<ChineseLearning />);
-    expect(screen.getByText(/Mastered: 1 \//)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(/Mastered: 1 \/ 5/)).toBeInTheDocument());
 
     await user.click(screen.getByText('Reset Progress'));
-    expect(screen.getByText(/Mastered: 0 \//)).toBeInTheDocument();
+    expect(screen.getByText(/Mastered: 0 \/ 5/)).toBeInTheDocument();
   });
 
   it('filters characters by category in flashcard view', async () => {
     const user = userEvent.setup();
     render(<ChineseLearning />);
+    await waitFor(() => expect(screen.getByText('Flashcards')).toBeInTheDocument());
 
     await user.click(screen.getByText('Flashcards'));
-    // Click "Numbers" category filter
     await user.click(screen.getByText('Numbers'));
-    // Should show 一 as first character
-    expect(screen.getByTestId('flashcard-character')).toHaveTextContent('一');
+    expect(screen.getByTestId('flashcard-character')).toHaveTextContent('\u4e00');
+  });
+
+  it('shows Add Character button when authenticated', async () => {
+    render(<ChineseLearning />);
+    await waitFor(() => {
+      expect(screen.getByTestId('add-character-btn')).toBeInTheDocument();
+    });
+  });
+
+  it('shows sign-in hint when not authenticated', async () => {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue(null);
+    render(<ChineseLearning />);
+    await waitFor(() => {
+      expect(screen.getByText('Sign in to add characters')).toBeInTheDocument();
+    });
+  });
+
+  it('opens editor when Add Character is clicked', async () => {
+    const user = userEvent.setup();
+    render(<ChineseLearning />);
+    await waitFor(() => expect(screen.getByTestId('add-character-btn')).toBeInTheDocument());
+
+    await user.click(screen.getByTestId('add-character-btn'));
+    expect(screen.getByTestId('character-editor')).toBeInTheDocument();
+  });
+
+  it('shows loading state when no cached characters', async () => {
+    window.__chineseCharacters = {
+      getAll: vi.fn().mockResolvedValue([]),
+      add: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      subscribe: undefined,
+    };
+    localStorage.removeItem('chinese-characters-cache');
+
+    render(<ChineseLearning />);
+    // Should show loading briefly then no-characters message
+    await waitFor(() => {
+      expect(screen.getByText('No characters yet. Add one to get started!')).toBeInTheDocument();
+    });
+  });
+
+  it('shows no characters message when empty', async () => {
+    window.__chineseCharacters = {
+      getAll: vi.fn().mockResolvedValue([]),
+      add: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      subscribe: vi.fn((cb) => { cb([]); return vi.fn(); }),
+    };
+
+    render(<ChineseLearning />);
+    await waitFor(() => {
+      expect(screen.getByTestId('no-characters')).toBeInTheDocument();
+    });
   });
 });

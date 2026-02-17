@@ -3,7 +3,6 @@ import { Link } from 'react-router';
 import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery, useUnits, formatTemperature } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
-import { useDailyVerse } from '../../hooks/useDailyVerse';
 import ErrorBoundary from '../common/ErrorBoundary';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -285,7 +284,24 @@ const StockWidget = React.memo(function StockWidget() {
 
 const VerseWidget = React.memo(function VerseWidget() {
   const { t } = useTranslation();
-  const { verse, loading } = useDailyVerse();
+  const [bookmarks, setBookmarks] = React.useState<Array<{ book: string; chapter: number; label: string }>>([]);
+
+  useEffect(() => {
+    function loadBookmarks() {
+      try {
+        const stored = localStorage.getItem(StorageKeys.BIBLE_BOOKMARKS);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setBookmarks(Array.isArray(parsed) ? parsed : []);
+        } else {
+          setBookmarks([]);
+        }
+      } catch { setBookmarks([]); }
+    }
+    loadBookmarks();
+    window.addEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, loadBookmarks);
+    return () => window.removeEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, loadBookmarks);
+  }, []);
 
   return (
     <div>
@@ -296,24 +312,27 @@ const VerseWidget = React.memo(function VerseWidget() {
           </svg>
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.verse')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.verseDesc')}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.bible')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.bibleDesc')}</p>
         </div>
       </div>
-      {loading ? (
-        <div className="h-4 bg-amber-200 dark:bg-amber-800/40 rounded animate-pulse w-3/4" />
-      ) : verse ? (
-        <div className="bg-amber-50/50 dark:bg-amber-900/10 rounded-lg p-2.5">
-          {verse.text && (
-            <p className="text-sm italic text-amber-700 dark:text-amber-300 leading-relaxed">
-              &ldquo;{verse.text}&rdquo;
-            </p>
+      {bookmarks.length > 0 ? (
+        <div className="space-y-1">
+          {bookmarks.slice(0, 4).map((b, i) => (
+            <div key={i} className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 bg-amber-50/50 dark:bg-amber-900/10 rounded px-2 py-1">
+              <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              <span className="truncate">{b.label || `${b.book} ${b.chapter}`}</span>
+            </div>
+          ))}
+          {bookmarks.length > 4 && (
+            <p className="text-[10px] text-amber-500 dark:text-amber-400 text-center">+{bookmarks.length - 4} {t('widgets.moreBookmarks')}</p>
           )}
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
-            — {verse.reference}
-          </p>
         </div>
-      ) : null}
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noBookmarks')}</p>
+      )}
     </div>
   );
 });
@@ -355,9 +374,6 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   }, []);
 
   const isPlaying = !!episode;
-
-  // Only show widget when user has podcast subscriptions or is actively playing
-  if (!hasSubscriptions && !isPlaying) return null;
 
   return (
     <div>
@@ -403,8 +419,10 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
             </div>
           </div>
         </div>
-      ) : (
+      ) : hasSubscriptions ? (
         <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.nothingPlaying')}</p>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.discoverPodcasts')}</p>
       )}
     </div>
   );
@@ -1030,7 +1048,7 @@ export default function WidgetDashboard() {
         </div>
       ) : (
         /* Normal mode: only visible widgets with data in a responsive grid */
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
           {visibleWidgets.map(widget => {
             const WidgetComponent = WIDGET_COMPONENTS[widget.id];
             const routeDef = WIDGET_ROUTES[widget.id];

@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation, StorageKeys, WindowEvents, type TranslationKey } from '@mycircle/shared';
-import { characters, categoryOrder, type ChineseCharacter, type CharacterCategory } from '../data/characters';
+import { categoryOrder, type ChineseCharacter, type CharacterCategory } from '../data/characters';
+import { useChineseCharacters } from '../hooks/useChineseCharacters';
 import FlashcardView from './FlashcardView';
 import PracticeCanvas from './PracticeCanvas';
 import CharacterGrid from './CharacterGrid';
+import CharacterEditor from './CharacterEditor';
 
 type View = 'grid' | 'flashcards' | 'practice';
 
@@ -38,10 +40,13 @@ function saveProgress(progress: Progress) {
 
 export default function ChineseLearning() {
   const { t } = useTranslation();
+  const { characters, loading, isAuthenticated, addCharacter, updateCharacter, deleteCharacter } = useChineseCharacters();
   const [view, setView] = useState<View>('grid');
   const [selectedCategory, setSelectedCategory] = useState<CharacterCategory | null>(null);
   const [practiceChar, setPracticeChar] = useState<ChineseCharacter | null>(null);
   const [masteredIds, setMasteredIds] = useState<Set<string>>(() => new Set(loadProgress().masteredIds));
+  const [editorChar, setEditorChar] = useState<ChineseCharacter | undefined>(undefined);
+  const [showEditor, setShowEditor] = useState(false);
 
   const filteredChars = selectedCategory
     ? characters.filter((c) => c.category === selectedCategory)
@@ -67,8 +72,6 @@ export default function ChineseLearning() {
 
   const handleSelectFromGrid = useCallback((char: ChineseCharacter) => {
     setSelectedCategory(char.category);
-    // Find index in filtered list
-    const idx = characters.filter((c) => c.category === char.category).indexOf(char);
     setPracticeChar(char);
     setView('flashcards');
   }, []);
@@ -77,6 +80,32 @@ export default function ChineseLearning() {
     setMasteredIds(new Set());
     saveProgress({ masteredIds: [], lastDate: '' });
   }, []);
+
+  const handleAddClick = useCallback(() => {
+    setEditorChar(undefined);
+    setShowEditor(true);
+  }, []);
+
+  const handleEdit = useCallback((char: ChineseCharacter) => {
+    setEditorChar(char);
+    setShowEditor(true);
+  }, []);
+
+  const handleSave = useCallback(async (data: { character: string; pinyin: string; meaning: string; category: CharacterCategory }) => {
+    if (editorChar) {
+      await updateCharacter(editorChar.id, data);
+    } else {
+      await addCharacter(data);
+    }
+    setShowEditor(false);
+    setEditorChar(undefined);
+  }, [editorChar, addCharacter, updateCharacter]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    await deleteCharacter(id);
+    setShowEditor(false);
+    setEditorChar(undefined);
+  }, [deleteCharacter]);
 
   // Listen for external progress changes (e.g. Firestore restore)
   useEffect(() => {
@@ -88,11 +117,34 @@ export default function ChineseLearning() {
     return () => window.removeEventListener(WindowEvents.CHINESE_PROGRESS_CHANGED, handleProgressChanged);
   }, []);
 
+  if (loading && characters.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto" data-testid="chinese-learning">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">{t('chinese.title')}</h1>
+        <p className="text-gray-500 dark:text-gray-400">{t('chinese.loading')}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto" data-testid="chinese-learning">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('chinese.title')}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('chinese.title')}</h1>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={handleAddClick}
+              className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              data-testid="add-character-btn"
+            >
+              + {t('chinese.addCharacter')}
+            </button>
+          ) : (
+            <span className="text-xs text-gray-400 dark:text-gray-500">{t('chinese.signInToAdd')}</span>
+          )}
+        </div>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('chinese.subtitle')}</p>
         <div className="flex items-center gap-2 mt-2">
           <span className="text-sm text-green-600 dark:text-green-400 font-medium">
@@ -160,27 +212,47 @@ export default function ChineseLearning() {
       )}
 
       {/* Content */}
-      {view === 'grid' && (
-        <CharacterGrid
-          characters={characters}
-          masteredIds={masteredIds}
-          onSelect={handleSelectFromGrid}
-        />
+      {characters.length === 0 ? (
+        <p className="text-center text-gray-500 dark:text-gray-400 py-8" data-testid="no-characters">
+          {t('chinese.noCharacters')}
+        </p>
+      ) : (
+        <>
+          {view === 'grid' && (
+            <CharacterGrid
+              characters={characters}
+              masteredIds={masteredIds}
+              onSelect={handleSelectFromGrid}
+              onEdit={isAuthenticated ? handleEdit : undefined}
+              onDelete={isAuthenticated ? handleDelete : undefined}
+            />
+          )}
+
+          {view === 'flashcards' && (
+            <FlashcardView
+              characters={filteredChars}
+              masteredIds={masteredIds}
+              onToggleMastered={toggleMastered}
+              onPractice={handlePractice}
+            />
+          )}
+
+          {view === 'practice' && practiceChar && (
+            <PracticeCanvas
+              character={practiceChar}
+              onBack={() => setView('flashcards')}
+            />
+          )}
+        </>
       )}
 
-      {view === 'flashcards' && (
-        <FlashcardView
-          characters={filteredChars}
-          masteredIds={masteredIds}
-          onToggleMastered={toggleMastered}
-          onPractice={handlePractice}
-        />
-      )}
-
-      {view === 'practice' && practiceChar && (
-        <PracticeCanvas
-          character={practiceChar}
-          onBack={() => setView('flashcards')}
+      {/* Editor modal */}
+      {showEditor && (
+        <CharacterEditor
+          character={editorChar}
+          onSave={handleSave}
+          onCancel={() => { setShowEditor(false); setEditorChar(undefined); }}
+          onDelete={editorChar ? handleDelete : undefined}
         />
       )}
     </div>
