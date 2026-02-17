@@ -8,6 +8,14 @@ vi.mock('@mycircle/shared', () => ({
   useUnits: () => ({ tempUnit: 'C', speedUnit: 'ms', setTempUnit: vi.fn(), setSpeedUnit: vi.fn() }),
   formatTemperature: (temp: number, unit?: string) => unit === 'F' ? `${Math.round(temp * 9/5 + 32)}°F` : `${Math.round(temp)}°C`,
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
+  WindowEvents: {
+    SUBSCRIPTIONS_CHANGED: 'subscriptions-changed',
+    NOTEBOOK_CHANGED: 'notebook-changed',
+    CHILD_DATA_CHANGED: 'child-data-changed',
+    ENGLISH_PROGRESS_CHANGED: 'english-progress-changed',
+    CHINESE_PROGRESS_CHANGED: 'chinese-progress-changed',
+    BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
+  },
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',

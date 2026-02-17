@@ -26,6 +26,7 @@ import {
   updateBibleBookmarks,
   updateChineseLearningProgress,
   updateEnglishLearningProgress,
+  updateChildData,
   identifyUser,
   clearUserIdentity,
   logEvent,
@@ -162,6 +163,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(StorageKeys.ENGLISH_LEARNING_PROGRESS, JSON.stringify(userProfile.englishLearningProgress));
             window.dispatchEvent(new Event(WindowEvents.ENGLISH_PROGRESS_CHANGED));
           }
+
+          // Restore Child Development data
+          if (userProfile.childName) {
+            localStorage.setItem(StorageKeys.CHILD_NAME, userProfile.childName);
+          }
+          if (userProfile.childBirthDate) {
+            localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, userProfile.childBirthDate);
+          }
+          if (userProfile.childName || userProfile.childBirthDate) {
+            window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
+          }
+
+          // Restore notebook count
+          window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
         }
       } else {
         clearUserIdentity();
@@ -390,6 +405,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     window.addEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, handleBibleBookmarksChanged);
     return () => window.removeEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, handleBibleBookmarksChanged);
+  }, [user]);
+
+  // Auto-sync child development data from localStorage to Firestore
+  useEffect(() => {
+    function handleChildDataChanged() {
+      if (user) {
+        const childName = localStorage.getItem(StorageKeys.CHILD_NAME);
+        const childBirthDate = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
+        updateChildData(user.uid, { childName, childBirthDate });
+      }
+    }
+    window.addEventListener(WindowEvents.CHILD_DATA_CHANGED, handleChildDataChanged);
+    return () => window.removeEventListener(WindowEvents.CHILD_DATA_CHANGED, handleChildDataChanged);
   }, [user]);
 
   return (
