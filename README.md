@@ -9,7 +9,6 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 [![Deploy](https://github.com/FishGit2020/MyCircle/actions/workflows/deploy.yml/badge.svg)](https://github.com/FishGit2020/MyCircle/actions/workflows/deploy.yml)
 [![Lighthouse CI](https://github.com/FishGit2020/MyCircle/actions/workflows/lighthouse.yml/badge.svg)](https://github.com/FishGit2020/MyCircle/actions/workflows/lighthouse.yml)
 [![CodeQL](https://github.com/FishGit2020/MyCircle/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/FishGit2020/MyCircle/actions/workflows/github-code-scanning/codeql)
-[![Dependabot Updates](https://github.com/FishGit2020/MyCircle/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/FishGit2020/MyCircle/actions/workflows/dependabot/dependabot-updates)
 
 ![Built with React](https://img.shields.io/badge/React-18.2-blue)
 ![Micro Frontends](https://img.shields.io/badge/Micro%20Frontends-Vite%20Federation-green)
