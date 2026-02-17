@@ -3,20 +3,20 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import DashboardPage from './DashboardPage';
 
-// Mock @mycircle/shared — useTranslation (identity) + getDailyVerse (reference-only)
+// Mock @mycircle/shared — only useTranslation needed by DashboardPage now
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-  getDailyVerse: () => ({ reference: 'Test 1:1' }),
 }));
 
-// Mock useDailyVerse hook — returns API verse with text
+// Mock useDailyVerse hook — returns API verse with text by default
+const mockUseDailyVerse = vi.fn().mockReturnValue({
+  verse: { text: 'Test verse from API', reference: 'Test 1:1 (NIV)', copyright: null },
+  loading: false,
+});
 vi.mock('../hooks/useDailyVerse', () => ({
-  useDailyVerse: () => ({
-    verse: { text: 'Test verse from API', reference: 'Test 1:1 (NIV)', copyright: null },
-    loading: false,
-  }),
+  useDailyVerse: () => mockUseDailyVerse(),
 }));
 
 // Mock useAuth — unauthenticated user with no cities
@@ -55,5 +55,16 @@ describe('DashboardPage', () => {
     renderDashboard();
     expect(screen.getByText(/Test verse from API/)).toBeInTheDocument();
     expect(screen.getByText(/Test 1:1/)).toBeInTheDocument();
+  });
+
+  it('renders reference-only fallback when API text is unavailable', () => {
+    mockUseDailyVerse.mockReturnValueOnce({
+      verse: { reference: 'Psalm 23:1 (NIV)' },
+      loading: false,
+    });
+    renderDashboard();
+    expect(screen.getByText(/Psalm 23:1/)).toBeInTheDocument();
+    // No verse text should be rendered
+    expect(screen.queryByText(/\u201c/)).not.toBeInTheDocument();
   });
 });

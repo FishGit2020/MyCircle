@@ -1,13 +1,11 @@
 import React from 'react';
-import { useTranslation, getDailyVerse } from '@mycircle/shared';
+import { useTranslation } from '@mycircle/shared';
 import { WidgetDashboard } from '../components/widgets';
 import { useDailyVerse } from '../hooks/useDailyVerse';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { verse: apiVerse, loading } = useDailyVerse();
-  const localVerse = getDailyVerse();
-  const verse = apiVerse || localVerse;
+  const { verse, loading } = useDailyVerse();
 
   return (
     <div className="space-y-8">

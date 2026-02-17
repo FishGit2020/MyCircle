@@ -265,9 +265,11 @@ function VerseWidget() {
         <div className="h-4 bg-amber-200 dark:bg-amber-800/40 rounded animate-pulse w-3/4" />
       ) : verse ? (
         <div className="bg-amber-50/50 dark:bg-amber-900/10 rounded-lg p-2.5">
-          <p className="text-sm italic text-amber-700 dark:text-amber-300 leading-relaxed">
-            &ldquo;{verse.text}&rdquo;
-          </p>
+          {verse.text && (
+            <p className="text-sm italic text-amber-700 dark:text-amber-300 leading-relaxed">
+              &ldquo;{verse.text}&rdquo;
+            </p>
+          )}
           <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
             — {verse.reference}
           </p>
