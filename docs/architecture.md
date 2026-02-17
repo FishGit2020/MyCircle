@@ -518,7 +518,9 @@ Heavy shared dependencies (`@apollo/client`, `graphql`) use `eager: false` in th
 |-----------|-------|---------|
 | Polling interval | 30 s | Checks `registration.update()` periodically |
 | `visibilitychange` listener | on tab focus | Triggers immediate check when user returns to tab |
-| Fallback reload timeout | 1 s | Force-reloads if `controllerchange` event never fires |
+| `registerType` | `'prompt'` | New SW waits; user clicks "Reload" to activate it |
+
+**Important:** The Workbox config must **not** set `skipWaiting: true` or `clientsClaim: true` — those directives are injected into the SW file itself and would bypass the prompt, causing silent auto-refreshes (via stale-chunk recovery) instead of the intended banner.
 
 The `visibilitychange` listener is the most impactful optimization — users returning to a tab after a deploy see the reload prompt almost instantly instead of waiting up to 30 seconds.
 
@@ -1013,6 +1015,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **useNotes** | `packages/notebook/src/hooks/useNotes.ts` | Private notebook CRUD hook via window bridge |
 | **usePublicNotes** | `packages/notebook/src/hooks/usePublicNotes.ts` | Public notes CRUD hook via window bridge |
 | **Web Vitals** | `packages/shared/src/utils/webVitals.ts` | Core Web Vitals reporting (LCP, CLS, INP) |
+| **tracedLazy** | `packages/shell/src/lib/tracedLazy.ts` | React.lazy wrapper with Firebase Performance traces for MFE loads |
 | **Firebase Functions** | `functions/src/index.ts` | Production Cloud Functions (GraphQL, proxies, AI) |
 | **CI Workflow** | `.github/workflows/ci.yml` | PR checks: typecheck, lint, test |
 | **Deploy Workflow** | `.github/workflows/deploy.yml` | Firebase Hosting deployment on push to main |
@@ -1255,6 +1258,9 @@ The shell host initializes `@sentry/react` in `main.tsx` before `createRoot()` (
 
 ### Web Vitals
 Core Web Vitals are measured using the `web-vitals` library via `reportWebVitals()` from `@mycircle/shared`. Metrics reported: LCP, CLS, INP, FCP, TTFB. Each metric includes the current route path for per-MFE analysis. In development, metrics are logged to the console. In production, metrics are sent via `navigator.sendBeacon('/api/vitals')`.
+
+### Firebase Performance Custom Traces
+Each micro-frontend's chunk load is wrapped with a Firebase Performance `trace()` via the `tracedLazy()` utility (`packages/shell/src/lib/tracedLazy.ts`). This replaces bare `React.lazy()` calls in `App.tsx` and measures wall-clock time from dynamic `import()` initiation to module evaluation. Traces are named `mfe_<name>_load` (e.g., `mfe_weather_load`, `mfe_stocks_load`) and appear in **Firebase Console > Performance > Custom traces**. The utility uses a getter function (`getPerf`) to avoid capturing a stale `null` before Firebase initializes. When `perf` is null (tests, Firebase disabled), tracing is skipped gracefully. See [`docs/analytics-and-tracking.md`](./analytics-and-tracking.md#custom-mfe-load-traces) for the full trace name table and console viewing instructions.
 
 ### Lighthouse CI
 Every pull request triggers a Lighthouse CI run (`.github/workflows/lighthouse.yml`) that builds the shell and audits it against four categories. Accessibility is gated at ≥ 90 (`error` level), while performance, best practices, and SEO use `warn` at ≥ 80-90. Results are uploaded to Lighthouse's temporary public storage. Configuration lives in `.lighthouserc.json`.

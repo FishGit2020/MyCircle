@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useRef } from 'react';
+import React, { Suspense, useState, useRef } from 'react';
 import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { Layout } from './components/layout';
@@ -9,19 +9,23 @@ import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
 import WhatsNewPage from './pages/WhatsNewPage';
 import { useAuth } from './context/AuthContext';
+import { tracedLazy } from './lib/tracedLazy';
+import { perf } from './lib/firebase';
 
-// Lazy load remote micro frontends
-const WeatherDisplayMF = lazy(() => import('weatherDisplay/WeatherDisplay'));
-const StockTrackerMF = lazy(() => import('stockTracker/StockTracker'));
-const PodcastPlayerMF = lazy(() => import('podcastPlayer/PodcastPlayer'));
-const AiAssistantMF = lazy(() => import('aiAssistant/AiAssistant'));
-const BibleReaderMF = lazy(() => import('bibleReader/BibleReader'));
-const WorshipSongsMF = lazy(() => import('worshipSongs/WorshipSongs'));
-const NotebookMF = lazy(() => import('notebook/Notebook'));
-const BabyTrackerMF = lazy(() => import('babyTracker/BabyTracker'));
-const ChildDevelopmentMF = lazy(() => import('childDevelopment/ChildDevelopment'));
-const ChineseLearningMF = lazy(() => import('chineseLearning/ChineseLearning'));
-const EnglishLearningMF = lazy(() => import('englishLearning/EnglishLearning'));
+const getPerf = () => perf;
+
+// Lazy load remote micro frontends with Firebase Performance tracing
+const WeatherDisplayMF = tracedLazy('mfe_weather_load', () => import('weatherDisplay/WeatherDisplay'), getPerf);
+const StockTrackerMF = tracedLazy('mfe_stocks_load', () => import('stockTracker/StockTracker'), getPerf);
+const PodcastPlayerMF = tracedLazy('mfe_podcasts_load', () => import('podcastPlayer/PodcastPlayer'), getPerf);
+const AiAssistantMF = tracedLazy('mfe_ai_load', () => import('aiAssistant/AiAssistant'), getPerf);
+const BibleReaderMF = tracedLazy('mfe_bible_load', () => import('bibleReader/BibleReader'), getPerf);
+const WorshipSongsMF = tracedLazy('mfe_worship_load', () => import('worshipSongs/WorshipSongs'), getPerf);
+const NotebookMF = tracedLazy('mfe_notebook_load', () => import('notebook/Notebook'), getPerf);
+const BabyTrackerMF = tracedLazy('mfe_baby_load', () => import('babyTracker/BabyTracker'), getPerf);
+const ChildDevelopmentMF = tracedLazy('mfe_childdev_load', () => import('childDevelopment/ChildDevelopment'), getPerf);
+const ChineseLearningMF = tracedLazy('mfe_chinese_load', () => import('chineseLearning/ChineseLearning'), getPerf);
+const EnglishLearningMF = tracedLazy('mfe_english_load', () => import('englishLearning/EnglishLearning'), getPerf);
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
