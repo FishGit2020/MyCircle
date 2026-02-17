@@ -23,7 +23,11 @@ const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.
 
 const port = process.env.PORT || 3003;
 
-async function startServer() {
+/**
+ * Create and configure the Express app with Apollo Server, AI chat, and WebSocket subscriptions.
+ * Returns the app and httpServer so callers (e.g., production.ts) can extend them before listening.
+ */
+export async function createApp() {
   const app = express();
   const httpServer = createHttpServer(app);
 
@@ -299,14 +303,19 @@ async function startServer() {
     res.status(500).send('Internal Server Error');
   });
 
-  // Start HTTP server (this will also handle WebSocket connections)
+  return { app, httpServer, apolloServer };
+}
+
+/** Dev entry point — creates the app and starts listening. */
+async function startServer() {
+  const { app, httpServer, apolloServer } = await createApp();
+
   httpServer.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
     console.log(`GraphQL endpoint: http://localhost:${port}/graphql`);
     console.log(`WebSocket subscriptions: ws://localhost:${port}/graphql`);
   });
 
-  // Graceful shutdown
   process.on('SIGTERM', async () => {
     console.log('SIGTERM signal received: closing HTTP server');
     await apolloServer.stop();
@@ -316,10 +325,14 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
-  console.error('Error starting server:', err);
-  process.exit(1);
-});
+// Only auto-start when this file is run directly (not imported by production.ts)
+const isDirectRun = process.argv[1]?.includes('server/index');
+if (isDirectRun) {
+  startServer().catch((err) => {
+    console.error('Error starting server:', err);
+    process.exit(1);
+  });
+}
 
 // ─── AI Chat tool execution helpers ─────────────────────────
 

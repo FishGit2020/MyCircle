@@ -1,0 +1,41 @@
+services:
+  app:
+    image: ghcr.io/fishgit2020/mycircle:latest
+    # To build locally instead of pulling from GHCR, uncomment:
+    # build:
+    #   context: ../../
+    #   dockerfile: deploy/docker/Dockerfile
+    container_name: mycircle-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r=>{if(!r.ok)throw r.status}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: mycircle-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:

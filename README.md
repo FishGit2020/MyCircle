@@ -800,6 +800,32 @@ pnpm test:e2e:emulator # Run emulator tests
 - Common missing roles: Cloud Scheduler Admin, Secret Manager Viewer, Service Account User
 - Quick workaround: deploy locally with `pnpm firebase:deploy` (uses your personal Firebase credentials)
 
+## Docker Self-Hosting (Synology NAS)
+
+MyCircle can be self-hosted on a Synology DS1525+ NAS (or any Docker host) as an alternative to Firebase Hosting. A single Docker container serves static assets and API routes, with Caddy providing automatic HTTPS.
+
+```
+Internet → Caddy (auto-HTTPS) → Node.js :3000
+                                   ├─ /graphql, /ai/chat   → Apollo + Gemini
+                                   ├─ /stock/*, /podcast/*  → API proxies
+                                   └─ /*                    → Static SPA
+```
+
+Firebase client SDKs (Auth, Firestore, FCM) still talk to Google's cloud — only hosting is self-hosted.
+
+**Quick start:**
+```bash
+# On the NAS
+cd ~/mycircle
+cp .env.example .env        # Fill in API keys
+nano Caddyfile               # Set your domain
+docker compose pull && docker compose up -d
+```
+
+The Docker image is built automatically in CI and pushed to GHCR on every push to `main`.
+
+See [`deploy/docker/README.md`](deploy/docker/README.md) for the full deployment guide.
+
 ## License
 
 MIT

@@ -1,0 +1,26 @@
+# Replace with your actual domain (Caddy auto-provisions HTTPS via Let's Encrypt)
+mycircle.example.com {
+	# Reverse proxy to Node.js app
+	reverse_proxy app:3000
+
+	# Compression
+	encode zstd gzip
+
+	# Security headers
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(self), geolocation=(self)"
+		# Remove server identity
+		-Server
+	}
+
+	# Cache-busting overrides for files that must never be stale
+	@nocache path */remoteEntry.js */sw.js
+	header @nocache Cache-Control "no-cache, no-store, must-revalidate"
+
+	# Long-lived cache for hashed assets
+	@hashed path_regexp \.[0-9a-f]{8,}\.(js|css|woff2?|png|jpg|svg)$
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+}
