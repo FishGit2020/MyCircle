@@ -129,7 +129,15 @@ describe('CitySearch', () => {
     });
 
     it('shows loading state while searching', async () => {
-      renderWithProviders(<CitySearch />);
+      // Use a delayed mock so loading state persists long enough for assertion
+      const delayedMocks = [
+        {
+          request: { query: SEARCH_CITIES, variables: { query: 'London', limit: 5 } },
+          result: { data: { searchCities: mockCities } },
+          delay: 30000,
+        },
+      ];
+      renderWithProviders(<CitySearch />, delayedMocks);
 
       const input = screen.getByPlaceholderText('Search for a city...');
       fireEvent.change(input, { target: { value: 'London' } });
