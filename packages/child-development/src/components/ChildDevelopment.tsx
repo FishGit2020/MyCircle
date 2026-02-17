@@ -7,6 +7,7 @@ import {
 } from '../data/milestones';
 import type { DomainId, AgeRangeId } from '../data/milestones';
 import { parentingVerses } from '../data/parentingVerses';
+import TimelineView from './TimelineView';
 
 function getRandomVerseIndex(): number {
   return Math.floor(Math.random() * parentingVerses.length);
@@ -224,7 +225,7 @@ export default function ChildDevelopment() {
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
   const [mode, setMode] = useState<'tracking' | 'reference'>('tracking');
-  const [activeTab, setActiveTab] = useState<'overview' | DomainId>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | DomainId>('overview');
   const [checkedMilestones, setCheckedMilestones] = useState<string[]>([]);
   const [verseIndex, setVerseIndex] = useState(getRandomVerseIndex);
   const [isEditing, setIsEditing] = useState(false);
@@ -373,7 +374,7 @@ export default function ChildDevelopment() {
 
   // ─── Domain Detail View ──────────────────────────────────────────────────
 
-  if (activeTab !== 'overview') {
+  if (activeTab !== 'overview' && activeTab !== 'timeline') {
     const domainMeta = getDomainMeta(activeTab)!;
     const domainMilestones = getMilestonesByDomain(activeTab);
 
@@ -450,7 +451,7 @@ export default function ChildDevelopment() {
   // ─── Overview Tab ────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className={activeTab === 'timeline' ? 'max-w-6xl mx-auto' : 'max-w-4xl mx-auto'}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <div>
@@ -471,8 +472,34 @@ export default function ChildDevelopment() {
       {/* Verse */}
       <VerseSection verseIndex={verseIndex} onShuffle={shuffleVerse} />
 
-      {/* Mode toggle */}
-      <div className="flex items-center gap-2 mb-6">
+      {/* View tabs: Overview | Timeline */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-100 dark:bg-gray-800">
+          <button
+            type="button"
+            onClick={() => setActiveTab('overview')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              activeTab === 'overview'
+                ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            {t('childDev.overview' as any)}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('timeline')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              activeTab === 'timeline'
+                ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            {t('childDev.timeline' as any)}
+          </button>
+        </div>
+
+        {/* Mode toggle */}
         <div className="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-100 dark:bg-gray-800">
           <button
             type="button"
@@ -499,22 +526,32 @@ export default function ChildDevelopment() {
         </div>
       </div>
 
-      {/* Domain cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {DOMAINS.map(domain => {
-          const domainMilestones = getMilestonesByDomain(domain.id);
-          const checkedCount = domainMilestones.filter(m => checkedMilestones.includes(m.id)).length;
-          return (
-            <DomainCard
-              key={domain.id}
-              domain={domain}
-              checkedCount={checkedCount}
-              totalCount={domainMilestones.length}
-              onClick={() => setActiveTab(domain.id)}
-            />
-          );
-        })}
-      </div>
+      {/* Content: Overview or Timeline */}
+      {activeTab === 'timeline' ? (
+        <TimelineView
+          ageInMonths={ageInMonths}
+          currentAgeRange={currentAgeRange}
+          checkedMilestones={checkedMilestones}
+          mode={mode}
+          onToggleMilestone={toggleMilestone}
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {DOMAINS.map(domain => {
+            const domainMilestones = getMilestonesByDomain(domain.id);
+            const checkedCount = domainMilestones.filter(m => checkedMilestones.includes(m.id)).length;
+            return (
+              <DomainCard
+                key={domain.id}
+                domain={domain}
+                checkedCount={checkedCount}
+                totalCount={domainMilestones.length}
+                onClick={() => setActiveTab(domain.id)}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
