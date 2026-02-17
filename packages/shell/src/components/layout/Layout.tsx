@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
+import type { TranslationKey } from '@mycircle/shared';
 import { useTranslation } from '@mycircle/shared';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
@@ -46,12 +47,143 @@ function prefetchRoute(path: string) {
   }
 }
 
+// --- NavIcon (copied from BottomNav to avoid coupling desktop/mobile nav) ---
+function NavIcon({ icon, className }: { icon: string; className?: string }) {
+  const cls = className || 'w-4 h-4';
+  switch (icon) {
+    case 'weather':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>;
+    case 'stocks':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>;
+    case 'podcasts':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>;
+    case 'bible':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
+    case 'worship':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>;
+    case 'notebook':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>;
+    case 'baby':
+      return <svg className={cls} fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>;
+    case 'child-dev':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>;
+    case 'chinese':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>;
+    case 'english':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
+    case 'ai':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>;
+    default:
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg>;
+  }
+}
+
+// --- Nav group data model ---
+interface NavItem { path: string; labelKey: TranslationKey; icon: string }
+interface NavGroup { labelKey: TranslationKey; items: NavItem[] }
+
+const NAV_GROUPS: NavGroup[] = [
+  { labelKey: 'nav.group.daily', items: [
+    { path: '/weather', labelKey: 'dashboard.weather', icon: 'weather' },
+    { path: '/stocks',  labelKey: 'nav.stocks',        icon: 'stocks' },
+    { path: '/podcasts', labelKey: 'nav.podcasts',     icon: 'podcasts' },
+  ]},
+  { labelKey: 'nav.group.faith', items: [
+    { path: '/bible',   labelKey: 'nav.bible',   icon: 'bible' },
+    { path: '/worship', labelKey: 'nav.worship', icon: 'worship' },
+  ]},
+  { labelKey: 'nav.group.family', items: [
+    { path: '/baby',      labelKey: 'nav.baby',     icon: 'baby' },
+    { path: '/child-dev', labelKey: 'nav.childDev', icon: 'child-dev' },
+  ]},
+  { labelKey: 'nav.group.learning', items: [
+    { path: '/chinese', labelKey: 'nav.chinese', icon: 'chinese' },
+    { path: '/english', labelKey: 'nav.english', icon: 'english' },
+  ]},
+  { labelKey: 'nav.group.tools', items: [
+    { path: '/notebook', labelKey: 'nav.notebook', icon: 'notebook' },
+    { path: '/ai',       labelKey: 'nav.ai',      icon: 'ai' },
+  ]},
+];
+
+// --- NavDropdown component ---
+function NavDropdown({
+  group,
+  isOpen,
+  onToggle,
+  pathname,
+  t: translate,
+}: {
+  group: NavGroup;
+  isOpen: boolean;
+  onToggle: () => void;
+  pathname: string;
+  t: (key: TranslationKey) => string;
+}) {
+  const isGroupActive = group.items.some(
+    item => pathname.startsWith(item.path),
+  );
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`text-sm font-medium transition flex items-center gap-1 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded px-1 ${
+          isGroupActive
+            ? 'text-blue-600 dark:text-blue-400'
+            : 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
+        }`}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        {translate(group.labelKey)}
+        <svg
+          className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div
+          role="menu"
+          className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50"
+        >
+          {group.items.map(item => {
+            const active = pathname.startsWith(item.path);
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                role="menuitem"
+                onMouseEnter={() => prefetchRoute(item.path)}
+                onFocus={() => prefetchRoute(item.path)}
+                className={`flex items-center gap-2 px-3 py-2 text-sm transition ${
+                  active
+                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <NavIcon icon={item.icon} />
+                {translate(item.labelKey)}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Layout() {
   const { t } = useTranslation();
   const { config, loading: configLoading } = useRemoteConfigContext();
   const { toggleTheme } = useTheme();
   const [hasActivePlayer, setHasActivePlayer] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
   const location = useLocation();
 
   useKeyboardShortcuts({
@@ -74,6 +206,31 @@ export default function Layout() {
         : 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
     }`;
   };
+
+  // Close dropdown on route change
+  useEffect(() => { setOpenGroup(null); }, [location.pathname]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (openGroup === null) return;
+    function handleMouseDown(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenGroup(null);
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [openGroup]);
+
+  // Close dropdown on Escape
+  useEffect(() => {
+    if (openGroup === null) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpenGroup(null);
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [openGroup]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
@@ -98,46 +255,24 @@ export default function Layout() {
             </Link>
 
             {/* Desktop nav (hidden on mobile) */}
-            <nav aria-label="Main navigation" className="hidden md:flex items-center space-x-4">
+            <nav ref={navRef} aria-label="Main navigation" className="hidden md:flex items-center space-x-4">
               <Link to="/" className={navLinkClass('/')}>
                 {t('nav.home')}
               </Link>
-              <Link to="/weather" className={navLinkClass('/weather')} onMouseEnter={() => prefetchRoute('/weather')} onFocus={() => prefetchRoute('/weather')}>
-                {t('dashboard.weather')}
-              </Link>
-              <Link to="/stocks" className={navLinkClass('/stocks')} onMouseEnter={() => prefetchRoute('/stocks')} onFocus={() => prefetchRoute('/stocks')}>
-                {t('nav.stocks')}
-              </Link>
-              <Link to="/podcasts" className={navLinkClass('/podcasts')} onMouseEnter={() => prefetchRoute('/podcasts')} onFocus={() => prefetchRoute('/podcasts')}>
-                {t('nav.podcasts')}
-              </Link>
-              <Link to="/bible" className={navLinkClass('/bible')} onMouseEnter={() => prefetchRoute('/bible')} onFocus={() => prefetchRoute('/bible')}>
-                {t('nav.bible')}
-              </Link>
-              <Link to="/worship" className={navLinkClass('/worship')} onMouseEnter={() => prefetchRoute('/worship')} onFocus={() => prefetchRoute('/worship')}>
-                {t('nav.worship')}
-              </Link>
-              <Link to="/notebook" className={navLinkClass('/notebook')} onMouseEnter={() => prefetchRoute('/notebook')} onFocus={() => prefetchRoute('/notebook')}>
-                {t('nav.notebook')}
-              </Link>
-              <Link to="/baby" className={navLinkClass('/baby')} onMouseEnter={() => prefetchRoute('/baby')} onFocus={() => prefetchRoute('/baby')}>
-                {t('nav.baby')}
-              </Link>
-              <Link to="/child-dev" className={navLinkClass('/child-dev')} onMouseEnter={() => prefetchRoute('/child-dev')} onFocus={() => prefetchRoute('/child-dev')}>
-                {t('nav.childDev')}
-              </Link>
-              <Link to="/english" className={navLinkClass('/english')} onMouseEnter={() => prefetchRoute('/english')} onFocus={() => prefetchRoute('/english')}>
-                {t('nav.english')}
-              </Link>
-              <Link to="/chinese" className={navLinkClass('/chinese')} onMouseEnter={() => prefetchRoute('/chinese')} onFocus={() => prefetchRoute('/chinese')}>
-                {t('nav.chinese')}
-              </Link>
-              <Link to="/ai" className={navLinkClass('/ai')} onMouseEnter={() => prefetchRoute('/ai')} onFocus={() => prefetchRoute('/ai')}>
-                {t('nav.ai')}
-              </Link>
+              {NAV_GROUPS.map(group => (
+                <NavDropdown
+                  key={group.labelKey}
+                  group={group}
+                  isOpen={openGroup === group.labelKey}
+                  onToggle={() => setOpenGroup(prev => prev === group.labelKey ? null : group.labelKey)}
+                  pathname={location.pathname}
+                  t={t}
+                />
+              ))}
               <button
+                type="button"
                 onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors"
                 aria-label="Search"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
