@@ -177,8 +177,8 @@ federation({
     react:              { singleton: true, requiredVersion: '^18.2.0' },
     'react-dom':        { singleton: true, requiredVersion: '^18.2.0' },
     'react-router':     { singleton: true, requiredVersion: '^7' },
-    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1' },
-    graphql:            { singleton: true, requiredVersion: '^16.12.0' },
+    '@apollo/client':   { singleton: true, requiredVersion: '^4.1.1', eager: false },
+    graphql:            { singleton: true, requiredVersion: '^16.12.0', eager: false },
     '@mycircle/shared': { singleton: true },
   }
 })
@@ -453,13 +453,17 @@ The PWA service worker caches `remoteEntry.js` files with a `NetworkFirst` strat
 
 ### Build Configuration
 
-All packages (shell + 9 MFEs) set `modulePreload: false` in their Vite build config. All packages also use `minify: 'esbuild'` for production JS minification:
+All packages (shell + 9 MFEs) set `modulePreload: false` in their Vite build config. All packages also use `minify: 'esbuild'` for production JS minification. The shell additionally configures esbuild to strip `console.*` and `debugger` statements and remove legal comments, and uses cssnano in its PostCSS pipeline for aggressive CSS minification:
 
 ```typescript
+// Shell esbuild options
+esbuild: { drop: ['console', 'debugger'], legalComments: 'none' }
 build: { modulePreload: false, minify: 'esbuild' }
 ```
 
 `modulePreload: false` prevents Vite from injecting `<link rel="modulepreload">` tags in HTML, which would conflict with Module Federation's own module loading mechanism. Prefetch is instead controlled explicitly via the `import()` calls in Layer 1. `minify: 'esbuild'` ensures all federated remote chunks are minified, reducing bundle sizes without affecting module resolution (Module Federation uses explicit `exposes` config).
+
+Heavy shared dependencies (`@apollo/client`, `graphql`) use `eager: false` in the federation config so they are not preloaded into the initial dependency graph — they are loaded on-demand when a remote MFE actually imports them.
 
 ### Trade-offs
 
