@@ -107,6 +107,18 @@ const childDevDest = path.join(firebaseDir, 'child-development');
 console.log(`Copying child-development to ${childDevDest}`);
 copyDir(childDevDist, childDevDest);
 
+// 12. Copy chinese-learning MF to /chinese-learning
+const chineseLearningDist = path.join(rootDir, 'packages', 'chinese-learning', 'dist');
+const chineseLearningDest = path.join(firebaseDir, 'chinese-learning');
+console.log(`Copying chinese-learning to ${chineseLearningDest}`);
+copyDir(chineseLearningDist, chineseLearningDest);
+
+// 13. Copy english-learning MF to /english-learning
+const englishLearningDist = path.join(rootDir, 'packages', 'english-learning', 'dist');
+const englishLearningDest = path.join(firebaseDir, 'english-learning');
+console.log(`Copying english-learning to ${englishLearningDest}`);
+copyDir(englishLearningDist, englishLearningDest);
+
 console.log('\nFirebase deployment directory assembled successfully!');
 console.log(`Output: ${firebaseDir}`);
 

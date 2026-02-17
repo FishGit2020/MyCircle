@@ -132,6 +132,14 @@ const childDevelopmentRemote = isProduction
   ? '/child-development/assets/remoteEntry.js'
   : 'http://localhost:3012/assets/remoteEntry.js';
 
+const chineseLearningRemote = isProduction
+  ? '/chinese-learning/assets/remoteEntry.js'
+  : 'http://localhost:3013/assets/remoteEntry.js';
+
+const englishLearningRemote = isProduction
+  ? '/english-learning/assets/remoteEntry.js'
+  : 'http://localhost:3014/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -149,7 +157,9 @@ export default defineConfig({
         worshipSongs: worshipSongsRemote,
         notebook: notebookRemote,
         babyTracker: babyTrackerRemote,
-        childDevelopment: childDevelopmentRemote
+        childDevelopment: childDevelopmentRemote,
+        chineseLearning: chineseLearningRemote,
+        englishLearning: englishLearningRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

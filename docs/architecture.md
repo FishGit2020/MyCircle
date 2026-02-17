@@ -38,6 +38,11 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 |  |    (MFE)     | |    (MFE)      | |       (MFE)       |                  |
 |  |  Port 3010   | |  Port 3011    | |    Port 3012      |                  |
 |  +--------------+ +---------------+ +-------------------+                  |
+|  +-------------------+ +-------------------+                               |
+|  | Chinese Learning  | | English Learning  |                               |
+|  |       (MFE)       | |       (MFE)       |                               |
+|  |    Port 3013      | |    Port 3014      |                               |
+|  +-------------------+ +-------------------+                               |
 +──────────────────────────────────────────────────────────────────────────+
                                 |
                                 v
@@ -342,6 +347,32 @@ Exposes `ChildDevelopment` component via Module Federation. Port **3012**.
 - Persistence: `StorageKeys.CHILD_NAME`, `CHILD_BIRTH_DATE` (localStorage)
 - `WindowEvents.CHILD_DATA_CHANGED` bridges MFE ↔ shell for cross-tab sync
 - Route: `/child-dev`
+
+### Chinese Learning - `packages/chinese-learning/`
+
+Exposes `ChineseLearning` component via Module Federation. Port **3013**.
+
+**Key Behavior:**
+- ~50 Chinese characters/phrases across 8 categories (Family, Feelings, Food, Body, House, Nature, Numbers, Phrases)
+- **Flashcard system** — front shows character, tap to flip for pinyin + meaning; navigation between characters; mark as mastered
+- **Practice canvas** — Pointer Events API (`pointerdown/move/up`) drawing with reference character as `globalAlpha=0.15` watermark; undo (stroke history) and clear; `touch-action: none` prevents scroll interference
+- **Character grid** — browse all characters grouped by category with green checkmark badges on mastered items
+- Persistence: `StorageKeys.CHINESE_LEARNING_PROGRESS` (localStorage JSON: `{ masteredIds, lastDate }`)
+- `WindowEvents.CHINESE_PROGRESS_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
+- Route: `/chinese`
+
+### English Learning - `packages/english-learning/`
+
+Exposes `EnglishLearning` component via Module Federation. Port **3014**.
+
+**Key Behavior:**
+- ~80 daily English phrases across 8 categories (Greetings, Feelings, House, Food, Going Out, People, Time, Emergencies)
+- **Lesson mode** — step-through phrases showing English, phonetic guide, and Chinese translation; mark as "Got It" to track completion
+- **Quiz mode** — show Chinese phrase, pick correct English from 4 choices; auto-advance with correct/incorrect feedback; score tracking
+- **Progress dashboard** — per-category progress bars, streak counter (consecutive days with quiz activity), quiz score history
+- Persistence: `StorageKeys.ENGLISH_LEARNING_PROGRESS` (localStorage JSON: `{ completedIds, quizScores, lastDate }`)
+- `WindowEvents.ENGLISH_PROGRESS_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
+- Route: `/english`
 
 ---
 

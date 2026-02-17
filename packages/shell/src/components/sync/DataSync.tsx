@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
  * custom window events. DataSync listens and persists to the user's profile.
  */
 export default function DataSync() {
-  const { user, syncStockWatchlist, syncPodcastSubscriptions } = useAuth();
+  const { user, syncStockWatchlist, syncPodcastSubscriptions, syncChineseLearningProgress, syncEnglishLearningProgress } = useAuth();
 
   useEffect(() => {
     if (!user) return;
@@ -29,14 +29,34 @@ export default function DataSync() {
       } catch { /* ignore parse errors */ }
     };
 
+    const handleChineseProgressChanged = () => {
+      try {
+        const raw = localStorage.getItem(StorageKeys.CHINESE_LEARNING_PROGRESS);
+        const progress = raw ? JSON.parse(raw) : null;
+        if (progress) syncChineseLearningProgress(progress);
+      } catch { /* ignore parse errors */ }
+    };
+
+    const handleEnglishProgressChanged = () => {
+      try {
+        const raw = localStorage.getItem(StorageKeys.ENGLISH_LEARNING_PROGRESS);
+        const progress = raw ? JSON.parse(raw) : null;
+        if (progress) syncEnglishLearningProgress(progress);
+      } catch { /* ignore parse errors */ }
+    };
+
     window.addEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
     window.addEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
+    window.addEventListener(WindowEvents.CHINESE_PROGRESS_CHANGED, handleChineseProgressChanged);
+    window.addEventListener(WindowEvents.ENGLISH_PROGRESS_CHANGED, handleEnglishProgressChanged);
 
     return () => {
       window.removeEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
       window.removeEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
+      window.removeEventListener(WindowEvents.CHINESE_PROGRESS_CHANGED, handleChineseProgressChanged);
+      window.removeEventListener(WindowEvents.ENGLISH_PROGRESS_CHANGED, handleEnglishProgressChanged);
     };
-  }, [user, syncStockWatchlist, syncPodcastSubscriptions]);
+  }, [user, syncStockWatchlist, syncPodcastSubscriptions, syncChineseLearningProgress, syncEnglishLearningProgress]);
 
   return null;
 }

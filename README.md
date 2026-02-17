@@ -104,6 +104,22 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Encouraging Bible verses for parents with shuffle
 - Dark mode, full i18n (English, Spanish, Chinese)
 
+### Chinese Learning
+- Learn Chinese characters through interactive flashcards and handwriting practice
+- ~50 characters/phrases across 8 categories: Family, Feelings, Food & Drink, Body & Actions, Around the House, Nature & Animals, Numbers, Common Phrases
+- **Flashcard system** — front shows character, tap to flip for pinyin + meaning; mark as mastered to track progress
+- **Practice canvas** — Pointer Events drawing with reference watermark, undo/clear support; works on mouse, touch, and stylus
+- **Character grid** — browse all characters grouped by category with mastered indicators
+- Progress persisted to localStorage and synced to Firestore
+
+### English Learning
+- Learn everyday English phrases step by step, designed for Chinese speakers
+- ~80 phrases across 8 categories: Basic Greetings, Feelings, Around the House, Food & Drink, Going Out, People & Family, Time & Weather, Emergencies
+- **Lesson mode** — step through phrases with Chinese translation and phonetic guide; mark as "Got It" to track progress
+- **Quiz mode** — multiple choice: show Chinese phrase, pick the correct English translation; auto-advancing with score tracking
+- **Progress dashboard** — per-category progress bars, streak counter, quiz history
+- Progress persisted to localStorage and synced to Firestore
+
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
@@ -185,6 +201,8 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Notebook** | Personal & public note-taking with search and Firestore sync | `Notebook` |
 | **Baby Tracker** | Baby growth tracking with weekly fruit comparisons and Bible verses | `BabyTracker` |
 | **Child Development** | Postnatal milestone tracker (birth–5 years) across 6 domains | `ChildDevelopment` |
+| **Chinese Learning** | Chinese character flashcards + handwriting practice canvas | `ChineseLearning` |
+| **English Learning** | Daily English phrases with lessons, quizzes, and progress tracking | `EnglishLearning` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
@@ -222,6 +240,8 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/notebook/:noteId` | Note editor |
 | `/baby` | Baby growth tracker with weekly development |
 | `/child-dev` | Child development milestone tracker (birth–5 years) |
+| `/chinese` | Chinese character learning with flashcards and practice |
+| `/english` | English phrase learning with lessons and quizzes |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack

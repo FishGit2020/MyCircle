@@ -19,6 +19,8 @@ const WorshipSongsMF = lazy(() => import('worshipSongs/WorshipSongs'));
 const NotebookMF = lazy(() => import('notebook/Notebook'));
 const BabyTrackerMF = lazy(() => import('babyTracker/BabyTracker'));
 const ChildDevelopmentMF = lazy(() => import('childDevelopment/ChildDevelopment'));
+const ChineseLearningMF = lazy(() => import('chineseLearning/ChineseLearning'));
+const EnglishLearningMF = lazy(() => import('englishLearning/EnglishLearning'));
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -320,6 +322,40 @@ function ChildDevPage() {
   );
 }
 
+// Fallback for Chinese Learning MFE
+const ChineseLearningFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Chinese Learning module is loading...</p>
+  </div>
+);
+
+function ChinesePage() {
+  return (
+    <ErrorBoundary fallback={<ChineseLearningFallback />}>
+      <Suspense fallback={<Loading />}>
+        <ChineseLearningMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+// Fallback for English Learning MFE
+const EnglishLearningFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">English Learning module is loading...</p>
+  </div>
+);
+
+function EnglishPage() {
+  return (
+    <ErrorBoundary fallback={<EnglishLearningFallback />}>
+      <Suspense fallback={<Loading />}>
+        <EnglishLearningMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -353,6 +389,8 @@ export default function App() {
         <Route path="notebook/:noteId" element={<NotebookPage />} />
         <Route path="baby" element={<BabyPage />} />
         <Route path="child-dev" element={<ChildDevPage />} />
+        <Route path="chinese" element={<ChinesePage />} />
+        <Route path="english" element={<EnglishPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />
       </Route>

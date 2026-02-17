@@ -82,12 +82,21 @@ describe('ReloadPrompt', () => {
 
   it('sets a fallback reload timeout after clicking reload', async () => {
     mockNeedRefresh = true;
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        addEventListener: mockAddEventListener,
+        removeEventListener: mockRemoveEventListener,
+        getRegistration: vi.fn().mockResolvedValue({ unregister: vi.fn().mockResolvedValue(undefined) }),
+      },
+      writable: true,
+      configurable: true,
+    });
     render(<ReloadPrompt />);
     await act(async () => {
       fireEvent.click(screen.getByText('pwa.reload'));
     });
-    // Fallback timer set for 1 second
-    act(() => { vi.advanceTimersByTime(1000); });
+    // Fallback timer set for 2 seconds (unregister SW + reload)
+    await act(async () => { vi.advanceTimersByTime(2000); });
     expect(window.location.reload).toHaveBeenCalled();
   });
 
@@ -140,10 +149,21 @@ describe('ReloadPrompt', () => {
   it('force-reloads if updateServiceWorker rejects', async () => {
     mockNeedRefresh = true;
     mockUpdateServiceWorker.mockRejectedValueOnce(new Error('SW error'));
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: {
+        addEventListener: mockAddEventListener,
+        removeEventListener: mockRemoveEventListener,
+        getRegistration: vi.fn().mockResolvedValue({ unregister: vi.fn().mockResolvedValue(undefined) }),
+      },
+      writable: true,
+      configurable: true,
+    });
     render(<ReloadPrompt />);
     await act(async () => {
       fireEvent.click(screen.getByText('pwa.reload'));
     });
+    // Now reload happens after the 2s fallback timeout
+    await act(async () => { vi.advanceTimersByTime(2000); });
     expect(window.location.reload).toHaveBeenCalled();
   });
 });
