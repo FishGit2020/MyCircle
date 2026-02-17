@@ -15,6 +15,10 @@ vi.mock('@mycircle/shared', () => ({
     NOTEBOOK_CACHE: 'notebook-cache',
     BABY_DUE_DATE: 'baby-due-date',
     BABY_COMPARE_CATEGORY: 'baby-compare-category',
+    ENGLISH_LEARNING_PROGRESS: 'english-learning-progress',
+    CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
+    CHILD_NAME: 'child-name',
+    CHILD_BIRTH_DATE: 'child-birth-date',
   },
   MFEvents: {
     PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
@@ -26,8 +30,9 @@ vi.mock('@mycircle/shared', () => ({
   GET_BIBLE_VOTD_API: { kind: 'Document', definitions: [] },
   GET_CURRENT_WEATHER: { kind: 'Document', definitions: [] },
   REVERSE_GEOCODE: { kind: 'Document', definitions: [] },
-  getDailyVerse: () => ({ reference: 'Test 1:1' }),
-  getAllDailyVerses: () => [{ reference: 'Test 1:1' }],
+  getDailyVerse: () => ({ usfm: 'TST.1.1', reference: 'Test 1:1', text: 'Test verse text' }),
+  getAllDailyVerses: () => [{ usfm: 'TST.1.1', reference: 'Test 1:1', text: 'Test verse text' }],
+  NIV_COPYRIGHT: 'NIV Copyright',
 }));
 
 vi.mock('../../context/AuthContext', () => ({
@@ -59,14 +64,18 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders all six default widgets', () => {
+  it('renders default widgets (podcast hidden without subscriptions)', () => {
     renderWidget();
     expect(screen.getByText('widgets.weather')).toBeInTheDocument();
     expect(screen.getByText('widgets.stocks')).toBeInTheDocument();
     expect(screen.getByText('widgets.verse')).toBeInTheDocument();
-    expect(screen.getByText('widgets.nowPlaying')).toBeInTheDocument();
     expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
     expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
+    expect(screen.getByText('widgets.childDev')).toBeInTheDocument();
+    expect(screen.getByText('widgets.english')).toBeInTheDocument();
+    expect(screen.getByText('widgets.chinese')).toBeInTheDocument();
+    // Podcast widget hidden — no subscriptions and nothing playing
+    expect(screen.queryByText('widgets.nowPlaying')).not.toBeInTheDocument();
   });
 
   it('renders customize button', () => {
@@ -86,9 +95,9 @@ describe('WidgetDashboard', () => {
   it('shows visibility toggles in editing mode', () => {
     renderWidget();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // All six widgets should show "Visible" toggle
+    // All nine widgets should show "Visible" toggle
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(7);
+    expect(visibleButtons.length).toBe(9);
   });
 
   it('can toggle widget visibility', () => {
@@ -105,8 +114,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(7);
-    expect(downButtons.length).toBe(7);
+    expect(upButtons.length).toBe(9);
+    expect(downButtons.length).toBe(9);
   });
 
   it('persists layout to localStorage', () => {
@@ -147,7 +156,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(7);
+    expect(allVisible.length).toBe(9);
   });
 
   it('has proper a11y labels on the section', () => {

@@ -14,6 +14,8 @@ export default {
     "../weather-display/src/**/*.{js,ts,jsx,tsx}",
     "../worship-songs/src/**/*.{js,ts,jsx,tsx}",
     "../child-development/src/**/*.{js,ts,jsx,tsx}",
+    "../english-learning/src/**/*.{js,ts,jsx,tsx}",
+    "../chinese-learning/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',
   theme: {

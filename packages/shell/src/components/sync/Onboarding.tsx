@@ -92,6 +92,36 @@ const STEPS = [
     ),
     color: 'from-pink-500/10 to-rose-500/10',
   },
+  {
+    titleKey: 'onboarding.step9Title' as const,
+    descKey: 'onboarding.step9Desc' as const,
+    icon: (
+      <svg className="w-16 h-16 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+    ),
+    color: 'from-teal-500/10 to-cyan-500/10',
+  },
+  {
+    titleKey: 'onboarding.step10Title' as const,
+    descKey: 'onboarding.step10Desc' as const,
+    icon: (
+      <svg className="w-16 h-16 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364V3" />
+      </svg>
+    ),
+    color: 'from-sky-500/10 to-blue-500/10',
+  },
+  {
+    titleKey: 'onboarding.step11Title' as const,
+    descKey: 'onboarding.step11Desc' as const,
+    icon: (
+      <svg className="w-16 h-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+      </svg>
+    ),
+    color: 'from-red-500/10 to-orange-500/10',
+  },
 ];
 
 export default function Onboarding() {

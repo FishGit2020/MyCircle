@@ -175,7 +175,7 @@ export default defineConfig({
       : []),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'icons/*.png'],
+      includeAssets: ['favicon.ico', 'favicon.svg', 'icons/*.png'],
       manifest: {
         name: 'MyCircle',
         short_name: 'MyCircle',
@@ -198,7 +198,7 @@ export default defineConfig({
             type: 'image/png'
           },
           {
-            src: '/icons/icon-512x512.png',
+            src: '/icons/icon-maskable-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'

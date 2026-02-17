@@ -96,6 +96,8 @@ export default function KeyboardShortcutsHelp({ open, onClose }: Props) {
           <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>o</Kbd></>} label={t('shortcuts.goWorship')} />
           <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>n</Kbd></>} label={t('shortcuts.goNotebook')} />
           <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>y</Kbd></>} label={t('shortcuts.goBaby')} />
+          <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>e</Kbd></>} label={t('shortcuts.goEnglish')} />
+          <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>c</Kbd></>} label={t('shortcuts.goChinese')} />
           <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>a</Kbd></>} label={t('shortcuts.goAi')} />
         </div>
 

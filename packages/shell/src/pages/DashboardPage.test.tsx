@@ -10,13 +10,13 @@ vi.mock('@mycircle/shared', () => ({
   }),
 }));
 
-// Mock useDailyVerse hook — returns API verse with text by default
-const mockUseDailyVerse = vi.fn().mockReturnValue({
+// Mock useCuratedVerse hook — returns API verse with text by default
+const mockUseCuratedVerse = vi.fn().mockReturnValue({
   verse: { text: 'Test verse from API', reference: 'Test 1:1 (NIV)', copyright: null },
   loading: false,
 });
-vi.mock('../hooks/useDailyVerse', () => ({
-  useDailyVerse: () => mockUseDailyVerse(),
+vi.mock('../hooks/useCuratedVerse', () => ({
+  useCuratedVerse: () => mockUseCuratedVerse(),
 }));
 
 // Mock useAuth — unauthenticated user with no cities
@@ -57,8 +57,18 @@ describe('DashboardPage', () => {
     expect(screen.getByText(/Test 1:1/)).toBeInTheDocument();
   });
 
+  it('renders loading skeleton while fetching verse', () => {
+    mockUseCuratedVerse.mockReturnValueOnce({
+      verse: { reference: 'JER.29.11' },
+      loading: true,
+    });
+    const { container } = renderDashboard();
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    expect(screen.queryByText(/JER\.29\.11/)).not.toBeInTheDocument();
+  });
+
   it('renders reference-only fallback when API text is unavailable', () => {
-    mockUseDailyVerse.mockReturnValueOnce({
+    mockUseCuratedVerse.mockReturnValueOnce({
       verse: { reference: 'Psalm 23:1 (NIV)' },
       loading: false,
     });

@@ -1,4 +1,4 @@
-import { useQuery, GET_BIBLE_VOTD_API, getDailyVerse } from '@mycircle/shared';
+import { useQuery, GET_BIBLE_VOTD_API, getDailyVerse, NIV_COPYRIGHT } from '@mycircle/shared';
 import type { DailyVerse } from '@mycircle/shared';
 
 export type { DailyVerse };
@@ -27,15 +27,18 @@ export function useDailyVerse() {
     fetchPolicy: 'cache-first',
   });
 
-  // Use API verse when available with actual text; otherwise fall back to
-  // the local curated verse (reference-only, no text).
+  // Use API verse when available; otherwise fall back to
+  // the local curated verse with hardcoded NIV text.
   const verse: DailyVerse = data?.bibleVotdApi?.text
     ? {
         text: data.bibleVotdApi.text,
         reference: data.bibleVotdApi.reference,
         copyright: data.bibleVotdApi.copyright || undefined,
       }
-    : localVerse;
+    : {
+        ...localVerse,
+        copyright: localVerse.copyright ?? NIV_COPYRIGHT,
+      };
 
   return {
     verse,

@@ -15,7 +15,7 @@ Lessons learned from building MyCircle's Vite Module Federation architecture wit
 - [6. Event Bus Memory Leaks](#6-event-bus-memory-leaks)
 - [7. localStorage Key Collisions](#7-localstorage-key-collisions)
 - [8. Body Scroll Lock Conflicts](#8-body-scroll-lock-conflicts)
-- [9. Missing Test Aliases for New Remotes](#9-missing-test-aliases-for-new-remotes)
+- [9. Missing Test Aliases for New Remotes](#9-missing-test-aliases-for-new-remotes) (includes **Full Checklist for Adding a New MFE**)
 
 ### Limitations & Architecture
 - [10. No Hot Reload for Remote MFEs in Dev Mode](#10-no-hot-reload-for-remote-mfes-in-dev-mode)
@@ -382,14 +382,56 @@ export default function BabyTrackerMock() {
 
 Note the path difference: the root config uses `./packages/shell/src/test/mocks/...` while the shell config uses `./src/test/mocks/...` (relative to each config's location).
 
-### Checklist for Adding a New MFE
+### Full Checklist for Adding a New MFE
 
-- [ ] Create `packages/<name>/` with its own `vitest.config.ts`
+When adding a new micro-frontend, update **all** of the following. Items marked with `*` are easy to forget.
+
+#### Package Setup
+
+- [ ] Create `packages/<name>/` with `package.json`, `vite.config.ts`, `vitest.config.ts`, `tsconfig.json`, `index.html`
+- [ ] Add `corePlugins: { preflight: false }` in the MFE's `tailwind.config.js` (see Pitfall #2)
+- [ ] Register the remote in `packages/shell/vite.config.ts` → `federation({ remotes: ... })`
+- [ ] Add type declaration in `packages/shell/src/remotes.d.ts`
+
+#### Test Infrastructure
+
 - [ ] Create mock at `packages/shell/src/test/mocks/<Name>Mock.tsx`
 - [ ] Add alias to `packages/shell/vitest.config.ts`
-- [ ] Add alias to root `vitest.config.ts`
-- [ ] Add route entry to `Layout.tsx` `ROUTE_MODULE_MAP`
+- [ ] Add alias to root `vitest.config.ts` (different relative path — see note above)
 - [ ] Verify with `pnpm test:run` (root) — not just `pnpm --filter @mycircle/shell test:run`
+
+#### Shell Integration (all in `packages/shell/src/`)
+
+- [ ] **Route**: Add `<Route>` and lazy import in `App.tsx`
+- [ ] **Layout prefetch** `*`: Add to `ROUTE_MODULE_MAP` in `components/layout/Layout.tsx`
+- [ ] **Desktop nav link** `*`: Add `<Link>` with `onMouseEnter`/`onFocus` prefetch in `Layout.tsx`
+- [ ] **Tailwind content** `*`: Add `../<name>/src/**/*.{js,ts,jsx,tsx}` to `shell/tailwind.config.js` `content` array
+- [ ] **Bottom nav**: Add entry to `ALL_NAV_ITEMS` in `components/layout/BottomNav.tsx`
+- [ ] **Breadcrumbs** `*`: Add route label to `ROUTE_LABEL_KEYS` in `components/layout/Breadcrumbs.tsx`
+- [ ] **Command palette**: Add to `ROUTE_LABEL_KEYS` and `navItems` in `components/layout/CommandPalette.tsx`
+- [ ] **Keyboard shortcut** `*`: Add `g + <key>` binding in `hooks/useKeyboardShortcuts.ts`
+- [ ] **Shortcuts help** `*`: Add `<ShortcutRow>` in `components/layout/KeyboardShortcutsHelp.tsx`
+
+#### Dashboard & Onboarding
+
+- [ ] **Onboarding card** `*`: Add step to `STEPS` array in `components/sync/Onboarding.tsx`
+- [ ] **Widget** (optional): Add to `WidgetType`, `DEFAULT_LAYOUT`, `WIDGET_COMPONENTS`, `WIDGET_ROUTES` in `components/widgets/WidgetDashboard.tsx`
+- [ ] **Widget tests**: Update widget counts in `WidgetDashboard.test.tsx`
+
+#### Shared Package
+
+- [ ] **i18n**: Add all user-visible strings to `en`, `es`, `zh` in `shared/src/i18n/translations.ts` — including `nav.*`, `commandPalette.goTo*`, `shortcuts.go*`, `onboarding.step*`, `widgets.*` keys
+- [ ] **StorageKeys**: Add any new localStorage keys to `StorageKeys` in `shared/src/utils/eventBus.ts`
+- [ ] **WindowEvents** (if needed): Add cross-MFE events to `WindowEvents`
+- [ ] **Build shared**: `pnpm --filter @mycircle/shared build`
+
+#### Docs & Config
+
+- [ ] Update `docs/architecture.md` with the new MFE
+- [ ] Update `README.md` feature list
+- [ ] Add preview script to root `package.json` (e.g., `preview:<name>`)
+- [ ] Add to `firebase.json` rewrites if using Firebase hosting
+- [ ] Add to `scripts/assemble-firebase.mjs` build list
 
 ---
 

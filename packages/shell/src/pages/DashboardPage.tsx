@@ -1,11 +1,11 @@
 import React from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { WidgetDashboard } from '../components/widgets';
-import { useDailyVerse } from '../hooks/useDailyVerse';
+import { useCuratedVerse } from '../hooks/useCuratedVerse';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { verse, loading } = useDailyVerse();
+  const { verse, loading } = useCuratedVerse();
 
   return (
     <div className="space-y-8">
@@ -21,19 +21,26 @@ export default function DashboardPage() {
         <div className="max-w-lg mx-auto">
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
             {loading ? (
-              <div className="h-4 bg-blue-200 dark:bg-blue-800/40 rounded animate-pulse w-3/4 mx-auto" />
-            ) : verse.text ? (
-              <p className="text-sm italic text-blue-600 dark:text-blue-400">
-                &ldquo;{verse.text}&rdquo;
-              </p>
-            ) : null}
-            <p className={`text-xs text-blue-700 dark:text-blue-300 font-medium ${verse.text || loading ? 'mt-1.5' : ''}`}>
-              — {verse.reference}
-            </p>
-            {verse.copyright && (
-              <p className="text-[10px] text-blue-500/80 dark:text-blue-400/70 mt-1 leading-tight">
-                {verse.copyright}
-              </p>
+              <div className="animate-pulse space-y-2">
+                <div className="h-4 bg-blue-200 dark:bg-blue-700/40 rounded w-3/4 mx-auto" />
+                <div className="h-3 bg-blue-200 dark:bg-blue-700/40 rounded w-1/3 mx-auto" />
+              </div>
+            ) : (
+              <>
+                {verse.text ? (
+                  <p className="text-sm italic text-blue-600 dark:text-blue-400">
+                    &ldquo;{verse.text}&rdquo;
+                  </p>
+                ) : null}
+                <p className={`text-xs text-blue-700 dark:text-blue-300 font-medium ${verse.text ? 'mt-1.5' : ''}`}>
+                  — {verse.reference}
+                </p>
+                {verse.copyright && (
+                  <p className="text-[10px] text-blue-500/80 dark:text-blue-400/70 mt-1 leading-tight">
+                    {verse.copyright}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
