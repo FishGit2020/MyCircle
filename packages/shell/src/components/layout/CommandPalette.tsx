@@ -27,6 +27,8 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/notebook': 'commandPalette.goToNotebook',
   '/baby': 'commandPalette.goToBaby',
   '/child-dev': 'commandPalette.goToChildDev',
+  '/english': 'commandPalette.goToEnglish',
+  '/chinese': 'commandPalette.goToChinese',
   '/ai': 'commandPalette.goToAi',
 };
 
@@ -155,6 +157,16 @@ export default function CommandPalette({ recentPages = [] }: Props) {
       id: 'nav-child-dev', label: t('commandPalette.goToChildDev'), description: '/child-dev',
       icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>,
       action: () => { navigate('/child-dev'); setOpen(false); }, category: 'navigation',
+    },
+    {
+      id: 'nav-english', label: t('commandPalette.goToEnglish'), description: '/english',
+      icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364V3" /></svg>,
+      action: () => { navigate('/english'); setOpen(false); }, category: 'navigation',
+    },
+    {
+      id: 'nav-chinese', label: t('commandPalette.goToChinese'), description: '/chinese',
+      icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>,
+      action: () => { navigate('/chinese'); setOpen(false); }, category: 'navigation',
     },
     {
       id: 'nav-ai', label: t('commandPalette.goToAi'), description: '/ai',

@@ -13,6 +13,8 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   notebook: 'nav.notebook',
   baby: 'nav.baby',
   'child-dev': 'nav.childDev',
+  english: 'nav.english',
+  chinese: 'nav.chinese',
   compare: 'nav.compare',
 };
 

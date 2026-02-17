@@ -149,10 +149,24 @@ git checkout main && git pull origin main                                     # 
 
 ---
 
+## 9. Adding a New Micro Frontend
+
+When adding a new MFE, there are **20+ integration points** across the codebase. See the [Full Checklist for Adding a New MFE](./mfe-guide.md#full-checklist-for-adding-a-new-mfe) in the MFE Guide.
+
+Key areas to update (commonly missed items marked with `*`):
+- Package setup, test mocks, and vitest aliases
+- Shell: route, lazy import, **Layout prefetch** `*`, **Tailwind content** `*`, desktop nav link
+- Navigation: BottomNav, **Breadcrumbs** `*`, CommandPalette, **keyboard shortcut** `*`, **shortcuts help** `*`
+- Dashboard: **onboarding card** `*`, widget (optional)
+- Shared: i18n keys (all 3 locales), StorageKeys, WindowEvents
+- Docs: `architecture.md`, `README.md`, firebase config
+
+---
+
 ## See Also
 
 - [PR Lifecycle](./pr-lifecycle.md) — branch protection, merge workflow
 - [CI/CD Pipeline](./cicd.md) — pipeline details, troubleshooting
 - [Architecture](./architecture.md) — MFE structure, data flow
-- [MFE Guide](./mfe-guide.md) — pitfalls and lessons learned
+- [MFE Guide](./mfe-guide.md) — pitfalls and lessons learned (includes new MFE checklist)
 - [API Keys](./api-keys.md) — external service configuration

@@ -38,7 +38,7 @@ export default function FlashcardView({ characters, masteredIds, onToggleMastere
 
       {/* Flashcard */}
       <div
-        className="relative w-64 h-80 cursor-pointer [perspective:600px]"
+        className="relative w-64 h-80 cursor-pointer overflow-hidden [perspective:600px]"
         onClick={() => setFlipped(!flipped)}
         data-testid="flashcard"
       >
@@ -48,14 +48,14 @@ export default function FlashcardView({ characters, masteredIds, onToggleMastere
           }`}
         >
           {/* Front */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 [backface-visibility:hidden]">
-            <span className="text-7xl mb-2" data-testid="flashcard-character">{character.character}</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 [backface-visibility:hidden]">
+            <span className="text-6xl mb-2" data-testid="flashcard-character">{character.character}</span>
             <span className="text-sm text-gray-400 dark:text-gray-500 mt-4">
               {flipped ? t('chinese.hideAnswer') : t('chinese.showAnswer')}
             </span>
           </div>
           {/* Back */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/20 rounded-2xl shadow-lg border border-blue-200 dark:border-blue-800 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-blue-50 dark:bg-blue-900/20 rounded-2xl shadow-lg border border-blue-200 dark:border-blue-800 [backface-visibility:hidden] [transform:rotateY(180deg)]">
             <span className="text-5xl mb-3">{character.character}</span>
             <span className="text-2xl text-blue-600 dark:text-blue-400 font-medium" data-testid="flashcard-pinyin">{character.pinyin}</span>
             <span className="text-lg text-gray-600 dark:text-gray-300 mt-1" data-testid="flashcard-meaning">{character.meaning}</span>
