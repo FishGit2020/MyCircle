@@ -12,16 +12,14 @@ interface Props {
   watchlist: WatchlistItem[];
   onToggleWatchlist: (symbol: string) => void;
   onSelectStock: (symbol: string) => void;
-  liveEnabled: boolean;
 }
 
-function WatchlistCard({ item, onToggleWatchlist, onSelectStock, liveEnabled }: {
+function WatchlistCard({ item, onToggleWatchlist, onSelectStock }: {
   item: WatchlistItem;
   onToggleWatchlist: (symbol: string) => void;
   onSelectStock: (symbol: string) => void;
-  liveEnabled: boolean;
 }) {
-  const { quote, loading: quoteLoading } = useStockQuote(item.symbol, liveEnabled ? 60_000 : 0);
+  const { quote, loading: quoteLoading } = useStockQuote(item.symbol, 0);
   const { candles, loading: candlesLoading } = useStockCandles(item.symbol);
 
   const sparklineData = candles && candles.s !== 'no_data' && candles.c
@@ -42,7 +40,7 @@ function WatchlistCard({ item, onToggleWatchlist, onSelectStock, liveEnabled }: 
   );
 }
 
-export default function Watchlist({ watchlist, onToggleWatchlist, onSelectStock, liveEnabled }: Props) {
+export default function Watchlist({ watchlist, onToggleWatchlist, onSelectStock }: Props) {
   const { t } = useTranslation();
 
   if (watchlist.length === 0) {
@@ -69,7 +67,6 @@ export default function Watchlist({ watchlist, onToggleWatchlist, onSelectStock,
           item={item}
           onToggleWatchlist={onToggleWatchlist}
           onSelectStock={onSelectStock}
-          liveEnabled={liveEnabled}
         />
       ))}
     </div>

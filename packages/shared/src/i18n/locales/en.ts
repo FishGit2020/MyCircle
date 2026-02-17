@@ -151,9 +151,6 @@ const en = {
   'notifications.preferences': 'Notification Preferences',
   'notifications.weatherAlerts': 'Weather Alerts',
   'notifications.weatherAlertsDesc': 'Severe weather warnings for your favorite cities',
-  'notifications.podcastAlerts': 'New Episodes',
-  'notifications.podcastAlertsDesc': 'When subscribed podcasts release new episodes',
-  'notifications.noSubscriptionsForAlerts': 'Subscribe to podcasts first',
   'notifications.announcementAlerts': 'Announcements',
   'notifications.announcementAlertsDesc': 'Get notified when new app updates are posted',
 
@@ -350,10 +347,8 @@ const en = {
   'stocks.loading': 'Loading stock data...',
   'stocks.error': 'Failed to load stock data',
   'stocks.sparkline7d': '7-day trend',
-  'stocks.live': 'LIVE',
+  'stocks.refresh': 'Refresh',
   'stocks.lastUpdated': 'Last updated',
-  'stocks.refreshInterval': 'Refresh interval',
-  'stocks.paused': 'Paused',
   'stocks.costBasis': 'Cost Basis',
   'stocks.shares': 'Shares',
   'stocks.gainLoss': 'Gain / Loss',
@@ -1343,6 +1338,11 @@ const en = {
   'chinese.noCharacters': 'No characters yet. Add one to get started!',
   'chinese.signInToAdd': 'Sign in to add characters',
   'chinese.loading': 'Loading characters...',
+
+  // Pull to Refresh
+  'pullToRefresh.hint': 'Pull to refresh',
+  'pullToRefresh.release': 'Release to refresh',
+  'pullToRefresh.refreshing': 'Refreshing...',
 } as const;
 
 export default en;

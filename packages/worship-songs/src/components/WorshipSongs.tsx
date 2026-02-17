@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PullToRefresh } from '@mycircle/shared';
 import { useWorshipSongs } from '../hooks/useWorshipSongs';
 import type { WorshipSong } from '../types';
 import SongList from './SongList';
@@ -15,7 +15,7 @@ export default function WorshipSongs() {
   const { songId } = useParams<{ songId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { songs, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong } = useWorshipSongs();
+  const { songs, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong, refresh } = useWorshipSongs();
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [songLoading, setSongLoading] = useState(false);
@@ -126,7 +126,7 @@ export default function WorshipSongs() {
 
     default:
       return (
-        <>
+        <PullToRefresh onRefresh={() => refresh()}>
           {errorMsg && (
             <div role="alert" className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 flex items-center justify-between">
               <span>{errorMsg}</span>
@@ -142,7 +142,7 @@ export default function WorshipSongs() {
             onSelectSong={handleSelectSong}
             onNewSong={handleNewSong}
           />
-        </>
+        </PullToRefresh>
       );
   }
 }

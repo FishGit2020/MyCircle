@@ -153,9 +153,6 @@ const es: Record<TranslationKey, string> = {
   'notifications.preferences': 'Preferencias de notificaciones',
   'notifications.weatherAlerts': 'Alertas meteorol\u00f3gicas',
   'notifications.weatherAlertsDesc': 'Avisos de clima severo para tus ciudades favoritas',
-  'notifications.podcastAlerts': 'Nuevos episodios',
-  'notifications.podcastAlertsDesc': 'Cuando tus podcasts suscritos publiquen nuevos episodios',
-  'notifications.noSubscriptionsForAlerts': 'Suscr\u00edbete a podcasts primero',
   'notifications.announcementAlerts': 'Anuncios',
   'notifications.announcementAlertsDesc': 'Recibe notificaciones de nuevas actualizaciones',
 
@@ -352,10 +349,8 @@ const es: Record<TranslationKey, string> = {
   'stocks.loading': 'Cargando datos de acciones...',
   'stocks.error': 'Error al cargar datos de acciones',
   'stocks.sparkline7d': 'Tendencia 7 d\u00edas',
-  'stocks.live': 'EN VIVO',
+  'stocks.refresh': 'Actualizar',
   'stocks.lastUpdated': '\u00daltima actualizaci\u00f3n',
-  'stocks.refreshInterval': 'Intervalo de actualizaci\u00f3n',
-  'stocks.paused': 'Pausado',
   'stocks.costBasis': 'Costo base',
   'stocks.shares': 'Acciones',
   'stocks.gainLoss': 'Ganancia / P\u00e9rdida',
@@ -1345,6 +1340,11 @@ const es: Record<TranslationKey, string> = {
   'chinese.noCharacters': 'No hay caracteres a\u00fan. \u00a1Agrega uno para comenzar!',
   'chinese.signInToAdd': 'Inicia sesi\u00f3n para agregar caracteres',
   'chinese.loading': 'Cargando caracteres...',
+
+  // Pull to Refresh
+  'pullToRefresh.hint': 'Desliza para actualizar',
+  'pullToRefresh.release': 'Suelta para actualizar',
+  'pullToRefresh.refreshing': 'Actualizando...',
 };
 
 export default es;

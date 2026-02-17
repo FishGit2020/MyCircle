@@ -1,4 +1,4 @@
-import { useTranslation, useCryptoPrices } from '@mycircle/shared';
+import { useTranslation, useCryptoPrices, PullToRefresh } from '@mycircle/shared';
 
 function MiniSparkline({ data, positive }: { data: number[]; positive: boolean }) {
   if (data.length < 2) return null;
@@ -47,7 +47,7 @@ function MiniSparkline({ data, positive }: { data: number[]; positive: boolean }
 
 export default function CryptoTracker() {
   const { t } = useTranslation();
-  const { prices, loading, error } = useCryptoPrices();
+  const { prices, loading, error, refetch } = useCryptoPrices();
 
   if (error) {
     return (
@@ -89,6 +89,7 @@ export default function CryptoTracker() {
   const changeBg = isPositive ? 'bg-green-50 dark:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/30';
 
   return (
+    <PullToRefresh onRefresh={() => refetch()}>
     <div
       className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-100 dark:border-gray-700"
       aria-label={`${coin.name} (${coin.symbol.toUpperCase()})`}
@@ -128,5 +129,6 @@ export default function CryptoTracker() {
         )}
       </div>
     </div>
+    </PullToRefresh>
   );
 }
