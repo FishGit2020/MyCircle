@@ -205,7 +205,6 @@ export default defineConfig({
           }
         ],
         shortcuts: [
-          { name: 'Dashboard', short_name: 'Home', url: '/', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Weather', short_name: 'Weather', url: '/weather', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Bible Reader', short_name: 'Bible', url: '/bible', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Podcasts', short_name: 'Podcasts', url: '/podcasts', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
@@ -216,7 +215,6 @@ export default defineConfig({
           { name: 'English Learning', short_name: 'English', url: '/english', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Chinese Learning', short_name: 'Chinese', url: '/chinese', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Child Development', short_name: 'ChildDev', url: '/child-dev', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
-          { name: 'Baby Tracker', short_name: 'Baby', url: '/baby', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
         ]
       },
       workbox: {

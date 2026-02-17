@@ -28,17 +28,21 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
 
+const VALID_IDS = new Set<string>(DEFAULT_LAYOUT.map(w => w.id));
+
 function loadLayout(): WidgetConfig[] {
   try {
     const stored = localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
     if (stored) {
       const parsed: WidgetConfig[] = JSON.parse(stored);
-      // Ensure all widget types exist (forward-compat)
-      const ids = new Set(parsed.map(w => w.id));
+      // Remove stale widget IDs that no longer exist (e.g. removed features)
+      const filtered = parsed.filter(w => VALID_IDS.has(w.id));
+      // Ensure all current widget types exist (forward-compat)
+      const ids = new Set(filtered.map(w => w.id));
       for (const def of DEFAULT_LAYOUT) {
-        if (!ids.has(def.id)) parsed.push(def);
+        if (!ids.has(def.id)) filtered.push(def);
       }
-      return parsed;
+      return filtered;
     }
   } catch { /* ignore */ }
   return DEFAULT_LAYOUT;
