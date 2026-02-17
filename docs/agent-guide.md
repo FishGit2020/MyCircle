@@ -163,6 +163,25 @@ Key areas to update (commonly missed items marked with `*`):
 
 ---
 
+## 11. Removing Features Safely
+
+When removing a widget, route, or feature:
+
+1. **Filter stale localStorage entries** — if the feature stored data in a registry (e.g., `WIDGET_COMPONENTS`, `DEFAULT_LAYOUT`), the user's localStorage may still contain references to the removed ID. Always filter out unknown IDs in the loader function:
+   ```ts
+   const VALID_IDS = new Set(DEFAULT_LAYOUT.map(w => w.id));
+   const filtered = parsed.filter(w => VALID_IDS.has(w.id));
+   ```
+2. **Delete e2e tests** — search `e2e/` for references to the removed feature
+3. **Update unit test counts** — tests that assert array lengths (e.g., `expect(buttons.length).toBe(9)`) must be updated
+4. **Remove i18n keys** — keys from all 3 locales (`en.ts`, `es.ts`, `zh.ts`)
+5. **PWA manifest shortcuts** — max 10 allowed; remove the feature's shortcut if over limit
+6. **Update docs** — `README.md` widget table, `architecture.md`, Quick Access tiles array
+
+**Why this matters:** Users' browsers cache layout/config in localStorage. If code references a removed ID without guarding, the app crashes with `undefined is not a function` — which in production (minified) shows as an opaque error like `W3[D.id] is not a function`.
+
+---
+
 ## See Also
 
 - [PR Lifecycle](./pr-lifecycle.md) — branch protection, merge workflow
