@@ -80,4 +80,20 @@ test.describe('Widget Dashboard', () => {
     const hiddenText = page.getByText(/hidden/i);
     await expect(hiddenText.first()).toBeVisible();
   });
+
+  test('podcast widget shows content even without subscriptions', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('[class*="grid"]', { timeout: 10_000 });
+    // Podcast widget should show "discover podcasts" message instead of being empty
+    const podcastText = page.getByText(/discover.*podcast|currently playing|no podcast/i);
+    await expect(podcastText.first()).toBeVisible();
+  });
+
+  test('bible widget shows bookmarks or placeholder', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('[class*="grid"]', { timeout: 10_000 });
+    // Bible widget should show bookmarks or "no bookmarks" message
+    const bibleText = page.getByText(/bookmark|bible/i);
+    await expect(bibleText.first()).toBeVisible();
+  });
 });

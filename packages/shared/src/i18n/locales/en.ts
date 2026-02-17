@@ -767,6 +767,11 @@ const en = {
   'widgets.nowPlaying': 'Now Playing',
   'widgets.nowPlayingDesc': 'Currently playing podcast',
   'widgets.nothingPlaying': 'No podcast playing',
+  'widgets.discoverPodcasts': 'Tap to discover and subscribe to podcasts',
+  'widgets.bible': 'Bible',
+  'widgets.bibleDesc': 'Your saved bookmarks',
+  'widgets.noBookmarks': 'No bookmarks yet — open Bible to save passages',
+  'widgets.moreBookmarks': 'more',
   'widgets.noFavoriteCity': 'Add a favorite city to see weather',
   'widgets.noStocks': 'Add stocks to your watchlist',
   'widgets.notebook': 'Notebook',
@@ -796,6 +801,10 @@ const en = {
   'whatsNew.close': 'Close',
   'whatsNew.noUpdates': 'No announcements yet. Check back later!',
   'whatsNew.newBadge': 'New updates available',
+  'whatsNew.viewAll': 'View All Updates',
+  'whatsNew.new': 'NEW',
+  'whatsNew.noAnnouncements': 'No announcements yet',
+  'whatsNew.dismiss': 'Dismiss',
 
   // Baby Tracker
   'nav.baby': 'Baby',
@@ -1311,6 +1320,24 @@ const en = {
   'english.category.people': 'People & Family',
   'english.category.time': 'Time & Weather',
   'english.category.emergency': 'Emergencies',
+
+  // Chinese Characters CRUD
+  'chinese.addCharacter': 'Add Character',
+  'chinese.editCharacter': 'Edit Character',
+  'chinese.deleteCharacter': 'Delete Character',
+  'chinese.deleteConfirm': 'Delete this character? This cannot be undone.',
+  'chinese.character': 'Character',
+  'chinese.pinyin': 'Pinyin',
+  'chinese.meaning': 'Meaning',
+  'chinese.categoryLabel': 'Category',
+  'chinese.save': 'Save',
+  'chinese.cancel': 'Cancel',
+  'chinese.pinyinKeyboard': 'Pinyin Keyboard',
+  'chinese.createdBy': 'Added by',
+  'chinese.editedBy': 'Edited by',
+  'chinese.noCharacters': 'No characters yet. Add one to get started!',
+  'chinese.signInToAdd': 'Sign in to add characters',
+  'chinese.loading': 'Loading characters...',
 } as const;
 
 export default en;

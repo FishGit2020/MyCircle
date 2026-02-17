@@ -353,12 +353,17 @@ Exposes `ChildDevelopment` component via Module Federation. Port **3012**.
 Exposes `ChineseLearning` component via Module Federation. Port **3013**.
 
 **Key Behavior:**
-- ~50 Chinese characters/phrases across 8 categories (Family, Feelings, Food, Body, House, Nature, Numbers, Phrases)
+- **Firestore-backed characters** — `chineseCharacters` collection (public read, authenticated write); CRUD via `window.__chineseCharacters` bridge; real-time `onSnapshot` subscription with `localStorage` cache (`StorageKeys.CHINESE_CHARACTERS_CACHE`)
+- `useChineseCharacters` hook — mirrors `useWorshipSongs` pattern: real-time subscribe with one-shot fetch fallback, auth state detection, CRUD operations
+- ~50 default characters seeded via `scripts/seed-chinese-characters.mjs` across 8 categories (Family, Feelings, Food, Body, House, Nature, Numbers, Phrases)
+- **Character CRUD** — `CharacterEditor` modal with character, pinyin (with `PinyinKeyboard`), meaning, category; add/edit/delete with confirmation; creator/editor metadata
+- **PinyinKeyboard** — compact toggle toolbar with tone-marked vowels grouped by base vowel (ā á ǎ à, ē é ě è, etc.); inserts at cursor position
 - **Flashcard system** — front shows character, tap to flip for pinyin + meaning; navigation between characters; mark as mastered
 - **Practice canvas** — Pointer Events API (`pointerdown/move/up`) drawing with reference character as `globalAlpha=0.15` watermark; undo (stroke history) and clear; `touch-action: none` prevents scroll interference
-- **Character grid** — browse all characters grouped by category with green checkmark badges on mastered items
+- **Character grid** — browse all characters grouped by category with green checkmark badges; edit button on hover (auth-gated); creator metadata tooltip
 - Persistence: `StorageKeys.CHINESE_LEARNING_PROGRESS` (localStorage JSON: `{ masteredIds, lastDate }`)
 - `WindowEvents.CHINESE_PROGRESS_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
+- `WindowEvents.CHINESE_CHARACTERS_CHANGED` invalidation signal for non-real-time consumers
 - Route: `/chinese`
 
 ### English Learning - `packages/english-learning/`

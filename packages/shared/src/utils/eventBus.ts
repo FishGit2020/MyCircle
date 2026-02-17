@@ -33,6 +33,7 @@ export const WindowEvents = {
   BIBLE_BOOKMARKS_CHANGED: 'bible-bookmarks-changed',
   CHINESE_PROGRESS_CHANGED: 'chinese-progress-changed',
   ENGLISH_PROGRESS_CHANGED: 'english-progress-changed',
+  CHINESE_CHARACTERS_CHANGED: 'chinese-characters-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -72,6 +73,7 @@ export const StorageKeys = {
   RECENTLY_VISITED: 'recently-visited',
   CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
   ENGLISH_LEARNING_PROGRESS: 'english-learning-progress',
+  CHINESE_CHARACTERS_CACHE: 'chinese-characters-cache',
 } as const;
 
 export interface CitySelectedEvent {
