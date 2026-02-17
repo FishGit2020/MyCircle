@@ -1,6 +1,6 @@
 import React, { useReducer, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router';
-import { useTranslation, StorageKeys, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery, useUnits, formatTemperature } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery, useUnits, formatTemperature } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import { useDailyVerse } from '../../hooks/useDailyVerse';
@@ -275,13 +275,18 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   const [hasSubscriptions, setHasSubscriptions] = React.useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
-      if (stored) {
-        const subs = JSON.parse(stored);
-        setHasSubscriptions(Array.isArray(subs) && subs.length > 0);
-      }
-    } catch { /* ignore */ }
+    function loadSubs() {
+      try {
+        const stored = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
+        if (stored) {
+          const subs = JSON.parse(stored);
+          setHasSubscriptions(Array.isArray(subs) && subs.length > 0);
+        }
+      } catch { /* ignore */ }
+    }
+    loadSubs();
+    window.addEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, loadSubs);
+    return () => window.removeEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, loadSubs);
   }, []);
 
   useEffect(() => {
@@ -360,10 +365,15 @@ const NotebookWidget = React.memo(function NotebookWidget() {
   const [noteCount, setNoteCount] = React.useState<number | null>(null);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(StorageKeys.NOTEBOOK_CACHE);
-      if (stored) setNoteCount(JSON.parse(stored));
-    } catch { /* ignore */ }
+    function load() {
+      try {
+        const stored = localStorage.getItem(StorageKeys.NOTEBOOK_CACHE);
+        if (stored) setNoteCount(JSON.parse(stored));
+      } catch { /* ignore */ }
+    }
+    load();
+    window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
   }, []);
 
   return (

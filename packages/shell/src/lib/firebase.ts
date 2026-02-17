@@ -115,6 +115,8 @@ export interface UserProfile {
   bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
   chineseLearningProgress?: { masteredIds: string[]; lastDate: string };
   englishLearningProgress?: { completedIds: string[]; quizScores: Array<{ date: string; correct: number; total: number }>; lastDate: string };
+  childName?: string;
+  childBirthDate?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -421,6 +423,16 @@ export async function updateEnglishLearningProgress(uid: string, progress: { com
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     englishLearningProgress: progress,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateChildData(uid: string, data: { childName: string | null; childBirthDate: string | null }) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    childName: data.childName || null,
+    childBirthDate: data.childBirthDate || null,
     updatedAt: serverTimestamp(),
   });
 }
