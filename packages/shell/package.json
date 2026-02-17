@@ -18,6 +18,7 @@
     "graphql": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "@sentry/react": "^10.38.0",
     "react-router": "catalog:",
     "workbox-window": "^7.4.0"
   },

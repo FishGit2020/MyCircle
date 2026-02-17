@@ -318,7 +318,8 @@ export default defineConfig({
     modulePreload: false,
     target: 'esnext',
     minify: 'esbuild',
-    cssCodeSplit: true
+    cssCodeSplit: true,
+    sourcemap: 'hidden', // Generate source maps for Sentry but don't expose to browser
   },
   server: {
     port: 3000,

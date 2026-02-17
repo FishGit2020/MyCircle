@@ -764,6 +764,9 @@ importers:
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
+      '@sentry/react':
+        specifier: ^10.38.0
+        version: 10.38.0(react@18.3.1)
       firebase:
         specifier: ^12.9.0
         version: 12.9.0
