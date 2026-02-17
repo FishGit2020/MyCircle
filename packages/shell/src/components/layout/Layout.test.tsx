@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import Layout from './Layout';
 import { ThemeProvider } from '../../context/ThemeContext';
@@ -56,13 +56,78 @@ describe('Layout', () => {
     expect(screen.getByText('MyCircle')).toBeInTheDocument();
   });
 
-  it('renders navigation links for Home, Stocks, Podcasts, AI', () => {
+  it('renders Home link and nav group labels', () => {
     renderWithRouter(<Layout />);
 
     expect(screen.getAllByText('Home').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Stocks').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Podcasts').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('AI').length).toBeGreaterThan(0);
+    expect(screen.getByText('Daily')).toBeInTheDocument();
+    expect(screen.getByText('Faith')).toBeInTheDocument();
+    expect(screen.getByText('Family')).toBeInTheDocument();
+    expect(screen.getByText('Learning')).toBeInTheDocument();
+    expect(screen.getByText('Tools')).toBeInTheDocument();
+  });
+
+  it('clicking Daily opens dropdown with Weather, Stocks, Podcasts links', () => {
+    renderWithRouter(<Layout />);
+
+    // Dropdown menu should not exist initially
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+
+    // Click the Daily group button
+    fireEvent.click(screen.getByText('Daily'));
+
+    // Dropdown should now be open
+    const menu = screen.getByRole('menu');
+    expect(menu).toBeInTheDocument();
+
+    // Check for items inside the dropdown
+    expect(screen.getByRole('menuitem', { name: /Weather/i })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /Stocks/i })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /Podcasts/i })).toBeInTheDocument();
+  });
+
+  it('clicking outside closes dropdown', () => {
+    renderWithRouter(<Layout />);
+
+    // Open the Daily dropdown
+    fireEvent.click(screen.getByText('Daily'));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    // Click outside (on the document body)
+    fireEvent.mouseDown(document.body);
+
+    // Dropdown should be closed
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('Escape key closes dropdown', () => {
+    renderWithRouter(<Layout />);
+
+    // Open the Daily dropdown
+    fireEvent.click(screen.getByText('Daily'));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    // Press Escape
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    // Dropdown should be closed
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('only one dropdown can be open at a time', () => {
+    renderWithRouter(<Layout />);
+
+    // Open Daily
+    fireEvent.click(screen.getByText('Daily'));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /Weather/i })).toBeInTheDocument();
+
+    // Click Faith — should close Daily and open Faith
+    fireEvent.click(screen.getByText('Faith'));
+    const menus = screen.getAllByRole('menu');
+    expect(menus).toHaveLength(1);
+    expect(screen.getByRole('menuitem', { name: /Bible/i })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /Weather/i })).not.toBeInTheDocument();
   });
 
   it('renders footer with OpenWeatherMap attribution', () => {

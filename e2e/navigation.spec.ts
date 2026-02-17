@@ -25,21 +25,27 @@ test.describe('Navigation', () => {
 
   test('Stocks link navigates to stocks page', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: 'Stocks' }).first().click();
+    // Open the Daily dropdown first, then click Stocks
+    await page.getByRole('navigation', { name: /main/i }).getByRole('button', { name: /daily/i }).click();
+    await page.getByRole('menuitem', { name: /stocks/i }).click();
 
     await expect(page).toHaveURL('/stocks');
   });
 
   test('Podcasts link navigates to podcasts page', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: 'Podcasts' }).first().click();
+    // Open the Daily dropdown first, then click Podcasts
+    await page.getByRole('navigation', { name: /main/i }).getByRole('button', { name: /daily/i }).click();
+    await page.getByRole('menuitem', { name: /podcasts/i }).click();
 
     await expect(page).toHaveURL('/podcasts');
   });
 
   test('AI link navigates to AI page', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: 'AI' }).first().click();
+    // Open the Tools dropdown first, then click AI
+    await page.getByRole('navigation', { name: /main/i }).getByRole('button', { name: /tools/i }).click();
+    await page.getByRole('menuitem', { name: /ai/i }).click();
 
     await expect(page).toHaveURL('/ai');
   });

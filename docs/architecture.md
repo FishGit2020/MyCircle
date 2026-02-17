@@ -111,7 +111,7 @@ The orchestrator that loads and composes all remote micro frontends.
 
 **Responsibilities:**
 - Application routing (React Router v7)
-- Layout: sticky header with nav links, toggles, notifications, "What's New" button, user menu
+- Layout: sticky header with grouped nav dropdowns (Daily, Faith, Family, Learning, Tools), toggles, notifications, "What's New" button, user menu
 - Authentication context (Firebase Auth)
 - Theme context (dark/light mode with system preference detection)
 - i18n / language selection (English, Spanish, Chinese)
@@ -413,7 +413,7 @@ The shell uses a three-layer loading strategy to balance initial page load speed
 
 **File:** `packages/shell/src/components/layout/Layout.tsx`
 
-When a user hovers or focuses a navigation link, the shell fires a dynamic `import()` for that MFE's remote module. A `Set<string>` prevents duplicate loads.
+When a user hovers or focuses a dropdown menu item (or the Home link), the shell fires a dynamic `import()` for that MFE's remote module. A `Set<string>` prevents duplicate loads.
 
 ```typescript
 const prefetched = new Set<string>();
@@ -962,7 +962,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | Component | File Path | Purpose |
 |-----------|-----------|---------|
 | **App (Shell)** | `packages/shell/src/App.tsx` | Routing, lazy MFE loading |
-| **Layout** | `packages/shell/src/components/layout/Layout.tsx` | Header, nav, toggles, footer |
+| **Layout** | `packages/shell/src/components/layout/Layout.tsx` | Header, grouped nav dropdowns, toggles, footer |
 | **CitySearchWrapper** | `packages/shell/src/components/widgets/CitySearchWrapper.tsx` | MFE host, event listener, city persistence |
 | **UseMyLocation** | `packages/shell/src/components/widgets/UseMyLocation.tsx` | Geolocation + reverse geocode |
 | **FavoriteCities** | `packages/shell/src/components/widgets/FavoriteCities.tsx` | Favorited cities grid |

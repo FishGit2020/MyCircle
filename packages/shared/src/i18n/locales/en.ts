@@ -9,6 +9,11 @@ const en = {
   'nav.skipToContent': 'Skip to content',
   'nav.breadcrumbLabel': 'Breadcrumb',
   'nav.recentlyVisited': 'Recently Visited',
+  'nav.group.daily': 'Daily',
+  'nav.group.faith': 'Faith',
+  'nav.group.family': 'Family',
+  'nav.group.learning': 'Learning',
+  'nav.group.tools': 'Tools',
 
   // Home page
   'home.title': 'Welcome to MyCircle',

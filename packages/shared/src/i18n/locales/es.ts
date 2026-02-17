@@ -11,6 +11,11 @@ const es: Record<TranslationKey, string> = {
   'nav.skipToContent': 'Saltar al contenido',
   'nav.breadcrumbLabel': 'Ruta de navegaci\u00f3n',
   'nav.recentlyVisited': 'Visitados recientemente',
+  'nav.group.daily': 'Diario',
+  'nav.group.faith': 'Fe',
+  'nav.group.family': 'Familia',
+  'nav.group.learning': 'Aprendizaje',
+  'nav.group.tools': 'Herramientas',
 
   // Home page
   'home.title': 'Bienvenido a MyCircle',
