@@ -24,46 +24,6 @@
         "function": "aiChat"
       },
       {
-        "source": "/city-search/**",
-        "destination": "/city-search/index.html"
-      },
-      {
-        "source": "/weather-display/**",
-        "destination": "/weather-display/index.html"
-      },
-      {
-        "source": "/stock-tracker/**",
-        "destination": "/stock-tracker/index.html"
-      },
-      {
-        "source": "/podcast-player/**",
-        "destination": "/podcast-player/index.html"
-      },
-      {
-        "source": "/ai-assistant/**",
-        "destination": "/ai-assistant/index.html"
-      },
-      {
-        "source": "/bible-reader/**",
-        "destination": "/bible-reader/index.html"
-      },
-      {
-        "source": "/worship-songs/**",
-        "destination": "/worship-songs/index.html"
-      },
-      {
-        "source": "/notebook/**",
-        "destination": "/notebook/index.html"
-      },
-      {
-        "source": "/baby-tracker/**",
-        "destination": "/baby-tracker/index.html"
-      },
-      {
-        "source": "/child-development/**",
-        "destination": "/child-development/index.html"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }
