@@ -8,7 +8,7 @@ import ErrorBoundary from '../common/ErrorBoundary';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -17,6 +17,7 @@ export interface WidgetConfig {
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'weather', visible: true },
+  { id: 'stocks', visible: true },
   { id: 'verse', visible: true },
   { id: 'nowPlaying', visible: true },
   { id: 'notebook', visible: true },
@@ -233,6 +234,55 @@ const WeatherWidget = React.memo(function WeatherWidget() {
   );
 });
 
+const StockWidget = React.memo(function StockWidget() {
+  const { t } = useTranslation();
+  const [watchlist, setWatchlist] = React.useState<Array<{ symbol: string; companyName: string }>>([]);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
+        if (stored) setWatchlist(JSON.parse(stored));
+      } catch { /* ignore */ }
+    }
+    load();
+    window.addEventListener(WindowEvents.WATCHLIST_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.WATCHLIST_CHANGED, load);
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-green-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.stocks')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.stocksDesc')}</p>
+        </div>
+      </div>
+      {watchlist.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5">
+          {watchlist.map(item => (
+            <Link
+              key={item.symbol}
+              to={`/stocks/${item.symbol}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs px-2.5 py-1 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-mono font-medium hover:bg-green-100 dark:hover:bg-green-800/40 active:bg-green-200 dark:active:bg-green-700/40 transition-colors"
+            >
+              {item.symbol}
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noStocks')}</p>
+      )}
+    </div>
+  );
+});
+
 const VerseWidget = React.memo(function VerseWidget() {
   const { t } = useTranslation();
   const { verse, loading } = useDailyVerse();
@@ -363,6 +413,7 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
 const NotebookWidget = React.memo(function NotebookWidget() {
   const { t } = useTranslation();
   const [noteCount, setNoteCount] = React.useState<number | null>(null);
+  const [publicCount, setPublicCount] = React.useState<number | null>(null);
 
   useEffect(() => {
     function load() {
@@ -374,6 +425,16 @@ const NotebookWidget = React.memo(function NotebookWidget() {
     load();
     window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
     return () => window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
+  }, []);
+
+  // Fetch public notes count (lightweight — cached by Firestore persistence)
+  useEffect(() => {
+    const api = (window as any).__notebook;
+    if (api?.getAllPublic) {
+      api.getAllPublic().then((notes: any[]) => {
+        setPublicCount(notes.length);
+      }).catch(() => { /* ignore */ });
+    }
   }, []);
 
   return (
@@ -389,13 +450,20 @@ const NotebookWidget = React.memo(function NotebookWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.notebookDesc')}</p>
         </div>
       </div>
-      {noteCount !== null && noteCount > 0 ? (
-        <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
-          {t('notebook.noteCount').replace('{count}', String(noteCount))}
-        </p>
-      ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noNotes')}</p>
-      )}
+      <div className="space-y-1">
+        {noteCount !== null && noteCount > 0 ? (
+          <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+            {t('notebook.noteCount').replace('{count}', String(noteCount))}
+          </p>
+        ) : (
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noNotes')}</p>
+        )}
+        {publicCount !== null && publicCount > 0 && (
+          <p className="text-xs text-indigo-500 dark:text-indigo-400/70">
+            {t('widgets.publicNoteCount').replace('{count}', String(publicCount))}
+          </p>
+        )}
+      </div>
     </div>
   );
 });
@@ -696,6 +764,7 @@ const ChineseLearningWidget = React.memo(function ChineseLearningWidget() {
 
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   weather: WeatherWidget,
+  stocks: StockWidget,
   verse: VerseWidget,
   nowPlaying: NowPlayingWidget,
   notebook: NotebookWidget,
@@ -707,6 +776,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
   weather: '/weather',
+  stocks: '/stocks',
   verse: '/bible',
   nowPlaying: '/podcasts',
   notebook: '/notebook',

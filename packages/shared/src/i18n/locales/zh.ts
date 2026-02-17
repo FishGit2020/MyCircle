@@ -774,6 +774,7 @@ const zh: Record<TranslationKey, string> = {
   'widgets.notebook': '\u7b14\u8bb0\u672c',
   'widgets.notebookDesc': '\u60a8\u7684\u4e2a\u4eba\u7b14\u8bb0',
   'widgets.noNotes': '\u8fd8\u6ca1\u6709\u7b14\u8bb0',
+  'widgets.publicNoteCount': '{count} \u7bc7\u516c\u5f00\u7b14\u8bb0',
   'widgets.hidden': '\u5df2\u9690\u85cf',
   'widgets.visible': '\u53ef\u89c1',
   'widgets.moveUp': '\u4e0a\u79fb\u7ec4\u4ef6',

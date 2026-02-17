@@ -9,6 +9,7 @@ vi.mock('@mycircle/shared', () => ({
   formatTemperature: (temp: number, unit?: string) => unit === 'F' ? `${Math.round(temp * 9/5 + 32)}°F` : `${Math.round(temp)}°C`,
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
   WindowEvents: {
+    WATCHLIST_CHANGED: 'watchlist-changed',
     SUBSCRIPTIONS_CHANGED: 'subscriptions-changed',
     NOTEBOOK_CHANGED: 'notebook-changed',
     CHILD_DATA_CHANGED: 'child-data-changed',
@@ -76,6 +77,7 @@ describe('WidgetDashboard', () => {
   it('renders all default widgets', () => {
     renderWidget();
     expect(screen.getByText('widgets.weather')).toBeInTheDocument();
+    expect(screen.getByText('widgets.stocks')).toBeInTheDocument();
     expect(screen.getByText('widgets.verse')).toBeInTheDocument();
     expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
     expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
@@ -103,7 +105,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     // All 8 widgets should show "Visible" toggle (stocks removed)
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(8);
+    expect(visibleButtons.length).toBe(9);
   });
 
   it('can toggle widget visibility', () => {
@@ -120,8 +122,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(8);
-    expect(downButtons.length).toBe(8);
+    expect(upButtons.length).toBe(9);
+    expect(downButtons.length).toBe(9);
   });
 
   it('persists layout to localStorage', () => {
@@ -161,7 +163,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(8);
+    expect(allVisible.length).toBe(9);
   });
 
   it('has proper a11y labels on the section', () => {
