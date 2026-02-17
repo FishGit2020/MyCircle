@@ -143,7 +143,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge; auto-popup toast for unread announcements (1.5s delay, one-time per batch); dedicated `/whats-new` page with all announcements, NEW badges on unread, blue highlight; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
 - **Offline sync** — Firestore offline persistence via `persistentLocalCache` with multi-tab support; floating `SyncIndicator` shows offline/synced status
-- Offline indicator & PWA support with **fast update detection** (30s polling + visibility-change check, `skipWaiting` for immediate SW activation)
+- Offline indicator & PWA support with **fast update detection** (30s polling + visibility-change check, prompt-based reload banner)
 - **Unified logger** — `createLogger('namespace')` utility in shared package for consistent, namespace-prefixed logging across all packages
 - **Mobile UX** — safe area insets for notched devices (iPhone X+), enlarged touch targets (40-48px) on audio player controls and nav editor, active state feedback on mobile buttons
 - Firebase Auth (Google OAuth + email/password) with cross-device profile sync; **sign-out clears user-specific localStorage and Apollo cache** to prevent data leaking between accounts
@@ -363,7 +363,9 @@ mycircle/
 │   └── generate-icons.mjs       # PWA icon generation
 ├── docs/
 │   ├── architecture.md          # Detailed architecture analysis
-│   └── agent-guide.md           # AI agent development guide (i18n, a11y, theme, responsive, CI)
+│   ├── agent-guide.md           # AI agent development guide (i18n, a11y, theme, responsive, CI)
+│   ├── analytics-and-tracking.md # Analytics & performance monitoring (Web Vitals, Firebase Perf, Lighthouse)
+│   └── web-vitals-setup.md      # Redirect → analytics-and-tracking.md
 ├── firebase.json                # Firebase hosting + functions config
 ├── firestore.rules              # Firestore security rules
 ├── pnpm-workspace.yaml          # Workspace package declarations
@@ -723,6 +725,7 @@ These are only used when running Firebase emulators with the mock API server (se
 - **Sentry** (`@sentry/react`): Client-side error tracking with session replay. Initialized in `main.tsx` (production only). Errors from React `ErrorBoundary` components are automatically captured with component stack traces.
 - **Structured Logging**: Firebase Cloud Functions use `firebase-functions/logger` for structured, queryable logs in Google Cloud Logging.
 - **Web Vitals**: Core Web Vitals (LCP, CLS, INP, FCP, TTFB) measured via `web-vitals` library. Reported per route for MFE-level performance analysis.
+- **Firebase Performance Custom Traces**: Each MFE chunk load is instrumented via `tracedLazy()` — traces appear as `mfe_*` in Firebase Console > Performance > Custom traces. See [`docs/analytics-and-tracking.md`](docs/analytics-and-tracking.md).
 
 ## Testing
 
