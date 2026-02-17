@@ -35,6 +35,7 @@ declare global {
       update: (id: string, updates: Partial<{ title: string; content: string }>) => Promise<void>;
       delete: (id: string) => Promise<void>;
     };
+    __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
   }
 }
 

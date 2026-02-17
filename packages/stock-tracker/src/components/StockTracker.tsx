@@ -97,6 +97,7 @@ export default function StockTracker() {
   const handleToggleWatchlist = useCallback((symbol: string) => {
     setWatchlist(prev => {
       const exists = prev.find(item => item.symbol === symbol);
+      window.__logAnalyticsEvent?.('watchlist_toggle', { symbol, action: exists ? 'remove' : 'add' });
       if (exists) return prev.filter(item => item.symbol !== symbol);
       const name = symbol === selectedSymbol ? selectedName : symbol;
       return [...prev, { symbol, companyName: name }];

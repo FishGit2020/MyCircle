@@ -573,6 +573,7 @@ export default function BibleReader() {
     setCurrentChapter(chapter);
     loadPassage(currentBook, chapter, bibleVersion);
     saveLastRead({ book: currentBook, chapter, chapters: currentChapters });
+    window.__logAnalyticsEvent?.('bible_chapter_read', { book: currentBook, chapter });
     setView('passage');
   };
 
@@ -581,6 +582,7 @@ export default function BibleReader() {
     setCurrentChapter(chapter);
     loadPassage(currentBook, chapter, bibleVersion);
     saveLastRead({ book: currentBook, chapter, chapters: currentChapters });
+    window.__logAnalyticsEvent?.('bible_chapter_read', { book: currentBook, chapter });
   };
 
   const handleContinueReading = () => {

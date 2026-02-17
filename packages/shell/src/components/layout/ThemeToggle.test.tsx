@@ -5,6 +5,8 @@ import ThemeToggle from './ThemeToggle';
 const mockToggleTheme = vi.fn();
 const mockUpdateDarkMode = vi.fn().mockResolvedValue(undefined);
 
+vi.mock('../../lib/firebase', () => ({ logEvent: vi.fn() }));
+
 vi.mock('../../context/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'light',

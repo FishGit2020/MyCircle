@@ -23,6 +23,7 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
     setSaving(true);
     try {
       await onSave(note?.id ?? null, { title: title.trim(), content: content.trim() });
+      window.__logAnalyticsEvent?.('note_save', { is_new: !note?.id });
     } finally {
       setSaving(false);
     }

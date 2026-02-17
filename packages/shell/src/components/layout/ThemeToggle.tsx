@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { logEvent } from '../../lib/firebase';
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -9,6 +10,7 @@ export default function ThemeToggle() {
   const handleToggle = async () => {
     const newDarkMode = theme === 'light';
     toggleTheme();
+    logEvent('theme_toggle', { new_theme: newDarkMode ? 'dark' : 'light' });
     if (user) {
       try {
         await updateDarkMode(newDarkMode);

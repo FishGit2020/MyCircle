@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import type { RecentPage } from '../../hooks/useRecentlyVisited';
 import { useSearchableContent } from '../../hooks/useSearchableContent';
+import { logEvent } from '../../lib/firebase';
 
 interface PaletteItem {
   id: string;
@@ -63,6 +64,7 @@ export default function CommandPalette({ recentPages = [] }: Props) {
 
   useEffect(() => {
     if (open) {
+      logEvent('command_palette_open');
       setQuery('');
       setSelectedIndex(0);
       setTimeout(() => inputRef.current?.focus(), 50);
@@ -201,7 +203,7 @@ export default function CommandPalette({ recentPages = [] }: Props) {
       e.preventDefault();
       setSelectedIndex(prev => Math.max(prev - 1, 0));
     } else if (e.key === 'Enter' && flatList[selectedIndex]) {
-      flatList[selectedIndex].action();
+      handleSelect(flatList[selectedIndex]);
     }
   }, [flatList, selectedIndex]);
 
@@ -212,6 +214,11 @@ export default function CommandPalette({ recentPages = [] }: Props) {
       el?.scrollIntoView({ block: 'nearest' });
     }
   }, [selectedIndex]);
+
+  const handleSelect = useCallback((item: PaletteItem) => {
+    logEvent('command_palette_select', { category: item.category, item: item.id });
+    item.action();
+  }, []);
 
   if (!open) return null;
 
@@ -261,7 +268,7 @@ export default function CommandPalette({ recentPages = [] }: Props) {
                       <button
                         key={item.id}
                         data-palette-index={idx}
-                        onClick={item.action}
+                        onClick={() => handleSelect(item)}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
                           idx === selectedIndex
                             ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
@@ -292,7 +299,7 @@ export default function CommandPalette({ recentPages = [] }: Props) {
                       <button
                         key={item.id}
                         data-palette-index={idx}
-                        onClick={item.action}
+                        onClick={() => handleSelect(item)}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
                           idx === selectedIndex
                             ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
@@ -323,7 +330,7 @@ export default function CommandPalette({ recentPages = [] }: Props) {
                       <button
                         key={item.id}
                         data-palette-index={idx}
-                        onClick={item.action}
+                        onClick={() => handleSelect(item)}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
                           idx === selectedIndex
                             ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'

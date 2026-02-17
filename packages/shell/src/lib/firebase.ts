@@ -788,4 +788,9 @@ if (firebaseEnabled) {
   };
 }
 
+// Expose analytics for MFEs
+window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
+  logEvent(eventName, params);
+};
+
 export { app, auth, db, perf, analytics, firebaseEnabled };

@@ -117,6 +117,7 @@ export default function ChildDevelopment() {
     setBirthDate(inputBirthDate);
     setIsEditing(false);
     window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
+    window.__logAnalyticsEvent?.('child_info_save');
   }, [inputName, inputBirthDate]);
 
   // ─── Setup View ──────────────────────────────────────────────────────────

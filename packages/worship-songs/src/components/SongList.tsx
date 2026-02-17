@@ -37,11 +37,17 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
     e.stopPropagation();
     setFavorites(prev => {
       const next = new Set(prev);
-      if (next.has(songId)) next.delete(songId); else next.add(songId);
+      if (next.has(songId)) {
+        next.delete(songId);
+      } else {
+        next.add(songId);
+        const song = songs.find(s => s.id === songId);
+        if (song) window.__logAnalyticsEvent?.('worship_song_favorite', { song_title: song.title });
+      }
       saveFavorites(next);
       return next;
     });
-  }, []);
+  }, [songs]);
 
   const processed = useMemo(() => {
     let result = songs;

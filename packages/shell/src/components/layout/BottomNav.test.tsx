@@ -3,6 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import BottomNav from './BottomNav';
 
+vi.mock('../../lib/firebase', () => ({ logEvent: vi.fn() }));
+
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   StorageKeys: { BOTTOM_NAV_ORDER: 'bottom-nav-order' },

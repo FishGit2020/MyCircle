@@ -73,15 +73,19 @@ export default function EnglishLearning() {
 
   const handleComplete = useCallback((id: string) => {
     setProgress((prev) => {
+      const isNew = !prev.completedIds.includes(id);
       const next = {
         ...prev,
         completedIds: [...new Set([...prev.completedIds, id])],
         lastDate: new Date().toISOString().slice(0, 10),
       };
       saveProgress(next);
+      if (isNew && next.completedIds.length === filteredPhrases.length) {
+        window.__logAnalyticsEvent?.('english_lesson_complete');
+      }
       return next;
     });
-  }, []);
+  }, [filteredPhrases.length]);
 
   const handleQuizComplete = useCallback((score: { correct: number; total: number }) => {
     setProgress((prev) => {

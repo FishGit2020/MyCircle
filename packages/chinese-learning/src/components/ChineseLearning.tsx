@@ -59,6 +59,7 @@ export default function ChineseLearning() {
         next.delete(id);
       } else {
         next.add(id);
+        window.__logAnalyticsEvent?.('chinese_character_mastered');
       }
       saveProgress({ masteredIds: Array.from(next), lastDate: new Date().toISOString().slice(0, 10) });
       return next;
