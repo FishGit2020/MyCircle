@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useQuery, GET_BIBLE_PASSAGE } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay } from '@mycircle/shared';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
-
-function getRandomVerseIndex(): number {
-  return Math.floor(Math.random() * pregnancyVerses.length);
-}
 
 function calculateGestationalAge(dueDateStr: string): { weeks: number; days: number; totalDays: number } {
   const dueDate = new Date(dueDateStr + 'T00:00:00');
@@ -40,8 +36,8 @@ export default function BabyTracker() {
   const { t } = useTranslation();
   const [dueDate, setDueDate] = useState<string>('');
   const [inputDate, setInputDate] = useState<string>('');
-  const [verseIndex, setVerseIndex] = useState(getRandomVerseIndex);
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
+  const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
 
   // Load due date from localStorage on mount
   useEffect(() => {
@@ -81,25 +77,6 @@ export default function BabyTracker() {
     setInputDate('');
     window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
   }, []);
-
-  const shuffleVerse = useCallback(() => {
-    setVerseIndex(prev => {
-      let next = getRandomVerseIndex();
-      while (next === prev && pregnancyVerses.length > 1) {
-        next = getRandomVerseIndex();
-      }
-      return next;
-    });
-  }, []);
-
-  const verse = pregnancyVerses[verseIndex];
-
-  // Fetch verse text from YouVersion API
-  const { data: verseData, loading: verseLoading } = useQuery(GET_BIBLE_PASSAGE, {
-    variables: { reference: verse.reference },
-    fetchPolicy: 'cache-first',
-  });
-  const verseText = verseData?.biblePassage?.text || '';
 
   // Computed pregnancy state
   const gestationalAge = useMemo(() => {
@@ -149,7 +126,7 @@ export default function BabyTracker() {
               </p>
             ) : null}
             <p className={`text-pink-600 dark:text-pink-400 text-sm font-semibold ${verseText || verseLoading ? 'mt-2' : ''}`}>
-              — {verse.reference}
+              — {verseRef}
             </p>
           </div>
           <button

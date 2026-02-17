@@ -16,11 +16,12 @@ vi.mock('@mycircle/shared', () => ({
   WindowEvents: {
     CHILD_DATA_CHANGED: 'child-data-changed',
   },
-  useQuery: () => ({
-    data: { biblePassage: { text: 'Test verse text', reference: 'Proverbs 22:6' } },
+  useVerseOfDay: () => ({
+    reference: 'Proverbs 22:6',
+    text: 'Test verse text',
     loading: false,
+    shuffle: vi.fn(),
   }),
-  GET_BIBLE_PASSAGE: { kind: 'Document', definitions: [] },
 }));
 
 describe('ChildDevelopment', () => {

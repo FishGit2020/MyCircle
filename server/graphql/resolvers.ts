@@ -228,7 +228,7 @@ const BOOK_ABBREVIATIONS: Record<string, string> = {
   'Genesis': 'GEN', 'Exodus': 'EXO', 'Leviticus': 'LEV', 'Numbers': 'NUM', 'Deuteronomy': 'DEU',
   'Joshua': 'JOS', 'Judges': 'JDG', 'Ruth': 'RUT', '1 Samuel': '1SA', '2 Samuel': '2SA',
   '1 Kings': '1KI', '2 Kings': '2KI', '1 Chronicles': '1CH', '2 Chronicles': '2CH', 'Ezra': 'EZR',
-  'Nehemiah': 'NEH', 'Esther': 'EST', 'Job': 'JOB', 'Psalms': 'PSA', 'Proverbs': 'PRO',
+  'Nehemiah': 'NEH', 'Esther': 'EST', 'Job': 'JOB', 'Psalm': 'PSA', 'Psalms': 'PSA', 'Proverbs': 'PRO',
   'Ecclesiastes': 'ECC', 'Song of Solomon': 'SNG', 'Isaiah': 'ISA', 'Jeremiah': 'JER',
   'Lamentations': 'LAM', 'Ezekiel': 'EZK', 'Daniel': 'DAN', 'Hosea': 'HOS', 'Joel': 'JOL',
   'Amos': 'AMO', 'Obadiah': 'OBA', 'Jonah': 'JON', 'Micah': 'MIC', 'Nahum': 'NAM',
@@ -247,7 +247,7 @@ function convertToUsfmRef(reference: string): string {
   const [, bookName, chapter, verseStart, verseEnd] = match;
   const usfm = BOOK_ABBREVIATIONS[bookName];
   if (!usfm) return reference;
-  if (verseStart && verseEnd) return `${usfm}.${chapter}.${verseStart}-${usfm}.${chapter}.${verseEnd}`;
+  if (verseStart && verseEnd) return `${usfm}.${chapter}.${verseStart}-${verseEnd}`;
   if (verseStart) return `${usfm}.${chapter}.${verseStart}`;
   return `${usfm}.${chapter}`;
 }

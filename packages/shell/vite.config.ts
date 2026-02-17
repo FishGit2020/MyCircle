@@ -218,8 +218,9 @@ export default defineConfig({
         ]
       },
       workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
+        // skipWaiting: true,    — removed: conflicts with registerType:'prompt'
+        // clientsClaim: true,   — the ReloadPrompt banner handles the update flow
+
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [
           /^\/graphql/,

@@ -1,12 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useQuery, GET_BIBLE_PASSAGE } from '@mycircle/shared';
-import { AGE_RANGES, getAgeRangeForMonths } from '../data/milestones';
+import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay } from '@mycircle/shared';
+import { getAgeRangeForMonths } from '../data/milestones';
 import { parentingVerses } from '../data/parentingVerses';
 import TimelineView from './TimelineView';
-
-function getRandomVerseIndex(): number {
-  return Math.floor(Math.random() * parentingVerses.length);
-}
 
 /**
  * Encode/decode sensitive values to avoid clear-text storage in localStorage.
@@ -21,30 +17,26 @@ function decodeSensitive(value: string): string {
 
 // ─── Verse Section ───────────────────────────────────────────────────────────
 
-function VerseSection({ verseIndex, onShuffle }: { verseIndex: number; onShuffle: () => void }) {
+function VerseSection() {
   const { t } = useTranslation();
-  const verse = parentingVerses[verseIndex];
-  const { data } = useQuery(GET_BIBLE_PASSAGE, {
-    variables: { reference: verse.reference },
-    errorPolicy: 'ignore',
-  });
-
-  const text = data?.biblePassage?.text || t(verse.textKey as any);
+  const { reference, text, shuffle } = useVerseOfDay(parentingVerses, (key) => t(key as any));
 
   return (
     <div className="bg-amber-50/50 dark:bg-amber-900/10 rounded-lg p-4 mb-6">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
-          <p className="text-sm italic text-amber-700 dark:text-amber-300 leading-relaxed">
-            &ldquo;{text}&rdquo;
-          </p>
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">
-            — {verse.reference}
+          {text && (
+            <p className="text-sm italic text-amber-700 dark:text-amber-300 leading-relaxed">
+              &ldquo;{text}&rdquo;
+            </p>
+          )}
+          <p className={`text-xs text-amber-600 dark:text-amber-400 font-medium ${text ? 'mt-1' : ''}`}>
+            — {reference}
           </p>
         </div>
         <button
           type="button"
-          onClick={onShuffle}
+          onClick={shuffle}
           className="flex-shrink-0 p-1.5 rounded-lg text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
           aria-label={t('childDev.shuffleVerse' as any)}
         >
@@ -67,7 +59,6 @@ export default function ChildDevelopment() {
   const [birthDate, setBirthDate] = useState('');
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
-  const [verseIndex, setVerseIndex] = useState(getRandomVerseIndex);
   const [isEditing, setIsEditing] = useState(false);
 
   // Load from localStorage on mount
@@ -128,16 +119,6 @@ export default function ChildDevelopment() {
     window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
   }, [inputName, inputBirthDate]);
 
-  const shuffleVerse = useCallback(() => {
-    setVerseIndex(prev => {
-      let next = Math.floor(Math.random() * parentingVerses.length);
-      while (next === prev && parentingVerses.length > 1) {
-        next = Math.floor(Math.random() * parentingVerses.length);
-      }
-      return next;
-    });
-  }, []);
-
   // ─── Setup View ──────────────────────────────────────────────────────────
 
   if (!birthDate || isEditing) {
@@ -152,7 +133,7 @@ export default function ChildDevelopment() {
           </p>
         </div>
 
-        <VerseSection verseIndex={verseIndex} onShuffle={shuffleVerse} />
+        <VerseSection />
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="space-y-4">
@@ -217,7 +198,7 @@ export default function ChildDevelopment() {
       </div>
 
       {/* Verse */}
-      <VerseSection verseIndex={verseIndex} onShuffle={shuffleVerse} />
+      <VerseSection />
 
       {/* Timeline (the primary and only view) */}
       <TimelineView
