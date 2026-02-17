@@ -357,7 +357,7 @@ When adding a new micro-frontend, update **all** of the following. Items marked 
 - [ ] Update `docs/architecture.md` with the new MFE
 - [ ] Update `README.md` feature list
 - [ ] Add preview script to root `package.json` (e.g., `preview:<name>`)
-- [ ] Add to `firebase.json` rewrites if using Firebase hosting
+- [ ] ~~Add to `firebase.json` rewrites~~ — **Not needed.** The single catch-all rewrite (`** → /index.html`) routes all navigation to the shell, which handles client-side routing via React Router. Per-MFE rewrites were removed because they served each MFE's standalone `index.html` instead of the shell's, causing `Unexpected token '<'` errors on direct URL access (asset paths resolved against the wrong root).
 - [ ] Add to `scripts/assemble-firebase.mjs` build list
 
 ---
