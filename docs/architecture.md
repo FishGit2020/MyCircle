@@ -522,6 +522,8 @@ Heavy shared dependencies (`@apollo/client`, `graphql`) use `eager: false` in th
 
 **Important:** The Workbox config must **not** set `skipWaiting: true` or `clientsClaim: true` — those directives are injected into the SW file itself and would bypass the prompt, causing silent auto-refreshes (via stale-chunk recovery) instead of the intended banner.
 
+**FCM service worker scope:** The Firebase Cloud Messaging service worker (`firebase-messaging-sw.js`) must be registered with an explicit scope (`/firebase-cloud-messaging-push-scope`) to avoid colliding with the PWA service worker at scope `/`. Without this, registering the FCM SW replaces the PWA registration, causing `useRegisterSW` to detect a false "update" and show the reload prompt in an infinite loop whenever push notifications are enabled.
+
 The `visibilitychange` listener is the most impactful optimization — users returning to a tab after a deploy see the reload prompt almost instantly instead of waiting up to 30 seconds.
 
 ### Future Considerations

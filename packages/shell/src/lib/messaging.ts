@@ -23,8 +23,12 @@ export async function requestNotificationPermission(): Promise<string | null> {
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') return null;
 
-  // Register the FCM service worker
-  const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+  // Register the FCM service worker with its own scope so it doesn't
+  // collide with the PWA service worker (both default to scope '/').
+  const registration = await navigator.serviceWorker.register(
+    '/firebase-messaging-sw.js',
+    { scope: '/firebase-cloud-messaging-push-scope' }
+  );
 
   const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
   if (!vapidKey) {
