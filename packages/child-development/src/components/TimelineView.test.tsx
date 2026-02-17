@@ -40,14 +40,14 @@ describe('TimelineView', () => {
     expect(screen.getByText('childDev.cdcAttribution')).toBeInTheDocument();
   });
 
-  it('renders CDC and AAP guide links for expanded stages', () => {
+  it('renders CDC and AAP guide links for the auto-expanded current stage', () => {
     render(<TimelineView {...DEFAULT_PROPS} />);
 
-    // Past and current stages are auto-expanded, so their links should be visible
+    // Only current stage is auto-expanded, so one pair of links visible
     const cdcLinks = screen.getAllByText('childDev.cdcGuide');
     const aapLinks = screen.getAllByText('childDev.aapGuide');
-    expect(cdcLinks.length).toBeGreaterThan(0);
-    expect(aapLinks.length).toBeGreaterThan(0);
+    expect(cdcLinks).toHaveLength(1);
+    expect(aapLinks).toHaveLength(1);
   });
 
   it('shows green dot for past stages', () => {
@@ -88,20 +88,20 @@ describe('TimelineView', () => {
     expect(upcomingBadges.length).toBe(4); // 18-24m, 2-3y, 3-4y, 4-5y
   });
 
-  it('auto-expands past and current stages', () => {
+  it('auto-expands only the current stage, past stages collapsed', () => {
     render(<TimelineView {...DEFAULT_PROPS} />);
 
-    // Past and current stages should show milestones (domain cards inside them)
-    const pastStage = screen.getByTestId('stage-0-3m');
-    expect(pastStage).toBeInTheDocument();
+    // Current stage should be expanded
+    const currentButton = screen.getByTestId('stage-12-18m').querySelector('button');
+    expect(currentButton).toHaveAttribute('aria-expanded', 'true');
 
-    const currentStage = screen.getByTestId('stage-12-18m');
-    expect(currentStage).toBeInTheDocument();
+    // Past stages should be collapsed by default
+    const pastButton = screen.getByTestId('stage-0-3m').querySelector('button');
+    expect(pastButton).toHaveAttribute('aria-expanded', 'false');
 
-    // The expanded stages should show domain milestone text
-    // Check that domain names appear within expanded milestone sections
+    // Domain headers: 1 filter chip + 1 inside the expanded current stage = 2
     const domainHeaders = screen.getAllByText('childDev.domainPhysical');
-    expect(domainHeaders.length).toBeGreaterThan(1); // Filter chip + multiple expanded stages
+    expect(domainHeaders).toHaveLength(2);
   });
 
   it('collapses upcoming stages by default', () => {
@@ -199,13 +199,43 @@ describe('TimelineView', () => {
     expect(upcomingBadges).toHaveLength(9);
   });
 
-  it('shows milestones grouped by domain within expanded stages', () => {
+  it('shows milestones grouped by domain within expanded current stage', () => {
     render(<TimelineView {...DEFAULT_PROPS} />);
 
-    // In expanded stages, milestones should be grouped under domain headers
-    // Physical domain header should appear in multiple expanded stages
+    // Only current stage auto-expanded: 1 filter chip + 1 domain header = 2
     const physicalHeaders = screen.getAllByText('childDev.domainPhysical');
-    // At least 1 filter chip + headers in 5 expanded stages (4 past + 1 current)
-    expect(physicalHeaders.length).toBeGreaterThanOrEqual(6);
+    expect(physicalHeaders).toHaveLength(2);
+  });
+
+  it('allows toggling past stages open and closed', async () => {
+    const user = userEvent.setup();
+    render(<TimelineView {...DEFAULT_PROPS} />);
+
+    // Past stage starts collapsed
+    const pastStage = screen.getByTestId('stage-0-3m');
+    const pastButton = pastStage.querySelector('button')!;
+    expect(pastButton).toHaveAttribute('aria-expanded', 'false');
+
+    // Click to expand
+    await user.click(pastButton);
+    expect(pastButton).toHaveAttribute('aria-expanded', 'true');
+
+    // Click again to collapse
+    await user.click(pastButton);
+    expect(pastButton).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('allows collapsing the current stage', async () => {
+    const user = userEvent.setup();
+    render(<TimelineView {...DEFAULT_PROPS} />);
+
+    // Current stage starts expanded
+    const currentStage = screen.getByTestId('stage-12-18m');
+    const currentButton = currentStage.querySelector('button')!;
+    expect(currentButton).toHaveAttribute('aria-expanded', 'true');
+
+    // Click to collapse
+    await user.click(currentButton);
+    expect(currentButton).toHaveAttribute('aria-expanded', 'false');
   });
 });

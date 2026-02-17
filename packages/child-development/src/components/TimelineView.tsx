@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import {
   DOMAINS, AGE_RANGES,
@@ -82,7 +82,21 @@ export default function TimelineView({
   const [visibleDomains, setVisibleDomains] = useState<Set<DomainId>>(
     () => new Set(DOMAINS.map(d => d.id)),
   );
-  const [expandedStages, setExpandedStages] = useState<Set<AgeRangeId>>(() => new Set());
+  const [expandedStages, setExpandedStages] = useState<Set<AgeRangeId>>(
+    () => new Set(currentAgeRange ? [currentAgeRange.id] : []),
+  );
+
+  // Auto-expand current stage when it changes (e.g. birthday edited)
+  useEffect(() => {
+    if (currentAgeRange) {
+      setExpandedStages(prev => {
+        if (prev.has(currentAgeRange.id)) return prev;
+        const next = new Set(prev);
+        next.add(currentAgeRange.id);
+        return next;
+      });
+    }
+  }, [currentAgeRange]);
 
   /* Toggle a domain chip on/off (keep at least one visible) */
   const toggleDomain = (domainId: DomainId) => {
@@ -114,10 +128,8 @@ export default function TimelineView({
     return 'upcoming';
   };
 
-  /* Whether a stage should be expanded (auto-expand past & current) */
+  /* Whether a stage should be expanded (only current auto-expanded, all toggleable) */
   const isExpanded = (ar: AgeRangeMeta): boolean => {
-    const status = getStageStatus(ar);
-    if (status === 'past' || status === 'current') return true;
     return expandedStages.has(ar.id);
   };
 
