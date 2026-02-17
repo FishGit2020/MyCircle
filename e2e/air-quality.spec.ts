@@ -20,7 +20,8 @@ test.describe('Air Quality Index Widget', () => {
   });
 
   test('expands pollutant details on click', async ({ page }) => {
-    const btn = page.locator('button[aria-expanded]').filter({ hasText: /./ }).first();
+    const section = page.locator('section', { has: page.locator('#aqi-title') });
+    const btn = section.locator('button[aria-expanded]').filter({ hasText: /./ }).first();
     await expect(btn).toBeVisible({ timeout: 10000 });
     await expect(btn).toHaveAttribute('aria-expanded', 'false');
 

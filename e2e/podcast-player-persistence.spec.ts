@@ -20,7 +20,8 @@ test.describe('Persistent Podcast Audio Player', () => {
     await expect(page.getByRole('region', { name: /now playing/i })).toBeVisible({ timeout: 5_000 });
 
     // Navigate to stocks via SPA link (not page.goto which causes full reload and loses React state)
-    await page.getByRole('navigation', { name: /main/i }).getByRole('link', { name: /stocks/i }).click();
+    await page.getByRole('navigation', { name: /main/i }).getByRole('button', { name: /daily/i }).click();
+    await page.getByRole('menuitem', { name: /stocks/i }).click();
     await page.waitForURL('**/stocks');
 
     // Player should still be visible
@@ -43,7 +44,8 @@ test.describe('Persistent Podcast Audio Player', () => {
     await expect(page.getByRole('region', { name: /now playing/i })).toBeVisible({ timeout: 5_000 });
 
     // Navigate to stocks via SPA link (not page.goto which causes full reload and loses React state)
-    await page.getByRole('navigation', { name: /main/i }).getByRole('link', { name: /stocks/i }).click();
+    await page.getByRole('navigation', { name: /main/i }).getByRole('button', { name: /daily/i }).click();
+    await page.getByRole('menuitem', { name: /stocks/i }).click();
     await page.waitForURL('**/stocks');
 
     // Close the player from the stocks page (use JS click to avoid desktop/mobile visibility issues)

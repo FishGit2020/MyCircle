@@ -11,6 +11,11 @@ const zh: Record<TranslationKey, string> = {
   'nav.skipToContent': '\u8df3\u8f6c\u5230\u5185\u5bb9',
   'nav.breadcrumbLabel': '\u9762\u5305\u5c51\u5bfc\u822a',
   'nav.recentlyVisited': '\u6700\u8fd1\u8bbf\u95ee',
+  'nav.group.daily': '\u65e5\u5e38',
+  'nav.group.faith': '\u4fe1\u4ef0',
+  'nav.group.family': '\u5bb6\u5ead',
+  'nav.group.learning': '\u5b66\u4e60',
+  'nav.group.tools': '\u5de5\u5177',
 
   // Home page
   'home.title': '\u6b22\u8fce\u6765\u5230 MyCircle',
