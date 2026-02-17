@@ -169,10 +169,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(StorageKeys.CHILD_NAME, userProfile.childName);
           }
           if (userProfile.childBirthDate) {
+            // Firestore may have a plain date (new) or btoa-encoded date (legacy).
+            // Normalise to plain first, then encode for localStorage.
+            let plainDate = userProfile.childBirthDate;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(plainDate)) {
+              try { plainDate = atob(plainDate); } catch { /* use as-is */ }
+            }
             try {
-              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, btoa(userProfile.childBirthDate));
+              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, btoa(plainDate));
             } catch {
-              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, userProfile.childBirthDate);
+              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, plainDate);
             }
           }
           if (userProfile.childName || userProfile.childBirthDate) {
@@ -416,7 +422,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     function handleChildDataChanged() {
       if (user) {
         const childName = localStorage.getItem(StorageKeys.CHILD_NAME);
-        const childBirthDate = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
+        const rawBirthDate = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
+        // Decode before uploading — localStorage stores btoa-encoded dates,
+        // but Firestore should have plain dates so the restore path can encode once.
+        let childBirthDate: string | null = null;
+        if (rawBirthDate) {
+          try { childBirthDate = atob(rawBirthDate); } catch { childBirthDate = rawBirthDate; }
+        }
         updateChildData(user.uid, { childName, childBirthDate });
       }
     }
