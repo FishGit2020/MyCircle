@@ -169,8 +169,7 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'md:pb-24' : 'md:pb-8'}`}
-        style={{ paddingBottom: hasActivePlayer ? '10rem' : '5rem' }}
+        className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-40 md:pb-24' : 'pb-20 md:pb-8'}`}
       >
         <Outlet />
       </main>
@@ -186,8 +185,7 @@ export default function Layout() {
 
       <footer
         role="contentinfo"
-        className="bg-gray-800 dark:bg-gray-950 text-white py-6 md:pb-6 mt-12 transition-colors"
-        style={{ paddingBottom: hasActivePlayer ? '10rem' : '5rem' }}
+        className={`bg-gray-800 dark:bg-gray-950 text-white py-6 ${hasActivePlayer ? 'pb-40' : 'pb-20'} md:pb-6 mt-12 transition-colors`}
       >
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">

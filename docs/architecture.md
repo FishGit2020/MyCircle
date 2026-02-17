@@ -268,7 +268,7 @@ Exposes `BibleReader` component via Module Federation.
 - Browse all 66 canonical Bible books (Old & New Testament) with search/filter
 - Chapter grid navigation with previous/next chapter controls
 - **Dynamic Bible versions**: 19+ English translations (KJV, NIV, AMP, NASB, etc.) fetched from YouVersion API via `bibleVersions` GraphQL query (24hr server-side cache)
-- Verse of the Day via GraphQL (`bibleVotd` query) cached by day-of-year; query is skipped when `VITE_GRAPHQL_URL` is unset to avoid console errors from failed network requests (falls back to local verse data)
+- Verse of the Day via GraphQL (`bibleVotdApi` query) cached by day-of-year with local verse fallback
 - Passage reading via YouVersion API (`biblePassage` query with USFM reference conversion), with copyright display
 - Font size adjustment (5 levels, persisted via `StorageKeys.BIBLE_FONT_SIZE`)
 - Bookmark system (create/remove, stored in `StorageKeys.BIBLE_BOOKMARKS`, synced to Firestore per user via `BIBLE_BOOKMARKS_CHANGED` event)

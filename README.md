@@ -123,7 +123,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Firebase Auth (Google OAuth + email/password) with cross-device profile sync; **sign-out clears user-specific localStorage and Apollo cache** to prevent data leaking between accounts
 - Firebase App Check for API protection
 - Firebase Remote Config for feature flags
-- GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ); daily verse query skipped when `VITE_GRAPHQL_URL` is unset (falls back to local data)
+- GraphQL API with Apollo Client caching and Automatic Persisted Queries (APQ)
 - **Centralized Tailwind CSS** — single Tailwind build in the shell host scans all MFE sources, eliminating duplicate utility classes and specificity conflicts
 - **Navigation & discovery** — breadcrumb trail on all feature pages, recently-visited pages in command palette (Ctrl+K), **cross-package content search** (stocks, Bible bookmarks searchable from Ctrl+K palette), focus management on route change for screen readers
 - **Keyboard shortcuts** — `Ctrl/Cmd+K` command palette, `Ctrl/Cmd+D` dark mode toggle, `g` then letter for quick navigation (e.g., `g w` for Weather), `?` for shortcuts help
