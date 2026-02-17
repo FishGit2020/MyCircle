@@ -86,7 +86,9 @@ const WeatherWidget = React.memo(function WeatherWidget() {
   const { tempUnit } = useUnits();
   const [geoCity, setGeoCity] = React.useState<string | null>(null);
   const [geoError, setGeoError] = React.useState(false);
+  const [geoDenied, setGeoDenied] = React.useState(false);
   const [geoLoading, setGeoLoading] = React.useState(false);
+  const [needsPrompt, setNeedsPrompt] = React.useState(false);
 
   const [fetchWeather, { data: weatherData }] = useLazyQuery(GET_CURRENT_WEATHER);
   const [fetchGeocode, { data: geocodeData }] = useLazyQuery(REVERSE_GEOCODE);
@@ -98,39 +100,50 @@ const WeatherWidget = React.memo(function WeatherWidget() {
     }
   }, [geocodeData]);
 
-  // Auto-fetch current location weather only if permission was previously granted
+  const requestLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setGeoError(true);
+      return;
+    }
+    setGeoLoading(true);
+    setNeedsPrompt(false);
+    setGeoDenied(false);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        fetchWeather({ variables: { lat: latitude, lon: longitude } });
+        fetchGeocode({ variables: { lat: latitude, lon: longitude } });
+        setGeoLoading(false);
+      },
+      () => {
+        setGeoDenied(true);
+        setGeoLoading(false);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+    );
+  }, [fetchWeather, fetchGeocode]);
+
+  // Auto-fetch if permission was previously granted; otherwise show prompt
   useEffect(() => {
     if (!navigator.geolocation) {
       setGeoError(true);
       return;
     }
 
-    const fetchLocation = () => {
-      setGeoLoading(true);
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          fetchWeather({ variables: { lat: latitude, lon: longitude } });
-          fetchGeocode({ variables: { lat: latitude, lon: longitude } });
-          setGeoLoading(false);
-        },
-        () => {
-          setGeoError(true);
-          setGeoLoading(false);
-        },
-        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
-      );
-    };
-
     if (navigator.permissions) {
       navigator.permissions.query({ name: 'geolocation' }).then((result) => {
         if (result.state === 'granted') {
-          fetchLocation();
+          requestLocation();
+        } else if (result.state === 'denied') {
+          setGeoDenied(true);
+        } else {
+          setNeedsPrompt(true);
         }
-        // If 'prompt' or 'denied', don't auto-request — let user click UseMyLocation
       });
+    } else {
+      // Permissions API not supported — show prompt button
+      setNeedsPrompt(true);
     }
-    // Fallback: if Permissions API not supported, don't auto-request
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = weatherData?.currentWeather;
@@ -150,14 +163,15 @@ const WeatherWidget = React.memo(function WeatherWidget() {
         </div>
       </div>
 
-      {/* Current location weather */}
+      {/* Loading spinner */}
       {geoLoading && (
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2">
           <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
           <span className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.locating')}</span>
         </div>
       )}
 
+      {/* Weather data */}
       {current && (
         <div className="bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-900/20 dark:to-sky-900/20 rounded-lg p-2.5">
           <div className="flex items-center justify-between">
@@ -182,6 +196,34 @@ const WeatherWidget = React.memo(function WeatherWidget() {
         </div>
       )}
 
+      {/* Location prompt — shown when permission hasn't been granted yet */}
+      {needsPrompt && !current && !geoLoading && (
+        <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-lg p-3 text-center">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+            {t('widgets.locationNeeded')}
+          </p>
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); requestLocation(); }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 active:bg-blue-300 dark:active:bg-blue-800/50 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {t('widgets.useMyLocation')}
+          </button>
+        </div>
+      )}
+
+      {/* Permission denied */}
+      {geoDenied && !current && !geoLoading && (
+        <p className="text-xs text-amber-600 dark:text-amber-400">
+          {t('widgets.locationDenied')}
+        </p>
+      )}
+
+      {/* Geolocation not supported */}
       {geoError && !current && (
         <p className="text-xs text-amber-600 dark:text-amber-400">
           {t('widgets.enableLocation')}
