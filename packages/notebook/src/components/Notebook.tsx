@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PullToRefresh } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
 import { usePublicNotes } from '../hooks/usePublicNotes';
 import NoteList from './NoteList';
@@ -15,8 +15,8 @@ export default function Notebook() {
   const { noteId } = useParams<{ noteId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { notes, loading, error, saveNote, deleteNote } = useNotes();
-  const { notes: publicNotes, loading: publicLoading, error: publicError, publishNote, updateNote: updatePublicNote, deleteNote: deletePublicNote } = usePublicNotes();
+  const { notes, loading, error, saveNote, deleteNote, reload } = useNotes();
+  const { notes: publicNotes, loading: publicLoading, error: publicError, publishNote, updateNote: updatePublicNote, deleteNote: deletePublicNote, reload: reloadPublic } = usePublicNotes();
   const [tab, setTab] = useState<Tab>('my');
 
   // Derive view from URL
@@ -116,6 +116,7 @@ export default function Notebook() {
   ];
 
   return (
+    <PullToRefresh onRefresh={async () => { reload(); reloadPublic(); }}>
     <div className="space-y-4">
       {/* Tab bar */}
       <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700" role="tablist" aria-label={t('notebook.title')}>
@@ -144,5 +145,6 @@ export default function Notebook() {
         isPublicView={tab === 'public'}
       />
     </div>
+    </PullToRefresh>
   );
 }

@@ -153,9 +153,6 @@ const zh: Record<TranslationKey, string> = {
   'notifications.preferences': '\u901a\u77e5\u8bbe\u7f6e',
   'notifications.weatherAlerts': '\u5929\u6c14\u8b66\u62a5',
   'notifications.weatherAlertsDesc': '\u6536\u85cf\u57ce\u5e02\u7684\u6076\u52a3\u5929\u6c14\u8b66\u544a',
-  'notifications.podcastAlerts': '\u65b0\u8282\u76ee',
-  'notifications.podcastAlertsDesc': '\u5f53\u8ba2\u9605\u7684\u64ad\u5ba2\u53d1\u5e03\u65b0\u8282\u76ee\u65f6\u63d0\u9192',
-  'notifications.noSubscriptionsForAlerts': '\u8bf7\u5148\u8ba2\u9605\u64ad\u5ba2',
   'notifications.announcementAlerts': '\u516c\u544a\u901a\u77e5',
   'notifications.announcementAlertsDesc': '\u5f53\u53d1\u5e03\u65b0\u7684\u5e94\u7528\u66f4\u65b0\u65f6\u63a5\u6536\u901a\u77e5',
 
@@ -352,10 +349,8 @@ const zh: Record<TranslationKey, string> = {
   'stocks.loading': '\u6b63\u5728\u52a0\u8f7d\u80a1\u7968\u6570\u636e...',
   'stocks.error': '\u52a0\u8f7d\u80a1\u7968\u6570\u636e\u5931\u8d25',
   'stocks.sparkline7d': '7\u5929\u8d70\u52bf',
-  'stocks.live': '\u5b9e\u65f6',
+  'stocks.refresh': '\u5237\u65b0',
   'stocks.lastUpdated': '\u4e0a\u6b21\u66f4\u65b0',
-  'stocks.refreshInterval': '\u5237\u65b0\u95f4\u9694',
-  'stocks.paused': '\u5df2\u6682\u505c',
   'stocks.costBasis': '\u6210\u672c',
   'stocks.shares': '\u80a1\u6570',
   'stocks.gainLoss': '\u76c8\u4e8f',
@@ -1345,6 +1340,11 @@ const zh: Record<TranslationKey, string> = {
   'chinese.noCharacters': '\u8fd8\u6ca1\u6709\u5b57\u7b26\u3002\u6dfb\u52a0\u4e00\u4e2a\u5f00\u59cb\u5427\uff01',
   'chinese.signInToAdd': '\u767b\u5f55\u540e\u6dfb\u52a0\u5b57\u7b26',
   'chinese.loading': '\u52a0\u8f7d\u5b57\u7b26\u4e2d...',
+
+  // Pull to Refresh
+  'pullToRefresh.hint': '\u4e0b\u62c9\u5237\u65b0',
+  'pullToRefresh.release': '\u91ca\u653e\u5237\u65b0',
+  'pullToRefresh.refreshing': '\u5237\u65b0\u4e2d...',
 };
 
 export default zh;

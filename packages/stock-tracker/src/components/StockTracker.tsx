@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
-import { useTranslation, WindowEvents, StorageKeys } from '@mycircle/shared';
+import { useTranslation, WindowEvents, PullToRefresh } from '@mycircle/shared';
 import StockSearch from './StockSearch';
 import CryptoTracker from './CryptoTracker';
 import Watchlist from './Watchlist';
@@ -68,17 +68,9 @@ export default function StockTracker() {
   const [buyPrice, setBuyPrice] = useState('');
   const [quantity, setQuantity] = useState('');
 
-  const [liveEnabled, setLiveEnabled] = useState(() => {
-    try { return localStorage.getItem(StorageKeys.STOCK_LIVE) === 'true'; } catch { return false; }
-  });
-
-  useEffect(() => {
-    try { localStorage.setItem(StorageKeys.STOCK_LIVE, String(liveEnabled)); } catch { /* ignore */ }
-  }, [liveEnabled]);
-
-  const { quote: selectedQuote, loading: quoteLoading, lastUpdated, isLive } = useStockQuote(
+  const { quote: selectedQuote, loading: quoteLoading, lastUpdated, refetch } = useStockQuote(
     selectedSymbol,
-    liveEnabled ? 60_000 : 0
+    0
   );
   const { candles: selectedCandles, loading: candlesLoading } = useStockCandles(selectedSymbol, timeframe);
 
@@ -179,7 +171,6 @@ export default function StockTracker() {
             watchlist={watchlist}
             onToggleWatchlist={handleToggleWatchlist}
             onSelectStock={handleWatchlistStockSelect}
-            liveEnabled={liveEnabled}
           />
         </div>
       )}
@@ -197,6 +188,7 @@ export default function StockTracker() {
 
       {/* Selected stock detail view */}
       {selectedSymbol && (
+        <PullToRefresh onRefresh={() => refetch()}>
         <div className="mb-8 stock-card-enter">
           <div className="flex items-center gap-3 mb-4">
             <button
@@ -328,25 +320,19 @@ export default function StockTracker() {
               </div>
               <div className="flex items-center gap-2 text-sm mb-4">
                 <button
-                  onClick={() => setLiveEnabled(prev => !prev)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border transition-colors font-medium ${
-                    isLive
-                      ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                      : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                  }`}
-                  aria-label={isLive ? t('stocks.live') : t('stocks.paused')}
+                  type="button"
+                  onClick={() => refetch()}
+                  disabled={quoteLoading}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium disabled:opacity-50"
+                  aria-label={t('stocks.refresh')}
                 >
-                  {isLive ? (
-                    <>
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      {t('stocks.live')}
-                    </>
-                  ) : (
-                    t('stocks.paused')
-                  )}
+                  <svg className={`w-4 h-4 ${quoteLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {t('stocks.refresh')}
                 </button>
-                {isLive && lastUpdated && (
-                  <span className="text-gray-500 dark:text-gray-400">· {lastUpdated.toLocaleTimeString()}</span>
+                {lastUpdated && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">· {lastUpdated.toLocaleTimeString()}</span>
                 )}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
@@ -477,6 +463,7 @@ export default function StockTracker() {
 
           <StockNews symbol={selectedSymbol} />
         </div>
+        </PullToRefresh>
       )}
 
     </div>

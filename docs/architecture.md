@@ -991,6 +991,7 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **StockTracker** | `packages/stock-tracker/src/components/StockTracker.tsx` | Stock quotes and watchlist |
 | **CryptoTracker** | `packages/stock-tracker/src/components/CryptoTracker.tsx` | Live crypto prices (CoinGecko) |
 | **useCryptoPrices** | `packages/shared/src/hooks/useCryptoPrices.ts` | Crypto price data fetching hook |
+| **PullToRefresh** | `packages/shared/src/components/PullToRefresh.tsx` | Shared pull-to-refresh gesture wrapper for mobile PWA (Weather, Stocks, Crypto, Notebook, Worship) |
 | **GlobalAudioPlayer** | `packages/shell/src/components/player/GlobalAudioPlayer.tsx` | Persistent audio player (shell-level, survives route changes) |
 | **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, event publishing |
 | **AiAssistant** | `packages/ai-assistant/src/components/AiAssistant.tsx` | AI chat UI (Gemini) |
