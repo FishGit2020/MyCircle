@@ -6,16 +6,12 @@ interface CryptoPricesResponse {
   cryptoPrices: CryptoPrice[];
 }
 
-const DEFAULT_IDS = ['bitcoin', 'ethereum', 'solana', 'cardano', 'dogecoin'];
+const DEFAULT_IDS = ['bitcoin'];
 
-export function useCryptoPrices(
-  ids: string[] = DEFAULT_IDS,
-  pollInterval: number = 60_000,
-) {
+export function useCryptoPrices(ids: string[] = DEFAULT_IDS) {
   const { data, loading, error, refetch } = useQuery<CryptoPricesResponse>(GET_CRYPTO_PRICES, {
     variables: { ids },
     fetchPolicy: 'cache-and-network',
-    pollInterval,
   });
 
   return {
