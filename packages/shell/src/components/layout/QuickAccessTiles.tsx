@@ -94,21 +94,21 @@ export default function QuickAccessTiles() {
   const { t } = useTranslation();
 
   return (
-    <section className="hidden md:block" aria-label={t('home.quickAccess')}>
+    <section aria-label={t('home.quickAccess')}>
       <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
         {t('home.quickAccess')}
       </h3>
-      <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3">
         {QUICK_ACCESS_ITEMS.map(item => (
           <Link
             key={item.path}
             to={item.path}
-            className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
+            className="flex flex-col items-center gap-1.5 md:gap-2 p-2.5 md:p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 active:bg-gray-50 dark:active:bg-gray-700 transition-all"
           >
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${item.color} ${item.darkColor}`}>
+            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center ${item.color} ${item.darkColor}`}>
               {item.icon}
             </div>
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-[10px] md:text-xs font-medium text-gray-700 dark:text-gray-300 text-center leading-tight">
               {t(item.labelKey)}
             </span>
           </Link>
