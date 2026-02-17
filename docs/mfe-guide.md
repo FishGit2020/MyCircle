@@ -7,7 +7,7 @@ Lessons learned from building MyCircle's Vite Module Federation architecture wit
 ## Table of Contents
 
 ### Pitfalls & Solutions
-- [1. CSS Cascade Order Conflict](#1-css-cascade-order-conflict)
+- [1. CSS Cascade Order Conflict (Resolved)](#1-css-cascade-order-conflict-resolved)
 - [2. Duplicate Tailwind Preflight Resets](#2-duplicate-tailwind-preflight-resets)
 - [3. Prefetch Side Effects](#3-prefetch-side-effects)
 - [4. Scrollbar Layout Shift](#4-scrollbar-layout-shift)
@@ -24,113 +24,41 @@ Lessons learned from building MyCircle's Vite Module Federation architecture wit
 
 ---
 
-## 1. CSS Cascade Order Conflict
+## 1. CSS Cascade Order Conflict (Resolved)
 
-**Severity: High** | **File: `packages/shell/tailwind.config.js`**
+**Status: Resolved** | Previously **Severity: High**
 
-### The Problem
+### The Original Problem
 
-When Module Federation dynamically loads an MFE, its CSS bundle is injected as a `<style>` tag **appended to `<head>`** — after the shell's CSS. If the MFE's CSS contains duplicate Tailwind utility classes, those duplicates appear later in the document cascade and can override the shell's styles.
+When MFEs had their own Tailwind builds, each MFE's CSS bundle was injected as a `<style>` tag **appended to `<head>`** — after the shell's CSS. Duplicate Tailwind utility classes from MFE bundles appeared later in the document cascade and could override the shell's responsive styles (e.g., an MFE's `sm:grid-cols-2` overriding the shell's `lg:grid-cols-6` on desktop, because both `sm:` and `lg:` media queries are active at >= 1024px and the last rule in document order wins).
 
-### How It Manifests
+### How It Was Resolved
 
-The shell's `DashboardPage` uses:
+Tailwind CSS was **centralized into the shell** (see `docs/architecture.md` — "Centralized Tailwind CSS"). MFEs no longer have their own Tailwind configs, `@tailwind` directives, or `tailwindcss` devDependencies. The shell's single `tailwind.config.js` scans all MFE `src/` directories in its `content` array, producing one CSS bundle that covers the entire app.
 
-```
-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6
-```
+With no duplicate utility classes injected by MFEs, the cascade ordering conflict cannot occur. The previous workaround (`important: '#root'` in the shell's Tailwind config) was removed since the root cause — multiple competing Tailwind CSS bundles — no longer exists.
 
-On a desktop screen (>= 1024px), **both** `sm:` and `lg:` media queries are active. Since `sm:grid-cols-2` and `lg:grid-cols-6` have identical specificity (one class selector = `0-1-0`), the **last rule in document order wins**.
+### If the Problem Resurfaces
 
-Before MFE load (correct):
-```css
-/* Shell CSS */
-@media (min-width: 640px)  { .sm\:grid-cols-2 { grid-template-columns: repeat(2,...) } }
-@media (min-width: 1024px) { .lg\:grid-cols-6 { grid-template-columns: repeat(6,...) } }
-/* lg wins — correct! */
-```
-
-After MFE CSS is injected (broken):
-```css
-/* Shell CSS */
-@media (min-width: 640px)  { .sm\:grid-cols-2 { ... } }   /* position A */
-@media (min-width: 1024px) { .lg\:grid-cols-6 { ... } }   /* position B */
-
-/* MFE CSS (appended AFTER shell) */
-@media (min-width: 640px)  { .sm\:grid-cols-2 { ... } }   /* position C — NOW WINS */
-```
-
-Position C's `sm:grid-cols-2` overrides position B's `lg:grid-cols-6`. The 6-column grid collapses to 2 columns.
-
-### Which MFEs Trigger It
-
-Any MFE whose Tailwind bundle contains the same responsive utility class used in the shell:
-
-| MFE | Conflicting class | Source file |
-|-----|-------------------|-------------|
-| weather-display | `sm:grid-cols-2` | `HistoricalWeather.tsx` |
-| stock-tracker | `sm:grid-cols-2` | `Watchlist.tsx` |
-| worship-songs | `sm:grid-cols-2` | `SongList.tsx` |
-| notebook | `sm:grid-cols-2` | `NoteList.tsx` |
-
-### The Fix
-
-Add `important: '#root'` to the shell's Tailwind config:
-
-```js
-// packages/shell/tailwind.config.js
-export default {
-  important: '#root',   // <-- boosts specificity
-  // ...
-}
-```
-
-This wraps every shell utility in `#root`:
-
-```css
-/* Shell — specificity 1-1-0 (ID + class) */
-#root .lg\:grid-cols-6 { grid-template-columns: repeat(6,...) }
-
-/* MFE — specificity 0-1-0 (class only) */
-.sm\:grid-cols-2 { grid-template-columns: repeat(2,...) }
-```
-
-The shell's `1-1-0` always beats the MFE's `0-1-0`, regardless of document order.
-
-### Why Not `important: true`?
-
-Using `important: true` adds `!important` to every utility, which makes it very difficult to override styles intentionally (e.g., inline styles, conditional overrides). The selector approach is surgical — it boosts specificity without preventing overrides when needed.
+If a new MFE accidentally introduces its own Tailwind build (with `@tailwind` directives and `tailwindcss` in its PostCSS config), this cascade bug will return. The fix is to remove the MFE's Tailwind build and ensure it relies on the shell's centralized CSS — not to re-add `important: '#root'`.
 
 ---
 
-## 2. Duplicate Tailwind Preflight Resets
+## 2. Duplicate Tailwind Preflight Resets (Resolved)
 
-**Severity: Medium** | **File: all MFE `tailwind.config.js`**
+**Status: Resolved** | Previously **Severity: Medium**
 
-### The Problem
+### The Original Problem
 
-Tailwind's `preflight` layer injects a CSS reset (based on modern-normalize). If every MFE includes its own preflight, you get 8+ copies of base CSS resets injected at different times, potentially causing:
-- Flash of unstyled content (FOUC) as resets cascade
-- Inconsistent base styles depending on MFE load order
-- Unnecessary CSS weight
+When MFEs had their own Tailwind builds, each one injected Tailwind's `preflight` CSS reset (based on modern-normalize). Multiple copies of base resets injected at different times caused FOUC, inconsistent base styles, and unnecessary CSS weight.
 
-### The Fix
+### How It Was Resolved
 
-Only the **shell** (host app) includes preflight. All MFEs disable it:
-
-```js
-// packages/<any-mfe>/tailwind.config.js
-export default {
-  // ...
-  corePlugins: {
-    preflight: false,   // Shell provides the single source of base styles
-  },
-}
-```
+With Tailwind centralized in the shell, MFEs no longer have their own Tailwind configs or builds. Preflight is injected exactly once by the shell's `@tailwind base` directive. No per-MFE configuration is needed.
 
 ### Rule of Thumb
 
-> The host app owns base styles. Remotes only generate utility classes.
+> The host app owns all Tailwind CSS — base, components, and utilities. MFEs use Tailwind classes in their JSX but do not run Tailwind themselves.
 
 ---
 
@@ -157,15 +85,14 @@ function prefetchRoute(path: string) {
 ```
 
 The `import()` call loads the MFE's `remoteEntry.js`, which pulls in **both JS and CSS bundles**. This means:
-- CSS cascade conflicts (Pitfall #1) trigger on hover, not just on navigation
-- The user never visits the page but the layout already breaks
 - Network requests fire for modules the user may never use
+- MFE CSS is injected as a side effect of hover, even though the user hasn't navigated
 
 ### Mitigations
 
-1. **Fix Pitfall #1 first** — with `important: '#root'`, prefetch CSS injection is harmless
+1. With Tailwind centralized in the shell (Pitfall #1 resolved), MFE CSS bundles no longer contain duplicate Tailwind utilities, so prefetch CSS injection is harmless from a cascade perspective
 2. Consider `requestIdleCallback` or `IntersectionObserver` instead of hover-based prefetch to reduce unnecessary loads
-3. The `prefetched` Set prevents duplicate loads, but the first load is enough to corrupt the cascade
+3. The `prefetched` Set prevents duplicate loads
 
 ---
 
@@ -389,7 +316,7 @@ When adding a new micro-frontend, update **all** of the following. Items marked 
 #### Package Setup
 
 - [ ] Create `packages/<name>/` with `package.json`, `vite.config.ts`, `vitest.config.ts`, `tsconfig.json`, `index.html`
-- [ ] Add `corePlugins: { preflight: false }` in the MFE's `tailwind.config.js` (see Pitfall #2)
+- [ ] Do **not** add a `tailwind.config.js` or `@tailwind` directives — the shell's centralized Tailwind build covers all MFEs (see Pitfalls #1–#2)
 - [ ] Register the remote in `packages/shell/vite.config.ts` → `federation({ remotes: ... })`
 - [ ] Add type declaration in `packages/shell/src/remotes.d.ts`
 
@@ -564,9 +491,9 @@ Then hard-refresh with `Ctrl+Shift+R`.
 
 | Pitfall | Root Cause | Fix | Severity |
 |---------|-----------|-----|----------|
-| CSS cascade conflict | MFE CSS injected after shell, same utility classes | `important: '#root'` in shell Tailwind config | High |
-| Duplicate preflight | Multiple Tailwind base resets | `corePlugins: { preflight: false }` in MFEs | Medium |
-| Prefetch side effects | `import()` loads CSS as side effect | Fix cascade first; consider idle-time prefetch | Medium |
+| CSS cascade conflict | MFE CSS injected after shell, same utility classes | **Resolved** — centralized Tailwind in shell eliminates duplicate utilities | Resolved |
+| Duplicate preflight | Multiple Tailwind base resets | **Resolved** — MFEs no longer run Tailwind; shell provides single preflight | Resolved |
+| Prefetch side effects | `import()` loads CSS as side effect | Harmless with centralized Tailwind; consider idle-time prefetch | Medium |
 | Scrollbar layout shift | Viewport width changes with scrollbar | `scrollbar-gutter: stable` on `html` | Low |
 | Global state pollution | Shared `window` context | Namespaced bridges + centralized constants | High |
 | Event bus memory leaks | Missing `useEffect` cleanup | Always return unsubscribe in cleanup | Medium |
