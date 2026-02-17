@@ -9,16 +9,15 @@ test.describe('Widget Dashboard', () => {
     await expect(section).toBeVisible({ timeout: 10_000 });
   });
 
-  test('shows always-visible widgets without engagement data', async ({ page }) => {
+  test('shows always-visible widgets by default', async ({ page }) => {
     await page.goto('/');
 
     // Wait for the dashboard to load
     await page.waitForSelector('[class*="grid"]', { timeout: 10_000 });
 
-    // Weather and Verse widgets are always visible (no engagement data needed)
+    // At minimum, weather and verse widgets should be visible (always-on)
     const widgets = page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a');
     const count = await widgets.count();
-    // Without any localStorage data, only weather + verse are visible
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
@@ -43,45 +42,42 @@ test.describe('Widget Dashboard', () => {
     await expect(page.getByRole('button', { name: /customize/i })).toBeVisible();
   });
 
-  test('can toggle widget visibility', async ({ page }) => {
+  test('shows all widgets in editing mode with visibility toggles', async ({ page }) => {
     await page.goto('/');
 
     // Enter customize mode
     await page.getByRole('button', { name: /customize/i }).click({ timeout: 10_000 });
 
-    // Find visibility toggle buttons — all 8 widgets shown in edit mode
+    // All 8 widgets should show visibility toggle buttons in edit mode
     const visibleButtons = page.getByRole('button', { name: /toggle widget/i });
     const count = await visibleButtons.count();
     expect(count).toBe(8);
-
-    // Toggle the first widget off
-    await visibleButtons.first().click();
-
-    // Exit customize mode
-    await page.getByRole('button', { name: /done/i }).click();
   });
 
-  test('widget layout persists after page reload', async ({ page }) => {
+  test('widget visibility change persists after page reload', async ({ page }) => {
     await page.goto('/');
 
-    // Count visible widgets before changes
-    const widgetsBefore = page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a');
-    const countBefore = await widgetsBefore.count();
-
-    // Enter customize mode and hide first widget
+    // Enter customize mode
     await page.getByRole('button', { name: /customize/i }).click({ timeout: 10_000 });
-    const visibleButtons = page.getByRole('button', { name: /toggle widget/i });
-    await visibleButtons.first().click();
+
+    // Toggle the first widget visibility
+    const toggleButtons = page.getByRole('button', { name: /toggle widget/i });
+    await toggleButtons.first().click();
+
+    // Exit customize mode
     await page.getByRole('button', { name: /done/i }).click();
 
     // Reload the page
     await page.reload();
 
     // Wait for dashboard to render
-    await page.waitForSelector('[class*="grid"]', { timeout: 10_000 });
+    await page.getByRole('region', { name: /widgets/i }).waitFor({ timeout: 10_000 });
 
-    // Count should be less than or equal to before (one was hidden, persisted)
-    const countAfter = await page.getByRole('region', { name: /widgets/i }).locator('[class*="grid"] > a').count();
-    expect(countAfter).toBeLessThanOrEqual(countBefore);
+    // Re-enter customize mode to verify the toggle persisted
+    await page.getByRole('button', { name: /customize/i }).click();
+
+    // One widget should now show "hidden" state
+    const hiddenText = page.getByText(/hidden/i);
+    await expect(hiddenText.first()).toBeVisible();
   });
 });
