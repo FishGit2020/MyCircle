@@ -4,7 +4,7 @@ import {
   DOMAINS, AGE_RANGES,
   getMilestonesByDomainAndAge,
 } from '../data/milestones';
-import type { DomainId, AgeRangeId, AgeRangeMeta } from '../data/milestones';
+import type { DomainId, AgeRangeMeta, AgeRangeId } from '../data/milestones';
 
 /* ─── Domain Icon (local copy shared with ChildDevelopment.tsx) ────────────── */
 
@@ -38,14 +38,37 @@ const DOMAIN_COLORS: Record<string, { bg: string; fill: string; text: string }> 
   'bg-teal-500':   { bg: 'bg-teal-100 dark:bg-teal-900/20',    fill: 'bg-teal-500',   text: 'text-teal-700 dark:text-teal-300' },
 };
 
+/* ─── CDC / AAP Resource Links per age range ──────────────────────────────── */
+
+const CDC_LINKS: Record<AgeRangeId, string> = {
+  '0-3m':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-2mo.html',
+  '3-6m':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-4mo.html',
+  '6-9m':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-6mo.html',
+  '9-12m': 'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-9mo.html',
+  '12-18m':'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-12mo.html',
+  '18-24m':'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-18mo.html',
+  '2-3y':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-2yr.html',
+  '3-4y':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-3yr.html',
+  '4-5y':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-4yr.html',
+};
+
+const AAP_LINKS: Record<AgeRangeId, string> = {
+  '0-3m':  'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-1-Month.aspx',
+  '3-6m':  'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-4-Months.aspx',
+  '6-9m':  'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-7-Months.aspx',
+  '9-12m': 'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-12-Months.aspx',
+  '12-18m':'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-12-Months.aspx',
+  '18-24m':'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-24-Months.aspx',
+  '2-3y':  'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-3-Years.aspx',
+  '3-4y':  'https://www.healthychildren.org/English/ages-stages/preschool/Pages/Developmental-Milestones-3-to-4-Years.aspx',
+  '4-5y':  'https://www.healthychildren.org/English/ages-stages/preschool/Pages/Developmental-Milestones-4-to-5-Years.aspx',
+};
+
 /* ─── Props ────────────────────────────────────────────────────────────────── */
 
 interface TimelineViewProps {
   ageInMonths: number | null;
   currentAgeRange: AgeRangeMeta | null;
-  checkedMilestones: string[];
-  mode: 'tracking' | 'reference';
-  onToggleMilestone: (id: string) => void;
 }
 
 /* ─── Component ────────────────────────────────────────────────────────────── */
@@ -53,19 +76,13 @@ interface TimelineViewProps {
 export default function TimelineView({
   ageInMonths,
   currentAgeRange,
-  checkedMilestones,
-  mode,
-  onToggleMilestone,
 }: TimelineViewProps) {
   const { t } = useTranslation();
 
   const [visibleDomains, setVisibleDomains] = useState<Set<DomainId>>(
     () => new Set(DOMAINS.map(d => d.id)),
   );
-  const [expandedCell, setExpandedCell] = useState<{
-    domain: DomainId;
-    ageRange: AgeRangeId;
-  } | null>(null);
+  const [expandedStages, setExpandedStages] = useState<Set<AgeRangeId>>(() => new Set());
 
   /* Toggle a domain chip on/off (keep at least one visible) */
   const toggleDomain = (domainId: DomainId) => {
@@ -80,106 +97,58 @@ export default function TimelineView({
     });
   };
 
-  /* Completion map: "domain-ageRange" → { checked, total } */
-  const progressMap = useMemo(() => {
-    const map: Record<string, { checked: number; total: number }> = {};
-    for (const domain of DOMAINS) {
-      for (const ar of AGE_RANGES) {
-        const milestones = getMilestonesByDomainAndAge(domain.id, ar.id);
-        const checked = milestones.filter(m => checkedMilestones.includes(m.id)).length;
-        map[`${domain.id}-${ar.id}`] = { checked, total: milestones.length };
-      }
-    }
-    return map;
-  }, [checkedMilestones]);
+  /* Toggle expand/collapse for a stage */
+  const toggleStage = (ageRangeId: AgeRangeId) => {
+    setExpandedStages(prev => {
+      const next = new Set(prev);
+      if (next.has(ageRangeId)) next.delete(ageRangeId);
+      else next.add(ageRangeId);
+      return next;
+    });
+  };
 
-  /* Current-age marker as a percentage across the 9 equal-width columns */
-  const ageMarkerPercent = useMemo(() => {
-    if (ageInMonths === null) return null;
-    for (let i = 0; i < AGE_RANGES.length; i++) {
-      const ar = AGE_RANGES[i];
-      if (ageInMonths >= ar.minMonths && ageInMonths < ar.maxMonths) {
-        const segStart = (i / AGE_RANGES.length) * 100;
-        const segWidth = (1 / AGE_RANGES.length) * 100;
-        const within = (ageInMonths - ar.minMonths) / (ar.maxMonths - ar.minMonths);
-        return segStart + within * segWidth;
+  /* Determine stage status: past / current / upcoming */
+  const getStageStatus = (ar: AgeRangeMeta): 'past' | 'current' | 'upcoming' => {
+    if (currentAgeRange?.id === ar.id) return 'current';
+    if (ageInMonths !== null && ar.maxMonths <= ageInMonths) return 'past';
+    return 'upcoming';
+  };
+
+  /* Whether a stage should be expanded (auto-expand past & current) */
+  const isExpanded = (ar: AgeRangeMeta): boolean => {
+    const status = getStageStatus(ar);
+    if (status === 'past' || status === 'current') return true;
+    return expandedStages.has(ar.id);
+  };
+
+  /* Count milestones for a stage */
+  const getMilestoneCount = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const ar of AGE_RANGES) {
+      let count = 0;
+      for (const domain of DOMAINS) {
+        if (visibleDomains.has(domain.id)) {
+          count += getMilestonesByDomainAndAge(domain.id, ar.id).length;
+        }
       }
+      counts[ar.id] = count;
     }
-    return ageInMonths >= 60 ? 100 : null;
-  }, [ageInMonths]);
+    return counts;
+  }, [visibleDomains]);
 
   const activeDomains = DOMAINS.filter(d => visibleDomains.has(d.id));
-
-  /* ─── Expanded milestone panel (shared between desktop & mobile) ──────── */
-
-  const renderExpandedMilestones = (domainId: DomainId, ageRangeId: AgeRangeId) => {
-    const arMeta = AGE_RANGES.find(a => a.id === ageRangeId)!;
-    const domainMeta = DOMAINS.find(d => d.id === domainId)!;
-    const colors = DOMAIN_COLORS[domainMeta.color];
-    const milestones = getMilestonesByDomainAndAge(domainId, ageRangeId);
-
-    return (
-      <div
-        data-testid={`expanded-${domainId}-${ageRangeId}`}
-        className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700"
-      >
-        <h4 className={`text-sm font-semibold mb-2 ${colors.text}`}>
-          {t(domainMeta.nameKey as any)} — {t(arMeta.labelKey as any)}
-        </h4>
-        <div className="space-y-1">
-          {milestones.map(m => {
-            const isChecked = checkedMilestones.includes(m.id);
-            if (mode === 'tracking') {
-              return (
-                <label key={m.id} className="flex items-center gap-2 py-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => onToggleMilestone(m.id)}
-                    className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span
-                    className={`text-sm ${
-                      isChecked
-                        ? 'line-through text-gray-400 dark:text-gray-500'
-                        : 'text-gray-700 dark:text-gray-300'
-                    }`}
-                  >
-                    {t(m.nameKey as any)}
-                  </span>
-                  {m.isRedFlag && (
-                    <span className="text-xs px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium">
-                      !
-                    </span>
-                  )}
-                </label>
-              );
-            }
-            return (
-              <div key={m.id} className="flex items-center gap-2 py-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {t(m.nameKey as any)}
-                </span>
-                {m.isRedFlag && (
-                  <span className="text-xs px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium">
-                    {t('childDev.redFlag' as any)}
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
 
   /* ─── Render ─────────────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-4">
+      {/* CDC attribution */}
+      <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+        {t('childDev.cdcAttribution' as any)}
+      </p>
+
       {/* Domain filter chips */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label={t('childDev.timeline' as any)}>
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Domain filters">
         {DOMAINS.map(domain => {
           const active = visibleDomains.has(domain.id);
           const colors = DOMAIN_COLORS[domain.color];
@@ -201,192 +170,161 @@ export default function TimelineView({
         })}
       </div>
 
-      {/* ─── Desktop: Horizontal swim-lane timeline ────────────────────────── */}
-      <div className="hidden sm:block">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden relative">
-          {/* Header row */}
-          <div className="flex">
-            <div className="w-[140px] shrink-0 p-2 border-b border-gray-200 dark:border-gray-700" />
-            <div className="flex-1 grid grid-cols-9">
-              {AGE_RANGES.map(ar => {
-                const isCurrent = currentAgeRange?.id === ar.id;
-                return (
-                  <div
-                    key={ar.id}
-                    className={`p-2 text-[10px] font-medium text-center border-b border-l border-gray-200 dark:border-gray-700 ${
-                      isCurrent
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
-                        : 'text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    {t(ar.labelKey as any)}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+      {/* ─── Vertical Timeline ─────────────────────────────────────────────── */}
+      <div className="relative pl-8">
+        {/* Vertical line */}
+        <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
 
-          {/* Domain swim-lane rows */}
-          {activeDomains.map(domain => {
-            const colors = DOMAIN_COLORS[domain.color];
+        <div className="space-y-6">
+          {AGE_RANGES.map(ar => {
+            const status = getStageStatus(ar);
+            const expanded = isExpanded(ar);
+            const milestoneCount = getMilestoneCount[ar.id];
+
             return (
-              <div key={domain.id}>
-                <div className="flex">
-                  {/* Domain label */}
-                  <div className="w-[140px] shrink-0 p-2 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700">
-                    <span
-                      className={`inline-flex items-center justify-center w-6 h-6 rounded ${domain.color} text-white flex-shrink-0`}
-                    >
-                      <DomainIcon icon={domain.icon} className="w-3.5 h-3.5" />
-                    </span>
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
-                      {t(domain.nameKey as any)}
-                    </span>
+              <div key={ar.id} data-testid={`stage-${ar.id}`}>
+                {/* ─── Timeline node ──────────────────────────────────── */}
+                <button
+                  type="button"
+                  onClick={() => toggleStage(ar.id)}
+                  className="w-full text-left flex items-start gap-3 group"
+                  aria-expanded={expanded}
+                >
+                  {/* Dot */}
+                  <div className="relative -ml-8 flex-shrink-0 mt-0.5">
+                    {status === 'past' && (
+                      <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center" data-testid={`dot-past-${ar.id}`}>
+                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    )}
+                    {status === 'current' && (
+                      <div className="w-6 h-6 rounded-full border-[3px] border-blue-500 bg-white dark:bg-gray-900 flex items-center justify-center" data-testid={`dot-current-${ar.id}`}>
+                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                      </div>
+                    )}
+                    {status === 'upcoming' && (
+                      <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600" data-testid={`dot-upcoming-${ar.id}`} />
+                    )}
                   </div>
 
-                  {/* Progress cells */}
-                  <div className="flex-1 grid grid-cols-9">
-                    {AGE_RANGES.map(ar => {
-                      const pKey = `${domain.id}-${ar.id}`;
-                      const { checked, total } = progressMap[pKey];
-                      const percent = total > 0 ? (checked / total) * 100 : 0;
-                      const isCurrent = currentAgeRange?.id === ar.id;
-                      const isExpanded =
-                        expandedCell?.domain === domain.id &&
-                        expandedCell?.ageRange === ar.id;
+                  {/* Label + badge + count */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className={`text-sm font-semibold ${
+                        status === 'upcoming'
+                          ? 'text-gray-400 dark:text-gray-500'
+                          : 'text-gray-800 dark:text-white'
+                      }`}>
+                        {t(ar.labelKey as any)}
+                      </h4>
+                      {status === 'past' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-medium">
+                          {t('childDev.pastStage' as any)}
+                        </span>
+                      )}
+                      {status === 'current' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">
+                          {t('childDev.currentStage' as any)}
+                        </span>
+                      )}
+                      {status === 'upcoming' && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 font-medium">
+                          {t('childDev.upcomingStage' as any)}
+                        </span>
+                      )}
+                    </div>
+                    <p className={`text-xs mt-0.5 ${
+                      status === 'upcoming'
+                        ? 'text-gray-400 dark:text-gray-500'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {t('childDev.milestoneCount' as any).replace('{count}', String(milestoneCount))}
+                    </p>
+                  </div>
+
+                  {/* Expand/collapse chevron */}
+                  <svg
+                    className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform flex-shrink-0 mt-1 ${expanded ? 'rotate-180' : ''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* ─── Expanded milestones ─────────────────────────────── */}
+                {expanded && (
+                  <div className="mt-3 ml-0 space-y-3">
+                    {/* Resource links */}
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={CDC_LINKS[ar.id]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        {t('childDev.cdcGuide' as any)}
+                      </a>
+                      <a
+                        href={AAP_LINKS[ar.id]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        {t('childDev.aapGuide' as any)}
+                      </a>
+                    </div>
+
+                    {/* Milestones grouped by domain */}
+                    {activeDomains.map(domain => {
+                      const milestones = getMilestonesByDomainAndAge(domain.id, ar.id);
+                      if (milestones.length === 0) return null;
+                      const colors = DOMAIN_COLORS[domain.color];
 
                       return (
-                        <button
-                          key={ar.id}
-                          type="button"
-                          onClick={() =>
-                            setExpandedCell(
-                              isExpanded ? null : { domain: domain.id, ageRange: ar.id },
-                            )
-                          }
-                          className={`p-1.5 border-l border-b border-gray-100 dark:border-gray-700 transition-colors ${
-                            isCurrent ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
-                          } ${
-                            isExpanded
-                              ? 'ring-2 ring-inset ring-blue-400 dark:ring-blue-500'
-                              : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                          }`}
-                          aria-label={`${t(domain.nameKey as any)} ${t(ar.labelKey as any)}: ${checked}/${total}`}
+                        <div
+                          key={domain.id}
+                          className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3"
                         >
-                          <div className={`h-2.5 rounded-full overflow-hidden ${colors.bg}`}>
-                            <div
-                              className={`h-full rounded-full ${colors.fill} transition-all duration-300`}
-                              style={{ width: `${percent}%` }}
-                            />
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`inline-flex items-center justify-center w-5 h-5 rounded ${domain.color} text-white flex-shrink-0`}>
+                              <DomainIcon icon={domain.icon} className="w-3 h-3" />
+                            </span>
+                            <h5 className={`text-xs font-semibold ${colors.text}`}>
+                              {t(domain.nameKey as any)}
+                            </h5>
                           </div>
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 block text-center">
-                            {checked}/{total}
-                          </span>
-                        </button>
+                          <div className="space-y-1">
+                            {milestones.map(m => (
+                              <div key={m.id} className="flex items-start gap-2 py-0.5">
+                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+                                <span className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                  {t(m.nameKey as any)}
+                                </span>
+                                {m.isRedFlag && (
+                                  <span className="flex-shrink-0 text-xs px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium" title={t('childDev.redFlagInfo' as any)}>
+                                    {t('childDev.redFlag' as any)}
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
-                </div>
-
-                {/* Expanded milestone panel below the row */}
-                {expandedCell?.domain === domain.id &&
-                  renderExpandedMilestones(domain.id, expandedCell.ageRange)}
+                )}
               </div>
             );
           })}
-
-          {/* Current-age marker (vertical line) */}
-          {ageMarkerPercent !== null && (
-            <div
-              className="absolute top-0 bottom-0 w-0.5 bg-blue-500/70 dark:bg-blue-400/70 pointer-events-none z-10"
-              style={{
-                left: `calc(140px + (100% - 140px) * ${ageMarkerPercent / 100})`,
-              }}
-              data-testid="age-marker"
-            >
-              <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-blue-400 border-2 border-white dark:border-gray-800" />
-            </div>
-          )}
         </div>
-      </div>
-
-      {/* ─── Mobile: Vertical timeline ─────────────────────────────────────── */}
-      <div className="sm:hidden space-y-3">
-        {AGE_RANGES.map(ar => {
-          const isCurrent = currentAgeRange?.id === ar.id;
-          return (
-            <div
-              key={ar.id}
-              className={`bg-white dark:bg-gray-800 rounded-xl border-2 p-3 transition-colors ${
-                isCurrent
-                  ? 'border-blue-400 dark:border-blue-500 shadow-md'
-                  : 'border-gray-200 dark:border-gray-700'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <h4 className="text-sm font-semibold text-gray-800 dark:text-white">
-                  {t(ar.labelKey as any)}
-                </h4>
-                {isCurrent && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">
-                    {t('childDev.currentAge' as any)}
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                {activeDomains.map(domain => {
-                  const pKey = `${domain.id}-${ar.id}`;
-                  const { checked, total } = progressMap[pKey];
-                  const percent = total > 0 ? (checked / total) * 100 : 0;
-                  const colors = DOMAIN_COLORS[domain.color];
-                  const isExpanded =
-                    expandedCell?.domain === domain.id &&
-                    expandedCell?.ageRange === ar.id;
-
-                  return (
-                    <div key={domain.id}>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setExpandedCell(
-                            isExpanded ? null : { domain: domain.id, ageRange: ar.id },
-                          )
-                        }
-                        className="w-full flex items-center gap-2 py-1"
-                        aria-label={`${t(domain.nameKey as any)} ${t(ar.labelKey as any)}: ${checked}/${total}`}
-                      >
-                        <span
-                          className={`w-5 h-5 rounded ${domain.color} text-white inline-flex items-center justify-center flex-shrink-0`}
-                        >
-                          <DomainIcon icon={domain.icon} className="w-3 h-3" />
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div className={`h-2.5 rounded-full overflow-hidden ${colors.bg}`}>
-                            <div
-                              className={`h-full rounded-full ${colors.fill} transition-all duration-300`}
-                              style={{ width: `${percent}%` }}
-                            />
-                          </div>
-                        </div>
-                        <span className="text-xs text-gray-400 dark:text-gray-500 w-8 text-right flex-shrink-0">
-                          {checked}/{total}
-                        </span>
-                      </button>
-
-                      {/* Expanded milestones */}
-                      {isExpanded && (
-                        <div className="pl-7 pt-1 pb-2">
-                          {renderExpandedMilestones(domain.id, ar.id)}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );
