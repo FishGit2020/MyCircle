@@ -23,6 +23,33 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Self-healing: if stale SW serves outdated chunks that fail to load, unregister and reload -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.message && /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(e.message)) {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then(function(reg) {
+              if (reg) reg.unregister();
+              window.location.reload();
+            });
+          } else {
+            window.location.reload();
+          }
+        }
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        if (e.reason && /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(String(e.reason))) {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then(function(reg) {
+              if (reg) reg.unregister();
+              window.location.reload();
+            });
+          } else {
+            window.location.reload();
+          }
+        }
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
