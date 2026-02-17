@@ -1,9 +1,12 @@
+import { createLogger } from '@mycircle/shared';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
+
+const log = createLogger('firebase');
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -29,7 +32,9 @@ let appCheck: AppCheck | null = null;
 if (firebaseEnabled) {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   auth = getAuth(app);
-  db = getFirestore(app);
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+  });
   perf = getPerformance(app);
   analytics = getAnalytics(app);
   googleProvider = new GoogleAuthProvider();
@@ -45,7 +50,7 @@ if (firebaseEnabled) {
       isTokenAutoRefreshEnabled: true,
     });
   } catch (err) {
-    console.warn('App Check initialization failed:', err);
+    log.warn('App Check initialization failed:', err);
   }
 
   // Expose ID token getter for MFEs that can't import from shell directly
@@ -73,12 +78,12 @@ if (firebaseEnabled) {
       try {
         if (db) connectFirestoreEmulator(db, 'localhost', 8080);
       } catch (e) {
-        console.warn('Firestore emulator already connected:', e);
+        log.warn('Firestore emulator already connected:', e);
       }
       try {
         if (auth) connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
       } catch (e) {
-        console.warn('Auth emulator already connected:', e);
+        log.warn('Auth emulator already connected:', e);
       }
       // Expose test helper for emulator e2e auth tests
       (window as any).__signInForTest = (email: string, password: string) =>
@@ -149,7 +154,7 @@ if (auth) {
       }
     })
     .catch((err) => {
-      console.warn('Redirect sign-in result error:', err);
+      log.warn('Redirect sign-in result error:', err);
     });
 }
 
@@ -168,11 +173,11 @@ export async function signInWithGoogle() {
       code === 'auth/popup-closed-by-user' ||
       code === 'auth/cancelled-popup-request'
     ) {
-      console.warn('Popup sign-in failed, falling back to redirect:', code);
+      log.warn('Popup sign-in failed, falling back to redirect:', code);
       await signInWithRedirect(auth!, googleProvider!);
       return null; // page will redirect
     }
-    console.error('Error signing in with Google:', error);
+    log.error('Error signing in with Google:', error);
     throw error;
   }
 }
@@ -204,7 +209,7 @@ export async function logOut() {
   try {
     await signOut(auth);
   } catch (error) {
-    console.error('Error signing out:', error);
+    log.error('Error signing out:', error);
     throw error;
   }
 }
@@ -576,7 +581,7 @@ export function subscribeToWorshipSongs(callback: (songs: Array<Record<string, a
     const songs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(songs);
   }, (error) => {
-    console.warn('Worship songs snapshot error:', error);
+    log.warn('Worship songs snapshot error:', error);
   });
 }
 
@@ -662,7 +667,7 @@ export function subscribeToPublicNotes(callback: (notes: Array<Record<string, an
     const notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(notes);
   }, (error) => {
-    console.warn('Public notes snapshot error:', error);
+    log.warn('Public notes snapshot error:', error);
   });
 }
 

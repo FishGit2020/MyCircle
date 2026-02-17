@@ -203,9 +203,24 @@ export default defineConfig({
             type: 'image/png',
             purpose: 'maskable'
           }
+        ],
+        shortcuts: [
+          { name: 'Dashboard', short_name: 'Home', url: '/', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Weather', short_name: 'Weather', url: '/weather', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Bible Reader', short_name: 'Bible', url: '/bible', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Podcasts', short_name: 'Podcasts', url: '/podcasts', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Stocks', short_name: 'Stocks', url: '/stocks', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Notebook', short_name: 'Notes', url: '/notebook', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Worship Songs', short_name: 'Worship', url: '/worship', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'AI Assistant', short_name: 'AI', url: '/ai', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'English Learning', short_name: 'English', url: '/english', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Chinese Learning', short_name: 'Chinese', url: '/chinese', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Child Development', short_name: 'ChildDev', url: '/child-dev', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Baby Tracker', short_name: 'Baby', url: '/baby', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
         ]
       },
       workbox: {
+        skipWaiting: true,
         clientsClaim: true,
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [
