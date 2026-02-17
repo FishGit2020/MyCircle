@@ -21,7 +21,7 @@ test.describe('English Learning', () => {
   test('can navigate between phrases', async ({ page }) => {
     await page.goto('/english');
     const firstPhrase = await page.getByTestId('phrase-english').textContent();
-    await page.getByText('Next').click();
+    await page.getByRole('button', { name: 'Next' }).click();
     const secondPhrase = await page.getByTestId('phrase-english').textContent();
     expect(firstPhrase).not.toBe(secondPhrase);
   });

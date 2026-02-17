@@ -15,36 +15,36 @@ test.describe('Chinese Learning', () => {
 
   test('switches to flashcard view', async ({ page }) => {
     await page.goto('/chinese');
-    await page.getByText('Flashcards').click();
+    await page.getByRole('button', { name: 'Flashcards' }).click();
     await expect(page.getByTestId('flashcard')).toBeVisible();
   });
 
   test('flashcard flips to show answer', async ({ page }) => {
     await page.goto('/chinese');
-    await page.getByText('Flashcards').click();
+    await page.getByRole('button', { name: 'Flashcards' }).click();
     await page.getByTestId('flashcard').click();
     await expect(page.getByTestId('flashcard-pinyin')).toBeVisible();
   });
 
   test('can navigate between flashcards', async ({ page }) => {
     await page.goto('/chinese');
-    await page.getByText('Flashcards').click();
+    await page.getByRole('button', { name: 'Flashcards' }).click();
     const firstChar = await page.getByTestId('flashcard-character').textContent();
-    await page.getByText('Next').click();
+    await page.getByRole('button', { name: 'Next' }).click();
     const secondChar = await page.getByTestId('flashcard-character').textContent();
     expect(firstChar).not.toBe(secondChar);
   });
 
   test('can mark character as mastered', async ({ page }) => {
     await page.goto('/chinese');
-    await page.getByText('Flashcards').click();
+    await page.getByRole('button', { name: 'Flashcards' }).click();
     await page.getByTestId('toggle-mastered').click();
     await expect(page.getByText(/Mastered: 1 \//)).toBeVisible();
   });
 
   test('mastered progress persists via localStorage', async ({ page }) => {
     await page.goto('/chinese');
-    await page.getByText('Flashcards').click();
+    await page.getByRole('button', { name: 'Flashcards' }).click();
     await page.getByTestId('toggle-mastered').click();
 
     // Reload and verify persistence
@@ -54,8 +54,8 @@ test.describe('Chinese Learning', () => {
 
   test('practice canvas opens from flashcard', async ({ page }) => {
     await page.goto('/chinese');
-    await page.getByText('Flashcards').click();
-    await page.getByText('Practice Writing').click();
+    await page.getByRole('button', { name: 'Flashcards' }).click();
+    await page.getByRole('button', { name: 'Practice Writing' }).click();
     await expect(page.getByTestId('practice-canvas')).toBeVisible();
   });
 });
