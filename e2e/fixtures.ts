@@ -521,17 +521,17 @@ async function mockFirebaseAuth(page: Page) {
 async function mockChineseCharactersAPI(page: Page) {
   await page.addInitScript(() => {
     const mockChars = [
-      { id: 'f01', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'f02', character: '\u7238\u7238', pinyin: 'b\u00e0ba', meaning: 'dad', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'f03', character: '\u54e5\u54e5', pinyin: 'g\u0113ge', meaning: 'older brother', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'e01', character: '\u8981', pinyin: 'y\u00e0o', meaning: 'want', category: 'feelings', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'd01', character: '\u6c34', pinyin: 'shu\u01d0', meaning: 'water', category: 'food', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'b01', character: '\u624b', pinyin: 'sh\u01d2u', meaning: 'hand', category: 'body', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'h01', character: '\u95e8', pinyin: 'm\u00e9n', meaning: 'door', category: 'house', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'n01', character: '\u72d7', pinyin: 'g\u01d2u', meaning: 'dog', category: 'nature', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'num01', character: '\u4e00', pinyin: 'y\u012b', meaning: 'one', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'num02', character: '\u4e8c', pinyin: '\u00e8r', meaning: 'two', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-      { id: 'p01', character: '\u4f60\u597d', pinyin: 'n\u01d0h\u01ceo', meaning: 'hello', category: 'phrases', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'f01', character: '妈妈', pinyin: 'māma', meaning: 'mom', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'f02', character: '爸爸', pinyin: 'bàba', meaning: 'dad', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'f03', character: '哥哥', pinyin: 'gēge', meaning: 'older brother', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'e01', character: '要', pinyin: 'yào', meaning: 'want', category: 'feelings', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'd01', character: '水', pinyin: 'shuǐ', meaning: 'water', category: 'food', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'b01', character: '手', pinyin: 'shǒu', meaning: 'hand', category: 'body', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'h01', character: '门', pinyin: 'mén', meaning: 'door', category: 'house', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'n01', character: '狗', pinyin: 'gǒu', meaning: 'dog', category: 'nature', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'num01', character: '一', pinyin: 'yī', meaning: 'one', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'num02', character: '二', pinyin: 'èr', meaning: 'two', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'p01', character: '你好', pinyin: 'nǐhǎo', meaning: 'hello', category: 'phrases', createdBy: { uid: 'system', displayName: 'MyCircle' } },
     ];
     const subscribers: Array<(chars: any[]) => void> = [];
     const mockApi = {

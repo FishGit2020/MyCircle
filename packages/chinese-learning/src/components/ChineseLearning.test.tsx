@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import ChineseLearning from './ChineseLearning';
 
 const mockCharacters = [
-  { id: 'f01', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-  { id: 'f02', character: '\u7238\u7238', pinyin: 'b\u00e0ba', meaning: 'dad', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-  { id: 'num01', character: '\u4e00', pinyin: 'y\u012b', meaning: 'one', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-  { id: 'num02', character: '\u4e8c', pinyin: '\u00e8r', meaning: 'two', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
-  { id: 'p01', character: '\u4f60\u597d', pinyin: 'n\u01d0h\u01ceo', meaning: 'hello', category: 'phrases', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'f01', character: '妈妈', pinyin: 'māma', meaning: 'mom', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'f02', character: '爸爸', pinyin: 'bàba', meaning: 'dad', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'num01', character: '一', pinyin: 'yī', meaning: 'one', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'num02', character: '二', pinyin: 'èr', meaning: 'two', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+  { id: 'p01', character: '你好', pinyin: 'nǐhǎo', meaning: 'hello', category: 'phrases', createdBy: { uid: 'system', displayName: 'MyCircle' } },
 ];
 
 beforeEach(() => {
@@ -54,9 +54,9 @@ describe('ChineseLearning', () => {
   it('clicking a character in grid switches to flashcard view', async () => {
     const user = userEvent.setup();
     render(<ChineseLearning />);
-    await waitFor(() => expect(screen.getByText('\u5988\u5988')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('妈妈')).toBeInTheDocument());
 
-    await user.click(screen.getAllByText('\u5988\u5988')[0]);
+    await user.click(screen.getAllByText('妈妈')[0]);
     expect(screen.getByTestId('flashcard')).toBeInTheDocument();
   });
 
@@ -115,7 +115,7 @@ describe('ChineseLearning', () => {
 
     await user.click(screen.getByText('Flashcards'));
     await user.click(screen.getByText('Numbers'));
-    expect(screen.getByTestId('flashcard-character')).toHaveTextContent('\u4e00');
+    expect(screen.getByTestId('flashcard-character')).toHaveTextContent('一');
   });
 
   it('shows Add Character button when authenticated', async () => {

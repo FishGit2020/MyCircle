@@ -11,7 +11,6 @@ vi.mock('@mycircle/shared', () => ({
   ],
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
   GET_BIBLE_PASSAGE: 'GET_BIBLE_PASSAGE',
-  NIV_COPYRIGHT: 'NIV Copyright',
 }));
 
 import { useCuratedVerse } from './useCuratedVerse';
@@ -45,7 +44,7 @@ describe('useCuratedVerse', () => {
     const { result } = renderHook(() => useCuratedVerse());
     expect(result.current.verse.text).toBeTruthy();
     expect(result.current.verse.reference).toMatch(/Jeremiah|Isaiah|Joshua/);
-    expect(result.current.verse.copyright).toBe('NIV Copyright');
+    expect(result.current.verse.copyright).toBeUndefined();
   });
 
   it('returns loading state while fetching', () => {
@@ -65,6 +64,14 @@ describe('useCuratedVerse', () => {
     const callArgs = mockUseQuery.mock.calls[mockUseQuery.mock.calls.length - 1];
     expect(callArgs[1].variables.reference).toMatch(/^[A-Z]{3}\./);
     expect(callArgs[1].fetchPolicy).toBe('cache-first');
+  });
+
+  it('returns a consistent verse on the same day (not random)', () => {
+    mockUseQuery.mockReturnValue({ data: null, loading: false });
+
+    const { result: result1 } = renderHook(() => useCuratedVerse());
+    const { result: result2 } = renderHook(() => useCuratedVerse());
+    expect(result1.current.verse.reference).toBe(result2.current.verse.reference);
   });
 
   it('returns a stable verse across re-renders', () => {

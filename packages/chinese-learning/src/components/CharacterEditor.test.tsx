@@ -20,11 +20,11 @@ describe('CharacterEditor', () => {
   });
 
   it('renders edit mode with pre-filled values', () => {
-    const char = { id: '1', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family' as const };
+    const char = { id: '1', character: '妈妈', pinyin: 'māma', meaning: 'mom', category: 'family' as const };
     render(<CharacterEditor character={char} onSave={onSave} onCancel={onCancel} onDelete={onDelete} />);
     expect(screen.getByText('Edit Character')).toBeInTheDocument();
-    expect(screen.getByTestId('editor-character-input')).toHaveValue('\u5988\u5988');
-    expect(screen.getByTestId('editor-pinyin-input')).toHaveValue('m\u0101ma');
+    expect(screen.getByTestId('editor-character-input')).toHaveValue('妈妈');
+    expect(screen.getByTestId('editor-pinyin-input')).toHaveValue('māma');
     expect(screen.getByTestId('editor-meaning-input')).toHaveValue('mom');
   });
 
@@ -32,14 +32,14 @@ describe('CharacterEditor', () => {
     const user = userEvent.setup();
     render(<CharacterEditor onSave={onSave} onCancel={onCancel} />);
 
-    await user.type(screen.getByTestId('editor-character-input'), '\u6c34');
-    await user.type(screen.getByTestId('editor-pinyin-input'), 'shu\u01d0');
+    await user.type(screen.getByTestId('editor-character-input'), '水');
+    await user.type(screen.getByTestId('editor-pinyin-input'), 'shuǐ');
     await user.type(screen.getByTestId('editor-meaning-input'), 'water');
 
     await user.click(screen.getByTestId('editor-save-btn'));
     expect(onSave).toHaveBeenCalledWith({
-      character: '\u6c34',
-      pinyin: 'shu\u01d0',
+      character: '水',
+      pinyin: 'shuǐ',
       meaning: 'water',
       category: 'phrases', // default
     });
@@ -58,14 +58,14 @@ describe('CharacterEditor', () => {
   });
 
   it('shows delete button in edit mode', () => {
-    const char = { id: '1', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family' as const };
+    const char = { id: '1', character: '妈妈', pinyin: 'māma', meaning: 'mom', category: 'family' as const };
     render(<CharacterEditor character={char} onSave={onSave} onCancel={onCancel} onDelete={onDelete} />);
     expect(screen.getByTestId('editor-delete-btn')).toBeInTheDocument();
   });
 
   it('shows delete confirmation before actually deleting', async () => {
     const user = userEvent.setup();
-    const char = { id: '1', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family' as const };
+    const char = { id: '1', character: '妈妈', pinyin: 'māma', meaning: 'mom', category: 'family' as const };
     render(<CharacterEditor character={char} onSave={onSave} onCancel={onCancel} onDelete={onDelete} />);
 
     await user.click(screen.getByTestId('editor-delete-btn'));
@@ -80,8 +80,8 @@ describe('CharacterEditor', () => {
     const user = userEvent.setup();
     render(<CharacterEditor onSave={onSave} onCancel={onCancel} />);
 
-    await user.type(screen.getByTestId('editor-character-input'), '\u72d7');
-    await user.type(screen.getByTestId('editor-pinyin-input'), 'g\u01d2u');
+    await user.type(screen.getByTestId('editor-character-input'), '狗');
+    await user.type(screen.getByTestId('editor-pinyin-input'), 'gǒu');
     await user.type(screen.getByTestId('editor-meaning-input'), 'dog');
     await user.selectOptions(screen.getByTestId('editor-category-select'), 'nature');
 
