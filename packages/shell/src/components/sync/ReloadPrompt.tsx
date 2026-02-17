@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useTranslation } from '@mycircle/shared';
 
@@ -7,7 +7,6 @@ export default function ReloadPrompt() {
   const [reloading, setReloading] = useState(false);
   const {
     needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
   } = useRegisterSW({
     onRegisteredSW(_swUrl, registration) {
       if (registration) {
@@ -23,36 +22,15 @@ export default function ReloadPrompt() {
     },
   });
 
-  // Proactively listen for controller change so the page reloads
-  // even if the SW activates before the user clicks "Reload"
-  useEffect(() => {
-    if (!needRefresh) return;
-    const sw = navigator.serviceWorker;
-    if (!sw) return;
-    const onControllerChange = () => window.location.reload();
-    sw.addEventListener('controllerchange', onControllerChange);
-    return () => sw.removeEventListener('controllerchange', onControllerChange);
-  }, [needRefresh]);
-
   const handleReload = async () => {
     setReloading(true);
     try {
-      await updateServiceWorker(true);
+      const reg = await navigator.serviceWorker?.getRegistration();
+      await reg?.unregister();
     } catch {
-      // updateServiceWorker failed — fall through to fallback
+      // ignore
     }
-    // If controllerchange hasn't reloaded the page within 2s,
-    // the waiting SW likely didn't activate. Unregister it so
-    // the next load installs a fresh SW without a stuck "waiting" state.
-    setTimeout(async () => {
-      try {
-        const reg = await navigator.serviceWorker?.getRegistration();
-        await reg?.unregister();
-      } catch {
-        // ignore
-      }
-      window.location.reload();
-    }, 2000);
+    window.location.reload();
   };
 
   if (!needRefresh) return null;
