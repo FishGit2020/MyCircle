@@ -93,14 +93,13 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Development timeline** — 10-stage visual timeline showing completed milestones (green checkmarks), currently developing stage (highlighted with badge), and upcoming stages; grouped by biological systems (heart, senses, brain, etc.) rather than individual weeks
 - Dark mode, full i18n (English, Spanish, Chinese)
 
-### Child Development Tracker
-- Postnatal developmental milestone tracking from birth through age 5
+### Child Development Guide
+- Informational developmental milestone reference from birth through age 5 (CDC guidelines)
 - 6 developmental domains: Physical & Motor, Speech & Language, Cognitive, Social-Emotional, Health & Growth, Feeding & Sensory
-- 270 milestones across 9 age ranges with color-coded domain cards and SVG progress rings
-- **Tracking mode** — interactive checklist to mark completed milestones, persisted in localStorage
-- **Reference mode** — informational bullet list for browsing milestones
+- 270 milestones across 9 age ranges organized in a vertical timeline
+- **Vertical timeline** — progressive disclosure with color-coded stage dots (green = past, blue = current, gray = upcoming); past and current stages auto-expand, future stages collapse; domain filter chips to toggle visibility
+- **CDC & AAP resource links** — each age range stage links to corresponding CDC and AAP (HealthyChildren.org) developmental guidelines
 - Auto-calculated age from birth date, current age range highlighted
-- **Timeline view** — horizontal swim-lane timeline showing all 6 developmental domains across 9 age ranges; color-coded progress bars per cell, domain filter chips to toggle visibility, click-to-expand milestone checklists, current-age vertical marker; vertical layout on mobile
 - Red flag indicators for milestones that warrant pediatrician consultation
 - Encouraging Bible verses for parents with shuffle
 - Dark mode, full i18n (English, Spanish, Chinese)

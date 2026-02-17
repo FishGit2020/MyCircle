@@ -505,18 +505,36 @@ function BabyTrackerWidget() {
   );
 }
 
+/* Age range labels for inline lookup (avoids cross-MFE import) */
+const CHILD_AGE_RANGES = [
+  { min: 0, max: 3, label: '0–3 Months' },
+  { min: 3, max: 6, label: '3–6 Months' },
+  { min: 6, max: 9, label: '6–9 Months' },
+  { min: 9, max: 12, label: '9–12 Months' },
+  { min: 12, max: 18, label: '12–18 Months' },
+  { min: 18, max: 24, label: '18–24 Months' },
+  { min: 24, max: 36, label: '2–3 Years' },
+  { min: 36, max: 48, label: '3–4 Years' },
+  { min: 48, max: 60, label: '4–5 Years' },
+];
+
+function getStageLabel(months: number): string {
+  for (const r of CHILD_AGE_RANGES) {
+    if (months >= r.min && months < r.max) return r.label;
+  }
+  return months >= 60 ? '5+ Years' : '';
+}
+
 function ChildDevWidget() {
   const { t } = useTranslation();
   const [childName, setChildName] = useState<string | null>(null);
   const [ageMonths, setAgeMonths] = useState<number | null>(null);
-  const [progress, setProgress] = useState<number>(0);
 
   useEffect(() => {
     function compute() {
       try {
         const name = localStorage.getItem(StorageKeys.CHILD_NAME);
         const birthRaw = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
-        const milestonesStr = localStorage.getItem(StorageKeys.CHILD_MILESTONES);
         setChildName(name);
         if (birthRaw) {
           let birthStr: string;
@@ -527,13 +545,6 @@ function ChildDevWidget() {
           setAgeMonths(Math.max(0, months));
         } else {
           setAgeMonths(null);
-        }
-        if (milestonesStr) {
-          const checked: string[] = JSON.parse(milestonesStr);
-          // 270 total milestones
-          setProgress(Math.round((checked.length / 270) * 100));
-        } else {
-          setProgress(0);
         }
       } catch { setChildName(null); setAgeMonths(null); }
     }
@@ -547,6 +558,8 @@ function ChildDevWidget() {
       ? `${Math.floor(ageMonths / 12)}y ${ageMonths % 12}m`
       : `${ageMonths}m`
     : null;
+
+  const stageLabel = ageMonths !== null ? getStageLabel(ageMonths) : null;
 
   return (
     <div>
@@ -566,12 +579,11 @@ function ChildDevWidget() {
           <p className="text-sm font-medium text-teal-700 dark:text-teal-300">
             {childName} — {ageDisplay}
           </p>
-          <div className="mt-1.5 flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-teal-200 dark:bg-teal-800 rounded-full overflow-hidden">
-              <div className="h-full bg-teal-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
-            </div>
-            <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">{progress}%</span>
-          </div>
+          {stageLabel && (
+            <p className="text-xs text-teal-600 dark:text-teal-400 mt-1">
+              {stageLabel}
+            </p>
+          )}
         </div>
       ) : (
         <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noChildData')}</p>

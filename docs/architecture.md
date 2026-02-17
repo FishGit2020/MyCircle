@@ -133,7 +133,7 @@ The orchestrator that loads and composes all remote micro frontends.
 /notebook/new           -> Notebook MFE (new note editor)
 /notebook/:noteId       -> Notebook MFE (drill-down: note editor)
 /baby                   -> BabyTracker MFE (lazy-loaded, baby growth tracker)
-/child-dev              -> ChildDevelopment MFE (lazy-loaded, milestone tracker)
+/child-dev              -> ChildDevelopment MFE (lazy-loaded, developmental guide)
 /compare                -> WeatherCompare (legacy, still accessible)
 /*                      -> 404 NotFound
 ```
@@ -331,15 +331,15 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 Exposes `ChildDevelopment` component via Module Federation. Port **3012**.
 
 **Key Behavior:**
-- Postnatal developmental milestone tracking from birth through age 5 (270 milestones)
-- 6 developmental domains (Physical, Speech, Cognitive, Social, Health, Sensory) with color-coded cards and SVG progress rings
+- Informational developmental milestone reference from birth through age 5 (270 milestones, CDC guidelines)
+- 6 developmental domains (Physical, Speech, Cognitive, Social, Health, Sensory) with color-coded domain icons
 - 9 age ranges (0–3m, 3–6m, 6–9m, 9–12m, 12–18m, 18–24m, 2–3y, 3–4y, 4–5y)
-- **Overview + Timeline** tab toggle: Overview shows domain cards with progress rings; Timeline shows horizontal swim-lane view with domain filter chips, progress bars per cell, current-age vertical marker, and click-to-expand milestone details; mobile-responsive vertical layout
-- Tracking mode (checkboxes) vs. Reference mode (informational bullets)
+- **Vertical timeline** — progressive disclosure with color-coded stage dots (green past, blue current, gray upcoming); past and current stages auto-expand, future stages collapse; domain filter chips to toggle visibility; milestones displayed as bullet points grouped by domain
+- **CDC & AAP resource links** per age range stage linking to corresponding developmental guidelines
 - Auto-calculated age from birth date with current age range highlighting
 - Red flag indicators (~11% of milestones) for pediatrician consultation
 - Encouraging Bible verses (15 references) for parents with shuffle
-- Persistence: `StorageKeys.CHILD_NAME`, `CHILD_BIRTH_DATE`, `CHILD_MILESTONES` (localStorage)
+- Persistence: `StorageKeys.CHILD_NAME`, `CHILD_BIRTH_DATE` (localStorage)
 - `WindowEvents.CHILD_DATA_CHANGED` bridges MFE ↔ shell for cross-tab sync
 - Route: `/child-dev`
 

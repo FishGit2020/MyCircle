@@ -75,107 +75,56 @@ describe('ChildDevelopment', () => {
   it('loads child data from localStorage on mount', () => {
     storage['child-name'] = 'Liam';
     storage['child-birth-date'] = '2024-01-10';
-    storage['child-milestones'] = '["physical-0_3m-01"]';
 
     render(<ChildDevelopment />);
 
-    // Should show overview, not setup
+    // Should show main view, not setup
     expect(screen.getByText('Liam')).toBeInTheDocument();
   });
 
-  it('shows overview with domain cards when child data exists', () => {
+  it('renders timeline view when child data exists', () => {
     storage['child-name'] = 'Sophia';
     storage['child-birth-date'] = '2024-03-20';
 
     render(<ChildDevelopment />);
 
-    // 6 domain cards should be rendered
-    expect(screen.getByText('childDev.domainPhysical')).toBeInTheDocument();
-    expect(screen.getByText('childDev.domainSpeech')).toBeInTheDocument();
-    expect(screen.getByText('childDev.domainCognitive')).toBeInTheDocument();
-    expect(screen.getByText('childDev.domainSocial')).toBeInTheDocument();
-    expect(screen.getByText('childDev.domainHealth')).toBeInTheDocument();
-    expect(screen.getByText('childDev.domainSensory')).toBeInTheDocument();
+    // Should show the timeline (domain names appear in filter chips + expanded stage headers)
+    expect(screen.getAllByText('childDev.domainPhysical').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('childDev.domainSpeech').length).toBeGreaterThan(0);
+    expect(screen.getByText('childDev.cdcAttribution')).toBeInTheDocument();
   });
 
-  it('toggles milestone checkbox in tracking mode', async () => {
-    const user = userEvent.setup();
+  it('does not render any checkboxes or progress rings', () => {
     storage['child-name'] = 'Noah';
     storage['child-birth-date'] = '2024-06-01';
 
     render(<ChildDevelopment />);
 
-    // Click on the first domain card (Physical)
-    await user.click(screen.getByText('childDev.domainPhysical'));
-
-    // Should show domain detail view with checkboxes
-    const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes.length).toBeGreaterThan(0);
-
-    // Toggle first checkbox
-    await user.click(checkboxes[0]);
-    expect(storage['child-milestones']).toBeDefined();
-
-    const saved = JSON.parse(storage['child-milestones']);
-    expect(saved).toHaveLength(1);
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    // No SVG progress rings — no "%" text should appear
+    expect(screen.queryByText(/%$/)).toBeNull();
   });
 
-  it('switches between tracking and reference modes', async () => {
-    const user = userEvent.setup();
+  it('does not have tracking or reference mode toggles', () => {
     storage['child-name'] = 'Ava';
     storage['child-birth-date'] = '2024-06-01';
 
     render(<ChildDevelopment />);
 
-    // Start in tracking mode
-    expect(screen.getByText('childDev.tracking')).toBeInTheDocument();
-    expect(screen.getByText('childDev.reference')).toBeInTheDocument();
-
-    // Switch to reference mode
-    await user.click(screen.getByText('childDev.reference'));
-
-    // Navigate to a domain
-    await user.click(screen.getByText('childDev.domainPhysical'));
-
-    // Should show bullet items, not checkboxes
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.queryByText('childDev.tracking')).not.toBeInTheDocument();
+    expect(screen.queryByText('childDev.reference')).not.toBeInTheDocument();
+    expect(screen.queryByText('childDev.overview')).not.toBeInTheDocument();
   });
 
-  it('shows current age range highlighted', () => {
-    // Set birth date to ~6 months ago
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  it('does not read CHILD_MILESTONES from localStorage', () => {
     storage['child-name'] = 'Oliver';
-    storage['child-birth-date'] = sixMonthsAgo.toISOString().split('T')[0];
-
-    render(<ChildDevelopment />);
-
-    // Navigate to a domain to see age range cards
-    fireEvent.click(screen.getByText('childDev.domainPhysical'));
-
-    // Should have a "Current Age" badge somewhere
-    expect(screen.getByText('childDev.currentAge')).toBeInTheDocument();
-  });
-
-  it('navigates to domain detail and back', async () => {
-    const user = userEvent.setup();
-    storage['child-name'] = 'Emma';
     storage['child-birth-date'] = '2024-06-01';
+    storage['child-milestones'] = '["physical-0_3m-01"]';
 
     render(<ChildDevelopment />);
 
-    // Click a domain card
-    await user.click(screen.getByText('childDev.domainSpeech'));
-
-    // Should show back button and domain header
-    expect(screen.getByText('childDev.back')).toBeInTheDocument();
-    expect(screen.getByText('childDev.domainSpeech')).toBeInTheDocument();
-
-    // Go back
-    await user.click(screen.getByText('childDev.back'));
-
-    // Should be back to overview with all domain cards
-    expect(screen.getByText('childDev.domainPhysical')).toBeInTheDocument();
+    // The component should work fine — milestones storage is ignored
+    expect(screen.getByText('Oliver')).toBeInTheDocument();
   });
 
   it('shows red flag indicators', () => {
@@ -184,13 +133,7 @@ describe('ChildDevelopment', () => {
 
     render(<ChildDevelopment />);
 
-    // Switch to reference mode to see red flag labels
-    fireEvent.click(screen.getByText('childDev.reference'));
-
-    // Navigate to a domain
-    fireEvent.click(screen.getByText('childDev.domainPhysical'));
-
-    // Should show red flag labels
+    // Red flag labels should appear (from expanded past/current stages in the timeline)
     const redFlags = screen.getAllByText('childDev.redFlag');
     expect(redFlags.length).toBeGreaterThan(0);
   });
@@ -219,7 +162,25 @@ describe('ChildDevelopment', () => {
       window.dispatchEvent(new Event('child-data-changed'));
     });
 
-    // Should now show overview
+    // Should now show main view
     expect(screen.getByText('Mia')).toBeInTheDocument();
+  });
+
+  it('shows edit button and edit form works', async () => {
+    const user = userEvent.setup();
+    storage['child-name'] = 'Emma';
+    storage['child-birth-date'] = btoa('2024-06-01');
+
+    render(<ChildDevelopment />);
+
+    // Should show main view with edit button
+    expect(screen.getByText('Emma')).toBeInTheDocument();
+    const editBtn = screen.getByText('childDev.editChild');
+
+    await user.click(editBtn);
+
+    // Should show the form
+    expect(screen.getByLabelText('childDev.childName')).toBeInTheDocument();
+    expect(screen.getByText('childDev.saveChild')).toBeInTheDocument();
   });
 });
