@@ -514,11 +514,47 @@ async function mockFirebaseAuth(page: Page) {
   });
 }
 
+/**
+ * Mock Chinese characters API so the MFE has test data.
+ * Uses a getter to persist even after shell's firebase.ts sets the real value.
+ */
+async function mockChineseCharactersAPI(page: Page) {
+  await page.addInitScript(() => {
+    const mockChars = [
+      { id: 'f01', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'f02', character: '\u7238\u7238', pinyin: 'b\u00e0ba', meaning: 'dad', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'f03', character: '\u54e5\u54e5', pinyin: 'g\u0113ge', meaning: 'older brother', category: 'family', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'e01', character: '\u8981', pinyin: 'y\u00e0o', meaning: 'want', category: 'feelings', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'd01', character: '\u6c34', pinyin: 'shu\u01d0', meaning: 'water', category: 'food', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'b01', character: '\u624b', pinyin: 'sh\u01d2u', meaning: 'hand', category: 'body', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'h01', character: '\u95e8', pinyin: 'm\u00e9n', meaning: 'door', category: 'house', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'n01', character: '\u72d7', pinyin: 'g\u01d2u', meaning: 'dog', category: 'nature', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'num01', character: '\u4e00', pinyin: 'y\u012b', meaning: 'one', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'num02', character: '\u4e8c', pinyin: '\u00e8r', meaning: 'two', category: 'numbers', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+      { id: 'p01', character: '\u4f60\u597d', pinyin: 'n\u01d0h\u01ceo', meaning: 'hello', category: 'phrases', createdBy: { uid: 'system', displayName: 'MyCircle' } },
+    ];
+    const subscribers: Array<(chars: any[]) => void> = [];
+    const mockApi = {
+      getAll: () => Promise.resolve(mockChars),
+      add: (char: any) => { const id = 'new-' + Date.now(); mockChars.push({ id, ...char }); subscribers.forEach(cb => cb([...mockChars])); return Promise.resolve(id); },
+      update: (id: string, updates: any) => { const idx = mockChars.findIndex(c => c.id === id); if (idx >= 0) Object.assign(mockChars[idx], updates); subscribers.forEach(cb => cb([...mockChars])); return Promise.resolve(); },
+      delete: (id: string) => { const idx = mockChars.findIndex(c => c.id === id); if (idx >= 0) mockChars.splice(idx, 1); subscribers.forEach(cb => cb([...mockChars])); return Promise.resolve(); },
+      subscribe: (cb: (chars: any[]) => void) => { subscribers.push(cb); cb([...mockChars]); return () => { const i = subscribers.indexOf(cb); if (i >= 0) subscribers.splice(i, 1); }; },
+    };
+    Object.defineProperty(window, '__chineseCharacters', {
+      get: () => mockApi,
+      set: () => {},
+      configurable: true,
+    });
+  });
+}
+
 /** Extended test fixture that sets up all API mocks for every test. */
 export const test = base.extend<{ mockApi: void }>({
   mockApi: [async ({ page }, use) => {
     await dismissOnboarding(page);
     await mockFirebaseAuth(page);
+    await mockChineseCharactersAPI(page);
     await mockGraphQL(page);
     await mockStockAPI(page);
     await mockPodcastAPI(page);
