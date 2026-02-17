@@ -38,11 +38,21 @@ export default function ReloadPrompt() {
     setReloading(true);
     try {
       await updateServiceWorker(true);
-      // Fallback: if controllerchange never fires, force reload after 1s
-      setTimeout(() => window.location.reload(), 1000);
     } catch {
-      window.location.reload();
+      // updateServiceWorker failed — fall through to fallback
     }
+    // If controllerchange hasn't reloaded the page within 2s,
+    // the waiting SW likely didn't activate. Unregister it so
+    // the next load installs a fresh SW without a stuck "waiting" state.
+    setTimeout(async () => {
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration();
+        await reg?.unregister();
+      } catch {
+        // ignore
+      }
+      window.location.reload();
+    }, 2000);
   };
 
   if (!needRefresh) return null;

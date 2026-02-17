@@ -16,6 +16,8 @@ export default defineConfig({
       'notebook/Notebook': resolve(__dirname, './packages/shell/src/test/mocks/NotebookMock.tsx'),
       'babyTracker/BabyTracker': resolve(__dirname, './packages/shell/src/test/mocks/BabyTrackerMock.tsx'),
       'childDevelopment/ChildDevelopment': resolve(__dirname, './packages/shell/src/test/mocks/ChildDevelopmentMock.tsx'),
+      'chineseLearning/ChineseLearning': resolve(__dirname, './packages/shell/src/test/mocks/ChineseLearningMock.tsx'),
+      'englishLearning/EnglishLearning': resolve(__dirname, './packages/shell/src/test/mocks/EnglishLearningMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/src/test/mocks/pwaRegisterReactMock.ts'),
       '@weather/shared': resolve(__dirname, './packages/shared/src'),
     }

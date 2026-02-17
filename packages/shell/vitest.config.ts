@@ -30,6 +30,8 @@ export default defineConfig({
       'notebook/Notebook': resolve(__dirname, './src/test/mocks/NotebookMock.tsx'),
       'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx'),
       'childDevelopment/ChildDevelopment': resolve(__dirname, './src/test/mocks/ChildDevelopmentMock.tsx'),
+      'chineseLearning/ChineseLearning': resolve(__dirname, './src/test/mocks/ChineseLearningMock.tsx'),
+      'englishLearning/EnglishLearning': resolve(__dirname, './src/test/mocks/EnglishLearningMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './src/test/mocks/pwaRegisterReactMock.ts')
     }
   }

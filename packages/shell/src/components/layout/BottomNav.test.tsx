@@ -57,7 +57,7 @@ describe('BottomNav', () => {
   });
 
   it('loads persisted order from localStorage', () => {
-    const customOrder = ['/ai', '/weather', '/stocks', '/podcasts', '/', '/bible', '/worship', '/notebook', '/baby', '/child-dev'];
+    const customOrder = ['/ai', '/weather', '/stocks', '/podcasts', '/', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/chinese', '/english'];
     getItemSpy.mockImplementation((key: string) => {
       if (key === 'bottom-nav-order') return JSON.stringify(customOrder);
       return null;
@@ -105,7 +105,7 @@ describe('BottomNav', () => {
     fireEvent.click(screen.getByText('bottomNav.more'));
     fireEvent.click(screen.getByText('bottomNav.editOrder'));
     fireEvent.click(screen.getByText('bottomNav.reset'));
-    const defaultOrder = ['/', '/weather', '/stocks', '/podcasts', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/ai'];
+    const defaultOrder = ['/', '/weather', '/stocks', '/podcasts', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/chinese', '/english', '/ai'];
     expect(setItemSpy).toHaveBeenCalledWith('bottom-nav-order', JSON.stringify(defaultOrder));
   });
 

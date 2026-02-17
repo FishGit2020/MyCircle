@@ -31,6 +31,8 @@ export const WindowEvents = {
   BOTTOM_NAV_ORDER_CHANGED: 'bottom-nav-order-changed',
   NOTIFICATION_ALERTS_CHANGED: 'notification-alerts-changed',
   BIBLE_BOOKMARKS_CHANGED: 'bible-bookmarks-changed',
+  CHINESE_PROGRESS_CHANGED: 'chinese-progress-changed',
+  ENGLISH_PROGRESS_CHANGED: 'english-progress-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -68,6 +70,8 @@ export const StorageKeys = {
   PODCAST_ALERTS: 'podcast-alerts-enabled',
   ANNOUNCEMENT_ALERTS: 'announcement-alerts-enabled',
   RECENTLY_VISITED: 'recently-visited',
+  CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
+  ENGLISH_LEARNING_PROGRESS: 'english-learning-progress',
 } as const;
 
 export interface CitySelectedEvent {
