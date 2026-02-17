@@ -1,0 +1,55 @@
+# Dependencies (reinstalled in container)
+node_modules
+packages/*/node_modules
+functions/node_modules
+
+# Build output (rebuilt in container)
+dist
+packages/*/dist
+
+# Git
+.git
+.gitignore
+
+# Test infrastructure
+e2e
+playwright-report
+test-results
+playwright*.config.ts
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+
+# Firebase (not needed for Docker deployment)
+functions
+.firebase
+.firebaserc
+firebase.json
+firestore.rules
+firestore.indexes.json
+
+# CI/CD (except docker-deploy)
+.github/workflows/ci.yml
+.github/workflows/deploy.yml
+.github/workflows/e2e.yml
+.github/workflows/lighthouse.yml
+
+# Documentation
+docs
+*.md
+!deploy/docker/README.md
+
+# Editor / OS
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Misc
+replace_weather.ps1
+.env
+.env.*
+!.env.example
+.lighthouserc.json

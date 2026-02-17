@@ -1267,3 +1267,44 @@ Each micro-frontend's chunk load is wrapped with a Firebase Performance `trace()
 
 ### Lighthouse CI
 Every pull request triggers a Lighthouse CI run (`.github/workflows/lighthouse.yml`) that builds the shell and audits it against four categories. Accessibility is gated at ≥ 90 (`error` level), while performance, best practices, and SEO use `warn` at ≥ 80-90. Results are uploaded to Lighthouse's temporary public storage. Configuration lives in `.lighthouserc.json`.
+
+---
+
+## Docker Self-Hosting
+
+As an alternative to Firebase Hosting, MyCircle can be self-hosted on a Synology DS1525+ NAS (or any Docker host).
+
+### Architecture
+
+```
+Internet → [Router :443] → Caddy (auto-HTTPS) → mycircle-app (Node.js :3000)
+                                                   ├─ /graphql      → Apollo Server (GraphQL + WS subscriptions)
+                                                   ├─ /ai/chat      → Gemini AI proxy
+                                                   ├─ /stock/**     → Finnhub proxy (cached, rate-limited)
+                                                   ├─ /podcast/**   → PodcastIndex proxy (cached, rate-limited)
+                                                   ├─ /health       → Health check
+                                                   └─ /*            → Static files (SPA with MFE fallback)
+```
+
+A single Node.js container (`server/production.ts`) serves both the assembled static assets (`dist/firebase/`) and all API routes. Firebase client SDKs (Auth, Firestore, FCM) still talk directly to Google's cloud — only the hosting and API backend are self-hosted.
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `server/production.ts` | Production entry point — extends the dev server with proxies + static serving |
+| `server/index.ts` | Dev server — exports `createApp()` used by both dev and production |
+| `deploy/docker/Dockerfile` | Multi-stage build (builder → runtime) |
+| `deploy/docker/docker-compose.yml` | App + Caddy orchestration |
+| `deploy/docker/Caddyfile` | Reverse proxy, auto-HTTPS, security headers |
+| `deploy/docker/.env.example` | Runtime secrets template |
+| `.github/workflows/docker-deploy.yml` | CI: build image → push to GHCR |
+| `.dockerignore` | Excludes test/docs/functions from Docker context |
+
+### CI Pipeline
+
+The `docker-deploy.yml` workflow triggers on push to `main` (same path filters as `deploy.yml`). It builds the Docker image with Vite build-time secrets (`VITE_FIREBASE_*`) passed as `--build-arg`, tags it with the commit SHA and `latest`, and pushes to GitHub Container Registry (GHCR). The build uses GitHub Actions cache (`type=gha`) for Docker layer caching.
+
+### Deployment Guide
+
+See [`deploy/docker/README.md`](../deploy/docker/README.md) for the complete step-by-step Synology deployment guide, including Watchtower auto-updates and Cloudflare Tunnel alternative.
