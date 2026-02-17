@@ -4,3 +4,5 @@ export { useAirQuality } from './useAirQuality';
 export { useCryptoPrices } from './useCryptoPrices';
 export { useUnits } from './useUnits';
 export { useRemoteConfig } from './useRemoteConfig';
+export { useVerseOfDay } from './useVerseOfDay';
+export type { VerseRef } from './useVerseOfDay';
