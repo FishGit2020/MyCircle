@@ -26,7 +26,9 @@ test.describe('Chinese Learning', () => {
     await page.goto('/chinese');
     await page.getByRole('button', { name: 'Flashcards' }).click();
     await expect(page.getByTestId('flashcard-character')).toBeVisible();
-    await page.getByTestId('flashcard').click();
+    // Click the visible character text to trigger flip (the parent div uses
+    // backface-visibility:hidden which Playwright treats as non-clickable)
+    await page.getByTestId('flashcard-character').click();
     // After flip, pinyin uses backface-visibility so check attachment
     await expect(page.getByTestId('flashcard-pinyin')).toBeAttached();
   });

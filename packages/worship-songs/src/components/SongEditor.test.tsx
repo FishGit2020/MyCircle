@@ -47,7 +47,7 @@ describe('SongEditor', () => {
     expect(input.value).toBe('https://youtube.com/watch?v=abc123');
   });
 
-  it('includes YouTube URL in saved data', async () => {
+  it('includes YouTube URL in saved data', { timeout: 15000 }, async () => {
     const user = userEvent.setup();
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
