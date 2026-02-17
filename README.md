@@ -100,6 +100,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Tracking mode** — interactive checklist to mark completed milestones, persisted in localStorage
 - **Reference mode** — informational bullet list for browsing milestones
 - Auto-calculated age from birth date, current age range highlighted
+- **Timeline view** — horizontal swim-lane timeline showing all 6 developmental domains across 9 age ranges; color-coded progress bars per cell, domain filter chips to toggle visibility, click-to-expand milestone checklists, current-age vertical marker; vertical layout on mobile
 - Red flag indicators for milestones that warrant pediatrician consultation
 - Encouraging Bible verses for parents with shuffle
 - Dark mode, full i18n (English, Spanish, Chinese)

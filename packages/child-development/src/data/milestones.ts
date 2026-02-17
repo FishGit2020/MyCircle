@@ -103,15 +103,15 @@ export const DOMAINS: readonly DomainMeta[] = [
 /* --------------------------- Age-Range Meta ----------------------------- */
 
 export const AGE_RANGES: readonly AgeRangeMeta[] = [
-  { id: '0-3m', labelKey: 'childDev.age_0_3m', minMonths: 0, maxMonths: 3 },
-  { id: '3-6m', labelKey: 'childDev.age_3_6m', minMonths: 3, maxMonths: 6 },
-  { id: '6-9m', labelKey: 'childDev.age_6_9m', minMonths: 6, maxMonths: 9 },
-  { id: '9-12m', labelKey: 'childDev.age_9_12m', minMonths: 9, maxMonths: 12 },
-  { id: '12-18m', labelKey: 'childDev.age_12_18m', minMonths: 12, maxMonths: 18 },
-  { id: '18-24m', labelKey: 'childDev.age_18_24m', minMonths: 18, maxMonths: 24 },
-  { id: '2-3y', labelKey: 'childDev.age_2_3y', minMonths: 24, maxMonths: 36 },
-  { id: '3-4y', labelKey: 'childDev.age_3_4y', minMonths: 36, maxMonths: 48 },
-  { id: '4-5y', labelKey: 'childDev.age_4_5y', minMonths: 48, maxMonths: 60 },
+  { id: '0-3m', labelKey: 'childDev.ageRange0_3m', minMonths: 0, maxMonths: 3 },
+  { id: '3-6m', labelKey: 'childDev.ageRange3_6m', minMonths: 3, maxMonths: 6 },
+  { id: '6-9m', labelKey: 'childDev.ageRange6_9m', minMonths: 6, maxMonths: 9 },
+  { id: '9-12m', labelKey: 'childDev.ageRange9_12m', minMonths: 9, maxMonths: 12 },
+  { id: '12-18m', labelKey: 'childDev.ageRange12_18m', minMonths: 12, maxMonths: 18 },
+  { id: '18-24m', labelKey: 'childDev.ageRange18_24m', minMonths: 18, maxMonths: 24 },
+  { id: '2-3y', labelKey: 'childDev.ageRange2_3y', minMonths: 24, maxMonths: 36 },
+  { id: '3-4y', labelKey: 'childDev.ageRange3_4y', minMonths: 36, maxMonths: 48 },
+  { id: '4-5y', labelKey: 'childDev.ageRange4_5y', minMonths: 48, maxMonths: 60 },
 ] as const;
 
 /* ------------------------------- Helpers -------------------------------- */

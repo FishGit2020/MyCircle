@@ -334,6 +334,7 @@ Exposes `ChildDevelopment` component via Module Federation. Port **3012**.
 - Postnatal developmental milestone tracking from birth through age 5 (270 milestones)
 - 6 developmental domains (Physical, Speech, Cognitive, Social, Health, Sensory) with color-coded cards and SVG progress rings
 - 9 age ranges (0–3m, 3–6m, 6–9m, 9–12m, 12–18m, 18–24m, 2–3y, 3–4y, 4–5y)
+- **Overview + Timeline** tab toggle: Overview shows domain cards with progress rings; Timeline shows horizontal swim-lane view with domain filter chips, progress bars per cell, current-age vertical marker, and click-to-expand milestone details; mobile-responsive vertical layout
 - Tracking mode (checkboxes) vs. Reference mode (informational bullets)
 - Auto-calculated age from birth date with current age range highlighting
 - Red flag indicators (~11% of milestones) for pediatrician consultation
