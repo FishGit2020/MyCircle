@@ -53,7 +53,10 @@ describe('SongEditor', () => {
 
     await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
     await user.type(screen.getByRole('textbox', { name: /worship\.content/ }), 'Some lyrics');
-    await user.type(screen.getByLabelText('worship.youtubeUrl'), 'https://youtube.com/watch?v=xyz');
+    // Use paste instead of type for the long URL to avoid keystroke timeout in CI
+    const urlInput = screen.getByLabelText('worship.youtubeUrl');
+    await user.click(urlInput);
+    await user.paste('https://youtube.com/watch?v=xyz');
     await user.click(screen.getByText('worship.save'));
 
     expect(onSave).toHaveBeenCalledWith(
