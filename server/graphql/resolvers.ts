@@ -311,39 +311,81 @@ async function getYouVersionPassage(bibleId: number, reference: string) {
 
 const DEFAULT_YOUVERSION_BIBLE_ID = 111; // NIV 2011
 
-// Curated verse references — text is fetched from YouVersion API at runtime
+/** Fetch Verse of the Day from YouVersion API.
+ *  Step 1: GET /v1/verse_of_the_days/{day} → { day, passage_id }
+ *  Step 2: Fetch the passage text using the passage_id (already in USFM format) */
+async function getYouVersionVotd(day: number): Promise<{ text: string; reference: string; translation: string; copyright: string | null }> {
+  const apiKey = process.env.YOUVERSION_APP_KEY;
+  if (!apiKey) throw new Error('YOUVERSION_APP_KEY not configured');
+
+  const cacheKey = `youversion:votd:${day}`;
+  const cached = bibleCache.get<any>(cacheKey);
+  if (cached) return cached;
+
+  // Step 1: Get the passage_id for this day
+  const votdResponse = await axios.get(`${YOUVERSION_API_BASE}/verse_of_the_days/${day}`, {
+    headers: { 'x-yvp-app-key': apiKey },
+    timeout: 10000,
+  });
+
+  const passageId: string = votdResponse.data.passage_id;
+  if (!passageId) throw new Error(`No passage_id returned for day ${day}`);
+
+  // Step 2: Fetch the passage text using the USFM passage_id
+  const passageResponse = await axios.get(
+    `${YOUVERSION_API_BASE}/bibles/${DEFAULT_YOUVERSION_BIBLE_ID}/passages/${encodeURIComponent(passageId)}`,
+    {
+      params: { format: 'text' },
+      headers: { 'x-yvp-app-key': apiKey },
+      timeout: 10000,
+    }
+  );
+
+  const data = passageResponse.data;
+  const result = {
+    text: (data.content || data.text || '').trim(),
+    reference: data.reference || passageId,
+    translation: data.bible_abbreviation || data.translation || 'NIV',
+    copyright: data.copyright || null,
+  };
+
+  bibleCache.set(cacheKey, result, 3600);
+  return result;
+}
+
+// 90 curated encouraging verse references (USFM format for direct YouVersion API use)
 const DAILY_VERSES = [
-  { reference: "Jeremiah 29:11" },
-  { reference: "Proverbs 3:5-6" },
-  { reference: "Philippians 4:13" },
-  { reference: "Psalm 23:1" },
-  { reference: "Joshua 1:9" },
-  { reference: "Romans 8:28" },
-  { reference: "Psalm 27:1" },
-  { reference: "Isaiah 40:31" },
-  { reference: "Philippians 4:6" },
-  { reference: "Isaiah 41:10" },
-  { reference: "Matthew 11:28" },
-  { reference: "Numbers 6:24-25" },
-  { reference: "John 3:16" },
-  { reference: "Psalm 37:4" },
-  { reference: "Proverbs 18:10" },
-  { reference: "Ecclesiastes 3:11" },
-  { reference: "1 Peter 5:7" },
-  { reference: "Psalm 118:24" },
-  { reference: "Galatians 5:22-23" },
-  { reference: "Joshua 1:9" },
-  { reference: "Psalm 34:18" },
-  { reference: "2 Corinthians 5:17" },
-  { reference: "Proverbs 16:3" },
-  { reference: "Psalm 46:1" },
-  { reference: "Proverbs 16:9" },
-  { reference: "Lamentations 3:22-23" },
-  { reference: "John 14:27" },
-  { reference: "2 Corinthians 5:7" },
-  { reference: "Psalm 46:10" },
-  { reference: "1 Corinthians 13:4" },
-  { reference: "Romans 15:13" },
+  { reference: "JER.29.11" }, { reference: "ISA.41.10" }, { reference: "JOS.1.9" },
+  { reference: "PHP.4.13" }, { reference: "ISA.40.31" }, { reference: "ROM.8.28" },
+  { reference: "DEU.31.6" }, { reference: "PSA.46.1" }, { reference: "MAT.11.28" },
+  { reference: "ROM.15.13" }, { reference: "PSA.23.4" }, { reference: "JHN.14.27" },
+  { reference: "PHP.4.6-PHP.4.7" }, { reference: "PSA.34.18" }, { reference: "1PE.5.7" },
+  { reference: "ISA.26.3" }, { reference: "PSA.147.3" }, { reference: "PSA.55.22" },
+  { reference: "PSA.46.10" }, { reference: "COL.3.15" }, { reference: "2CO.12.9" },
+  { reference: "PSA.27.1" }, { reference: "ISA.40.29" }, { reference: "PSA.28.7" },
+  { reference: "PSA.18.2" }, { reference: "2TI.1.7" }, { reference: "ISA.12.2" },
+  { reference: "PSA.118.6" }, { reference: "PSA.73.26" }, { reference: "NAM.1.7" },
+  { reference: "LAM.3.22-LAM.3.23" }, { reference: "2TH.3.3" }, { reference: "PHP.1.6" },
+  { reference: "NUM.6.24-NUM.6.26" }, { reference: "PSA.37.4" }, { reference: "JER.31.3" },
+  { reference: "PSA.145.18" }, { reference: "PSA.138.7" }, { reference: "HEB.13.5" },
+  { reference: "ISA.49.15-ISA.49.16" }, { reference: "ROM.8.31" }, { reference: "JHN.16.33" },
+  { reference: "GAL.6.9" }, { reference: "JAS.1.2-JAS.1.3" }, { reference: "JAS.1.12" },
+  { reference: "2CO.4.16-2CO.4.17" }, { reference: "HEB.10.35-HEB.10.36" },
+  { reference: "ROM.5.3-ROM.5.4" }, { reference: "HEB.12.1" }, { reference: "PSA.31.24" },
+  { reference: "PRO.3.5-PRO.3.6" }, { reference: "PSA.56.3" }, { reference: "JER.17.7" },
+  { reference: "PSA.62.1-PSA.62.2" }, { reference: "PRO.16.3" }, { reference: "ISA.30.21" },
+  { reference: "PSA.32.8" }, { reference: "PSA.16.8" }, { reference: "PSA.121.1-PSA.121.2" },
+  { reference: "MIC.7.7" }, { reference: "PSA.91.1-PSA.91.2" }, { reference: "ISA.43.2" },
+  { reference: "PSA.121.7-PSA.121.8" }, { reference: "PSA.91.11" }, { reference: "ISA.54.17" },
+  { reference: "PSA.34.4" }, { reference: "PRO.18.10" }, { reference: "PSA.94.19" },
+  { reference: "PSA.40.1-PSA.40.2" }, { reference: "DEU.33.27" }, { reference: "PSA.30.5" },
+  { reference: "ISA.43.18-ISA.43.19" }, { reference: "2CO.5.17" }, { reference: "ECC.3.11" },
+  { reference: "JHN.15.11" }, { reference: "ROM.12.12" }, { reference: "HAB.3.17-HAB.3.18" },
+  { reference: "ZEP.3.17" }, { reference: "PSA.23.1" }, { reference: "JER.29.13" },
+  { reference: "ROM.8.38-ROM.8.39" }, { reference: "1JN.4.18" }, { reference: "EPH.3.20" },
+  { reference: "PHP.4.19" }, { reference: "JHN.10.10" }, { reference: "PSA.103.2-PSA.103.4" },
+  { reference: "ISA.40.28" }, { reference: "MAT.11.29-MAT.11.30" }, { reference: "ISA.61.1" },
+  { reference: "JHN.14.1" },
 ];
 
 // ─── Podcast API helpers (PodcastIndex) ──────────────────────
@@ -589,9 +631,15 @@ export const resolvers = {
     },
 
     bibleVotdApi: async (_: any, { day }: { day: number }) => {
+      // Try the real YouVersion VOTD API first
+      try {
+        return await getYouVersionVotd(day);
+      } catch {
+        console.warn('[bibleVotdApi] YouVersion VOTD API failed for day', day, '— trying biblePassage fallback');
+      }
+      // Fallback: use curated reference + fetch passage text
       const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
       const curated = DAILY_VERSES[index];
-      // Try fetching fresh verse text via biblePassage API
       try {
         const passage = await getYouVersionPassage(DEFAULT_YOUVERSION_BIBLE_ID, curated.reference);
         return { text: passage.text, reference: passage.reference, translation: passage.translation, copyright: passage.copyright };
