@@ -3,7 +3,7 @@ import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
-import { GET_STOCK_QUOTE, StorageKeys } from '@mycircle/shared';
+import { GET_STOCK_QUOTE } from '@mycircle/shared';
 import StockTracker from './StockTracker';
 
 // Mock localStorage
@@ -49,7 +49,7 @@ describe('StockTracker', () => {
     expect(screen.getByText('Search for stocks and add them to your watchlist.')).toBeInTheDocument();
   });
 
-  it('shows LIVE indicator when a stock quote is loaded and live is enabled', async () => {
+  it('shows refresh button when viewing a stock detail', async () => {
     const mockTimestamp = Math.floor(Date.now() / 1000);
     const mocks = [
       {
@@ -74,15 +74,9 @@ describe('StockTracker', () => {
       },
     ];
 
-    localStorageMock.getItem.mockImplementation((key: string) => {
-      if (key === StorageKeys.STOCK_WATCHLIST) return JSON.stringify([{ symbol: 'AAPL', companyName: 'Apple Inc.' }]);
-      if (key === StorageKeys.STOCK_LIVE) return 'true';
-      return null;
-    });
-
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <MemoryRouter initialEntries={['/stocks']}>
+        <MemoryRouter initialEntries={['/stocks/AAPL?name=Apple+Inc.']}>
           <Routes>
             <Route path="/stocks" element={<StockTracker />} />
             <Route path="/stocks/:symbol" element={<StockTracker />} />
@@ -91,18 +85,8 @@ describe('StockTracker', () => {
       </MockedProvider>
     );
 
-    const appleCard = await screen.findByText('AAPL');
-    await act(async () => {
-      await userEvent.click(appleCard);
-    });
-
-    const liveIndicator = await screen.findByText('LIVE');
-    expect(liveIndicator).toBeInTheDocument();
-  });
-
-  it('shows Paused when live is disabled', () => {
-    renderTracker();
-
-    expect(screen.queryByText('LIVE')).not.toBeInTheDocument();
+    const refreshButton = await screen.findByRole('button', { name: 'Refresh' });
+    expect(refreshButton).toBeInTheDocument();
+    expect(refreshButton).toBeEnabled();
   });
 });
