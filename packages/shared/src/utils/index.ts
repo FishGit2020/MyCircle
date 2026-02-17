@@ -5,3 +5,5 @@ export * from './fuzzySearch';
 export * from './webVitals';
 export * from './dailyVerse';
 export * from './getErrorMessage';
+export * from './safeStorage';
+export * from './logger';

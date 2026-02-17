@@ -7,6 +7,7 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   useUnits: () => ({ tempUnit: 'C', speedUnit: 'ms', setTempUnit: vi.fn(), setSpeedUnit: vi.fn() }),
   formatTemperature: (temp: number, unit?: string) => unit === 'F' ? `${Math.round(temp * 9/5 + 32)}°F` : `${Math.round(temp)}°C`,
+  createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
@@ -64,18 +65,12 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders default widgets (podcast hidden without subscriptions)', () => {
+  it('renders default widgets (only weather and verse visible without engagement data)', () => {
     renderWidget();
+    // Weather and verse always visible
     expect(screen.getByText('widgets.weather')).toBeInTheDocument();
-    expect(screen.getByText('widgets.stocks')).toBeInTheDocument();
     expect(screen.getByText('widgets.verse')).toBeInTheDocument();
-    expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
-    expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
-    expect(screen.getByText('widgets.childDev')).toBeInTheDocument();
-    expect(screen.getByText('widgets.english')).toBeInTheDocument();
-    expect(screen.getByText('widgets.chinese')).toBeInTheDocument();
-    // Podcast widget hidden — no subscriptions and nothing playing
-    expect(screen.queryByText('widgets.nowPlaying')).not.toBeInTheDocument();
+    // Other widgets hidden in normal mode (no engagement data in localStorage)
   });
 
   it('renders customize button', () => {
@@ -95,9 +90,9 @@ describe('WidgetDashboard', () => {
   it('shows visibility toggles in editing mode', () => {
     renderWidget();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // All nine widgets should show "Visible" toggle
+    // All 8 widgets should show "Visible" toggle (stocks removed)
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(9);
+    expect(visibleButtons.length).toBe(8);
   });
 
   it('can toggle widget visibility', () => {
@@ -114,8 +109,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(9);
-    expect(downButtons.length).toBe(9);
+    expect(upButtons.length).toBe(8);
+    expect(downButtons.length).toBe(8);
   });
 
   it('persists layout to localStorage', () => {
@@ -131,8 +126,7 @@ describe('WidgetDashboard', () => {
     const customLayout = JSON.stringify([
       { id: 'verse', visible: true },
       { id: 'weather', visible: true },
-      { id: 'stocks', visible: false },
-      { id: 'nowPlaying', visible: true },
+      { id: 'nowPlaying', visible: false },
     ]);
     getItemSpy.mockImplementation((key: string) => {
       if (key === 'widget-dashboard-layout') return customLayout;
@@ -141,7 +135,7 @@ describe('WidgetDashboard', () => {
     renderWidget();
     // Enter editing mode to see hidden widget
     fireEvent.click(screen.getByText('widgets.customize'));
-    // stocks widget should be hidden
+    // nowPlaying widget should be hidden
     expect(screen.getByText('widgets.hidden')).toBeInTheDocument();
   });
 
@@ -156,7 +150,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(9);
+    expect(allVisible.length).toBe(8);
   });
 
   it('has proper a11y labels on the section', () => {

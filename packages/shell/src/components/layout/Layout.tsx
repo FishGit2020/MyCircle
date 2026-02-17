@@ -6,6 +6,7 @@ import UserMenu from './UserMenu';
 import LanguageSelector from './LanguageSelector';
 import FeedbackButton from './FeedbackButton';
 import OfflineIndicator from './OfflineIndicator';
+import SyncIndicator from '../common/SyncIndicator';
 import CommandPalette from './CommandPalette';
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 import Breadcrumbs from './Breadcrumbs';
@@ -177,7 +178,7 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-40 md:pb-24' : 'pb-20 md:pb-8'}`}
+        className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
       >
         <Outlet />
       </main>
@@ -190,10 +191,11 @@ export default function Layout() {
 
       <FeedbackButton hasActivePlayer={hasActivePlayer} />
       <PwaInstallPrompt />
+      <SyncIndicator />
 
       <footer
         role="contentinfo"
-        className={`bg-gray-800 dark:bg-gray-950 text-white py-6 ${hasActivePlayer ? 'pb-40' : 'pb-20'} md:pb-6 mt-12 transition-colors`}
+        className={`bg-gray-800 dark:bg-gray-950 text-white py-6 ${hasActivePlayer ? 'pb-32' : 'pb-16'} md:pb-6 mt-12 transition-colors`}
       >
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">

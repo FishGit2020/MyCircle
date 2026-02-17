@@ -1,5 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
+import { createLogger } from '@mycircle/shared';
+
+const log = createLogger('ErrorBoundary');
 
 interface Props {
   children: ReactNode;
@@ -22,7 +25,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Micro Frontend Error:', error, errorInfo);
+    log.error('Micro Frontend Error:', error, errorInfo);
     Sentry.captureException(error, {
       contexts: { react: { componentStack: errorInfo.componentStack } },
     });

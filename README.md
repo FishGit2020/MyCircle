@@ -13,11 +13,15 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### Dashboard
 - Dashboard homepage with quick-access cards for all features
-- **Customizable widget dashboard** — drag-and-drop reordering, visibility toggles, layout persistence
-- Weather favorites, stock watchlist, and podcast subscription previews
+- **Customizable widget dashboard** — drag-and-drop reordering (desktop), tap-to-move buttons (mobile), visibility toggles, layout persistence
+- **Smart widget visibility** — widgets only appear when the user has engagement data (e.g., stock watchlist, baby due date, learning progress); Weather and Verse always visible
+- **Desktop Quick Access tiles** — responsive grid of navigation tiles to all features (hidden on mobile, where BottomNav serves the same purpose)
+- **Per-widget error boundaries** — a crash in one widget doesn't take down the entire dashboard
+- Current location weather preview with clothing tip
 - Recent city searches for quick navigation
 - **Customizable bottom navigation** — reorderable nav items with drag-and-drop, persisted per user (Firestore when signed in, localStorage fallback)
 - **PWA Install Prompt** — Add to Home Screen banner with 7-day dismissal memory
+- **PWA Home Screen Shortcuts** — long-press shortcuts to all 12 features from the installed app icon
 
 ### Weather
 - **Enhanced city autocomplete** — inline recent city matching during search, localStorage fallback for non-auth users, "Clear all" recents
@@ -134,7 +138,9 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Push notifications** — multi-category preferences (weather alerts, podcast episodes, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
 - **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge, accessible modal with mobile bottom-nav clearance; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
-- Offline indicator & PWA support with **fast update detection** (30s polling + visibility-change check, 1s fallback reload)
+- **Offline sync** — Firestore offline persistence via `persistentLocalCache` with multi-tab support; floating `SyncIndicator` shows offline/synced status
+- Offline indicator & PWA support with **fast update detection** (30s polling + visibility-change check, `skipWaiting` for immediate SW activation)
+- **Unified logger** — `createLogger('namespace')` utility in shared package for consistent, namespace-prefixed logging across all packages
 - **Mobile UX** — safe area insets for notched devices (iPhone X+), enlarged touch targets (40-48px) on audio player controls and nav editor, active state feedback on mobile buttons
 - Firebase Auth (Google OAuth + email/password) with cross-device profile sync; **sign-out clears user-specific localStorage and Apollo cache** to prevent data leaking between accounts
 - Firebase App Check for API protection
@@ -144,7 +150,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Navigation & discovery** — breadcrumb trail on all feature pages, recently-visited pages in command palette (Ctrl+K), **cross-package content search** (stocks, Bible bookmarks searchable from Ctrl+K palette), focus management on route change for screen readers
 - **Keyboard shortcuts** — `Ctrl/Cmd+K` command palette, `Ctrl/Cmd+D` dark mode toggle, `g` then letter for quick navigation (e.g., `g w` for Weather), `?` for shortcuts help
 - **Accessibility** — ARIA live regions for loading/offline states, `role="alert"` for toast notifications, `aria-expanded`/`aria-haspopup` on menus, sr-only text for color-dependent stock indicators, `aria-valuetext` on audio progress bars, keyboard-focusable scroll regions, WCAG AA color contrast compliance (≥ 4.5:1 on all text elements including widget placeholders, buttons, and footer badges), 24px minimum touch targets
-- **Performance** — production JS minification via esbuild with `drop: ['console', 'debugger']` and `legalComments: 'none'` (shell host + all 9 remote MFEs), CSS minification via cssnano in PostCSS pipeline, lazy federation shared deps (`eager: false` on `@apollo/client` and `graphql`), CSS code splitting, `React.memo` on list item components (PodcastCard, StockCard, CryptoCard), paginated episode list with "Show more" button, `useCallback` for stable handler references
+- **Performance** — production JS minification via esbuild with `drop: ['console', 'debugger']` and `legalComments: 'none'` (shell host + all 12 remote MFEs), CSS minification via cssnano in PostCSS pipeline, lazy federation shared deps (`eager: false` on `@apollo/client` and `graphql`), CSS code splitting, **code-split i18n** (Spanish/Chinese lazy-loaded, English synchronous fallback), `React.memo` on all dashboard widgets and list item components, `useReducer` for consolidated dashboard state, paginated episode list with "Show more" button, `useCallback` for stable handler references, **safe storage utility** (`safeGetItem`/`safeSetItem`/`safeGetJSON`) for localStorage resilience
 - **Lighthouse CI** — automated Lighthouse scoring on every PR (accessibility ≥ 90 required, performance/SEO/best-practices ≥ 80-90 warned)
 
 ## Architecture
@@ -165,11 +171,16 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │     (MFE)       │ │    (MFE)     │ │    (MFE)      │ │   Songs    │  │
 │  │   Port 3006     │ │  Port 3007   │ │  Port 3008    │ │ Port 3009  │  │
 │  └─────────────────┘ └──────────────┘ └───────────────┘ └────────────┘  │
-│  ┌────────────┐ ┌──────────────┐ ┌───────────────────┐                     │
-│  │  Notebook  │ │ Baby Tracker │ │ Child Development │                     │
-│  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │                     │
-│  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │                     │
-│  └────────────┘ └──────────────┘ └───────────────────┘                     │
+│  ┌────────────┐ ┌──────────────┐ ┌───────────────────┐ ┌────────────────┐  │
+│  │  Notebook  │ │ Baby Tracker │ │ Child Development │ │Chinese Learning│  │
+│  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │ │     (MFE)      │  │
+│  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │ │  Port 3013     │  │
+│  └────────────┘ └──────────────┘ └───────────────────┘ └────────────────┘  │
+│  ┌─────────────────┐                                                         │
+│  │ English Learning │                                                         │
+│  │      (MFE)       │                                                         │
+│  │   Port 3014      │                                                         │
+│  └─────────────────┘                                                         │
 └──────────────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -209,15 +220,16 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 
 The homepage features a customizable widget dashboard with drag-and-drop reordering and visibility toggles (layout persisted in localStorage):
 
-| Widget | Icon | Data Source |
-|--------|------|-------------|
-| **Weather** | Cloud/sun | Current conditions + 7-day forecast for your city |
-| **Stocks** | Chart | Watchlist prices from Finnhub API |
-| **Podcasts** | Headphones | Latest episodes from subscribed feeds |
-| **Bible** | Book | Verse of the Day from curated collection |
-| **Notebook** | Pencil | Recent notes count from Firestore |
-| **Baby Tracker** | Heart | Current week + fruit comparison from localStorage |
-| **Child Dev** | Shield | Child name + age + milestone progress from localStorage |
+| Widget | Icon | Data Source | Smart Visibility |
+|--------|------|-------------|------------------|
+| **Weather** | Cloud/sun | Current location conditions via geolocation | Always visible |
+| **Bible Verse** | Book | Verse of the Day from curated collection | Always visible |
+| **Podcasts** | Headphones | Latest episodes from subscribed feeds | Has subscriptions |
+| **Notebook** | Pencil | Recent notes count from Firestore | Has saved notes |
+| **Baby Tracker** | Heart | Current week + fruit comparison from localStorage | Has due date set |
+| **Child Dev** | Shield | Child name + age + milestone progress from localStorage | Has birth date set |
+| **English Learning** | ABC | Completed lesson count | Has started progress |
+| **Chinese Learning** | Hanzi | Mastered character count | Has started progress |
 
 ### Routes
 
@@ -270,9 +282,10 @@ mycircle/
 │   │   └── src/
 │   │       ├── apollo/          # Apollo Client factory, queries, fragments
 │   │       ├── hooks/           # useWeatherData and other shared hooks
-│   │       ├── i18n/            # Internationalization (translations)
+│   │       ├── i18n/            # Internationalization (code-split: en sync, es/zh lazy)
+│   │       │   └── locales/    # Per-locale translation files (en.ts, es.ts, zh.ts)
 │   │       ├── types/           # TypeScript interfaces
-│   │       ├── utils/           # Event bus, weather helpers, getErrorMessage
+│   │       ├── utils/           # Event bus, weather helpers, logger, safeStorage
 │   │       └── data/            # Static data files
 │   ├── shell/                   # Host micro frontend
 │   │   └── src/
@@ -285,7 +298,7 @@ mycircle/
 │   │       │   ├── settings/    # UnitToggle, SpeedToggle
 │   │       │   └── sync/        # ThemeSync, DataSync, ReloadPrompt, Onboarding
 │   │       ├── context/         # AuthContext, ThemeContext, RemoteConfigContext
-│   │       ├── hooks/           # useDailyVerse, useAnnouncements
+│   │       ├── hooks/           # useDailyVerse, useAnnouncements, useOnlineStatus, etc.
 │   │       ├── lib/             # Firebase SDK integration (auth, Firestore, FCM)
 │   │       └── App.tsx          # Routes & provider hierarchy
 │   ├── city-search/             # City search MFE
@@ -591,7 +604,7 @@ query SearchCities($query: String!) {
 
 ### How It Works
 
-1. **Shell (Host)** loads 8 remote modules at runtime via `remoteEntry.js`
+1. **Shell (Host)** loads 12 remote modules at runtime via `remoteEntry.js`
 2. Each **remote MFE** exposes its root component
 3. **Shared dependencies** (React, React DOM, Apollo Client) are deduplicated at runtime via `singleton: true` and `requiredVersion` constraints
 4. **pnpm catalogs** centralise version specifiers so all packages resolve the same version from a single source of truth in `pnpm-workspace.yaml`

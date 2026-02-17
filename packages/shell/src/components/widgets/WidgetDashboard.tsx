@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useReducer, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router';
 import { useTranslation, StorageKeys, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery, useUnits, formatTemperature } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import { useDailyVerse } from '../../hooks/useDailyVerse';
+import ErrorBoundary from '../common/ErrorBoundary';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning';
+export type WidgetType = 'weather' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -16,7 +17,6 @@ export interface WidgetConfig {
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'weather', visible: true },
-  { id: 'stocks', visible: true },
   { id: 'verse', visible: true },
   { id: 'nowPlaying', visible: true },
   { id: 'notebook', visible: true },
@@ -50,6 +50,31 @@ function saveLayout(layout: WidgetConfig[]) {
   } catch { /* ignore */ }
 }
 
+// ─── Smart Widget Visibility ────────────────────────────────────────────────
+
+const WIDGET_HAS_DATA: Record<WidgetType, () => boolean> = {
+  weather: () => true,
+  verse: () => true,
+  nowPlaying: () => {
+    try { const s = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS); return !!s && JSON.parse(s).length > 0; }
+    catch { return false; }
+  },
+  notebook: () => {
+    try { const c = localStorage.getItem(StorageKeys.NOTEBOOK_CACHE); return !!c && JSON.parse(c) > 0; }
+    catch { return false; }
+  },
+  babyTracker: () => !!localStorage.getItem(StorageKeys.BABY_DUE_DATE),
+  childDev: () => !!localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE),
+  englishLearning: () => {
+    try { const r = localStorage.getItem(StorageKeys.ENGLISH_LEARNING_PROGRESS); return !!r && JSON.parse(r).completedIds?.length > 0; }
+    catch { return false; }
+  },
+  chineseLearning: () => {
+    try { const r = localStorage.getItem(StorageKeys.CHINESE_LEARNING_PROGRESS); return !!r && JSON.parse(r).masteredIds?.length > 0; }
+    catch { return false; }
+  },
+};
+
 // ─── Individual Widgets ──────────────────────────────────────────────────────
 
 /** Get a brief clothing tip based on temperature */
@@ -77,13 +102,12 @@ function getWeatherIcon(weatherMain: string): string {
   return '\u{1F324}\uFE0F';
 }
 
-function WeatherWidget() {
+const WeatherWidget = React.memo(function WeatherWidget() {
   const { t } = useTranslation();
   const { tempUnit } = useUnits();
-  const { favoriteCities } = useAuth();
-  const [geoCity, setGeoCity] = useState<string | null>(null);
-  const [geoError, setGeoError] = useState(false);
-  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoCity, setGeoCity] = React.useState<string | null>(null);
+  const [geoError, setGeoError] = React.useState(false);
+  const [geoLoading, setGeoLoading] = React.useState(false);
 
   const [fetchWeather, { data: weatherData }] = useLazyQuery(GET_CURRENT_WEATHER);
   const [fetchGeocode, { data: geocodeData }] = useLazyQuery(REVERSE_GEOCODE);
@@ -143,7 +167,7 @@ function WeatherWidget() {
         </div>
         <div>
           <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.weather')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.weatherDesc')}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.weatherLocalDesc')}</p>
         </div>
       </div>
 
@@ -156,7 +180,7 @@ function WeatherWidget() {
       )}
 
       {current && (
-        <div className="bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-900/20 dark:to-sky-900/20 rounded-lg p-2.5 mb-2">
+        <div className="bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-900/20 dark:to-sky-900/20 rounded-lg p-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-lg" role="img" aria-label={weatherMain}>{getWeatherIcon(weatherMain)}</span>
@@ -165,7 +189,7 @@ function WeatherWidget() {
                   {geoCity || t('widgets.yourLocation')}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {formatTemperature(current.temp, tempUnit)} · {weatherMain}
+                  {weatherMain}
                 </p>
               </div>
             </div>
@@ -180,73 +204,15 @@ function WeatherWidget() {
       )}
 
       {geoError && !current && (
-        <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
+        <p className="text-xs text-amber-600 dark:text-amber-400">
           {t('widgets.enableLocation')}
         </p>
       )}
-
-      {/* Favorite cities */}
-      {favoriteCities.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5">
-          {favoriteCities.slice(0, 3).map(c => (
-            <span key={c.id} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-              {c.name}
-            </span>
-          ))}
-          {favoriteCities.length > 3 && (
-            <span className="text-xs text-gray-400">+{favoriteCities.length - 3}</span>
-          )}
-        </div>
-      ) : !current ? (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noFavoriteCity')}</p>
-      ) : null}
     </div>
   );
-}
+});
 
-function StockWidget() {
-  const { t } = useTranslation();
-  const [watchlist, setWatchlist] = useState<Array<{ symbol: string; companyName: string }>>([]);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
-      if (stored) setWatchlist(JSON.parse(stored));
-    } catch { /* ignore */ }
-  }, []);
-
-  return (
-    <div>
-      <div className="flex items-center gap-3 mb-2">
-        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-green-500">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-        </div>
-        <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.stocks')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.stocksDesc')}</p>
-        </div>
-      </div>
-      {watchlist.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5">
-          {watchlist.slice(0, 4).map(item => (
-            <span key={item.symbol} className="text-xs px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-mono">
-              {item.symbol}
-            </span>
-          ))}
-          {watchlist.length > 4 && (
-            <span className="text-xs text-gray-400">+{watchlist.length - 4}</span>
-          )}
-        </div>
-      ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noStocks')}</p>
-      )}
-    </div>
-  );
-}
-
-function VerseWidget() {
+const VerseWidget = React.memo(function VerseWidget() {
   const { t } = useTranslation();
   const { verse, loading } = useDailyVerse();
 
@@ -279,13 +245,13 @@ function VerseWidget() {
       ) : null}
     </div>
   );
-}
+});
 
-function NowPlayingWidget() {
+const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   const { t } = useTranslation();
-  const [episode, setEpisode] = useState<Episode | null>(null);
-  const [podcast, setPodcast] = useState<Podcast | null>(null);
-  const [hasSubscriptions, setHasSubscriptions] = useState(false);
+  const [episode, setEpisode] = React.useState<Episode | null>(null);
+  const [podcast, setPodcast] = React.useState<Podcast | null>(null);
+  const [hasSubscriptions, setHasSubscriptions] = React.useState(false);
 
   useEffect(() => {
     try {
@@ -366,11 +332,11 @@ function NowPlayingWidget() {
       )}
     </div>
   );
-}
+});
 
-function NotebookWidget() {
+const NotebookWidget = React.memo(function NotebookWidget() {
   const { t } = useTranslation();
-  const [noteCount, setNoteCount] = useState<number | null>(null);
+  const [noteCount, setNoteCount] = React.useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -401,7 +367,7 @@ function NotebookWidget() {
       )}
     </div>
   );
-}
+});
 
 // Inline size lookups for widget — duplication necessary since we can't import from baby-tracker MFE
 type CompareCategory = 'fruit' | 'animal' | 'vegetable';
@@ -434,10 +400,10 @@ const BABY_SIZES: Record<CompareCategory, string[]> = {
 const CATEGORY_ICONS: Record<CompareCategory, string> = { fruit: '\uD83C\uDF4E', animal: '\uD83D\uDC3E', vegetable: '\uD83E\uDD66' };
 const CATEGORIES: CompareCategory[] = ['fruit', 'animal', 'vegetable'];
 
-function BabyTrackerWidget() {
+const BabyTrackerWidget = React.memo(function BabyTrackerWidget() {
   const { t } = useTranslation();
-  const [weekInfo, setWeekInfo] = useState<{ week: number; day: number } | null>(null);
-  const [category, setCategory] = useState<CompareCategory>(() => {
+  const [weekInfo, setWeekInfo] = React.useState<{ week: number; day: number } | null>(null);
+  const [category, setCategory] = React.useState<CompareCategory>(() => {
     try {
       const stored = localStorage.getItem(StorageKeys.BABY_COMPARE_CATEGORY);
       if (stored && (stored === 'fruit' || stored === 'animal' || stored === 'vegetable')) return stored;
@@ -501,6 +467,7 @@ function BabyTrackerWidget() {
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
+                type="button"
                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCategoryChange(cat); }}
                 className={`text-xs px-1.5 py-0.5 rounded-full transition-colors ${
                   category === cat
@@ -519,19 +486,19 @@ function BabyTrackerWidget() {
       )}
     </div>
   );
-}
+});
 
 /* Age range labels for inline lookup (avoids cross-MFE import) */
 const CHILD_AGE_RANGES = [
-  { min: 0, max: 3, label: '0–3 Months' },
-  { min: 3, max: 6, label: '3–6 Months' },
-  { min: 6, max: 9, label: '6–9 Months' },
-  { min: 9, max: 12, label: '9–12 Months' },
-  { min: 12, max: 18, label: '12–18 Months' },
-  { min: 18, max: 24, label: '18–24 Months' },
-  { min: 24, max: 36, label: '2–3 Years' },
-  { min: 36, max: 48, label: '3–4 Years' },
-  { min: 48, max: 60, label: '4–5 Years' },
+  { min: 0, max: 3, label: '0\u20133 Months' },
+  { min: 3, max: 6, label: '3\u20136 Months' },
+  { min: 6, max: 9, label: '6\u20139 Months' },
+  { min: 9, max: 12, label: '9\u201312 Months' },
+  { min: 12, max: 18, label: '12\u201318 Months' },
+  { min: 18, max: 24, label: '18\u201324 Months' },
+  { min: 24, max: 36, label: '2\u20133 Years' },
+  { min: 36, max: 48, label: '3\u20134 Years' },
+  { min: 48, max: 60, label: '4\u20135 Years' },
 ];
 
 function getStageLabel(months: number): string {
@@ -541,10 +508,10 @@ function getStageLabel(months: number): string {
   return months >= 60 ? '5+ Years' : '';
 }
 
-function ChildDevWidget() {
+const ChildDevWidget = React.memo(function ChildDevWidget() {
   const { t } = useTranslation();
-  const [childName, setChildName] = useState<string | null>(null);
-  const [ageMonths, setAgeMonths] = useState<number | null>(null);
+  const [childName, setChildName] = React.useState<string | null>(null);
+  const [ageMonths, setAgeMonths] = React.useState<number | null>(null);
 
   useEffect(() => {
     function compute() {
@@ -606,11 +573,11 @@ function ChildDevWidget() {
       )}
     </div>
   );
-}
+});
 
-function EnglishLearningWidget() {
+const EnglishLearningWidget = React.memo(function EnglishLearningWidget() {
   const { t } = useTranslation();
-  const [completedCount, setCompletedCount] = useState(0);
+  const [completedCount, setCompletedCount] = React.useState(0);
 
   useEffect(() => {
     function load() {
@@ -649,11 +616,11 @@ function EnglishLearningWidget() {
       )}
     </div>
   );
-}
+});
 
-function ChineseLearningWidget() {
+const ChineseLearningWidget = React.memo(function ChineseLearningWidget() {
   const { t } = useTranslation();
-  const [masteredCount, setMasteredCount] = useState(0);
+  const [masteredCount, setMasteredCount] = React.useState(0);
 
   useEffect(() => {
     function load() {
@@ -692,13 +659,12 @@ function ChineseLearningWidget() {
       )}
     </div>
   );
-}
+});
 
 // ─── Widget Registry ─────────────────────────────────────────────────────────
 
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   weather: WeatherWidget,
-  stocks: StockWidget,
   verse: VerseWidget,
   nowPlaying: NowPlayingWidget,
   notebook: NotebookWidget,
@@ -709,8 +675,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
-  weather: (ctx) => ctx.favoriteCities[0] ? `/weather/${ctx.favoriteCities[0].lat},${ctx.favoriteCities[0].lon}?name=${encodeURIComponent(ctx.favoriteCities[0].name)}` : '/weather',
-  stocks: '/stocks',
+  weather: '/weather',
   verse: '/bible',
   nowPlaying: '/podcasts',
   notebook: '/notebook',
@@ -720,16 +685,90 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   chineseLearning: '/chinese',
 };
 
+// ─── Dashboard Reducer ──────────────────────────────────────────────────────
+
+type DashboardAction =
+  | { type: 'SET_LAYOUT'; layout: WidgetConfig[] }
+  | { type: 'TOGGLE_EDITING' }
+  | { type: 'DRAG_START'; index: number }
+  | { type: 'DRAG_OVER'; index: number }
+  | { type: 'DRAG_LEAVE' }
+  | { type: 'DROP'; dropIndex: number }
+  | { type: 'DRAG_END' }
+  | { type: 'MOVE_WIDGET'; index: number; direction: -1 | 1 }
+  | { type: 'TOGGLE_VISIBILITY'; index: number }
+  | { type: 'RESET' };
+
+interface DashboardState {
+  layout: WidgetConfig[];
+  editing: boolean;
+  dragIndex: number | null;
+  dragOverIndex: number | null;
+}
+
+function dashboardReducer(state: DashboardState, action: DashboardAction): DashboardState {
+  switch (action.type) {
+    case 'SET_LAYOUT':
+      return { ...state, layout: action.layout };
+    case 'TOGGLE_EDITING':
+      return { ...state, editing: !state.editing };
+    case 'DRAG_START':
+      return { ...state, dragIndex: action.index };
+    case 'DRAG_OVER':
+      return { ...state, dragOverIndex: action.index };
+    case 'DRAG_LEAVE':
+      return { ...state, dragOverIndex: null };
+    case 'DROP': {
+      if (state.dragIndex === null || state.dragIndex === action.dropIndex) {
+        return { ...state, dragOverIndex: null };
+      }
+      const next = [...state.layout];
+      const [moved] = next.splice(state.dragIndex, 1);
+      next.splice(action.dropIndex, 0, moved);
+      return { ...state, layout: next, dragOverIndex: null };
+    }
+    case 'DRAG_END':
+      return { ...state, dragIndex: null, dragOverIndex: null };
+    case 'MOVE_WIDGET': {
+      const target = action.index + action.direction;
+      if (target < 0 || target >= state.layout.length) return state;
+      const next = [...state.layout];
+      [next[action.index], next[target]] = [next[target], next[action.index]];
+      return { ...state, layout: next };
+    }
+    case 'TOGGLE_VISIBILITY':
+      return {
+        ...state,
+        layout: state.layout.map((w, i) =>
+          i === action.index ? { ...w, visible: !w.visible } : w
+        ),
+      };
+    case 'RESET':
+      return { ...state, layout: DEFAULT_LAYOUT };
+    default:
+      return state;
+  }
+}
+
 // ─── Main Dashboard Component ────────────────────────────────────────────────
 
 export default function WidgetDashboard() {
   const { t } = useTranslation();
-  const { favoriteCities } = useAuth();
-  const [layout, setLayout] = useState<WidgetConfig[]>(loadLayout);
-  const [editing, setEditing] = useState(false);
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const { user, favoriteCities } = useAuth();
+  const [state, dispatch] = useReducer(dashboardReducer, undefined, () => ({
+    layout: loadLayout(),
+    editing: false,
+    dragIndex: null,
+    dragOverIndex: null,
+  }));
+  const { layout, editing, dragIndex, dragOverIndex } = state;
   const dragNodeRef = useRef<HTMLDivElement | null>(null);
+
+  // Re-check widget visibility when auth state changes (sign-in loads personalized data)
+  const [authRevision, setAuthRevision] = React.useState(0);
+  useEffect(() => {
+    setAuthRevision(r => r + 1);
+  }, [user]);
 
   // Persist layout on change
   useEffect(() => {
@@ -739,7 +778,7 @@ export default function WidgetDashboard() {
   // ── Drag handlers ──────────────────────────────────────────────────────
 
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
-    setDragIndex(index);
+    dispatch({ type: 'DRAG_START', index });
     dragNodeRef.current = e.currentTarget as HTMLDivElement;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', String(index));
@@ -754,57 +793,31 @@ export default function WidgetDashboard() {
   const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    setDragOverIndex(index);
+    dispatch({ type: 'DRAG_OVER', index });
   }, []);
 
   const handleDragLeave = useCallback(() => {
-    setDragOverIndex(null);
+    dispatch({ type: 'DRAG_LEAVE' });
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
-    setDragOverIndex(null);
-    if (dragIndex === null || dragIndex === dropIndex) return;
-
-    setLayout(prev => {
-      const next = [...prev];
-      const [moved] = next.splice(dragIndex, 1);
-      next.splice(dropIndex, 0, moved);
-      return next;
-    });
-  }, [dragIndex]);
+    dispatch({ type: 'DROP', dropIndex });
+  }, []);
 
   const handleDragEnd = useCallback(() => {
     if (dragNodeRef.current) {
       dragNodeRef.current.style.opacity = '1';
     }
-    setDragIndex(null);
-    setDragOverIndex(null);
+    dispatch({ type: 'DRAG_END' });
   }, []);
 
-  // ── Keyboard reorder ──────────────────────────────────────────────────
-
-  const moveWidget = useCallback((index: number, direction: -1 | 1) => {
-    const target = index + direction;
-    if (target < 0 || target >= layout.length) return;
-    setLayout(prev => {
-      const next = [...prev];
-      [next[index], next[target]] = [next[target], next[index]];
-      return next;
-    });
-  }, [layout.length]);
-
-  const toggleVisibility = useCallback((index: number) => {
-    setLayout(prev => prev.map((w, i) =>
-      i === index ? { ...w, visible: !w.visible } : w
-    ));
-  }, []);
-
-  const resetLayout = useCallback(() => {
-    setLayout(DEFAULT_LAYOUT);
-  }, []);
-
-  const visibleWidgets = layout.filter(w => w.visible);
+  // Normal mode: only show widgets that are visible AND have engagement data
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const visibleWidgets = React.useMemo(
+    () => layout.filter(w => w.visible && WIDGET_HAS_DATA[w.id]()),
+    [layout, authRevision]
+  );
 
   return (
     <section aria-label={t('widgets.title')}>
@@ -816,14 +829,16 @@ export default function WidgetDashboard() {
         <div className="flex items-center gap-2">
           {editing && (
             <button
-              onClick={resetLayout}
+              type="button"
+              onClick={() => dispatch({ type: 'RESET' })}
               className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
               {t('widgets.reset')}
             </button>
           )}
           <button
-            onClick={() => setEditing(e => !e)}
+            type="button"
+            onClick={() => dispatch({ type: 'TOGGLE_EDITING' })}
             className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
             aria-pressed={editing}
           >
@@ -861,8 +876,8 @@ export default function WidgetDashboard() {
                 `}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  {/* Drag handle */}
-                  <span className="text-gray-500 dark:text-gray-400 select-none" aria-hidden="true">
+                  {/* Drag handle (desktop only) */}
+                  <span className="hidden md:inline text-gray-500 dark:text-gray-400 select-none" aria-hidden="true">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
                       <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
@@ -870,24 +885,26 @@ export default function WidgetDashboard() {
                     </svg>
                   </span>
 
-                  {/* Keyboard move buttons */}
+                  {/* Move buttons (tap on mobile, click on desktop) */}
                   <button
-                    onClick={() => moveWidget(index, -1)}
+                    type="button"
+                    onClick={() => dispatch({ type: 'MOVE_WIDGET', index, direction: -1 })}
                     disabled={index === 0}
-                    className="p-1 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1.5 md:p-1 rounded-lg md:rounded text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed active:bg-gray-200 dark:active:bg-gray-600 transition-colors"
                     aria-label={t('widgets.moveUp')}
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
                     </svg>
                   </button>
                   <button
-                    onClick={() => moveWidget(index, 1)}
+                    type="button"
+                    onClick={() => dispatch({ type: 'MOVE_WIDGET', index, direction: 1 })}
                     disabled={index === layout.length - 1}
-                    className="p-1 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1.5 md:p-1 rounded-lg md:rounded text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed active:bg-gray-200 dark:active:bg-gray-600 transition-colors"
                     aria-label={t('widgets.moveDown')}
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-5 h-5 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
@@ -896,7 +913,8 @@ export default function WidgetDashboard() {
 
                   {/* Visibility toggle */}
                   <button
-                    onClick={() => toggleVisibility(index)}
+                    type="button"
+                    onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', index })}
                     className={`text-xs px-2 py-1 rounded-full transition-colors ${
                       widget.visible
                         ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
@@ -909,14 +927,16 @@ export default function WidgetDashboard() {
                   </button>
                 </div>
                 <div className={!widget.visible ? 'pointer-events-none' : ''}>
-                  <WidgetComponent />
+                  <ErrorBoundary>
+                    <WidgetComponent />
+                  </ErrorBoundary>
                 </div>
               </div>
             );
           })}
         </div>
       ) : (
-        /* Normal mode: only visible widgets in a responsive grid */
+        /* Normal mode: only visible widgets with data in a responsive grid */
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {visibleWidgets.map(widget => {
             const WidgetComponent = WIDGET_COMPONENTS[widget.id];
@@ -928,7 +948,9 @@ export default function WidgetDashboard() {
                 to={to}
                 className="block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
               >
-                <WidgetComponent />
+                <ErrorBoundary>
+                  <WidgetComponent />
+                </ErrorBoundary>
               </Link>
             );
           })}

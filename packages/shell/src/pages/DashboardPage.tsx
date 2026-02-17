@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { WidgetDashboard } from '../components/widgets';
+import QuickAccessTiles from '../components/layout/QuickAccessTiles';
 import { useCuratedVerse } from '../hooks/useCuratedVerse';
 
 export default function DashboardPage() {
@@ -48,6 +49,9 @@ export default function DashboardPage() {
 
       {/* Widget Dashboard */}
       <WidgetDashboard />
+
+      {/* Desktop Quick Access Tiles */}
+      <QuickAccessTiles />
     </div>
   );
 }
