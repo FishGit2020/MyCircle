@@ -169,7 +169,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(StorageKeys.CHILD_NAME, userProfile.childName);
           }
           if (userProfile.childBirthDate) {
-            localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, userProfile.childBirthDate);
+            try {
+              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, btoa(userProfile.childBirthDate));
+            } catch {
+              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, userProfile.childBirthDate);
+            }
           }
           if (userProfile.childName || userProfile.childBirthDate) {
             window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
