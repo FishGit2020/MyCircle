@@ -50,31 +50,6 @@ function saveLayout(layout: WidgetConfig[]) {
   } catch { /* ignore */ }
 }
 
-// ─── Smart Widget Visibility ────────────────────────────────────────────────
-
-const WIDGET_HAS_DATA: Record<WidgetType, () => boolean> = {
-  weather: () => true,
-  verse: () => true,
-  nowPlaying: () => {
-    try { const s = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS); return !!s && JSON.parse(s).length > 0; }
-    catch { return false; }
-  },
-  notebook: () => {
-    try { const c = localStorage.getItem(StorageKeys.NOTEBOOK_CACHE); return !!c && JSON.parse(c) > 0; }
-    catch { return false; }
-  },
-  babyTracker: () => !!localStorage.getItem(StorageKeys.BABY_DUE_DATE),
-  childDev: () => !!localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE),
-  englishLearning: () => {
-    try { const r = localStorage.getItem(StorageKeys.ENGLISH_LEARNING_PROGRESS); return !!r && JSON.parse(r).completedIds?.length > 0; }
-    catch { return false; }
-  },
-  chineseLearning: () => {
-    try { const r = localStorage.getItem(StorageKeys.CHINESE_LEARNING_PROGRESS); return !!r && JSON.parse(r).masteredIds?.length > 0; }
-    catch { return false; }
-  },
-};
-
 // ─── Individual Widgets ──────────────────────────────────────────────────────
 
 /** Get a brief clothing tip based on temperature */
@@ -754,7 +729,7 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
 
 export default function WidgetDashboard() {
   const { t } = useTranslation();
-  const { user, favoriteCities } = useAuth();
+  const { favoriteCities } = useAuth();
   const [state, dispatch] = useReducer(dashboardReducer, undefined, () => ({
     layout: loadLayout(),
     editing: false,
@@ -763,12 +738,6 @@ export default function WidgetDashboard() {
   }));
   const { layout, editing, dragIndex, dragOverIndex } = state;
   const dragNodeRef = useRef<HTMLDivElement | null>(null);
-
-  // Re-check widget visibility when auth state changes (sign-in loads personalized data)
-  const [authRevision, setAuthRevision] = React.useState(0);
-  useEffect(() => {
-    setAuthRevision(r => r + 1);
-  }, [user]);
 
   // Persist layout on change
   useEffect(() => {
@@ -812,11 +781,9 @@ export default function WidgetDashboard() {
     dispatch({ type: 'DRAG_END' });
   }, []);
 
-  // Normal mode: only show widgets that are visible AND have engagement data
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const visibleWidgets = React.useMemo(
-    () => layout.filter(w => w.visible && WIDGET_HAS_DATA[w.id]()),
-    [layout, authRevision]
+    () => layout.filter(w => w.visible),
+    [layout]
   );
 
   return (

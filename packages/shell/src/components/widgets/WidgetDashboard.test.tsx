@@ -65,12 +65,15 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders default widgets (only weather and verse visible without engagement data)', () => {
+  it('renders all default widgets', () => {
     renderWidget();
-    // Weather and verse always visible
     expect(screen.getByText('widgets.weather')).toBeInTheDocument();
     expect(screen.getByText('widgets.verse')).toBeInTheDocument();
-    // Other widgets hidden in normal mode (no engagement data in localStorage)
+    expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
+    expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
+    expect(screen.getByText('widgets.childDev')).toBeInTheDocument();
+    expect(screen.getByText('widgets.english')).toBeInTheDocument();
+    expect(screen.getByText('widgets.chinese')).toBeInTheDocument();
   });
 
   it('renders customize button', () => {
