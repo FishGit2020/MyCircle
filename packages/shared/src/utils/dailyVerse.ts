@@ -7,8 +7,6 @@
  * Hardcoded NIV text serves as offline fallback.
  */
 
-export const NIV_COPYRIGHT = 'Holy Bible, New International Version\u00ae, NIV\u00ae Copyright \u00a9 1973, 1978, 1984, 2011 by Biblica, Inc.\u2122';
-
 export interface DailyVerse {
   text?: string;
   reference: string;

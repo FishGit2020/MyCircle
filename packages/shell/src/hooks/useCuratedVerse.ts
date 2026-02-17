@@ -1,8 +1,13 @@
-import { useState } from 'react';
-import { useQuery, getAllDailyVerses, GET_BIBLE_PASSAGE, NIV_COPYRIGHT } from '@mycircle/shared';
+import { useQuery, getAllDailyVerses, GET_BIBLE_PASSAGE } from '@mycircle/shared';
 import type { DailyVerse } from '@mycircle/shared';
 
 export type { DailyVerse };
+
+function getDayOfYear(): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+}
 
 interface PassageResponse {
   biblePassage: {
@@ -15,9 +20,11 @@ interface PassageResponse {
 
 export function useCuratedVerse() {
   const verses = getAllDailyVerses();
-  const [localVerse] = useState<DailyVerse>(
-    () => verses[Math.floor(Math.random() * verses.length)],
-  );
+  // Use day-based selection with an offset from the daily verse index
+  // so Bible Reader shows a different verse than the dashboard
+  const day = getDayOfYear();
+  const offset = Math.floor(verses.length / 2);
+  const localVerse = verses[(day + offset) % verses.length];
 
   const { data, loading } = useQuery<PassageResponse>(GET_BIBLE_PASSAGE, {
     variables: { reference: localVerse.usfm ?? localVerse.reference },
@@ -32,7 +39,7 @@ export function useCuratedVerse() {
       }
     : {
         ...localVerse,
-        copyright: localVerse.copyright ?? NIV_COPYRIGHT,
+        copyright: localVerse.copyright,
       };
 
   return { verse, loading };

@@ -44,7 +44,6 @@ vi.mock('@mycircle/shared', () => ({
   REVERSE_GEOCODE: { kind: 'Document', definitions: [] },
   getDailyVerse: () => ({ usfm: 'TST.1.1', reference: 'Test 1:1', text: 'Test verse text' }),
   getAllDailyVerses: () => [{ usfm: 'TST.1.1', reference: 'Test 1:1', text: 'Test verse text' }],
-  NIV_COPYRIGHT: 'NIV Copyright',
 }));
 
 vi.mock('../../context/AuthContext', () => ({

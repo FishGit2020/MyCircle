@@ -2,8 +2,8 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useChineseCharacters } from './useChineseCharacters';
 
 const mockCharacters = [
-  { id: '1', character: '\u5988\u5988', pinyin: 'm\u0101ma', meaning: 'mom', category: 'family' },
-  { id: '2', character: '\u7238\u7238', pinyin: 'b\u00e0ba', meaning: 'dad', category: 'family' },
+  { id: '1', character: '妈妈', pinyin: 'māma', meaning: 'mom', category: 'family' },
+  { id: '2', character: '爸爸', pinyin: 'bàba', meaning: 'dad', category: 'family' },
 ];
 
 beforeEach(() => {
@@ -82,11 +82,11 @@ describe('useChineseCharacters', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
-      await result.current.addCharacter({ character: '\u6c34', pinyin: 'shu\u01d0', meaning: 'water', category: 'food' } as any);
+      await result.current.addCharacter({ character: '水', pinyin: 'shuǐ', meaning: 'water', category: 'food' } as any);
     });
 
     expect(window.__chineseCharacters!.add).toHaveBeenCalledWith(
-      expect.objectContaining({ character: '\u6c34' })
+      expect.objectContaining({ character: '水' })
     );
     expect(dispatchSpy).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'chinese-characters-changed' })

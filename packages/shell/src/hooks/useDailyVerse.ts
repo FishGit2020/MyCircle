@@ -1,4 +1,4 @@
-import { useQuery, GET_BIBLE_VOTD_API, getDailyVerse, NIV_COPYRIGHT } from '@mycircle/shared';
+import { useQuery, GET_BIBLE_VOTD_API, getDailyVerse } from '@mycircle/shared';
 import type { DailyVerse } from '@mycircle/shared';
 
 export type { DailyVerse };
@@ -37,7 +37,7 @@ export function useDailyVerse() {
       }
     : {
         ...localVerse,
-        copyright: localVerse.copyright ?? NIV_COPYRIGHT,
+        copyright: localVerse.copyright,
       };
 
   return {
