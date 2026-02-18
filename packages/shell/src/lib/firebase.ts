@@ -558,10 +558,15 @@ export async function getWorshipSong(id: string) {
   return { id: docSnap.id, ...docSnap.data() };
 }
 
+/** Strip undefined values — Firestore rejects them */
+function stripUndefined(obj: Record<string, any>): Record<string, any> {
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+}
+
 export async function addWorshipSong(song: Record<string, any>) {
   if (!db) throw new Error('Firebase not initialized');
   const docRef = await addDoc(collection(db, 'worshipSongs'), {
-    ...song,
+    ...stripUndefined(song),
     createdBy: auth?.currentUser?.uid ?? null,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -573,7 +578,7 @@ export async function updateWorshipSong(id: string, updates: Record<string, any>
   if (!db) throw new Error('Firebase not initialized');
   const docRef = doc(db, 'worshipSongs', id);
   await updateDoc(docRef, {
-    ...updates,
+    ...stripUndefined(updates),
     updatedAt: serverTimestamp(),
   });
 }
