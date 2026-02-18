@@ -6,9 +6,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   StorageKeys: {
-    PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
     WEATHER_ALERTS: 'weather-alerts-enabled',
-    PODCAST_ALERTS: 'podcast-alerts-enabled',
     ANNOUNCEMENT_ALERTS: 'announcement-alerts-enabled',
   },
   WindowEvents: {
@@ -24,7 +22,7 @@ vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({ favoriteCities: mockFavoriteCities }),
 }));
 
-const mockRequestPermission = vi.fn();
+const mockRequestPermission = vi.fn().mockResolvedValue(null);
 const mockOnForegroundMessage = vi.fn(() => () => {});
 const mockSubscribeToWeatherAlerts = vi.fn().mockResolvedValue(true);
 const mockUnsubscribeFromWeatherAlerts = vi.fn().mockResolvedValue(true);
@@ -53,6 +51,7 @@ function openPanel() {
 describe('NotificationBell', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRequestPermission.mockResolvedValue(null);
     localStorage.clear();
     mockFavoriteCities = [];
     Object.defineProperty(globalThis, 'Notification', {
@@ -109,11 +108,11 @@ describe('NotificationBell', () => {
 
   // ── Toggle switches ───────────────────────────────────────────────────────
 
-  it('shows three notification toggle switches in the panel', () => {
+  it('shows two notification toggle switches in the panel', () => {
     render(<NotificationBell />);
     openPanel();
     const switches = screen.getAllByRole('switch');
-    expect(switches).toHaveLength(3);
+    expect(switches).toHaveLength(2);
   });
 
   it('all toggles are off by default (aria-checked=false)', () => {
@@ -128,7 +127,6 @@ describe('NotificationBell', () => {
     render(<NotificationBell />);
     openPanel();
     expect(screen.getByText('notifications.weatherAlerts')).toBeInTheDocument();
-    expect(screen.getByText('notifications.podcastAlerts')).toBeInTheDocument();
     expect(screen.getByText('notifications.announcementAlerts')).toBeInTheDocument();
   });
 
@@ -136,7 +134,6 @@ describe('NotificationBell', () => {
     render(<NotificationBell />);
     openPanel();
     expect(screen.getByText('notifications.weatherAlertsDesc')).toBeInTheDocument();
-    expect(screen.getByText('notifications.podcastAlertsDesc')).toBeInTheDocument();
     expect(screen.getByText('notifications.announcementAlertsDesc')).toBeInTheDocument();
   });
 
@@ -152,45 +149,6 @@ describe('NotificationBell', () => {
     });
   });
 
-  // ── Podcast toggle ────────────────────────────────────────────────────────
-
-  it('shows feedback when toggling podcasts with no subscriptions', async () => {
-    render(<NotificationBell />);
-    openPanel();
-    fireEvent.click(screen.getAllByRole('switch')[1]);
-
-    await waitFor(() => {
-      expect(screen.getByRole('status')).toHaveTextContent('notifications.noSubscriptionsForAlerts');
-    });
-  });
-
-  it('enables podcast alerts when subscriptions exist', async () => {
-    localStorage.setItem('podcast-subscriptions', JSON.stringify(['123', '456']));
-    mockRequestPermission.mockResolvedValue('fake-token');
-
-    render(<NotificationBell />);
-    openPanel();
-    const podcastSwitch = screen.getAllByRole('switch')[1];
-    await act(async () => { fireEvent.click(podcastSwitch); });
-
-    await waitFor(() => {
-      expect(podcastSwitch).toHaveAttribute('aria-checked', 'true');
-    });
-  });
-
-  it('persists podcast alert state to localStorage', async () => {
-    localStorage.setItem('podcast-subscriptions', JSON.stringify(['123']));
-    mockRequestPermission.mockResolvedValue('fake-token');
-
-    render(<NotificationBell />);
-    openPanel();
-    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[1]); });
-
-    await waitFor(() => {
-      expect(localStorage.getItem('podcast-alerts-enabled')).toBe('true');
-    });
-  });
-
   // ── Initial state from localStorage ───────────────────────────────────────
 
   it('reads initial enabled state from localStorage', () => {
@@ -200,8 +158,7 @@ describe('NotificationBell', () => {
     openPanel();
     const switches = screen.getAllByRole('switch');
     expect(switches[0]).toHaveAttribute('aria-checked', 'true');  // weather
-    expect(switches[1]).toHaveAttribute('aria-checked', 'false'); // podcast
-    expect(switches[2]).toHaveAttribute('aria-checked', 'false'); // announcement
+    expect(switches[1]).toHaveAttribute('aria-checked', 'false'); // announcement
   });
 
   // ── Active indicator ──────────────────────────────────────────────────────
@@ -227,7 +184,7 @@ describe('NotificationBell', () => {
 
     render(<NotificationBell />);
     openPanel();
-    const announcementSwitch = screen.getAllByRole('switch')[2];
+    const announcementSwitch = screen.getAllByRole('switch')[1];
     await act(async () => { fireEvent.click(announcementSwitch); });
 
     await waitFor(() => {
@@ -241,7 +198,7 @@ describe('NotificationBell', () => {
 
     render(<NotificationBell />);
     openPanel();
-    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[2]); });
+    await act(async () => { fireEvent.click(screen.getAllByRole('switch')[1]); });
 
     await waitFor(() => {
       expect(localStorage.getItem('announcement-alerts-enabled')).toBe('true');
@@ -254,7 +211,7 @@ describe('NotificationBell', () => {
 
     await act(async () => { render(<NotificationBell />); });
     openPanel();
-    const announcementSwitch = screen.getAllByRole('switch')[2];
+    const announcementSwitch = screen.getAllByRole('switch')[1];
     expect(announcementSwitch).toHaveAttribute('aria-checked', 'true');
 
     await act(async () => { fireEvent.click(announcementSwitch); });
@@ -271,6 +228,6 @@ describe('NotificationBell', () => {
     render(<NotificationBell />);
     openPanel();
     const switches = screen.getAllByRole('switch');
-    expect(switches[2]).toHaveAttribute('aria-checked', 'true');
+    expect(switches[1]).toHaveAttribute('aria-checked', 'true');
   });
 });

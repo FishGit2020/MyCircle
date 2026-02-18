@@ -8,7 +8,6 @@ export default function NotificationBell() {
   const { t } = useTranslation();
   const { favoriteCities } = useAuth();
   const [weatherEnabled, setWeatherEnabled] = useState(() => localStorage.getItem(StorageKeys.WEATHER_ALERTS) === 'true');
-  const [podcastEnabled, setPodcastEnabled] = useState(() => localStorage.getItem(StorageKeys.PODCAST_ALERTS) === 'true');
   const [announcementEnabled, setAnnouncementEnabled] = useState(() => localStorage.getItem(StorageKeys.ANNOUNCEMENT_ALERTS) === 'true');
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -18,7 +17,7 @@ export default function NotificationBell() {
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const anyEnabled = weatherEnabled || podcastEnabled || announcementEnabled;
+  const anyEnabled = weatherEnabled || announcementEnabled;
 
   // Don't render if Firebase or Notification API isn't available
   if (!firebaseEnabled || typeof Notification === 'undefined') return null;
@@ -119,32 +118,6 @@ export default function NotificationBell() {
       setLoading(false);
     }
   }, [weatherEnabled, loading, fcmToken, favoriteCities, ensureToken]);
-
-  const handleTogglePodcasts = useCallback(async () => {
-    if (loading) return;
-
-    const subs = getSubscribedIds();
-    if (!podcastEnabled && subs.length === 0) {
-      showFeedback(t('notifications.noSubscriptionsForAlerts'));
-      return;
-    }
-
-    if (podcastEnabled) {
-      setPodcastEnabled(false);
-      localStorage.setItem(StorageKeys.PODCAST_ALERTS, 'false');
-      window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
-      showFeedback(t('notifications.disabled'));
-      return;
-    }
-
-    const token = await ensureToken();
-    if (!token) return;
-
-    setPodcastEnabled(true);
-    localStorage.setItem(StorageKeys.PODCAST_ALERTS, 'true');
-    window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
-    showFeedback(t('notifications.enabled'));
-  }, [podcastEnabled, loading, ensureToken]);
 
   const handleToggleAnnouncements = useCallback(async () => {
     if (loading) return;
@@ -271,19 +244,6 @@ export default function NotificationBell() {
                 }
                 color="blue"
               />
-              {/* Podcast alerts */}
-              <NotificationToggle
-                label={t('notifications.podcastAlerts')}
-                description={t('notifications.podcastAlertsDesc')}
-                enabled={podcastEnabled}
-                onToggle={handleTogglePodcasts}
-                icon={
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                  </svg>
-                }
-                color="purple"
-              />
               {/* Announcement alerts */}
               <NotificationToggle
                 label={t('notifications.announcementAlerts')}
@@ -376,12 +336,3 @@ function NotificationToggle({
   );
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function getSubscribedIds(): string[] {
-  try {
-    const stored = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
-    if (stored) return JSON.parse(stored).map(String);
-  } catch { /* ignore */ }
-  return [];
-}

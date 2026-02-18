@@ -138,9 +138,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userProfile.weatherAlertsEnabled !== undefined) {
             localStorage.setItem(StorageKeys.WEATHER_ALERTS, String(userProfile.weatherAlertsEnabled));
           }
-          if (userProfile.podcastAlertsEnabled !== undefined) {
-            localStorage.setItem(StorageKeys.PODCAST_ALERTS, String(userProfile.podcastAlertsEnabled));
-          }
           if (userProfile.announcementAlertsEnabled !== undefined) {
             localStorage.setItem(StorageKeys.ANNOUNCEMENT_ALERTS, String(userProfile.announcementAlertsEnabled));
           }
@@ -242,7 +239,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         StorageKeys.THEME,
         StorageKeys.LOCALE,
         StorageKeys.WEATHER_ALERTS,
-        StorageKeys.PODCAST_ALERTS,
         StorageKeys.ANNOUNCEMENT_ALERTS,
       ]);
       Object.values(StorageKeys).forEach((key) => {
@@ -390,7 +386,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         updateUserNotificationAlerts(user.uid, {
           weatherAlertsEnabled: localStorage.getItem(StorageKeys.WEATHER_ALERTS) === 'true',
-          podcastAlertsEnabled: localStorage.getItem(StorageKeys.PODCAST_ALERTS) === 'true',
           announcementAlertsEnabled: localStorage.getItem(StorageKeys.ANNOUNCEMENT_ALERTS) === 'true',
         });
       }

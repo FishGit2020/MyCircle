@@ -39,7 +39,6 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Activity suggestions** — weather-based outdoor/indoor activity recommendations (hiking, swimming, skiing, etc.) with collapsible card UI
 - Geolocation ("Use My Location")
 - Favorite & recent cities (synced via Firestore)
-- Share weather (link or screenshot image)
 - **Weather comparison** — compare two cities side-by-side with inline city search, prominent "Compare" button in header, always-visible comparison section
 - **Historical weather** — "This day last year" comparison using Open-Meteo archive API
 - **Air Quality Index** — real-time AQI with color-coded levels, expandable pollutant breakdown (PM2.5, PM10, O₃, NO₂, SO₂, CO)
@@ -50,7 +49,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 ### Stocks & Crypto
 - Real-time stock quotes via Finnhub API
 - Symbol search and **watchlist** (shown first for quick access)
-- Live polling with visible toggle control
+- Manual refresh button
 - **Collapsible crypto tracker** — live BTC, ETH, SOL, ADA, DOGE prices via CoinGecko API with 7-day sparkline, market cap, 24h volume, and expandable detail cards; entire section collapses with persisted state
 
 ### Podcasts
@@ -72,7 +71,6 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Bookmarks with localStorage persistence
 - Copy passage text to clipboard
 - Copyright notice display for licensed translations
-- **Community notes** — personal notes per passage (book + chapter), auto-saved with debounce to localStorage, collapsible notes panel with saved indicator
 - **Daily devotional** — curated 30-entry reading plan cycled by day-of-year, with themed passage and "Read Passage" button, completion tracking (green checkmark persisted in localStorage, 90-day rolling window)
 
 ### Worship Songs
@@ -145,7 +143,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Dark / light theme with system preference detection
 - Multi-language support (i18n: English, Spanish, Chinese)
 - Temperature (°C / °F) and wind speed (m/s, mph, km/h) unit toggles
-- **Push notifications** — multi-category preferences (weather alerts, podcast episodes, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
+- **Push notifications** — multi-category preferences (weather alerts, announcements) via Firebase Cloud Messaging, synced per user to Firestore for cross-device persistence
 - **"What's New" announcements** — Firestore-backed changelog with sparkle icon, unread badge; auto-popup toast for unread announcements (1.5s delay, one-time per batch); dedicated `/whats-new` page with all announcements, NEW badges on unread, blue highlight; per-user read tracking (Firestore for signed-in, localStorage for anonymous)
 - **Feedback without login** — anyone can submit feedback (Firestore rules validate data structure without requiring auth)
 - **Offline sync** — Firestore offline persistence via `persistentLocalCache` with multi-tab support; floating `SyncIndicator` shows offline/synced status

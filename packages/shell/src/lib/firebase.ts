@@ -110,7 +110,6 @@ export interface UserProfile {
   babyDueDate?: string;
   bottomNavOrder?: string[];
   weatherAlertsEnabled?: boolean;
-  podcastAlertsEnabled?: boolean;
   announcementAlertsEnabled?: boolean;
   bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
   chineseLearningProgress?: { masteredIds: string[]; lastDate: string };
@@ -448,7 +447,6 @@ export async function updateBibleBookmarks(uid: string, bookmarks: Array<{ book:
 
 export async function updateUserNotificationAlerts(uid: string, alerts: {
   weatherAlertsEnabled: boolean;
-  podcastAlertsEnabled: boolean;
   announcementAlertsEnabled: boolean;
 }) {
   if (!db) return;

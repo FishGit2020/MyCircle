@@ -771,7 +771,6 @@ interface Note {
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
 | `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |
 | `'weather-alerts-enabled'` | `'true'` / `'false'` | Weather alert notifications toggle (Firestore sync when signed in) |
-| `'podcast-alerts-enabled'` | `'true'` / `'false'` | Podcast alert notifications toggle (Firestore sync when signed in) |
 | `'announcement-alerts-enabled'` | `'true'` / `'false'` | Announcement alert notifications toggle (Firestore sync when signed in) |
 | `'last-seen-announcement'` | Announcement doc ID | Tracks last viewed announcement (anonymous users) |
 | `'bible-translation'` | Bible version ID (e.g., `'1'` for KJV, `'111'` for NIV) | Selected YouVersion Bible version for passage reading |
@@ -913,7 +912,7 @@ Password reset is also available via `sendPasswordResetEmail(auth, email)`.
 When a user signs out, `signOutUser()` performs three cleanup steps:
 
 1. **Firebase sign-out** — `logOut()` clears the Firebase auth session.
-2. **localStorage cleanup** — iterates `Object.values(StorageKeys)` and removes all user-specific keys. Device-level keys (`THEME`, `LOCALE`, `WEATHER_ALERTS`, `PODCAST_ALERTS`, `ANNOUNCEMENT_ALERTS`) are preserved so the next user inherits the device's display and notification preferences.
+2. **localStorage cleanup** — iterates `Object.values(StorageKeys)` and removes all user-specific keys. Device-level keys (`THEME`, `LOCALE`, `WEATHER_ALERTS`, `ANNOUNCEMENT_ALERTS`) are preserved so the next user inherits the device's display and notification preferences.
 3. **Apollo cache reset** — `getApolloClient().clearStore()` wipes cached GraphQL responses (e.g., daily verse) so the next session starts fresh.
 
 This prevents stale data (watchlists, bookmarks, baby tracker settings, widget layouts) from leaking between accounts on a shared device.
