@@ -103,8 +103,8 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 
 ### Child Development Guide
 - Informational developmental milestone reference from birth through age 5 (CDC guidelines)
-- 6 developmental domains: Physical & Motor, Speech & Language, Cognitive, Social-Emotional, Health & Growth, Feeding & Sensory
-- 270 milestones across 9 age ranges organized in a vertical timeline
+- 5 developmental domains aligned with CDC/AAP guidelines: Physical & Motor, Language & Communication, Cognitive, Social & Emotional, Sensory (baby ages only)
+- 195 milestones across 9 age ranges organized in a vertical timeline
 - **Vertical timeline** — progressive disclosure with color-coded stage dots (green = past, blue = current, gray = upcoming); past and current stages auto-expand, future stages collapse; domain filter chips to toggle visibility
 - **CDC & AAP resource links** — each age range stage links to corresponding CDC and AAP (HealthyChildren.org) developmental guidelines
 - Auto-calculated age from birth date, current age range highlighted
@@ -219,7 +219,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Worship Songs** | Song library with lyrics, chord editor, YouTube links, metronome | `WorshipSongs` |
 | **Notebook** | Personal & public note-taking with search and Firestore sync | `Notebook` |
 | **Baby Tracker** | Baby growth tracking with weekly fruit comparisons and Bible verses | `BabyTracker` |
-| **Child Development** | Postnatal milestone tracker (birth–5 years) across 6 domains | `ChildDevelopment` |
+| **Child Development** | Postnatal milestone tracker (birth–5 years) across 5 CDC/AAP-aligned domains | `ChildDevelopment` |
 | **Chinese Learning** | Chinese character flashcards + handwriting practice canvas | `ChineseLearning` |
 | **English Learning** | Daily English phrases with lessons, quizzes, and progress tracking | `EnglishLearning` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
