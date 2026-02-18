@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
-import { useTranslation, WindowEvents } from '@mycircle/shared';
+import { useTranslation, WindowEvents, StorageKeys } from '@mycircle/shared';
 import StockSearch from './StockSearch';
 import CryptoTracker from './CryptoTracker';
 import Watchlist from './Watchlist';
