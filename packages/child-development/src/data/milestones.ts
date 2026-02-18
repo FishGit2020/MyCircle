@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // Child-Development – milestone catalogue
-// 6 domains × 9 age ranges × 5 milestones = 270 milestones
+// 5 domains (4 core × 9 ages + sensory × 3 baby ages) = 195 milestones
 // ---------------------------------------------------------------------------
 
 /* -------------------------------- Types --------------------------------- */
@@ -10,7 +10,6 @@ export type DomainId =
   | 'speech'
   | 'cognitive'
   | 'social'
-  | 'health'
   | 'sensory';
 
 export type AgeRangeId =
@@ -41,7 +40,7 @@ export interface DomainMeta {
   descKey: string;
   /** Tailwind colour class */
   color: string;
-  icon: 'runner' | 'speech-bubble' | 'brain' | 'handshake' | 'muscle' | 'baby';
+  icon: 'runner' | 'speech-bubble' | 'brain' | 'handshake' | 'baby';
 }
 
 export interface AgeRangeMeta {
@@ -83,13 +82,6 @@ export const DOMAINS: readonly DomainMeta[] = [
     descKey: 'childDev.domainSocialDesc',
     color: 'bg-green-500',
     icon: 'handshake',
-  },
-  {
-    id: 'health',
-    nameKey: 'childDev.domainHealth',
-    descKey: 'childDev.domainHealthDesc',
-    color: 'bg-red-500',
-    icon: 'muscle',
   },
   {
     id: 'sensory',
@@ -411,74 +403,7 @@ export const MILESTONES: readonly Milestone[] = [
   ms('social', '4-5y', 5),        // Shows more independence
 
   // ========================================================================
-  // HEALTH / SELF-CARE DOMAIN (45 milestones)
-  // ========================================================================
-
-  // -- 0-3m --
-  ms('health', '0-3m', 1, true),  // Latches and suckles well during feeding
-  ms('health', '0-3m', 2),        // Has regular wet and dirty diapers
-  ms('health', '0-3m', 3),        // Sleeps for longer stretches at night (up to 4-5 hours)
-  ms('health', '0-3m', 4),        // Gains weight steadily
-  ms('health', '0-3m', 5),        // Settles when held or rocked
-
-  // -- 3-6m --
-  ms('health', '3-6m', 1),        // Begins to establish regular sleep patterns
-  ms('health', '3-6m', 2),        // Shows readiness for solid foods
-  ms('health', '3-6m', 3, true),  // Doubles birth weight by around 5 months
-  ms('health', '3-6m', 4),        // Produces tears when crying
-  ms('health', '3-6m', 5),        // Sleeps 12-16 hours per day including naps
-
-  // -- 6-9m --
-  ms('health', '6-9m', 1),        // Eats mashed or soft foods
-  ms('health', '6-9m', 2),        // Drinks from a cup with help
-  ms('health', '6-9m', 3),        // Begins self-feeding with fingers
-  ms('health', '6-9m', 4),        // Sleeps through the night (6-8 hours)
-  ms('health', '6-9m', 5),        // First teeth begin to appear
-
-  // -- 9-12m --
-  ms('health', '9-12m', 1),       // Feeds self finger foods
-  ms('health', '9-12m', 2),       // Holds a bottle or sippy cup independently
-  ms('health', '9-12m', 3),       // Chews soft foods
-  ms('health', '9-12m', 4),       // Cooperates with dressing (lifts arms)
-  ms('health', '9-12m', 5, true), // Triples birth weight by 12 months
-
-  // -- 12-18m --
-  ms('health', '12-18m', 1),       // Drinks from an open cup with some spilling
-  ms('health', '12-18m', 2),       // Begins to eat with a spoon
-  ms('health', '12-18m', 3),       // Naps once or twice a day consistently
-  ms('health', '12-18m', 4),       // Indicates discomfort with wet or dirty diaper
-  ms('health', '12-18m', 5),       // Helps with undressing (pulls off socks)
-
-  // -- 18-24m --
-  ms('health', '18-24m', 1),       // Uses a spoon and fork with some success
-  ms('health', '18-24m', 2),       // Shows interest in toilet training
-  ms('health', '18-24m', 3),       // Washes and dries hands with help
-  ms('health', '18-24m', 4),       // Removes loose clothing independently
-  ms('health', '18-24m', 5),       // Transitions to one nap per day
-
-  // -- 2-3y --
-  ms('health', '2-3y', 1, true),  // Begins daytime toilet training
-  ms('health', '2-3y', 2),        // Brushes teeth with help
-  ms('health', '2-3y', 3),        // Puts on some clothing independently
-  ms('health', '2-3y', 4),        // Washes hands independently
-  ms('health', '2-3y', 5),        // Eats with a fork and spoon competently
-
-  // -- 3-4y --
-  ms('health', '3-4y', 1),        // Uses the toilet independently most of the time
-  ms('health', '3-4y', 2),        // Pours from a small pitcher
-  ms('health', '3-4y', 3, true),  // Dresses and undresses independently (except buttons)
-  ms('health', '3-4y', 4),        // Brushes teeth with supervision
-  ms('health', '3-4y', 5),        // Sleeps 10-13 hours per day
-
-  // -- 4-5y --
-  ms('health', '4-5y', 1),        // Manages clothing fasteners (buttons, zippers)
-  ms('health', '4-5y', 2, true),  // Cares for own toileting needs independently
-  ms('health', '4-5y', 3),        // Washes face and hands without help
-  ms('health', '4-5y', 4),        // Uses a napkin appropriately
-  ms('health', '4-5y', 5),        // Serves self food from a communal bowl
-
-  // ========================================================================
-  // SENSORY DOMAIN (45 milestones)
+  // SENSORY DOMAIN (15 milestones — baby ages only: 0-3m, 3-6m, 6-9m)
   // ========================================================================
 
   // -- 0-3m --
@@ -501,48 +426,6 @@ export const MILESTONES: readonly Milestone[] = [
   ms('sensory', '6-9m', 3),        // Enjoys textured toys and different surfaces
   ms('sensory', '6-9m', 4),        // Explores objects by mouthing, touching, shaking
   ms('sensory', '6-9m', 5),        // Shows preference for certain tastes
-
-  // -- 9-12m --
-  ms('sensory', '9-12m', 1),       // Looks for dropped or hidden objects
-  ms('sensory', '9-12m', 2),       // Responds to music by bouncing or swaying
-  ms('sensory', '9-12m', 3, true), // Responds to quiet sounds from across the room
-  ms('sensory', '9-12m', 4),       // Enjoys messy play (food, water, sand)
-  ms('sensory', '9-12m', 5),       // Notices small objects and details
-
-  // -- 12-18m --
-  ms('sensory', '12-18m', 1),       // Points at distant objects of interest
-  ms('sensory', '12-18m', 2, true), // Recognizes self in a mirror
-  ms('sensory', '12-18m', 3),       // Enjoys listening to songs and rhymes
-  ms('sensory', '12-18m', 4),       // Tolerates variety of textures in food
-  ms('sensory', '12-18m', 5),       // Shows interest in colorful pictures
-
-  // -- 18-24m --
-  ms('sensory', '18-24m', 1),       // Identifies familiar sounds (dog barking, car horn)
-  ms('sensory', '18-24m', 2),       // Enjoys sensory play (sand, water, playdough)
-  ms('sensory', '18-24m', 3),       // Matches identical objects or pictures
-  ms('sensory', '18-24m', 4),       // Tolerates brushing teeth and hair
-  ms('sensory', '18-24m', 5),       // Shows awareness of body position during movement
-
-  // -- 2-3y --
-  ms('sensory', '2-3y', 1),        // Matches colors
-  ms('sensory', '2-3y', 2),        // Enjoys a variety of movement activities (swinging, sliding)
-  ms('sensory', '2-3y', 3),        // Tolerates a wide range of food textures
-  ms('sensory', '2-3y', 4),        // Identifies objects by touch without looking
-  ms('sensory', '2-3y', 5),        // Maintains balance on uneven surfaces
-
-  // -- 3-4y --
-  ms('sensory', '3-4y', 1),        // Names basic tastes (sweet, salty)
-  ms('sensory', '3-4y', 2, true),  // Has adequate visual acuity for age
-  ms('sensory', '3-4y', 3),        // Responds appropriately to hot and cold temperatures
-  ms('sensory', '3-4y', 4),        // Can play in noisy environments without distress
-  ms('sensory', '3-4y', 5),        // Coordinates hand and eye movements well
-
-  // -- 4-5y --
-  ms('sensory', '4-5y', 1),        // Copies simple shapes and patterns
-  ms('sensory', '4-5y', 2),        // Identifies common scents (flowers, food)
-  ms('sensory', '4-5y', 3),        // Has good binocular vision (depth perception)
-  ms('sensory', '4-5y', 4),        // Handles different sensory inputs without being overwhelmed
-  ms('sensory', '4-5y', 5),        // Demonstrates body awareness during physical activities
 ] as const;
 
 /* ----------------------------- Query helpers ----------------------------- */
@@ -557,7 +440,7 @@ export function getMilestonesByAgeRange(ageRange: AgeRangeId): Milestone[] {
   return MILESTONES.filter((m) => m.ageRange === ageRange);
 }
 
-/** All milestones for a given domain AND age range (returns 5) */
+/** All milestones for a given domain AND age range (returns 0 or 5) */
 export function getMilestonesByDomainAndAge(
   domain: DomainId,
   ageRange: AgeRangeId,

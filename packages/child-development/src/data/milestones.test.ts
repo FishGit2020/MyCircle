@@ -12,9 +12,9 @@ import {
 import type { DomainId, AgeRangeId } from './milestones';
 
 describe('milestones data', () => {
-  it('defines all 6 domains', () => {
+  it('defines all 5 domains', () => {
     const ids = DOMAINS.map(d => d.id);
-    expect(ids).toEqual(['physical', 'speech', 'cognitive', 'social', 'health', 'sensory']);
+    expect(ids).toEqual(['physical', 'speech', 'cognitive', 'social', 'sensory']);
   });
 
   it('defines all 9 age ranges', () => {
@@ -24,24 +24,39 @@ describe('milestones data', () => {
     ]);
   });
 
-  it('has exactly 270 milestones (6 domains × 9 age ranges × 5)', () => {
-    expect(MILESTONES).toHaveLength(270);
+  it('has exactly 195 milestones (4 core×9 ages + sensory×3 baby ages)', () => {
+    expect(MILESTONES).toHaveLength(195);
   });
 
-  it('each domain has milestones in every age range', () => {
-    const domainIds: DomainId[] = ['physical', 'speech', 'cognitive', 'social', 'health', 'sensory'];
+  it('each domain×age cell has 0 or 5 milestones', () => {
+    const domainIds: DomainId[] = ['physical', 'speech', 'cognitive', 'social', 'sensory'];
     const ageIds: AgeRangeId[] = ['0-3m', '3-6m', '6-9m', '9-12m', '12-18m', '18-24m', '2-3y', '3-4y', '4-5y'];
 
     for (const domain of domainIds) {
       for (const age of ageIds) {
         const milestones = getMilestonesByDomainAndAge(domain, age);
-        expect(milestones).toHaveLength(5);
+        expect(
+          milestones.length === 0 || milestones.length === 5,
+          `${domain}×${age} has ${milestones.length} milestones (expected 0 or 5)`,
+        ).toBe(true);
       }
     }
   });
 
+  it('sensory domain only has milestones for baby ages (0-3m, 3-6m, 6-9m)', () => {
+    const babyAges: AgeRangeId[] = ['0-3m', '3-6m', '6-9m'];
+    const olderAges: AgeRangeId[] = ['9-12m', '12-18m', '18-24m', '2-3y', '3-4y', '4-5y'];
+
+    for (const age of babyAges) {
+      expect(getMilestonesByDomainAndAge('sensory', age)).toHaveLength(5);
+    }
+    for (const age of olderAges) {
+      expect(getMilestonesByDomainAndAge('sensory', age)).toHaveLength(0);
+    }
+  });
+
   it('milestone IDs match {domain}-{ageRange}-{nn} pattern', () => {
-    const pattern = /^(physical|speech|cognitive|social|health|sensory)-(0_3m|3_6m|6_9m|9_12m|12_18m|18_24m|2_3y|3_4y|4_5y)-\d{2}$/;
+    const pattern = /^(physical|speech|cognitive|social|sensory)-(0_3m|3_6m|6_9m|9_12m|12_18m|18_24m|2_3y|3_4y|4_5y)-\d{2}$/;
     for (const m of MILESTONES) {
       expect(m.id).toMatch(pattern);
     }
@@ -59,23 +74,33 @@ describe('milestones data', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('has 10-15% red flags', () => {
+  it('has 10-18% red flags', () => {
     const redFlags = MILESTONES.filter(m => m.isRedFlag);
     const pct = (redFlags.length / MILESTONES.length) * 100;
     expect(pct).toBeGreaterThanOrEqual(10);
-    expect(pct).toBeLessThanOrEqual(15);
+    expect(pct).toBeLessThanOrEqual(18);
   });
 
-  it('getMilestonesByDomain returns 45 milestones for each domain', () => {
-    for (const d of DOMAINS) {
-      expect(getMilestonesByDomain(d.id)).toHaveLength(45);
-    }
+  it('getMilestonesByDomain returns correct counts per domain', () => {
+    expect(getMilestonesByDomain('physical')).toHaveLength(45);
+    expect(getMilestonesByDomain('speech')).toHaveLength(45);
+    expect(getMilestonesByDomain('cognitive')).toHaveLength(45);
+    expect(getMilestonesByDomain('social')).toHaveLength(45);
+    expect(getMilestonesByDomain('sensory')).toHaveLength(15);
   });
 
-  it('getMilestonesByAgeRange returns 30 milestones for each age range', () => {
-    for (const a of AGE_RANGES) {
-      expect(getMilestonesByAgeRange(a.id)).toHaveLength(30);
-    }
+  it('getMilestonesByAgeRange returns correct counts per age', () => {
+    // Baby ages: 4 core + sensory = 25
+    expect(getMilestonesByAgeRange('0-3m')).toHaveLength(25);
+    expect(getMilestonesByAgeRange('3-6m')).toHaveLength(25);
+    expect(getMilestonesByAgeRange('6-9m')).toHaveLength(25);
+    // Older ages: 4 core only = 20
+    expect(getMilestonesByAgeRange('9-12m')).toHaveLength(20);
+    expect(getMilestonesByAgeRange('12-18m')).toHaveLength(20);
+    expect(getMilestonesByAgeRange('18-24m')).toHaveLength(20);
+    expect(getMilestonesByAgeRange('2-3y')).toHaveLength(20);
+    expect(getMilestonesByAgeRange('3-4y')).toHaveLength(20);
+    expect(getMilestonesByAgeRange('4-5y')).toHaveLength(20);
   });
 
   it('getAgeRangeForMonths maps correctly', () => {

@@ -336,8 +336,8 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 Exposes `ChildDevelopment` component via Module Federation. Port **3012**.
 
 **Key Behavior:**
-- Informational developmental milestone reference from birth through age 5 (270 milestones, CDC guidelines)
-- 6 developmental domains (Physical, Speech, Cognitive, Social, Health, Sensory) with color-coded domain icons
+- Informational developmental milestone reference from birth through age 5 (195 milestones, CDC/AAP guidelines)
+- 5 developmental domains (Physical, Speech, Cognitive, Social, Sensory — baby ages only) with color-coded domain icons
 - 9 age ranges (0–3m, 3–6m, 6–9m, 9–12m, 12–18m, 18–24m, 2–3y, 3–4y, 4–5y)
 - **Vertical timeline** — progressive disclosure with color-coded stage dots (green past, blue current, gray upcoming); past and current stages auto-expand, future stages collapse; domain filter chips to toggle visibility; milestones displayed as bullet points grouped by domain
 - **CDC & AAP resource links** per age range stage linking to corresponding developmental guidelines

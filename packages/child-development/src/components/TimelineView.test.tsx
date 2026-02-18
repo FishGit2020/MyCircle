@@ -24,7 +24,7 @@ describe('TimelineView', () => {
     render(<TimelineView {...DEFAULT_PROPS} />);
 
     const chips = screen.getAllByRole('button', { pressed: true });
-    expect(chips).toHaveLength(6); // All 6 domains active
+    expect(chips).toHaveLength(5); // All 5 domains active
   });
 
   it('renders age range labels in timeline', () => {
@@ -129,15 +129,15 @@ describe('TimelineView', () => {
     const user = userEvent.setup();
     render(<TimelineView {...DEFAULT_PROPS} />);
 
-    // All 6 chips start pressed (active)
-    expect(screen.getAllByRole('button', { pressed: true })).toHaveLength(6);
+    // All 5 chips start pressed (active)
+    expect(screen.getAllByRole('button', { pressed: true })).toHaveLength(5);
 
     // Click the first chip (Physical) to deactivate it
     const physicalChips = screen.getAllByText('childDev.domainPhysical');
     await user.click(physicalChips[0]); // the filter chip
 
-    // Now 5 pressed, 1 unpressed
-    expect(screen.getAllByRole('button', { pressed: true })).toHaveLength(5);
+    // Now 4 pressed, 1 unpressed
+    expect(screen.getAllByRole('button', { pressed: true })).toHaveLength(4);
     expect(screen.getAllByRole('button', { pressed: false }).length).toBeGreaterThan(0);
   });
 
@@ -145,13 +145,12 @@ describe('TimelineView', () => {
     const user = userEvent.setup();
     render(<TimelineView {...DEFAULT_PROPS} />);
 
-    // Deactivate 5 of 6 domains
+    // Deactivate 4 of 5 domains
     const domainNames = [
       'childDev.domainPhysical',
       'childDev.domainSpeech',
       'childDev.domainCognitive',
       'childDev.domainSocial',
-      'childDev.domainHealth',
     ];
 
     for (const name of domainNames) {
