@@ -1,6 +1,6 @@
 import React, { useReducer, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router';
-import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents, REVERSE_GEOCODE, GET_CURRENT_WEATHER, useLazyQuery, useUnits, formatTemperature } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import ErrorBoundary from '../common/ErrorBoundary';
@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning' | 'worship';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -25,6 +25,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'childDev', visible: true },
   { id: 'englishLearning', visible: true },
   { id: 'chineseLearning', visible: true },
+  { id: 'worship', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -57,98 +58,9 @@ function saveLayout(layout: WidgetConfig[]) {
 
 // ─── Individual Widgets ──────────────────────────────────────────────────────
 
-/** Get a brief clothing tip based on temperature */
-function getClothingTip(temp: number, weatherMain: string): string {
-  const isRainy = /rain|drizzle|thunderstorm/i.test(weatherMain);
-  const isSnowy = /snow/i.test(weatherMain);
-  if (isSnowy) return 'widgets.tipSnow';
-  if (isRainy) return 'widgets.tipRain';
-  if (temp <= 0) return 'widgets.tipFreezing';
-  if (temp <= 10) return 'widgets.tipCold';
-  if (temp <= 20) return 'widgets.tipCool';
-  if (temp <= 28) return 'widgets.tipWarm';
-  return 'widgets.tipHot';
-}
-
-/** Get a weather condition icon */
-function getWeatherIcon(weatherMain: string): string {
-  const main = weatherMain.toLowerCase();
-  if (main.includes('thunder')) return '\u26C8\uFE0F';
-  if (main.includes('rain') || main.includes('drizzle')) return '\u{1F327}\uFE0F';
-  if (main.includes('snow')) return '\u{1F328}\uFE0F';
-  if (main.includes('cloud')) return '\u2601\uFE0F';
-  if (main === 'clear') return '\u2600\uFE0F';
-  if (main.includes('fog') || main.includes('mist') || main.includes('haze')) return '\u{1F32B}\uFE0F';
-  return '\u{1F324}\uFE0F';
-}
-
 const WeatherWidget = React.memo(function WeatherWidget() {
   const { t } = useTranslation();
-  const { tempUnit } = useUnits();
-  const [geoCity, setGeoCity] = React.useState<string | null>(null);
-  const [geoError, setGeoError] = React.useState(false);
-  const [geoDenied, setGeoDenied] = React.useState(false);
-  const [geoLoading, setGeoLoading] = React.useState(false);
-  const [needsPrompt, setNeedsPrompt] = React.useState(false);
-
-  const [fetchWeather, { data: weatherData }] = useLazyQuery(GET_CURRENT_WEATHER);
-  const [fetchGeocode, { data: geocodeData }] = useLazyQuery(REVERSE_GEOCODE);
-
-  // Update city name when geocode completes
-  useEffect(() => {
-    if (geocodeData?.reverseGeocode?.name) {
-      setGeoCity(geocodeData.reverseGeocode.name);
-    }
-  }, [geocodeData]);
-
-  const requestLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setGeoError(true);
-      return;
-    }
-    setGeoLoading(true);
-    setNeedsPrompt(false);
-    setGeoDenied(false);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        fetchWeather({ variables: { lat: latitude, lon: longitude } });
-        fetchGeocode({ variables: { lat: latitude, lon: longitude } });
-        setGeoLoading(false);
-      },
-      () => {
-        setGeoDenied(true);
-        setGeoLoading(false);
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
-    );
-  }, [fetchWeather, fetchGeocode]);
-
-  // Auto-fetch if permission was previously granted; otherwise show prompt
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setGeoError(true);
-      return;
-    }
-
-    if (navigator.permissions) {
-      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-        if (result.state === 'granted') {
-          requestLocation();
-        } else if (result.state === 'denied') {
-          setGeoDenied(true);
-        } else {
-          setNeedsPrompt(true);
-        }
-      });
-    } else {
-      // Permissions API not supported — show prompt button
-      setNeedsPrompt(true);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const current = weatherData?.currentWeather;
-  const weatherMain = current?.weather?.[0]?.main || '';
+  const { favoriteCities } = useAuth();
 
   return (
     <div>
@@ -160,75 +72,24 @@ const WeatherWidget = React.memo(function WeatherWidget() {
         </div>
         <div>
           <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.weather')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.weatherLocalDesc')}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.weatherDesc')}</p>
         </div>
       </div>
-
-      {/* Loading spinner */}
-      {geoLoading && (
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.locating')}</span>
+      {favoriteCities.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5">
+          {favoriteCities.map(city => (
+            <Link
+              key={city.id}
+              to={`/weather/${city.lat},${city.lon}?name=${encodeURIComponent(city.name)}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium hover:bg-blue-100 dark:hover:bg-blue-800/40 active:bg-blue-200 dark:active:bg-blue-700/40 transition-colors"
+            >
+              {city.name}
+            </Link>
+          ))}
         </div>
-      )}
-
-      {/* Weather data */}
-      {current && (
-        <div className="bg-gradient-to-r from-blue-50 to-sky-50 dark:from-blue-900/20 dark:to-sky-900/20 rounded-lg p-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-lg" role="img" aria-label={weatherMain}>{getWeatherIcon(weatherMain)}</span>
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {geoCity || t('widgets.yourLocation')}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {weatherMain}
-                </p>
-              </div>
-            </div>
-            <span className="text-lg font-semibold text-gray-900 dark:text-white">
-              {formatTemperature(current.temp, tempUnit)}
-            </span>
-          </div>
-          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5">
-            {t(getClothingTip(current.temp, weatherMain) as any)}
-          </p>
-        </div>
-      )}
-
-      {/* Location prompt — shown when permission hasn't been granted yet */}
-      {needsPrompt && !current && !geoLoading && (
-        <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-            {t('widgets.locationNeeded')}
-          </p>
-          <button
-            type="button"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); requestLocation(); }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 active:bg-blue-300 dark:active:bg-blue-800/50 transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            {t('widgets.useMyLocation')}
-          </button>
-        </div>
-      )}
-
-      {/* Permission denied */}
-      {geoDenied && !current && !geoLoading && (
-        <p className="text-xs text-amber-600 dark:text-amber-400">
-          {t('widgets.locationDenied')}
-        </p>
-      )}
-
-      {/* Geolocation not supported */}
-      {geoError && !current && (
-        <p className="text-xs text-amber-600 dark:text-amber-400">
-          {t('widgets.enableLocation')}
-        </p>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noFavoriteCity')}</p>
       )}
     </div>
   );
@@ -779,6 +640,68 @@ const ChineseLearningWidget = React.memo(function ChineseLearningWidget() {
   );
 });
 
+const WorshipWidget = React.memo(function WorshipWidget() {
+  const { t } = useTranslation();
+  const [songCount, setSongCount] = React.useState(0);
+  const [favCount, setFavCount] = React.useState(0);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.WORSHIP_SONGS_CACHE);
+        if (raw) {
+          const songs = JSON.parse(raw);
+          setSongCount(Array.isArray(songs) ? songs.length : 0);
+        } else {
+          setSongCount(0);
+        }
+      } catch { setSongCount(0); }
+      try {
+        const rawFav = localStorage.getItem(StorageKeys.WORSHIP_FAVORITES);
+        if (rawFav) {
+          const favs = JSON.parse(rawFav);
+          setFavCount(Array.isArray(favs) ? favs.length : 0);
+        } else {
+          setFavCount(0);
+        }
+      } catch { setFavCount(0); }
+    }
+    load();
+    window.addEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, load);
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center text-violet-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.worship')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.worshipDesc')}</p>
+        </div>
+      </div>
+      {songCount > 0 ? (
+        <div className="space-y-1">
+          <p className="text-sm text-violet-600 dark:text-violet-400 font-medium">
+            {t('widgets.worshipSongCount').replace('{count}', String(songCount))}
+          </p>
+          {favCount > 0 && (
+            <p className="text-xs text-violet-500 dark:text-violet-400/70">
+              {t('widgets.worshipFavCount').replace('{count}', String(favCount))}
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorshipSongs')}</p>
+      )}
+    </div>
+  );
+});
+
 // ─── Widget Registry ─────────────────────────────────────────────────────────
 
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
@@ -791,6 +714,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   childDev: ChildDevWidget,
   englishLearning: EnglishLearningWidget,
   chineseLearning: ChineseLearningWidget,
+  worship: WorshipWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -803,6 +727,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   childDev: '/child-dev',
   englishLearning: '/english',
   chineseLearning: '/chinese',
+  worship: '/worship',
 };
 
 // ─── Dashboard Reducer ──────────────────────────────────────────────────────

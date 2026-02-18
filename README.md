@@ -25,7 +25,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Smart widget visibility** — widgets only appear when the user has engagement data (e.g., stock watchlist, baby due date, learning progress); Weather and Verse always visible
 - **Desktop Quick Access tiles** — responsive grid of navigation tiles to all features (hidden on mobile, where BottomNav serves the same purpose)
 - **Per-widget error boundaries** — a crash in one widget doesn't take down the entire dashboard
-- Current location weather preview with clothing tip
+- Favorite cities quick-access chips on weather widget
 - Recent city searches for quick navigation
 - **Customizable bottom navigation** — reorderable nav items with drag-and-drop, persisted per user (Firestore when signed in, localStorage fallback)
 - **PWA Install Prompt** — Add to Home Screen banner with 7-day dismissal memory
@@ -232,7 +232,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 
 | Widget | Icon | Data Source | Smart Visibility |
 |--------|------|-------------|------------------|
-| **Weather** | Cloud/sun | Current location conditions via geolocation | Always visible |
+| **Weather** | Cloud/sun | Favorite cities as quick-access chips | Always visible |
 | **Bible Verse** | Book | Verse of the Day from curated collection | Always visible |
 | **Podcasts** | Headphones | Latest episodes from subscribed feeds | Has subscriptions |
 | **Notebook** | Pencil | Recent notes count from Firestore | Has saved notes |
