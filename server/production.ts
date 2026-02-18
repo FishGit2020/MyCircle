@@ -49,7 +49,7 @@ function getPodcastIndexHeaders(apiKey: string, apiSecret: string): Record<strin
   const ts = Math.floor(Date.now() / 1000);
   // SHA-1 required by PodcastIndex API auth spec (https://podcastindex-org.github.io/docs-api/#auth)
   // Not used for password hashing or security-critical integrity checks — safe to use here.
-  const hash = crypto.createHash('sha1').update(`${apiKey}${apiSecret}${ts}`).digest('hex'); // lgtm[js/weak-cryptographic-algorithm]
+  const hash = crypto.createHash('sha1').update(`${apiKey}${apiSecret}${ts}`).digest('hex');
   return {
     'X-Auth-Key': apiKey,
     'X-Auth-Date': String(ts),
