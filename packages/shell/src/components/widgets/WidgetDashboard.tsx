@@ -4,6 +4,7 @@ import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import ErrorBoundary from '../common/ErrorBoundary';
+import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -941,7 +942,7 @@ export default function WidgetDashboard() {
           {editing && (
             <button
               type="button"
-              onClick={() => dispatch({ type: 'RESET' })}
+              onClick={() => { logEvent('widget_reset'); dispatch({ type: 'RESET' }); }}
               className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
               {t('widgets.reset')}
@@ -1025,7 +1026,7 @@ export default function WidgetDashboard() {
                   {/* Visibility toggle */}
                   <button
                     type="button"
-                    onClick={() => dispatch({ type: 'TOGGLE_VISIBILITY', index })}
+                    onClick={() => { logEvent('widget_toggle_visibility', { widget_id: widget.id, visible: !widget.visible }); dispatch({ type: 'TOGGLE_VISIBILITY', index }); }}
                     className={`text-xs px-2 py-1 rounded-full transition-colors ${
                       widget.visible
                         ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'

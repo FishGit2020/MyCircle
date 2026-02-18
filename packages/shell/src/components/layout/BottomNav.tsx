@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router';
 import { useTranslation, StorageKeys, WindowEvents, TranslationKey } from '@mycircle/shared';
+import { logEvent } from '../../lib/firebase';
 
 interface NavItem {
   path: string;
@@ -270,6 +271,7 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
             <Link
               key={item.path}
               to={item.path}
+              onClick={() => logEvent('bottom_nav_tap', { item_path: item.path })}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
                 active
                   ? 'text-blue-600 dark:text-blue-400'
@@ -286,7 +288,7 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
         {/* More button */}
         <div ref={moreRef} className="relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full">
           <button
-            onClick={() => setMoreOpen(prev => !prev)}
+            onClick={() => setMoreOpen(prev => { if (!prev) logEvent('bottom_nav_more_open'); return !prev; })}
             className={`flex flex-col items-center justify-center gap-0.5 w-full h-full transition-colors ${
               isMoreActive || moreOpen
                 ? 'text-blue-600 dark:text-blue-400'

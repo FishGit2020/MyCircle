@@ -89,6 +89,7 @@ export default function PodcastPlayer() {
       setCurrentEpisode(episode);
       setIsPlaying(true);
     }
+    window.__logAnalyticsEvent?.('episode_play', { podcast_title: selectedPodcast?.title ?? '' });
     eventBus.publish(MFEvents.PODCAST_PLAY_EPISODE, { episode, podcast: selectedPodcast });
   }, [currentEpisode?.id, selectedPodcast]);
 
@@ -104,8 +105,10 @@ export default function PodcastPlayer() {
       const id = String(podcast.id);
       if (next.has(id)) {
         next.delete(id);
+        window.__logAnalyticsEvent?.('podcast_subscribe', { podcast_title: podcast.title, action: 'unsubscribe' });
       } else {
         next.add(id);
+        window.__logAnalyticsEvent?.('podcast_subscribe', { podcast_title: podcast.title, action: 'subscribe' });
       }
       saveSubscriptions(next);
       // Notify shell for Firestore sync

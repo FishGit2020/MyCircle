@@ -166,6 +166,88 @@ ORDER BY vital, avg_value DESC
 
 ---
 
+## Custom GA4 Events
+
+### Overview
+
+MyCircle tracks 24 custom GA4 events across the shell and MFE packages. Shell components import `logEvent` directly; MFE packages use the `window.__logAnalyticsEvent` bridge.
+
+### Event Catalog
+
+| # | Event Name | Parameters | Source | Component |
+|---|---|---|---|---|
+| 1 | `login` | `{method}` | Shell | AuthModal |
+| 2 | `city_searched` | `{query}` | Shell | CitySearch |
+| 3 | `feedback_submitted` | `{category, rating}` | Shell | FeedbackButton |
+| 4 | `web_vitals` | `{metric_name, metric_value, ...}` | Shell | webVitals.ts |
+| 5 | `nav_dropdown_open` | `{group}` | Shell | Layout |
+| 6 | `bottom_nav_tap` | `{item_path}` | Shell | BottomNav |
+| 7 | `bottom_nav_more_open` | — | Shell | BottomNav |
+| 8 | `command_palette_open` | — | Shell | CommandPalette |
+| 9 | `command_palette_select` | `{category, item}` | Shell | CommandPalette |
+| 10 | `theme_toggle` | `{new_theme}` | Shell | ThemeToggle |
+| 11 | `language_change` | `{locale}` | Shell | LanguageSelector |
+| 12 | `widget_toggle_visibility` | `{widget_id, visible}` | Shell | WidgetDashboard |
+| 13 | `widget_reset` | — | Shell | WidgetDashboard |
+| 14 | `onboarding_step` | `{step}` | Shell | Onboarding |
+| 15 | `onboarding_complete` | — | Shell | Onboarding |
+| 16 | `watchlist_toggle` | `{symbol, action}` | MFE | StockTracker |
+| 17 | `episode_play` | `{podcast_title}` | MFE | PodcastPlayer |
+| 18 | `podcast_subscribe` | `{podcast_title, action}` | MFE | PodcastPlayer |
+| 19 | `bible_chapter_read` | `{book, chapter}` | MFE | BibleReader |
+| 20 | `worship_song_favorite` | `{song_title}` | MFE | SongList |
+| 21 | `note_save` | `{is_new}` | MFE | NoteEditor |
+| 22 | `baby_due_date_save` | — | MFE | BabyTracker |
+| 23 | `child_info_save` | — | MFE | ChildDevelopment |
+| 24 | `chinese_character_mastered` | — | MFE | ChineseLearning |
+| 25 | `english_lesson_complete` | — | MFE | EnglishLearning |
+
+### MFE Analytics Bridge
+
+MFE packages cannot import from the shell. The shell exposes a bridge on `window`:
+
+```typescript
+// Shell (firebase.ts) — sets up the bridge
+window.__logAnalyticsEvent = (eventName, params) => logEvent(eventName, params);
+
+// MFE component — calls via optional chaining (no-op when standalone)
+window.__logAnalyticsEvent?.('watchlist_toggle', { symbol, action: 'add' });
+```
+
+The `?.` operator makes MFE analytics calls a **safe no-op** in:
+- Unit tests (no bridge set up)
+- Standalone dev mode (MFE running outside shell)
+- Pre-Firebase initialization
+
+The Window type declaration lives in `packages/shell/src/context/RemoteConfigContext.tsx` alongside other `window.__*` bridge types.
+
+### Register Custom Dimensions in GA4
+
+For event parameters to appear in GA4 reports, register them as custom dimensions:
+
+**GA4 > Admin > Data display > Custom definitions > Create custom dimension**
+
+| Display Name | Event Parameter | Scope |
+|---|---|---|
+| Nav Group | `group` | Event |
+| Nav Item Path | `item_path` | Event |
+| Command Category | `category` | Event |
+| Command Item | `item` | Event |
+| Theme | `new_theme` | Event |
+| Locale | `locale` | Event |
+| Widget ID | `widget_id` | Event |
+| Widget Visible | `visible` | Event |
+| Onboarding Step | `step` | Event |
+| Stock Symbol | `symbol` | Event |
+| Action | `action` | Event |
+| Podcast Title | `podcast_title` | Event |
+| Bible Book | `book` | Event |
+| Bible Chapter | `chapter` | Event |
+| Song Title | `song_title` | Event |
+| Is New Note | `is_new` | Event |
+
+---
+
 ## Firebase Performance Monitoring
 
 ### Automatic Traces

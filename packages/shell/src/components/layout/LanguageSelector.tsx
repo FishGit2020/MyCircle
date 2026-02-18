@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useTranslation, Locale } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
+import { logEvent } from '../../lib/firebase';
 
 const LOCALES: { value: Locale; label: string }[] = [
   { value: 'en', label: 'EN' },
@@ -29,6 +30,7 @@ export default function LanguageSelector() {
 
   const handleChange = (newLocale: Locale) => {
     setLocale(newLocale);
+    logEvent('language_change', { locale: newLocale });
     if (user) {
       updateLocale(newLocale);
     }

@@ -69,6 +69,7 @@ export default function BabyTracker() {
     localStorage.setItem(StorageKeys.BABY_DUE_DATE, inputDate);
     setDueDate(inputDate);
     window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+    window.__logAnalyticsEvent?.('baby_due_date_save');
   }, [inputDate]);
 
   const clearDueDate = useCallback(() => {

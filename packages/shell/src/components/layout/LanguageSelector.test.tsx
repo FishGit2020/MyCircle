@@ -9,6 +9,8 @@ let mockLocale = 'en';
 let mockUser: any = null;
 let mockProfile: any = null;
 
+vi.mock('../../lib/firebase', () => ({ logEvent: vi.fn() }));
+
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     locale: mockLocale,

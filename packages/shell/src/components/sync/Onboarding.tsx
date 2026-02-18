@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
+import { logEvent } from '../../lib/firebase';
 
 const ONBOARDING_KEY = 'mycircle-onboarding-complete';
 
@@ -136,8 +137,10 @@ export default function Onboarding() {
 
   const nextStep = useCallback(() => {
     if (step < STEPS.length - 1) {
+      logEvent('onboarding_step', { step: step + 1 });
       setStep(s => s + 1);
     } else {
+      logEvent('onboarding_complete');
       dismiss();
     }
   }, [step, dismiss]);

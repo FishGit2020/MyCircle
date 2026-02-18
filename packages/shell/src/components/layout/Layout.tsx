@@ -21,6 +21,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useFocusOnRouteChange } from '../../hooks/useFocusOnRouteChange';
 import { useRecentlyVisited } from '../../hooks/useRecentlyVisited';
+import { logEvent } from '../../lib/firebase';
 
 // Prefetch MFE remote modules on hover/focus to reduce perceived load time
 const prefetched = new Set<string>();
@@ -264,7 +265,13 @@ export default function Layout() {
                   key={group.labelKey}
                   group={group}
                   isOpen={openGroup === group.labelKey}
-                  onToggle={() => setOpenGroup(prev => prev === group.labelKey ? null : group.labelKey)}
+                  onToggle={() => {
+                    setOpenGroup(prev => {
+                      const next = prev === group.labelKey ? null : group.labelKey;
+                      if (next) logEvent('nav_dropdown_open', { group: group.labelKey });
+                      return next;
+                    });
+                  }}
                   pathname={location.pathname}
                   t={t}
                 />
