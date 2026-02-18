@@ -114,7 +114,7 @@ function VotdSection() {
 
   if (loading) {
     return (
-      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800/40 animate-pulse">
+      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800/40 animate-pulse min-h-[140px]">
         <div className="h-4 bg-blue-200 dark:bg-blue-800/40 rounded w-3/4 mx-auto mb-3" />
         <div className="h-3 bg-blue-200 dark:bg-blue-800/40 rounded w-1/2 mx-auto" />
       </div>
@@ -130,7 +130,7 @@ function VotdSection() {
   }
 
   return (
-    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800/40">
+    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800/40 min-h-[140px]">
       <h2 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wide">
         {t('bible.verseOfDay')}
       </h2>

@@ -20,7 +20,7 @@ export default function DashboardPage() {
         </p>
         {/* Daily Bible verse */}
         <div className="max-w-lg mx-auto">
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 border border-blue-100 dark:border-blue-800/40 min-h-[72px]">
             {loading ? (
               <div className="animate-pulse space-y-2">
                 <div className="h-4 bg-blue-200 dark:bg-blue-700/40 rounded w-3/4 mx-auto" />

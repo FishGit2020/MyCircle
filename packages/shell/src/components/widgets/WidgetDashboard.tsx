@@ -933,7 +933,7 @@ export default function WidgetDashboard() {
               <Link
                 key={widget.id}
                 to={to}
-                className="block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
+                className="block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all min-h-[120px]"
               >
                 <ErrorBoundary>
                   <WidgetComponent />
