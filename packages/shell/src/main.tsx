@@ -14,6 +14,7 @@ import './index.css';
 
 Sentry.init({
   dsn: 'https://87fdd6cb3be74b2284019ac9fdce801e@o4510878995251200.ingest.us.sentry.io/4510878996299776',
+  release: import.meta.env.VITE_SENTRY_RELEASE || undefined,
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
