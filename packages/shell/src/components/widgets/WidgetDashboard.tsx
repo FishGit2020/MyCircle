@@ -348,52 +348,19 @@ const NotebookWidget = React.memo(function NotebookWidget() {
   );
 });
 
-// Inline size lookups for widget — duplication necessary since we can't import from baby-tracker MFE
-type CompareCategory = 'fruit' | 'animal' | 'vegetable';
-const BABY_SIZES: Record<CompareCategory, string[]> = {
-  fruit: [
-    '', 'poppy seed', 'poppy seed', 'poppy seed', 'poppy seed', 'sesame seed', 'lentil', 'blueberry',
-    'raspberry', 'grape', 'kumquat', 'fig', 'lime', 'lemon', 'peach', 'apple', 'avocado', 'pear',
-    'bell pepper', 'mango', 'banana', 'carrot', 'papaya', 'grapefruit', 'ear of corn', 'rutabaga',
-    'scallion bunch', 'cauliflower', 'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama',
-    'pineapple', 'cantaloupe', 'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek',
-    'mini watermelon', 'watermelon',
-  ],
-  animal: [
-    '', 'flea', 'flea', 'flea', 'ant', 'tadpole', 'ladybug', 'bee', 'tree frog', 'goldfish',
-    'hummingbird', 'mouse', 'hamster', 'gerbil', 'chipmunk', 'hedgehog', 'duckling', 'baby rabbit',
-    'guinea pig', 'ferret', 'kitten', 'sugar glider', 'chinchilla', 'prairie dog', 'cottontail rabbit',
-    'barn owl', 'groundhog', 'toy poodle', 'red panda', 'jackrabbit', 'small cat', 'raccoon',
-    'cocker spaniel', 'armadillo', 'fox cub', 'beagle puppy', 'otter', 'koala', 'red fox', 'corgi',
-    'small lamb',
-  ],
-  vegetable: [
-    '', 'grain of salt', 'grain of salt', 'mustard seed', 'peppercorn', 'sesame seed', 'lentil',
-    'kidney bean', 'chickpea', 'olive', 'Brussels sprout', 'baby carrot', 'jalape\u00f1o',
-    'snap pea pod', 'tomato', 'artichoke', 'beet', 'turnip', 'bell pepper', 'zucchini', 'sweet potato',
-    'carrot', 'spaghetti squash', 'potato', 'ear of corn', 'rutabaga', 'scallion bunch', 'cauliflower',
-    'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama', 'celery stalk', 'cantaloupe',
-    'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek', 'pumpkin', 'watermelon',
-  ],
-};
-const CATEGORY_ICONS: Record<CompareCategory, string> = { fruit: '\uD83C\uDF4E', animal: '\uD83D\uDC3E', vegetable: '\uD83E\uDD66' };
-const CATEGORIES: CompareCategory[] = ['fruit', 'animal', 'vegetable'];
+// Inline fruit-size lookup for widget — duplication necessary since we can't import from baby-tracker MFE
+const BABY_FRUIT_SIZES: string[] = [
+  '', 'poppy seed', 'poppy seed', 'poppy seed', 'poppy seed', 'sesame seed', 'lentil', 'blueberry',
+  'raspberry', 'grape', 'kumquat', 'fig', 'lime', 'lemon', 'peach', 'apple', 'avocado', 'pear',
+  'bell pepper', 'mango', 'banana', 'carrot', 'papaya', 'grapefruit', 'ear of corn', 'rutabaga',
+  'scallion bunch', 'cauliflower', 'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama',
+  'pineapple', 'cantaloupe', 'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek',
+  'mini watermelon', 'watermelon',
+];
 
 const BabyTrackerWidget = React.memo(function BabyTrackerWidget() {
   const { t } = useTranslation();
   const [weekInfo, setWeekInfo] = React.useState<{ week: number; day: number } | null>(null);
-  const [category, setCategory] = React.useState<CompareCategory>(() => {
-    try {
-      const stored = localStorage.getItem(StorageKeys.BABY_COMPARE_CATEGORY);
-      if (stored && (stored === 'fruit' || stored === 'animal' || stored === 'vegetable')) return stored;
-    } catch { /* ignore */ }
-    return 'fruit';
-  });
-
-  const handleCategoryChange = useCallback((cat: CompareCategory) => {
-    setCategory(cat);
-    try { localStorage.setItem(StorageKeys.BABY_COMPARE_CATEGORY, cat); } catch { /* ignore */ }
-  }, []);
 
   useEffect(() => {
     function compute() {
@@ -422,7 +389,7 @@ const BabyTrackerWidget = React.memo(function BabyTrackerWidget() {
     return () => window.removeEventListener('baby-due-date-changed', compute);
   }, []);
 
-  const sizeLabel = weekInfo ? (BABY_SIZES[category][weekInfo.week] || '') : '';
+  const sizeLabel = weekInfo ? (BABY_FRUIT_SIZES[weekInfo.week] || '') : '';
 
   return (
     <div>
@@ -442,23 +409,6 @@ const BabyTrackerWidget = React.memo(function BabyTrackerWidget() {
           <p className="text-sm text-pink-600 dark:text-pink-400 font-medium capitalize">
             {t('baby.week')} {weekInfo.week}{weekInfo.day > 0 ? ` + ${weekInfo.day} ${t('baby.days')}` : ''} — {sizeLabel}
           </p>
-          <div className="flex gap-1 mt-1.5">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                type="button"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCategoryChange(cat); }}
-                className={`text-xs px-1.5 py-0.5 rounded-full transition-colors ${
-                  category === cat
-                    ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                }`}
-                aria-label={t(`baby.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any)}
-              >
-                {CATEGORY_ICONS[cat]}
-              </button>
-            ))}
-          </div>
         </>
       ) : (
         <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noDueDate')}</p>

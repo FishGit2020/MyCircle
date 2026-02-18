@@ -27,7 +27,6 @@ vi.mock('@mycircle/shared', () => ({
     WORSHIP_FAVORITES: 'worship-favorites',
     NOTEBOOK_CACHE: 'notebook-cache',
     BABY_DUE_DATE: 'baby-due-date',
-    BABY_COMPARE_CATEGORY: 'baby-compare-category',
     ENGLISH_LEARNING_PROGRESS: 'english-learning-progress',
     CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
     CHILD_NAME: 'child-name',

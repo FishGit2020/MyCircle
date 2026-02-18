@@ -62,7 +62,6 @@ export const StorageKeys = {
   BIBLE_TRANSLATION: 'bible-translation',
   NOTEBOOK_CACHE: 'notebook-cache',
   BABY_DUE_DATE: 'baby-due-date',
-  BABY_COMPARE_CATEGORY: 'baby-compare-category',
   CHILD_NAME: 'child-name',
   CHILD_BIRTH_DATE: 'child-birth-date',
   CHILD_MILESTONES: 'child-milestones',
