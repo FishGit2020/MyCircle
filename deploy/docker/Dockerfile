@@ -41,8 +41,6 @@ RUN --mount=type=secret,id=VITE_FIREBASE_API_KEY \
     --mount=type=secret,id=VITE_FIREBASE_APP_ID \
     --mount=type=secret,id=VITE_FIREBASE_MEASUREMENT_ID \
     --mount=type=secret,id=VITE_FIREBASE_VAPID_KEY \
-    --mount=type=secret,id=VITE_SENTRY_DSN \
-    --mount=type=secret,id=VITE_RECAPTCHA_SITE_KEY \
     for f in /run/secrets/VITE_*; do \
       [ -f "$f" ] && export "$(basename "$f")=$(cat "$f")"; \
     done && \

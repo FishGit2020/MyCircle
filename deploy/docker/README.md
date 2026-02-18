@@ -187,8 +187,6 @@ docker buildx build \
   --secret id=VITE_FIREBASE_APP_ID,env=VITE_FIREBASE_APP_ID \
   --secret id=VITE_FIREBASE_MEASUREMENT_ID,env=VITE_FIREBASE_MEASUREMENT_ID \
   --secret id=VITE_FIREBASE_VAPID_KEY,env=VITE_FIREBASE_VAPID_KEY \
-  --secret id=VITE_SENTRY_DSN,env=VITE_SENTRY_DSN \
-  --secret id=VITE_RECAPTCHA_SITE_KEY,env=VITE_RECAPTCHA_SITE_KEY \
   -t mycircle:local .
 
 docker compose -f deploy/docker/docker-compose.yml up -d
