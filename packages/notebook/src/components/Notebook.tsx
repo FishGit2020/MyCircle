@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { useTranslation, PullToRefresh } from '@mycircle/shared';
+import { useTranslation } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
 import { usePublicNotes } from '../hooks/usePublicNotes';
 import NoteList from './NoteList';
@@ -116,7 +116,6 @@ export default function Notebook() {
   ];
 
   return (
-    <PullToRefresh onRefresh={async () => { reload(); reloadPublic(); }}>
     <div className="space-y-4">
       {/* Tab bar */}
       <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700" role="tablist" aria-label={t('notebook.title')}>
@@ -135,6 +134,16 @@ export default function Notebook() {
             {label}
           </button>
         ))}
+        <button
+          type="button"
+          onClick={() => { reload(); reloadPublic(); }}
+          className="ml-auto p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label={t('notebook.refresh')}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
       </div>
 
       <NoteList
@@ -145,6 +154,5 @@ export default function Notebook() {
         isPublicView={tab === 'public'}
       />
     </div>
-    </PullToRefresh>
   );
 }

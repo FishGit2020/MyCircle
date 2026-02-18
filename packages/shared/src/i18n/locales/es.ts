@@ -1341,10 +1341,10 @@ const es: Record<TranslationKey, string> = {
   'chinese.signInToAdd': 'Inicia sesi\u00f3n para agregar caracteres',
   'chinese.loading': 'Cargando caracteres...',
 
-  // Pull to Refresh
-  'pullToRefresh.hint': 'Desliza para actualizar',
-  'pullToRefresh.release': 'Suelta para actualizar',
-  'pullToRefresh.refreshing': 'Actualizando...',
+  // Refresh buttons
+  'notebook.refresh': 'Actualizar',
+  'worship.refresh': 'Actualizar',
+  'crypto.refresh': 'Actualizar',
 };
 
 export default es;

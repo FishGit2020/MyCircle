@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router';
-import { useWeatherData, useHistoricalWeather, useAirQuality, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys, REVERSE_GEOCODE, useLazyQuery, PullToRefresh } from '@mycircle/shared';
+import { useWeatherData, useHistoricalWeather, useAirQuality, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys, REVERSE_GEOCODE, useLazyQuery } from '@mycircle/shared';
 import CurrentWeather from './CurrentWeatherV1';
 import Forecast from './Forecast';
 import HourlyForecast from './HourlyForecast';
@@ -172,7 +172,6 @@ export default function WeatherDisplay() {
   }
 
   return (
-    <PullToRefresh onRefresh={() => refetch()}>
     <div className="weather-display-container space-y-6 animate-fadeIn" aria-live="polite">
       <Link
         to="/weather"
@@ -288,6 +287,5 @@ export default function WeatherDisplay() {
         </span>
       </div>
     </div>
-    </PullToRefresh>
   );
 }
