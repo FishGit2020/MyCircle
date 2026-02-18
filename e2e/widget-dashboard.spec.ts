@@ -48,10 +48,10 @@ test.describe('Widget Dashboard', () => {
     // Enter customize mode
     await page.getByRole('button', { name: /customize/i }).click({ timeout: 10_000 });
 
-    // All 8 widgets should show visibility toggle buttons in edit mode
+    // All 10 widgets should show visibility toggle buttons in edit mode
     const visibleButtons = page.getByRole('button', { name: /toggle widget/i });
     const count = await visibleButtons.count();
-    expect(count).toBe(9);
+    expect(count).toBe(10);
   });
 
   test('widget visibility change persists after page reload', async ({ page }) => {
