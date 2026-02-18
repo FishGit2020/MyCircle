@@ -1302,7 +1302,7 @@ A single Node.js container (`server/production.ts`) serves both the assembled st
 
 ### CI Pipeline
 
-The `docker-deploy.yml` workflow triggers on push to `main` (same path filters as `deploy.yml`). It builds the Docker image with Vite build-time secrets (`VITE_FIREBASE_*`) passed as `--build-arg`, tags it with the commit SHA and `latest`, and pushes to GitHub Container Registry (GHCR). The build uses GitHub Actions cache (`type=gha`) for Docker layer caching.
+The `docker-deploy.yml` workflow triggers on push to `main` (same path filters as `deploy.yml`). It builds the Docker image with Vite build-time config (`VITE_FIREBASE_*`) injected via BuildKit `--secret` mounts (not `--build-arg`) so values never persist in image layer metadata. The image is tagged with the commit SHA and `latest`, then pushed to GitHub Container Registry (GHCR). The build uses GitHub Actions cache (`type=gha`) for Docker layer caching.
 
 ### Deployment Guide
 

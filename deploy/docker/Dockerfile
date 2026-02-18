@@ -28,20 +28,25 @@ RUN pnpm install --frozen-lockfile
 # Copy source
 COPY . .
 
-# Accept Vite build-time env vars
-ARG VITE_FIREBASE_API_KEY
-ARG VITE_FIREBASE_AUTH_DOMAIN
-ARG VITE_FIREBASE_PROJECT_ID
-ARG VITE_FIREBASE_STORAGE_BUCKET
-ARG VITE_FIREBASE_MESSAGING_SENDER_ID
-ARG VITE_FIREBASE_APP_ID
-ARG VITE_FIREBASE_MEASUREMENT_ID
-ARG VITE_FIREBASE_VAPID_KEY
-ARG VITE_SENTRY_DSN
-ARG VITE_RECAPTCHA_SITE_KEY
-
 # Build shared → all MFEs → assemble static output
-RUN pnpm build:shared && \
+# Vite build-time config is injected via BuildKit secret mounts so values
+# never persist in image layers (unlike ARG, which is visible in `docker history`).
+# Even though these are public Firebase client keys, secret mounts keep them
+# out of the image metadata as a defence-in-depth measure.
+RUN --mount=type=secret,id=VITE_FIREBASE_API_KEY \
+    --mount=type=secret,id=VITE_FIREBASE_AUTH_DOMAIN \
+    --mount=type=secret,id=VITE_FIREBASE_PROJECT_ID \
+    --mount=type=secret,id=VITE_FIREBASE_STORAGE_BUCKET \
+    --mount=type=secret,id=VITE_FIREBASE_MESSAGING_SENDER_ID \
+    --mount=type=secret,id=VITE_FIREBASE_APP_ID \
+    --mount=type=secret,id=VITE_FIREBASE_MEASUREMENT_ID \
+    --mount=type=secret,id=VITE_FIREBASE_VAPID_KEY \
+    --mount=type=secret,id=VITE_SENTRY_DSN \
+    --mount=type=secret,id=VITE_RECAPTCHA_SITE_KEY \
+    for f in /run/secrets/VITE_*; do \
+      [ -f "$f" ] && export "$(basename "$f")=$(cat "$f")"; \
+    done && \
+    pnpm build:shared && \
     NODE_ENV=production pnpm build:mf && \
     node scripts/assemble-firebase.mjs
 
@@ -52,20 +57,22 @@ RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 
-# Copy package manifests and install production deps only
+# Copy package manifests (real files so lockfile stays in sync)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/shared/package.json packages/shared/
-# Dummy workspace entries to satisfy pnpm (only root deps needed at runtime)
-RUN mkdir -p packages/shell packages/city-search packages/weather-display \
-    packages/stock-tracker packages/podcast-player packages/ai-assistant \
-    packages/bible-reader packages/worship-songs packages/notebook \
-    packages/baby-tracker packages/child-development packages/chinese-learning \
-    packages/english-learning && \
-    for pkg in shell city-search weather-display stock-tracker podcast-player \
-    ai-assistant bible-reader worship-songs notebook baby-tracker \
-    child-development chinese-learning english-learning; do \
-      echo '{"name":"@mycircle/'$pkg'","version":"1.0.0","private":true}' > packages/$pkg/package.json; \
-    done
+COPY --from=builder /app/packages/shared/package.json packages/shared/
+COPY --from=builder /app/packages/shell/package.json packages/shell/
+COPY --from=builder /app/packages/city-search/package.json packages/city-search/
+COPY --from=builder /app/packages/weather-display/package.json packages/weather-display/
+COPY --from=builder /app/packages/stock-tracker/package.json packages/stock-tracker/
+COPY --from=builder /app/packages/podcast-player/package.json packages/podcast-player/
+COPY --from=builder /app/packages/ai-assistant/package.json packages/ai-assistant/
+COPY --from=builder /app/packages/bible-reader/package.json packages/bible-reader/
+COPY --from=builder /app/packages/worship-songs/package.json packages/worship-songs/
+COPY --from=builder /app/packages/notebook/package.json packages/notebook/
+COPY --from=builder /app/packages/baby-tracker/package.json packages/baby-tracker/
+COPY --from=builder /app/packages/child-development/package.json packages/child-development/
+COPY --from=builder /app/packages/chinese-learning/package.json packages/chinese-learning/
+COPY --from=builder /app/packages/english-learning/package.json packages/english-learning/
 
 RUN pnpm install --frozen-lockfile --prod && \
     pnpm store prune

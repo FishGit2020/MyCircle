@@ -174,16 +174,22 @@ Cloudflare handles HTTPS termination, DDoS protection, and DNS automatically.
 To build the image locally instead of pulling from GHCR:
 
 ```bash
-# From the repo root
-docker compose -f deploy/docker/docker-compose.yml build \
-  --build-arg VITE_FIREBASE_API_KEY=... \
-  --build-arg VITE_FIREBASE_AUTH_DOMAIN=... \
-  --build-arg VITE_FIREBASE_PROJECT_ID=... \
-  --build-arg VITE_FIREBASE_STORAGE_BUCKET=... \
-  --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID=... \
-  --build-arg VITE_FIREBASE_APP_ID=... \
-  --build-arg VITE_FIREBASE_MEASUREMENT_ID=... \
-  --build-arg VITE_FIREBASE_VAPID_KEY=...
+# From the repo root — secrets are passed via BuildKit secret mounts
+# (not --build-arg) so they never appear in docker history.
+# Set the VITE_* env vars in your shell first, then:
+docker buildx build \
+  --file deploy/docker/Dockerfile \
+  --secret id=VITE_FIREBASE_API_KEY,env=VITE_FIREBASE_API_KEY \
+  --secret id=VITE_FIREBASE_AUTH_DOMAIN,env=VITE_FIREBASE_AUTH_DOMAIN \
+  --secret id=VITE_FIREBASE_PROJECT_ID,env=VITE_FIREBASE_PROJECT_ID \
+  --secret id=VITE_FIREBASE_STORAGE_BUCKET,env=VITE_FIREBASE_STORAGE_BUCKET \
+  --secret id=VITE_FIREBASE_MESSAGING_SENDER_ID,env=VITE_FIREBASE_MESSAGING_SENDER_ID \
+  --secret id=VITE_FIREBASE_APP_ID,env=VITE_FIREBASE_APP_ID \
+  --secret id=VITE_FIREBASE_MEASUREMENT_ID,env=VITE_FIREBASE_MEASUREMENT_ID \
+  --secret id=VITE_FIREBASE_VAPID_KEY,env=VITE_FIREBASE_VAPID_KEY \
+  --secret id=VITE_SENTRY_DSN,env=VITE_SENTRY_DSN \
+  --secret id=VITE_RECAPTCHA_SITE_KEY,env=VITE_RECAPTCHA_SITE_KEY \
+  -t mycircle:local .
 
 docker compose -f deploy/docker/docker-compose.yml up -d
 ```
