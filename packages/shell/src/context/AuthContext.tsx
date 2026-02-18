@@ -175,11 +175,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(plainDate)) {
               try { plainDate = atob(plainDate); } catch { /* use as-is */ }
             }
-            try {
-              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, btoa(plainDate));
-            } catch {
-              localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, plainDate);
-            }
+            // btoa() is safe for date strings (pure ASCII); no fallback needed
+            localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, btoa(plainDate));
           }
           if (userProfile.childName || userProfile.childBirthDate) {
             window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
