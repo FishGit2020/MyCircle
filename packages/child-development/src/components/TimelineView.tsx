@@ -41,27 +41,27 @@ const DOMAIN_COLORS: Record<string, { bg: string; fill: string; text: string }> 
 /* ─── CDC / AAP Resource Links per age range ──────────────────────────────── */
 
 const CDC_LINKS: Record<AgeRangeId, string> = {
-  '0-3m':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-2mo.html',
-  '3-6m':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-4mo.html',
-  '6-9m':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-6mo.html',
-  '9-12m': 'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-9mo.html',
-  '12-18m':'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-12mo.html',
-  '18-24m':'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-18mo.html',
-  '2-3y':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-2yr.html',
-  '3-4y':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-3yr.html',
-  '4-5y':  'https://www.cdc.gov/ncbddd/actearly/milestones/milestones-4yr.html',
+  '0-3m':  'https://www.cdc.gov/act-early/milestones/2-months.html',
+  '3-6m':  'https://www.cdc.gov/act-early/milestones/4-months.html',
+  '6-9m':  'https://www.cdc.gov/act-early/milestones/6-months.html',
+  '9-12m': 'https://www.cdc.gov/act-early/milestones/9-months.html',
+  '12-18m':'https://www.cdc.gov/act-early/milestones/1-year.html',
+  '18-24m':'https://www.cdc.gov/act-early/milestones/18-months.html',
+  '2-3y':  'https://www.cdc.gov/act-early/milestones/2-years.html',
+  '3-4y':  'https://www.cdc.gov/act-early/milestones/3-years.html',
+  '4-5y':  'https://www.cdc.gov/act-early/milestones/4-years.html',
 };
 
 const AAP_LINKS: Record<AgeRangeId, string> = {
   '0-3m':  'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-1-Month.aspx',
-  '3-6m':  'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-4-Months.aspx',
+  '3-6m':  'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-3-Months.aspx',
   '6-9m':  'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-7-Months.aspx',
   '9-12m': 'https://www.healthychildren.org/English/ages-stages/baby/Pages/Developmental-Milestones-12-Months.aspx',
-  '12-18m':'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-12-Months.aspx',
-  '18-24m':'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-24-Months.aspx',
-  '2-3y':  'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-3-Years.aspx',
-  '3-4y':  'https://www.healthychildren.org/English/ages-stages/preschool/Pages/Developmental-Milestones-3-to-4-Years.aspx',
-  '4-5y':  'https://www.healthychildren.org/English/ages-stages/preschool/Pages/Developmental-Milestones-4-to-5-Years.aspx',
+  '12-18m':'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Milestones-During-The-First-2-Years.aspx',
+  '18-24m':'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-2-Year-Olds.aspx',
+  '2-3y':  'https://www.healthychildren.org/English/ages-stages/toddler/Pages/Developmental-Milestones-2-Year-Olds.aspx',
+  '3-4y':  'https://www.healthychildren.org/English/ages-stages/preschool/Pages/Developmental-Milestones-3-to-4-Year-Olds.aspx',
+  '4-5y':  'https://www.healthychildren.org/English/ages-stages/preschool/Pages/Developmental-Milestones-4-to-5-Year-Olds.aspx',
 };
 
 /* ─── Props ────────────────────────────────────────────────────────────────── */
