@@ -20,6 +20,7 @@ import { useRemoteConfigContext } from '../../context/RemoteConfigContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useFocusOnRouteChange } from '../../hooks/useFocusOnRouteChange';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useRecentlyVisited } from '../../hooks/useRecentlyVisited';
 import { logEvent } from '../../lib/firebase';
 
@@ -193,6 +194,7 @@ export default function Layout() {
   });
 
   useFocusOnRouteChange();
+  useDocumentTitle();
   const { recent } = useRecentlyVisited();
 
   const handlePlayerStateChange = useCallback((active: boolean) => {
