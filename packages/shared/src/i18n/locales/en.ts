@@ -1339,10 +1339,10 @@ const en = {
   'chinese.signInToAdd': 'Sign in to add characters',
   'chinese.loading': 'Loading characters...',
 
-  // Pull to Refresh
-  'pullToRefresh.hint': 'Pull to refresh',
-  'pullToRefresh.release': 'Release to refresh',
-  'pullToRefresh.refreshing': 'Refreshing...',
+  // Refresh buttons
+  'notebook.refresh': 'Refresh',
+  'worship.refresh': 'Refresh',
+  'crypto.refresh': 'Refresh',
 } as const;
 
 export default en;
