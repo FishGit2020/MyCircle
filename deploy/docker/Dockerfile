@@ -74,7 +74,7 @@ COPY --from=builder /app/packages/child-development/package.json packages/child-
 COPY --from=builder /app/packages/chinese-learning/package.json packages/chinese-learning/
 COPY --from=builder /app/packages/english-learning/package.json packages/english-learning/
 
-RUN pnpm install --frozen-lockfile --prod && \
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune
 
 # Copy built shared package (needed for runtime imports)
