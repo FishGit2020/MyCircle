@@ -89,7 +89,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 max-w-2xl mx-auto">
         <button
           onClick={onCancel}
           className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
@@ -103,7 +103,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
+      <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto">
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{t('worship.requiredFieldLegend')}</p>
 
         {/* Title */}
