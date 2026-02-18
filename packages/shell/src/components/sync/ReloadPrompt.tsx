@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, createLogger } from '@mycircle/shared';
+
+const log = createLogger('ReloadPrompt');
 
 export default function ReloadPrompt() {
   const { t } = useTranslation();
@@ -19,6 +21,9 @@ export default function ReloadPrompt() {
           }
         });
       }
+    },
+    onRegisterError(error) {
+      log.warn('Service worker registration failed', error);
     },
   });
 

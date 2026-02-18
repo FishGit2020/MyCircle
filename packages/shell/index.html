@@ -47,7 +47,7 @@
         }
       });
       window.addEventListener('unhandledrejection', function(e) {
-        if (e.reason && /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(String(e.reason))) {
+        if (e.reason && /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module|Script .+ load failed/i.test(String(e.reason))) {
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistration().then(function(reg) {
               if (reg) reg.unregister();
