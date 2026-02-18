@@ -151,7 +151,7 @@ git checkout main && git pull origin main                                     # 
 
 ## 9. Adding a New Micro Frontend
 
-When adding a new MFE, there are **20+ integration points** across the codebase. See the [Full Checklist for Adding a New MFE](./mfe-guide.md#full-checklist-for-adding-a-new-mfe) in the MFE Guide.
+When adding a new MFE, there are **20+ integration points** across the codebase. See the [Full Checklist for Adding a New MFE](./docs/mfe-guide.md#full-checklist-for-adding-a-new-mfe) in the MFE Guide.
 
 Key areas to update (commonly missed items marked with `*`):
 - Package setup, test mocks, and vitest aliases
@@ -184,8 +184,8 @@ When removing a widget, route, or feature:
 
 ## See Also
 
-- [PR Lifecycle](./pr-lifecycle.md) — branch protection, merge workflow
-- [CI/CD Pipeline](./cicd.md) — pipeline details, troubleshooting
-- [Architecture](./architecture.md) — MFE structure, data flow
-- [MFE Guide](./mfe-guide.md) — pitfalls and lessons learned (includes new MFE checklist)
-- [API Keys](./api-keys.md) — external service configuration
+- [PR Lifecycle](./docs/pr-lifecycle.md) — branch protection, merge workflow
+- [CI/CD Pipeline](./docs/cicd.md) — pipeline details, troubleshooting
+- [Architecture](./docs/architecture.md) — MFE structure, data flow
+- [MFE Guide](./docs/mfe-guide.md) — pitfalls and lessons learned (includes new MFE checklist)
+- [API Keys](./docs/api-keys.md) — external service configuration

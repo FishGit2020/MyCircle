@@ -81,7 +81,7 @@ function StockCard({
           </div>
           <div className="flex justify-between items-end">
             <div className="h-7 bg-gray-200 dark:bg-gray-600 rounded w-20" />
-            <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-16" />
+            <div className="w-[80px] h-[32px] bg-gray-200 dark:bg-gray-600 rounded" />
           </div>
         </div>
       </div>
@@ -160,11 +160,11 @@ function StockCard({
           )}
         </div>
 
-        {sparklineData && sparklineData.length >= 2 && (
-          <div className="flex-shrink-0" title={t('stocks.sparkline7d')}>
+        <div className="flex-shrink-0 w-[80px] h-[32px]" title={sparklineData && sparklineData.length >= 2 ? t('stocks.sparkline7d') : undefined}>
+          {sparklineData && sparklineData.length >= 2 && (
             <MiniSparkline data={sparklineData} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
