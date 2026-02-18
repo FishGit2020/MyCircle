@@ -19,18 +19,20 @@ function decodeSensitive(value: string): string {
 
 function VerseSection() {
   const { t } = useTranslation();
-  const { reference, text, shuffle } = useVerseOfDay(parentingVerses, (key) => t(key as any));
+  const { reference, text, loading, shuffle } = useVerseOfDay(parentingVerses, (key) => t(key as any));
 
   return (
     <div className="bg-amber-50/50 dark:bg-amber-900/10 rounded-lg p-4 mb-6">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
-          {text && (
+          {loading ? (
+            <div className="h-4 bg-amber-200 dark:bg-amber-800/40 rounded animate-pulse w-3/4" />
+          ) : text ? (
             <p className="text-sm italic text-amber-700 dark:text-amber-300 leading-relaxed">
               &ldquo;{text}&rdquo;
             </p>
-          )}
-          <p className={`text-xs text-amber-600 dark:text-amber-400 font-medium ${text ? 'mt-1' : ''}`}>
+          ) : null}
+          <p className={`text-xs text-amber-600 dark:text-amber-400 font-medium ${text || loading ? 'mt-1' : ''}`}>
             — {reference}
           </p>
         </div>
