@@ -68,7 +68,6 @@ export const StorageKeys = {
   CHILD_MILESTONES: 'child-milestones',
   BOTTOM_NAV_ORDER: 'bottom-nav-order',
   WEATHER_ALERTS: 'weather-alerts-enabled',
-  PODCAST_ALERTS: 'podcast-alerts-enabled',
   ANNOUNCEMENT_ALERTS: 'announcement-alerts-enabled',
   RECENTLY_VISITED: 'recently-visited',
   CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
