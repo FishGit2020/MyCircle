@@ -18,9 +18,11 @@ Sentry.init({
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
+    Sentry.browserProfilingIntegration(),
   ],
   sendDefaultPii: true,
   tracesSampleRate: 1.0,
+  profileSessionSampleRate: 1.0,
   // Only add trace headers to our own domains — never to Google OAuth or other third parties
   tracePropagationTargets: ['localhost', /^https:\/\/mycircle-dash\.web\.app/],
   replaysSessionSampleRate: 0.1,

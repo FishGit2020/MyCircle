@@ -12,6 +12,7 @@ mycircle.example.com {
 		X-Frame-Options DENY
 		Referrer-Policy strict-origin-when-cross-origin
 		Permissions-Policy "camera=(), microphone=(self), geolocation=(self)"
+		Document-Policy js-profiling
 		# Remove server identity
 		-Server
 	}
