@@ -1341,10 +1341,10 @@ const zh: Record<TranslationKey, string> = {
   'chinese.signInToAdd': '\u767b\u5f55\u540e\u6dfb\u52a0\u5b57\u7b26',
   'chinese.loading': '\u52a0\u8f7d\u5b57\u7b26\u4e2d...',
 
-  // Pull to Refresh
-  'pullToRefresh.hint': '\u4e0b\u62c9\u5237\u65b0',
-  'pullToRefresh.release': '\u91ca\u653e\u5237\u65b0',
-  'pullToRefresh.refreshing': '\u5237\u65b0\u4e2d...',
+  // Refresh buttons
+  'notebook.refresh': '\u5237\u65b0',
+  'worship.refresh': '\u5237\u65b0',
+  'crypto.refresh': '\u5237\u65b0',
 };
 
 export default zh;

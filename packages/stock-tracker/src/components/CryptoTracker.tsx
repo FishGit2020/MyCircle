@@ -1,4 +1,4 @@
-import { useTranslation, useCryptoPrices, PullToRefresh } from '@mycircle/shared';
+import { useTranslation, useCryptoPrices } from '@mycircle/shared';
 
 function MiniSparkline({ data, positive }: { data: number[]; positive: boolean }) {
   if (data.length < 2) return null;
@@ -89,7 +89,6 @@ export default function CryptoTracker() {
   const changeBg = isPositive ? 'bg-green-50 dark:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/30';
 
   return (
-    <PullToRefresh onRefresh={() => refetch()}>
     <div
       className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-100 dark:border-gray-700"
       aria-label={`${coin.name} (${coin.symbol.toUpperCase()})`}
@@ -106,6 +105,16 @@ export default function CryptoTracker() {
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">
               {coin.symbol.toUpperCase()}
             </h3>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="p-1 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label={t('crypto.refresh')}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{coin.name}</p>
         </div>
@@ -129,6 +138,5 @@ export default function CryptoTracker() {
         )}
       </div>
     </div>
-    </PullToRefresh>
   );
 }

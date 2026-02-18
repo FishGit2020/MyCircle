@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
-import { useTranslation, WindowEvents, PullToRefresh } from '@mycircle/shared';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 import StockSearch from './StockSearch';
 import CryptoTracker from './CryptoTracker';
 import Watchlist from './Watchlist';
@@ -189,7 +189,6 @@ export default function StockTracker() {
 
       {/* Selected stock detail view */}
       {selectedSymbol && (
-        <PullToRefresh onRefresh={() => refetch()}>
         <div className="mb-8 stock-card-enter">
           <div className="flex items-center gap-3 mb-4">
             <button
@@ -464,7 +463,6 @@ export default function StockTracker() {
 
           <StockNews symbol={selectedSymbol} />
         </div>
-        </PullToRefresh>
       )}
 
     </div>

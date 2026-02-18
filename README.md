@@ -151,7 +151,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Offline sync** — Firestore offline persistence via `persistentLocalCache` with multi-tab support; floating `SyncIndicator` shows offline/synced status
 - Offline indicator & PWA support with **fast update detection** (30s polling + visibility-change check, prompt-based reload banner)
 - **Unified logger** — `createLogger('namespace')` utility in shared package for consistent, namespace-prefixed logging across all packages
-- **Mobile UX** — safe area insets for notched devices (iPhone X+), enlarged touch targets (40-48px) on audio player controls and nav editor, active state feedback on mobile buttons, **pull-to-refresh** gesture on Weather, Stocks, Crypto, Notebook, and Worship Songs pages (Chrome's native page-reload is disabled via `overscroll-behavior`)
+- **Mobile UX** — safe area insets for notched devices (iPhone X+), enlarged touch targets (40-48px) on audio player controls and nav editor, active state feedback on mobile buttons, **refresh buttons** on Weather, Stocks, Crypto, Notebook, and Worship Songs pages
 - Firebase Auth (Google OAuth + email/password) with cross-device profile sync; **sign-out clears user-specific localStorage and Apollo cache** to prevent data leaking between accounts
 - Firebase App Check for API protection
 - Firebase Remote Config for feature flags
