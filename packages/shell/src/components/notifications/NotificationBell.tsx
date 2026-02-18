@@ -167,10 +167,10 @@ export default function NotificationBell() {
     });
   }, [anyEnabled, fcmToken]);
 
-  // Re-subscribe weather when favorites change
+  // Re-subscribe weather when favorites change (empty list unsubscribes)
   useEffect(() => {
-    if (!weatherEnabled || !fcmToken || !favoriteCities || favoriteCities.length === 0) return;
-    const cities = favoriteCities.map(c => ({ lat: c.lat, lon: c.lon, name: c.name }));
+    if (!weatherEnabled || !fcmToken) return;
+    const cities = (favoriteCities || []).map(c => ({ lat: c.lat, lon: c.lon, name: c.name }));
     subscribeToWeatherAlerts(fcmToken, cities);
   }, [favoriteCities, weatherEnabled, fcmToken]);
 
