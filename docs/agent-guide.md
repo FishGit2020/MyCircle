@@ -11,8 +11,8 @@ Compact reference for AI coding agents. Rules over explanations.
 3. `pnpm build:shared` (required before per-package tests)
 4. `pnpm test:run` then `pnpm typecheck:all`
 5. Commit (conventional), push, `gh pr create`
-6. CI must pass: `ci` + `e2e` (both required)
-7. `gh pr merge --squash`
+6. CI must pass: `ci` + `e2e` (both required) — poll with `gh pr checks <PR#>` or `gh run watch`
+7. `gh pr merge <PR#> --squash --admin` (only after `ci` and `e2e` both pass)
 8. `git checkout main && git pull origin main`
 9. Update `README.md` and `docs/architecture.md` if adding user-facing features
 
