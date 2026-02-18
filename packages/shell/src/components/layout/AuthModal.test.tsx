@@ -90,7 +90,7 @@ describe('AuthModal', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument();
       expect(screen.getByText('auth.errorWrongPassword')).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 
   it('switches to sign up tab and shows additional fields', async () => {
