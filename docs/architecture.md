@@ -588,17 +588,13 @@ CitySearch.tsx                          CitySearchWrapper.tsx
                                              +--> setLocation() -> fetch weather
 ```
 
-**Geolocation Flow:**
+**Weather Widget Flow:**
 ```
-UseMyLocation.tsx (shell)
+WeatherWidget (WidgetDashboard.tsx)
      |
-     +--> navigator.geolocation.getCurrentPosition()
+     +--> useAuth() -> favoriteCities[]
      |
-     +--> REVERSE_GEOCODE GraphQL query
-     |
-     +--> sessionStorage.setItem('selectedCity', ...)
-     |
-     +--> navigate(/weather/:lat,:lon)
+     +--> Render city chips as <Link to="/weather/:lat,:lon">
 ```
 
 **Persistent Podcast Player Flow:**

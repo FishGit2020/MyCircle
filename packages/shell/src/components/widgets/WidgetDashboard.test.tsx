@@ -7,8 +7,6 @@ vi.mock('../../lib/firebase', () => ({ logEvent: vi.fn() }));
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
-  useUnits: () => ({ tempUnit: 'C', speedUnit: 'ms', setTempUnit: vi.fn(), setSpeedUnit: vi.fn() }),
-  formatTemperature: (temp: number, unit?: string) => unit === 'F' ? `${Math.round(temp * 9/5 + 32)}°F` : `${Math.round(temp)}°C`,
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
   WindowEvents: {
     WATCHLIST_CHANGED: 'watchlist-changed',
@@ -19,12 +17,14 @@ vi.mock('@mycircle/shared', () => ({
     CHINESE_PROGRESS_CHANGED: 'chinese-progress-changed',
     BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
     BIBLE_BOOKMARKS_CHANGED: 'bible-bookmarks-changed',
+    WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
   },
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
     WIDGET_LAYOUT: 'widget-dashboard-layout',
     WORSHIP_SONGS_CACHE: 'worship-songs-cache',
+    WORSHIP_FAVORITES: 'worship-favorites',
     NOTEBOOK_CACHE: 'notebook-cache',
     BABY_DUE_DATE: 'baby-due-date',
     BABY_COMPARE_CATEGORY: 'baby-compare-category',
@@ -39,13 +39,6 @@ vi.mock('@mycircle/shared', () => ({
     PODCAST_CLOSE_PLAYER: 'mf:podcast-close-player',
   },
   subscribeToMFEvent: () => () => {},
-  useQuery: () => ({ data: null, loading: false, error: null }),
-  useLazyQuery: () => [vi.fn(), { data: null, loading: false }],
-  GET_BIBLE_VOTD_API: { kind: 'Document', definitions: [] },
-  GET_CURRENT_WEATHER: { kind: 'Document', definitions: [] },
-  REVERSE_GEOCODE: { kind: 'Document', definitions: [] },
-  getDailyVerse: () => ({ usfm: 'TST.1.1', reference: 'Test 1:1', text: 'Test verse text' }),
-  getAllDailyVerses: () => [{ usfm: 'TST.1.1', reference: 'Test 1:1', text: 'Test verse text' }],
 }));
 
 vi.mock('../../context/AuthContext', () => ({
@@ -87,6 +80,7 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.childDev')).toBeInTheDocument();
     expect(screen.getByText('widgets.english')).toBeInTheDocument();
     expect(screen.getByText('widgets.chinese')).toBeInTheDocument();
+    expect(screen.getByText('widgets.worship')).toBeInTheDocument();
   });
 
   it('renders customize button', () => {
@@ -108,7 +102,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     // All 8 widgets should show "Visible" toggle (stocks removed)
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(9);
+    expect(visibleButtons.length).toBe(10);
   });
 
   it('can toggle widget visibility', () => {
@@ -125,8 +119,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(9);
-    expect(downButtons.length).toBe(9);
+    expect(upButtons.length).toBe(10);
+    expect(downButtons.length).toBe(10);
   });
 
   it('persists layout to localStorage', () => {
@@ -166,7 +160,19 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(9);
+    expect(allVisible.length).toBe(10);
+  });
+
+  it('renders worship widget with song count', () => {
+    const songs = [{ id: '1', title: 'Amazing Grace' }, { id: '2', title: 'Holy Holy Holy' }];
+    const favs = ['1'];
+    getItemSpy.mockImplementation((key: string) => {
+      if (key === 'worship-songs-cache') return JSON.stringify(songs);
+      if (key === 'worship-favorites') return JSON.stringify(favs);
+      return null;
+    });
+    renderWidget();
+    expect(screen.getByText('widgets.worship')).toBeInTheDocument();
   });
 
   it('has proper a11y labels on the section', () => {
