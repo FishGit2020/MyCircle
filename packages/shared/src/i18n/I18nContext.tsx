@@ -8,10 +8,13 @@ function getInitialLocale(): Locale {
     const stored = localStorage.getItem(StorageKeys.LOCALE);
     if (stored === 'en' || stored === 'es' || stored === 'zh') return stored;
   } catch { /* ignore */ }
-  // Auto-detect from browser
-  const browserLang = navigator.language.slice(0, 2);
-  if (browserLang === 'es') return 'es';
-  if (browserLang === 'zh') return 'zh';
+  // Auto-detect from browser preference list (first supported match wins)
+  const supported: Record<string, Locale> = { en: 'en', es: 'es', zh: 'zh' };
+  const langs = navigator.languages ?? [navigator.language];
+  for (const lang of langs) {
+    const match = supported[lang.slice(0, 2)];
+    if (match) return match;
+  }
   return 'en';
 }
 
