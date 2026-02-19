@@ -17,8 +17,10 @@ vi.mock('virtual:pwa-register/react', () => ({
   },
 }));
 
+const { mockWarn } = vi.hoisted(() => ({ mockWarn: vi.fn() }));
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: mockWarn, error: vi.fn() }),
 }));
 
 const mockUnregister = vi.fn().mockResolvedValue(undefined);
@@ -98,6 +100,13 @@ describe('ReloadPrompt', () => {
     render(<ReloadPrompt />);
     fireEvent.click(screen.getByLabelText('pwa.dismiss'));
     expect(mockSetNeedRefresh).toHaveBeenCalledWith(false);
+  });
+
+  it('logs warning when SW registration fails', () => {
+    render(<ReloadPrompt />);
+    const error = new TypeError('Script https://mycircle-dash.web.app/sw.js load failed');
+    hookOptions.onRegisterError(error);
+    expect(mockWarn).toHaveBeenCalledWith('Service worker registration failed', error);
   });
 
   it('still reloads even if unregister fails', async () => {
