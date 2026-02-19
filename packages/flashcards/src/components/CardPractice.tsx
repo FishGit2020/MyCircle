@@ -65,7 +65,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
   if (!card) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <button

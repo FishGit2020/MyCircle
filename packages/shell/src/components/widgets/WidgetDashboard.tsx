@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning' | 'worship';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning' | 'worship' | 'flashcards' | 'workTracker';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -26,6 +26,8 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'englishLearning', visible: true },
   { id: 'chineseLearning', visible: true },
   { id: 'worship', visible: true },
+  { id: 'flashcards', visible: true },
+  { id: 'workTracker', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -652,6 +654,69 @@ const WorshipWidget = React.memo(function WorshipWidget() {
   );
 });
 
+const FlashcardsWidget = React.memo(function FlashcardsWidget() {
+  const { t } = useTranslation();
+  const [masteredCount, setMasteredCount] = React.useState(0);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.FLASHCARD_PROGRESS);
+        if (raw) {
+          const progress = JSON.parse(raw);
+          setMasteredCount(Array.isArray(progress.masteredIds) ? progress.masteredIds.length : 0);
+        }
+      } catch { /* ignore */ }
+    }
+    load();
+    window.addEventListener('flashcard-progress-changed', load);
+    return () => window.removeEventListener('flashcard-progress-changed', load);
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.flashcards')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.flashcardsDesc')}</p>
+        </div>
+      </div>
+      {masteredCount > 0 ? (
+        <p className="text-xs text-teal-600 dark:text-teal-400/70">
+          {t('widgets.flashcardsMastered').replace('{count}', String(masteredCount))}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noFlashcardProgress')}</p>
+      )}
+    </div>
+  );
+});
+
+const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.workTracker')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.workTrackerDesc')}</p>
+        </div>
+      </div>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+    </div>
+  );
+});
+
 // ─── Widget Registry ─────────────────────────────────────────────────────────
 
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
@@ -665,6 +730,8 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   englishLearning: EnglishLearningWidget,
   chineseLearning: ChineseLearningWidget,
   worship: WorshipWidget,
+  flashcards: FlashcardsWidget,
+  workTracker: WorkTrackerWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -678,6 +745,8 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   englishLearning: '/english',
   chineseLearning: '/chinese',
   worship: '/worship',
+  flashcards: '/flashcards',
+  workTracker: '/work-tracker',
 };
 
 // ─── Dashboard Reducer ──────────────────────────────────────────────────────
