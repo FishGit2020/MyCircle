@@ -1,5 +1,30 @@
 # Contributing to MyCircle
 
+## Prerequisites
+
+Install the following before cloning the project:
+
+| Tool | Version | Install (macOS) |
+|------|---------|-----------------|
+| **Node.js** | >= 22 | `brew install node@22` or [nvm](https://github.com/nvm-sh/nvm): `nvm install 22` |
+| **pnpm** | 9.x | `corepack enable && corepack prepare pnpm@9.15.0 --activate` |
+| **Git** | any | `brew install git` (or Xcode Command Line Tools: `xcode-select --install`) |
+| **GitHub CLI** | any | `brew install gh` then `gh auth login` |
+| **Firebase CLI** | any | `npm install -g firebase-tools` then `firebase login` |
+| **Java** | >= 11 | `brew install openjdk@17` (required for Firebase emulators) |
+
+> **Windows:** Use the same Node/pnpm versions. Install Git from [git-scm.com](https://git-scm.com/), GitHub CLI from [cli.github.com](https://cli.github.com/), and Java from [adoptium.net](https://adoptium.net/).
+
+### Verify
+
+```bash
+node -v    # v22.x
+pnpm -v    # 9.x
+gh --version
+firebase --version
+java -version
+```
+
 ## Quick Start
 
 ```bash
