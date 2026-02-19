@@ -112,8 +112,6 @@ export interface UserProfile {
   weatherAlertsEnabled?: boolean;
   announcementAlertsEnabled?: boolean;
   bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
-  chineseLearningProgress?: { masteredIds: string[]; lastDate: string };
-  englishLearningProgress?: { completedIds: string[]; quizScores: Array<{ date: string; correct: number; total: number }>; lastDate: string };
   childName?: string;
   childBirthDate?: string;
   createdAt: Date;
@@ -404,24 +402,6 @@ export async function updateUserBottomNavOrder(uid: string, order: string[] | nu
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     bottomNavOrder: order || null,
-    updatedAt: serverTimestamp(),
-  });
-}
-
-export async function updateChineseLearningProgress(uid: string, progress: { masteredIds: string[]; lastDate: string }) {
-  if (!db) return;
-  const userRef = doc(db, 'users', uid);
-  await updateDoc(userRef, {
-    chineseLearningProgress: progress,
-    updatedAt: serverTimestamp(),
-  });
-}
-
-export async function updateEnglishLearningProgress(uid: string, progress: { completedIds: string[]; quizScores: Array<{ date: string; correct: number; total: number }>; lastDate: string }) {
-  if (!db) return;
-  const userRef = doc(db, 'users', uid);
-  await updateDoc(userRef, {
-    englishLearningProgress: progress,
     updatedAt: serverTimestamp(),
   });
 }

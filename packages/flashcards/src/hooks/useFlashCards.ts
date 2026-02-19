@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { FlashCard, FlashCardProgress, CardType } from '../types';
+import { phrases } from '../data/phrases';
 
 const log = createLogger('flashcards');
 
@@ -8,6 +9,10 @@ declare global {
   interface Window {
     __chineseCharacters?: {
       getAll: () => Promise<Array<{ id: string; character: string; pinyin: string; meaning: string; category: string }>>;
+      add: (char: Record<string, any>) => Promise<string>;
+      update: (id: string, updates: Record<string, any>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (chars: any[]) => void) => () => void;
     };
     __flashcards?: {
       getAll: () => Promise<any[]>;
@@ -37,23 +42,15 @@ function saveToStorage(key: string, value: unknown) {
   } catch { /* ignore */ }
 }
 
-// English phrases bundled from english-learning (re-export approach)
-const ENGLISH_PHRASES: FlashCard[] = [
-  { id: 'en-g01', type: 'english', category: 'greetings', front: 'Hi!', back: '嗨！' },
-  { id: 'en-g02', type: 'english', category: 'greetings', front: 'Bye bye!', back: '拜拜！' },
-  { id: 'en-g03', type: 'english', category: 'greetings', front: 'Please.', back: '请。' },
-  { id: 'en-g04', type: 'english', category: 'greetings', front: 'Thank you!', back: '谢谢你！' },
-  { id: 'en-g05', type: 'english', category: 'greetings', front: 'Sorry.', back: '对不起。' },
-  { id: 'en-g06', type: 'english', category: 'greetings', front: "You're welcome.", back: '不客气。' },
-  { id: 'en-g07', type: 'english', category: 'greetings', front: 'Good morning!', back: '早上好！' },
-  { id: 'en-g08', type: 'english', category: 'greetings', front: 'Good night!', back: '晚安！' },
-  { id: 'en-fe01', type: 'english', category: 'feelings', front: "I'm happy.", back: '我很开心。' },
-  { id: 'en-fe02', type: 'english', category: 'feelings', front: "I'm tired.", back: '我累了。' },
-  { id: 'en-fe03', type: 'english', category: 'feelings', front: "I'm hungry.", back: '我饿了。' },
-  { id: 'en-fo01', type: 'english', category: 'food', front: 'Water, please.', back: '请给我水。' },
-  { id: 'en-fo02', type: 'english', category: 'food', front: "I'm full.", back: '我吃饱了。' },
-  { id: 'en-fo03', type: 'english', category: 'food', front: 'Delicious!', back: '好吃！' },
-];
+// All 88 English phrases mapped to FlashCards
+const ENGLISH_PHRASES: FlashCard[] = phrases.map(p => ({
+  id: `en-${p.id}`,
+  type: 'english' as CardType,
+  category: p.category,
+  front: p.english,
+  back: p.chinese,
+  meta: { phonetic: p.phonetic },
+}));
 
 export function useFlashCards() {
   const [bibleCards, setBibleCards] = useState<FlashCard[]>(() =>
@@ -86,6 +83,18 @@ export function useFlashCards() {
     return () => { mounted = false; clearInterval(interval); };
   }, []);
 
+  // Map raw Chinese characters to FlashCards
+  const mapChineseToCards = useCallback((chars: Array<{ id: string; character: string; pinyin: string; meaning: string; category: string }>): FlashCard[] => {
+    return chars.map(c => ({
+      id: `zh-${c.id}`,
+      type: 'chinese' as CardType,
+      category: c.category,
+      front: c.character,
+      back: c.meaning,
+      meta: { pinyin: c.pinyin },
+    }));
+  }, []);
+
   // Load Chinese characters from bridge API
   useEffect(() => {
     let mounted = true;
@@ -93,23 +102,32 @@ export function useFlashCards() {
       try {
         if (window.__chineseCharacters) {
           const chars = await window.__chineseCharacters.getAll();
-          if (mounted) {
-            setChineseCards(chars.map(c => ({
-              id: `zh-${c.id}`,
-              type: 'chinese' as CardType,
-              category: c.category,
-              front: c.character,
-              back: c.meaning,
-              meta: { pinyin: c.pinyin },
-            })));
-          }
+          if (mounted) setChineseCards(mapChineseToCards(chars));
         }
       } catch { /* ignore */ }
       if (mounted) setLoading(false);
     }
     loadChinese();
-    return () => { mounted = false; };
-  }, []);
+
+    // Subscribe to real-time changes
+    const unsub = window.__chineseCharacters?.subscribe?.((chars) => {
+      if (mounted) setChineseCards(mapChineseToCards(chars));
+    });
+
+    // Listen for CRUD events
+    const handleChanged = () => {
+      window.__chineseCharacters?.getAll().then(chars => {
+        if (mounted) setChineseCards(mapChineseToCards(chars));
+      }).catch(() => { /* ignore */ });
+    };
+    window.addEventListener(WindowEvents.CHINESE_CHARACTERS_CHANGED, handleChanged);
+
+    return () => {
+      mounted = false;
+      unsub?.();
+      window.removeEventListener(WindowEvents.CHINESE_CHARACTERS_CHANGED, handleChanged);
+    };
+  }, [mapChineseToCards]);
 
   // Firestore real-time subscription for cards when authenticated
   useEffect(() => {
@@ -193,6 +211,50 @@ export function useFlashCards() {
       }
     }
   }, [isAuthenticated]);
+
+  // One-time migration: merge old English/Chinese progress into flashcard progress
+  useEffect(() => {
+    const migrated = localStorage.getItem('flashcard-progress-migrated');
+    if (migrated) return;
+
+    const idsToMerge: string[] = [];
+    try {
+      const englishRaw = localStorage.getItem(StorageKeys.ENGLISH_LEARNING_PROGRESS);
+      if (englishRaw) {
+        const english = JSON.parse(englishRaw);
+        if (Array.isArray(english.completedIds)) {
+          idsToMerge.push(...english.completedIds.map((id: string) => `en-${id}`));
+        }
+      }
+    } catch { /* ignore */ }
+    try {
+      const chineseRaw = localStorage.getItem(StorageKeys.CHINESE_LEARNING_PROGRESS);
+      if (chineseRaw) {
+        const chinese = JSON.parse(chineseRaw);
+        if (Array.isArray(chinese.masteredIds)) {
+          idsToMerge.push(...chinese.masteredIds.map((id: string) => `zh-${id}`));
+        }
+      }
+    } catch { /* ignore */ }
+
+    if (idsToMerge.length > 0) {
+      setProgress(prev => {
+        const merged = new Set([...prev.masteredIds, ...idsToMerge]);
+        const next: FlashCardProgress = {
+          masteredIds: Array.from(merged),
+          lastPracticed: prev.lastPracticed || new Date().toISOString(),
+        };
+        saveToStorage(StorageKeys.FLASHCARD_PROGRESS, next);
+        window.__flashcards?.updateProgress(next).catch(() => { /* ignore */ });
+        log.info(`Migrated ${idsToMerge.length} progress entries from old MFEs`);
+        return next;
+      });
+    }
+
+    localStorage.setItem('flashcard-progress-migrated', '1');
+    try { localStorage.removeItem(StorageKeys.ENGLISH_LEARNING_PROGRESS); } catch { /* ignore */ }
+    try { localStorage.removeItem(StorageKeys.CHINESE_LEARNING_PROGRESS); } catch { /* ignore */ }
+  }, []);
 
   // Listen for progress changes from other tabs (localStorage-only mode)
   useEffect(() => {
@@ -296,6 +358,33 @@ export function useFlashCards() {
     window.__flashcards?.updateProgress(next).catch(() => { /* ignore */ });
   }, []);
 
+  // Chinese character CRUD via bridge API
+  const addChineseChar = useCallback(async (data: { character: string; pinyin: string; meaning: string; category: string }) => {
+    if (!window.__chineseCharacters) return;
+    await window.__chineseCharacters.add(data);
+    window.dispatchEvent(new Event(WindowEvents.CHINESE_CHARACTERS_CHANGED));
+  }, []);
+
+  const updateChineseChar = useCallback(async (id: string, data: { character: string; pinyin: string; meaning: string; category: string }) => {
+    if (!window.__chineseCharacters) return;
+    await window.__chineseCharacters.update(id, data);
+    window.dispatchEvent(new Event(WindowEvents.CHINESE_CHARACTERS_CHANGED));
+  }, []);
+
+  const deleteChineseChar = useCallback(async (id: string) => {
+    if (!window.__chineseCharacters) return;
+    await window.__chineseCharacters.delete(id);
+    window.dispatchEvent(new Event(WindowEvents.CHINESE_CHARACTERS_CHANGED));
+  }, []);
+
+  const reloadChinese = useCallback(async () => {
+    if (!window.__chineseCharacters) return;
+    try {
+      const chars = await window.__chineseCharacters.getAll();
+      setChineseCards(mapChineseToCards(chars));
+    } catch { /* ignore */ }
+  }, [mapChineseToCards]);
+
   return {
     allCards,
     chineseCards,
@@ -313,5 +402,9 @@ export function useFlashCards() {
     updateCustomCard,
     deleteCard,
     resetProgress,
+    addChineseChar,
+    updateChineseChar,
+    deleteChineseChar,
+    reloadChinese,
   };
 }

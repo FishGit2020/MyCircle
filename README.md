@@ -115,26 +115,6 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Encouraging Bible verses for parents with shuffle
 - Dark mode, full i18n (English, Spanish, Chinese)
 
-### Chinese Learning
-- Learn Chinese characters through interactive flashcards and handwriting practice
-- **Firestore-backed characters** — characters stored in Firestore (public read, authenticated write); real-time updates via `onSnapshot`
-- ~50 default characters/phrases across 8 categories: Family, Feelings, Food & Drink, Body & Actions, Around the House, Nature & Animals, Numbers, Common Phrases
-- **Character CRUD** — authenticated users can add, edit, and delete characters with creator/editor metadata
-- **Pinyin keyboard** — compact toolbar with tone-marked vowels (ā á ǎ à, etc.) for easy pinyin input
-- **Character editor** — modal with character, pinyin (with keyboard), meaning, and category fields; delete with confirmation
-- **Flashcard system** — front shows character, tap to flip for pinyin + meaning; mark as mastered to track progress
-- **Practice canvas** — Pointer Events drawing with reference watermark, undo/clear support; works on mouse, touch, and stylus
-- **Character grid** — browse all characters grouped by category with mastered indicators; edit/delete controls on hover (auth-gated)
-- Progress persisted to localStorage and synced to Firestore
-
-### English Learning
-- Learn everyday English phrases step by step, designed for Chinese speakers
-- ~80 phrases across 8 categories: Basic Greetings, Feelings, Around the House, Food & Drink, Going Out, People & Family, Time & Weather, Emergencies
-- **Lesson mode** — step through phrases with Chinese translation and phonetic guide; mark as "Got It" to track progress
-- **Quiz mode** — multiple choice: show Chinese phrase, pick the correct English translation; auto-advancing with score tracking
-- **Progress dashboard** — per-category progress bars, streak counter, quiz history
-- Progress persisted to localStorage and synced to Firestore
-
 ### AI Assistant
 - Conversational AI chat powered by Google Gemini
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
@@ -182,16 +162,16 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │     (MFE)       │ │    (MFE)     │ │    (MFE)      │ │   Songs    │  │
 │  │   Port 3006     │ │  Port 3007   │ │  Port 3008    │ │ Port 3009  │  │
 │  └─────────────────┘ └──────────────┘ └───────────────┘ └────────────┘  │
-│  ┌────────────┐ ┌──────────────┐ ┌───────────────────┐ ┌────────────────┐  │
-│  │  Notebook  │ │ Baby Tracker │ │ Child Development │ │Chinese Learning│  │
-│  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │ │     (MFE)      │  │
-│  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │ │  Port 3013     │  │
-│  └────────────┘ └──────────────┘ └───────────────────┘ └────────────────┘  │
-│  ┌─────────────────┐ ┌──────────────┐ ┌──────────────┐                        │
-│  │ English Learning │ │  Flashcards  │ │ Work Tracker │                        │
-│  │      (MFE)       │ │    (MFE)     │ │    (MFE)     │                        │
-│  │   Port 3014      │ │  Port 3015   │ │  Port 3016   │                        │
-│  └─────────────────┘ └──────────────┘ └──────────────┘                        │
+│  ┌────────────┐ ┌──────────────┐ ┌───────────────────┐ ┌──────────────┐  │
+│  │  Notebook  │ │ Baby Tracker │ │ Child Development │ │  Flashcards  │  │
+│  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │ │    (MFE)     │  │
+│  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │ │  Port 3015   │  │
+│  └────────────┘ └──────────────┘ └───────────────────┘ └──────────────┘  │
+│  ┌──────────────┐                                                           │
+│  │ Work Tracker │                                                           │
+│  │    (MFE)     │                                                           │
+│  │  Port 3016   │                                                           │
+│  └──────────────┘                                                           │
 └──────────────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -223,9 +203,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Notebook** | Personal & public note-taking with search and Firestore sync | `Notebook` |
 | **Baby Tracker** | Baby growth tracking with weekly fruit comparisons and Bible verses | `BabyTracker` |
 | **Child Development** | Postnatal milestone tracker (birth–5 years) across 5 CDC/AAP-aligned domains | `ChildDevelopment` |
-| **Chinese Learning** | Chinese character flashcards + handwriting practice canvas | `ChineseLearning` |
-| **English Learning** | Daily English phrases with lessons, quizzes, and progress tracking | `EnglishLearning` |
-| **Flashcards** | Multi-format flash cards (Chinese, English, Bible, custom) with 3D flip and mastery tracking | `FlashCards` |
+| **Flashcards** | Unified learning hub: quiz mode, handwriting practice canvas, character editor with Pinyin keyboard, 88 English phrases, 3D flip cards, Bible verses, custom cards, and mastery tracking | `FlashCards` |
 | **Work Tracker** | Firestore-backed daily work log with timeline view and real-time sync | `WorkTracker` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
@@ -241,8 +219,6 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | **Notebook** | Pencil | Recent notes count from Firestore | Has saved notes |
 | **Baby Tracker** | Heart | Current week + fruit comparison from localStorage | Has due date set |
 | **Child Dev** | Shield | Child name + age + milestone progress from localStorage | Has birth date set |
-| **English Learning** | ABC | Completed lesson count | Has started progress |
-| **Chinese Learning** | Hanzi | Mastered character count | Has started progress |
 
 ### Routes
 
@@ -265,8 +241,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/notebook/:noteId` | Note editor |
 | `/baby` | Baby growth tracker with weekly development |
 | `/child-dev` | Child development milestone tracker (birth–5 years) |
-| `/chinese` | Chinese character learning with flashcards and practice |
-| `/english` | English phrase learning with lessons and quizzes |
+| `/flashcards` | Flashcards — quiz mode, handwriting practice, character editor, English phrases |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack

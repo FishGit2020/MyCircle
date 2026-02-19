@@ -2,10 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { FlashCard, CardType } from '../types';
 import { useFlashCards } from '../hooks/useFlashCards';
+import { phrases } from '../data/phrases';
+import type { ChineseCharacter, CharacterCategory } from '../data/characters';
 import CardGrid from './CardGrid';
 import CardPractice from './CardPractice';
 import AddCardModal from './AddCardModal';
 import BibleVersePicker from './BibleVersePicker';
+import QuizView from './QuizView';
+import CharacterEditor from './CharacterEditor';
 
 const TYPE_LABELS: Record<CardType, string> = {
   chinese: 'flashcards.chinese',
@@ -19,6 +23,7 @@ export default function FlashCards() {
   const { t } = useTranslation();
   const {
     allCards,
+    chineseCards,
     progress,
     loading,
     cardTypes,
@@ -29,6 +34,9 @@ export default function FlashCards() {
     deleteCard,
     resetProgress,
     isAuthenticated,
+    addChineseChar,
+    updateChineseChar,
+    deleteChineseChar,
   } = useFlashCards();
 
   const [activeType, setActiveType] = useState<CardType | 'all'>('all');
@@ -39,6 +47,9 @@ export default function FlashCards() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [cardToDelete, setCardToDelete] = useState<FlashCard | null>(null);
   const [cardToEdit, setCardToEdit] = useState<FlashCard | null>(null);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [showCharEditor, setShowCharEditor] = useState(false);
+  const [editingChar, setEditingChar] = useState<ChineseCharacter | undefined>(undefined);
 
   const filteredCards = useMemo(() => {
     if (activeType === 'all') return allCards;
@@ -144,6 +155,15 @@ export default function FlashCards() {
         >
           {t('flashcards.practiceAll')}
         </button>
+        {allCards.some(c => c.type === 'english') && (
+          <button
+            type="button"
+            onClick={() => setShowQuiz(true)}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition"
+          >
+            {t('english.quiz')}
+          </button>
+        )}
         {isAuthenticated && (
           <>
             <button
@@ -152,6 +172,13 @@ export default function FlashCards() {
               className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
             >
               {t('flashcards.addCustomCard')}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEditingChar(undefined); setShowCharEditor(true); }}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-900/50 transition"
+            >
+              {t('chinese.addCharacter')}
             </button>
             <button
               type="button"
@@ -248,6 +275,48 @@ export default function FlashCards() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Quiz view */}
+      {showQuiz && (
+        <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={() => setShowQuiz(false)}
+              className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition"
+            >
+              {t('flashcards.done')}
+            </button>
+            <span className="text-sm font-medium text-gray-800 dark:text-white">{t('english.quiz')}</span>
+            <div className="w-10" />
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <QuizView phrases={phrases} onQuizComplete={() => {}} />
+          </div>
+        </div>
+      )}
+
+      {/* Character editor */}
+      {showCharEditor && (
+        <CharacterEditor
+          character={editingChar}
+          onSave={async (data) => {
+            if (editingChar) {
+              await updateChineseChar(editingChar.id, data);
+            } else {
+              await addChineseChar(data);
+            }
+            setShowCharEditor(false);
+            setEditingChar(undefined);
+          }}
+          onCancel={() => { setShowCharEditor(false); setEditingChar(undefined); }}
+          onDelete={editingChar ? async (id) => {
+            await deleteChineseChar(id);
+            setShowCharEditor(false);
+            setEditingChar(undefined);
+          } : undefined}
+        />
       )}
 
       {/* Reset confirmation */}

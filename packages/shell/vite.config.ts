@@ -132,14 +132,6 @@ const childDevelopmentRemote = isProduction
   ? '/child-development/assets/remoteEntry.js'
   : 'http://localhost:3012/assets/remoteEntry.js';
 
-const chineseLearningRemote = isProduction
-  ? '/chinese-learning/assets/remoteEntry.js'
-  : 'http://localhost:3013/assets/remoteEntry.js';
-
-const englishLearningRemote = isProduction
-  ? '/english-learning/assets/remoteEntry.js'
-  : 'http://localhost:3014/assets/remoteEntry.js';
-
 const flashcardsRemote = isProduction
   ? '/flashcards/assets/remoteEntry.js'
   : 'http://localhost:3015/assets/remoteEntry.js';
@@ -166,8 +158,6 @@ export default defineConfig({
         notebook: notebookRemote,
         babyTracker: babyTrackerRemote,
         childDevelopment: childDevelopmentRemote,
-        chineseLearning: chineseLearningRemote,
-        englishLearning: englishLearningRemote,
         flashcards: flashcardsRemote,
         workTracker: workTrackerRemote
       },
@@ -222,8 +212,6 @@ export default defineConfig({
           { name: 'Notebook', short_name: 'Notes', url: '/notebook', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Worship Songs', short_name: 'Worship', url: '/worship', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'AI Assistant', short_name: 'AI', url: '/ai', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
-          { name: 'English Learning', short_name: 'English', url: '/english', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
-          { name: 'Chinese Learning', short_name: 'Chinese', url: '/chinese', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Child Development', short_name: 'ChildDev', url: '/child-dev', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
         ]
       },

@@ -24,8 +24,6 @@ const WorshipSongsMF = tracedLazy('mfe_worship_load', () => import('worshipSongs
 const NotebookMF = tracedLazy('mfe_notebook_load', () => import('notebook/Notebook'), getPerf);
 const BabyTrackerMF = tracedLazy('mfe_baby_load', () => import('babyTracker/BabyTracker'), getPerf);
 const ChildDevelopmentMF = tracedLazy('mfe_childdev_load', () => import('childDevelopment/ChildDevelopment'), getPerf);
-const ChineseLearningMF = tracedLazy('mfe_chinese_load', () => import('chineseLearning/ChineseLearning'), getPerf);
-const EnglishLearningMF = tracedLazy('mfe_english_load', () => import('englishLearning/EnglishLearning'), getPerf);
 const FlashCardsMF = tracedLazy('mfe_flashcards_load', () => import('flashcards/FlashCards'), getPerf);
 const WorkTrackerMF = tracedLazy('mfe_work_tracker_load', () => import('workTracker/WorkTracker'), getPerf);
 
@@ -329,40 +327,6 @@ function ChildDevPage() {
   );
 }
 
-// Fallback for Chinese Learning MFE
-const ChineseLearningFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Chinese Learning module is loading...</p>
-  </div>
-);
-
-function ChinesePage() {
-  return (
-    <ErrorBoundary fallback={<ChineseLearningFallback />}>
-      <Suspense fallback={<Loading />}>
-        <ChineseLearningMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for English Learning MFE
-const EnglishLearningFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">English Learning module is loading...</p>
-  </div>
-);
-
-function EnglishPage() {
-  return (
-    <ErrorBoundary fallback={<EnglishLearningFallback />}>
-      <Suspense fallback={<Loading />}>
-        <EnglishLearningMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
 // Fallback for Flash Cards MFE
 const FlashCardsFallback = () => (
   <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
@@ -430,8 +394,6 @@ export default function App() {
         <Route path="notebook/:noteId" element={<NotebookPage />} />
         <Route path="baby" element={<BabyPage />} />
         <Route path="child-dev" element={<ChildDevPage />} />
-        <Route path="chinese" element={<ChinesePage />} />
-        <Route path="english" element={<EnglishPage />} />
         <Route path="flashcards" element={<FlashCardsPage />} />
         <Route path="work-tracker" element={<WorkTrackerPage />} />
         <Route path="whats-new" element={<WhatsNewPage />} />

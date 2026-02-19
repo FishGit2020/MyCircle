@@ -24,8 +24,6 @@ import {
   updateUserBottomNavOrder,
   updateUserNotificationAlerts,
   updateBibleBookmarks,
-  updateChineseLearningProgress,
-  updateEnglishLearningProgress,
   updateChildData,
   identifyUser,
   clearUserIdentity,
@@ -56,8 +54,6 @@ interface AuthContextType {
   syncStockWatchlist: (watchlist: WatchlistItem[]) => Promise<void>;
   syncPodcastSubscriptions: (subscriptionIds: string[]) => Promise<void>;
   syncBabyDueDate: (date: string | null) => Promise<void>;
-  syncChineseLearningProgress: (progress: { masteredIds: string[]; lastDate: string }) => Promise<void>;
-  syncEnglishLearningProgress: (progress: { completedIds: string[]; quizScores: Array<{ date: string; correct: number; total: number }>; lastDate: string }) => Promise<void>;
   recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
   refreshProfile: () => Promise<void>;
@@ -147,18 +143,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userProfile.bibleBookmarks && userProfile.bibleBookmarks.length > 0) {
             localStorage.setItem(StorageKeys.BIBLE_BOOKMARKS, JSON.stringify(userProfile.bibleBookmarks));
             window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
-          }
-
-          // Restore Chinese Learning progress
-          if (userProfile.chineseLearningProgress) {
-            localStorage.setItem(StorageKeys.CHINESE_LEARNING_PROGRESS, JSON.stringify(userProfile.chineseLearningProgress));
-            window.dispatchEvent(new Event(WindowEvents.CHINESE_PROGRESS_CHANGED));
-          }
-
-          // Restore English Learning progress
-          if (userProfile.englishLearningProgress) {
-            localStorage.setItem(StorageKeys.ENGLISH_LEARNING_PROGRESS, JSON.stringify(userProfile.englishLearningProgress));
-            window.dispatchEvent(new Event(WindowEvents.ENGLISH_PROGRESS_CHANGED));
           }
 
           // Restore Child Development data
@@ -253,8 +237,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
       window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
       window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.CHINESE_PROGRESS_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.ENGLISH_PROGRESS_CHANGED));
       window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
       window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
       window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
@@ -346,18 +328,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const syncPodcastSubscriptions = useCallback(async (subscriptionIds: string[]) => {
     if (user) {
       await updatePodcastSubscriptions(user.uid, subscriptionIds);
-    }
-  }, [user]);
-
-  const syncChineseLearningProgress = useCallback(async (progress: { masteredIds: string[]; lastDate: string }) => {
-    if (user) {
-      await updateChineseLearningProgress(user.uid, progress);
-    }
-  }, [user]);
-
-  const syncEnglishLearningProgress = useCallback(async (progress: { completedIds: string[]; quizScores: Array<{ date: string; correct: number; total: number }>; lastDate: string }) => {
-    if (user) {
-      await updateEnglishLearningProgress(user.uid, progress);
     }
   }, [user]);
 
@@ -464,8 +434,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         syncStockWatchlist,
         syncPodcastSubscriptions,
         syncBabyDueDate,
-        syncChineseLearningProgress,
-        syncEnglishLearningProgress,
         recentCities,
         favoriteCities,
         refreshProfile,
