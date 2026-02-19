@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import HistoricalWeather from './HistoricalWeather';
 import type { CurrentWeather, HistoricalWeatherDay } from '@mycircle/shared';
@@ -101,5 +101,39 @@ describe('HistoricalWeather', () => {
     render(<HistoricalWeather current={mockCurrent} historical={mockHistorical} />);
     expect(screen.getByAltText('clear sky')).toBeInTheDocument();
     expect(screen.getByAltText('Partly cloudy')).toBeInTheDocument();
+  });
+});
+
+describe('HistoricalWeather (Fahrenheit)', () => {
+  afterEach(() => {
+    localStorage.removeItem('tempUnit');
+  });
+
+  it('shows correct temperature difference in Fahrenheit', () => {
+    localStorage.setItem('tempUnit', 'F');
+    render(<HistoricalWeather current={mockCurrent} historical={mockHistorical} />);
+    // Diff = 25 - 20 = 5°C → 5 * 9/5 = 9°F (NOT 5*9/5+32 = 41°F)
+    expect(screen.getByRole('status')).toHaveTextContent('9°F');
+    expect(screen.getByRole('status')).toHaveTextContent('warmer');
+  });
+
+  it('shows correct cooler difference in Fahrenheit', () => {
+    localStorage.setItem('tempUnit', 'F');
+    const coolerCurrent = { ...mockCurrent, temp_max: 15 };
+    render(<HistoricalWeather current={coolerCurrent} historical={mockHistorical} />);
+    // Diff = 15 - 20 = -5°C → 5 * 9/5 = 9°F cooler
+    expect(screen.getByRole('status')).toHaveTextContent('9°F');
+    expect(screen.getByRole('status')).toHaveTextContent('cooler');
+  });
+
+  it('converts absolute temperatures to Fahrenheit in cards', () => {
+    localStorage.setItem('tempUnit', 'F');
+    render(<HistoricalWeather current={mockCurrent} historical={mockHistorical} />);
+    // Today high: 25°C = 77°F, Today low: 18°C = 64°F
+    expect(screen.getByText('77°F')).toBeInTheDocument();
+    expect(screen.getByText('64°F')).toBeInTheDocument();
+    // Historical high: 20°C = 68°F, Historical low: 12°C = 54°F
+    expect(screen.getByText('68°F')).toBeInTheDocument();
+    expect(screen.getByText('54°F')).toBeInTheDocument();
   });
 });

@@ -46,6 +46,14 @@ export function formatTemperature(temp: number, unit?: TemperatureUnit): string 
   return `${Math.round(temp)}°C`;
 }
 
+export function formatTemperatureDiff(diff: number, unit?: TemperatureUnit): string {
+  const u = unit ?? getStoredUnits().tempUnit;
+  if (u === 'F') {
+    return `${Math.round(diff * 9/5)}°F`;
+  }
+  return `${Math.round(diff)}°C`;
+}
+
 export function convertTemp(temp: number, unit?: TemperatureUnit): number {
   const u = unit ?? getStoredUnits().tempUnit;
   if (u === 'F') return Math.round(temp * 9/5 + 32);

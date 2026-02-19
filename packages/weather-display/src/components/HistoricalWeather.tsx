@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation, useUnits, formatTemperature, formatWindSpeed, getWeatherIconUrl } from '@mycircle/shared';
+import { useTranslation, useUnits, formatTemperature, formatTemperatureDiff, formatWindSpeed, getWeatherIconUrl } from '@mycircle/shared';
 import type { CurrentWeather, HistoricalWeatherDay } from '@mycircle/shared';
 
 interface Props {
@@ -98,7 +98,7 @@ export default function HistoricalWeather({ current, historical }: Props) {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             )}
-            {formatTemperature(absDiff, tempUnit)} {diff > 0 ? t('weather.warmer') : t('weather.cooler')}
+            {formatTemperatureDiff(absDiff, tempUnit)} {diff > 0 ? t('weather.warmer') : t('weather.cooler')}
           </span>
         </div>
       )}
