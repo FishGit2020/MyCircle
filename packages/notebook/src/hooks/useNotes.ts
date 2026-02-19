@@ -8,6 +8,7 @@ interface NotebookAPI {
   add: (note: NoteInput) => Promise<string>;
   update: (id: string, updates: Partial<NoteInput>) => Promise<void>;
   delete: (id: string) => Promise<void>;
+  subscribe?: (callback: (notes: Note[]) => void) => () => void;
 }
 
 export function useNotes() {
@@ -39,16 +40,31 @@ export function useNotes() {
     }
   }, [api, t]);
 
+  // Real-time subscription with one-shot fallback
   useEffect(() => {
-    loadNotes();
-  }, [loadNotes]);
+    if (!api) {
+      setLoading(false);
+      return;
+    }
 
-  // Listen to invalidation signals from other tabs/components
-  useEffect(() => {
+    if (api.subscribe) {
+      const unsubscribe = api.subscribe((data) => {
+        setNotes(data);
+        setLoading(false);
+        // Update dashboard cache
+        try {
+          localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(data.length));
+        } catch { /* ignore */ }
+      });
+      return unsubscribe;
+    }
+
+    // Fallback: one-shot fetch + manual invalidation
+    loadNotes();
     const handler = () => loadNotes();
     window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
     return () => window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
-  }, [loadNotes]);
+  }, [api, loadNotes]);
 
   const saveNote = useCallback(async (id: string | null, data: NoteInput) => {
     if (!api) throw new Error('Notebook API not available');
@@ -58,15 +74,13 @@ export function useNotes() {
       await api.add(data);
     }
     window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-    await loadNotes();
-  }, [api, loadNotes]);
+  }, [api]);
 
   const deleteNote = useCallback(async (id: string) => {
     if (!api) throw new Error('Notebook API not available');
     await api.delete(id);
     window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-    await loadNotes();
-  }, [api, loadNotes]);
+  }, [api]);
 
   return { notes, loading, error, saveNote, deleteNote, reload: loadNotes };
 }

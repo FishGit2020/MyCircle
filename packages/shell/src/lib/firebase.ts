@@ -651,6 +651,18 @@ export async function deleteUserNote(uid: string, noteId: string) {
   await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
 }
 
+/** Subscribe to real-time private notes updates via Firestore onSnapshot */
+export function subscribeToUserNotes(uid: string, callback: (notes: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'notes'), orderBy('updatedAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(notes);
+  }, (error) => {
+    log.warn('User notes snapshot error:', error);
+  });
+}
+
 // Public Notes — shared notes visible to all authenticated users
 export async function getPublicNotes() {
   if (!db) return [];
@@ -771,6 +783,10 @@ if (firebaseEnabled) {
     delete: (id: string) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deleteUserNote(auth.currentUser.uid, id);
+    },
+    subscribe: (callback: (notes: Array<Record<string, any>>) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToUserNotes(auth.currentUser.uid, callback);
     },
     // Public notes
     getAllPublic: () => getPublicNotes(),
