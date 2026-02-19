@@ -871,6 +871,11 @@ const en = {
   'baby.stage9Desc': 'Brain connections form rapidly. Baby practices breathing, fingernails and toenails complete, pupils respond to light, and the nervous system matures.',
   'baby.stage10': 'Ready for Birth',
   'baby.stage10Desc': 'Kidneys and liver fully developed, baby gains weight daily, lanugo sheds, lungs mature, and all organs are ready. Baby is prepared to meet you!',
+  'baby.sources': 'Reliable Sources',
+  'baby.acogGuide': 'ACOG Guide',
+  'baby.mayoGuide': 'Mayo Clinic',
+  'baby.whatToExpect': 'What to Expect',
+  'baby.sourcesAttribution': 'Growth data follows ACOG clinical guidelines',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Keyboard Shortcuts',

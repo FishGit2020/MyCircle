@@ -873,6 +873,11 @@ const es: Record<TranslationKey, string> = {
   'baby.stage9Desc': 'Las conexiones cerebrales se forman r\u00e1pidamente. El beb\u00e9 practica la respiraci\u00f3n, las u\u00f1as se completan, las pupilas responden a la luz y el sistema nervioso madura.',
   'baby.stage10': 'Listo para Nacer',
   'baby.stage10Desc': 'Ri\u00f1ones e h\u00edgado completamente desarrollados, el beb\u00e9 gana peso cada d\u00eda, el lanugo se cae, los pulmones maduran y todos los \u00f3rganos est\u00e1n listos.',
+  'baby.sources': 'Fuentes confiables',
+  'baby.acogGuide': 'Gu\u00eda ACOG',
+  'baby.mayoGuide': 'Mayo Clinic',
+  'baby.whatToExpect': 'What to Expect',
+  'baby.sourcesAttribution': 'Los datos de crecimiento siguen las gu\u00edas cl\u00ednicas de ACOG',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Atajos de teclado',

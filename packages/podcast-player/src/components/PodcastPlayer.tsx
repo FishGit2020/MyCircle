@@ -9,6 +9,24 @@ import SubscribedPodcasts from './SubscribedPodcasts';
 import EpisodeList from './EpisodeList';
 import './PodcastPlayer.css';
 
+/** Strip dangerous HTML elements/attributes, keep safe formatting tags */
+function sanitizeHtml(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('script,iframe,style,object,embed,form,input,textarea,select').forEach(el => el.remove());
+  doc.querySelectorAll('*').forEach(el => {
+    for (const attr of Array.from(el.attributes)) {
+      if (attr.name.startsWith('on') || attr.name === 'style') {
+        el.removeAttribute(attr.name);
+      }
+    }
+    if (el.tagName === 'A') {
+      el.setAttribute('target', '_blank');
+      el.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+  return doc.body.innerHTML;
+}
+
 function loadSubscriptions(): Set<string> {
   try {
     const stored = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
@@ -215,9 +233,10 @@ export default function PodcastPlayer() {
                   {selectedPodcast.author}
                 </p>
                 {selectedPodcast.description && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-3">
-                    {selectedPodcast.description}
-                  </p>
+                  <div
+                    className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-3 [&_p]:mb-1 [&_p:last-child]:mb-0 [&_a]:text-blue-500 [&_a]:underline dark:[&_a]:text-blue-400"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(selectedPodcast.description) }}
+                  />
                 )}
                 <div className="mt-3">
                   <button
