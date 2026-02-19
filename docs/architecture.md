@@ -276,8 +276,9 @@ Exposes `BibleReader` component via Module Federation.
 - Verse of the Day via GraphQL (`bibleVotdApi` query) cached by day-of-year with local verse fallback
 - Passage reading via YouVersion API (`biblePassage` query with USFM reference conversion), with copyright display
 - Font size adjustment (5 levels, persisted via `StorageKeys.BIBLE_FONT_SIZE`)
-- Bookmark system (create/remove, stored in `StorageKeys.BIBLE_BOOKMARKS`, synced to Firestore per user via `BIBLE_BOOKMARKS_CHANGED` event)
-- Copy passage text to clipboard
+- Bookmark system (create/remove, stored in `StorageKeys.BIBLE_BOOKMARKS`, synced to Firestore per user via `BIBLE_BOOKMARKS_CHANGED` event). Bookmark links include `?book=X&chapter=Y` for direct navigation.
+- **URL-based navigation**: `useSearchParams` reads/writes `?book=X&chapter=Y&version=N` for deep-linking, shareable URLs, and bookmark navigation. Plain `/bible` shows book selector (backward compatible).
+- Copy passage text to clipboard, share link button (copies current URL with passage context)
 - **Community notes**: Collapsible notes panel per passage (`book:chapter` key). Auto-saved to `StorageKeys.BIBLE_NOTES` with 800ms debounce. Notes are loaded when navigating to a passage and cleared preview shown in collapsed state.
 - **Daily devotional**: `DailyDevotional` component renders a curated reading plan (30 entries cycled by `dayOfYear % 30`). Each entry has a book, chapter, and theme. "Read Passage" button navigates to the passage and marks the day complete in `StorageKeys.BIBLE_DEVOTIONAL_LOG` (90-day rolling window to prevent unbounded growth).
 - Last read position tracking (`StorageKeys.BIBLE_LAST_READ`)

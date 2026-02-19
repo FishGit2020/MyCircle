@@ -93,9 +93,10 @@ export default function BibleVersePicker({ onAddCards, onClose }: BibleVersePick
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto">
-        <div className="px-6 pt-6 pb-4">
-          <div className="flex items-center justify-between mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] flex flex-col">
+        {/* Fixed header */}
+        <div className="px-6 pt-6 pb-3 flex-shrink-0">
+          <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
               {t('flashcards.addBibleVerses')}
             </h2>
@@ -110,14 +111,17 @@ export default function BibleVersePicker({ onAddCards, onClose }: BibleVersePick
               </svg>
             </button>
           </div>
+        </div>
 
+        {/* Scrollable content */}
+        <div className="px-6 pb-6 overflow-y-auto flex-1 min-h-0">
           {/* Book selector */}
           {step === 'book' && (
             <div>
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
                 {t('flashcards.selectBook')}
               </h3>
-              <div className="grid grid-cols-2 gap-1.5 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-2 gap-1.5">
                 {BIBLE_BOOKS.map(b => (
                   <button
                     key={b.name}

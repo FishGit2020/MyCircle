@@ -70,8 +70,9 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Dynamic Bible version selector** — 19+ English translations (KJV, NIV, AMP, NASB, etc.) fetched from YouVersion API with localStorage persistence
 - Verse of the Day
 - Font size adjustment (14-22px) with persistence
-- Bookmarks with localStorage persistence
-- Copy passage text to clipboard
+- Bookmarks with localStorage persistence — clicking a bookmark navigates directly to the passage
+- **Shareable URLs** — `?book=Genesis&chapter=1&version=111` search params for deep-linking and sharing passages
+- Copy passage text to clipboard, share link button copies URL
 - Copyright notice display for licensed translations
 - **Daily devotional** — curated 30-entry reading plan cycled by day-of-year, with themed passage and "Read Passage" button, completion tracking (green checkmark persisted in localStorage, 90-day rolling window)
 
@@ -254,7 +255,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/podcasts` | Podcast player (discover + subscriptions tabs) |
 | `/podcasts/:podcastId` | Podcast drill-down — episode list |
 | `/ai` | AI assistant |
-| `/bible` | Bible reader with daily devotionals |
+| `/bible` | Bible reader with daily devotionals (supports `?book=X&chapter=Y&version=N`) |
 | `/worship` | Worship song library — song list |
 | `/worship/new` | New worship song editor |
 | `/worship/:songId` | Worship song viewer |

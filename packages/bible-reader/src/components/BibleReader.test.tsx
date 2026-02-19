@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import BibleReader from './BibleReader';
 
@@ -70,9 +71,11 @@ describe('BibleReader', () => {
 
   it('renders the Verse of the Day section', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('bible.verseOfDay')).toBeInTheDocument();
@@ -82,9 +85,11 @@ describe('BibleReader', () => {
 
   it('renders the book selector with Old and New Testament sections', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('bible.oldTestament')).toBeInTheDocument();
@@ -95,9 +100,11 @@ describe('BibleReader', () => {
 
   it('renders search input for filtering books', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByPlaceholderText('bible.searchBooks')).toBeInTheDocument();
@@ -106,9 +113,11 @@ describe('BibleReader', () => {
   it('filters books when searching', async () => {
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     await user.type(screen.getByPlaceholderText('bible.searchBooks'), 'john');
@@ -120,9 +129,11 @@ describe('BibleReader', () => {
   it('shows chapter selector when a book is clicked', async () => {
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     await user.click(screen.getByText('Genesis'));
@@ -136,9 +147,11 @@ describe('BibleReader', () => {
   it('has back navigation from chapter selector', async () => {
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     await user.click(screen.getByText('Genesis'));
@@ -150,9 +163,11 @@ describe('BibleReader', () => {
 
   it('renders scripture attribution footer', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('bible.attributionYouVersion')).toBeInTheDocument();
@@ -167,9 +182,11 @@ describe('BibleReader', () => {
     });
 
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     // Should show loading skeleton, not the verse text
@@ -185,9 +202,11 @@ describe('Daily Devotional', () => {
 
   it('renders the daily devotional card', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('bible.dailyDevotional')).toBeInTheDocument();
@@ -197,9 +216,11 @@ describe('Daily Devotional', () => {
   it('shows completed state after clicking Read Passage', async () => {
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     await user.click(screen.getByText('bible.devotionalRead'));
@@ -210,9 +231,11 @@ describe('Daily Devotional', () => {
   it('saves completion to localStorage', async () => {
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     await user.click(screen.getByText('bible.devotionalRead'));
@@ -229,9 +252,11 @@ describe('Daily Devotional', () => {
     localStorage.setItem('bible-devotional-log', JSON.stringify([todayKey]));
 
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('bible.devotionalCompleted')).toBeInTheDocument();
@@ -246,9 +271,11 @@ describe('Bible Version Selector', () => {
 
   it('renders the version selector dropdown', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByLabelText('bible.versionSelect')).toBeInTheDocument();
@@ -256,9 +283,11 @@ describe('Bible Version Selector', () => {
 
   it('defaults to NIV (id=111) when no version is stored', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
@@ -269,9 +298,11 @@ describe('Bible Version Selector', () => {
     localStorage.setItem('bible-translation', '111');
 
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
@@ -281,9 +312,11 @@ describe('Bible Version Selector', () => {
   it('persists version selection to localStorage', async () => {
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     await user.selectOptions(screen.getByLabelText('bible.versionSelect'), '111');
@@ -292,9 +325,11 @@ describe('Bible Version Selector', () => {
 
   it('shows dynamic version options from YouVersion API', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
@@ -313,9 +348,11 @@ describe('Bible Version Selector', () => {
     });
 
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
@@ -331,9 +368,11 @@ describe('Bible Version Selector', () => {
     });
 
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     const select = screen.getByLabelText('bible.versionSelect') as HTMLSelectElement;
@@ -370,9 +409,11 @@ describe('Bible Version Selector', () => {
 
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     // Navigate to Genesis chapter 1
@@ -418,9 +459,11 @@ describe('Bible Version Selector', () => {
 
     const user = userEvent.setup();
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     await user.click(screen.getByText('Genesis'));
@@ -431,9 +474,11 @@ describe('Bible Version Selector', () => {
 
   it('has accessible label for version selector', () => {
     render(
-      <MockedProvider mocks={[]} addTypename={false}>
-        <BibleReader />
-      </MockedProvider>
+      <MemoryRouter>
+        <MockedProvider mocks={[]} addTypename={false}>
+          <BibleReader />
+        </MockedProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('bible.version')).toBeInTheDocument();

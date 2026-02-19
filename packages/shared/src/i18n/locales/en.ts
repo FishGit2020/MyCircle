@@ -614,6 +614,7 @@ const en = {
   'bible.devotionalReflection': 'Reflect',
   'bible.version': 'Version',
   'bible.versionSelect': 'Select Bible version',
+  'bible.sharePassage': 'Share link',
 
   // Toast messages
   'toast.addedToWatchlist': 'Added to watchlist',

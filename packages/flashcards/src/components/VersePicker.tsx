@@ -154,7 +154,7 @@ export default function VersePicker({ passageText, verses: apiVerses, reference,
         ))}
       </div>
 
-      <div className="space-y-2 max-h-64 overflow-y-auto mb-4">
+      <div className="space-y-2 mb-4">
         {verses.map(verse => (
           <label
             key={verse.number}
