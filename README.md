@@ -186,11 +186,11 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │ │     (MFE)      │  │
 │  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │ │  Port 3013     │  │
 │  └────────────┘ └──────────────┘ └───────────────────┘ └────────────────┘  │
-│  ┌─────────────────┐                                                         │
-│  │ English Learning │                                                         │
-│  │      (MFE)       │                                                         │
-│  │   Port 3014      │                                                         │
-│  └─────────────────┘                                                         │
+│  ┌─────────────────┐ ┌──────────────┐ ┌──────────────┐                        │
+│  │ English Learning │ │  Flashcards  │ │ Work Tracker │                        │
+│  │      (MFE)       │ │    (MFE)     │ │    (MFE)     │                        │
+│  │   Port 3014      │ │  Port 3015   │ │  Port 3016   │                        │
+│  └─────────────────┘ └──────────────┘ └──────────────┘                        │
 └──────────────────────────────────────────────────────────────────────────┘
                                 │
                                 ▼
@@ -224,6 +224,8 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Child Development** | Postnatal milestone tracker (birth–5 years) across 5 CDC/AAP-aligned domains | `ChildDevelopment` |
 | **Chinese Learning** | Chinese character flashcards + handwriting practice canvas | `ChineseLearning` |
 | **English Learning** | Daily English phrases with lessons, quizzes, and progress tracking | `EnglishLearning` |
+| **Flashcards** | Multi-format flash cards (Chinese, English, Bible, custom) with 3D flip and mastery tracking | `FlashCards` |
+| **Work Tracker** | Firestore-backed daily work log with timeline view and real-time sync | `WorkTracker` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
