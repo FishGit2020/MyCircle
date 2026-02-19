@@ -198,12 +198,18 @@ export const typeDefs = `#graphql
     copyright: String
   }
 
+  type BibleVerseItem {
+    number: Int!
+    text: String!
+  }
+
   type BiblePassage {
     text: String!
     reference: String!
     translation: String
     verseCount: Int
     copyright: String
+    verses: [BibleVerseItem!]!
   }
 
   type BibleVersion {

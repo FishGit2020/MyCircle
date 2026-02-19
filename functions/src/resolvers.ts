@@ -556,33 +556,98 @@ async function getYouVersionBibles(apiKey: string): Promise<YouVersionBible[]> {
   return bibles;
 }
 
+/**
+ * Parse individual verses from YouVersion HTML content.
+ * YouVersion HTML format uses:
+ *   <span class="yv-v" v="1"></span><span class="yv-vlbl">1</span>Verse text...
+ * Text between markers (including continuation paragraphs and poetry blocks)
+ * belongs to the preceding verse.
+ * Returns empty array if no verse markers found.
+ */
+function parseVersesFromHtml(html: string): Array<{ number: number; text: string }> {
+  // Strategy 1: YouVersion yv-v markers (confirmed format from API)
+  // Split at each <span class="yv-v" v="N"></span> boundary
+  const yvParts = html.split(/<span\s+class="yv-v"\s+v="(\d+)"[^>]*><\/span>/);
+  if (yvParts.length > 2) {
+    const verses: Array<{ number: number; text: string }> = [];
+    for (let i = 1; i < yvParts.length; i += 2) {
+      const num = parseInt(yvParts[i], 10);
+      const rawHtml = yvParts[i + 1] || '';
+      const text = rawHtml
+        .replace(/<span\s+class="yv-vlbl"[^>]*>\d+<\/span>/g, '') // remove visible verse labels
+        .replace(/<\/div>\s*<div[^>]*>/g, ' ')  // add space between paragraphs/poetry blocks
+        .replace(/<[^>]+>/g, '')  // strip remaining HTML
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (text && !isNaN(num)) {
+        verses.push({ number: num, text });
+      }
+    }
+    if (verses.length > 1) {
+      verses.sort((a, b) => a.number - b.number);
+      return verses;
+    }
+  }
+
+  // Strategy 2: <sup>N</sup> verse numbers (other Bible API formats)
+  const supParts = html.split(/<sup[^>]*>\s*(\d+)\s*<\/sup>/i);
+  if (supParts.length > 2) {
+    const verses: Array<{ number: number; text: string }> = [];
+    for (let i = 1; i < supParts.length; i += 2) {
+      const num = parseInt(supParts[i], 10);
+      const rawText = (supParts[i + 1] || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+      if (rawText && !isNaN(num)) {
+        verses.push({ number: num, text: rawText });
+      }
+    }
+    if (verses.length > 1) {
+      verses.sort((a, b) => a.number - b.number);
+      return verses;
+    }
+  }
+
+  return [];
+}
+
+/** Strip HTML tags and normalize whitespace */
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+}
+
 /** Fetch a passage from YouVersion API */
 async function getYouVersionPassage(
   bibleId: number,
   reference: string,
   apiKey: string
-): Promise<{ text: string; reference: string; translation: string; verseCount: number; copyright: string | null }> {
+): Promise<{ text: string; reference: string; translation: string; verseCount: number; copyright: string | null; verses: Array<{ number: number; text: string }> }> {
   const usfmRef = convertToUsfmRef(reference);
   const cacheKey = `youversion:passage:${bibleId}:${usfmRef}`;
   const cached = bibleCache.get<any>(cacheKey);
   if (cached) return cached;
 
+  // Fetch HTML format to extract verse-level structure
   const response = await axios.get(
     `${YOUVERSION_API_BASE}/bibles/${bibleId}/passages/${encodeURIComponent(usfmRef)}`,
     {
-      params: { format: 'text' },
+      params: { format: 'html' },
       headers: { 'x-yvp-app-key': apiKey },
       timeout: 10000,
     }
   );
 
   const data = response.data;
+  const htmlContent = (data.content || data.text || '').trim();
+  const verses = parseVersesFromHtml(htmlContent);
+
   const result = {
-    text: (data.content || data.text || '').trim(),
+    text: verses.length > 0
+      ? verses.map(v => v.text).join(' ')
+      : stripHtml(htmlContent),
     reference: data.reference || reference,
     translation: data.bible_abbreviation || data.translation || String(bibleId),
-    verseCount: data.verse_count || data.verses?.length || 0,
+    verseCount: verses.length || data.verse_count || data.verses?.length || 0,
     copyright: data.copyright || null,
+    verses,
   };
 
   bibleCache.set(cacheKey, result, 3600);
