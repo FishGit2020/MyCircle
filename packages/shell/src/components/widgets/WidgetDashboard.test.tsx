@@ -22,6 +22,7 @@ vi.mock('@mycircle/shared', () => ({
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
+    PODCAST_NOW_PLAYING: 'podcast-now-playing',
     WIDGET_LAYOUT: 'widget-dashboard-layout',
     WORSHIP_SONGS_CACHE: 'worship-songs-cache',
     WORSHIP_FAVORITES: 'worship-favorites',
@@ -32,6 +33,8 @@ vi.mock('@mycircle/shared', () => ({
     CHILD_NAME: 'child-name',
     CHILD_BIRTH_DATE: 'child-birth-date',
     BIBLE_BOOKMARKS: 'bible-bookmarks',
+    FLASHCARD_PROGRESS: 'flashcard-progress',
+    WORK_TRACKER_CACHE: 'work-tracker-cache',
   },
   MFEvents: {
     PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
@@ -177,5 +180,29 @@ describe('WidgetDashboard', () => {
   it('has proper a11y labels on the section', () => {
     renderWidget();
     expect(screen.getByRole('region', { name: 'widgets.title' })).toBeInTheDocument();
+  });
+
+  it('hydrates NowPlayingWidget from persisted localStorage', () => {
+    const nowPlaying = {
+      episode: {
+        id: 42,
+        title: 'Persisted Episode',
+        description: 'Stored in localStorage',
+        datePublished: 1700000000,
+        duration: 1800,
+        enclosureUrl: 'https://example.com/ep.mp3',
+        enclosureType: 'audio/mpeg',
+        image: '',
+        feedId: 10,
+      },
+      podcast: { id: 10, title: 'Persisted Podcast', author: '', artwork: '', description: '', feedUrl: '', episodeCount: 1, categories: {} },
+    };
+    getItemSpy.mockImplementation((key: string) => {
+      if (key === 'podcast-now-playing') return JSON.stringify(nowPlaying);
+      return null;
+    });
+    renderWidget();
+    expect(screen.getByText('Persisted Episode')).toBeInTheDocument();
+    expect(screen.getByText('Persisted Podcast')).toBeInTheDocument();
   });
 });

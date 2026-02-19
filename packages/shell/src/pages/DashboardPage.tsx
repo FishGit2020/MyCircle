@@ -6,7 +6,7 @@ import { useCuratedVerse } from '../hooks/useCuratedVerse';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { verse, loading } = useCuratedVerse();
+  const { verse, verseFragments, loading } = useCuratedVerse();
 
   return (
     <div className="space-y-8">
@@ -28,12 +28,23 @@ export default function DashboardPage() {
               </div>
             ) : (
               <>
-                {verse.text ? (
+                {verseFragments ? (
+                  <p className="text-sm italic text-blue-600 dark:text-blue-400 text-left leading-relaxed">
+                    &ldquo;{verseFragments.map((v) => (
+                      <span key={v.number}>
+                        <sup className="text-[10px] font-bold text-blue-400 dark:text-blue-500 mr-0.5 not-italic select-none">
+                          {v.number}
+                        </sup>
+                        {v.text}{' '}
+                      </span>
+                    ))}&rdquo;
+                  </p>
+                ) : verse.text ? (
                   <p className="text-sm italic text-blue-600 dark:text-blue-400">
                     &ldquo;{verse.text}&rdquo;
                   </p>
                 ) : null}
-                <p className={`text-xs text-blue-700 dark:text-blue-300 font-medium ${verse.text ? 'mt-1.5' : ''}`}>
+                <p className={`text-xs text-blue-700 dark:text-blue-300 font-medium ${verse.text || verseFragments ? 'mt-1.5' : ''}`}>
                   — {verse.reference}
                 </p>
                 {verse.copyright && (

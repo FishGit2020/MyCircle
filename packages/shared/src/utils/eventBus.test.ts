@@ -131,5 +131,6 @@ describe('StorageKeys constants', () => {
     expect(StorageKeys.STOCK_WATCHLIST).toBe('stock-tracker-watchlist');
     expect(StorageKeys.BABY_DUE_DATE).toBe('baby-due-date');
     expect(StorageKeys.NOTEBOOK_CACHE).toBe('notebook-cache');
+    expect(StorageKeys.PODCAST_NOW_PLAYING).toBe('podcast-now-playing');
   });
 });

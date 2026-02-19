@@ -124,6 +124,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
         setQueue([]);
         setSleepMinutes(0);
         setSleepRemaining(0);
+        try { localStorage.removeItem(StorageKeys.PODCAST_NOW_PLAYING); } catch { /* */ }
       }
     );
 
@@ -143,6 +144,11 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !episode) return;
+
+    // Persist now-playing state so dashboard widget can hydrate on mount
+    try {
+      localStorage.setItem(StorageKeys.PODCAST_NOW_PLAYING, JSON.stringify({ episode, podcast }));
+    } catch { /* ignore */ }
 
     audio.src = episode.enclosureUrl;
     audio.playbackRate = playbackSpeed;
@@ -200,6 +206,8 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
           setPodcast(next.podcast);
           return rest;
         }
+        // No more episodes — clear now-playing persistence
+        try { localStorage.removeItem(StorageKeys.PODCAST_NOW_PLAYING); } catch { /* */ }
         return prev;
       });
     };
@@ -349,6 +357,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
     setQueue([]);
     setSleepMinutes(0);
     setSleepRemaining(0);
+    try { localStorage.removeItem(StorageKeys.PODCAST_NOW_PLAYING); } catch { /* */ }
   }, [episode]);
 
   // Sleep timer countdown
@@ -613,7 +622,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
                   </p>
                 ) : (
                   queue.map((item, i) => (
-                    <div key={`${item.episode.id}-${i}`} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-750">
+                    <div key={`${item.episode.id}-${i}`} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <span className="text-xs text-gray-400 w-4">{i + 1}</span>
                       <p className="text-xs text-gray-800 dark:text-gray-200 truncate flex-1">{item.episode.title}</p>
                       <button
