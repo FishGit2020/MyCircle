@@ -225,7 +225,7 @@ export default function CommandPalette({ recentPages = [] }: Props) {
   let globalIndex = 0;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-start justify-center sm:pt-[15vh]">
+    <div className="fixed inset-0 z-[200] flex items-start justify-center sm:pt-[15vh]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm hidden sm:block" onClick={() => setOpen(false)} />
 

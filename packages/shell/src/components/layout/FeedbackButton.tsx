@@ -133,6 +133,7 @@ export default function FeedbackButton({ hasActivePlayer }: { hasActivePlayer?: 
         ref={triggerRef}
         onClick={handleOpen}
         className={`fixed ${hasActivePlayer ? 'bottom-36 md:bottom-24' : 'bottom-20 md:bottom-6'} right-6 z-40 flex items-center gap-2 p-3 md:px-4 md:py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 focus-visible:outline-none`}
+        style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
         aria-haspopup="dialog"
         aria-label={t('feedback.button')}
       >
