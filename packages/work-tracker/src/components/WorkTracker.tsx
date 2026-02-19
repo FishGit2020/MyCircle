@@ -8,7 +8,7 @@ type TimeFilter = 'today' | 'thisMonth' | 'all';
 
 export default function WorkTracker() {
   const { t } = useTranslation();
-  const { entries, loading, isAuthenticated, addEntry, updateEntry, deleteEntry } = useWorkEntries();
+  const { entries, loading, isAuthenticated, authChecked, addEntry, updateEntry, deleteEntry } = useWorkEntries();
   const [filter, setFilter] = useState<TimeFilter>('all');
 
   const today = new Date().toISOString().split('T')[0];
@@ -25,19 +25,25 @@ export default function WorkTracker() {
     }
   }, [entries, filter, today, currentMonth]);
 
+  if (!authChecked || loading) {
+    return (
+      <div className="pb-20 md:pb-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('workTracker.title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('workTracker.subtitle')}</p>
+        </div>
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="pb-20 md:pb-8">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('workTracker.title')}</h1>
         <p className="text-gray-500 dark:text-gray-400">{t('workTracker.signInRequired')}</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
       </div>
     );
   }

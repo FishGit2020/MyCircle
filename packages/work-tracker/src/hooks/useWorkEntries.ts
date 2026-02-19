@@ -19,6 +19,7 @@ export function useWorkEntries() {
   const [entries, setEntries] = useState<WorkEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Auth state detection
   useEffect(() => {
@@ -30,6 +31,7 @@ export function useWorkEntries() {
       } catch {
         if (mounted) setIsAuthenticated(false);
       }
+      if (mounted) setAuthChecked(true);
     };
     checkAuth();
     const interval = setInterval(checkAuth, 5000);
@@ -98,6 +100,7 @@ export function useWorkEntries() {
     entries,
     loading,
     isAuthenticated,
+    authChecked,
     addEntry,
     updateEntry,
     deleteEntry,
