@@ -22,6 +22,8 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,7 +64,7 @@ jobs:
         run: npx firebase-tools deploy --only functions,firestore --project mycircle-dash
 
       - name: Create Sentry release and upload source maps
-        if: ${{ secrets.SENTRY_AUTH_TOKEN != '' }}
+        if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
         run: |
           npx @sentry/cli releases new "$SENTRY_RELEASE"
           npx @sentry/cli releases set-commits "$SENTRY_RELEASE" --auto
@@ -70,7 +72,6 @@ jobs:
           npx @sentry/cli releases finalize "$SENTRY_RELEASE"
           npx @sentry/cli releases deploys "$SENTRY_RELEASE" new -e production
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: youpeng-huang
           SENTRY_PROJECT: javascript-react
           SENTRY_RELEASE: ${{ github.sha }}
