@@ -78,7 +78,9 @@
   "functions": {
     "source": "functions",
     "runtime": "nodejs22",
-    "predeploy": ["pnpm --dir \"$RESOURCE_DIR\" run build"]
+    "predeploy": [
+      "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm install && pnpm run build"
+    ]
   },
   "emulators": {
     "functions": {
