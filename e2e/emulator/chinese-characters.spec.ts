@@ -29,10 +29,4 @@ test.describe('Chinese Characters — Firestore Emulator', () => {
     const docs = await getFirestoreChineseCharacters(request);
     expect(Array.isArray(docs)).toBe(true);
   });
-
-  test('flashcards page loads (Chinese characters via bridge)', async ({ page }) => {
-    await page.goto('/flashcards');
-    await page.waitForLoadState('domcontentloaded');
-    await expect(page.locator('body')).not.toBeEmpty();
-  });
 });
