@@ -12,5 +12,7 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   english: 'nav.english',
   chinese: 'nav.chinese',
   compare: 'nav.compare',
+  flashcards: 'nav.flashcards',
+  'work-tracker': 'nav.workTracker',
   'whats-new': 'whatsNew.title',
 };

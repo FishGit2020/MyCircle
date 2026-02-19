@@ -1323,6 +1323,9 @@ const en = {
   'flashcards.bibleFull': 'Bible (Full)',
   'flashcards.cardTypeBoth': 'Both',
   'flashcards.selectAll': 'Select All',
+  'flashcards.edit': 'Edit',
+  'flashcards.editCard': 'Edit Card',
+  'flashcards.uncategorized': 'Uncategorized',
 
   // Work Tracker
   'nav.workTracker': 'Work Log',

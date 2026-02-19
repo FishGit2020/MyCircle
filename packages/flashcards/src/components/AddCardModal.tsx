@@ -2,20 +2,28 @@ import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 
 interface AddCardModalProps {
-  onAdd: (card: { front: string; back: string; category: string }) => void;
+  onAdd?: (card: { front: string; back: string; category: string }) => void;
+  onEdit?: (updates: { front: string; back: string; category: string }) => void;
+  initialValues?: { front: string; back: string; category: string };
   onClose: () => void;
 }
 
-export default function AddCardModal({ onAdd, onClose }: AddCardModalProps) {
+export default function AddCardModal({ onAdd, onEdit, initialValues, onClose }: AddCardModalProps) {
   const { t } = useTranslation();
-  const [front, setFront] = useState('');
-  const [back, setBack] = useState('');
-  const [category, setCategory] = useState('custom');
+  const isEditMode = !!initialValues;
+  const [front, setFront] = useState(initialValues?.front ?? '');
+  const [back, setBack] = useState(initialValues?.back ?? '');
+  const [category, setCategory] = useState(initialValues?.category ?? 'custom');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!front.trim() || !back.trim()) return;
-    onAdd({ front: front.trim(), back: back.trim(), category: category.trim() || 'custom' });
+    const data = { front: front.trim(), back: back.trim(), category: category.trim() || 'custom' };
+    if (isEditMode && onEdit) {
+      onEdit(data);
+    } else if (onAdd) {
+      onAdd(data);
+    }
     onClose();
   };
 
@@ -25,7 +33,7 @@ export default function AddCardModal({ onAdd, onClose }: AddCardModalProps) {
         <form onSubmit={handleSubmit}>
           <div className="px-6 pt-6 pb-4">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-              {t('flashcards.addCustomCard')}
+              {isEditMode ? t('flashcards.editCard') : t('flashcards.addCustomCard')}
             </h2>
 
             <div className="space-y-4">

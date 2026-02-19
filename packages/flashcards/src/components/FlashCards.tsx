@@ -25,8 +25,10 @@ export default function FlashCards() {
     toggleMastered,
     addBibleCards,
     addCustomCard,
+    updateCustomCard,
     deleteCard,
     resetProgress,
+    isAuthenticated,
   } = useFlashCards();
 
   const [activeType, setActiveType] = useState<CardType | 'all'>('all');
@@ -35,6 +37,8 @@ export default function FlashCards() {
   const [practiceCards, setPracticeCards] = useState<FlashCard[] | null>(null);
   const [practiceStart, setPracticeStart] = useState(0);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState<FlashCard | null>(null);
+  const [cardToEdit, setCardToEdit] = useState<FlashCard | null>(null);
 
   const filteredCards = useMemo(() => {
     if (activeType === 'all') return allCards;
@@ -59,6 +63,20 @@ export default function FlashCards() {
   const handleReset = () => {
     resetProgress();
     setShowResetConfirm(false);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (cardToDelete) {
+      deleteCard(cardToDelete.id);
+      setCardToDelete(null);
+    }
+  };
+
+  const handleEdit = (updates: { front: string; back: string; category: string }) => {
+    if (cardToEdit) {
+      updateCustomCard(cardToEdit.id, updates);
+      setCardToEdit(null);
+    }
   };
 
   if (loading) {
@@ -126,20 +144,24 @@ export default function FlashCards() {
         >
           {t('flashcards.practiceAll')}
         </button>
-        <button
-          type="button"
-          onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
-        >
-          {t('flashcards.addCustomCard')}
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowBiblePicker(true)}
-          className="px-4 py-2 rounded-lg text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition"
-        >
-          {t('flashcards.addBibleVerses')}
-        </button>
+        {isAuthenticated && (
+          <>
+            <button
+              type="button"
+              onClick={() => setShowAddModal(true)}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              {t('flashcards.addCustomCard')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowBiblePicker(true)}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition"
+            >
+              {t('flashcards.addBibleVerses')}
+            </button>
+          </>
+        )}
         {masteredCount > 0 && (
           <button
             type="button"
@@ -156,6 +178,9 @@ export default function FlashCards() {
         cards={filteredCards}
         masteredIds={progress.masteredIds}
         onCardClick={handleCardClick}
+        onDeleteCard={setCardToDelete}
+        onEditCard={setCardToEdit}
+        isAuthenticated={isAuthenticated}
       />
 
       {/* Practice view */}
@@ -177,12 +202,52 @@ export default function FlashCards() {
         />
       )}
 
+      {/* Edit card modal */}
+      {cardToEdit && (
+        <AddCardModal
+          initialValues={{
+            front: cardToEdit.front,
+            back: cardToEdit.back,
+            category: cardToEdit.category,
+          }}
+          onEdit={handleEdit}
+          onClose={() => setCardToEdit(null)}
+        />
+      )}
+
       {/* Bible verse picker */}
       {showBiblePicker && (
         <BibleVersePicker
           onAddCards={addBibleCards}
           onClose={() => setShowBiblePicker(false)}
         />
+      )}
+
+      {/* Delete confirmation */}
+      {cardToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <p className="text-gray-800 dark:text-white mb-4">
+              {t('flashcards.deleteConfirm')}
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setCardToDelete(null)}
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
+              >
+                {t('flashcards.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition"
+              >
+                {t('flashcards.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Reset confirmation */}

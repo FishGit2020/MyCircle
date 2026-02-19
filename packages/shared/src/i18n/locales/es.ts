@@ -1325,6 +1325,9 @@ const es: Record<TranslationKey, string> = {
   'flashcards.bibleFull': 'Biblia (Completa)',
   'flashcards.cardTypeBoth': 'Ambas',
   'flashcards.selectAll': 'Seleccionar Todo',
+  'flashcards.edit': 'Editar',
+  'flashcards.editCard': 'Editar Tarjeta',
+  'flashcards.uncategorized': 'Sin Categor\u00eda',
 
   // Work Tracker
   'nav.workTracker': 'Registro de Trabajo',
