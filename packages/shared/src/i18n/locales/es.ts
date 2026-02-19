@@ -1318,6 +1318,8 @@ const es: Record<TranslationKey, string> = {
   'flashcards.done': 'Listo',
   'flashcards.bibleFirstLetter': 'Biblia (Primera Letra)',
   'flashcards.bibleFull': 'Biblia (Completa)',
+  'flashcards.cardTypeBoth': 'Ambas',
+  'flashcards.selectAll': 'Seleccionar Todo',
 
   // Work Tracker
   'nav.workTracker': 'Registro de Trabajo',

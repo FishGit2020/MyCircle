@@ -29,8 +29,18 @@ const BIBLE_BOOKS = [
   { name: '3 John', chapters: 1 }, { name: 'Jude', chapters: 1 }, { name: 'Revelation', chapters: 22 },
 ];
 
+interface VerseItem {
+  number: number;
+  text: string;
+}
+
 interface PassageResponse {
-  biblePassage: { text: string; reference: string; verseCount: number };
+  biblePassage: {
+    text: string;
+    reference: string;
+    verseCount: number;
+    verses: VerseItem[];
+  };
 }
 
 interface BibleVersePickerProps {
@@ -63,10 +73,10 @@ export default function BibleVersePicker({ onAddCards, onClose }: BibleVersePick
     setStep('verse');
   };
 
-  const handleAddCards = (cardData: Array<{ front: string; back: string; reference: string; verseRange: string }>) => {
-    const cards: FlashCard[] = cardData.map((d, i) => ({
-      id: `bible-${selectedBook.toLowerCase().replace(/\s/g, '')}-${selectedChapter}-${d.verseRange}-${i === 0 ? 'fl' : 'ft'}`,
-      type: i === 0 ? 'bible-first-letter' as const : 'bible-full' as const,
+  const handleAddCards = (cardData: Array<{ front: string; back: string; reference: string; verseRange: string; type: 'bible-first-letter' | 'bible-full' }>) => {
+    const cards: FlashCard[] = cardData.map(d => ({
+      id: `bible-${selectedBook.toLowerCase().replace(/\s/g, '')}-${selectedChapter}-${d.verseRange}-${d.type === 'bible-first-letter' ? 'fl' : 'ft'}`,
+      type: d.type,
       category: selectedBook,
       front: d.front,
       back: d.back,
@@ -158,6 +168,7 @@ export default function BibleVersePicker({ onAddCards, onClose }: BibleVersePick
               ) : data?.biblePassage ? (
                 <VersePicker
                   passageText={data.biblePassage.text}
+                  verses={data.biblePassage.verses}
                   reference={data.biblePassage.reference}
                   book={selectedBook}
                   chapter={selectedChapter}

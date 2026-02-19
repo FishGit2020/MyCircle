@@ -341,7 +341,10 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
   const handleCopy = useCallback(async () => {
     if (!passage) return;
     try {
-      await navigator.clipboard.writeText(`${passage.text}\n\n— ${passage.reference}`);
+      const text = passage.verses && passage.verses.length > 0
+        ? passage.verses.map(v => `${v.number} ${v.text}`).join('\n')
+        : passage.text;
+      await navigator.clipboard.writeText(`${text}\n\n— ${passage.reference}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* */ }
@@ -481,12 +484,28 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
 
       {passage && !loading && (
         <div>
-          <div
-            className="prose prose-sm dark:prose-invert max-w-none leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-line"
-            style={{ fontSize: `${fontSize}px`, lineHeight: fontSize > 18 ? '1.8' : '1.6' }}
-          >
-            {passage.text}
-          </div>
+          {passage.verses && passage.verses.length > 0 ? (
+            <div
+              className="leading-relaxed text-gray-700 dark:text-gray-300"
+              style={{ fontSize: `${fontSize}px`, lineHeight: fontSize > 18 ? '1.8' : '1.6' }}
+            >
+              {passage.verses.map(verse => (
+                <span key={verse.number}>
+                  <sup className="text-xs font-bold text-blue-400 dark:text-blue-500 mr-0.5 select-none">
+                    {verse.number}
+                  </sup>
+                  {verse.text}{' '}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="prose prose-sm dark:prose-invert max-w-none leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-line"
+              style={{ fontSize: `${fontSize}px`, lineHeight: fontSize > 18 ? '1.8' : '1.6' }}
+            >
+              {passage.text}
+            </div>
+          )}
           {passage.translation && (
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
               {t('bible.translation')}: {passage.translation}
