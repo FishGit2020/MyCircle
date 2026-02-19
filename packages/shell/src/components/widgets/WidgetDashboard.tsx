@@ -699,6 +699,23 @@ const FlashcardsWidget = React.memo(function FlashcardsWidget() {
 
 const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
   const { t } = useTranslation();
+  const [monthCount, setMonthCount] = React.useState<number | null>(null);
+
+  useEffect(() => {
+    function load() {
+      const api = (window as any).__workTracker;
+      if (!api?.getAll) return;
+      api.getAll().then((entries: Array<{ date: string }>) => {
+        const now = new Date();
+        const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        setMonthCount(entries.filter(e => e.date.startsWith(monthPrefix)).length);
+      }).catch(() => { /* ignore — user not signed in */ });
+    }
+    load();
+    window.addEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
+  }, []);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -712,7 +729,13 @@ const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.workTrackerDesc')}</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+      {monthCount !== null && monthCount > 0 ? (
+        <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">
+          {t('widgets.workTrackerEntries').replace('{count}', String(monthCount))}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+      )}
     </div>
   );
 });
