@@ -10,6 +10,8 @@ const mockSignOut = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
+  isNativePlatform: () => false,
 }));
 
 let mockUser: any = null;
@@ -24,7 +26,16 @@ vi.mock('../../context/AuthContext', () => ({
     signUpWithEmail: mockSignUpWithEmail,
     resetPassword: mockResetPassword,
     signOut: mockSignOut,
+    updateDarkMode: vi.fn(),
   }),
+}));
+
+vi.mock('../../context/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: vi.fn() }),
+}));
+
+vi.mock('../../lib/firebase', () => ({
+  logEvent: vi.fn(),
 }));
 
 beforeEach(() => {

@@ -76,6 +76,7 @@ describe('EnglishLearning', () => {
       lastDate: '2026-01-01',
     }));
 
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
     const user = userEvent.setup();
     render(<EnglishLearning />);
     expect(screen.getByText(/Progress: 1 \//)).toBeInTheDocument();

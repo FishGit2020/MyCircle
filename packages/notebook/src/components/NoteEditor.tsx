@@ -42,19 +42,21 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {note ? t('notebook.editNote') : t('notebook.newNote')}
-        </h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 min-h-[calc(100vh-12rem)]">
+      {/* Breadcrumb navigation */}
+      <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
         <button
           type="button"
           onClick={onCancel}
-          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
         >
-          {t('notebook.back')}
+          {t('notebook.title')}
         </button>
-      </div>
+        <span className="text-gray-400 dark:text-gray-500">/</span>
+        <span className="text-gray-700 dark:text-gray-300 font-medium">
+          {note ? t('notebook.editNote') : t('notebook.newNote')}
+        </span>
+      </nav>
 
       <div>
         <label htmlFor="note-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -80,8 +82,7 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder={t('notebook.contentPlaceholder')}
-          rows={12}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-y font-mono text-sm"
+          className="w-full flex-1 min-h-[200px] px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-y font-mono text-sm"
         />
       </div>
 

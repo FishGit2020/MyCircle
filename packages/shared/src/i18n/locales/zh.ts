@@ -185,6 +185,8 @@ const zh: Record<TranslationKey, string> = {
   // Auth
   'auth.signIn': '\u767b\u5f55',
   'auth.signOut': '\u9000\u51fa',
+  'theme.dark': '\u6df1\u8272\u6a21\u5f0f',
+  'theme.light': '\u6d45\u8272\u6a21\u5f0f',
   'auth.signUp': '\u6ce8\u518c',
   'auth.email': '\u90ae\u7bb1',
   'auth.password': '\u5bc6\u7801',
@@ -1228,6 +1230,7 @@ const zh: Record<TranslationKey, string> = {
   'english.lessonComplete': '\u8bfe\u7a0b\u5b8c\u6210\uff01',
   'english.quizComplete': '\u6d4b\u9a8c\u5b8c\u6210\uff01',
   'english.reset': '\u91cd\u7f6e\u8fdb\u5ea6',
+  'english.resetConfirm': '\u786e\u5b9a\u8981\u91cd\u7f6e\u6240\u6709\u8fdb\u5ea6\u5417\uff1f\u6b64\u64cd\u4f5c\u4e0d\u53ef\u64a4\u9500\u3002',
   'english.category.greetings': '\u57fa\u672c\u95ee\u5019',
   'english.category.feelings': '\u611f\u89c9',
   'english.category.house': '\u5bb6\u91cc',
