@@ -119,6 +119,18 @@ const englishLearningDest = path.join(firebaseDir, 'english-learning');
 console.log(`Copying english-learning to ${englishLearningDest}`);
 copyDir(englishLearningDist, englishLearningDest);
 
+// 14. Copy flashcards MF to /flashcards
+const flashcardsDist = path.join(rootDir, 'packages', 'flashcards', 'dist');
+const flashcardsDest = path.join(firebaseDir, 'flashcards');
+console.log(`Copying flashcards to ${flashcardsDest}`);
+copyDir(flashcardsDist, flashcardsDest);
+
+// 15. Copy work-tracker MF to /work-tracker
+const workTrackerDist = path.join(rootDir, 'packages', 'work-tracker', 'dist');
+const workTrackerDest = path.join(firebaseDir, 'work-tracker');
+console.log(`Copying work-tracker to ${workTrackerDest}`);
+copyDir(workTrackerDist, workTrackerDest);
+
 console.log('\nFirebase deployment directory assembled successfully!');
 console.log(`Output: ${firebaseDir}`);
 

@@ -38,11 +38,11 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 |  |    (MFE)     | |    (MFE)      | |       (MFE)       |                  |
 |  |  Port 3010   | |  Port 3011    | |    Port 3012      |                  |
 |  +--------------+ +---------------+ +-------------------+                  |
-|  +-------------------+ +-------------------+                               |
-|  | Chinese Learning  | | English Learning  |                               |
-|  |       (MFE)       | |       (MFE)       |                               |
-|  |    Port 3013      | |    Port 3014      |                               |
-|  +-------------------+ +-------------------+                               |
+|  +-------------------+ +-------------------+ +------------+ +-------------+ |
+|  | Chinese Learning  | | English Learning  | | Flashcards | |Work Tracker | |
+|  |       (MFE)       | |       (MFE)       | |   (MFE)    | |    (MFE)    | |
+|  |    Port 3013      | |    Port 3014      | | Port 3015  | |  Port 3016  | |
+|  +-------------------+ +-------------------+ +------------+ +-------------+ |
 +──────────────────────────────────────────────────────────────────────────+
                                 |
                                 v
@@ -378,6 +378,36 @@ Exposes `EnglishLearning` component via Module Federation. Port **3014**.
 - Persistence: `StorageKeys.ENGLISH_LEARNING_PROGRESS` (localStorage JSON: `{ completedIds, quizScores, lastDate }`)
 - `WindowEvents.ENGLISH_PROGRESS_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
 - Route: `/english`
+
+### Flashcards - `packages/flashcards/`
+
+Exposes `FlashCards` component via Module Federation. Port **3015**.
+
+**Key Behavior:**
+- Multi-format flash card system supporting Chinese characters, English phrases, Bible verses, and custom user-created cards
+- **Card types:** Chinese (character → meaning + pinyin), English (phrase → translation), Bible first-letter (initials → full text), Bible full (reference → text), Custom (user-defined front/back)
+- **3D flip animation** — CSS perspective transforms for realistic card rotation on tap/click
+- **BibleVersePicker** — book → chapter → verse selector using `GET_BIBLE_PASSAGE` GraphQL query; generates two card types per selection (first-letter + full-text)
+- **Mastery tracking** — toggle cards as mastered; progress persisted to `StorageKeys.FLASHCARD_PROGRESS` (localStorage JSON: `{ masteredIds, lastPracticed }`)
+- **Category filtering** — filter by card type (Chinese, English, Bible, Custom) with chip toggles
+- Bible/custom cards stored in `StorageKeys.FLASHCARD_BIBLE_CARDS` and `StorageKeys.FLASHCARD_CUSTOM_CARDS`
+- Chinese cards loaded from `window.__chineseCharacters` bridge API; English cards bundled at build time
+- `WindowEvents.FLASHCARD_PROGRESS_CHANGED` for cross-tab sync
+- Route: `/flashcards`
+
+### Work Tracker - `packages/work-tracker/`
+
+Exposes `WorkTracker` component via Module Federation. Port **3016**.
+
+**Key Behavior:**
+- Firestore-backed daily work log stored in `users/{uid}/worklog` subcollection
+- **EntryForm** — quick text input for logging what you worked on
+- **TimelineView** — vertical timeline grouped by date, with inline edit/delete on hover
+- **Time filters** — Today, This Month, All toggle chips
+- **Real-time sync** — uses `window.__workTracker` bridge API with `onSnapshot` subscription
+- Auth-gated: requires Firebase sign-in; shows sign-in prompt for anonymous users
+- `WindowEvents.WORK_TRACKER_CHANGED` for cross-tab sync
+- Route: `/work-tracker`
 
 ---
 
