@@ -1,6 +1,7 @@
 import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from './firebase';
+import { isNativePlatform } from '@mycircle/shared';
 
 let messaging: Messaging | null = null;
 
@@ -17,6 +18,9 @@ function getMessagingInstance(): Messaging | null {
  * Only called when the user explicitly enables notifications.
  */
 export async function requestNotificationPermission(): Promise<string | null> {
+  // FCM push via service worker is not available in Capacitor's WKWebView
+  if (isNativePlatform()) return null;
+
   const msg = getMessagingInstance();
   if (!msg) return null;
 

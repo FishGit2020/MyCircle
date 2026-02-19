@@ -69,6 +69,9 @@
     "firebase:deploy:functions": "pnpm firebase:build:functions && firebase deploy --only functions",
     "firebase:emulators": "pnpm firebase:build && firebase emulators:start",
     "firebase:login": "firebase login",
+    "cap:build": "pnpm build:shared && pnpm firebase:build:mf && pnpm firebase:assemble && npx cap sync",
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open ios",
     "analyze": "cross-env ANALYZE=true pnpm --filter @mycircle/shell build",
     "check:shared-versions": "node scripts/check-shared-versions.mjs",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist dist functions/node_modules functions/lib",
@@ -106,6 +109,13 @@
     "ws": "^8.19.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/ios": "^8.1.0",
+    "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.1",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

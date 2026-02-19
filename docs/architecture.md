@@ -989,6 +989,8 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **GlobalAudioPlayer** | `packages/shell/src/components/player/GlobalAudioPlayer.tsx` | Persistent audio player (shell-level, survives route changes) |
 | **PodcastPlayer** | `packages/podcast-player/src/components/PodcastPlayer.tsx` | Podcast search, episodes, event publishing |
 | **AiAssistant** | `packages/ai-assistant/src/components/AiAssistant.tsx` | AI chat UI (Gemini) |
+| **Platform Utils** | `packages/shared/src/utils/platform.ts` | Capacitor native platform detection |
+| **Capacitor Config** | `capacitor.config.ts` | iOS/Android native shell configuration |
 | **Event Bus** | `packages/shared/src/utils/eventBus.ts` | Cross-MFE communication |
 | **Apollo Client** | `packages/shared/src/apollo/client.ts` | GraphQL setup, caching |
 | **Queries** | `packages/shared/src/apollo/queries.ts` | GraphQL queries & subscription |

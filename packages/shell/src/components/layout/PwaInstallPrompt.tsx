@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, isNativePlatform } from '@mycircle/shared';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -17,6 +17,9 @@ export default function PwaInstallPrompt() {
   const bannerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // PWA install prompt is irrelevant inside a native Capacitor app
+    if (isNativePlatform()) return;
+
     // Check if user previously dismissed
     try {
       const dismissed = localStorage.getItem(DISMISSED_KEY);

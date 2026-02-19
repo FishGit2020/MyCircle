@@ -21,6 +21,7 @@ const { mockWarn } = vi.hoisted(() => ({ mockWarn: vi.fn() }));
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: mockWarn, error: vi.fn() }),
+  isNativePlatform: () => false,
 }));
 
 const mockUnregister = vi.fn().mockResolvedValue(undefined);
