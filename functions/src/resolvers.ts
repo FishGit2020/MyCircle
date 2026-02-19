@@ -573,12 +573,10 @@ function parseVersesFromHtml(html: string): Array<{ number: number; text: string
     for (let i = 1; i < yvParts.length; i += 2) {
       const num = parseInt(yvParts[i], 10);
       const rawHtml = yvParts[i + 1] || '';
-      const text = rawHtml
+      const cleaned = rawHtml
         .replace(/<span\s+class="yv-vlbl"[^>]*>\d+<\/span>/g, '') // remove visible verse labels
-        .replace(/<\/div>\s*<div[^>]*>/g, ' ')  // add space between paragraphs/poetry blocks
-        .replace(/<[^>]+>/g, '')  // strip remaining HTML
-        .replace(/\s+/g, ' ')
-        .trim();
+        .replace(/<\/div>\s*<div[^>]*>/g, ' ');  // add space between paragraphs/poetry blocks
+      const text = stripHtml(cleaned);
       if (text && !isNaN(num)) {
         verses.push({ number: num, text });
       }
@@ -595,7 +593,7 @@ function parseVersesFromHtml(html: string): Array<{ number: number; text: string
     const verses: Array<{ number: number; text: string }> = [];
     for (let i = 1; i < supParts.length; i += 2) {
       const num = parseInt(supParts[i], 10);
-      const rawText = (supParts[i + 1] || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+      const rawText = stripHtml(supParts[i + 1] || '');
       if (rawText && !isNaN(num)) {
         verses.push({ number: num, text: rawText });
       }
@@ -609,9 +607,16 @@ function parseVersesFromHtml(html: string): Array<{ number: number; text: string
   return [];
 }
 
-/** Strip HTML tags and normalize whitespace */
+/** Strip HTML tags and normalize whitespace.
+ *  Loops until stable to handle malformed/nested tags like <<script>. */
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  let result = html;
+  let prev = '';
+  while (result !== prev) {
+    prev = result;
+    result = result.replace(/<[^>]+>/g, '');
+  }
+  return result.replace(/\s+/g, ' ').trim();
 }
 
 /** Fetch a passage from YouVersion API */
