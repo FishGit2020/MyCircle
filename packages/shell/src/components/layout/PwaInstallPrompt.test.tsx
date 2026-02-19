@@ -4,6 +4,7 @@ import PwaInstallPrompt from './PwaInstallPrompt';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  isNativePlatform: () => false,
 }));
 
 let getItemSpy: ReturnType<typeof vi.spyOn>;

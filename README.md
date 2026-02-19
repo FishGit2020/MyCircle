@@ -826,6 +826,19 @@ The Docker image is built automatically in CI and pushed to GHCR on every push t
 
 See [`deploy/docker/README.md`](deploy/docker/README.md) for the full deployment guide.
 
+## Mobile (iOS)
+
+MyCircle can be shipped as a native iOS app via [Capacitor](https://capacitorjs.com/), wrapping the existing web build in a WKWebView with zero UI rewrite.
+
+```bash
+pnpm cap:build    # Full web build + sync to native project
+pnpm cap:open     # Open in Xcode (macOS required)
+```
+
+Platform detection (`isNativePlatform()`, `getPlatform()`) is available in `@mycircle/shared`. Web-only features (service worker updates, FCM push, PWA install prompt) are automatically disabled in the native shell.
+
+See [`docs/mobile-ios.md`](docs/mobile-ios.md) for the full setup guide, live reload instructions, and App Store submission steps.
+
 ## License
 
 MIT

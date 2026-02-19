@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
-import { useTranslation, createLogger } from '@mycircle/shared';
+import { useTranslation, createLogger, isNativePlatform } from '@mycircle/shared';
 
 const log = createLogger('ReloadPrompt');
 
@@ -11,7 +11,8 @@ export default function ReloadPrompt() {
     needRefresh: [needRefresh, setNeedRefresh],
   } = useRegisterSW({
     onRegisteredSW(_swUrl, registration) {
-      if (registration) {
+      // Service workers are not supported in Capacitor's WKWebView
+      if (registration && !isNativePlatform()) {
         // Check for SW updates every 30 seconds
         setInterval(() => registration.update(), 30_000);
         // Check for updates when user returns to the tab
@@ -23,6 +24,8 @@ export default function ReloadPrompt() {
       }
     },
     onRegisterError(error) {
+      // Suppress SW registration errors in native (expected — WKWebView has no SW support)
+      if (isNativePlatform()) return;
       log.warn('Service worker registration failed', error);
     },
   });
@@ -38,7 +41,7 @@ export default function ReloadPrompt() {
     window.location.reload();
   };
 
-  if (!needRefresh) return null;
+  if (!needRefresh || isNativePlatform()) return null;
 
   return (
     <div

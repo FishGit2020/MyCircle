@@ -50,5 +50,8 @@ ui-debug.log
 functions/lib/
 auth-users.json
 
+# Capacitor
+ios/App/Pods/
+
 # Stray scripts
 replace_weather.ps1
