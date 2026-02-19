@@ -15,6 +15,16 @@ service cloud.firestore {
       match /worklog/{entryId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Flashcards subcollection - private per-user cards
+      match /flashcards/{cardId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Flashcard progress subcollection - private per-user progress
+      match /flashcardProgress/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Feedback collection - anyone can submit feedback (write-only inbox)

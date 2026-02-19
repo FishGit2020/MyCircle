@@ -883,6 +883,111 @@ if (firebaseEnabled) {
   };
 }
 
+// Flash Cards — user-scoped subcollection
+export async function getUserFlashcards(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'flashcards'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function addUserFlashcard(uid: string, card: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const id = card.id || `card-${Date.now()}`;
+  await setDoc(doc(db, 'users', uid, 'flashcards', id), {
+    ...card,
+    id,
+    createdAt: serverTimestamp(),
+  });
+  return id;
+}
+
+export async function addUserFlashcards(uid: string, cards: Array<Record<string, any>>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const promises = cards.map(card => {
+    const id = card.id || `card-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    return setDoc(doc(db, 'users', uid, 'flashcards', id), {
+      ...card,
+      id,
+      createdAt: serverTimestamp(),
+    });
+  });
+  await Promise.all(promises);
+}
+
+export async function updateUserFlashcard(uid: string, cardId: string, updates: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = doc(db, 'users', uid, 'flashcards', cardId);
+  await updateDoc(docRef, {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteUserFlashcard(uid: string, cardId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'users', uid, 'flashcards', cardId));
+}
+
+export function subscribeToUserFlashcards(uid: string, callback: (cards: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'flashcards'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const cards = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(cards);
+  }, (error) => {
+    log.warn('Flashcard snapshot error:', error);
+  });
+}
+
+export async function getUserFlashcardProgress(uid: string) {
+  if (!db) return null;
+  const docRef = doc(db, 'users', uid, 'flashcardProgress', 'main');
+  const snap = await getDoc(docRef);
+  return snap.exists() ? snap.data() : null;
+}
+
+export async function updateUserFlashcardProgress(uid: string, progress: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = doc(db, 'users', uid, 'flashcardProgress', 'main');
+  await setDoc(docRef, {
+    ...progress,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+// Expose flashcards API for MFEs
+if (firebaseEnabled) {
+  window.__flashcards = {
+    getAll: () => auth?.currentUser ? getUserFlashcards(auth.currentUser.uid) : Promise.resolve([]),
+    add: (card: Record<string, any>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addUserFlashcard(auth.currentUser.uid, card);
+    },
+    addBatch: (cards: Array<Record<string, any>>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addUserFlashcards(auth.currentUser.uid, cards);
+    },
+    update: (id: string, updates: Record<string, any>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateUserFlashcard(auth.currentUser.uid, id, updates);
+    },
+    delete: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteUserFlashcard(auth.currentUser.uid, id);
+    },
+    subscribe: (callback: (cards: Array<Record<string, any>>) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToUserFlashcards(auth.currentUser.uid, callback);
+    },
+    getProgress: () => auth?.currentUser ? getUserFlashcardProgress(auth.currentUser.uid) : Promise.resolve(null),
+    updateProgress: (progress: Record<string, any>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateUserFlashcardProgress(auth.currentUser.uid, progress);
+    },
+  };
+}
+
 // Expose analytics for MFEs
 window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
   logEvent(eventName, params);

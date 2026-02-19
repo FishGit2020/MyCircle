@@ -35,6 +35,16 @@ declare global {
       update: (id: string, updates: Partial<{ title: string; content: string }>) => Promise<void>;
       delete: (id: string) => Promise<void>;
     };
+    __flashcards?: {
+      getAll: () => Promise<any[]>;
+      add: (card: Record<string, any>) => Promise<string>;
+      addBatch: (cards: Array<Record<string, any>>) => Promise<void>;
+      update: (id: string, updates: Record<string, any>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (cards: any[]) => void) => () => void;
+      getProgress: () => Promise<any>;
+      updateProgress: (progress: Record<string, any>) => Promise<void>;
+    };
     __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
   }
 }

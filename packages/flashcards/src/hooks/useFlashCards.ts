@@ -1,12 +1,25 @@
-import { useState, useEffect, useCallback } from 'react';
-import { StorageKeys, WindowEvents } from '@mycircle/shared';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { FlashCard, FlashCardProgress, CardType } from '../types';
+
+const log = createLogger('flashcards');
 
 declare global {
   interface Window {
     __chineseCharacters?: {
       getAll: () => Promise<Array<{ id: string; character: string; pinyin: string; meaning: string; category: string }>>;
     };
+    __flashcards?: {
+      getAll: () => Promise<any[]>;
+      add: (card: Record<string, any>) => Promise<string>;
+      addBatch: (cards: Array<Record<string, any>>) => Promise<void>;
+      update: (id: string, updates: Record<string, any>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (cards: any[]) => void) => () => void;
+      getProgress: () => Promise<any>;
+      updateProgress: (progress: Record<string, any>) => Promise<void>;
+    };
+    __getFirebaseIdToken?: () => Promise<string | null>;
   }
 }
 
@@ -54,6 +67,24 @@ export function useFlashCards() {
   );
   const [chineseCards, setChineseCards] = useState<FlashCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const migratedRef = useRef(false);
+
+  // Auth state detection
+  useEffect(() => {
+    let mounted = true;
+    const checkAuth = async () => {
+      try {
+        const token = await window.__getFirebaseIdToken?.();
+        if (mounted) setIsAuthenticated(!!token);
+      } catch {
+        if (mounted) setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+    const interval = setInterval(checkAuth, 5000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
 
   // Load Chinese characters from bridge API
   useEffect(() => {
@@ -80,8 +111,92 @@ export function useFlashCards() {
     return () => { mounted = false; };
   }, []);
 
-  // Listen for progress changes from other tabs
+  // Firestore real-time subscription for cards when authenticated
   useEffect(() => {
+    if (!isAuthenticated || !window.__flashcards?.subscribe) return;
+
+    let received = false;
+    const unsubscribe = window.__flashcards.subscribe((firestoreCards) => {
+      received = true;
+      // Split into bible and custom cards
+      const bible: FlashCard[] = [];
+      const custom: FlashCard[] = [];
+      for (const c of firestoreCards) {
+        const card: FlashCard = {
+          id: c.id,
+          type: c.type,
+          category: c.category || '',
+          front: c.front,
+          back: c.back,
+          meta: c.meta,
+        };
+        if (card.type === 'bible-first-letter' || card.type === 'bible-full') {
+          bible.push(card);
+        } else if (card.type === 'custom') {
+          custom.push(card);
+        }
+      }
+      setBibleCards(bible);
+      setCustomCards(custom);
+      // Cache in localStorage
+      saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, bible);
+      saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, custom);
+    });
+
+    // Load progress from Firestore
+    window.__flashcards.getProgress?.().then(data => {
+      if (data) {
+        const p: FlashCardProgress = {
+          masteredIds: data.masteredIds || [],
+          lastPracticed: data.lastPracticed || '',
+        };
+        setProgress(p);
+        saveToStorage(StorageKeys.FLASHCARD_PROGRESS, p);
+      }
+    }).catch(() => { /* ignore */ });
+
+    const timeout = setTimeout(() => {
+      if (!received) setLoading(false);
+    }, 3000);
+
+    return () => { unsubscribe(); clearTimeout(timeout); };
+  }, [isAuthenticated]);
+
+  // One-time migration: upload localStorage cards to Firestore on first auth
+  useEffect(() => {
+    if (!isAuthenticated || migratedRef.current || !window.__flashcards) return;
+    migratedRef.current = true;
+
+    const localBible: FlashCard[] = loadFromStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, []);
+    const localCustom: FlashCard[] = loadFromStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, []);
+    const cardsToMigrate = [...localBible, ...localCustom];
+
+    if (cardsToMigrate.length > 0) {
+      window.__flashcards.getAll().then(existing => {
+        const existingIds = new Set(existing.map((c: any) => c.id));
+        const newCards = cardsToMigrate.filter(c => !existingIds.has(c.id));
+        if (newCards.length > 0) {
+          log.info(`Migrating ${newCards.length} flashcards to Firestore`);
+          window.__flashcards!.addBatch(newCards).catch(() => {
+            log.warn('Failed to migrate flashcards');
+          });
+        }
+      }).catch(() => { /* ignore */ });
+
+      // Also migrate progress
+      const localProgress = loadFromStorage<FlashCardProgress>(
+        StorageKeys.FLASHCARD_PROGRESS,
+        { masteredIds: [], lastPracticed: '' }
+      );
+      if (localProgress.masteredIds.length > 0) {
+        window.__flashcards.updateProgress(localProgress).catch(() => { /* ignore */ });
+      }
+    }
+  }, [isAuthenticated]);
+
+  // Listen for progress changes from other tabs (localStorage-only mode)
+  useEffect(() => {
+    if (isAuthenticated) return; // Firestore handles sync when authenticated
     const handler = () => {
       setProgress(loadFromStorage(StorageKeys.FLASHCARD_PROGRESS, { masteredIds: [], lastPracticed: '' }));
       setBibleCards(loadFromStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, []));
@@ -89,7 +204,7 @@ export function useFlashCards() {
     };
     window.addEventListener(WindowEvents.FLASHCARD_PROGRESS_CHANGED, handler);
     return () => window.removeEventListener(WindowEvents.FLASHCARD_PROGRESS_CHANGED, handler);
-  }, []);
+  }, [isAuthenticated]);
 
   const allCards: FlashCard[] = [...chineseCards, ...ENGLISH_PHRASES, ...bibleCards, ...customCards];
 
@@ -108,6 +223,8 @@ export function useFlashCards() {
       };
       saveToStorage(StorageKeys.FLASHCARD_PROGRESS, next);
       window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+      // Fire-and-forget Firestore write
+      window.__flashcards?.updateProgress(next).catch(() => { /* ignore */ });
       return next;
     });
   }, []);
@@ -119,6 +236,10 @@ export function useFlashCards() {
       const next = [...prev, ...newCards];
       saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, next);
       window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+      // Fire-and-forget Firestore batch add
+      if (newCards.length > 0) {
+        window.__flashcards?.addBatch(newCards).catch(() => { /* ignore */ });
+      }
       return next;
     });
   }, []);
@@ -133,6 +254,19 @@ export function useFlashCards() {
       const next = [...prev, newCard];
       saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, next);
       window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+      // Fire-and-forget Firestore write
+      window.__flashcards?.add(newCard).catch(() => { /* ignore */ });
+      return next;
+    });
+  }, []);
+
+  const updateCustomCard = useCallback((cardId: string, updates: { front: string; back: string; category: string }) => {
+    setCustomCards(prev => {
+      const next = prev.map(c => c.id === cardId ? { ...c, ...updates } : c);
+      saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, next);
+      window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+      // Fire-and-forget Firestore write
+      window.__flashcards?.update(cardId, updates).catch(() => { /* ignore */ });
       return next;
     });
   }, []);
@@ -149,6 +283,8 @@ export function useFlashCards() {
       return next;
     });
     window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+    // Fire-and-forget Firestore delete
+    window.__flashcards?.delete(cardId).catch(() => { /* ignore */ });
   }, []);
 
   const resetProgress = useCallback(() => {
@@ -156,6 +292,8 @@ export function useFlashCards() {
     setProgress(next);
     saveToStorage(StorageKeys.FLASHCARD_PROGRESS, next);
     window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+    // Fire-and-forget Firestore write
+    window.__flashcards?.updateProgress(next).catch(() => { /* ignore */ });
   }, []);
 
   return {
@@ -168,9 +306,11 @@ export function useFlashCards() {
     loading,
     categories,
     cardTypes,
+    isAuthenticated,
     toggleMastered,
     addBibleCards,
     addCustomCard,
+    updateCustomCard,
     deleteCard,
     resetProgress,
   };
