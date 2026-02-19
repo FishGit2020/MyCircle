@@ -12,8 +12,8 @@ pnpm test:run && pnpm typecheck
 git add <files> && git commit --no-verify -m "feat: description"
 git push -u origin HEAD
 gh pr create --title "feat: description" --body "summary"
-gh pr checks <PR#> --watch          # wait for ci + e2e to pass
-gh pr merge <PR#> --squash --admin
+gh pr checks <PR#> --watch          # wait for ALL checks to pass
+gh pr merge <PR#> --squash --admin  # ONLY after ci, e2e, and e2e-emulator all pass
 git checkout main && git pull origin main
 ```
 
