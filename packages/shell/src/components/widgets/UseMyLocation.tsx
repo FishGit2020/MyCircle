@@ -41,8 +41,8 @@ export default function UseMyLocation() {
         lat,
         lon
       }));
-      // Navigate to weather page
-      navigate(`/weather/${lat},${lon}`);
+      // Navigate to weather page with city name
+      navigate(`/weather/${lat},${lon}?name=${encodeURIComponent(name)}`);
     } else {
       setError(t('error.couldNotDetermineLocation'));
     }
