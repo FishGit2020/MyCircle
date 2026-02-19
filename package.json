@@ -58,7 +58,7 @@
     "mock-api": "node scripts/mock-api-server.mjs",
     "seed:firestore": "node scripts/seed-firestore.mjs",
     "emulator:seed-and-test": "pnpm seed:firestore && pnpm test:e2e:emulator",
-    "emulator:exec": "firebase emulators:exec --only functions,hosting,firestore,auth \"pnpm emulator:seed-and-test\"",
+    "emulator:exec": "firebase emulators:exec --only hosting,firestore,auth \"pnpm emulator:seed-and-test\"",
     "emulator:test": "concurrently -k -s first \"pnpm mock-api\" \"pnpm emulator:exec\"",
     "firebase:build": "pnpm build:shared && pnpm firebase:build:mf && pnpm firebase:build:functions && pnpm firebase:assemble",
     "firebase:build:mf": "cross-env NODE_ENV=production pnpm --filter @mycircle/shell build && cross-env NODE_ENV=production pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
