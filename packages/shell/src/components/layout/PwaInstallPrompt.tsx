@@ -69,6 +69,13 @@ export default function PwaInstallPrompt() {
     } catch { /* ignore */ }
   }, []);
 
+  // Auto-dismiss success toast after 3 seconds
+  useEffect(() => {
+    if (!installed) return;
+    const timer = setTimeout(() => setInstalled(false), 3000);
+    return () => clearTimeout(timer);
+  }, [installed]);
+
   // Close on Escape
   useEffect(() => {
     if (!showBanner) return;

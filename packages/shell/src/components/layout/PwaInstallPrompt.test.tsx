@@ -104,4 +104,15 @@ describe('PwaInstallPrompt', () => {
     act(() => { window.dispatchEvent(new Event('appinstalled')); });
     expect(screen.getByText('pwa.installed')).toBeInTheDocument();
   });
+
+  it('auto-dismisses success message after 3 seconds', () => {
+    vi.useFakeTimers();
+    render(<PwaInstallPrompt />);
+    act(() => { fireBeforeInstallPrompt(); });
+    act(() => { window.dispatchEvent(new Event('appinstalled')); });
+    expect(screen.getByText('pwa.installed')).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(3000); });
+    expect(screen.queryByText('pwa.installed')).not.toBeInTheDocument();
+    vi.useRealTimers();
+  });
 });
