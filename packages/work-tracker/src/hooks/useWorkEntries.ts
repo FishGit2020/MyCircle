@@ -49,19 +49,30 @@ export function useWorkEntries() {
 
   // Real-time subscription with fallback
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
     if (window.__workTracker?.subscribe) {
+      let received = false;
       const unsubscribe = window.__workTracker.subscribe((data) => {
+        received = true;
         setEntries(data);
         setLoading(false);
       });
-      return unsubscribe;
+      // Fallback: if subscribe returns a no-op and callback never fires
+      const timeout = setTimeout(() => {
+        if (!received) setLoading(false);
+      }, 3000);
+      return () => { unsubscribe(); clearTimeout(timeout); };
     }
 
     loadEntries();
     const handler = () => { loadEntries(); };
     window.addEventListener(WindowEvents.WORK_TRACKER_CHANGED, handler);
     return () => window.removeEventListener(WindowEvents.WORK_TRACKER_CHANGED, handler);
-  }, [loadEntries]);
+  }, [loadEntries, isAuthenticated]);
 
   const addEntry = useCallback(async (content: string) => {
     if (!window.__workTracker) throw new Error('Work tracker API not available');
