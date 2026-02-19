@@ -1,7 +1,7 @@
 import { createLogger } from '@mycircle/shared';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -574,11 +574,22 @@ export async function addWorshipSong(song: Record<string, any>) {
   return docRef.id;
 }
 
+/** Optional fields that should be removed from Firestore when cleared */
+const OPTIONAL_SONG_FIELDS = ['youtubeUrl', 'bpm', 'tags'];
+
 export async function updateWorshipSong(id: string, updates: Record<string, any>) {
   if (!db) throw new Error('Firebase not initialized');
   const docRef = doc(db, 'worshipSongs', id);
+  // For optional fields, explicitly delete them from Firestore when undefined
+  const deletions: Record<string, any> = {};
+  for (const field of OPTIONAL_SONG_FIELDS) {
+    if (field in updates && updates[field] === undefined) {
+      deletions[field] = deleteField();
+    }
+  }
   await updateDoc(docRef, {
     ...stripUndefined(updates),
+    ...deletions,
     updatedAt: serverTimestamp(),
   });
 }

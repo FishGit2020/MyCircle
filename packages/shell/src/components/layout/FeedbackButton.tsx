@@ -132,13 +132,14 @@ export default function FeedbackButton({ hasActivePlayer }: { hasActivePlayer?: 
       <button
         ref={triggerRef}
         onClick={handleOpen}
-        className={`fixed ${hasActivePlayer ? 'bottom-36 md:bottom-24' : 'bottom-20 md:bottom-6'} right-6 z-40 flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 focus-visible:outline-none`}
+        className={`fixed ${hasActivePlayer ? 'bottom-36 md:bottom-24' : 'bottom-20 md:bottom-6'} right-6 z-40 flex items-center gap-2 p-3 md:px-4 md:py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 focus-visible:outline-none`}
         aria-haspopup="dialog"
+        aria-label={t('feedback.button')}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        {t('feedback.button')}
+        <span className="hidden md:inline">{t('feedback.button')}</span>
       </button>
 
       {/* Modal backdrop + dialog */}

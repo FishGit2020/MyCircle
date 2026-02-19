@@ -339,7 +339,8 @@ export default function Layout() {
 
       <footer
         role="contentinfo"
-        className={`bg-gray-800 dark:bg-gray-950 text-white py-6 ${hasActivePlayer ? 'pb-32' : 'pb-16'} md:pb-6 mt-12 transition-colors`}
+        className="bg-gray-800 dark:bg-gray-950 text-white py-6 md:pb-6 mt-12 transition-colors"
+        style={{ paddingBottom: `calc(${hasActivePlayer ? '8rem' : '4rem'} + env(safe-area-inset-bottom, 0px))` }}
       >
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
