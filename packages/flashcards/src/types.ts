@@ -8,6 +8,7 @@ export interface FlashCard {
   back: string;
   meta?: {
     pinyin?: string;
+    phonetic?: string;
     reference?: string;
     book?: string;
     chapter?: number;

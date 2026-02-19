@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { FlashCard } from '../types';
+import type { ChineseCharacter } from '../data/characters';
 import FlipCard from './FlipCard';
+import PracticeCanvas from './PracticeCanvas';
 
 interface CardPracticeProps {
   cards: FlashCard[];
@@ -44,6 +46,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
   const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(startIndex);
   const [flipped, setFlipped] = useState(false);
+  const [showWritingPractice, setShowWritingPractice] = useState(false);
 
   const card = cards[currentIndex];
   const isMastered = card ? masteredIds.includes(card.id) : false;
@@ -63,6 +66,28 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
   }, [currentIndex]);
 
   if (!card) return null;
+
+  // Map current card to ChineseCharacter for PracticeCanvas
+  const chineseCharForCanvas: ChineseCharacter | null = card.type === 'chinese' ? {
+    id: card.id.replace('zh-', ''),
+    character: card.front,
+    pinyin: card.meta?.pinyin || '',
+    meaning: card.back,
+    category: card.category as any,
+  } : null;
+
+  if (showWritingPractice && chineseCharForCanvas) {
+    return (
+      <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex-1 overflow-y-auto p-4">
+          <PracticeCanvas
+            character={chineseCharForCanvas}
+            onBack={() => setShowWritingPractice(false)}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
@@ -127,6 +152,15 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
         >
           {t('flashcards.flip')}
         </button>
+        {card.type === 'chinese' && (
+          <button
+            type="button"
+            onClick={() => setShowWritingPractice(true)}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition"
+          >
+            {t('chinese.practice')}
+          </button>
+        )}
         <button
           type="button"
           onClick={goNext}

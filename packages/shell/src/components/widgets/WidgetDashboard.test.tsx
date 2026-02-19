@@ -13,8 +13,6 @@ vi.mock('@mycircle/shared', () => ({
     SUBSCRIPTIONS_CHANGED: 'subscriptions-changed',
     NOTEBOOK_CHANGED: 'notebook-changed',
     CHILD_DATA_CHANGED: 'child-data-changed',
-    ENGLISH_PROGRESS_CHANGED: 'english-progress-changed',
-    CHINESE_PROGRESS_CHANGED: 'chinese-progress-changed',
     BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
     BIBLE_BOOKMARKS_CHANGED: 'bible-bookmarks-changed',
     WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
@@ -28,8 +26,6 @@ vi.mock('@mycircle/shared', () => ({
     WORSHIP_FAVORITES: 'worship-favorites',
     NOTEBOOK_CACHE: 'notebook-cache',
     BABY_DUE_DATE: 'baby-due-date',
-    ENGLISH_LEARNING_PROGRESS: 'english-learning-progress',
-    CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
     CHILD_NAME: 'child-name',
     CHILD_BIRTH_DATE: 'child-birth-date',
     BIBLE_BOOKMARKS: 'bible-bookmarks',
@@ -80,8 +76,6 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
     expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
     expect(screen.getByText('widgets.childDev')).toBeInTheDocument();
-    expect(screen.getByText('widgets.english')).toBeInTheDocument();
-    expect(screen.getByText('widgets.chinese')).toBeInTheDocument();
     expect(screen.getByText('widgets.worship')).toBeInTheDocument();
   });
 
@@ -104,7 +98,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     // All 8 widgets should show "Visible" toggle (stocks removed)
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(12);
+    expect(visibleButtons.length).toBe(10);
   });
 
   it('can toggle widget visibility', () => {
@@ -121,8 +115,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(12);
-    expect(downButtons.length).toBe(12);
+    expect(upButtons.length).toBe(10);
+    expect(downButtons.length).toBe(10);
   });
 
   it('persists layout to localStorage', () => {
@@ -162,7 +156,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(12);
+    expect(allVisible.length).toBe(10);
   });
 
   it('renders worship widget with song count', () => {

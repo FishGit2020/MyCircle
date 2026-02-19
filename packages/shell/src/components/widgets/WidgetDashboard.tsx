@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'englishLearning' | 'chineseLearning' | 'worship' | 'flashcards' | 'workTracker';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -23,8 +23,6 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'notebook', visible: true },
   { id: 'babyTracker', visible: true },
   { id: 'childDev', visible: true },
-  { id: 'englishLearning', visible: true },
-  { id: 'chineseLearning', visible: true },
   { id: 'worship', visible: true },
   { id: 'flashcards', visible: true },
   { id: 'workTracker', visible: true },
@@ -521,92 +519,6 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
   );
 });
 
-const EnglishLearningWidget = React.memo(function EnglishLearningWidget() {
-  const { t } = useTranslation();
-  const [completedCount, setCompletedCount] = React.useState(0);
-
-  useEffect(() => {
-    function load() {
-      try {
-        const raw = localStorage.getItem(StorageKeys.ENGLISH_LEARNING_PROGRESS);
-        if (raw) {
-          const progress = JSON.parse(raw);
-          setCompletedCount(Array.isArray(progress.completedIds) ? progress.completedIds.length : 0);
-        }
-      } catch { /* ignore */ }
-    }
-    load();
-    window.addEventListener('english-progress-changed', load);
-    return () => window.removeEventListener('english-progress-changed', load);
-  }, []);
-
-  return (
-    <div>
-      <div className="flex items-center gap-3 mb-2">
-        <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center text-sky-500">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364V3" />
-          </svg>
-        </div>
-        <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.english')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.englishDesc')}</p>
-        </div>
-      </div>
-      {completedCount > 0 ? (
-        <p className="text-sm text-sky-600 dark:text-sky-400 font-medium">
-          {t('widgets.englishCompleted').replace('{count}', String(completedCount))}
-        </p>
-      ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noEnglishProgress')}</p>
-      )}
-    </div>
-  );
-});
-
-const ChineseLearningWidget = React.memo(function ChineseLearningWidget() {
-  const { t } = useTranslation();
-  const [masteredCount, setMasteredCount] = React.useState(0);
-
-  useEffect(() => {
-    function load() {
-      try {
-        const raw = localStorage.getItem(StorageKeys.CHINESE_LEARNING_PROGRESS);
-        if (raw) {
-          const progress = JSON.parse(raw);
-          setMasteredCount(Array.isArray(progress.masteredIds) ? progress.masteredIds.length : 0);
-        }
-      } catch { /* ignore */ }
-    }
-    load();
-    window.addEventListener('chinese-progress-changed', load);
-    return () => window.removeEventListener('chinese-progress-changed', load);
-  }, []);
-
-  return (
-    <div>
-      <div className="flex items-center gap-3 mb-2">
-        <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/30 flex items-center justify-center text-red-500">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-          </svg>
-        </div>
-        <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.chinese')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.chineseDesc')}</p>
-        </div>
-      </div>
-      {masteredCount > 0 ? (
-        <p className="text-sm text-red-600 dark:text-red-400 font-medium">
-          {t('widgets.chineseMastered').replace('{count}', String(masteredCount))}
-        </p>
-      ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noChineseProgress')}</p>
-      )}
-    </div>
-  );
-});
-
 const WorshipWidget = React.memo(function WorshipWidget() {
   const { t } = useTranslation();
   const [songCount, setSongCount] = React.useState(0);
@@ -742,8 +654,6 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   notebook: NotebookWidget,
   babyTracker: BabyTrackerWidget,
   childDev: ChildDevWidget,
-  englishLearning: EnglishLearningWidget,
-  chineseLearning: ChineseLearningWidget,
   worship: WorshipWidget,
   flashcards: FlashcardsWidget,
   workTracker: WorkTrackerWidget,
@@ -757,8 +667,6 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   notebook: '/notebook',
   babyTracker: '/baby',
   childDev: '/child-dev',
-  englishLearning: '/english',
-  chineseLearning: '/chinese',
   worship: '/worship',
   flashcards: '/flashcards',
   workTracker: '/work-tracker',

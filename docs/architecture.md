@@ -33,16 +33,16 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 |  |     (MFE)       | |    (MFE)     | |    (MFE)      | |    Songs     |  |
 |  |   Port 3006     | |  Port 3007   | |  Port 3008    | |  Port 3009   |  |
 |  +-----------------+ +--------------+ +---------------+ +--------------+  |
-|  +--------------+ +---------------+ +-------------------+                  |
-|  |   Notebook   | | Baby Tracker  | | Child Development |                  |
-|  |    (MFE)     | |    (MFE)      | |       (MFE)       |                  |
-|  |  Port 3010   | |  Port 3011    | |    Port 3012      |                  |
-|  +--------------+ +---------------+ +-------------------+                  |
-|  +-------------------+ +-------------------+ +------------+ +-------------+ |
-|  | Chinese Learning  | | English Learning  | | Flashcards | |Work Tracker | |
-|  |       (MFE)       | |       (MFE)       | |   (MFE)    | |    (MFE)    | |
-|  |    Port 3013      | |    Port 3014      | | Port 3015  | |  Port 3016  | |
-|  +-------------------+ +-------------------+ +------------+ +-------------+ |
+|  +--------------+ +---------------+ +-------------------+ +------------+    |
+|  |   Notebook   | | Baby Tracker  | | Child Development | | Flashcards |    |
+|  |    (MFE)     | |    (MFE)      | |       (MFE)       | |   (MFE)    |    |
+|  |  Port 3010   | |  Port 3011    | |    Port 3012      | | Port 3015  |    |
+|  +--------------+ +---------------+ +-------------------+ +------------+    |
+|  +-------------+                                                             |
+|  |Work Tracker |                                                             |
+|  |    (MFE)    |                                                             |
+|  |  Port 3016  |                                                             |
+|  +-------------+                                                             |
 +──────────────────────────────────────────────────────────────────────────+
                                 |
                                 v
@@ -78,7 +78,7 @@ A comprehensive analysis of the MyCircle personal dashboard architecture, coveri
 
 ### Centralized Tailwind CSS
 
-Tailwind CSS is built exclusively in the shell host. The shell's `tailwind.config.js` scans all 9 MFE `src/` directories in its `content` array, producing a single CSS bundle that covers every utility class used across the entire app. MFE packages do not have their own Tailwind configs, `@tailwind` directives, or `tailwindcss` devDependencies — they rely entirely on the shell's CSS output at runtime.
+Tailwind CSS is built exclusively in the shell host. The shell's `tailwind.config.js` scans all 12 MFE `src/` directories in its `content` array, producing a single CSS bundle that covers every utility class used across the entire app. MFE packages do not have their own Tailwind configs, `@tailwind` directives, or `tailwindcss` devDependencies — they rely entirely on the shell's CSS output at runtime.
 
 This eliminates duplicate utility class injection, prevents specificity conflicts between MFE CSS bundles, and reduces total CSS payload. The only MFE-level CSS that remains is `worship-songs/src/index.css`, which contains `@media print` rules for print-friendly song output (no Tailwind directives).
 
@@ -139,6 +139,7 @@ The orchestrator that loads and composes all remote micro frontends.
 /notebook/:noteId       -> Notebook MFE (drill-down: note editor)
 /baby                   -> BabyTracker MFE (lazy-loaded, baby growth tracker)
 /child-dev              -> ChildDevelopment MFE (lazy-loaded, developmental guide)
+/flashcards             -> FlashCards MFE (lazy-loaded, quiz mode, handwriting, character editor, English phrases)
 /compare                -> WeatherCompare (legacy, still accessible)
 /*                      -> 404 NotFound
 ```
@@ -349,47 +350,22 @@ Exposes `ChildDevelopment` component via Module Federation. Port **3012**.
 - `WindowEvents.CHILD_DATA_CHANGED` bridges MFE ↔ shell for cross-tab sync
 - Route: `/child-dev`
 
-### Chinese Learning - `packages/chinese-learning/`
-
-Exposes `ChineseLearning` component via Module Federation. Port **3013**.
-
-**Key Behavior:**
-- **Firestore-backed characters** — `chineseCharacters` collection (public read, authenticated write); CRUD via `window.__chineseCharacters` bridge; real-time `onSnapshot` subscription with `localStorage` cache (`StorageKeys.CHINESE_CHARACTERS_CACHE`)
-- `useChineseCharacters` hook — mirrors `useWorshipSongs` pattern: real-time subscribe with one-shot fetch fallback, auth state detection, CRUD operations
-- ~50 default characters seeded via `scripts/seed-chinese-characters.mjs` across 8 categories (Family, Feelings, Food, Body, House, Nature, Numbers, Phrases)
-- **Character CRUD** — `CharacterEditor` modal with character, pinyin (with `PinyinKeyboard`), meaning, category; add/edit/delete with confirmation; creator/editor metadata
-- **PinyinKeyboard** — compact toggle toolbar with tone-marked vowels grouped by base vowel (ā á ǎ à, ē é ě è, etc.); inserts at cursor position
-- **Flashcard system** — front shows character, tap to flip for pinyin + meaning; navigation between characters; mark as mastered
-- **Practice canvas** — Pointer Events API (`pointerdown/move/up`) drawing with reference character as `globalAlpha=0.15` watermark; undo (stroke history) and clear; `touch-action: none` prevents scroll interference
-- **Character grid** — browse all characters grouped by category with green checkmark badges; edit button on hover (auth-gated); creator metadata tooltip
-- Persistence: `StorageKeys.CHINESE_LEARNING_PROGRESS` (localStorage JSON: `{ masteredIds, lastDate }`)
-- `WindowEvents.CHINESE_PROGRESS_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
-- `WindowEvents.CHINESE_CHARACTERS_CHANGED` invalidation signal for non-real-time consumers
-- Route: `/chinese`
-
-### English Learning - `packages/english-learning/`
-
-Exposes `EnglishLearning` component via Module Federation. Port **3014**.
-
-**Key Behavior:**
-- ~80 daily English phrases across 8 categories (Greetings, Feelings, House, Food, Going Out, People, Time, Emergencies)
-- **Lesson mode** — step-through phrases showing English, phonetic guide, and Chinese translation; mark as "Got It" to track completion
-- **Quiz mode** — show Chinese phrase, pick correct English from 4 choices; auto-advance with correct/incorrect feedback; score tracking
-- **Progress dashboard** — per-category progress bars, streak counter (consecutive days with quiz activity), quiz score history
-- Persistence: `StorageKeys.ENGLISH_LEARNING_PROGRESS` (localStorage JSON: `{ completedIds, quizScores, lastDate }`)
-- `WindowEvents.ENGLISH_PROGRESS_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
-- Route: `/english`
-
 ### Flashcards - `packages/flashcards/`
 
 Exposes `FlashCards` component via Module Federation. Port **3015**.
 
 **Key Behavior:**
+- Unified learning hub that consolidates Chinese Learning and English Learning into a single MFE alongside Bible and custom flashcards
 - Multi-format flash card system supporting Chinese characters, English phrases, Bible verses, and custom user-created cards
 - **Card types:** Chinese (character → meaning + pinyin), English (phrase → translation), Bible first-letter (initials → full text), Bible full (reference → text), Custom (user-defined front/back)
+- **Quiz mode** (migrated from English Learning) — multiple choice: show Chinese phrase, pick correct English from 4 choices; auto-advance with correct/incorrect feedback; score tracking
+- **Handwriting practice canvas** (migrated from Chinese Learning) — Pointer Events API (`pointerdown/move/up`) drawing with reference character as `globalAlpha=0.15` watermark; undo (stroke history) and clear; `touch-action: none` prevents scroll interference; works on mouse, touch, and stylus
+- **Character editor with Pinyin keyboard** (migrated from Chinese Learning) — modal with character, pinyin, meaning, and category fields; compact toggle toolbar with tone-marked vowels grouped by base vowel (ā á ǎ à, ē é ě è, etc.); inserts at cursor position; add/edit/delete with confirmation; creator/editor metadata
+- **88 English phrases** (migrated from English Learning) — phrases across 8 categories (Greetings, Feelings, House, Food, Going Out, People, Time, Emergencies) with Chinese translation and phonetic guide
+- **Firestore-backed Chinese characters** — `chineseCharacters` collection (public read, authenticated write); CRUD via `window.__chineseCharacters` bridge; real-time `onSnapshot` subscription with `localStorage` cache
 - **3D flip animation** — CSS perspective transforms for realistic card rotation on tap/click
 - **BibleVersePicker** — book → chapter → verse selector using `GET_BIBLE_PASSAGE` GraphQL query; generates two card types per selection (first-letter + full-text)
-- **Mastery tracking** — toggle cards as mastered; progress persisted to `StorageKeys.FLASHCARD_PROGRESS` (localStorage JSON: `{ masteredIds, lastPracticed }`)
+- **Unified progress tracking** — mastery tracking across all card types; progress persisted to `StorageKeys.FLASHCARD_PROGRESS` (localStorage JSON: `{ masteredIds, lastPracticed }`)
 - **Category filtering** — filter by card type (Chinese, English, Bible, Custom) with chip toggles
 - Bible/custom cards stored in `StorageKeys.FLASHCARD_BIBLE_CARDS` and `StorageKeys.FLASHCARD_CUSTOM_CARDS`
 - Chinese cards loaded from `window.__chineseCharacters` bridge API; English cards bundled at build time
@@ -521,7 +497,7 @@ The PWA service worker caches `remoteEntry.js` files with a `NetworkFirst` strat
 
 ### Build Configuration
 
-All packages (shell + 9 MFEs) set `modulePreload: false` in their Vite build config. All packages also use `minify: 'esbuild'` for production JS minification. The shell additionally configures esbuild to strip `console.*` and `debugger` statements and remove legal comments, and uses cssnano in its PostCSS pipeline for aggressive CSS minification:
+All packages (shell + 12 MFEs) set `modulePreload: false` in their Vite build config. All packages also use `minify: 'esbuild'` for production JS minification. The shell additionally configures esbuild to strip `console.*` and `debugger` statements and remove legal comments, and uses cssnano in its PostCSS pipeline for aggressive CSS minification:
 
 ```typescript
 // Shell esbuild options
