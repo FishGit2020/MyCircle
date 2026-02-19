@@ -26,6 +26,8 @@ const BabyTrackerMF = tracedLazy('mfe_baby_load', () => import('babyTracker/Baby
 const ChildDevelopmentMF = tracedLazy('mfe_childdev_load', () => import('childDevelopment/ChildDevelopment'), getPerf);
 const ChineseLearningMF = tracedLazy('mfe_chinese_load', () => import('chineseLearning/ChineseLearning'), getPerf);
 const EnglishLearningMF = tracedLazy('mfe_english_load', () => import('englishLearning/EnglishLearning'), getPerf);
+const FlashCardsMF = tracedLazy('mfe_flashcards_load', () => import('flashcards/FlashCards'), getPerf);
+const WorkTrackerMF = tracedLazy('mfe_work_tracker_load', () => import('workTracker/WorkTracker'), getPerf);
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -361,6 +363,40 @@ function EnglishPage() {
   );
 }
 
+// Fallback for Flash Cards MFE
+const FlashCardsFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Flash Cards module is loading...</p>
+  </div>
+);
+
+function FlashCardsPage() {
+  return (
+    <ErrorBoundary fallback={<FlashCardsFallback />}>
+      <Suspense fallback={<Loading />}>
+        <FlashCardsMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+// Fallback for Work Tracker MFE
+const WorkTrackerFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Work Tracker module is loading...</p>
+  </div>
+);
+
+function WorkTrackerPage() {
+  return (
+    <ErrorBoundary fallback={<WorkTrackerFallback />}>
+      <Suspense fallback={<Loading />}>
+        <WorkTrackerMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -396,6 +432,8 @@ export default function App() {
         <Route path="child-dev" element={<ChildDevPage />} />
         <Route path="chinese" element={<ChinesePage />} />
         <Route path="english" element={<EnglishPage />} />
+        <Route path="flashcards" element={<FlashCardsPage />} />
+        <Route path="work-tracker" element={<WorkTrackerPage />} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />

@@ -34,6 +34,8 @@ export const WindowEvents = {
   CHINESE_PROGRESS_CHANGED: 'chinese-progress-changed',
   ENGLISH_PROGRESS_CHANGED: 'english-progress-changed',
   CHINESE_CHARACTERS_CHANGED: 'chinese-characters-changed',
+  FLASHCARD_PROGRESS_CHANGED: 'flashcard-progress-changed',
+  WORK_TRACKER_CHANGED: 'work-tracker-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -72,6 +74,10 @@ export const StorageKeys = {
   CHINESE_LEARNING_PROGRESS: 'chinese-learning-progress',
   ENGLISH_LEARNING_PROGRESS: 'english-learning-progress',
   CHINESE_CHARACTERS_CACHE: 'chinese-characters-cache',
+  FLASHCARD_BIBLE_CARDS: 'flashcard-bible-cards',
+  FLASHCARD_CUSTOM_CARDS: 'flashcard-custom-cards',
+  FLASHCARD_PROGRESS: 'flashcard-progress',
+  WORK_TRACKER_CACHE: 'work-tracker-cache',
 } as const;
 
 export interface CitySelectedEvent {

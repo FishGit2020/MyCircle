@@ -802,6 +802,71 @@ if (firebaseEnabled) {
   };
 }
 
+// Work Tracker — user-scoped subcollection
+export async function getWorkEntries(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'worklog'), orderBy('date', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function addWorkEntry(uid: string, entry: { date: string; content: string }) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'users', uid, 'worklog'), {
+    ...entry,
+    createdAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateWorkEntry(uid: string, entryId: string, updates: Partial<{ content: string }>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = doc(db, 'users', uid, 'worklog', entryId);
+  await updateDoc(docRef, {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteWorkEntry(uid: string, entryId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'users', uid, 'worklog', entryId));
+}
+
+export function subscribeToWorkEntries(uid: string, callback: (entries: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'worklog'), orderBy('date', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const entries = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(entries);
+  }, (error) => {
+    log.warn('Work entries snapshot error:', error);
+  });
+}
+
+// Expose work tracker API for MFEs
+if (firebaseEnabled) {
+  window.__workTracker = {
+    getAll: () => auth?.currentUser ? getWorkEntries(auth.currentUser.uid) : Promise.resolve([]),
+    add: (entry: { date: string; content: string }) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addWorkEntry(auth.currentUser.uid, entry);
+    },
+    update: (id: string, updates: Partial<{ content: string }>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateWorkEntry(auth.currentUser.uid, id, updates);
+    },
+    delete: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteWorkEntry(auth.currentUser.uid, id);
+    },
+    subscribe: (callback: (entries: Array<Record<string, any>>) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToWorkEntries(auth.currentUser.uid, callback);
+    },
+  };
+}
+
 // Expose analytics for MFEs
 window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
   logEvent(eventName, params);
