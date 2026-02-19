@@ -3,6 +3,24 @@ import { useTranslation, StorageKeys, eventBus, MFEvents } from '@mycircle/share
 import type { Episode } from '../hooks/usePodcastData';
 import type { Podcast } from '@mycircle/shared';
 
+/** Strip dangerous HTML elements/attributes, keep safe formatting tags */
+function sanitizeHtml(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('script,iframe,style,object,embed,form,input,textarea,select').forEach(el => el.remove());
+  doc.querySelectorAll('*').forEach(el => {
+    for (const attr of Array.from(el.attributes)) {
+      if (attr.name.startsWith('on') || attr.name === 'style') {
+        el.removeAttribute(attr.name);
+      }
+    }
+    if (el.tagName === 'A') {
+      el.setAttribute('target', '_blank');
+      el.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+  return doc.body.innerHTML;
+}
+
 interface EpisodeListProps {
   episodes: Episode[];
   loading: boolean;
@@ -257,9 +275,10 @@ export default function EpisodeList({
             {/* Expandable show notes */}
             {isExpanded && episode.description && (
               <div className="px-3 pb-3 pt-0 ml-[52px]">
-                <div className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-2">
-                  <p className="whitespace-pre-line">{episode.description}</p>
-                </div>
+                <div
+                  className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed border-t border-gray-100 dark:border-gray-700 pt-2 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_a]:text-blue-500 [&_a]:underline dark:[&_a]:text-blue-400"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(episode.description) }}
+                />
               </div>
             )}
           </div>

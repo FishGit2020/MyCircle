@@ -12,7 +12,7 @@ export interface BabyGrowthWeek {
 export type ComparisonCategory = 'fruit' | 'animal' | 'vegetable';
 
 // Week-by-week baby growth data with fruit, animal, and vegetable comparisons
-// Sources: American Pregnancy Association, What to Expect
+// Sources: ACOG (fetal growth charts), American Pregnancy Association, What to Expect, Mayo Clinic
 export const babyGrowthData: BabyGrowthWeek[] = [
   { week: 1,  fruit: 'poppy seed',      animal: 'flea',             vegetable: 'grain of salt',   lengthCm: 0.01, weightG: 0,     lengthIn: 0,     weightOz: 0 },
   { week: 2,  fruit: 'poppy seed',      animal: 'flea',             vegetable: 'grain of salt',   lengthCm: 0.01, weightG: 0,     lengthIn: 0,     weightOz: 0 },

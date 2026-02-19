@@ -379,6 +379,57 @@ export default function BabyTracker() {
               })}
             </div>
           </div>
+
+          {/* Source Attribution Links */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              {t('baby.sources')}
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              <a
+                href="https://www.acog.org/womens-health/faqs/how-your-fetus-grows-during-pregnancy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                {t('baby.acogGuide' as any)}
+              </a>
+              <a
+                href="https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/prenatal-care/art-20045302"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                {t('baby.mayoGuide' as any)}
+              </a>
+              <a
+                href={
+                  trimester === 1
+                    ? 'https://www.whattoexpect.com/pregnancy/first-trimester/'
+                    : trimester === 2
+                    ? 'https://www.whattoexpect.com/pregnancy/second-trimester/'
+                    : 'https://www.whattoexpect.com/pregnancy/third-trimester/'
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                {t('baby.whatToExpect' as any)}
+              </a>
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              {t('baby.sourcesAttribution' as any)}
+            </p>
+          </div>
         </section>
       )}
     </div>
