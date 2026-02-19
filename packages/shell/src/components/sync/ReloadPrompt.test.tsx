@@ -25,15 +25,27 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 const mockUnregister = vi.fn().mockResolvedValue(undefined);
+const mockCachesDelete = vi.fn().mockResolvedValue(true);
 
 beforeEach(() => {
   mockNeedRefresh = false;
   mockSetNeedRefresh.mockClear();
   mockUnregister.mockClear();
+  mockCachesDelete.mockClear();
 
   Object.defineProperty(navigator, 'serviceWorker', {
     value: {
       getRegistration: vi.fn().mockResolvedValue({ unregister: mockUnregister }),
+    },
+    writable: true,
+    configurable: true,
+  });
+
+  // Mock caches API
+  Object.defineProperty(window, 'caches', {
+    value: {
+      keys: vi.fn().mockResolvedValue(['workbox-precache-v2', 'mfe-remote-entries']),
+      delete: mockCachesDelete,
     },
     writable: true,
     configurable: true,
@@ -66,12 +78,14 @@ describe('ReloadPrompt', () => {
     expect(screen.getByText('pwa.reload')).toBeInTheDocument();
   });
 
-  it('unregisters SW and reloads when reload button is clicked', async () => {
+  it('clears caches, unregisters SW, and reloads when reload button is clicked', async () => {
     mockNeedRefresh = true;
     render(<ReloadPrompt />);
     await act(async () => {
       fireEvent.click(screen.getByText('pwa.reload'));
     });
+    expect(mockCachesDelete).toHaveBeenCalledWith('workbox-precache-v2');
+    expect(mockCachesDelete).toHaveBeenCalledWith('mfe-remote-entries');
     expect(mockUnregister).toHaveBeenCalled();
     expect(window.location.reload).toHaveBeenCalled();
   });

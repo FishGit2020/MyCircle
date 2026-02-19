@@ -33,6 +33,10 @@ export default function ReloadPrompt() {
   const handleReload = async () => {
     setReloading(true);
     try {
+      // Delete all SW caches first — prevents the still-active SW from
+      // serving stale index.html (with old chunk hashes) during reload
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(name => caches.delete(name)));
       const reg = await navigator.serviceWorker?.getRegistration();
       await reg?.unregister();
     } catch {
