@@ -185,6 +185,8 @@ const es: Record<TranslationKey, string> = {
   // Auth
   'auth.signIn': 'Iniciar sesi\u00f3n',
   'auth.signOut': 'Cerrar sesi\u00f3n',
+  'theme.dark': 'Modo Oscuro',
+  'theme.light': 'Modo Claro',
   'auth.signUp': 'Registrarse',
   'auth.email': 'Correo electr\u00f3nico',
   'auth.password': 'Contrase\u00f1a',
@@ -1228,6 +1230,7 @@ const es: Record<TranslationKey, string> = {
   'english.lessonComplete': '\u00a1Lecci\u00f3n Completa!',
   'english.quizComplete': '\u00a1Examen Completo!',
   'english.reset': 'Reiniciar Progreso',
+  'english.resetConfirm': '\u00bfEst\u00e1s seguro de que quieres reiniciar todo el progreso? Esta acci\u00f3n no se puede deshacer.',
   'english.category.greetings': 'Saludos B\u00e1sicos',
   'english.category.feelings': 'Sentimientos',
   'english.category.house': 'En la Casa',

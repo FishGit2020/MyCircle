@@ -125,8 +125,14 @@ const STEPS = [
   },
 ];
 
+const LOCALE_LABELS: Record<string, string> = {
+  en: 'English',
+  es: 'Espa\u00f1ol',
+  zh: '\u4e2d\u6587',
+};
+
 export default function Onboarding() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [visible, setVisible] = useState(() => !hasCompletedOnboarding());
   const [step, setStep] = useState(0);
 
@@ -159,9 +165,17 @@ export default function Onboarding() {
         {/* Gradient header */}
         <div className={`bg-gradient-to-br ${current.color} px-8 pt-10 pb-8 flex flex-col items-center text-center`}>
           {step === 0 && (
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              {t('onboarding.welcome')}
-            </h2>
+            <>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                {t('onboarding.welcome')}
+              </h2>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 mb-2">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+                {LOCALE_LABELS[locale] || locale.toUpperCase()}
+              </span>
+            </>
           )}
           <div className="mb-4">{current.icon}</div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">

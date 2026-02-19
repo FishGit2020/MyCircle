@@ -225,12 +225,12 @@ export default function CommandPalette({ recentPages = [] }: Props) {
   let globalIndex = 0;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh]">
+    <div className="fixed inset-0 z-[200] flex items-start justify-center sm:pt-[15vh]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm hidden sm:block" onClick={() => setOpen(false)} />
 
-      {/* Palette */}
-      <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Palette — full viewport on mobile, centered modal on desktop */}
+      <div className="relative w-full h-full sm:h-auto sm:max-w-lg sm:mx-4 bg-white dark:bg-gray-800 sm:rounded-xl shadow-2xl border-0 sm:border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
           <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -245,13 +245,23 @@ export default function CommandPalette({ recentPages = [] }: Props) {
             placeholder={t('commandPalette.placeholder')}
             className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white text-sm placeholder-gray-400"
           />
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="sm:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            aria-label={t('commandPalette.close')}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
           <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
             ESC
           </kbd>
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-72 overflow-y-auto py-2">
+        <div ref={listRef} className="flex-1 max-h-[calc(100vh-4rem)] sm:max-h-72 overflow-y-auto py-2">
           {flatList.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-gray-400">{t('commandPalette.noResults')}</p>
           ) : (

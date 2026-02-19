@@ -100,10 +100,11 @@ export default function EnglishLearning() {
   }, []);
 
   const handleReset = useCallback(() => {
+    if (!window.confirm(t('english.resetConfirm'))) return;
     const empty: Progress = { completedIds: [], quizScores: [], lastDate: '' };
     setProgress(empty);
     saveProgress(empty);
-  }, []);
+  }, [t]);
 
   // Listen for external progress changes
   useEffect(() => {

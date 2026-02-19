@@ -183,6 +183,8 @@ const en = {
   // Auth
   'auth.signIn': 'Sign In',
   'auth.signOut': 'Sign Out',
+  'theme.dark': 'Dark Mode',
+  'theme.light': 'Light Mode',
   'auth.signUp': 'Sign Up',
   'auth.email': 'Email',
   'auth.password': 'Password',
@@ -1226,6 +1228,7 @@ const en = {
   'english.lessonComplete': 'Lesson Complete!',
   'english.quizComplete': 'Quiz Complete!',
   'english.reset': 'Reset Progress',
+  'english.resetConfirm': 'Are you sure you want to reset all progress? This action cannot be undone.',
   'english.category.greetings': 'Basic Greetings',
   'english.category.feelings': 'Feelings',
   'english.category.house': 'Around the House',

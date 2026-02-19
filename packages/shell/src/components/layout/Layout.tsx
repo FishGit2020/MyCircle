@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router';
 import type { TranslationKey } from '@mycircle/shared';
 import { useTranslation } from '@mycircle/shared';
-import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
 import LanguageSelector from './LanguageSelector';
 import FeedbackButton from './FeedbackButton';
@@ -291,7 +290,6 @@ export default function Layout() {
                 <kbd className="hidden lg:inline px-1 py-0.5 bg-white dark:bg-gray-800 rounded text-[10px] border border-gray-200 dark:border-gray-600">Ctrl+K</kbd>
               </button>
               <LanguageSelector />
-              <ThemeToggle />
               <WhatsNewButton />
               <NotificationBell />
               <UserMenu />
@@ -300,7 +298,6 @@ export default function Layout() {
             {/* Mobile controls (bottom nav replaces hamburger) */}
             <div className="flex md:!hidden items-center gap-1 flex-shrink-0">
               <LanguageSelector />
-              <ThemeToggle />
               <WhatsNewButton />
               <button
                 onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
