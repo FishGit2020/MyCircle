@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
@@ -87,6 +87,7 @@ describe('StockTracker', () => {
 
     const refreshButton = await screen.findByRole('button', { name: 'Refresh' });
     expect(refreshButton).toBeInTheDocument();
-    expect(refreshButton).toBeEnabled();
+    // Wait for quote to load so the button becomes enabled
+    await waitFor(() => expect(refreshButton).toBeEnabled());
   });
 });

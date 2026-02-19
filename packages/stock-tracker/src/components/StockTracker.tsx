@@ -16,15 +16,6 @@ interface WatchlistItem {
   quantity?: number;
 }
 
-interface PriceAlert {
-  symbol: string;
-  type: 'above' | 'below';
-  price: number;
-  enabled: boolean;
-}
-
-const ALERTS_KEY = 'stock-price-alerts';
-
 function loadWatchlist(): WatchlistItem[] {
   try {
     const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
@@ -35,18 +26,6 @@ function loadWatchlist(): WatchlistItem[] {
 
 function saveWatchlist(watchlist: WatchlistItem[]): void {
   try { localStorage.setItem(StorageKeys.STOCK_WATCHLIST, JSON.stringify(watchlist)); } catch { /* ignore */ }
-}
-
-function loadAlerts(): PriceAlert[] {
-  try {
-    const stored = localStorage.getItem(ALERTS_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
-  return [];
-}
-
-function saveAlerts(alerts: PriceAlert[]): void {
-  try { localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts)); } catch { /* ignore */ }
 }
 
 export default function StockTracker() {
@@ -60,11 +39,7 @@ export default function StockTracker() {
 
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(loadWatchlist);
   const [timeframe, setTimeframe] = useState<Timeframe>('1M');
-  const [alerts, setAlerts] = useState<PriceAlert[]>(loadAlerts);
-  const [showAlertForm, setShowAlertForm] = useState(false);
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
-  const [alertPrice, setAlertPrice] = useState('');
-  const [alertType, setAlertType] = useState<'above' | 'below'>('above');
   const [buyPrice, setBuyPrice] = useState('');
   const [quantity, setQuantity] = useState('');
 
@@ -80,13 +55,9 @@ export default function StockTracker() {
     window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
   }, [watchlist]);
 
-  // Persist alerts
-  useEffect(() => { saveAlerts(alerts); }, [alerts]);
-
   // Reset form state when navigating to a different stock
   useEffect(() => {
     setTimeframe('1M');
-    setShowAlertForm(false);
     setShowPortfolioForm(false);
   }, [routeSymbol]);
 
@@ -113,19 +84,6 @@ export default function StockTracker() {
     navigate('/stocks');
   }, [navigate]);
 
-  const handleAddAlert = useCallback(() => {
-    if (!selectedSymbol || !alertPrice) return;
-    const price = parseFloat(alertPrice);
-    if (isNaN(price) || price <= 0) return;
-    setAlerts(prev => [...prev, { symbol: selectedSymbol, type: alertType, price, enabled: true }]);
-    setAlertPrice('');
-    setShowAlertForm(false);
-  }, [selectedSymbol, alertPrice, alertType]);
-
-  const handleRemoveAlert = useCallback((index: number) => {
-    setAlerts(prev => prev.filter((_, i) => i !== index));
-  }, []);
-
   const handleSavePortfolio = useCallback(() => {
     if (!selectedSymbol) return;
     const bp = parseFloat(buyPrice);
@@ -143,7 +101,6 @@ export default function StockTracker() {
 
   const isInWatchlist = selectedSymbol ? watchlist.some(item => item.symbol === selectedSymbol) : false;
   const watchlistItem = selectedSymbol ? watchlist.find(item => item.symbol === selectedSymbol) : null;
-  const symbolAlerts = selectedSymbol ? alerts.filter(a => a.symbol === selectedSymbol) : [];
 
   const isPositive = selectedQuote ? selectedQuote.d >= 0 : true;
   const changeColor = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
@@ -205,24 +162,17 @@ export default function StockTracker() {
               <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{selectedName}</p>
             </div>
             <div className="flex items-center gap-1">
-              {/* Alert button */}
+              {/* Refresh button */}
               <button
-                onClick={() => { setShowAlertForm(prev => !prev); setShowPortfolioForm(false); }}
-                className={`p-2 rounded-full transition ${
-                  symbolAlerts.length > 0
-                    ? 'text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30'
-                    : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-                aria-label={t('stocks.priceAlert')}
+                type="button"
+                onClick={() => refetch()}
+                disabled={quoteLoading}
+                className="p-2 rounded-full text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50"
+                aria-label={t('stocks.refresh')}
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                <svg className={`w-5 h-5 ${quoteLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                {symbolAlerts.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-[10px] rounded-full flex items-center justify-center">
-                    {symbolAlerts.length}
-                  </span>
-                )}
               </button>
               {/* Watchlist star */}
               <button
@@ -240,65 +190,6 @@ export default function StockTracker() {
               </button>
             </div>
           </div>
-
-          {/* Price Alert Form */}
-          {showAlertForm && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4">
-              <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-3">{t('stocks.priceAlert')}</h3>
-              {symbolAlerts.length > 0 && (
-                <div className="space-y-1.5 mb-3">
-                  {symbolAlerts.map((alert, i) => {
-                    const globalIndex = alerts.indexOf(alert);
-                    const triggered = selectedQuote && (
-                      (alert.type === 'above' && selectedQuote.c >= alert.price) ||
-                      (alert.type === 'below' && selectedQuote.c <= alert.price)
-                    );
-                    return (
-                      <div key={i} className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-sm ${
-                        triggered ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-                      }`}>
-                        <span>
-                          {alert.type === 'above' ? '\u2191' : '\u2193'} ${alert.price.toFixed(2)}
-                          {triggered && ' \u2714'}
-                        </span>
-                        <button onClick={() => handleRemoveAlert(globalIndex)} className="text-gray-400 hover:text-red-500 transition">
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <select
-                  value={alertType}
-                  onChange={(e) => setAlertType(e.target.value as 'above' | 'below')}
-                  className="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-                >
-                  <option value="above">{t('stocks.alertAbove')}</option>
-                  <option value="below">{t('stocks.alertBelow')}</option>
-                </select>
-                <input
-                  type="number"
-                  value={alertPrice}
-                  onChange={(e) => setAlertPrice(e.target.value)}
-                  placeholder="$0.00"
-                  className="flex-1 px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-                  step="0.01"
-                  min="0"
-                />
-                <button
-                  onClick={handleAddAlert}
-                  disabled={!alertPrice}
-                  className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  {t('stocks.addAlert')}
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Quote summary */}
           {quoteLoading ? (
@@ -318,23 +209,11 @@ export default function StockTracker() {
                   {isPositive ? '+' : ''}{selectedQuote.d.toFixed(2)} ({isPositive ? '+' : ''}{selectedQuote.dp.toFixed(2)}%)
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-sm mb-4">
-                <button
-                  type="button"
-                  onClick={() => refetch()}
-                  disabled={quoteLoading}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium disabled:opacity-50"
-                  aria-label={t('stocks.refresh')}
-                >
-                  <svg className={`w-4 h-4 ${quoteLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  {t('stocks.refresh')}
-                </button>
-                {lastUpdated && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">· {lastUpdated.toLocaleTimeString()}</span>
-                )}
-              </div>
+              {lastUpdated && (
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                  {lastUpdated.toLocaleTimeString()}
+                </p>
+              )}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500 dark:text-gray-400">{t('stocks.open')}</p>
@@ -403,7 +282,7 @@ export default function StockTracker() {
                     </div>
                   ) : (
                     <button
-                      onClick={() => { setShowPortfolioForm(prev => !prev); setShowAlertForm(false); }}
+                      onClick={() => setShowPortfolioForm(prev => !prev)}
                       className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition flex items-center gap-1"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
