@@ -50,3 +50,23 @@ declare module 'childDevelopment/ChildDevelopment' {
   const ChildDevelopment: React.ComponentType;
   export default ChildDevelopment;
 }
+
+declare module 'chineseLearning/ChineseLearning' {
+  const ChineseLearning: React.ComponentType;
+  export default ChineseLearning;
+}
+
+declare module 'englishLearning/EnglishLearning' {
+  const EnglishLearning: React.ComponentType;
+  export default EnglishLearning;
+}
+
+declare module 'flashcards/FlashCards' {
+  const FlashCards: React.ComponentType;
+  export default FlashCards;
+}
+
+declare module 'workTracker/WorkTracker' {
+  const WorkTracker: React.ComponentType;
+  export default WorkTracker;
+}

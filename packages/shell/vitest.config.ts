@@ -32,6 +32,8 @@ export default defineConfig({
       'childDevelopment/ChildDevelopment': resolve(__dirname, './src/test/mocks/ChildDevelopmentMock.tsx'),
       'chineseLearning/ChineseLearning': resolve(__dirname, './src/test/mocks/ChineseLearningMock.tsx'),
       'englishLearning/EnglishLearning': resolve(__dirname, './src/test/mocks/EnglishLearningMock.tsx'),
+      'flashcards/FlashCards': resolve(__dirname, './src/test/mocks/FlashCardsMock.tsx'),
+      'workTracker/WorkTracker': resolve(__dirname, './src/test/mocks/WorkTrackerMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './src/test/mocks/pwaRegisterReactMock.ts')
     }
   }
