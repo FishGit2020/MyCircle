@@ -1318,6 +1318,8 @@ const zh: Record<TranslationKey, string> = {
   'flashcards.done': '\u5b8c\u6210',
   'flashcards.bibleFirstLetter': '\u5723\u7ecf\uff08\u9996\u5b57\u6bcd\uff09',
   'flashcards.bibleFull': '\u5723\u7ecf\uff08\u5168\u6587\uff09',
+  'flashcards.cardTypeBoth': '\u4e24\u79cd',
+  'flashcards.selectAll': '\u5168\u9009',
 
   // Work Tracker
   'nav.workTracker': '\u5de5\u4f5c\u65e5\u5fd7',

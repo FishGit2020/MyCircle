@@ -10,12 +10,18 @@ export interface BibleVerse {
   copyright: string | null;
 }
 
+export interface BibleVerseItem {
+  number: number;
+  text: string;
+}
+
 export interface BiblePassage {
   text: string;
   reference: string;
   translation: string | null;
   verseCount: number;
   copyright: string | null;
+  verses: BibleVerseItem[];
 }
 
 export interface BibleVersion {

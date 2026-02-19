@@ -1316,6 +1316,8 @@ const en = {
   'flashcards.done': 'Done',
   'flashcards.bibleFirstLetter': 'Bible (First Letter)',
   'flashcards.bibleFull': 'Bible (Full)',
+  'flashcards.cardTypeBoth': 'Both',
+  'flashcards.selectAll': 'Select All',
 
   // Work Tracker
   'nav.workTracker': 'Work Log',

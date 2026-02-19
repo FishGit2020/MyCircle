@@ -365,6 +365,10 @@ export const GET_BIBLE_PASSAGE = gql`
       translation
       verseCount
       copyright
+      verses {
+        number
+        text
+      }
     }
   }
 `;
