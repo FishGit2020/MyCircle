@@ -69,7 +69,7 @@ Pull requests run these checks automatically:
 ## Detailed Guides
 
 - [Architecture](docs/architecture.md) — Full system architecture and MFE design
-- [Agent Guide](docs/agent-guide.md) — AI-assisted development standards
+- [CLAUDE.md](CLAUDE.md) — AI agent rules (auto-loaded by Claude Code)
 - [PR Lifecycle](docs/pr-lifecycle.md) — Branch protection and review process
 - [CI/CD Pipeline](docs/cicd.md) — Deployment and automation details
 - [MFE Guide](docs/mfe-guide.md) — Micro frontend pitfalls and lessons learned

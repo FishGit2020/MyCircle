@@ -1122,7 +1122,7 @@ mycircle/
 |       +-- e2e.yml             # Playwright E2E tests on PR
 +-- docs/
 |   +-- architecture.md         # This file
-|   +-- agent-guide.md          # AI agent development guide (i18n, a11y, theme, responsive, CI)
+|   (agent-guide.md removed — see CLAUDE.md at repo root)
 +-- firebase.json               # Firebase hosting + functions config
 +-- firestore.rules             # Firestore security rules
 +-- pnpm-workspace.yaml        # Workspace package declarations
