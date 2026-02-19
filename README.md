@@ -369,7 +369,7 @@ mycircle/
 │   └── generate-icons.mjs       # PWA icon generation
 ├── docs/
 │   ├── architecture.md          # Detailed architecture analysis
-│   ├── agent-guide.md           # AI agent development guide (i18n, a11y, theme, responsive, CI)
+│   (agent-guide.md removed — see CLAUDE.md at repo root)
 │   ├── analytics-and-tracking.md # Analytics & performance monitoring (Web Vitals, Firebase Perf, Lighthouse)
 │   └── web-vitals-setup.md      # Redirect → analytics-and-tracking.md
 ├── firebase.json                # Firebase hosting + functions config
