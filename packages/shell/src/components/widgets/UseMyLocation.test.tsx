@@ -167,7 +167,7 @@ describe('UseMyLocation', () => {
     fireEvent.click(screen.getByText('Use my current location'));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/weather/51.5074,-0.1278');
+      expect(mockNavigate).toHaveBeenCalledWith('/weather/51.5074,-0.1278?name=London');
     });
   });
 
