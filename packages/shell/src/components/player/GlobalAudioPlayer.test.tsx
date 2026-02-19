@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import GlobalAudioPlayer from './GlobalAudioPlayer';
-import { MFEvents } from '@mycircle/shared';
+import { MFEvents, StorageKeys } from '@mycircle/shared';
 
 // Mock HTMLMediaElement methods
 beforeEach(() => {
@@ -57,9 +57,17 @@ const renderWithProviders = (ui: React.ReactElement) => {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
 };
 
+const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
+const removeItemSpy = vi.spyOn(Storage.prototype, 'removeItem');
+
 describe('GlobalAudioPlayer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('renders player on PODCAST_PLAY_EPISODE and hides on PODCAST_CLOSE_PLAYER', () => {
@@ -134,5 +142,36 @@ describe('GlobalAudioPlayer', () => {
     const region = screen.getByRole('region', { name: 'Now Playing' });
     expect(region.className).toContain('bottom-14');
     expect(region.className).toContain('md:bottom-0');
+  });
+
+  it('persists now-playing state to localStorage on play', () => {
+    renderWithProviders(<GlobalAudioPlayer />);
+
+    act(() => { dispatchPlayEvent(); });
+
+    expect(setItemSpy).toHaveBeenCalledWith(
+      StorageKeys.PODCAST_NOW_PLAYING,
+      expect.stringContaining('Test Episode Title')
+    );
+  });
+
+  it('clears now-playing state from localStorage on close', () => {
+    renderWithProviders(<GlobalAudioPlayer />);
+
+    act(() => { dispatchPlayEvent(); });
+    // Close via button
+    const closeButtons = screen.getAllByLabelText('Close player');
+    fireEvent.click(closeButtons[0]);
+
+    expect(removeItemSpy).toHaveBeenCalledWith(StorageKeys.PODCAST_NOW_PLAYING);
+  });
+
+  it('clears now-playing state on PODCAST_CLOSE_PLAYER event', () => {
+    renderWithProviders(<GlobalAudioPlayer />);
+
+    act(() => { dispatchPlayEvent(); });
+    act(() => { dispatchCloseEvent(); });
+
+    expect(removeItemSpy).toHaveBeenCalledWith(StorageKeys.PODCAST_NOW_PLAYING);
   });
 });

@@ -9,12 +9,18 @@ function getDayOfYear(): number {
   return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+export interface VerseFragment {
+  number: number;
+  text: string;
+}
+
 interface PassageResponse {
   biblePassage: {
     text: string;
     reference: string;
     translation: string | null;
     copyright: string | null;
+    verses: VerseFragment[] | null;
   };
 }
 
@@ -42,5 +48,11 @@ export function useCuratedVerse() {
         copyright: localVerse.copyright,
       };
 
-  return { verse, loading };
+  // Structured verses with numbers (from API only)
+  const verseFragments: VerseFragment[] | null =
+    data?.biblePassage?.verses && data.biblePassage.verses.length > 0
+      ? data.biblePassage.verses
+      : null;
+
+  return { verse, verseFragments, loading };
 }

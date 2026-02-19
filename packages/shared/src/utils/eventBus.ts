@@ -78,6 +78,7 @@ export const StorageKeys = {
   FLASHCARD_CUSTOM_CARDS: 'flashcard-custom-cards',
   FLASHCARD_PROGRESS: 'flashcard-progress',
   WORK_TRACKER_CACHE: 'work-tracker-cache',
+  PODCAST_NOW_PLAYING: 'podcast-now-playing',
 } as const;
 
 export interface CitySelectedEvent {
