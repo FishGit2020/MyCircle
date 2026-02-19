@@ -4,6 +4,7 @@ import {
   getWindDirection,
   getWeatherDescription,
   formatTemperature,
+  formatTemperatureDiff,
   convertTemp,
   tempUnitSymbol,
   formatWindSpeed,
@@ -91,6 +92,20 @@ describe('formatTemperature', () => {
   it('converts and formats Fahrenheit correctly', () => {
     expect(formatTemperature(0, 'F')).toBe('32°F');
     expect(formatTemperature(100, 'F')).toBe('212°F');
+  });
+});
+
+describe('formatTemperatureDiff', () => {
+  it('formats Celsius difference correctly', () => {
+    expect(formatTemperatureDiff(5, 'C')).toBe('5°C');
+    expect(formatTemperatureDiff(7.4, 'C')).toBe('7°C');
+  });
+
+  it('scales Fahrenheit difference without +32 offset', () => {
+    // 5°C diff = 5 * 9/5 = 9°F diff (NOT 5*9/5+32=41)
+    expect(formatTemperatureDiff(5, 'F')).toBe('9°F');
+    expect(formatTemperatureDiff(10, 'F')).toBe('18°F');
+    expect(formatTemperatureDiff(0, 'F')).toBe('0°F');
   });
 });
 
