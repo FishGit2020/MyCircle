@@ -247,6 +247,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       });
 
+      // Notify all widgets that data has been cleared
+      window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.CHINESE_PROGRESS_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.ENGLISH_PROGRESS_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
+
       // Clear Apollo GraphQL cache to prevent stale queries from previous user
       await getApolloClient().clearStore();
 
