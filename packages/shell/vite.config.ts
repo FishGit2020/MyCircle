@@ -238,6 +238,7 @@ export default defineConfig({
           /^\/podcast\//,
           /^\/ai\//,
           /^\/api\//,
+          /^\/__\//,
         ],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         globIgnores: ['**/firebase-messaging-sw.js'],
