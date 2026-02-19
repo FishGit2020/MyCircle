@@ -79,7 +79,7 @@
     "source": "functions",
     "runtime": "nodejs22",
     "predeploy": [
-      "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm install && pnpm run build"
+      "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm install && npx tsc"
     ]
   },
   "emulators": {
