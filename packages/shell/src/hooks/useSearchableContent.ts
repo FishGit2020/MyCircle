@@ -61,7 +61,7 @@ export function useSearchableContent(isOpen: boolean): SearchableItem[] {
         label: b.label || `${b.book} ${b.chapter}`,
         description: `${b.book} ${b.chapter}`,
         type: 'bookmark',
-        route: '/bible',
+        route: `/bible?book=${encodeURIComponent(b.book)}&chapter=${b.chapter}`,
       });
     }
 

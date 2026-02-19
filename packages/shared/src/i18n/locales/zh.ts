@@ -616,6 +616,7 @@ const zh: Record<TranslationKey, string> = {
   'bible.devotionalReflection': '\u53cd\u601d',
   'bible.version': '\u7248\u672c',
   'bible.versionSelect': '\u9009\u62e9\u5723\u7ecf\u7248\u672c',
+  'bible.sharePassage': '\u5206\u4eab\u94fe\u63a5',
 
   // Toast messages
   'toast.addedToWatchlist': '\u5df2\u6dfb\u52a0\u5230\u81ea\u9009\u5217\u8868',

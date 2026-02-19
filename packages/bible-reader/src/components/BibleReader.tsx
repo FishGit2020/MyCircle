@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router';
 import { useTranslation, StorageKeys, WindowEvents, getDailyDevotional } from '@mycircle/shared';
 import { useVotd, useBiblePassage, useBibleVersions, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
@@ -350,6 +351,16 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
     } catch { /* */ }
   }, [passage]);
 
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const handleShareLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch { /* */ }
+  }, []);
+
   const changeFontSize = useCallback((delta: number) => {
     setFontSize(prev => {
       const idx = FONT_SIZES.indexOf(prev);
@@ -465,6 +476,29 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
             </svg>
             {isBookmarked ? t('bible.bookmarked') : t('bible.bookmark')}
           </button>
+
+          {/* Share link */}
+          <button
+            type="button"
+            onClick={handleShareLink}
+            className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white border border-gray-200 dark:border-gray-700 rounded-lg transition"
+          >
+            {linkCopied ? (
+              <>
+                <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                {t('bible.copied')}
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                {t('bible.sharePassage')}
+              </>
+            )}
+          </button>
         </div>
       )}
 
@@ -563,8 +597,33 @@ export default function BibleReader() {
   const [bibleVersion, setBibleVersion] = useState(loadBibleVersion);
   const { loadPassage, passage, loading: passageLoading, error: passageError } = useBiblePassage();
   const { versions: dynamicVersions, loading: versionsLoading, error: versionsError } = useBibleVersions();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const lastRead = useMemo(() => loadLastRead(), []);
+
+  // Read URL search params on mount — enables shareable links & bookmark navigation
+  useEffect(() => {
+    const bookParam = searchParams.get('book');
+    const chapterParam = searchParams.get('chapter');
+    const versionParam = searchParams.get('version');
+    if (bookParam && chapterParam) {
+      const bookData = BIBLE_BOOKS.find(b => b.name === bookParam);
+      const ch = parseInt(chapterParam, 10);
+      if (bookData && ch >= 1 && ch <= bookData.chapters) {
+        if (versionParam) {
+          setBibleVersion(versionParam);
+          saveBibleVersion(versionParam);
+        }
+        setCurrentBook(bookData.name);
+        setCurrentChapters(bookData.chapters);
+        setCurrentChapter(ch);
+        loadPassage(bookData.name, ch, versionParam || bibleVersion);
+        saveLastRead({ book: bookData.name, chapter: ch, chapters: bookData.chapters });
+        setView('passage');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleVersionChange = useCallback((version: string) => {
     setBibleVersion(version);
@@ -572,8 +631,9 @@ export default function BibleReader() {
     // Reload current passage with new version if viewing one
     if (view === 'passage' && currentBook && currentChapter > 0) {
       loadPassage(currentBook, currentChapter, version);
+      setSearchParams({ book: currentBook, chapter: String(currentChapter), version }, { replace: true });
     }
-  }, [view, currentBook, currentChapter, loadPassage]);
+  }, [view, currentBook, currentChapter, loadPassage, setSearchParams]);
 
   const handleBookSelect = (book: string, chapters: number) => {
     setCurrentBook(book);
@@ -582,6 +642,7 @@ export default function BibleReader() {
       setCurrentChapter(1);
       loadPassage(book, 1, bibleVersion);
       saveLastRead({ book, chapter: 1, chapters });
+      setSearchParams({ book, chapter: '1', version: bibleVersion }, { replace: true });
       setView('passage');
     } else {
       setView('chapters');
@@ -592,6 +653,7 @@ export default function BibleReader() {
     setCurrentChapter(chapter);
     loadPassage(currentBook, chapter, bibleVersion);
     saveLastRead({ book: currentBook, chapter, chapters: currentChapters });
+    setSearchParams({ book: currentBook, chapter: String(chapter), version: bibleVersion }, { replace: true });
     window.__logAnalyticsEvent?.('bible_chapter_read', { book: currentBook, chapter });
     setView('passage');
   };
@@ -601,6 +663,7 @@ export default function BibleReader() {
     setCurrentChapter(chapter);
     loadPassage(currentBook, chapter, bibleVersion);
     saveLastRead({ book: currentBook, chapter, chapters: currentChapters });
+    setSearchParams({ book: currentBook, chapter: String(chapter), version: bibleVersion }, { replace: true });
     window.__logAnalyticsEvent?.('bible_chapter_read', { book: currentBook, chapter });
   };
 
@@ -610,6 +673,7 @@ export default function BibleReader() {
     setCurrentChapters(lastRead.chapters);
     setCurrentChapter(lastRead.chapter);
     loadPassage(lastRead.book, lastRead.chapter, bibleVersion);
+    setSearchParams({ book: lastRead.book, chapter: String(lastRead.chapter), version: bibleVersion }, { replace: true });
     setView('passage');
   };
 
@@ -621,6 +685,7 @@ export default function BibleReader() {
     setCurrentChapter(chapter);
     loadPassage(book, chapter, bibleVersion);
     saveLastRead({ book, chapter, chapters: bookData.chapters });
+    setSearchParams({ book, chapter: String(chapter), version: bibleVersion }, { replace: true });
     setView('passage');
   };
 
@@ -632,6 +697,7 @@ export default function BibleReader() {
     setCurrentChapter(bm.chapter);
     loadPassage(bm.book, bm.chapter, bibleVersion);
     saveLastRead({ book: bm.book, chapter: bm.chapter, chapters: bookData.chapters });
+    setSearchParams({ book: bm.book, chapter: String(bm.chapter), version: bibleVersion }, { replace: true });
     setView('passage');
   };
 
@@ -710,7 +776,7 @@ export default function BibleReader() {
             book={currentBook}
             chapters={currentChapters}
             onSelect={handleChapterSelect}
-            onBack={() => setView('books')}
+            onBack={() => { setView('books'); setSearchParams({}, { replace: true }); }}
           />
         )}
 
@@ -722,7 +788,7 @@ export default function BibleReader() {
             passage={passage}
             loading={passageLoading}
             error={passageError}
-            onBack={() => setView('chapters')}
+            onBack={() => { setView('chapters'); setSearchParams({}, { replace: true }); }}
             onNavigate={handleNavigateChapter}
           />
         )}

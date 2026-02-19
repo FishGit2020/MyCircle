@@ -616,6 +616,7 @@ const es: Record<TranslationKey, string> = {
   'bible.devotionalReflection': 'Reflexiona',
   'bible.version': 'Versi\u00f3n',
   'bible.versionSelect': 'Seleccionar versi\u00f3n de la Biblia',
+  'bible.sharePassage': 'Compartir enlace',
 
   // Toast messages
   'toast.addedToWatchlist': 'Agregado a la lista',

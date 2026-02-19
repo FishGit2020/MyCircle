@@ -185,7 +185,7 @@ const VerseWidget = React.memo(function VerseWidget() {
           {bookmarks.slice(0, 4).map((b, i) => (
             <Link
               key={i}
-              to="/bible"
+              to={`/bible?book=${encodeURIComponent(b.book)}&chapter=${b.chapter}`}
               onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 bg-amber-50/50 dark:bg-amber-900/10 rounded px-2 py-1 hover:bg-amber-100 dark:hover:bg-amber-800/30 active:bg-amber-200 dark:active:bg-amber-700/30 transition-colors"
             >
