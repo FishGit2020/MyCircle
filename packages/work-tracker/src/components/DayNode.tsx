@@ -52,12 +52,12 @@ export default function DayNode({ date, entries, onUpdate, onDelete }: DayNodePr
       : '';
 
   return (
-    <div className="relative pl-8">
+    <div className="relative pl-10">
       {/* Timeline line */}
-      <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+      <div className="absolute left-[11px] top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
 
       {/* Timeline dot */}
-      <div className={`absolute left-1.5 top-1.5 w-4 h-4 rounded-full border-2 ${
+      <div className={`absolute left-1.5 top-1 w-3 h-3 rounded-full border-2 ${
         isToday(date)
           ? 'bg-blue-500 border-blue-500'
           : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600'
