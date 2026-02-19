@@ -23,14 +23,14 @@ describe('WorkTracker', () => {
     delete (window as any).__workTracker;
   });
 
-  it('shows sign-in required when not authenticated', () => {
+  it('shows sign-in required when not authenticated', async () => {
     render(<WorkTracker />);
-    expect(screen.getByText('workTracker.signInRequired')).toBeInTheDocument();
-  });
-
-  it('shows title when not authenticated', () => {
-    render(<WorkTracker />);
+    // Initially shows loading spinner while auth check runs
     expect(screen.getByText('workTracker.title')).toBeInTheDocument();
+    // After auth check resolves (no token), shows sign-in message
+    await vi.waitFor(() => {
+      expect(screen.getByText('workTracker.signInRequired')).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('shows loading state when authenticated', async () => {
