@@ -49,7 +49,7 @@ describe('useSearchableContent', () => {
       label: 'John 3:16',
       description: 'John 3',
       type: 'bookmark',
-      route: '/bible',
+      route: '/bible?book=John&chapter=3',
     });
   });
 
