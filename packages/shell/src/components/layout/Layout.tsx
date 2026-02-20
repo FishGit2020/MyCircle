@@ -322,6 +322,8 @@ export default function Layout() {
         className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
       >
         <Outlet />
+        {/* PWA safe area bottom spacer for notched devices */}
+        <div className="md:hidden" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} aria-hidden="true" />
       </main>
 
       <GlobalAudioPlayer onPlayerStateChange={handlePlayerStateChange} />

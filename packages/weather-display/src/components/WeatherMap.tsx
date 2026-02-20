@@ -63,6 +63,7 @@ export default function WeatherMap({ lat, lon }: Props) {
       className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden ${
         isFullscreen ? 'fixed inset-0 z-[100] rounded-none' : ''
       }`}
+      style={isFullscreen ? { paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' } : undefined}
     >
       <div className="p-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">

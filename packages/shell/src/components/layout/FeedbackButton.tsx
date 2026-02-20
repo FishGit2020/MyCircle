@@ -159,7 +159,7 @@ export default function FeedbackButton({ hasActivePlayer }: { hasActivePlayer?: 
             role="dialog"
             aria-modal="true"
             aria-labelledby="feedback-dialog-title"
-            className="relative w-full max-w-md mx-4 mb-4 sm:mb-0 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-black/40 overflow-hidden"
+            className="relative w-full max-w-md mx-4 mb-[calc(1rem_+_env(safe-area-inset-bottom,0px))] sm:mb-0 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-black/40 overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">

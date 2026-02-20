@@ -163,7 +163,7 @@ export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolea
   // ── Edit overlay ──────────────────────────────
   if (editing) {
     return (
-      <div className="md:hidden fixed inset-0 z-[60] bg-white dark:bg-gray-900 overflow-y-auto" data-testid="nav-editor">
+      <div className="md:hidden fixed inset-0 z-[60] bg-white dark:bg-gray-900 overflow-y-auto" data-testid="nav-editor" style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="max-w-md mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">{t('bottomNav.editTitle')}</h2>

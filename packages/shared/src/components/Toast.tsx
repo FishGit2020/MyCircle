@@ -108,6 +108,7 @@ function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast:
   return (
     <div
       className="fixed bottom-20 right-4 z-[100] flex flex-col gap-2 pointer-events-none sm:bottom-6"
+      style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
       aria-live="polite"
     >
       {toasts.map(toast => (
