@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useState, useCallback, useMemo } from 'react';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import type { FlashCard, CardType } from '../types';
 import { useFlashCards } from '../hooks/useFlashCards';
 import { phrases } from '../data/phrases';
@@ -30,7 +30,7 @@ export default function FlashCards() {
     toggleMastered,
     addBibleCards,
     addCustomCard,
-    updateCustomCard,
+    updateCard,
     deleteCard,
     resetProgress,
     isAuthenticated,
@@ -39,7 +39,13 @@ export default function FlashCards() {
     deleteChineseChar,
   } = useFlashCards();
 
-  const [activeType, setActiveType] = useState<CardType | 'all'>('all');
+  const [disabledTypes, setDisabledTypes] = useState<Set<CardType>>(() => {
+    try {
+      const stored = localStorage.getItem(StorageKeys.FLASHCARD_TYPE_FILTER);
+      if (stored) return new Set(JSON.parse(stored) as CardType[]);
+    } catch { /* ignore */ }
+    return new Set();
+  });
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBiblePicker, setShowBiblePicker] = useState(false);
   const [practiceCards, setPracticeCards] = useState<FlashCard[] | null>(null);
@@ -52,9 +58,19 @@ export default function FlashCards() {
   const [editingChar, setEditingChar] = useState<ChineseCharacter | undefined>(undefined);
 
   const filteredCards = useMemo(() => {
-    if (activeType === 'all') return allCards;
-    return allCards.filter(c => c.type === activeType);
-  }, [allCards, activeType]);
+    if (disabledTypes.size === 0) return allCards;
+    return allCards.filter(c => !disabledTypes.has(c.type));
+  }, [allCards, disabledTypes]);
+
+  const toggleType = useCallback((type: CardType) => {
+    setDisabledTypes(prev => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      try { localStorage.setItem(StorageKeys.FLASHCARD_TYPE_FILTER, JSON.stringify(Array.from(next))); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
 
   const masteredCount = progress.masteredIds.length;
 
@@ -85,7 +101,7 @@ export default function FlashCards() {
 
   const handleEdit = (updates: { front: string; back: string; category: string }) => {
     if (cardToEdit) {
-      updateCustomCard(cardToEdit.id, updates);
+      updateCard(cardToEdit.id, updates);
       setCardToEdit(null);
     }
   };
@@ -112,29 +128,20 @@ export default function FlashCards() {
         <span>{t('flashcards.masteredCount').replace('{count}', String(masteredCount))}</span>
       </div>
 
-      {/* Type filter chips */}
+      {/* Type filter chips (toggle: active = shown, inactive = hidden) */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          type="button"
-          onClick={() => setActiveType('all')}
-          className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-            activeType === 'all'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          {t('flashcards.allCategories')} ({allCards.length})
-        </button>
         {cardTypes.map(type => {
           const count = allCards.filter(c => c.type === type).length;
           const labelKey = TYPE_LABELS[type] || type;
+          const isEnabled = !disabledTypes.has(type);
           return (
             <button
               key={type}
               type="button"
-              onClick={() => setActiveType(type)}
+              aria-pressed={isEnabled}
+              onClick={() => toggleType(type)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-                activeType === type
+                isEnabled
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
@@ -345,6 +352,9 @@ export default function FlashCards() {
           </div>
         </div>
       )}
+
+      {/* PWA safe area bottom spacer for notched devices */}
+      <div className="md:hidden" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} aria-hidden="true" />
     </div>
   );
 }

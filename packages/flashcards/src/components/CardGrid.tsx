@@ -17,7 +17,7 @@ function canDelete(card: FlashCard): boolean {
 }
 
 function canEdit(card: FlashCard): boolean {
-  return card.type === 'custom';
+  return card.type === 'custom' || card.type === 'bible-first-letter' || card.type === 'bible-full';
 }
 
 export default function CardGrid({ cards, masteredIds, onCardClick, onDeleteCard, onEditCard, isAuthenticated }: CardGridProps) {

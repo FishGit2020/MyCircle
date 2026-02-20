@@ -322,15 +322,21 @@ export function useFlashCards() {
     });
   }, []);
 
-  const updateCustomCard = useCallback((cardId: string, updates: { front: string; back: string; category: string }) => {
+  const updateCard = useCallback((cardId: string, updates: { front: string; back: string; category: string }) => {
     setCustomCards(prev => {
+      if (!prev.some(c => c.id === cardId)) return prev;
       const next = prev.map(c => c.id === cardId ? { ...c, ...updates } : c);
       saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, next);
-      window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
-      // Fire-and-forget Firestore write
-      window.__flashcards?.update(cardId, updates).catch(() => { /* ignore */ });
       return next;
     });
+    setBibleCards(prev => {
+      if (!prev.some(c => c.id === cardId)) return prev;
+      const next = prev.map(c => c.id === cardId ? { ...c, ...updates } : c);
+      saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, next);
+      return next;
+    });
+    window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+    window.__flashcards?.update(cardId, updates).catch(() => { /* ignore */ });
   }, []);
 
   const deleteCard = useCallback((cardId: string) => {
@@ -399,7 +405,7 @@ export function useFlashCards() {
     toggleMastered,
     addBibleCards,
     addCustomCard,
-    updateCustomCard,
+    updateCard,
     deleteCard,
     resetProgress,
     addChineseChar,

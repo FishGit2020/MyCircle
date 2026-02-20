@@ -73,6 +73,7 @@ export const StorageKeys = {
   FLASHCARD_BIBLE_CARDS: 'flashcard-bible-cards',
   FLASHCARD_CUSTOM_CARDS: 'flashcard-custom-cards',
   FLASHCARD_PROGRESS: 'flashcard-progress',
+  FLASHCARD_TYPE_FILTER: 'flashcard-type-filter',
   WORK_TRACKER_CACHE: 'work-tracker-cache',
   PODCAST_NOW_PLAYING: 'podcast-now-playing',
 } as const;
