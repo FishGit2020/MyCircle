@@ -34,6 +34,7 @@ export default function SyncIndicator() {
           ? 'bg-green-600 text-white'
           : 'bg-gray-800 dark:bg-gray-700 text-white'
       }`}
+      style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       {isOnline ? (
         <>

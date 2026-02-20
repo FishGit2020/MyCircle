@@ -237,6 +237,7 @@ export default function AudioPlayer({ episode, podcast, onClose }: AudioPlayerPr
       className="podcast-player-slide-up fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
       role="region"
       aria-label={t('podcasts.nowPlaying')}
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <audio ref={audioRef} preload="metadata" className="hidden" />
 
