@@ -185,6 +185,7 @@ export const graphql = onRequest(
  * Firestore schema:
  *   alertSubscriptions/{docId}
  *     - token: string (FCM token)
+ *     - uid: string (Firebase Auth user ID — enables cross-device unsubscribe)
  *     - cities: Array<{ lat: number, lon: number, name: string }>
  *     - createdAt: Timestamp
  *     - updatedAt: Timestamp
@@ -208,13 +209,24 @@ export const subscribeToAlerts = onCall(
       throw new HttpsError('invalid-argument', 'cities must be an array');
     }
 
+    const uid = request.auth?.uid;
     const db = getFirestore();
     const subsRef = db.collection('alertSubscriptions');
     const existing = await subsRef.where('token', '==', token).limit(1).get();
 
-    // Empty cities array = unsubscribe (delete the doc)
+    // Empty cities array = unsubscribe for ALL devices owned by this user
     if (cities.length === 0) {
-      if (!existing.empty) {
+      if (uid) {
+        // Delete all subscription docs for this user (cross-device unsubscribe)
+        const userDocs = await subsRef.where('uid', '==', uid).get();
+        if (!userDocs.empty) {
+          const batch = db.batch();
+          userDocs.forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+        }
+      }
+      // Also delete the current token's doc if it exists but has no uid (legacy doc)
+      if (!existing.empty && !existing.docs[0].data().uid) {
         await existing.docs[0].ref.delete();
       }
       return { success: true, subscribed: false };
@@ -222,14 +234,20 @@ export const subscribeToAlerts = onCall(
 
     // Upsert: update existing or create new subscription
     if (!existing.empty) {
-      await existing.docs[0].ref.update({
+      // Lazy migration: add uid if missing (backward compat for pre-uid docs)
+      const updateData: Record<string, unknown> = {
         cities,
         updatedAt: FieldValue.serverTimestamp(),
-      });
+      };
+      if (uid && !existing.docs[0].data().uid) {
+        updateData.uid = uid;
+      }
+      await existing.docs[0].ref.update(updateData);
     } else {
       await subsRef.add({
         token,
         cities,
+        ...(uid ? { uid } : {}),
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });
