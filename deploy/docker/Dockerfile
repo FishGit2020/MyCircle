@@ -20,8 +20,6 @@ COPY packages/worship-songs/package.json packages/worship-songs/
 COPY packages/notebook/package.json packages/notebook/
 COPY packages/baby-tracker/package.json packages/baby-tracker/
 COPY packages/child-development/package.json packages/child-development/
-COPY packages/chinese-learning/package.json packages/chinese-learning/
-COPY packages/english-learning/package.json packages/english-learning/
 COPY packages/flashcards/package.json packages/flashcards/
 COPY packages/work-tracker/package.json packages/work-tracker/
 
@@ -71,8 +69,6 @@ COPY --from=builder /app/packages/worship-songs/package.json packages/worship-so
 COPY --from=builder /app/packages/notebook/package.json packages/notebook/
 COPY --from=builder /app/packages/baby-tracker/package.json packages/baby-tracker/
 COPY --from=builder /app/packages/child-development/package.json packages/child-development/
-COPY --from=builder /app/packages/chinese-learning/package.json packages/chinese-learning/
-COPY --from=builder /app/packages/english-learning/package.json packages/english-learning/
 COPY --from=builder /app/packages/flashcards/package.json packages/flashcards/
 COPY --from=builder /app/packages/work-tracker/package.json packages/work-tracker/
 

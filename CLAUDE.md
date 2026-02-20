@@ -44,7 +44,7 @@ Filter stale localStorage IDs or the app crashes (`undefined is not a function`)
 const VALID_IDS = new Set(DEFAULT_LAYOUT.map(w => w.id));
 const filtered = parsed.filter(w => VALID_IDS.has(w.id));
 ```
-Also: delete e2e tests, remove i18n keys from all 3 locales, update docs, respect PWA shortcuts max of 10.
+Also: delete e2e tests, remove i18n keys from all 3 locales, update `deploy/docker/Dockerfile` (remove `COPY` lines for deleted packages in both build and runtime stages), update docs, respect PWA shortcuts max of 10.
 
 ## Docs
 
