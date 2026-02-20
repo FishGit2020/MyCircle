@@ -27,6 +27,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **a11y**: Semantic HTML, `aria-label` where needed, `type="button"` on non-submit buttons, touch targets ≥ 44px
 - **Responsive**: Mobile-first (`md:` = main breakpoint). Content needs `pb-20 md:pb-8` for BottomNav.
 - **Spanish i18n**: File uses Unicode escapes (`\u00f3`). Always read the exact line before editing.
+- **PR merge**: Always run `gh pr checks <PR#> --watch` and confirm **all** checks (ci, e2e, e2e-emulator) pass before merging. Never merge with failing or pending checks.
 
 ## Test Gotchas
 
