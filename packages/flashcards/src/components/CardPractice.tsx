@@ -135,7 +135,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-4 px-4 py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
+      <div className="flex items-center justify-center gap-4 px-4 py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
         <button
           type="button"
           onClick={goPrev}
@@ -171,6 +171,8 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
           {t('flashcards.next')}
         </button>
       </div>
+      {/* PWA safe area bottom spacer for notched devices */}
+      <div className="bg-white dark:bg-gray-800" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} aria-hidden="true" />
     </div>
   );
 }
