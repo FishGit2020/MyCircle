@@ -13,6 +13,7 @@ vi.mock('@mycircle/shared', () => ({
     FLASHCARD_BIBLE_CARDS: 'flashcard-bible-cards',
     FLASHCARD_CUSTOM_CARDS: 'flashcard-custom-cards',
     FLASHCARD_PROGRESS: 'flashcard-progress',
+    FLASHCARD_TYPE_FILTER: 'flashcard-type-filter',
   },
   WindowEvents: {
     FLASHCARD_PROGRESS_CHANGED: 'flashcard-progress-changed',
@@ -74,9 +75,13 @@ describe('FlashCards', () => {
     expect(screen.getByText(/flashcards\.cardsCount/)).toBeInTheDocument();
   });
 
-  it('shows type filter chips', () => {
+  it('shows type filter chips as toggles', () => {
     render(<FlashCards />);
-    expect(screen.getByText(/flashcards\.allCategories/)).toBeInTheDocument();
+    // Should show English type chip (no "All" button anymore)
+    expect(screen.getByText(/flashcards\.english/)).toBeInTheDocument();
+    // All chips should default to pressed (enabled)
+    const englishChip = screen.getByText(/flashcards\.english/);
+    expect(englishChip).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('shows practice all button', () => {
@@ -164,7 +169,7 @@ describe('FlashCards', () => {
       expect(within(englishCard).queryByLabelText('flashcards.delete')).not.toBeInTheDocument();
     });
 
-    it('shows edit button on custom cards but not on bible cards', async () => {
+    it('shows edit button on custom and bible cards but not on english cards', async () => {
       seedCustomCard();
       seedBibleCard();
       render(<FlashCards />);
@@ -174,9 +179,13 @@ describe('FlashCards', () => {
       const customCard = screen.getByText('Test Front').closest('button')!;
       expect(within(customCard).getByLabelText('flashcards.edit')).toBeInTheDocument();
 
-      // Bible card should NOT have edit button (but may have delete)
+      // Bible card should also have edit button now
       const bibleCard = screen.getByText(/I t b G c/).closest('button')!;
-      expect(within(bibleCard).queryByLabelText('flashcards.edit')).not.toBeInTheDocument();
+      expect(within(bibleCard).getByLabelText('flashcards.edit')).toBeInTheDocument();
+
+      // English card should NOT have edit button
+      const englishCard = screen.getByText('Hi!').closest('button')!;
+      expect(within(englishCard).queryByLabelText('flashcards.edit')).not.toBeInTheDocument();
     });
 
     it('shows delete confirmation modal and deletes card', async () => {
@@ -227,5 +236,56 @@ describe('FlashCards', () => {
       expect(screen.getByDisplayValue('Test Front')).toBeInTheDocument();
       expect(screen.getByDisplayValue('Test Back')).toBeInTheDocument();
     });
+
+    it('can edit a bible card via the edit modal', async () => {
+      seedBibleCard();
+      const user = userEvent.setup();
+      render(<FlashCards />);
+      await screen.findByText('flashcards.addCustomCard');
+
+      // Click edit on bible card
+      const bibleCard = screen.getByText(/I t b G c/).closest('button')!;
+      const editBtn = within(bibleCard).getByLabelText('flashcards.edit');
+      await user.click(editBtn);
+
+      // Edit modal should show with pre-filled values
+      expect(screen.getByText('flashcards.editCard')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('I t b G c t h a t e.')).toBeInTheDocument();
+    });
+  });
+
+  it('toggles type filter chips to hide/show card types', async () => {
+    const user = userEvent.setup();
+    render(<FlashCards />);
+
+    // English chip should be active by default
+    const englishChip = screen.getByText(/flashcards\.english/);
+    expect(englishChip).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Hi!')).toBeInTheDocument();
+
+    // Toggle off English
+    await user.click(englishChip);
+    expect(englishChip).toHaveAttribute('aria-pressed', 'false');
+    // English cards should be hidden
+    expect(screen.queryByText('Hi!')).not.toBeInTheDocument();
+
+    // Toggle back on
+    await user.click(englishChip);
+    expect(englishChip).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Hi!')).toBeInTheDocument();
+  });
+
+  it('persists type filter to localStorage', async () => {
+    const user = userEvent.setup();
+    render(<FlashCards />);
+
+    const englishChip = screen.getByText(/flashcards\.english/);
+    await user.click(englishChip);
+
+    // Should have saved disabled types to localStorage
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      'flashcard-type-filter',
+      expect.stringContaining('english')
+    );
   });
 });
