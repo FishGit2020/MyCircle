@@ -726,6 +726,7 @@ interface Announcement {
 ```typescript
 interface AlertSubscription {
   token: string;              // FCM device token
+  uid?: string;               // Firebase Auth user ID (enables cross-device unsubscribe)
   cities: Array<{
     lat: number;
     lon: number;
@@ -736,8 +737,8 @@ interface AlertSubscription {
 }
 ```
 
-- **Subscribe:** `subscribeToAlerts` callable function — upserts by FCM token
-- **Unsubscribe:** Call with empty `cities` array — deletes the document
+- **Subscribe:** `subscribeToAlerts` callable function — upserts by FCM token, stores `uid` from auth context
+- **Unsubscribe:** Call with empty `cities` array — deletes **all** docs for the authenticated user (cross-device), plus any legacy docs for the current token
 - **Scheduled check:** `checkWeatherAlerts` runs every 30 minutes, fetches weather for all subscribed cities, sends FCM notifications for severe conditions (thunderstorm, heavy rain/snow, tornado, squall — 19 OpenWeather condition IDs)
 - **Stale token cleanup:** Invalid/expired FCM tokens are batch-deleted after failed send attempts
 
