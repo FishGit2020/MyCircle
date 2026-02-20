@@ -90,7 +90,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <button
@@ -135,7 +135,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-4 px-4 py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-center gap-4 px-4 py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
         <button
           type="button"
           onClick={goPrev}
