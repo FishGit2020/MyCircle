@@ -13,11 +13,11 @@ interface CardGridProps {
 }
 
 function canDelete(card: FlashCard): boolean {
-  return card.type === 'custom' || card.type === 'bible-first-letter' || card.type === 'bible-full';
+  return card.type !== 'english';
 }
 
 function canEdit(card: FlashCard): boolean {
-  return card.type === 'custom' || card.type === 'bible-first-letter' || card.type === 'bible-full';
+  return card.type !== 'english';
 }
 
 export default function CardGrid({ cards, masteredIds, onCardClick, onDeleteCard, onEditCard, isAuthenticated }: CardGridProps) {
