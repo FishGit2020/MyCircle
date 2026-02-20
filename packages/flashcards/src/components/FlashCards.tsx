@@ -93,9 +93,29 @@ export default function FlashCards() {
   };
 
   const handleDeleteConfirm = () => {
-    if (cardToDelete) {
+    if (!cardToDelete) return;
+    if (cardToDelete.type === 'chinese') {
+      const rawId = cardToDelete.id.replace(/^zh-/, '');
+      deleteChineseChar(rawId);
+    } else {
       deleteCard(cardToDelete.id);
-      setCardToDelete(null);
+    }
+    setCardToDelete(null);
+  };
+
+  const handleEditRequest = (card: FlashCard) => {
+    if (card.type === 'chinese') {
+      const rawId = card.id.replace(/^zh-/, '');
+      setEditingChar({
+        id: rawId,
+        character: card.front,
+        pinyin: card.meta?.pinyin || '',
+        meaning: card.back,
+        category: (card.category || 'phrases') as CharacterCategory,
+      });
+      setShowCharEditor(true);
+    } else {
+      setCardToEdit(card);
     }
   };
 
@@ -213,7 +233,7 @@ export default function FlashCards() {
         masteredIds={progress.masteredIds}
         onCardClick={handleCardClick}
         onDeleteCard={setCardToDelete}
-        onEditCard={setCardToEdit}
+        onEditCard={handleEditRequest}
         isAuthenticated={isAuthenticated}
       />
 
