@@ -3,10 +3,12 @@ import { render, screen } from '@testing-library/react';
 import Breadcrumbs from './Breadcrumbs';
 
 const mockLocation = { pathname: '/', search: '', hash: '', state: null, key: 'default' };
+let mockSearchParams = new URLSearchParams();
 
 vi.mock('react-router', () => ({
   Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>,
   useLocation: () => mockLocation,
+  useSearchParams: () => [mockSearchParams],
 }));
 
 vi.mock('@mycircle/shared', () => ({
@@ -24,6 +26,11 @@ vi.mock('@mycircle/shared', () => ({
         'nav.baby': 'Baby',
         'nav.compare': 'Compare',
         'nav.breadcrumbLabel': 'Breadcrumb',
+        'nav.detail': 'Details',
+        'worship.newSong': 'New Song',
+        'worship.editSong': 'Edit Song',
+        'notebook.newNote': 'New Note',
+        'notebook.editNote': 'Edit Note',
       };
       return map[key] ?? key;
     },
@@ -31,6 +38,10 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 describe('Breadcrumbs', () => {
+  beforeEach(() => {
+    mockSearchParams = new URLSearchParams();
+  });
+
   it('renders nothing on the home page', () => {
     mockLocation.pathname = '/';
     const { container } = render(<Breadcrumbs />);
@@ -64,16 +75,75 @@ describe('Breadcrumbs', () => {
     expect(screen.getByLabelText('Breadcrumb')).toBeInTheDocument();
   });
 
-  it('handles nested weather routes (e.g. /weather/12.34,56.78)', () => {
-    mockLocation.pathname = '/weather/12.34,56.78';
-    render(<Breadcrumbs />);
-    expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Weather')).toBeInTheDocument();
-  });
-
   it('renders nothing for unknown routes', () => {
     mockLocation.pathname = '/unknown-route';
     const { container } = render(<Breadcrumbs />);
     expect(container.innerHTML).toBe('');
+  });
+
+  // Drilldown (3-level) breadcrumb tests
+
+  it('shows stock symbol as detail label on /stocks/AAPL', () => {
+    mockLocation.pathname = '/stocks/AAPL';
+    render(<Breadcrumbs />);
+    expect(screen.getByText('Home').closest('a')).toHaveAttribute('href', '/');
+    const stocksLink = screen.getByText('Stocks');
+    expect(stocksLink.closest('a')).toHaveAttribute('href', '/stocks');
+    const detail = screen.getByText('AAPL');
+    expect(detail).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows city name from query param on /weather/:coords?name=New+York', () => {
+    mockLocation.pathname = '/weather/40.7,-74.0';
+    mockSearchParams = new URLSearchParams('name=New+York');
+    render(<Breadcrumbs />);
+    const weatherLink = screen.getByText('Weather');
+    expect(weatherLink.closest('a')).toHaveAttribute('href', '/weather');
+    const detail = screen.getByText('New York');
+    expect(detail).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('falls back to Details for weather without name param', () => {
+    mockLocation.pathname = '/weather/12.34,56.78';
+    render(<Breadcrumbs />);
+    const weatherLink = screen.getByText('Weather');
+    expect(weatherLink.closest('a')).toHaveAttribute('href', '/weather');
+    expect(screen.getByText('Details')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows New Song on /worship/new', () => {
+    mockLocation.pathname = '/worship/new';
+    render(<Breadcrumbs />);
+    const worshipLink = screen.getByText('Worship');
+    expect(worshipLink.closest('a')).toHaveAttribute('href', '/worship');
+    expect(screen.getByText('New Song')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows Edit Song on /worship/:songId/edit', () => {
+    mockLocation.pathname = '/worship/abc123/edit';
+    render(<Breadcrumbs />);
+    expect(screen.getByText('Worship').closest('a')).toHaveAttribute('href', '/worship');
+    expect(screen.getByText('Edit Song')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows Details on /worship/:songId (view)', () => {
+    mockLocation.pathname = '/worship/xyz';
+    render(<Breadcrumbs />);
+    expect(screen.getByText('Worship').closest('a')).toHaveAttribute('href', '/worship');
+    expect(screen.getByText('Details')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows Edit Note on /notebook/:noteId', () => {
+    mockLocation.pathname = '/notebook/abc123';
+    render(<Breadcrumbs />);
+    expect(screen.getByText('Notebook').closest('a')).toHaveAttribute('href', '/notebook');
+    expect(screen.getByText('Edit Note')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows New Note on /notebook/new', () => {
+    mockLocation.pathname = '/notebook/new';
+    render(<Breadcrumbs />);
+    expect(screen.getByText('Notebook').closest('a')).toHaveAttribute('href', '/notebook');
+    expect(screen.getByText('New Note')).toHaveAttribute('aria-current', 'page');
   });
 });
