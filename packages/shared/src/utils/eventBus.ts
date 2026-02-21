@@ -34,6 +34,7 @@ export const WindowEvents = {
   CHINESE_CHARACTERS_CHANGED: 'chinese-characters-changed',
   FLASHCARD_PROGRESS_CHANGED: 'flashcard-progress-changed',
   WORK_TRACKER_CHANGED: 'work-tracker-changed',
+  WORSHIP_FAVORITES_CHANGED: 'worship-favorites-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals

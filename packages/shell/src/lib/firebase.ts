@@ -112,6 +112,7 @@ export interface UserProfile {
   weatherAlertsEnabled?: boolean;
   announcementAlertsEnabled?: boolean;
   bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
+  worshipFavorites?: string[];
   childName?: string;
   childBirthDate?: string;
   createdAt: Date;
@@ -421,6 +422,15 @@ export async function updateBibleBookmarks(uid: string, bookmarks: Array<{ book:
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     bibleBookmarks: bookmarks,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateWorshipFavorites(uid: string, favorites: string[]) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    worshipFavorites: favorites,
     updatedAt: serverTimestamp(),
   });
 }
