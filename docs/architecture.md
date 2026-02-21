@@ -298,7 +298,7 @@ Exposes `WorshipSongs` component via Module Federation.
 - **YouTube link integration**: Optional `youtubeUrl` field on `WorshipSong` type. `SongEditor` renders a URL input; `SongViewer` renders a styled red "Watch on YouTube" `<a>` tag (opens `target="_blank"`, `rel="noopener noreferrer"`) when URL is present, hidden otherwise.
 - **Built-in metronome**: `Metronome` component uses Web Audio API (`AudioContext` + `OscillatorNode`) for precise click timing. Optional `bpm` field on `WorshipSong` (30-240 range). Features: start/stop toggle, +/- BPM buttons, direct BPM number input, tap tempo (4-tap rolling average with 2s timeout), visual beat indicator (green flash). Always rendered in `SongViewer` below controls bar.
 - **Capo calculator**: `CapoCalculator` component in `SongViewer` (ChordPro only). Collapsible panel showing fret positions 1-9 with resulting chord shape keys. Easy guitar keys (C, G, D, A, E) highlighted with green styling. Selecting a capo position adjusts displayed chords to the shape key (transposes content by `semitones - capoFret`). Formula: `shapeKey = transposeChord(soundingKey, -capoFret)`. Shows instruction panel when active and suggested easy-key positions when inactive.
-- Favorites system with `StorageKeys.WORSHIP_FAVORITES`
+- Favorites system with `StorageKeys.WORSHIP_FAVORITES` (Firestore sync when signed in)
 - **Real-time sync** via Firestore `onSnapshot` — changes by any user push instantly to all connected clients; `useWorshipSongs` hook prefers `subscribe()` over one-shot `getAll()`, with localStorage cache as initial data
 - Tag-based filtering and full-text search
 

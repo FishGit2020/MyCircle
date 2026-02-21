@@ -24,6 +24,7 @@ import {
   updateUserBottomNavOrder,
   updateUserNotificationAlerts,
   updateBibleBookmarks,
+  updateWorshipFavorites,
   updateChildData,
   identifyUser,
   clearUserIdentity,
@@ -143,6 +144,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userProfile.bibleBookmarks && userProfile.bibleBookmarks.length > 0) {
             localStorage.setItem(StorageKeys.BIBLE_BOOKMARKS, JSON.stringify(userProfile.bibleBookmarks));
             window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
+          }
+
+          // Restore worship favorites
+          if (userProfile.worshipFavorites && userProfile.worshipFavorites.length > 0) {
+            localStorage.setItem(StorageKeys.WORSHIP_FAVORITES, JSON.stringify(userProfile.worshipFavorites));
+            window.dispatchEvent(new Event(WindowEvents.WORSHIP_FAVORITES_CHANGED));
           }
 
           // Restore Child Development data
@@ -391,6 +398,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     window.addEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, handleBibleBookmarksChanged);
     return () => window.removeEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, handleBibleBookmarksChanged);
+  }, [user]);
+
+  // Auto-sync worship favorites from localStorage to Firestore
+  useEffect(() => {
+    function handleWorshipFavoritesChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.WORSHIP_FAVORITES);
+          const favorites = stored ? JSON.parse(stored) : [];
+          updateWorshipFavorites(user.uid, favorites);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, handleWorshipFavoritesChanged);
+    return () => window.removeEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, handleWorshipFavoritesChanged);
   }, [user]);
 
   // Auto-sync child development data from localStorage to Firestore

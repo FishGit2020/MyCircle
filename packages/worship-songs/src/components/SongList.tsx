@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 
 // --- Favorites helpers ---
@@ -12,7 +12,10 @@ function loadFavorites(): Set<string> {
 }
 
 function saveFavorites(favs: Set<string>) {
-  try { localStorage.setItem(StorageKeys.WORSHIP_FAVORITES, JSON.stringify([...favs])); } catch { /* */ }
+  try {
+    localStorage.setItem(StorageKeys.WORSHIP_FAVORITES, JSON.stringify([...favs]));
+    window.dispatchEvent(new Event(WindowEvents.WORSHIP_FAVORITES_CHANGED));
+  } catch { /* */ }
 }
 
 type SortMode = 'alpha' | 'recent';

@@ -32,10 +32,15 @@ function loadNavOrder(): string[] {
     const stored = localStorage.getItem(StorageKeys.BOTTOM_NAV_ORDER);
     if (stored) {
       const order = JSON.parse(stored) as string[];
-      // Validate: must contain all paths
-      const allPaths = new Set(DEFAULT_ORDER);
-      if (order.length === allPaths.size && order.every(p => allPaths.has(p))) {
-        return order;
+      const validPaths = new Set(DEFAULT_ORDER);
+      // Keep stored paths that still exist, preserving user's order
+      const merged = order.filter(p => validPaths.has(p));
+      // Append any new paths not in the stored order
+      for (const p of DEFAULT_ORDER) {
+        if (!merged.includes(p)) merged.push(p);
+      }
+      if (merged.length === DEFAULT_ORDER.length) {
+        return merged;
       }
     }
   } catch { /* ignore */ }
