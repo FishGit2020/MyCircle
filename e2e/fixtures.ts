@@ -434,6 +434,24 @@ export async function mockGraphQL(page: Page) {
       });
     }
 
+    // ─── AI Chat GraphQL mutation ──────────────────────────────
+
+    if (operationName === 'AiChat') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: {
+            aiChat: {
+              response: mockAiChatResponse.response,
+              toolCalls: mockAiChatResponse.toolCalls,
+              actions: null,
+            },
+          },
+        }),
+      });
+    }
+
     // Default: return empty data instead of forwarding to a potentially
     // dead server (in CI static mode, port 3003 is not running).
     return route.fulfill({
