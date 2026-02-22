@@ -86,7 +86,7 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
       )
     : httpWithAuth;
 
-  return new ApolloClient({
+  const client = new ApolloClient({
     link: splitLink,
     cache: new InMemoryCache({
       typePolicies: {
@@ -116,6 +116,13 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
       }
     }
   });
+
+  // Expose client for Apollo DevTools browser extension
+  if (isBrowser) {
+    (window as any).__APOLLO_CLIENT__ = client;
+  }
+
+  return client;
 }
 
 // Default singleton client
