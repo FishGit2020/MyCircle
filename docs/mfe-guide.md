@@ -360,6 +360,7 @@ When adding a new micro-frontend, update **all** of the following. Items marked 
 - [ ] ~~Add to `firebase.json` rewrites~~ — **Not needed.** The single catch-all rewrite (`** → /index.html`) routes all navigation to the shell, which handles client-side routing via React Router. Per-MFE rewrites were removed because they served each MFE's standalone `index.html` instead of the shell's, causing `Unexpected token '<'` errors on direct URL access (asset paths resolved against the wrong root).
 - [ ] Add to `scripts/assemble-firebase.mjs` build list
 - [ ] **Dockerfile** `*`: Add `COPY packages/<name>/package.json packages/<name>/` in **both** the build stage and the runtime stage (`COPY --from=builder ...`) in `deploy/docker/Dockerfile`. Missing this causes the Docker Build & Push CI job to fail.
+- [ ] **AI tool registry** (if applicable): Register MFE-specific tools in `scripts/mcp-tools/mfe-tools.ts` and add execution handlers in `server/graphql/resolvers.ts`. See [docs/mcp.md](./mcp.md) for details.
 
 ---
 

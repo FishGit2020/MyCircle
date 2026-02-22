@@ -383,6 +383,23 @@ export const GET_BIBLE_VERSIONS = gql`
   }
 `;
 
+export const AI_CHAT = gql`
+  mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON) {
+    aiChat(message: $message, history: $history, context: $context) {
+      response
+      toolCalls {
+        name
+        args
+        result
+      }
+      actions {
+        type
+        payload
+      }
+    }
+  }
+`;
+
 export const WEATHER_UPDATES = gql`
   ${WEATHER_CONDITION_FRAGMENT}
   subscription WeatherUpdates($lat: Float!, $lon: Float!) {

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { getRecaptchaToken } from '@mycircle/shared';
+import { useMutation, AI_CHAT } from '@mycircle/shared';
 
 export interface ChatMessage {
   id: string;
@@ -13,6 +13,11 @@ export interface ToolCall {
   name: string;
   args: Record<string, unknown>;
   result?: string;
+}
+
+export interface AiAction {
+  type: string;
+  payload: Record<string, unknown>;
 }
 
 interface AiChatState {
@@ -101,6 +106,26 @@ function saveMessages(messages: ChatMessage[]) {
   } catch { /* ignore */ }
 }
 
+/** Handle frontend actions returned by the AI. */
+function handleActions(actions: AiAction[]) {
+  for (const action of actions) {
+    switch (action.type) {
+      case 'navigateTo':
+        window.dispatchEvent(new CustomEvent('navigate', { detail: action.payload }));
+        break;
+      case 'addFlashcard':
+        (window as any).__flashcards?.add(action.payload);
+        break;
+      case 'addBookmark':
+        window.dispatchEvent(new CustomEvent('bible-bookmark', { detail: action.payload }));
+        break;
+      case 'listFlashcards':
+        window.dispatchEvent(new CustomEvent('flashcards-list', { detail: action.payload }));
+        break;
+    }
+  }
+}
+
 export function useAiChat() {
   const [state, setState] = useState<AiChatState>(() => ({
     messages: loadMessages(),
@@ -109,6 +134,8 @@ export function useAiChat() {
     lastUserContent: null,
   }));
   const abortRef = useRef<AbortController | null>(null);
+
+  const [aiChatMutation] = useMutation(AI_CHAT);
 
   const sendMessage = useCallback(async (content: string) => {
     const userMessage: ChatMessage = {
@@ -144,31 +171,36 @@ export function useAiChat() {
 
       const userContext = gatherUserContext();
 
-      const idToken = await (window as any).__getFirebaseIdToken?.();
-      const recaptchaToken = await getRecaptchaToken('ai_chat');
-      const response = await fetch('/ai/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {}),
-          ...(recaptchaToken ? { 'x-recaptcha-token': recaptchaToken } : {}),
+      const { data, errors } = await aiChatMutation({
+        variables: {
+          message: content,
+          history,
+          context: userContext,
         },
-        body: JSON.stringify({ message: content, history, context: userContext }),
-        signal: abortRef.current.signal,
+        context: {
+          fetchOptions: { signal: abortRef.current.signal },
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Request failed (${response.status})`);
+      if (errors && errors.length > 0) {
+        throw new Error(errors[0].message);
       }
 
-      const data = await response.json();
+      const result = data?.aiChat;
+      if (!result) {
+        throw new Error('No response from AI');
+      }
+
+      // Handle frontend actions
+      if (result.actions && result.actions.length > 0) {
+        handleActions(result.actions);
+      }
 
       const assistantMessage: ChatMessage = {
         id: generateId(),
         role: 'assistant',
-        content: data.response,
-        toolCalls: data.toolCalls,
+        content: result.response,
+        toolCalls: result.toolCalls || undefined,
         timestamp: Date.now(),
       };
 
@@ -187,7 +219,7 @@ export function useAiChat() {
       const message = err instanceof Error ? err.message : 'Failed to get response';
       setState(prev => ({ ...prev, loading: false, error: message }));
     }
-  }, [state.messages]);
+  }, [state.messages, aiChatMutation]);
 
   const clearChat = useCallback(() => {
     setState({ messages: [], loading: false, error: null, lastUserContent: null });

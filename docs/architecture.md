@@ -1283,7 +1283,7 @@ As an alternative to Firebase Hosting, MyCircle can be self-hosted on a Synology
 ```
 Internet → [Router :443] → Caddy (auto-HTTPS) → mycircle-app (Node.js :3000)
                                                    ├─ /graphql      → Apollo Server (GraphQL + WS subscriptions)
-                                                   ├─ /ai/chat      → Gemini AI proxy
+                                                   │                  (includes Mutation.aiChat for AI)
                                                    ├─ /stock/**     → Finnhub proxy (cached, rate-limited)
                                                    ├─ /podcast/**   → PodcastIndex proxy (cached, rate-limited)
                                                    ├─ /health       → Health check
@@ -1312,3 +1312,41 @@ The `docker-deploy.yml` workflow triggers on push to `main` (same path filters a
 ### Deployment Guide
 
 See [`deploy/docker/README.md`](../deploy/docker/README.md) for the complete step-by-step Synology deployment guide, including Watchtower auto-updates and Cloudflare Tunnel alternative.
+
+## MCP Server & AI Tool Registry
+
+MyCircle includes a custom MCP (Model Context Protocol) server for Claude Code integration.
+
+### Components
+
+| File | Purpose |
+|------|---------|
+| `.mcp.json` | Claude Code MCP server config |
+| `scripts/mcp-server.ts` | MCP stdio server entry point |
+| `scripts/mcp-tools/validators.ts` | Project health validators (i18n, Dockerfile, PWA, widgets) |
+| `scripts/mcp-tools/mfe-tools.ts` | Shared AI tool definitions (Zod schemas) |
+| `scripts/mcp-tools/gemini-bridge.ts` | Zod → Gemini FunctionDeclaration converter |
+
+### Data Flow
+
+```
+Claude Code ──stdio──> mcp-server.ts ──> validators (read-only file checks)
+                                     └──> tool registry (schema reference)
+
+AI Chat ──GraphQL──> Mutation.aiChat ──> resolvers.ts
+                                             │
+                                             ├── shared tool defs (mfe-tools.ts + gemini-bridge.ts)
+                                             ├── Gemini function calling → executeAiTool()
+                                             └── returns { response, toolCalls, actions[] }
+                                                                             │
+Frontend (useAiChat) ←──────────────────────────────────────────────────────┘
+     ├── navigateTo → window event → shell router
+     ├── addFlashcard → window.__flashcards.add()
+     └── addBookmark → window event → bible-reader
+```
+
+### AI Chat Migration
+
+AI chat was migrated from REST (`POST /ai/chat`) to GraphQL (`Mutation.aiChat`). The frontend uses Apollo's `useMutation` hook. Tool declarations are defined once in `mfe-tools.ts` using Zod schemas and converted to Gemini format via `gemini-bridge.ts`, eliminating duplicated declarations.
+
+See [docs/mcp.md](./mcp.md) for the full MCP server guide.

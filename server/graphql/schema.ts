@@ -248,12 +248,43 @@ export const typeDefs = `#graphql
     biblePassage(reference: String!, translation: String): BiblePassage!
   }
 
+  # ─── AI Chat Types ─────────────────────────────────────────────
+
+  scalar JSON
+
+  type ToolCallResult {
+    name: String!
+    args: JSON
+    result: String
+  }
+
+  type AiAction {
+    type: String!
+    payload: JSON
+  }
+
+  type AiChatResponse {
+    response: String!
+    toolCalls: [ToolCallResult!]
+    actions: [AiAction!]
+  }
+
+  input AiChatHistoryInput {
+    role: String!
+    content: String!
+  }
+
+  type Mutation {
+    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON): AiChatResponse!
+  }
+
   type Subscription {
     weatherUpdates(lat: Float!, lon: Float!): WeatherUpdate!
   }
 
   schema {
     query: Query
+    mutation: Mutation
     subscription: Subscription
   }
 `;

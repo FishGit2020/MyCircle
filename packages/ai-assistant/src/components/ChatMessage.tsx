@@ -6,9 +6,10 @@ import type { ChatMessage as ChatMessageType } from '../hooks/useAiChat';
 
 interface ChatMessageProps {
   message: ChatMessageType;
+  debugMode?: boolean;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps) {
+export default function ChatMessage({ message, debugMode }: ChatMessageProps) {
   const { t } = useTranslation();
   const isUser = message.role === 'user';
   const [copied, setCopied] = useState(false);
@@ -64,7 +65,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           )}
         </div>
         {message.toolCalls && message.toolCalls.length > 0 && (
-          <ToolCallDisplay toolCalls={message.toolCalls} />
+          <ToolCallDisplay toolCalls={message.toolCalls} debugMode={debugMode} />
         )}
       </div>
     </div>
