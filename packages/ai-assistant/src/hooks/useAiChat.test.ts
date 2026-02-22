@@ -1,28 +1,37 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import React from 'react';
 
-// Mock getRecaptchaToken before importing the hook
+// Track the mutate function so tests can inspect calls
+const mockMutate = vi.fn();
+
 vi.mock('@mycircle/shared', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@mycircle/shared')>();
   return {
     ...actual,
     getRecaptchaToken: vi.fn().mockResolvedValue(''),
+    // Mock useMutation to return our mock function
+    useMutation: vi.fn(() => [mockMutate]),
+    // AI_CHAT is just a gql document — provide a stub
+    AI_CHAT: {},
+    createLogger: vi.fn(() => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() })),
   };
 });
 
 import { useAiChat } from './useAiChat';
 
-// Mock fetch
-const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
-
 describe('useAiChat', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ response: 'Hello!', toolCalls: [] }),
+    mockMutate.mockResolvedValue({
+      data: {
+        aiChat: {
+          response: 'Hello!',
+          toolCalls: [],
+          actions: null,
+        },
+      },
     });
   });
 
@@ -37,7 +46,7 @@ describe('useAiChat', () => {
     expect(result.current.error).toBeNull();
   });
 
-  it('sends context data with the request', async () => {
+  it('sends context data with the mutation', async () => {
     // Set up localStorage with user context
     localStorage.setItem('stock-watchlist', JSON.stringify([
       { symbol: 'AAPL', companyName: 'Apple' },
@@ -55,17 +64,16 @@ describe('useAiChat', () => {
       await result.current.sendMessage('Hello');
     });
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
-    const [, options] = mockFetch.mock.calls[0];
-    const body = JSON.parse(options.body);
+    expect(mockMutate).toHaveBeenCalledTimes(1);
+    const variables = mockMutate.mock.calls[0][0].variables;
 
     // Should include context object
-    expect(body.context).toBeDefined();
-    expect(body.context.stockWatchlist).toEqual(['AAPL', 'GOOGL']);
-    expect(body.context.favoriteCities).toEqual(['Tokyo']);
-    expect(body.context.locale).toBe('en');
-    expect(body.context.tempUnit).toBe('C');
-    expect(body.context.currentPage).toBeDefined();
+    expect(variables.context).toBeDefined();
+    expect(variables.context.stockWatchlist).toEqual(['AAPL', 'GOOGL']);
+    expect(variables.context.favoriteCities).toEqual(['Tokyo']);
+    expect(variables.context.locale).toBe('en');
+    expect(variables.context.tempUnit).toBe('C');
+    expect(variables.context.currentPage).toBeDefined();
   });
 
   it('handles empty localStorage gracefully', async () => {
@@ -75,28 +83,26 @@ describe('useAiChat', () => {
       await result.current.sendMessage('Hello');
     });
 
-    const [, options] = mockFetch.mock.calls[0];
-    const body = JSON.parse(options.body);
+    const variables = mockMutate.mock.calls[0][0].variables;
 
     // Context should exist but be sparse
-    expect(body.context).toBeDefined();
-    expect(body.context.stockWatchlist).toBeUndefined();
-    expect(body.context.favoriteCities).toBeUndefined();
+    expect(variables.context).toBeDefined();
+    expect(variables.context.stockWatchlist).toBeUndefined();
+    expect(variables.context.favoriteCities).toBeUndefined();
   });
 
-  it('includes message and history in request', async () => {
+  it('includes message and history in mutation variables', async () => {
     const { result } = renderHook(() => useAiChat());
 
     await act(async () => {
       await result.current.sendMessage('What is the weather?');
     });
 
-    const [, options] = mockFetch.mock.calls[0];
-    const body = JSON.parse(options.body);
+    const variables = mockMutate.mock.calls[0][0].variables;
 
-    expect(body.message).toBe('What is the weather?');
-    expect(body.history).toBeDefined();
-    expect(Array.isArray(body.history)).toBe(true);
+    expect(variables.message).toBe('What is the weather?');
+    expect(variables.history).toBeDefined();
+    expect(Array.isArray(variables.history)).toBe(true);
   });
 
   it('clears chat', () => {
@@ -107,5 +113,30 @@ describe('useAiChat', () => {
     });
 
     expect(result.current.messages).toEqual([]);
+  });
+
+  it('handles actions from the response', async () => {
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    mockMutate.mockResolvedValue({
+      data: {
+        aiChat: {
+          response: 'Navigating to stocks...',
+          toolCalls: [{ name: 'navigateTo', args: { page: 'stocks' }, result: '{"navigateTo":"stocks"}' }],
+          actions: [{ type: 'navigateTo', payload: { page: 'stocks' } }],
+        },
+      },
+    });
+
+    const { result } = renderHook(() => useAiChat());
+
+    await act(async () => {
+      await result.current.sendMessage('Go to stocks');
+    });
+
+    // Should dispatch a navigate event
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'navigate' })
+    );
+    dispatchSpy.mockRestore();
   });
 });

@@ -45,11 +45,25 @@ Filter stale localStorage IDs or the app crashes (`undefined is not a function`)
 const VALID_IDS = new Set(DEFAULT_LAYOUT.map(w => w.id));
 const filtered = parsed.filter(w => VALID_IDS.has(w.id));
 ```
-Also: delete e2e tests, remove i18n keys from all 3 locales, update `deploy/docker/Dockerfile` (remove `COPY` lines for deleted packages in both build and runtime stages), update docs, respect PWA shortcuts max of 10.
+Also: delete e2e tests, remove i18n keys from all 3 locales, update `deploy/docker/Dockerfile` (remove `COPY` lines for deleted packages in both build and runtime stages), update `packages/shell/tailwind.config.js` `content` array (add/remove MFE src paths — missing this silently breaks arbitrary-value Tailwind classes like `z-[55]`), update docs, respect PWA shortcuts max of 10.
+
+## MCP Validators
+
+MyCircle has a custom MCP server (`.mcp.json`) with project health validators. After restarting Claude Code, these tools are available:
+
+- `validate_i18n` — Check all 3 locale files have the same keys
+- `validate_dockerfile` — Check Dockerfile references all packages
+- `validate_pwa_shortcuts` — Count PWA shortcuts (max 10)
+- `validate_widget_registry` — Check WidgetType/DEFAULT_LAYOUT/WIDGET_COMPONENTS sync
+- `validate_all` — Run all validators at once
+- `list_ai_tools` — List all AI assistant tool definitions
+
+Run `validate_all` after adding/removing features or packages.
 
 ## Docs
 
 - [Architecture](./docs/architecture.md) — MFE structure, data flow
 - [MFE Guide](./docs/mfe-guide.md) — adding new MFEs (20+ integration points), pitfalls
+- [MCP Server](./docs/mcp.md) — MCP validators, AI tool registry, adding tools
 - [PR Lifecycle](./docs/pr-lifecycle.md) — branch protection, merge workflow
 - [CI/CD Pipeline](./docs/cicd.md) — pipeline details, troubleshooting

@@ -1,10 +1,13 @@
 import axios from 'axios';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
+import { GraphQLScalarType, Kind } from 'graphql';
 import { getCurrentWeather, getForecast, getHourlyForecast } from '../api/weather.js';
 import { searchCities, reverseGeocode } from '../api/geocoding.js';
 import { getCacheKey, getCachedData, setCachedData } from '../middleware/cache.js';
 import { pubsub, WEATHER_UPDATE } from './pubsub.js';
+import { ALL_TOOLS } from '../../scripts/mcp-tools/mfe-tools.js';
+import { toGeminiFunctionDeclarations } from '../../scripts/mcp-tools/gemini-bridge.js';
 
 // Caches for stock, crypto, podcast, weather, and bible data
 const stockCache = new NodeCache({ stdTTL: 30, checkperiod: 10 });
@@ -12,11 +15,38 @@ const cryptoCache = new NodeCache({ stdTTL: 60, checkperiod: 20 });
 const podcastCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 const weatherExtraCache = new NodeCache({ stdTTL: 600, checkperiod: 60 });
 const bibleCache = new NodeCache({ stdTTL: 3600, checkperiod: 300 });
+const aiChatCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.com';
 const OPENWEATHER_BASE = process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org';
+const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
 const OPEN_METEO_BASE = process.env.OPEN_METEO_BASE_URL || 'https://archive-api.open-meteo.com';
 const YOUVERSION_API_BASE = process.env.YOUVERSION_API_BASE_URL || 'https://api.youversion.com/v1';
+
+// ─── JSON Scalar ──────────────────────────────────────────────
+
+const JSONScalar = new GraphQLScalarType({
+  name: 'JSON',
+  description: 'Arbitrary JSON value',
+  serialize: (value: unknown) => value,
+  parseValue: (value: unknown) => value,
+  parseLiteral: (ast) => {
+    if (ast.kind === Kind.STRING) return ast.value;
+    if (ast.kind === Kind.INT) return parseInt(ast.value, 10);
+    if (ast.kind === Kind.FLOAT) return parseFloat(ast.value);
+    if (ast.kind === Kind.BOOLEAN) return ast.value;
+    if (ast.kind === Kind.NULL) return null;
+    if (ast.kind === Kind.LIST) return ast.values.map((v: any) => JSONScalar.parseLiteral(v));
+    if (ast.kind === Kind.OBJECT) {
+      const obj: Record<string, any> = {};
+      for (const field of ast.fields) {
+        obj[field.name.value] = JSONScalar.parseLiteral(field.value);
+      }
+      return obj;
+    }
+    return null;
+  },
+});
 
 // ─── Stock API helpers (Finnhub) ─────────────────────────────
 
@@ -472,7 +502,169 @@ async function getPodcastEpisodesAPI(feedId: number) {
 // Store active subscriptions
 const activeSubscriptions = new Map<string, NodeJS.Timer>();
 
+// ─── AI Chat tool execution helpers ─────────────────────────
+
+async function executeAiGetWeather(city: string): Promise<string> {
+  const apiKey = process.env.OPENWEATHER_API_KEY;
+  if (!apiKey) return JSON.stringify({ error: 'Weather API not configured' });
+
+  const cacheKey = `ai:weather:${city.toLowerCase()}`;
+  const cached = aiChatCache.get<string>(cacheKey);
+  if (cached) return cached;
+
+  const geoRes = await axios.get(
+    `${OPENWEATHER_BASE}/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${apiKey}`,
+    { timeout: 5000 }
+  );
+
+  if (!geoRes.data || geoRes.data.length === 0) {
+    return JSON.stringify({ error: `City "${city}" not found` });
+  }
+
+  const { lat, lon, name, country } = geoRes.data[0];
+  const weatherRes = await axios.get(
+    `${OPENWEATHER_BASE}/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`,
+    { timeout: 5000 }
+  );
+
+  const w = weatherRes.data;
+  const result = JSON.stringify({
+    city: name, country,
+    temp: Math.round(w.main.temp), feelsLike: Math.round(w.main.feels_like),
+    description: w.weather[0].description, humidity: w.main.humidity,
+    windSpeed: w.wind.speed, icon: w.weather[0].icon,
+  });
+
+  aiChatCache.set(cacheKey, result, 300);
+  return result;
+}
+
+async function executeAiSearchCities(query: string): Promise<string> {
+  const apiKey = process.env.OPENWEATHER_API_KEY;
+  if (!apiKey) return JSON.stringify({ error: 'Weather API not configured' });
+
+  const res = await axios.get(
+    `${OPENWEATHER_BASE}/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${apiKey}`,
+    { timeout: 5000 }
+  );
+
+  return JSON.stringify(
+    res.data.map((c: any) => ({ name: c.name, country: c.country, state: c.state || '', lat: c.lat, lon: c.lon }))
+  );
+}
+
+async function executeAiGetStockQuote(symbol: string): Promise<string> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) return JSON.stringify({ error: 'Stock API not configured' });
+
+  const cacheKey = `ai:stock:${symbol.toUpperCase()}`;
+  const cached = aiChatCache.get<string>(cacheKey);
+  if (cached) return cached;
+
+  const res = await axios.get(
+    `${FINNHUB_BASE}/api/v1/quote?symbol=${encodeURIComponent(symbol.toUpperCase())}`,
+    { headers: { 'X-Finnhub-Token': apiKey }, timeout: 5000 }
+  );
+
+  const result = JSON.stringify({
+    symbol: symbol.toUpperCase(), price: res.data.c, change: res.data.d,
+    changePercent: res.data.dp, high: res.data.h, low: res.data.l,
+    open: res.data.o, previousClose: res.data.pc,
+  });
+
+  aiChatCache.set(cacheKey, result, 60);
+  return result;
+}
+
+async function executeAiGetCryptoPrices(): Promise<string> {
+  const cacheKey = 'ai:crypto';
+  const cached = aiChatCache.get<string>(cacheKey);
+  if (cached) return cached;
+
+  const ids = 'bitcoin,ethereum,solana,cardano,dogecoin';
+  const res = await axios.get(
+    `${COINGECKO_BASE}/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
+    { timeout: 5000 }
+  );
+
+  const result = JSON.stringify(
+    res.data.map((c: any) => ({
+      name: c.name, symbol: c.symbol.toUpperCase(), price: c.current_price,
+      change24h: c.price_change_percentage_24h?.toFixed(2) + '%', marketCap: c.market_cap,
+    }))
+  );
+
+  aiChatCache.set(cacheKey, result, 120);
+  return result;
+}
+
+async function executeAiBibleVerse(reference: string, translation?: string): Promise<string> {
+  try {
+    const parsed = translation ? parseInt(translation, 10) : NaN;
+    const bibleId = isNaN(parsed) ? DEFAULT_YOUVERSION_BIBLE_ID : parsed;
+    const passage = await getYouVersionPassage(bibleId, reference);
+    return JSON.stringify(passage);
+  } catch (err: any) {
+    return JSON.stringify({ error: err.message || 'Failed to look up Bible verse' });
+  }
+}
+
+async function executeAiSearchPodcasts(query: string): Promise<string> {
+  try {
+    const data = await searchPodcastsAPI(query);
+    const feeds = (data.feeds ?? []).slice(0, 5).map(normalizePodcastFeed);
+    return JSON.stringify({ feeds, count: feeds.length });
+  } catch (err: any) {
+    return JSON.stringify({ error: err.message || 'Failed to search podcasts' });
+  }
+}
+
+/** Execute an AI tool by name and return the result string + optional frontend actions. */
+async function executeAiTool(
+  name: string,
+  args: Record<string, unknown>,
+): Promise<{ result: string; actions?: Array<{ type: string; payload: unknown }> }> {
+  switch (name) {
+    case 'getWeather':
+      return { result: await executeAiGetWeather(args.city as string) };
+    case 'searchCities':
+      return { result: await executeAiSearchCities(args.query as string) };
+    case 'getStockQuote':
+      return { result: await executeAiGetStockQuote(args.symbol as string) };
+    case 'getCryptoPrices':
+      return { result: await executeAiGetCryptoPrices() };
+    case 'navigateTo':
+      return {
+        result: JSON.stringify({ navigateTo: args.page }),
+        actions: [{ type: 'navigateTo', payload: { page: args.page } }],
+      };
+    case 'addFlashcard':
+      return {
+        result: JSON.stringify({ success: true, message: 'Flashcard will be added' }),
+        actions: [{ type: 'addFlashcard', payload: { front: args.front, back: args.back, category: args.category || 'custom', type: args.type || 'custom' } }],
+      };
+    case 'getBibleVerse':
+      return { result: await executeAiBibleVerse(args.reference as string, args.translation as string | undefined) };
+    case 'searchPodcasts':
+      return { result: await executeAiSearchPodcasts(args.query as string) };
+    case 'addBookmark':
+      return {
+        result: JSON.stringify({ success: true, message: 'Bookmark will be added' }),
+        actions: [{ type: 'addBookmark', payload: { reference: args.reference } }],
+      };
+    case 'listFlashcards':
+      return {
+        result: JSON.stringify({ message: 'Flashcard list will be retrieved from frontend' }),
+        actions: [{ type: 'listFlashcards', payload: { type: args.type } }],
+      };
+    default:
+      return { result: JSON.stringify({ error: `Unknown tool: ${name}` }) };
+  }
+}
+
 export const resolvers = {
+  JSON: JSONScalar,
+
   Query: {
     weather: async (_: any, { lat, lon }: { lat: number; lon: number }) => {
       const cacheKeyPrefix = getCacheKey(lat, lon, 'all');
@@ -653,6 +845,127 @@ export const resolvers = {
       const parsed = translation ? parseInt(translation, 10) : NaN;
       const bibleId = isNaN(parsed) ? DEFAULT_YOUVERSION_BIBLE_ID : parsed;
       return await getYouVersionPassage(bibleId, reference);
+    },
+  },
+
+  // ─── Mutation ──────────────────────────────────────────────
+
+  Mutation: {
+    aiChat: async (_: any, { message, history, context }: {
+      message: string;
+      history?: { role: string; content: string }[];
+      context?: Record<string, unknown>;
+    }) => {
+      const geminiKey = process.env.GEMINI_API_KEY;
+      if (!geminiKey) throw new Error('GEMINI_API_KEY not configured');
+
+      const { GoogleGenAI } = await import('@google/genai');
+      const ai = new GoogleGenAI({ apiKey: geminiKey });
+
+      // Convert shared tool definitions to Gemini format
+      const functionDeclarations = toGeminiFunctionDeclarations(ALL_TOOLS);
+      const tools = [{ functionDeclarations }];
+
+      // Build conversation history
+      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+      if (history && Array.isArray(history)) {
+        for (const msg of history) {
+          contents.push({
+            role: msg.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: msg.content }],
+          });
+        }
+      }
+      contents.push({ role: 'user', parts: [{ text: message }] });
+
+      // Build context-aware system instruction
+      let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, navigate users around the app, create flashcards, look up Bible verses, search podcasts, and bookmark Bible passages. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
+
+      if (context && typeof context === 'object') {
+        const ctxParts: string[] = [];
+        if (Array.isArray(context.favoriteCities) && context.favoriteCities.length > 0) {
+          ctxParts.push(`Favorite cities: ${(context.favoriteCities as string[]).join(', ')}`);
+        }
+        if (Array.isArray(context.recentCities) && context.recentCities.length > 0) {
+          ctxParts.push(`Recently searched cities: ${(context.recentCities as string[]).join(', ')}`);
+        }
+        if (Array.isArray(context.stockWatchlist) && context.stockWatchlist.length > 0) {
+          ctxParts.push(`Stock watchlist: ${(context.stockWatchlist as string[]).join(', ')}`);
+        }
+        if (typeof context.podcastSubscriptions === 'number' && context.podcastSubscriptions > 0) {
+          ctxParts.push(`Subscribed to ${context.podcastSubscriptions} podcasts`);
+        }
+        if (context.tempUnit) ctxParts.push(`Preferred temperature unit: ${context.tempUnit === 'F' ? 'Fahrenheit' : 'Celsius'}`);
+        if (context.locale) ctxParts.push(`Language: ${context.locale === 'es' ? 'Spanish' : 'English'}`);
+        if (context.currentPage) ctxParts.push(`Currently on: ${context.currentPage}`);
+
+        if (ctxParts.length > 0) {
+          systemInstruction += '\n\nUser context:\n' + ctxParts.join('\n');
+          systemInstruction += '\n\nUse this context to personalize responses. For example, if the user asks "how is the weather?" you can check their favorite or recent cities. If they ask about stocks, reference their watchlist.';
+        }
+      }
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents,
+        config: { tools, systemInstruction },
+      });
+
+      // Process function calls
+      const toolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
+      const allActions: Array<{ type: string; payload: unknown }> = [];
+      const candidate = response.candidates?.[0];
+      const parts = candidate?.content?.parts || [];
+
+      let hasToolCalls = false;
+      for (const part of parts) {
+        if (part.functionCall) {
+          hasToolCalls = true;
+          const fc = part.functionCall;
+          const args = (fc.args || {}) as Record<string, unknown>;
+
+          try {
+            const { result, actions } = await executeAiTool(fc.name!, args);
+            toolCalls.push({ name: fc.name!, args, result });
+            if (actions) allActions.push(...actions);
+          } catch (err: any) {
+            toolCalls.push({ name: fc.name!, args, result: JSON.stringify({ error: err.message }) });
+          }
+        }
+      }
+
+      if (hasToolCalls && toolCalls.length > 0) {
+        const toolResponseParts = toolCalls.map(tc => ({
+          functionResponse: {
+            name: tc.name,
+            response: { result: tc.result },
+          },
+        }));
+
+        const followupContents = [
+          ...contents,
+          { role: 'model', parts },
+          { role: 'user', parts: toolResponseParts },
+        ];
+
+        const followup = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: followupContents,
+          config: {
+            systemInstruction: 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. Summarize the tool results in a natural, helpful way. Be concise.',
+          },
+        });
+
+        const finalText = followup.text || 'I found some information but had trouble formatting it.';
+        return {
+          response: finalText,
+          toolCalls,
+          actions: allActions.length > 0 ? allActions : null,
+        };
+      }
+
+      const text = response.text || 'Sorry, I could not generate a response.';
+      return { response: text, toolCalls: null, actions: null };
     },
   },
 

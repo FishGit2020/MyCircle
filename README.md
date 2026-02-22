@@ -116,11 +116,14 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Dark mode, full i18n (English, Spanish, Chinese)
 
 ### AI Assistant
-- Conversational AI chat powered by Google Gemini
+- Conversational AI chat powered by Google Gemini via **GraphQL mutation** (`Mutation.aiChat`)
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
-- Tool calling: weather lookup, city search, stock quotes, crypto prices (CoinGecko), page navigation
+- **10 AI tools**: weather lookup, city search, stock quotes, crypto prices, page navigation, flashcard creation, Bible verse lookup, podcast search, Bible bookmarks, flashcard listing
+- **Shared tool registry** — tool definitions in Zod (`scripts/mcp-tools/mfe-tools.ts`), auto-converted to Gemini format via bridge, eliminating duplicated declarations
+- **Frontend actions** — tools like `navigateTo`, `addFlashcard`, `addBookmark` return actions that the frontend executes locally (cross-MFE events, localStorage writes)
+- **Expandable debug panel** — click any tool call badge to see input args and raw JSON result; toggle debug mode via header button (persisted in localStorage)
 - **Voice input** — microphone button using Web Speech API (`SpeechRecognition`) with pulsing visual feedback, graceful fallback (hidden when unsupported)
-- Suggested prompt chips with crypto, weather, stock, and navigation prompts
+- Suggested prompt chips with crypto, weather, stock, navigation, flashcard, Bible, and podcast prompts
 
 ### General
 - Dark / light theme with system preference detection
@@ -452,6 +455,23 @@ mycircle/
 | `pnpm firebase:deploy` | Full Firebase deployment (hosting + functions + firestore) |
 | `pnpm clean` | Remove all dist directories and node_modules |
 
+### MCP Server (Claude Code Integration)
+
+MyCircle includes a custom MCP server that provides project health validators and an AI tool registry for Claude Code.
+
+**Setup:** The `.mcp.json` config is already in the project root. After starting a new Claude Code session, the `mycircle` server is available with these tools:
+
+| Tool | Description |
+|------|-------------|
+| `validate_i18n` | Check all 3 locale files have the same keys |
+| `validate_dockerfile` | Check Dockerfile references all packages |
+| `validate_pwa_shortcuts` | Count PWA shortcuts (max 10) |
+| `validate_widget_registry` | Check widget registry consistency |
+| `validate_all` | Run all validators |
+| `list_ai_tools` | List all AI assistant tool definitions |
+
+**AI Tool Registry:** AI tool definitions are shared between the MCP server and the Gemini backend. Defined once in `scripts/mcp-tools/mfe-tools.ts` using Zod schemas, they are auto-converted to Gemini's format. See [docs/mcp.md](./docs/mcp.md) for the full guide.
+
 ## CI/CD
 
 MyCircle uses **GitHub Actions** for continuous integration and deployment:
@@ -539,7 +559,7 @@ After deployment, the app is available at:
 | `graphql` | `/graphql` | GraphQL API — weather, city search, stocks, podcasts, bible, crypto | — |
 | `stockProxy` | `/stock/**` | Finnhub API proxy (search, quote, profile, candles) | 60 req/min/IP |
 | `podcastProxy` | `/podcast/**` | PodcastIndex API proxy (search, trending, episodes) | 60 req/min/IP |
-| `aiChat` | `/ai/chat` | Gemini AI chat with function calling (weather, stocks, crypto, navigation) | 10 req/min/IP |
+| `aiChat` | GraphQL `Mutation.aiChat` | Gemini AI chat with function calling (10 tools: weather, stocks, crypto, navigation, flashcards, Bible, podcasts, bookmarks) | 10 req/min/IP |
 | `subscribeToAlerts` | Callable | Subscribe/unsubscribe FCM tokens to weather alerts for cities | — |
 | `checkWeatherAlerts` | Scheduled (every 30 min) | Check weather for subscribed cities, send FCM for severe conditions | — |
 
