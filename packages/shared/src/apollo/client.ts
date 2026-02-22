@@ -87,6 +87,7 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
     : httpWithAuth;
 
   return new ApolloClient({
+    connectToDevTools: true,
     link: splitLink,
     cache: new InMemoryCache({
       typePolicies: {
