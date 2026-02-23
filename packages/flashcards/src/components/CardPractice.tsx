@@ -96,6 +96,8 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
         <button
           type="button"
           onClick={onClose}
+          title={t('flashcards.done')}
+          aria-label={t('flashcards.done')}
           className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition"
         >
           {t('flashcards.done')}
@@ -106,6 +108,8 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
         <button
           type="button"
           onClick={() => onToggleMastered(card.id)}
+          title={isMastered ? t('flashcards.unmarkMastered') : t('flashcards.markMastered')}
+          aria-label={isMastered ? t('flashcards.unmarkMastered') : t('flashcards.markMastered')}
           className={`text-sm font-medium px-3 py-1 rounded-lg transition ${
             isMastered
               ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
@@ -141,6 +145,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
           onClick={goPrev}
           disabled={currentIndex === 0}
           className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-30 transition hover:bg-gray-200 dark:hover:bg-gray-600"
+          title={t('flashcards.previous')}
           aria-label={t('flashcards.previous')}
         >
           {t('flashcards.previous')}
@@ -149,6 +154,8 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
           type="button"
           onClick={() => setFlipped(f => !f)}
           className="px-6 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition"
+          title={t('flashcards.flip')}
+          aria-label={t('flashcards.flip')}
         >
           {t('flashcards.flip')}
         </button>
@@ -157,6 +164,8 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
             type="button"
             onClick={() => setShowWritingPractice(true)}
             className="px-4 py-2 rounded-lg text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition"
+            title={t('chinese.practice')}
+            aria-label={t('chinese.practice')}
           >
             {t('chinese.practice')}
           </button>
@@ -166,6 +175,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
           onClick={goNext}
           disabled={currentIndex === cards.length - 1}
           className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-30 transition hover:bg-gray-200 dark:hover:bg-gray-600"
+          title={t('flashcards.next')}
           aria-label={t('flashcards.next')}
         >
           {t('flashcards.next')}

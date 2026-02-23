@@ -195,6 +195,7 @@ export function useFlashCards() {
       setBibleCards(bible);
       setCustomCards(custom);
       setChineseCards(chinese);
+      setLoading(false);
       // Cache in localStorage
       saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, bible);
       saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, custom);
@@ -212,6 +213,7 @@ export function useFlashCards() {
       }
     }).catch(() => { /* ignore */ });
 
+    // Fallback: stop loading after 3s if no data arrives (empty collection, etc.)
     const timeout = setTimeout(() => {
       if (!received) setLoading(false);
     }, 3000);
@@ -477,7 +479,7 @@ export function useFlashCards() {
     } catch { /* ignore */ }
   }, [mapChineseToCards]);
 
-  // Publish a card to the public collection
+  // Publish a card to the public collection, then remove the private copy
   const publishCard = useCallback(async (card: FlashCard) => {
     if (!window.__flashcards?.publish) return;
     await window.__flashcards.publish({
@@ -487,7 +489,9 @@ export function useFlashCards() {
       category: card.category,
       meta: card.meta,
     });
-  }, []);
+    // Remove the private copy — the card now lives in publicFlashcards
+    deleteCard(card.id);
+  }, [deleteCard]);
 
   return {
     allCards,
