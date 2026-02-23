@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation, StorageKeys } from '@mycircle/shared';
 import type { FlashCard, CardType, VisibilityFilter } from '../types';
 import { useFlashCards } from '../hooks/useFlashCards';
-import { phrases } from '../data/phrases';
 import type { ChineseCharacter, CharacterCategory } from '../data/characters';
 import CardGrid from './CardGrid';
 import CardPractice from './CardPractice';
@@ -214,7 +213,7 @@ export default function FlashCards() {
         >
           {t('flashcards.practiceAll')}
         </button>
-        {allCards.some(c => c.type === 'english') && (
+        {filteredCards.length >= 2 && (
           <button
             type="button"
             onClick={() => setShowQuiz(true)}
@@ -352,7 +351,7 @@ export default function FlashCards() {
             <div className="w-10" />
           </div>
           <div className="flex-1 overflow-y-auto p-4">
-            <QuizView phrases={phrases} onQuizComplete={() => {}} />
+            <QuizView cards={filteredCards} onQuizComplete={() => {}} />
           </div>
         </div>
       )}
