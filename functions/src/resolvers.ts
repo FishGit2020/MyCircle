@@ -1,6 +1,31 @@
 import axios from 'axios';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
+import { GraphQLScalarType, Kind } from 'graphql';
+
+// JSON scalar for arbitrary JSON values in GraphQL
+const JSONScalar = new GraphQLScalarType({
+  name: 'JSON',
+  description: 'Arbitrary JSON value',
+  serialize: (value: unknown) => value,
+  parseValue: (value: unknown) => value,
+  parseLiteral: (ast) => {
+    if (ast.kind === Kind.STRING) return ast.value;
+    if (ast.kind === Kind.INT) return parseInt(ast.value, 10);
+    if (ast.kind === Kind.FLOAT) return parseFloat(ast.value);
+    if (ast.kind === Kind.BOOLEAN) return ast.value;
+    if (ast.kind === Kind.NULL) return null;
+    if (ast.kind === Kind.LIST) return ast.values.map((v: any) => JSONScalar.parseLiteral(v));
+    if (ast.kind === Kind.OBJECT) {
+      const obj: Record<string, any> = {};
+      for (const field of ast.fields) {
+        obj[field.name.value] = JSONScalar.parseLiteral(field.value);
+      }
+      return obj;
+    }
+    return null;
+  },
+});
 
 // Configurable base URLs — defaults to production, overridden in emulator via .env.emulator
 const OPENWEATHER_BASE = process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org';
@@ -739,6 +764,17 @@ const DEFAULT_YOUVERSION_BIBLE_ID = 111;
 // Resolver factory
 export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => string, getPodcastKeys?: () => { apiKey: string; apiSecret: string }, getYouVersionKey?: () => string) {
   return {
+    JSON: JSONScalar,
+
+    Mutation: {
+      aiChat: async (_: any, { message }: { message: string }) => {
+        // In Cloud Functions, AI chat is handled by the separate aiChat REST endpoint.
+        // This mutation resolver exists so the GraphQL schema validates, but the
+        // frontend should use the REST endpoint in production.
+        throw new Error('AI chat is handled by the dedicated /ai/chat Cloud Function endpoint. Use that instead of GraphQL in production.');
+      },
+    },
+
     Query: {
       weather: async (_: any, { lat, lon }: { lat: number; lon: number }) => {
         const apiKey = getApiKey();
