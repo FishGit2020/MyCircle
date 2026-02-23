@@ -49,8 +49,14 @@ service cloud.firestore {
       allow create, update, delete: if request.auth != null;
     }
 
-    // Chinese characters - public read, authenticated write
+    // Chinese characters - public read, authenticated write (legacy, kept during migration)
     match /chineseCharacters/{charId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+
+    // Public flashcards - public read, authenticated write
+    match /publicFlashcards/{cardId} {
       allow read: if true;
       allow create, update, delete: if request.auth != null;
     }

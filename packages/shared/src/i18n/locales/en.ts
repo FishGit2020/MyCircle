@@ -1319,6 +1319,13 @@ const en = {
   'flashcards.edit': 'Edit',
   'flashcards.editCard': 'Edit Card',
   'flashcards.uncategorized': 'Uncategorized',
+  'flashcards.publish': 'Publish',
+  'flashcards.publishConfirm': 'Share this flashcard with all users? This cannot be undone.',
+  'flashcards.shared': 'Shared',
+  'flashcards.private': 'Private',
+  'flashcards.myCards': 'My Cards',
+  'flashcards.published': 'Published',
+  'flashcards.allCards': 'All',
 
   // Work Tracker
   'nav.workTracker': 'Work Log',

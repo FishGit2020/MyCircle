@@ -797,13 +797,37 @@ if (firebaseEnabled) {
   };
 }
 
-// Expose Chinese characters API for MFEs
+// Expose Chinese characters API for MFEs — CRUD now routes to user-scoped flashcards
 if (firebaseEnabled) {
   window.__chineseCharacters = {
     getAll: getChineseCharacters as any,
-    add: addChineseCharacter,
-    update: updateChineseCharacter,
-    delete: deleteChineseCharacter,
+    add: async (char: Record<string, any>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      const card = {
+        id: `zh-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        type: 'chinese',
+        front: char.character,
+        back: char.meaning,
+        category: char.category || 'phrases',
+        meta: { pinyin: char.pinyin },
+      };
+      return addUserFlashcard(uid, card);
+    },
+    update: async (id: string, updates: Record<string, any>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      const cardUpdates: Record<string, any> = {};
+      if (updates.character !== undefined) cardUpdates.front = updates.character;
+      if (updates.meaning !== undefined) cardUpdates.back = updates.meaning;
+      if (updates.pinyin !== undefined) cardUpdates.meta = { pinyin: updates.pinyin };
+      if (updates.category !== undefined) cardUpdates.category = updates.category;
+      return updateUserFlashcard(uid, `zh-${id}`, cardUpdates);
+    },
+    delete: async (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteUserFlashcard(auth.currentUser.uid, `zh-${id}`);
+    },
     subscribe: subscribeToChineseCharacters,
   };
 }
@@ -871,6 +895,85 @@ if (firebaseEnabled) {
       return subscribeToWorkEntries(auth.currentUser.uid, callback);
     },
   };
+}
+
+// Public Flashcards — shared collection (public read, auth write)
+export async function getPublicFlashcards() {
+  if (!db) return [];
+  const q = query(collection(db, 'publicFlashcards'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function addPublicFlashcard(card: Record<string, any>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const user = auth?.currentUser;
+  const id = card.id || `pub-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  await setDoc(doc(db, 'publicFlashcards', id), {
+    ...card,
+    id,
+    isPublic: true,
+    createdBy: { uid: user?.uid ?? 'anonymous', displayName: user?.displayName || user?.email || 'Anonymous' },
+    createdAt: serverTimestamp(),
+  }, { merge: true });
+  return id;
+}
+
+export function subscribeToPublicFlashcards(callback: (cards: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'publicFlashcards'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const cards = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(cards);
+  }, (error) => {
+    log.warn('Public flashcards snapshot error:', error);
+  });
+}
+
+export async function migrateChineseToPublic() {
+  if (!db || !auth?.currentUser) return;
+  const user = auth.currentUser;
+  const uid = user.uid;
+  const displayName = user.displayName || user.email || 'Anonymous';
+  try {
+    const q = query(collection(db, 'chineseCharacters'), orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    const promises: Promise<void>[] = [];
+    for (const d of snapshot.docs) {
+      const data = d.data();
+      // Write to publicFlashcards
+      promises.push(
+        setDoc(doc(db!, 'publicFlashcards', d.id), {
+          id: d.id,
+          type: 'chinese',
+          front: data.character,
+          back: data.meaning,
+          category: data.category || 'phrases',
+          meta: { pinyin: data.pinyin },
+          isPublic: true,
+          createdBy: data.createdBy || { uid, displayName },
+          createdAt: data.createdAt || serverTimestamp(),
+        }, { merge: true })
+      );
+      // Write private copy to user's flashcards
+      const privateId = `zh-${d.id}`;
+      promises.push(
+        setDoc(doc(db!, 'users', uid, 'flashcards', privateId), {
+          id: privateId,
+          type: 'chinese',
+          front: data.character,
+          back: data.meaning,
+          category: data.category || 'phrases',
+          meta: { pinyin: data.pinyin },
+          createdAt: data.createdAt || serverTimestamp(),
+        }, { merge: true })
+      );
+    }
+    await Promise.all(promises);
+    log.info(`Migrated ${snapshot.docs.length} Chinese characters to publicFlashcards + user flashcards`);
+  } catch (error) {
+    log.warn('Chinese migration error:', error);
+  }
 }
 
 // Flash Cards — user-scoped subcollection
@@ -975,6 +1078,14 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return updateUserFlashcardProgress(auth.currentUser.uid, progress);
     },
+    // Public flashcards
+    getAllPublic: () => getPublicFlashcards(),
+    subscribePublic: subscribeToPublicFlashcards,
+    publish: (card: Record<string, any>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addPublicFlashcard(card);
+    },
+    migrateChineseToPublic: () => migrateChineseToPublic(),
   };
 }
 

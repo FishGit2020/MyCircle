@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
-import type { FlashCard, FlashCardProgress, CardType } from '../types';
+import type { FlashCard, FlashCardProgress, CardType, VisibilityFilter } from '../types';
 import { phrases } from '../data/phrases';
 
 const log = createLogger('flashcards');
@@ -23,6 +23,10 @@ declare global {
       subscribe: (callback: (cards: any[]) => void) => () => void;
       getProgress: () => Promise<any>;
       updateProgress: (progress: Record<string, any>) => Promise<void>;
+      getAllPublic: () => Promise<any[]>;
+      subscribePublic: (callback: (cards: any[]) => void) => () => void;
+      publish: (card: Record<string, any>) => Promise<string>;
+      migrateChineseToPublic: () => Promise<void>;
     };
     __getFirebaseIdToken?: () => Promise<string | null>;
   }
@@ -59,13 +63,18 @@ export function useFlashCards() {
   const [customCards, setCustomCards] = useState<FlashCard[]>(() =>
     loadFromStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, [])
   );
+  const [chineseCards, setChineseCards] = useState<FlashCard[]>([]);
+  const [publicCards, setPublicCards] = useState<FlashCard[]>(() =>
+    loadFromStorage(StorageKeys.FLASHCARD_PUBLIC_CARDS, [])
+  );
   const [progress, setProgress] = useState<FlashCardProgress>(() =>
     loadFromStorage(StorageKeys.FLASHCARD_PROGRESS, { masteredIds: [], lastPracticed: '' })
   );
-  const [chineseCards, setChineseCards] = useState<FlashCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('all');
   const migratedRef = useRef(false);
+  const chineseMigratedRef = useRef(false);
 
   // Auth state detection
   useEffect(() => {
@@ -95,8 +104,9 @@ export function useFlashCards() {
     }));
   }, []);
 
-  // Load Chinese characters from bridge API
+  // Load Chinese characters from bridge API (fallback for unauthenticated users)
   useEffect(() => {
+    if (isAuthenticated) return; // When authenticated, Chinese cards come from user flashcards subscription
     let mounted = true;
     async function loadChinese() {
       try {
@@ -127,18 +137,44 @@ export function useFlashCards() {
       unsub?.();
       window.removeEventListener(WindowEvents.CHINESE_CHARACTERS_CHANGED, handleChanged);
     };
-  }, [mapChineseToCards]);
+  }, [mapChineseToCards, isAuthenticated]);
 
-  // Firestore real-time subscription for cards when authenticated
+  // Subscribe to public flashcards (no auth gate — public read)
+  useEffect(() => {
+    if (!window.__flashcards?.subscribePublic) return;
+    let mounted = true;
+
+    const unsubscribe = window.__flashcards.subscribePublic((firestoreCards) => {
+      const cards: FlashCard[] = firestoreCards.map((c: any) => ({
+        id: c.id,
+        type: c.type || 'chinese',
+        category: c.category || '',
+        front: c.front,
+        back: c.back,
+        meta: c.meta,
+        isPublic: true,
+        createdBy: c.createdBy,
+      }));
+      if (mounted) {
+        setPublicCards(cards);
+        saveToStorage(StorageKeys.FLASHCARD_PUBLIC_CARDS, cards);
+      }
+    });
+
+    return () => { mounted = false; unsubscribe(); };
+  }, []);
+
+  // Firestore real-time subscription for private cards when authenticated
   useEffect(() => {
     if (!isAuthenticated || !window.__flashcards?.subscribe) return;
 
     let received = false;
     const unsubscribe = window.__flashcards.subscribe((firestoreCards) => {
       received = true;
-      // Split into bible and custom cards
+      // Split into bible, custom, and chinese cards
       const bible: FlashCard[] = [];
       const custom: FlashCard[] = [];
+      const chinese: FlashCard[] = [];
       for (const c of firestoreCards) {
         const card: FlashCard = {
           id: c.id,
@@ -152,10 +188,13 @@ export function useFlashCards() {
           bible.push(card);
         } else if (card.type === 'custom') {
           custom.push(card);
+        } else if (card.type === 'chinese') {
+          chinese.push(card);
         }
       }
       setBibleCards(bible);
       setCustomCards(custom);
+      setChineseCards(chinese);
       // Cache in localStorage
       saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, bible);
       saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, custom);
@@ -210,6 +249,22 @@ export function useFlashCards() {
         window.__flashcards.updateProgress(localProgress).catch(() => { /* ignore */ });
       }
     }
+  }, [isAuthenticated]);
+
+  // One-time migration: Chinese characters → publicFlashcards + user flashcards
+  useEffect(() => {
+    if (!isAuthenticated || chineseMigratedRef.current || !window.__flashcards?.migrateChineseToPublic) return;
+    const migrated = localStorage.getItem('chinese-to-public-migrated');
+    if (migrated) { chineseMigratedRef.current = true; return; }
+    chineseMigratedRef.current = true;
+
+    log.info('Running Chinese → publicFlashcards migration');
+    window.__flashcards.migrateChineseToPublic().then(() => {
+      localStorage.setItem('chinese-to-public-migrated', '1');
+      log.info('Chinese migration complete');
+    }).catch((err) => {
+      log.warn('Chinese migration failed:', err);
+    });
   }, [isAuthenticated]);
 
   // One-time migration: merge old English/Chinese progress into flashcard progress
@@ -268,7 +323,24 @@ export function useFlashCards() {
     return () => window.removeEventListener(WindowEvents.FLASHCARD_PROGRESS_CHANGED, handler);
   }, [isAuthenticated]);
 
-  const allCards: FlashCard[] = [...chineseCards, ...ENGLISH_PHRASES, ...bibleCards, ...customCards];
+  // Merge private + English + public cards (dedup public cards already in private)
+  const privateCards: FlashCard[] = [...chineseCards, ...bibleCards, ...customCards];
+  const privateIds = useMemo(() => new Set(privateCards.map(c => c.id)), [privateCards]);
+
+  // Public cards that the user doesn't already have privately (avoid duplicates)
+  const publicCardsFiltered = useMemo(() =>
+    publicCards.filter(c => !privateIds.has(c.id) && !privateIds.has(`zh-${c.id}`)),
+    [publicCards, privateIds]
+  );
+
+  // Apply visibility filter
+  const allCards = useMemo(() => {
+    const combined = [...privateCards, ...ENGLISH_PHRASES, ...publicCardsFiltered];
+    if (visibilityFilter === 'all') return combined;
+    if (visibilityFilter === 'private') return combined.filter(c => !c.isPublic);
+    // 'published' — only public cards
+    return publicCards;
+  }, [privateCards, publicCardsFiltered, publicCards, visibilityFilter]);
 
   const categories = Array.from(new Set(allCards.map(c => c.category)));
 
@@ -306,23 +378,36 @@ export function useFlashCards() {
     });
   }, []);
 
-  const addCustomCard = useCallback((card: Omit<FlashCard, 'id' | 'type'>) => {
+  const addCustomCard = useCallback((card: Omit<FlashCard, 'id' | 'type'> & { type?: CardType }) => {
+    const cardType = card.type || 'custom';
+    const prefix = cardType === 'chinese' ? 'zh' : 'custom';
     const newCard: FlashCard = {
       ...card,
-      id: `custom-${Date.now()}`,
-      type: 'custom',
+      id: `${prefix}-${Date.now()}`,
+      type: cardType,
     };
-    setCustomCards(prev => {
-      const next = [...prev, newCard];
-      saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, next);
-      window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
-      // Fire-and-forget Firestore write
-      window.__flashcards?.add(newCard).catch(() => { /* ignore */ });
-      return next;
-    });
+    if (cardType === 'chinese') {
+      setChineseCards(prev => {
+        const next = [...prev, newCard];
+        return next;
+      });
+    } else {
+      setCustomCards(prev => {
+        const next = [...prev, newCard];
+        saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, next);
+        return next;
+      });
+    }
+    window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+    // Fire-and-forget Firestore write
+    window.__flashcards?.add(newCard).catch(() => { /* ignore */ });
   }, []);
 
   const updateCard = useCallback((cardId: string, updates: { front: string; back: string; category: string }) => {
+    setChineseCards(prev => {
+      if (!prev.some(c => c.id === cardId)) return prev;
+      return prev.map(c => c.id === cardId ? { ...c, ...updates } : c);
+    });
     setCustomCards(prev => {
       if (!prev.some(c => c.id === cardId)) return prev;
       const next = prev.map(c => c.id === cardId ? { ...c, ...updates } : c);
@@ -340,6 +425,7 @@ export function useFlashCards() {
   }, []);
 
   const deleteCard = useCallback((cardId: string) => {
+    setChineseCards(prev => prev.filter(c => c.id !== cardId));
     setBibleCards(prev => {
       const next = prev.filter(c => c.id !== cardId);
       saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, next);
@@ -391,17 +477,32 @@ export function useFlashCards() {
     } catch { /* ignore */ }
   }, [mapChineseToCards]);
 
+  // Publish a card to the public collection
+  const publishCard = useCallback(async (card: FlashCard) => {
+    if (!window.__flashcards?.publish) return;
+    await window.__flashcards.publish({
+      type: card.type,
+      front: card.front,
+      back: card.back,
+      category: card.category,
+      meta: card.meta,
+    });
+  }, []);
+
   return {
     allCards,
     chineseCards,
     englishCards: ENGLISH_PHRASES,
     bibleCards,
     customCards,
+    publicCards,
     progress,
     loading,
     categories,
     cardTypes,
     isAuthenticated,
+    visibilityFilter,
+    setVisibilityFilter,
     toggleMastered,
     addBibleCards,
     addCustomCard,
@@ -412,5 +513,6 @@ export function useFlashCards() {
     updateChineseChar,
     deleteChineseChar,
     reloadChinese,
+    publishCard,
   };
 }

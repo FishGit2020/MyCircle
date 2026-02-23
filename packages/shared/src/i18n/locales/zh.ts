@@ -1321,6 +1321,13 @@ const zh: Record<TranslationKey, string> = {
   'flashcards.edit': '\u7f16\u8f91',
   'flashcards.editCard': '\u7f16\u8f91\u5361\u7247',
   'flashcards.uncategorized': '\u672a\u5206\u7c7b',
+  'flashcards.publish': '\u53d1\u5e03',
+  'flashcards.publishConfirm': '\u5c06\u6b64\u95ea\u5361\u5206\u4eab\u7ed9\u6240\u6709\u7528\u6237\uff1f\u65e0\u6cd5\u64a4\u9500\u3002',
+  'flashcards.shared': '\u5df2\u5171\u4eab',
+  'flashcards.private': '\u79c1\u6709',
+  'flashcards.myCards': '\u6211\u7684\u5361\u7247',
+  'flashcards.published': '\u5df2\u53d1\u5e03',
+  'flashcards.allCards': '\u5168\u90e8',
 
   // Work Tracker
   'nav.workTracker': '\u5de5\u4f5c\u65e5\u5fd7',

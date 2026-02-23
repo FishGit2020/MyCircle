@@ -1321,6 +1321,13 @@ const es: Record<TranslationKey, string> = {
   'flashcards.edit': 'Editar',
   'flashcards.editCard': 'Editar Tarjeta',
   'flashcards.uncategorized': 'Sin Categor\u00eda',
+  'flashcards.publish': 'Publicar',
+  'flashcards.publishConfirm': '\u00bfCompartir esta tarjeta con todos los usuarios? No se puede deshacer.',
+  'flashcards.shared': 'Compartida',
+  'flashcards.private': 'Privada',
+  'flashcards.myCards': 'Mis Tarjetas',
+  'flashcards.published': 'Publicadas',
+  'flashcards.allCards': 'Todas',
 
   // Work Tracker
   'nav.workTracker': 'Registro de Trabajo',

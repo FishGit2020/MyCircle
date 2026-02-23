@@ -6,6 +6,8 @@ export interface FlashCard {
   category: string;
   front: string;
   back: string;
+  isPublic?: boolean;
+  createdBy?: { uid: string; displayName: string };
   meta?: {
     pinyin?: string;
     phonetic?: string;
@@ -15,6 +17,8 @@ export interface FlashCard {
     verses?: string;
   };
 }
+
+export type VisibilityFilter = 'all' | 'private' | 'published';
 
 export interface FlashCardProgress {
   masteredIds: string[];

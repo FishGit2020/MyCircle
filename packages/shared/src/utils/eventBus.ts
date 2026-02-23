@@ -77,6 +77,7 @@ export const StorageKeys = {
   FLASHCARD_TYPE_FILTER: 'flashcard-type-filter',
   WORK_TRACKER_CACHE: 'work-tracker-cache',
   PODCAST_NOW_PLAYING: 'podcast-now-playing',
+  FLASHCARD_PUBLIC_CARDS: 'flashcard-public-cards',
 } as const;
 
 export interface CitySelectedEvent {
