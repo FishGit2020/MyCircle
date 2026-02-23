@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import type { Phrase } from '../data/phrases';
+import type { FlashCard } from '../types';
 
 interface QuizViewProps {
-  phrases: Phrase[];
+  cards: FlashCard[];
   onQuizComplete: (score: { correct: number; total: number }) => void;
 }
 
@@ -16,24 +16,25 @@ function shuffle<T>(array: T[]): T[] {
   return arr;
 }
 
-export default function QuizView({ phrases, onQuizComplete }: QuizViewProps) {
+export default function QuizView({ cards, onQuizComplete }: QuizViewProps) {
   const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [isComplete, setIsComplete] = useState(false);
 
-  // Generate quiz questions: show Chinese, pick correct English
+  // Generate quiz questions: show front, pick correct back
   const questions = useMemo(() => {
-    const shuffled = shuffle(phrases).slice(0, Math.min(10, phrases.length));
-    return shuffled.map((phrase) => {
-      const wrongOptions = shuffle(phrases.filter((p) => p.id !== phrase.id))
+    if (cards.length < 2) return [];
+    const shuffled = shuffle(cards).slice(0, Math.min(10, cards.length));
+    return shuffled.map((card) => {
+      const wrongOptions = shuffle(cards.filter((c) => c.id !== card.id))
         .slice(0, 3)
-        .map((p) => p.english);
-      const options = shuffle([phrase.english, ...wrongOptions]);
-      return { phrase, options, correctAnswer: phrase.english };
+        .map((c) => c.back);
+      const options = shuffle([card.back, ...wrongOptions]);
+      return { card, options, correctAnswer: card.back };
     });
-  }, [phrases]);
+  }, [cards]);
 
   if (isComplete) {
     return (
@@ -49,7 +50,13 @@ export default function QuizView({ phrases, onQuizComplete }: QuizViewProps) {
     );
   }
 
-  if (questions.length === 0) return null;
+  if (questions.length === 0) {
+    return (
+      <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+        {t('flashcards.noCards')}
+      </p>
+    );
+  }
 
   const question = questions[currentIndex];
 
@@ -78,16 +85,19 @@ export default function QuizView({ phrases, onQuizComplete }: QuizViewProps) {
         {currentIndex + 1} / {questions.length}
       </div>
 
-      {/* Show Chinese phrase */}
+      {/* Show front of card */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center w-full max-w-md">
         <p className="text-3xl font-bold text-gray-800 dark:text-white" data-testid="quiz-question">
-          {question.phrase.chinese}
+          {question.card.front}
         </p>
+        {question.card.meta?.pinyin && (
+          <p className="text-lg text-gray-500 dark:text-gray-400 mt-1">{question.card.meta.pinyin}</p>
+        )}
       </div>
 
       {/* Options */}
       <div className="grid grid-cols-1 gap-2 w-full max-w-md">
-        {question.options.map((option) => {
+        {question.options.map((option, idx) => {
           const isCorrectOption = option === question.correctAnswer;
           const isSelected = option === selected;
           let btnClass = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700';
@@ -102,7 +112,7 @@ export default function QuizView({ phrases, onQuizComplete }: QuizViewProps) {
 
           return (
             <button
-              key={option}
+              key={`${option}-${idx}`}
               type="button"
               onClick={() => handleSelect(option)}
               disabled={selected !== null}
