@@ -26,6 +26,7 @@ declare global {
       getAllPublic: () => Promise<any[]>;
       subscribePublic: (callback: (cards: any[]) => void) => () => void;
       publish: (card: Record<string, any>) => Promise<string>;
+      deletePublic: (id: string) => Promise<void>;
       migrateChineseToPublic: () => Promise<void>;
     };
     __getFirebaseIdToken?: () => Promise<string | null>;
@@ -427,21 +428,31 @@ export function useFlashCards() {
   }, []);
 
   const deleteCard = useCallback((cardId: string) => {
-    setChineseCards(prev => prev.filter(c => c.id !== cardId));
-    setBibleCards(prev => {
-      const next = prev.filter(c => c.id !== cardId);
-      saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, next);
-      return next;
-    });
-    setCustomCards(prev => {
-      const next = prev.filter(c => c.id !== cardId);
-      saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, next);
-      return next;
-    });
+    // Check if this is a public card
+    const isPublicCard = publicCards.some(c => c.id === cardId);
+    if (isPublicCard) {
+      setPublicCards(prev => {
+        const next = prev.filter(c => c.id !== cardId);
+        saveToStorage(StorageKeys.FLASHCARD_PUBLIC_CARDS, next);
+        return next;
+      });
+      window.__flashcards?.deletePublic?.(cardId).catch(() => { /* ignore */ });
+    } else {
+      setChineseCards(prev => prev.filter(c => c.id !== cardId));
+      setBibleCards(prev => {
+        const next = prev.filter(c => c.id !== cardId);
+        saveToStorage(StorageKeys.FLASHCARD_BIBLE_CARDS, next);
+        return next;
+      });
+      setCustomCards(prev => {
+        const next = prev.filter(c => c.id !== cardId);
+        saveToStorage(StorageKeys.FLASHCARD_CUSTOM_CARDS, next);
+        return next;
+      });
+      window.__flashcards?.delete(cardId).catch(() => { /* ignore */ });
+    }
     window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
-    // Fire-and-forget Firestore delete
-    window.__flashcards?.delete(cardId).catch(() => { /* ignore */ });
-  }, []);
+  }, [publicCards]);
 
   const resetProgress = useCallback(() => {
     const next: FlashCardProgress = { masteredIds: [], lastPracticed: '' };
