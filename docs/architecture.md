@@ -362,13 +362,16 @@ Exposes `FlashCards` component via Module Federation. Port **3015**.
 - **Handwriting practice canvas** (migrated from Chinese Learning) — Pointer Events API (`pointerdown/move/up`) drawing with reference character as `globalAlpha=0.15` watermark; undo (stroke history) and clear; `touch-action: none` prevents scroll interference; works on mouse, touch, and stylus
 - **Character editor with Pinyin keyboard** (migrated from Chinese Learning) — modal with character, pinyin, meaning, and category fields; compact toggle toolbar with tone-marked vowels grouped by base vowel (ā á ǎ à, ē é ě è, etc.); inserts at cursor position; add/edit/delete with confirmation; creator/editor metadata
 - **88 English phrases** (migrated from English Learning) — phrases across 8 categories (Greetings, Feelings, House, Food, Going Out, People, Time, Emergencies) with Chinese translation and phonetic guide
-- **Firestore-backed Chinese characters** — `chineseCharacters` collection (public read, authenticated write); CRUD via `window.__chineseCharacters` bridge; real-time `onSnapshot` subscription with `localStorage` cache
+- **Chinese characters now per-user** — new Chinese cards are created in `users/{uid}/flashcards` (private). Legacy `chineseCharacters` collection retained as read-only fallback for unauthenticated users. On first auth, a one-time migration copies existing Chinese characters to both `publicFlashcards` and the user's private collection.
+- **Publish-to-shared model** — any private card (Chinese, Bible, Custom) can be published to `publicFlashcards` collection (public read, authenticated write). Published cards show a "Shared" badge and creator info. Publishing is one-way and irreversible.
+- **`publicFlashcards` collection** — schema: `{ id, type, front, back, category, meta, isPublic: true, createdBy: { uid, displayName }, createdAt }`. Public read, authenticated create/update/delete.
+- **Visibility tab filter** — "All" (private + English + public deduped), "My Cards" (private only), "Published" (public only). UI renders as segmented control above type filter chips.
 - **3D flip animation** — CSS perspective transforms for realistic card rotation on tap/click
 - **BibleVersePicker** — book → chapter → verse selector using `GET_BIBLE_PASSAGE` GraphQL query; generates two card types per selection (first-letter + full-text)
 - **Unified progress tracking** — mastery tracking across all card types; progress persisted to `StorageKeys.FLASHCARD_PROGRESS` (localStorage JSON: `{ masteredIds, lastPracticed }`)
 - **Category filtering** — filter by card type (Chinese, English, Bible, Custom) with chip toggles
-- Bible/custom cards stored in `StorageKeys.FLASHCARD_BIBLE_CARDS` and `StorageKeys.FLASHCARD_CUSTOM_CARDS`
-- Chinese cards loaded from `window.__chineseCharacters` bridge API; English cards bundled at build time
+- Bible/custom cards stored in `StorageKeys.FLASHCARD_BIBLE_CARDS` and `StorageKeys.FLASHCARD_CUSTOM_CARDS`; public cards cached in `StorageKeys.FLASHCARD_PUBLIC_CARDS`
+- Chinese cards loaded from `window.__flashcards` subscription when authenticated, `window.__chineseCharacters` as fallback; English cards bundled at build time
 - `WindowEvents.FLASHCARD_PROGRESS_CHANGED` for cross-tab sync
 - Route: `/flashcards`
 

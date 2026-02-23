@@ -9,6 +9,7 @@ interface CardGridProps {
   onCardClick: (card: FlashCard) => void;
   onDeleteCard?: (card: FlashCard) => void;
   onEditCard?: (card: FlashCard) => void;
+  onPublishCard?: (card: FlashCard) => void;
   isAuthenticated?: boolean;
 }
 
@@ -20,7 +21,12 @@ function canEdit(card: FlashCard): boolean {
   return card.type !== 'english';
 }
 
-export default function CardGrid({ cards, masteredIds, onCardClick, onDeleteCard, onEditCard, isAuthenticated }: CardGridProps) {
+function canPublish(card: FlashCard): boolean {
+  const publishableTypes = ['chinese', 'bible-first-letter', 'bible-full', 'custom'];
+  return publishableTypes.includes(card.type) && card.isPublic !== true;
+}
+
+export default function CardGrid({ cards, masteredIds, onCardClick, onDeleteCard, onEditCard, onPublishCard, isAuthenticated }: CardGridProps) {
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
@@ -90,6 +96,7 @@ export default function CardGrid({ cards, masteredIds, onCardClick, onDeleteCard
                     onClick={() => onCardClick(card)}
                     onDelete={isAuthenticated && onDeleteCard && canDelete(card) ? () => onDeleteCard(card) : undefined}
                     onEdit={isAuthenticated && onEditCard && canEdit(card) ? () => onEditCard(card) : undefined}
+                    onPublish={isAuthenticated && onPublishCard && canPublish(card) ? () => onPublishCard(card) : undefined}
                   />
                 ))}
               </div>

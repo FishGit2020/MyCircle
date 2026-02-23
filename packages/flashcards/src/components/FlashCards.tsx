@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation, StorageKeys } from '@mycircle/shared';
-import type { FlashCard, CardType } from '../types';
+import type { FlashCard, CardType, VisibilityFilter } from '../types';
 import { useFlashCards } from '../hooks/useFlashCards';
 import { phrases } from '../data/phrases';
 import type { ChineseCharacter, CharacterCategory } from '../data/characters';
@@ -18,6 +18,12 @@ const TYPE_LABELS: Record<CardType, string> = {
   'bible-full': 'flashcards.bibleFull',
   custom: 'flashcards.custom',
 };
+
+const VISIBILITY_OPTIONS: { value: VisibilityFilter; labelKey: string }[] = [
+  { value: 'all', labelKey: 'flashcards.allCards' },
+  { value: 'private', labelKey: 'flashcards.myCards' },
+  { value: 'published', labelKey: 'flashcards.published' },
+];
 
 export default function FlashCards() {
   const { t } = useTranslation();
@@ -37,6 +43,9 @@ export default function FlashCards() {
     addChineseChar,
     updateChineseChar,
     deleteChineseChar,
+    visibilityFilter,
+    setVisibilityFilter,
+    publishCard,
   } = useFlashCards();
 
   const [disabledTypes, setDisabledTypes] = useState<Set<CardType>>(() => {
@@ -126,6 +135,11 @@ export default function FlashCards() {
     }
   };
 
+  const handlePublish = useCallback(async (card: FlashCard) => {
+    if (!window.confirm(t('flashcards.publishConfirm'))) return;
+    await publishCard(card);
+  }, [publishCard, t]);
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -146,6 +160,24 @@ export default function FlashCards() {
       <div className="flex items-center gap-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
         <span>{t('flashcards.cardsCount').replace('{count}', String(allCards.length))}</span>
         <span>{t('flashcards.masteredCount').replace('{count}', String(masteredCount))}</span>
+      </div>
+
+      {/* Visibility tab filter */}
+      <div className="flex gap-1 mb-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit">
+        {VISIBILITY_OPTIONS.map(opt => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => setVisibilityFilter(opt.value)}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
+              visibilityFilter === opt.value
+                ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            {t(opt.labelKey as any)}
+          </button>
+        ))}
       </div>
 
       {/* Type filter chips (toggle: active = shown, inactive = hidden) */}
@@ -234,6 +266,7 @@ export default function FlashCards() {
         onCardClick={handleCardClick}
         onDeleteCard={setCardToDelete}
         onEditCard={handleEditRequest}
+        onPublishCard={handlePublish}
         isAuthenticated={isAuthenticated}
       />
 
