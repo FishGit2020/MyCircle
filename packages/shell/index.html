@@ -65,6 +65,17 @@
       });
       // Clear the reload guard once the app boots successfully
       window.addEventListener('load', function() { sessionStorage.removeItem('sw-reload'); });
+      // On deep-link page loads after a deploy, the old SW may still be active and
+      // serve a stale index.html whose chunk hashes no longer exist on the server.
+      // If a waiting SW exists, skip-wait it immediately so the next navigation
+      // (or the self-heal reload) picks up the fresh precache.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(function(reg) {
+          if (reg && reg.waiting) {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      }
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

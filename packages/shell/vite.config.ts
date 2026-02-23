@@ -222,6 +222,7 @@ export default defineConfig({
       workbox: {
         // skipWaiting: true,    — removed: conflicts with registerType:'prompt'
         // clientsClaim: true,   — the ReloadPrompt banner handles the update flow
+        cleanupOutdatedCaches: true,
 
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [
