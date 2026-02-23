@@ -411,10 +411,10 @@ export default function BabyTracker() {
               <a
                 href={
                   trimester === 1
-                    ? 'https://www.whattoexpect.com/pregnancy/first-trimester/'
+                    ? 'https://www.whattoexpect.com/first-trimester-of-pregnancy.aspx'
                     : trimester === 2
-                    ? 'https://www.whattoexpect.com/pregnancy/second-trimester/'
-                    : 'https://www.whattoexpect.com/pregnancy/third-trimester/'
+                    ? 'https://www.whattoexpect.com/second-trimester-of-pregnancy.aspx'
+                    : 'https://www.whattoexpect.com/third-trimester-of-pregnancy.aspx'
                 }
                 target="_blank"
                 rel="noopener noreferrer"
