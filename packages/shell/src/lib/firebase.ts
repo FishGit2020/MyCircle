@@ -919,6 +919,11 @@ export async function addPublicFlashcard(card: Record<string, any>) {
   return id;
 }
 
+export async function deletePublicFlashcard(id: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'publicFlashcards', id));
+}
+
 export function subscribeToPublicFlashcards(callback: (cards: Array<Record<string, any>>) => void): () => void {
   if (!db) return () => {};
   const q = query(collection(db, 'publicFlashcards'), orderBy('createdAt', 'desc'));
@@ -1084,6 +1089,10 @@ if (firebaseEnabled) {
     publish: (card: Record<string, any>) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return addPublicFlashcard(card);
+    },
+    deletePublic: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deletePublicFlashcard(id);
     },
     migrateChineseToPublic: () => migrateChineseToPublic(),
   };
