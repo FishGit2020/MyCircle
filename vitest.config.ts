@@ -35,6 +35,11 @@ export default defineConfig({
       'e2e/**',
       'functions/**',
     ],
+    poolOptions: {
+      forks: {
+        execArgv: ['--max-old-space-size=4096'],
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
