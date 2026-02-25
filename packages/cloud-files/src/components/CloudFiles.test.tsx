@@ -24,20 +24,11 @@ vi.mock('@mycircle/shared', () => ({
   }),
 }));
 
-function mockCloudFilesApi() {
-  (window as any).__getFirebaseIdToken = vi.fn();
-  (window as any).__cloudFiles = {
-    getAll: vi.fn(() => Promise.resolve([])),
-    subscribe: vi.fn(() => () => {}),
-    getAllShared: vi.fn(() => Promise.resolve([])),
-    subscribeShared: vi.fn(() => () => {}),
-  };
-}
-
 describe('CloudFiles', () => {
   beforeEach(() => {
     delete (window as any).__getFirebaseIdToken;
     delete (window as any).__cloudFiles;
+    localStorage.clear();
   });
 
   it('shows login prompt when not authenticated', () => {
@@ -49,8 +40,14 @@ describe('CloudFiles', () => {
     expect(screen.getByText('cloudFiles.loginToUse')).toBeInTheDocument();
   });
 
-  it('renders tabs when authenticated', async () => {
-    mockCloudFilesApi();
+  it('renders tabs and title when authenticated', async () => {
+    (window as any).__getFirebaseIdToken = vi.fn();
+    (window as any).__cloudFiles = {
+      getAll: vi.fn().mockResolvedValue([]),
+      subscribe: vi.fn(() => () => {}),
+      getAllShared: vi.fn().mockResolvedValue([]),
+      subscribeShared: vi.fn(() => () => {}),
+    };
 
     await act(async () => {
       render(
@@ -59,20 +56,9 @@ describe('CloudFiles', () => {
         </MemoryRouter>
       );
     });
+
+    expect(screen.getByText('cloudFiles.title')).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /cloudFiles\.myFiles/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /cloudFiles\.sharedFiles/i })).toBeInTheDocument();
-  });
-
-  it('shows title', async () => {
-    mockCloudFilesApi();
-
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <CloudFiles />
-        </MemoryRouter>
-      );
-    });
-    expect(screen.getByText('cloudFiles.title')).toBeInTheDocument();
   });
 });
