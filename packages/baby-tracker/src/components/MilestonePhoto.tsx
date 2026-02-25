@@ -168,7 +168,6 @@ export default function MilestonePhoto({
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={handleFileSelect}
         className="hidden"
         aria-hidden="true"
