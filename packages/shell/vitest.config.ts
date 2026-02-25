@@ -34,6 +34,7 @@ export default defineConfig({
       'englishLearning/EnglishLearning': resolve(__dirname, './src/test/mocks/EnglishLearningMock.tsx'),
       'flashcards/FlashCards': resolve(__dirname, './src/test/mocks/FlashCardsMock.tsx'),
       'workTracker/WorkTracker': resolve(__dirname, './src/test/mocks/WorkTrackerMock.tsx'),
+      'cloudFiles/CloudFiles': resolve(__dirname, './src/test/mocks/CloudFilesMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './src/test/mocks/pwaRegisterReactMock.ts')
     }
   }

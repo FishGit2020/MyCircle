@@ -70,3 +70,8 @@ declare module 'workTracker/WorkTracker' {
   const WorkTracker: React.ComponentType;
   export default WorkTracker;
 }
+
+declare module 'cloudFiles/CloudFiles' {
+  const CloudFiles: React.ComponentType;
+  export default CloudFiles;
+}

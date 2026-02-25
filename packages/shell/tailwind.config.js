@@ -15,6 +15,7 @@ export default {
     "../child-development/src/**/*.{js,ts,jsx,tsx}",
     "../flashcards/src/**/*.{js,ts,jsx,tsx}",
     "../work-tracker/src/**/*.{js,ts,jsx,tsx}",
+    "../cloud-files/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',
   theme: {

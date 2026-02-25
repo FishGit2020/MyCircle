@@ -20,6 +20,7 @@ export default defineConfig({
       'englishLearning/EnglishLearning': resolve(__dirname, './packages/shell/src/test/mocks/EnglishLearningMock.tsx'),
       'flashcards/FlashCards': resolve(__dirname, './packages/shell/src/test/mocks/FlashCardsMock.tsx'),
       'workTracker/WorkTracker': resolve(__dirname, './packages/shell/src/test/mocks/WorkTrackerMock.tsx'),
+      'cloudFiles/CloudFiles': resolve(__dirname, './packages/shell/src/test/mocks/CloudFilesMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/src/test/mocks/pwaRegisterReactMock.ts'),
       '@weather/shared': resolve(__dirname, './packages/shared/src'),
     }

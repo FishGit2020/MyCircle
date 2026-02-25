@@ -27,6 +27,10 @@
         "function": "aiChat"
       },
       {
+        "source": "/cloud-files/**",
+        "function": "cloudFiles"
+      },
+      {
         "source": "/baby-photos/**",
         "function": "babyPhotos"
       },

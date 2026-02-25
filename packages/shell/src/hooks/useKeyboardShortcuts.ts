@@ -67,6 +67,7 @@ export function useKeyboardShortcuts({ onToggleTheme, onShowHelp }: UseKeyboardS
         case 'e': e.preventDefault(); navigate('/english'); break;
         case 'c': e.preventDefault(); navigate('/chinese'); break;
         case 'a': e.preventDefault(); navigate('/ai'); break;
+        case 'u': e.preventDefault(); navigate('/files'); break;
       }
     };
 

@@ -99,6 +99,7 @@ export default function KeyboardShortcutsHelp({ open, onClose }: Props) {
           <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>e</Kbd></>} label={t('shortcuts.goEnglish')} />
           <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>c</Kbd></>} label={t('shortcuts.goChinese')} />
           <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>a</Kbd></>} label={t('shortcuts.goAi')} />
+          <ShortcutRow keys={<><Kbd>g</Kbd><Kbd>u</Kbd></>} label={t('shortcuts.goCloudFiles')} />
         </div>
 
         {/* Footer */}

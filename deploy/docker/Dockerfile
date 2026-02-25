@@ -22,6 +22,7 @@ COPY packages/baby-tracker/package.json packages/baby-tracker/
 COPY packages/child-development/package.json packages/child-development/
 COPY packages/flashcards/package.json packages/flashcards/
 COPY packages/work-tracker/package.json packages/work-tracker/
+COPY packages/cloud-files/package.json packages/cloud-files/
 
 RUN pnpm install --frozen-lockfile
 
@@ -71,6 +72,7 @@ COPY --from=builder /app/packages/baby-tracker/package.json packages/baby-tracke
 COPY --from=builder /app/packages/child-development/package.json packages/child-development/
 COPY --from=builder /app/packages/flashcards/package.json packages/flashcards/
 COPY --from=builder /app/packages/work-tracker/package.json packages/work-tracker/
+COPY --from=builder /app/packages/cloud-files/package.json packages/cloud-files/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune
