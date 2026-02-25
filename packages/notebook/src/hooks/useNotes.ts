@@ -16,6 +16,14 @@ export function useNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [authVersion, setAuthVersion] = useState(0);
+
+  // Re-initialize subscriptions when auth state changes (sign-in / sign-out)
+  useEffect(() => {
+    const handler = () => setAuthVersion(v => v + 1);
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+  }, []);
 
   const api = (window as any).__notebook as NotebookAPI | undefined;
 
@@ -64,7 +72,7 @@ export function useNotes() {
     const handler = () => loadNotes();
     window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
     return () => window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
-  }, [api, loadNotes]);
+  }, [api, loadNotes, authVersion]);
 
   const saveNote = useCallback(async (id: string | null, data: NoteInput) => {
     if (!api) throw new Error('Notebook API not available');

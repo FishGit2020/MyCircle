@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { WindowEvents } from '@mycircle/shared';
 import type { WorkEntry } from '../types';
+import { getLocalDateString } from '../utils/localDate';
 
 declare global {
   interface Window {
@@ -21,7 +22,7 @@ export function useWorkEntries() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
-  // Auth state detection
+  // Auth state detection — re-check instantly when auth changes
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
@@ -34,8 +35,9 @@ export function useWorkEntries() {
       if (mounted) setAuthChecked(true);
     };
     checkAuth();
-    const interval = setInterval(checkAuth, 5000);
-    return () => { mounted = false; clearInterval(interval); };
+    const handler = () => { checkAuth(); };
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler); };
   }, []);
 
   const loadEntries = useCallback(async () => {
@@ -78,7 +80,7 @@ export function useWorkEntries() {
 
   const addEntry = useCallback(async (content: string) => {
     if (!window.__workTracker) throw new Error('Work tracker API not available');
-    const date = new Date().toISOString().split('T')[0];
+    const date = getLocalDateString();
     const id = await window.__workTracker.add({ date, content });
     window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
     return id;

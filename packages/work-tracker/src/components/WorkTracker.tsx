@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { useWorkEntries } from '../hooks/useWorkEntries';
+import { getLocalDateString } from '../utils/localDate';
 import EntryForm from './EntryForm';
 import TimelineView from './TimelineView';
 
@@ -11,7 +12,7 @@ export default function WorkTracker() {
   const { entries, loading, isAuthenticated, authChecked, addEntry, updateEntry, deleteEntry } = useWorkEntries();
   const [filter, setFilter] = useState<TimeFilter>('all');
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
   const currentMonth = today.slice(0, 7); // "2026-02"
 
   const filteredEntries = useMemo(() => {
