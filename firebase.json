@@ -27,6 +27,10 @@
         "function": "aiChat"
       },
       {
+        "source": "/baby-photos/**",
+        "function": "babyPhotos"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
