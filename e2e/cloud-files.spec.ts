@@ -11,8 +11,9 @@ test.describe('Cloud Files', () => {
   });
 
   test('shows sign-in prompt for unauthenticated users', async ({ page }) => {
-    // The MFE shows "Sign in to use Cloud Files" when not authenticated
-    // Use a broad match since the text may vary by locale
-    await expect(page.getByText(/sign in|iniciar sesi|登录/i)).toBeVisible({ timeout: 15_000 });
+    // The cloud-files MFE shows a lock icon + "Sign in to use Cloud Files" message
+    // Use a locator scoped to the main content area to avoid matching the header Sign In button
+    const main = page.locator('main, [role="main"], .flex-1');
+    await expect(main.getByText(/sign in/i).first()).toBeVisible({ timeout: 15_000 });
   });
 });
