@@ -1109,7 +1109,7 @@ export const babyPhotos = onRequest(
       return;
     }
 
-    const path = req.path.replace(/^\/+/, '');
+    const path = req.path.replace(/^\/baby-photos\/?/, '').replace(/^\/+/, '');
 
     if (path === 'upload' && req.method === 'POST') {
       const parsed = babyPhotoUploadSchema.safeParse(req.body);
