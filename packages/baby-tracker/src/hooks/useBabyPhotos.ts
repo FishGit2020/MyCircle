@@ -39,6 +39,7 @@ export function useBabyPhotos() {
   const [photos, setPhotos] = useState<Map<number, MilestonePhotoData>>(getCached);
   const [uploading, setUploading] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorStageId, setErrorStageId] = useState<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check auth state
@@ -108,6 +109,7 @@ export function useBabyPhotos() {
     } catch (err: any) {
       const msg = err?.message || 'Upload failed';
       setError(msg);
+      setErrorStageId(stageId);
       console.error('Baby photo upload failed:', err);
     } finally {
       setUploading(null);
@@ -127,7 +129,7 @@ export function useBabyPhotos() {
     window.__logAnalyticsEvent?.('baby_milestone_photo_delete', { stageId });
   }, []);
 
-  const clearError = useCallback(() => setError(null), []);
+  const clearError = useCallback(() => { setError(null); setErrorStageId(null); }, []);
 
-  return { photos, uploading, error, clearError, uploadPhoto, deletePhoto, isAuthenticated };
+  return { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated };
 }
