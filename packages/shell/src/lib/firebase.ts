@@ -2,6 +2,7 @@ import { createLogger } from '@mycircle/shared';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, FirebaseStorage } from 'firebase/storage';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -27,6 +28,7 @@ let db: Firestore | null = null;
 let perf: FirebasePerformance | null = null;
 let analytics: Analytics | null = null;
 let googleProvider: GoogleAuthProvider | null = null;
+let storage: FirebaseStorage | null = null;
 let appCheck: AppCheck | null = null;
 
 if (firebaseEnabled) {
@@ -35,6 +37,7 @@ if (firebaseEnabled) {
   db = initializeFirestore(app, {
     localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
   });
+  storage = getStorage(app);
   perf = getPerformance(app);
   analytics = getAnalytics(app);
   googleProvider = new GoogleAuthProvider();
@@ -1098,9 +1101,69 @@ if (firebaseEnabled) {
   };
 }
 
+// Baby Milestone Photos — Firebase Storage + Firestore metadata
+export interface BabyMilestone {
+  photoUrl: string;
+  caption?: string;
+  uploadedAt: Date;
+}
+
+async function uploadBabyPhoto(uid: string, stageId: number, file: Blob): Promise<string> {
+  if (!storage) throw new Error('Firebase Storage not initialized');
+  const photoRef = ref(storage, `users/${uid}/baby-photos/${stageId}.jpg`);
+  await uploadBytes(photoRef, file, { contentType: 'image/jpeg' });
+  return getDownloadURL(photoRef);
+}
+
+async function deleteBabyPhoto(uid: string, stageId: number): Promise<void> {
+  if (!storage || !db) throw new Error('Firebase not initialized');
+  const photoRef = ref(storage, `users/${uid}/baby-photos/${stageId}.jpg`);
+  try {
+    await deleteObject(photoRef);
+  } catch (e: any) {
+    if (e?.code !== 'storage/object-not-found') throw e;
+  }
+  await deleteDoc(doc(db, 'users', uid, 'babyMilestones', String(stageId)));
+}
+
+async function getBabyMilestones(uid: string): Promise<Record<string, any>[]> {
+  if (!db) return [];
+  const snapshot = await getDocs(collection(db, 'users', uid, 'babyMilestones'));
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function setBabyMilestone(uid: string, stageId: number, data: { photoUrl: string; caption?: string }): Promise<void> {
+  if (!db) throw new Error('Firebase not initialized');
+  await setDoc(doc(db, 'users', uid, 'babyMilestones', String(stageId)), {
+    ...data,
+    uploadedAt: serverTimestamp(),
+  });
+}
+
+// Expose baby photos API for MFEs
+if (firebaseEnabled) {
+  window.__babyPhotos = {
+    upload: async (stageId: number, file: Blob, caption?: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      const photoUrl = await uploadBabyPhoto(uid, stageId, file);
+      await setBabyMilestone(uid, stageId, { photoUrl, caption });
+      return photoUrl;
+    },
+    getAll: () => {
+      if (!auth?.currentUser) return Promise.resolve([]);
+      return getBabyMilestones(auth.currentUser.uid);
+    },
+    delete: async (stageId: number) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      await deleteBabyPhoto(auth.currentUser.uid, stageId);
+    },
+  };
+}
+
 // Expose analytics for MFEs
 window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
   logEvent(eventName, params);
 };
 
-export { app, auth, db, perf, analytics, firebaseEnabled };
+export { app, auth, db, storage, perf, analytics, firebaseEnabled };

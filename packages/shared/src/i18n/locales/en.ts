@@ -891,6 +891,18 @@ const en = {
   'baby.mayoGuide': 'Mayo Clinic',
   'baby.whatToExpect': 'What to Expect',
   'baby.sourcesAttribution': 'Growth data follows ACOG clinical guidelines',
+  'baby.addPhoto': 'Add Photo',
+  'baby.deletePhoto': 'Delete Photo',
+  'baby.deletePhotoConfirm': 'Delete this milestone photo? This cannot be undone.',
+  'baby.photoCaption': 'Caption',
+  'baby.photoCaptionPlaceholder': 'Add a note about this moment...',
+  'baby.uploading': 'Uploading...',
+  'baby.photoSaved': 'Photo saved',
+  'baby.signInForPhotos': 'Sign in to add milestone photos',
+  'baby.milestonePhoto': 'Milestone photo',
+  'baby.viewPhoto': 'View photo',
+  'baby.closeLightbox': 'Close photo',
+  'baby.cancel': 'Cancel',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Keyboard Shortcuts',

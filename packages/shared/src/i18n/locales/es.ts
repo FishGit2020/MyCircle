@@ -893,6 +893,18 @@ const es: Record<TranslationKey, string> = {
   'baby.mayoGuide': 'Mayo Clinic',
   'baby.whatToExpect': 'What to Expect',
   'baby.sourcesAttribution': 'Los datos de crecimiento siguen las gu\u00edas cl\u00ednicas de ACOG',
+  'baby.addPhoto': 'Agregar foto',
+  'baby.deletePhoto': 'Eliminar foto',
+  'baby.deletePhotoConfirm': '\u00bfEliminar esta foto del hito? Esto no se puede deshacer.',
+  'baby.photoCaption': 'Descripci\u00f3n',
+  'baby.photoCaptionPlaceholder': 'Agrega una nota sobre este momento...',
+  'baby.uploading': 'Subiendo...',
+  'baby.photoSaved': 'Foto guardada',
+  'baby.signInForPhotos': 'Inicia sesi\u00f3n para agregar fotos de hitos',
+  'baby.milestonePhoto': 'Foto del hito',
+  'baby.viewPhoto': 'Ver foto',
+  'baby.closeLightbox': 'Cerrar foto',
+  'baby.cancel': 'Cancelar',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Atajos de teclado',
