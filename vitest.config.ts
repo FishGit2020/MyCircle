@@ -34,12 +34,8 @@ export default defineConfig({
       '**/dist/**',
       'e2e/**',
       'functions/**',
+      'packages/cloud-files/**',
     ],
-    poolOptions: {
-      forks: {
-        execArgv: ['--max-old-space-size=4096'],
-      },
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
