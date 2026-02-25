@@ -1131,16 +1131,19 @@ export const babyPhotos = onRequest(
         const filePath = `users/${uid}/baby-photos/${stageId}.jpg`;
         const file = bucket.file(filePath);
 
+        const downloadToken = crypto.randomUUID();
         await file.save(buffer, {
           contentType: 'image/jpeg',
-          metadata: { cacheControl: 'public, max-age=31536000' },
+          metadata: {
+            cacheControl: 'public, max-age=31536000',
+            metadata: { firebaseStorageDownloadTokens: downloadToken },
+          },
         });
 
-        // Generate a signed URL valid for 10 years (private photo, long-lived)
-        const [photoUrl] = await file.getSignedUrl({
-          action: 'read',
-          expires: Date.now() + 10 * 365 * 24 * 60 * 60 * 1000,
-        });
+        // Build Firebase Storage download URL (no IAM signBlob permission needed)
+        const bucketName = bucket.name;
+        const encodedPath = encodeURIComponent(filePath);
+        const photoUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`;
 
         // Write metadata to Firestore
         const db = getFirestore();
