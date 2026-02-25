@@ -38,6 +38,7 @@ function setCache(photos: Map<number, MilestonePhotoData>) {
 export function useBabyPhotos() {
   const [photos, setPhotos] = useState<Map<number, MilestonePhotoData>>(getCached);
   const [uploading, setUploading] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check auth state
@@ -92,6 +93,7 @@ export function useBabyPhotos() {
   const uploadPhoto = useCallback(async (stageId: number, file: File, caption?: string) => {
     if (!window.__babyPhotos) throw new Error('Baby photos API not available');
     setUploading(stageId);
+    setError(null);
     try {
       const compressed = await compressImage(file);
       const photoUrl = await window.__babyPhotos.upload(stageId, compressed, caption);
@@ -103,6 +105,10 @@ export function useBabyPhotos() {
       });
       window.dispatchEvent(new Event(WindowEvents.BABY_MILESTONES_CHANGED));
       window.__logAnalyticsEvent?.('baby_milestone_photo_upload', { stageId });
+    } catch (err: any) {
+      const msg = err?.message || 'Upload failed';
+      setError(msg);
+      console.error('Baby photo upload failed:', err);
     } finally {
       setUploading(null);
     }
@@ -121,5 +127,7 @@ export function useBabyPhotos() {
     window.__logAnalyticsEvent?.('baby_milestone_photo_delete', { stageId });
   }, []);
 
-  return { photos, uploading, uploadPhoto, deletePhoto, isAuthenticated };
+  const clearError = useCallback(() => setError(null), []);
+
+  return { photos, uploading, error, clearError, uploadPhoto, deletePhoto, isAuthenticated };
 }

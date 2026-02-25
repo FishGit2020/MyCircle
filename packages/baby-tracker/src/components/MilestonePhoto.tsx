@@ -9,6 +9,8 @@ interface MilestonePhotoProps {
   onUpload: (stageId: number, file: File, caption?: string) => Promise<void>;
   onDelete: (stageId: number) => Promise<void>;
   uploading: boolean;
+  error?: string | null;
+  onClearError?: () => void;
 }
 
 export default function MilestonePhoto({
@@ -19,6 +21,8 @@ export default function MilestonePhoto({
   onUpload,
   onDelete,
   uploading,
+  error,
+  onClearError,
 }: MilestonePhotoProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,14 +36,18 @@ export default function MilestonePhoto({
     if (!file) return;
     // Reset input so same file can be re-selected
     e.target.value = '';
+    onClearError?.();
 
-    if (showCaptionInput) {
-      // Upload with current caption
-      await onUpload(stageId, file, captionInput || undefined);
+    try {
+      if (showCaptionInput) {
+        await onUpload(stageId, file, captionInput || undefined);
+      } else {
+        await onUpload(stageId, file);
+      }
+    } finally {
+      // Always reset caption UI regardless of success/failure
       setCaptionInput('');
       setShowCaptionInput(false);
-    } else {
-      await onUpload(stageId, file);
     }
   };
 
@@ -64,6 +72,22 @@ export default function MilestonePhoto({
       <div className="flex items-center gap-2 mt-2">
         <div className="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 animate-pulse" />
         <span className="text-xs text-pink-500 dark:text-pink-400">{t('baby.uploading')}</span>
+      </div>
+    );
+  }
+
+  // Error state — show inline error with retry option
+  if (error && !photoUrl) {
+    return (
+      <div className="mt-2 flex items-center gap-2">
+        <span className="text-xs text-red-500 dark:text-red-400">{t('baby.uploadFailed')}</span>
+        <button
+          type="button"
+          onClick={onClearError}
+          className="text-xs text-pink-500 dark:text-pink-400 underline"
+        >
+          {t('baby.tryAgain')}
+        </button>
       </div>
     );
   }

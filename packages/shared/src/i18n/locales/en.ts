@@ -903,6 +903,8 @@ const en = {
   'baby.viewPhoto': 'View photo',
   'baby.closeLightbox': 'Close photo',
   'baby.cancel': 'Cancel',
+  'baby.uploadFailed': 'Upload failed. Please try again.',
+  'baby.tryAgain': 'Try again',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Keyboard Shortcuts',

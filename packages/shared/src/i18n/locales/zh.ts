@@ -905,6 +905,8 @@ const zh: Record<TranslationKey, string> = {
   'baby.viewPhoto': '\u67e5\u770b\u7167\u7247',
   'baby.closeLightbox': '\u5173\u95ed\u7167\u7247',
   'baby.cancel': '\u53d6\u6d88',
+  'baby.uploadFailed': '\u4e0a\u4f20\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002',
+  'baby.tryAgain': '\u91cd\u8bd5',
 
   // Keyboard Shortcuts
   'shortcuts.title': '\u952e\u76d8\u5feb\u6377\u952e',
