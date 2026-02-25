@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { WorkEntry } from '../types';
+import { getLocalDateString } from '../utils/localDate';
 import EntryForm from './EntryForm';
 
 interface DayNodeProps {
@@ -31,13 +32,13 @@ function formatDate(dateStr: string): string {
 }
 
 function isToday(dateStr: string): boolean {
-  return dateStr === new Date().toISOString().split('T')[0];
+  return dateStr === getLocalDateString();
 }
 
 function isYesterday(dateStr: string): boolean {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  return dateStr === yesterday.toISOString().split('T')[0];
+  return dateStr === getLocalDateString(yesterday);
 }
 
 export default function DayNode({ date, entries, onUpdate, onDelete }: DayNodeProps) {

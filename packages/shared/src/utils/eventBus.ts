@@ -36,6 +36,7 @@ export const WindowEvents = {
   WORK_TRACKER_CHANGED: 'work-tracker-changed',
   WORSHIP_FAVORITES_CHANGED: 'worship-favorites-changed',
   BABY_MILESTONES_CHANGED: 'baby-milestones-changed',
+  AUTH_STATE_CHANGED: 'auth-state-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals

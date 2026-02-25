@@ -331,7 +331,7 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 - `WindowEvents.BABY_DUE_DATE_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
 - Gestational week = `40 - ceil(weeksUntilDue)`, trimester display, ARIA progress bar
 - Uses Apollo `GET_BIBLE_PASSAGE` query for accurate verse text from YouVersion API
-- **Milestone Photos**: Per-stage photo upload via Firebase Storage (`users/{uid}/baby-photos/{stageId}.jpg`), metadata in Firestore subcollection `users/{uid}/babyMilestones/{stageId}`. Client-side image compression (canvas, max 1024px, JPEG 0.8). `window.__babyPhotos` bridge exposes `upload`, `getAll`, `delete` for MFE access. Photos are private per-user.
+- **Milestone Photos**: Per-stage photo upload routed through `babyPhotos` Cloud Function (`POST /baby-photos/upload`) which uses Firebase Admin SDK to write to Storage (`users/{uid}/baby-photos/{stageId}.jpg`) and Firestore (`users/{uid}/babyMilestones/{stageId}`). Client-side image compression (canvas, max 1024px, JPEG 0.8) then base64-encoded in JSON body. `window.__babyPhotos` bridge exposes `upload`, `getAll`, `delete` for MFE access. Photos are private per-user with signed URLs.
 - Route: `/baby`
 
 ### Child Development - `packages/child-development/`
@@ -1185,6 +1185,7 @@ All Cloud Functions are defined in `functions/src/index.ts` and deployed via `fi
 | `stockProxy` | `onRequest` | `/stock/**` | 256 MiB | 30s | FINNHUB_API_KEY |
 | `podcastProxy` | `onRequest` | `/podcast/**` | 256 MiB | 30s | PODCASTINDEX keys |
 | `aiChat` | `onRequest` | `/ai/chat` (POST) | 256 MiB | 60s | GEMINI, OPENWEATHER, FINNHUB, RECAPTCHA keys |
+| `babyPhotos` | `onRequest` | `/baby-photos/**` | 256 MiB | 30s | — |
 | `subscribeToAlerts` | `onCall` | Callable | Default | Default | — |
 | `checkWeatherAlerts` | `onSchedule` | Every 30 minutes | 256 MiB | 120s | OPENWEATHER_API_KEY |
 
@@ -1197,10 +1198,11 @@ IP-based rate limiting via `node-cache` (in-memory, per-instance):
 | `stockProxy` | 60 requests | 60 seconds |
 | `podcastProxy` | 60 requests | 60 seconds |
 | `aiChat` | 10 requests | 60 seconds |
+| `babyPhotos` | 10 requests | 60 seconds |
 
 ### Authentication
 
-- `stockProxy`, `aiChat`: Require Firebase Auth ID token (`Authorization: Bearer <token>`)
+- `stockProxy`, `aiChat`, `babyPhotos`: Require Firebase Auth ID token (`Authorization: Bearer <token>`)
 - `podcastProxy`: Public (no auth required) — allows unauthenticated podcast browsing with rate limiting
 - `graphql`: Requires auth for stock/podcast operations (checked by operation name)
 - `subscribeToAlerts`: Enforces App Check
