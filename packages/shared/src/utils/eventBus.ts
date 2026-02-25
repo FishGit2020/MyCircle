@@ -35,6 +35,7 @@ export const WindowEvents = {
   FLASHCARD_PROGRESS_CHANGED: 'flashcard-progress-changed',
   WORK_TRACKER_CHANGED: 'work-tracker-changed',
   WORSHIP_FAVORITES_CHANGED: 'worship-favorites-changed',
+  BABY_MILESTONES_CHANGED: 'baby-milestones-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -78,6 +79,7 @@ export const StorageKeys = {
   WORK_TRACKER_CACHE: 'work-tracker-cache',
   PODCAST_NOW_PLAYING: 'podcast-now-playing',
   FLASHCARD_PUBLIC_CARDS: 'flashcard-public-cards',
+  BABY_MILESTONES_CACHE: 'baby-milestones-cache',
 } as const;
 
 export interface CitySelectedEvent {

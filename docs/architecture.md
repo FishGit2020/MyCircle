@@ -331,6 +331,7 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 - `WindowEvents.BABY_DUE_DATE_CHANGED` bridges MFE ↔ shell AuthContext for Firestore sync
 - Gestational week = `40 - ceil(weeksUntilDue)`, trimester display, ARIA progress bar
 - Uses Apollo `GET_BIBLE_PASSAGE` query for accurate verse text from YouVersion API
+- **Milestone Photos**: Per-stage photo upload via Firebase Storage (`users/{uid}/baby-photos/{stageId}.jpg`), metadata in Firestore subcollection `users/{uid}/babyMilestones/{stageId}`. Client-side image compression (canvas, max 1024px, JPEG 0.8). `window.__babyPhotos` bridge exposes `upload`, `getAll`, `delete` for MFE access. Photos are private per-user.
 - Route: `/baby`
 
 ### Child Development - `packages/child-development/`
@@ -784,6 +785,7 @@ interface Note {
 | `'notebook-cache'` | JSON `{ count: number }` | Notebook note count for dashboard widget |
 | `'baby-due-date'` | ISO date string (e.g., `'2026-08-15'`) | Baby due date for growth tracking |
 | `'bottom-nav-order'` | JSON array of path strings | Mobile bottom nav item order (Firestore sync when signed in) |
+| `'baby-milestones-cache'` | JSON `Map<number, { photoUrl, caption }>` | Cached baby milestone photo metadata (localStorage, Firestore sync) |
 
 ### Browser SessionStorage — Geolocation
 

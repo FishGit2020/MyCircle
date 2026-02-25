@@ -893,6 +893,18 @@ const zh: Record<TranslationKey, string> = {
   'baby.mayoGuide': '\u6885\u5965\u8bca\u6240',
   'baby.whatToExpect': 'What to Expect',
   'baby.sourcesAttribution': '\u751f\u957f\u6570\u636e\u9075\u5faaACOG\u4e34\u5e8a\u6307\u5357',
+  'baby.addPhoto': '\u6dfb\u52a0\u7167\u7247',
+  'baby.deletePhoto': '\u5220\u9664\u7167\u7247',
+  'baby.deletePhotoConfirm': '\u5220\u9664\u8fd9\u5f20\u91cc\u7a0b\u7891\u7167\u7247\uff1f\u6b64\u64cd\u4f5c\u65e0\u6cd5\u64a4\u6d88\u3002',
+  'baby.photoCaption': '\u8bf4\u660e',
+  'baby.photoCaptionPlaceholder': '\u6dfb\u52a0\u5173\u4e8e\u8fd9\u4e2a\u65f6\u523b\u7684\u7b14\u8bb0...',
+  'baby.uploading': '\u4e0a\u4f20\u4e2d...',
+  'baby.photoSaved': '\u7167\u7247\u5df2\u4fdd\u5b58',
+  'baby.signInForPhotos': '\u767b\u5f55\u4ee5\u6dfb\u52a0\u91cc\u7a0b\u7891\u7167\u7247',
+  'baby.milestonePhoto': '\u91cc\u7a0b\u7891\u7167\u7247',
+  'baby.viewPhoto': '\u67e5\u770b\u7167\u7247',
+  'baby.closeLightbox': '\u5173\u95ed\u7167\u7247',
+  'baby.cancel': '\u53d6\u6d88',
 
   // Keyboard Shortcuts
   'shortcuts.title': '\u952e\u76d8\u5feb\u6377\u952e',

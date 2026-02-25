@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay } from '@mycircle/shared';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
+import { useBabyPhotos } from '../hooks/useBabyPhotos';
+import MilestonePhoto from './MilestonePhoto';
 
 function calculateGestationalAge(dueDateStr: string): { weeks: number; days: number; totalDays: number } {
   const dueDate = new Date(dueDateStr + 'T00:00:00');
@@ -38,6 +40,7 @@ export default function BabyTracker() {
   const [inputDate, setInputDate] = useState<string>('');
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
   const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
+  const { photos, uploading, uploadPhoto, deletePhoto, isAuthenticated } = useBabyPhotos();
 
   // Load due date from localStorage on mount
   useEffect(() => {
@@ -373,12 +376,30 @@ export default function BabyTracker() {
                           {t(stage.descKey as any)}
                         </p>
                       )}
+                      {(isCurrent || isCompleted) && (
+                        <MilestonePhoto
+                          stageId={stage.id}
+                          photoUrl={photos.get(stage.id)?.photoUrl}
+                          caption={photos.get(stage.id)?.caption}
+                          isAuthenticated={isAuthenticated}
+                          onUpload={uploadPhoto}
+                          onDelete={deletePhoto}
+                          uploading={uploading === stage.id}
+                        />
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
           </div>
+
+          {/* Sign in hint for photos */}
+          {!isAuthenticated && (
+            <p className="text-xs text-center text-gray-400 dark:text-gray-500 italic">
+              {t('baby.signInForPhotos')}
+            </p>
+          )}
 
           {/* Source Attribution Links */}
           <div className="space-y-2">

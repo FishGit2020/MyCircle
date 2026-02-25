@@ -25,6 +25,11 @@ service cloud.firestore {
       match /flashcardProgress/{docId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Baby milestones subcollection - private per-user milestone photos metadata
+      match /babyMilestones/{stageId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Feedback collection - anyone can submit feedback (write-only inbox)
