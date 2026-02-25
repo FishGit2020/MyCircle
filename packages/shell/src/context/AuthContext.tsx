@@ -172,12 +172,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           // Restore notebook count
           window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+          window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
+          window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
         }
+        // Notify all MFE hooks that auth state changed (sign-in)
+        window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
       } else {
         clearUserIdentity();
         setProfile(null);
         setRecentCities([]);
         setFavoriteCities([]);
+        window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
       }
       setLoading(false);
     });
@@ -249,6 +254,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
       window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
       window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
+      window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
 
       // Clear Apollo GraphQL cache to prevent stale queries from previous user
       await getApolloClient().clearStore();

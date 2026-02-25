@@ -36,7 +36,7 @@ export function useWorshipSongs() {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check auth state
+  // Check auth state — re-check instantly when auth changes
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
@@ -49,9 +49,9 @@ export function useWorshipSongs() {
     };
     checkAuth();
 
-    // Re-check on auth changes (storage event or custom event)
-    const interval = setInterval(checkAuth, 5000);
-    return () => { mounted = false; clearInterval(interval); };
+    const handler = () => { checkAuth(); };
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler); };
   }, []);
 
   // Load songs — one-shot fallback when subscribe is unavailable
