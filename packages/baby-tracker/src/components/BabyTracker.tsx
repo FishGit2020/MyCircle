@@ -40,7 +40,7 @@ export default function BabyTracker() {
   const [inputDate, setInputDate] = useState<string>('');
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
   const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
-  const { photos, uploading, uploadPhoto, deletePhoto, isAuthenticated } = useBabyPhotos();
+  const { photos, uploading, error, clearError, uploadPhoto, deletePhoto, isAuthenticated } = useBabyPhotos();
 
   // Load due date from localStorage on mount
   useEffect(() => {
@@ -385,6 +385,8 @@ export default function BabyTracker() {
                           onUpload={uploadPhoto}
                           onDelete={deletePhoto}
                           uploading={uploading === stage.id}
+                          error={uploading === null ? error : null}
+                          onClearError={clearError}
                         />
                       )}
                     </div>

@@ -905,6 +905,8 @@ const es: Record<TranslationKey, string> = {
   'baby.viewPhoto': 'Ver foto',
   'baby.closeLightbox': 'Cerrar foto',
   'baby.cancel': 'Cancelar',
+  'baby.uploadFailed': 'Error al subir. Int\u00e9ntalo de nuevo.',
+  'baby.tryAgain': 'Reintentar',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Atajos de teclado',
