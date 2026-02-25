@@ -13,12 +13,17 @@ export default function ReloadPrompt() {
     onRegisteredSW(_swUrl, registration) {
       // Service workers are not supported in Capacitor's WKWebView
       if (registration && !isNativePlatform()) {
+        // Safely call update — registration.update() throws InvalidStateError
+        // if the SW was unregistered or evicted (common on iOS Safari)
+        const tryUpdate = () => {
+          registration.update().catch(() => {});
+        };
         // Check for SW updates every 30 seconds
-        setInterval(() => registration.update(), 30_000);
+        setInterval(tryUpdate, 30_000);
         // Check for updates when user returns to the tab
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') {
-            registration.update();
+            tryUpdate();
           }
         });
       }
