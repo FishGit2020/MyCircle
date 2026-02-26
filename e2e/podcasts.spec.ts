@@ -71,7 +71,9 @@ test.describe('Podcast Player', () => {
     await firstCard.click();
 
     await expect(page.getByRole('heading', { name: /episodes/i })).toBeVisible({ timeout: 10_000 });
-    await page.getByRole('button', { name: 'Trending', exact: true }).click();
+
+    // Click breadcrumb link to navigate back
+    await page.getByRole('link', { name: /podcasts/i }).click();
 
     await expect(page.getByRole('heading', { level: 2, name: 'Trending' })).toBeVisible({ timeout: 10_000 });
   });
