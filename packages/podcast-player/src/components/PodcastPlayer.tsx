@@ -166,12 +166,6 @@ export default function PodcastPlayer() {
     eventBus.publish(MFEvents.PODCAST_PLAY_EPISODE, { episode, podcast: selectedPodcast });
   }, [currentEpisode?.id, selectedPodcast]);
 
-  const handleClosePlayer = useCallback(() => {
-    setCurrentEpisode(null);
-    setIsPlaying(false);
-    eventBus.publish(MFEvents.PODCAST_CLOSE_PLAYER);
-  }, []);
-
   const handleToggleSubscribe = useCallback((podcast: Podcast) => {
     setSubscribedIds(prev => {
       const next = new Set(prev);
