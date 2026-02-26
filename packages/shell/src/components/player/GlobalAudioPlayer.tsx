@@ -423,16 +423,18 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
       .replace('{episode}', episode.title)
       .replace('{podcast}', podcastName)
       .replace('{time}', timeStr);
+    const appLink = podcast ? `${window.location.origin}/podcasts/${podcast.id}` : '';
+    const fullText = appLink ? `${shareText}\n${appLink}\n${episode.enclosureUrl}` : `${shareText}\n${episode.enclosureUrl}`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: episode.title, text: shareText, url: episode.enclosureUrl });
+        await navigator.share({ title: episode.title, text: `${shareText}\n${episode.enclosureUrl}`, url: appLink || episode.enclosureUrl });
         return;
       } catch { /* user cancelled or share failed — fall through to clipboard */ }
     }
 
     try {
-      await navigator.clipboard.writeText(`${shareText}\n${episode.enclosureUrl}`);
+      await navigator.clipboard.writeText(fullText);
       setShareCopied(true);
       setTimeout(() => setShareCopied(false), 2000);
     } catch { /* clipboard not available */ }
