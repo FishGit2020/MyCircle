@@ -41,6 +41,7 @@ export function useBabyPhotos() {
   const [error, setError] = useState<string | null>(null);
   const [errorStageId, setErrorStageId] = useState<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true); // true until auth check + Firestore fetch complete
 
   // Check auth state
   useEffect(() => {
@@ -48,9 +49,16 @@ export function useBabyPhotos() {
     const checkAuth = async () => {
       try {
         const token = await window.__getFirebaseIdToken?.();
-        if (mounted) setIsAuthenticated(!!token);
+        if (mounted) {
+          setIsAuthenticated(!!token);
+          // If not authenticated, loading is done (no Firestore fetch needed)
+          if (!token) setLoading(false);
+        }
       } catch {
-        if (mounted) setIsAuthenticated(false);
+        if (mounted) {
+          setIsAuthenticated(false);
+          setLoading(false);
+        }
       }
     };
     checkAuth();
@@ -62,6 +70,7 @@ export function useBabyPhotos() {
   useEffect(() => {
     if (!isAuthenticated || !window.__babyPhotos) return;
     let mounted = true;
+    setLoading(true);
     window.__babyPhotos.getAll().then((docs) => {
       if (!mounted) return;
       const map = new Map<number, MilestonePhotoData>();
@@ -70,7 +79,9 @@ export function useBabyPhotos() {
       }
       setPhotos(map);
       setCache(map);
-    }).catch(() => { /* use cache */ });
+    }).catch(() => { /* use cache */ }).finally(() => {
+      if (mounted) setLoading(false);
+    });
     return () => { mounted = false; };
   }, [isAuthenticated]);
 
@@ -131,5 +142,5 @@ export function useBabyPhotos() {
 
   const clearError = useCallback(() => { setError(null); setErrorStageId(null); }, []);
 
-  return { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated };
+  return { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated, loading };
 }

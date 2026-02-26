@@ -40,7 +40,7 @@ export default function BabyTracker() {
   const [inputDate, setInputDate] = useState<string>('');
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
   const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
-  const { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated } = useBabyPhotos();
+  const { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated, loading: photosLoading } = useBabyPhotos();
 
   // Load due date from localStorage on mount
   useEffect(() => {
@@ -382,6 +382,7 @@ export default function BabyTracker() {
                           photoUrl={photos.get(stage.id)?.photoUrl}
                           caption={photos.get(stage.id)?.caption}
                           isAuthenticated={isAuthenticated}
+                          loading={photosLoading}
                           onUpload={uploadPhoto}
                           onDelete={deletePhoto}
                           uploading={uploading === stage.id}
@@ -397,7 +398,7 @@ export default function BabyTracker() {
           </div>
 
           {/* Sign in hint for photos */}
-          {!isAuthenticated && (
+          {!isAuthenticated && !photosLoading && (
             <p className="text-xs text-center text-gray-400 dark:text-gray-500 italic">
               {t('baby.signInForPhotos')}
             </p>

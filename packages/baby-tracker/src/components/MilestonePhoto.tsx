@@ -6,6 +6,7 @@ interface MilestonePhotoProps {
   photoUrl?: string;
   caption?: string;
   isAuthenticated: boolean;
+  loading?: boolean;
   onUpload: (stageId: number, file: File, caption?: string) => Promise<void>;
   onDelete: (stageId: number) => Promise<void>;
   uploading: boolean;
@@ -18,6 +19,7 @@ export default function MilestonePhoto({
   photoUrl,
   caption,
   isAuthenticated,
+  loading,
   onUpload,
   onDelete,
   uploading,
@@ -64,7 +66,20 @@ export default function MilestonePhoto({
     setConfirmDelete(false);
   };
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated && !loading) return null;
+
+  // Loading state — waiting for Firestore auth + data fetch
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 mt-2">
+        <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+        <div className="flex-1 space-y-1.5">
+          <div className="h-2.5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-2 w-14 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+      </div>
+    );
+  }
 
   // Uploading state
   if (uploading) {
