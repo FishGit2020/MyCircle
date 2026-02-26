@@ -249,6 +249,9 @@ Exposes `PodcastPlayer` component via Module Federation.
 - Built-in audio player for episode playback
 - **Category/genre filtering**: `TrendingPodcasts` extracts categories from podcast data (comma-separated strings), sorts by frequency (top 12), renders filter chips. `PodcastCard` displays up to 2 category badges as purple chips.
 - **Share episode clip**: Both `AudioPlayer` and `GlobalAudioPlayer` include a share button that formats episode title, podcast name, and current timestamp. Uses `navigator.share()` (Web Share API) with `navigator.clipboard.writeText()` fallback. Visual feedback via green checkmark on clipboard copy.
+- **Mark as played**: Toggle button per episode in `EpisodeList`. Played episode IDs stored in localStorage (`podcast-played-episodes`) as `Set<string>`, synced to Firestore `UserProfile.podcastPlayedEpisodes` via `DataSync`. Merged with auto-complete: `isComplete = autoComplete || manuallyMarked`.
+- **Queue dropdown**: `InlinePlaybackControls` shows a clickable queue button with dropdown listing queued episode titles and remove buttons. Queue data broadcast via `PodcastPlaybackStateEvent.queue` array.
+- **Media Session API**: `GlobalAudioPlayer` sets `navigator.mediaSession` metadata (title, artist, artwork) and registers action handlers (play, pause, seekforward, seekbackward) so iOS/Android lock screens show proper Now Playing cards with transport controls.
 - Podcast subscriptions stored in localStorage (`podcast-subscriptions`)
 - Subscribed tab fetches feed details via `podcastFeed(feedId)` query
 - All podcast/episode IDs use GraphQL `ID` type (string) to handle large PodcastIndex IDs
@@ -727,6 +730,7 @@ interface UserProfile {
   darkMode: boolean;
   recentCities: RecentCity[];
   lastPlayed?: LastPlayedData;  // Cross-device podcast resume state
+  podcastPlayedEpisodes?: string[];  // Manually marked "played" episode IDs
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -820,6 +824,7 @@ interface Note {
 | `'podcast-speed'` | Number (e.g., `1.5`) | Podcast playback speed multiplier |
 | `'podcast-progress'` | JSON object | Per-episode playback progress (resume position) |
 | `'podcast-last-played'` | JSON object | Last-played episode + podcast + position for cross-device resume (Firestore sync) |
+| `'podcast-played-episodes'` | JSON array of strings | Manually marked "played" episode IDs (Firestore sync) |
 | `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles (incl. activitySuggestions) |
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
 | `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |

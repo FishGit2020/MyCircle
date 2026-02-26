@@ -414,6 +414,8 @@ const zh: Record<TranslationKey, string> = {
   'podcasts.shareText': '\u6b63\u5728\u6536\u542c\u300c{podcast}\u300d\u7684\u300c{episode}\u300d\uff0c\u8fdb\u5ea6 {time}',
   'podcasts.showMore': '\u663e\u793a\u66f4\u591a\u8282\u76ee',
   'podcasts.viewPodcast': '\u67e5\u770b\u64ad\u5ba2',
+  'podcasts.markPlayed': '\u6807\u8bb0\u4e3a\u5df2\u64ad\u653e',
+  'podcasts.markUnplayed': '\u6807\u8bb0\u4e3a\u672a\u64ad\u653e',
 
   // AI Assistant
   'ai.title': 'AI \u52a9\u624b',

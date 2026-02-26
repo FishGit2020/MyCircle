@@ -414,6 +414,8 @@ const es: Record<TranslationKey, string> = {
   'podcasts.shareText': 'Escuchando "{episode}" de {podcast} en {time}',
   'podcasts.showMore': 'Mostrar m\u00e1s episodios',
   'podcasts.viewPodcast': 'Ver podcast',
+  'podcasts.markPlayed': 'Marcar como reproducido',
+  'podcasts.markUnplayed': 'Marcar como no reproducido',
 
   // AI Assistant
   'ai.title': 'Asistente IA',

@@ -31,9 +31,11 @@ export default function InlinePlaybackControls({ episode, podcast }: InlinePlayb
     sleepMinutes: 0,
     sleepRemaining: 0,
     queueLength: 0,
+    queue: [],
   });
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showSleepMenu, setShowSleepMenu] = useState(false);
+  const [showQueue, setShowQueue] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
   // Subscribe to playback state broadcasts from GlobalAudioPlayer
@@ -288,12 +290,59 @@ export default function InlinePlaybackControls({ episode, podcast }: InlinePlayb
           )}
         </div>
 
-        {/* Queue count */}
-        {state.queueLength > 0 && (
-          <span className="px-2 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-full">
-            {t('podcasts.queue')} ({state.queueLength})
-          </span>
-        )}
+        {/* Queue */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowQueue(!showQueue)}
+            className={`p-1.5 rounded-full transition ${
+              state.queueLength > 0
+                ? 'text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+            aria-label={t('podcasts.queue')}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h10m-10 4h6" />
+            </svg>
+            {state.queueLength > 0 && (
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 text-[9px] font-bold text-white bg-blue-500 rounded-full flex items-center justify-center">
+                {state.queueLength}
+              </span>
+            )}
+          </button>
+          {showQueue && (
+            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[220px] max-h-[250px] overflow-y-auto z-10">
+              <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  {t('podcasts.queue')} ({state.queueLength})
+                </span>
+              </div>
+              {(!state.queue || state.queue.length === 0) ? (
+                <p className="px-3 py-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+                  {t('podcasts.queueEmpty')}
+                </p>
+              ) : (
+                state.queue.map((item, i) => (
+                  <div key={`${item.id}-${i}`} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <span className="text-xs text-gray-400 w-4">{i + 1}</span>
+                    <p className="text-xs text-gray-800 dark:text-gray-200 truncate flex-1">{item.title}</p>
+                    <button
+                      type="button"
+                      onClick={() => eventBus.publish(MFEvents.PODCAST_REMOVE_FROM_QUEUE, { index: i })}
+                      className="p-0.5 text-gray-400 hover:text-red-500 transition flex-shrink-0"
+                      aria-label={t('podcasts.removeFromQueue')}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Share */}
         <button

@@ -41,7 +41,6 @@ export default function FlashCards() {
     isAuthenticated,
     addChineseChar,
     updateChineseChar,
-    deleteChineseChar,
     visibilityFilter,
     setVisibilityFilter,
     publishCard,
@@ -102,12 +101,7 @@ export default function FlashCards() {
 
   const handleDeleteConfirm = () => {
     if (!cardToDelete) return;
-    if (cardToDelete.type === 'chinese') {
-      const rawId = cardToDelete.id.replace(/^zh-/, '');
-      deleteChineseChar(rawId);
-    } else {
-      deleteCard(cardToDelete.id);
-    }
+    deleteCard(cardToDelete.id);
     setCardToDelete(null);
   };
 
@@ -371,7 +365,7 @@ export default function FlashCards() {
           }}
           onCancel={() => { setShowCharEditor(false); setEditingChar(undefined); }}
           onDelete={editingChar ? async (id) => {
-            await deleteChineseChar(id);
+            deleteCard(`zh-${id}`);
             setShowCharEditor(false);
             setEditingChar(undefined);
           } : undefined}

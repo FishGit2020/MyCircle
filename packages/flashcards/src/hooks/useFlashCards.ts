@@ -451,6 +451,13 @@ export function useFlashCards() {
       });
       window.__flashcards?.delete(cardId).catch(() => { /* ignore */ });
     }
+    // For Chinese-type cards, also delete from chineseCharacters collection
+    // so the public copy doesn't keep re-appearing via onSnapshot
+    if (cardId.startsWith('zh-')) {
+      const rawId = cardId.replace(/^zh-/, '');
+      window.__chineseCharacters?.delete(rawId).catch(() => { /* ignore */ });
+      window.dispatchEvent(new Event(WindowEvents.CHINESE_CHARACTERS_CHANGED));
+    }
     window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
   }, [publicCards]);
 
@@ -473,12 +480,6 @@ export function useFlashCards() {
   const updateChineseChar = useCallback(async (id: string, data: { character: string; pinyin: string; meaning: string; category: string }) => {
     if (!window.__chineseCharacters) return;
     await window.__chineseCharacters.update(id, data);
-    window.dispatchEvent(new Event(WindowEvents.CHINESE_CHARACTERS_CHANGED));
-  }, []);
-
-  const deleteChineseChar = useCallback(async (id: string) => {
-    if (!window.__chineseCharacters) return;
-    await window.__chineseCharacters.delete(id);
     window.dispatchEvent(new Event(WindowEvents.CHINESE_CHARACTERS_CHANGED));
   }, []);
 
@@ -526,7 +527,6 @@ export function useFlashCards() {
     resetProgress,
     addChineseChar,
     updateChineseChar,
-    deleteChineseChar,
     reloadChinese,
     publishCard,
   };

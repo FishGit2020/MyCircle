@@ -48,6 +48,7 @@ export const WindowEvents = {
   SHARED_FILES_CHANGED: 'shared-files-changed',
   AUTH_STATE_CHANGED: 'auth-state-changed',
   LAST_PLAYED_CHANGED: 'last-played-changed',
+  PODCAST_PLAYED_CHANGED: 'podcast-played-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -94,6 +95,7 @@ export const StorageKeys = {
   BABY_MILESTONES_CACHE: 'baby-milestones-cache',
   CLOUD_FILES_CACHE: 'cloud-files-cache',
   PODCAST_LAST_PLAYED: 'podcast-last-played',
+  PODCAST_PLAYED_EPISODES: 'podcast-played-episodes',
 } as const;
 
 export interface CitySelectedEvent {
@@ -125,6 +127,7 @@ export interface PodcastPlaybackStateEvent {
   sleepMinutes: number;
   sleepRemaining: number;
   queueLength: number;
+  queue?: Array<{ id: string | number; title: string }>;
 }
 
 class EventBusImpl implements EventBus {

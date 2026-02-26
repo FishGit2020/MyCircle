@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { useTranslation, StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useTranslation, StorageKeys, WindowEvents, eventBus, MFEvents } from '@mycircle/shared';
 import type { Episode } from '../hooks/usePodcastData';
 import type { Podcast } from '@mycircle/shared';
 
@@ -44,6 +44,17 @@ function loadProgress(): ProgressMap {
   } catch { return {}; }
 }
 
+function loadPlayedEpisodes(): Set<string> {
+  try {
+    const stored = localStorage.getItem(StorageKeys.PODCAST_PLAYED_EPISODES);
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  } catch { return new Set(); }
+}
+
+function savePlayedEpisodes(ids: Set<string>) {
+  try { localStorage.setItem(StorageKeys.PODCAST_PLAYED_EPISODES, JSON.stringify([...ids])); } catch { /* */ }
+}
+
 function formatDuration(seconds: number): string {
   if (!seconds || seconds <= 0) return '--:--';
   const h = Math.floor(seconds / 3600);
@@ -77,7 +88,15 @@ export default function EpisodeList({
   const [expandedId, setExpandedId] = useState<string | number | null>(null);
   const [visibleCount, setVisibleCount] = useState(20);
   const [sharedEpisodeId, setSharedEpisodeId] = useState<string | number | null>(null);
+  const [playedEpisodes, setPlayedEpisodes] = useState<Set<string>>(loadPlayedEpisodes);
   const progress = useMemo(() => loadProgress(), [currentEpisodeId]); // re-read when current episode changes
+
+  // Re-read played episodes when changed externally (e.g. restored from Firestore on login)
+  useEffect(() => {
+    const handler = () => setPlayedEpisodes(loadPlayedEpisodes());
+    window.addEventListener(WindowEvents.PODCAST_PLAYED_CHANGED, handler);
+    return () => window.removeEventListener(WindowEvents.PODCAST_PLAYED_CHANGED, handler);
+  }, []);
 
   const handleShareEpisode = useCallback(async (e: React.MouseEvent, episode: Episode) => {
     e.stopPropagation();
@@ -101,6 +120,22 @@ export default function EpisodeList({
       setTimeout(() => setSharedEpisodeId(null), 2000);
     } catch { /* clipboard not available */ }
   }, [podcast, t]);
+
+  const togglePlayed = useCallback((e: React.MouseEvent, episodeId: string | number) => {
+    e.stopPropagation();
+    const key = String(episodeId);
+    setPlayedEpisodes(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      savePlayedEpisodes(next);
+      window.dispatchEvent(new Event(WindowEvents.PODCAST_PLAYED_CHANGED));
+      return next;
+    });
+  }, []);
 
   const visibleEpisodes = useMemo(
     () => episodes.slice(0, visibleCount),
@@ -165,7 +200,8 @@ export default function EpisodeList({
         const ep = progress[String(episode.id)];
         const hasProgress = ep && ep.position > 0 && ep.duration > 0;
         const progressPercent = hasProgress ? Math.min((ep.position / ep.duration) * 100, 100) : 0;
-        const isComplete = hasProgress && ep.position >= ep.duration - 5;
+        const autoComplete = hasProgress && ep.position >= ep.duration - 5;
+        const isComplete = autoComplete || playedEpisodes.has(String(episode.id));
 
         return (
           <div
@@ -288,6 +324,29 @@ export default function EpisodeList({
                   ) : (
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                  )}
+                </button>
+
+                {/* Mark as played toggle */}
+                <button
+                  onClick={e => togglePlayed(e, episode.id)}
+                  className={`p-1.5 transition rounded ${
+                    isComplete
+                      ? 'text-green-500 dark:text-green-400 hover:text-gray-400 dark:hover:text-gray-500'
+                      : 'text-gray-400 hover:text-green-500 dark:hover:text-green-400'
+                  }`}
+                  aria-label={isComplete ? t('podcasts.markUnplayed') : t('podcasts.markPlayed')}
+                  title={isComplete ? t('podcasts.markUnplayed') : t('podcasts.markPlayed')}
+                  type="button"
+                >
+                  {isComplete ? (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   )}
                 </button>
