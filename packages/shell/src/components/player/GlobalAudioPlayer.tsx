@@ -526,21 +526,20 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
 
   if (!episode) return null;
 
-  // When on matching podcast page, render only the hidden <audio> to keep playback alive
-  if (isOnMatchingPodcastPage) {
-    return <audio ref={audioRef} preload="metadata" className="hidden" />;
-  }
-
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const artworkSrc = episode.image || podcast?.artwork || '';
 
+  // Audio element is ALWAYS rendered at the same tree position to prevent
+  // React from destroying/recreating it on route changes (which kills playback).
   return (
+    <>
+      <audio ref={audioRef} preload="metadata" className="hidden" />
+      {isOnMatchingPodcastPage ? null : (
     <div
-      className="podcast-player-slide-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-[55] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
+      className="podcast-player-slide-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
       role="region"
       aria-label={t('podcasts.nowPlaying')}
     >
-      <audio ref={audioRef} preload="metadata" className="hidden" />
 
       {/* Progress bar (clickable + keyboard accessible) */}
       <div
@@ -916,5 +915,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
         </div>
       </div>
     </div>
+      )}
+    </>
   );
 }
