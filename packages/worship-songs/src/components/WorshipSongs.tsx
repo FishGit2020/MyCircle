@@ -102,7 +102,6 @@ export default function WorshipSongs() {
           song={selectedSong}
           isAuthenticated={isAuthenticated}
           onEdit={handleEdit}
-          onBack={handleBack}
         />
       ) : null;
 

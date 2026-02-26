@@ -81,7 +81,6 @@ describe('WorshipSongs', () => {
     await user.click(screen.getByText('Amazing Grace'));
 
     await waitFor(() => {
-      expect(screen.getByText('Back to Songs')).toBeInTheDocument();
       expect(screen.getByText('John Newton')).toBeInTheDocument();
     });
   });

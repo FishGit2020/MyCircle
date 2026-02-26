@@ -53,7 +53,6 @@ const es: Record<TranslationKey, string> = {
   'search.suggestedCities': '\u00bfQuisiste decir?',
 
   // Weather Display
-  'weather.backToSearch': 'Volver a Buscar',
   'weather.refresh': 'Actualizar',
   'weather.refreshing': 'Actualizando...',
   'weather.live': 'En vivo',
@@ -509,7 +508,6 @@ const es: Record<TranslationKey, string> = {
   'worship.requiredFieldLegend': '* Campo obligatorio',
   'worship.fieldRequired': 'Este campo es obligatorio',
   'worship.fillRequiredFields': 'Complete todos los campos obligatorios (t\u00edtulo y contenido) para guardar',
-  'worship.back': 'Volver a canciones',
   'worship.noSongs': 'No hay canciones a\u00fan. \u00a1Agrega tu primera canci\u00f3n de adoraci\u00f3n!',
   'worship.searchPlaceholder': 'Buscar canciones...',
   'worship.transpose': 'Transponer',
@@ -567,7 +565,6 @@ const es: Record<TranslationKey, string> = {
   'notebook.save': 'Guardar',
   'notebook.saving': 'Guardando...',
   'notebook.cancel': 'Cancelar',
-  'notebook.back': 'Volver a Notas',
   'notebook.noNotes': 'No hay notas a\u00fan. \u00a1Crea tu primera nota!',
   'notebook.searchPlaceholder': 'Buscar notas...',
   'notebook.noteCount': '{count} notas',

@@ -41,10 +41,9 @@ interface SongViewerProps {
   song: WorshipSong;
   isAuthenticated: boolean;
   onEdit: () => void;
-  onBack: () => void;
 }
 
-export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: SongViewerProps) {
+export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewerProps) {
   const { t } = useTranslation();
   const [semitones, setSemitones] = useState(0);
   const [capoFret, setCapoFret] = useState(0);
@@ -106,20 +105,6 @@ export default function SongViewer({ song, isAuthenticated, onEdit, onBack }: So
 
   return (
     <div>
-      {/* Top bar */}
-      <div className="flex items-center gap-3 mb-4" data-print-hide>
-        <button
-          onClick={onBack}
-          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
-          title={t('worship.back')}
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <span className="text-sm text-gray-500 dark:text-gray-400">{t('worship.back')}</span>
-      </div>
-
       {/* Song header */}
       <div className="mb-6">
         <div className="flex items-start justify-between gap-4">

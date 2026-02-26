@@ -33,7 +33,6 @@ const baseSong: WorshipSong = {
 
 describe('SongViewer', () => {
   const onEdit = vi.fn();
-  const onBack = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -41,13 +40,13 @@ describe('SongViewer', () => {
   });
 
   it('does not show YouTube button when song has no YouTube URL', () => {
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     expect(screen.queryByText('worship.watchOnYoutube')).not.toBeInTheDocument();
   });
 
   it('shows YouTube button when song has a YouTube URL', () => {
     const songWithYoutube = { ...baseSong, youtubeUrl: 'https://youtube.com/watch?v=abc123' };
-    render(<SongViewer song={songWithYoutube} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={songWithYoutube} isAuthenticated onEdit={onEdit} />);
 
     const link = screen.getByText('worship.watchOnYoutube');
     expect(link).toBeInTheDocument();
@@ -57,43 +56,43 @@ describe('SongViewer', () => {
   });
 
   it('renders song title and artist', () => {
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
     expect(screen.getByText('John Newton')).toBeInTheDocument();
   });
 
   it('renders the edit button when authenticated', () => {
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     expect(screen.getByText('worship.editSong')).toBeInTheDocument();
   });
 
   it('hides edit button when not authenticated', () => {
-    render(<SongViewer song={baseSong} isAuthenticated={false} onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated={false} onEdit={onEdit} />);
     expect(screen.queryByText('worship.editSong')).not.toBeInTheDocument();
   });
 
   it('renders the metronome section', () => {
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     expect(screen.getByRole('group', { name: 'worship.metronome' })).toBeInTheDocument();
     expect(screen.getByLabelText('worship.metronomeStart')).toBeInTheDocument();
   });
 
   it('uses song BPM as initial metronome tempo', () => {
     const songWithBpm = { ...baseSong, bpm: 85 };
-    render(<SongViewer song={songWithBpm} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={songWithBpm} isAuthenticated onEdit={onEdit} />);
     const bpmInput = screen.getByRole('spinbutton', { name: 'worship.bpm' });
     expect(bpmInput).toHaveValue(85);
   });
 
   it('defaults metronome to 120 BPM when song has no BPM', () => {
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     const bpmInput = screen.getByRole('spinbutton', { name: 'worship.bpm' });
     expect(bpmInput).toHaveValue(120);
   });
 
   it('print button calls window.print()', () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
 
     const printBtn = screen.getByRole('button', { name: 'worship.print' });
     fireEvent.click(printBtn);
@@ -102,31 +101,31 @@ describe('SongViewer', () => {
   });
 
   it('print button has aria-label', () => {
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     const printBtn = screen.getByRole('button', { name: 'worship.print' });
     expect(printBtn).toHaveAttribute('aria-label', 'worship.print');
   });
 
   it('marks non-printable sections with data-print-hide', () => {
-    const { container } = render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    const { container } = render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     const hiddenElements = container.querySelectorAll('[data-print-hide]');
     expect(hiddenElements.length).toBeGreaterThanOrEqual(3);
   });
 
   it('marks song content with data-print-show', () => {
-    const { container } = render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    const { container } = render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     const showElements = container.querySelectorAll('[data-print-show]');
     expect(showElements.length).toBe(1);
   });
 
   it('renders capo calculator section for ChordPro songs', () => {
-    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     expect(screen.getByText('worship.capoCalculator')).toBeInTheDocument();
   });
 
   it('does not render capo calculator for plain text songs', () => {
     const textSong = { ...baseSong, format: 'text' as const };
-    render(<SongViewer song={textSong} isAuthenticated onEdit={onEdit} onBack={onBack} />);
+    render(<SongViewer song={textSong} isAuthenticated onEdit={onEdit} />);
     expect(screen.queryByText('worship.capoCalculator')).not.toBeInTheDocument();
   });
 });

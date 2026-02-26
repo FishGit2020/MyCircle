@@ -51,7 +51,6 @@ const en = {
   'search.suggestedCities': 'Did you mean?',
 
   // Weather Display
-  'weather.backToSearch': 'Back to Search',
   'weather.refresh': 'Refresh',
   'weather.refreshing': 'Refreshing...',
   'weather.live': 'Live',
@@ -507,7 +506,6 @@ const en = {
   'worship.requiredFieldLegend': '* Required field',
   'worship.fieldRequired': 'This field is required',
   'worship.fillRequiredFields': 'Please fill in all required fields (title and content) to save',
-  'worship.back': 'Back to Songs',
   'worship.noSongs': 'No songs yet. Add your first worship song!',
   'worship.searchPlaceholder': 'Search songs...',
   'worship.transpose': 'Transpose',
@@ -565,7 +563,6 @@ const en = {
   'notebook.save': 'Save',
   'notebook.saving': 'Saving...',
   'notebook.cancel': 'Cancel',
-  'notebook.back': 'Back to Notes',
   'notebook.noNotes': 'No notes yet. Create your first note!',
   'notebook.searchPlaceholder': 'Search notes...',
   'notebook.noteCount': '{count} notes',

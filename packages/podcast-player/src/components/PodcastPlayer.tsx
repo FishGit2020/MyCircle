@@ -96,10 +96,6 @@ export default function PodcastPlayer() {
     navigate(`/podcasts/${podcast.id}`, { state: { podcast } });
   }, [navigate]);
 
-  const handleBack = useCallback(() => {
-    navigate('/podcasts');
-  }, [navigate]);
-
   const handlePlayEpisode = useCallback((episode: Episode) => {
     if (currentEpisode?.id === episode.id) {
       setIsPlaying(prev => !prev);
@@ -183,22 +179,6 @@ export default function PodcastPlayer() {
         <div className="podcast-player-fade-in">
           {/* Selected podcast header */}
           <div className="mb-6">
-            <button
-              onClick={handleBack}
-              className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition mb-4"
-              aria-label={t('podcasts.trending')}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              {t('podcasts.trending')}
-            </button>
-
             <div className="flex items-start gap-4">
               {selectedPodcast.artwork ? (
                 <img
