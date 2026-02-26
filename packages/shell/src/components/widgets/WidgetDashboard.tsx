@@ -180,22 +180,22 @@ const VerseWidget = React.memo(function VerseWidget() {
         </div>
       </div>
       {bookmarks.length > 0 ? (
-        <div className="space-y-1">
-          {bookmarks.slice(0, 4).map((b, i) => (
+        <div className="flex flex-wrap gap-1.5">
+          {bookmarks.slice(0, 6).map((b, i) => (
             <Link
               key={i}
               to={`/bible?book=${encodeURIComponent(b.book)}&chapter=${b.chapter}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 bg-amber-50/50 dark:bg-amber-900/10 rounded px-2 py-1 hover:bg-amber-100 dark:hover:bg-amber-800/30 active:bg-amber-200 dark:active:bg-amber-700/30 transition-colors"
+              className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-medium hover:bg-amber-100 dark:hover:bg-amber-800/40 active:bg-amber-200 dark:active:bg-amber-700/40 transition-colors"
             >
               <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
               </svg>
-              <span className="truncate">{b.label || `${b.book} ${b.chapter}`}</span>
+              {b.label || `${b.book} ${b.chapter}`}
             </Link>
           ))}
-          {bookmarks.length > 4 && (
-            <p className="text-[10px] text-amber-500 dark:text-amber-400 text-center">+{bookmarks.length - 4} {t('widgets.moreBookmarks')}</p>
+          {bookmarks.length > 6 && (
+            <span className="text-[10px] text-amber-500 dark:text-amber-400 px-2 py-1">+{bookmarks.length - 6} {t('widgets.moreBookmarks')}</span>
           )}
         </div>
       ) : (
@@ -627,6 +627,33 @@ const FlashcardsWidget = React.memo(function FlashcardsWidget() {
 
 const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
   const { t } = useTranslation();
+  const [entryCount, setEntryCount] = React.useState(0);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.WORK_TRACKER_CACHE);
+        if (raw) {
+          const entries = JSON.parse(raw);
+          setEntryCount(Array.isArray(entries) ? entries.length : 0);
+        } else {
+          setEntryCount(0);
+        }
+      } catch { setEntryCount(0); }
+    }
+    load();
+    // Also try the bridge API for fresh data
+    const api = (window as any).__workTracker;
+    if (api?.getAll) {
+      api.getAll().then((entries: any[]) => {
+        setEntryCount(entries.length);
+        try { localStorage.setItem(StorageKeys.WORK_TRACKER_CACHE, JSON.stringify(entries)); } catch { /* ignore */ }
+      }).catch(() => { /* ignore */ });
+    }
+    window.addEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
+  }, []);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -640,13 +667,52 @@ const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.workTrackerDesc')}</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+      {entryCount > 0 ? (
+        <p className="text-xs text-amber-600 dark:text-amber-400/70">
+          {t('widgets.workTrackerEntries').replace('{count}', String(entryCount))}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+      )}
     </div>
   );
 });
 
 const CloudFilesWidget = React.memo(function CloudFilesWidget() {
   const { t } = useTranslation();
+  const [fileCount, setFileCount] = React.useState(0);
+  const [sharedCount, setSharedCount] = React.useState(0);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.CLOUD_FILES_CACHE);
+        if (raw) {
+          const files = JSON.parse(raw);
+          setFileCount(Array.isArray(files) ? files.length : 0);
+        } else {
+          setFileCount(0);
+        }
+      } catch { setFileCount(0); }
+    }
+    load();
+    // Also try the bridge API for fresh data
+    const api = (window as any).__cloudFiles;
+    if (api?.getAll) {
+      api.getAll().then((files: any[]) => {
+        setFileCount(files.length);
+        try { localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(files)); } catch { /* ignore */ }
+      }).catch(() => { /* ignore */ });
+    }
+    if (api?.getAllShared) {
+      api.getAllShared().then((files: any[]) => {
+        setSharedCount(files.length);
+      }).catch(() => { /* ignore */ });
+    }
+    window.addEventListener(WindowEvents.CLOUD_FILES_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.CLOUD_FILES_CHANGED, load);
+  }, []);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -660,7 +726,22 @@ const CloudFilesWidget = React.memo(function CloudFilesWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.cloudFilesDesc')}</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noCloudFiles')}</p>
+      {fileCount > 0 || sharedCount > 0 ? (
+        <div className="space-y-1">
+          {fileCount > 0 && (
+            <p className="text-xs text-cyan-600 dark:text-cyan-400/70">
+              {t('cloudFiles.fileCount').replace('{count}', String(fileCount))}
+            </p>
+          )}
+          {sharedCount > 0 && (
+            <p className="text-xs text-cyan-500 dark:text-cyan-400/50">
+              {t('widgets.sharedFileCount').replace('{count}', String(sharedCount))}
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noCloudFiles')}</p>
+      )}
     </div>
   );
 });
