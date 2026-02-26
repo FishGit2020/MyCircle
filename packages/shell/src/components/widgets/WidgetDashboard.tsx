@@ -627,6 +627,33 @@ const FlashcardsWidget = React.memo(function FlashcardsWidget() {
 
 const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
   const { t } = useTranslation();
+  const [entryCount, setEntryCount] = React.useState(0);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.WORK_TRACKER_CACHE);
+        if (raw) {
+          const entries = JSON.parse(raw);
+          setEntryCount(Array.isArray(entries) ? entries.length : 0);
+        } else {
+          setEntryCount(0);
+        }
+      } catch { setEntryCount(0); }
+    }
+    load();
+    // Also try the bridge API for fresh data
+    const api = (window as any).__workTracker;
+    if (api?.getAll) {
+      api.getAll().then((entries: any[]) => {
+        setEntryCount(entries.length);
+        try { localStorage.setItem(StorageKeys.WORK_TRACKER_CACHE, JSON.stringify(entries)); } catch { /* ignore */ }
+      }).catch(() => { /* ignore */ });
+    }
+    window.addEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
+  }, []);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -640,13 +667,52 @@ const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.workTrackerDesc')}</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+      {entryCount > 0 ? (
+        <p className="text-xs text-amber-600 dark:text-amber-400/70">
+          {t('widgets.workTrackerEntries').replace('{count}', String(entryCount))}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+      )}
     </div>
   );
 });
 
 const CloudFilesWidget = React.memo(function CloudFilesWidget() {
   const { t } = useTranslation();
+  const [fileCount, setFileCount] = React.useState(0);
+  const [sharedCount, setSharedCount] = React.useState(0);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.CLOUD_FILES_CACHE);
+        if (raw) {
+          const files = JSON.parse(raw);
+          setFileCount(Array.isArray(files) ? files.length : 0);
+        } else {
+          setFileCount(0);
+        }
+      } catch { setFileCount(0); }
+    }
+    load();
+    // Also try the bridge API for fresh data
+    const api = (window as any).__cloudFiles;
+    if (api?.getAll) {
+      api.getAll().then((files: any[]) => {
+        setFileCount(files.length);
+        try { localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(files)); } catch { /* ignore */ }
+      }).catch(() => { /* ignore */ });
+    }
+    if (api?.getAllShared) {
+      api.getAllShared().then((files: any[]) => {
+        setSharedCount(files.length);
+      }).catch(() => { /* ignore */ });
+    }
+    window.addEventListener(WindowEvents.CLOUD_FILES_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.CLOUD_FILES_CHANGED, load);
+  }, []);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -660,7 +726,22 @@ const CloudFilesWidget = React.memo(function CloudFilesWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.cloudFilesDesc')}</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noCloudFiles')}</p>
+      {fileCount > 0 || sharedCount > 0 ? (
+        <div className="space-y-1">
+          {fileCount > 0 && (
+            <p className="text-xs text-cyan-600 dark:text-cyan-400/70">
+              {t('cloudFiles.fileCount').replace('{count}', String(fileCount))}
+            </p>
+          )}
+          {sharedCount > 0 && (
+            <p className="text-xs text-cyan-500 dark:text-cyan-400/50">
+              {t('widgets.sharedFileCount').replace('{count}', String(sharedCount))}
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noCloudFiles')}</p>
+      )}
     </div>
   );
 });
