@@ -193,7 +193,7 @@ describe('AudioPlayer', () => {
     const text = writeText.mock.calls[0][0] as string;
     expect(text).toContain('Test Episode Title');
     expect(text).toContain('Test Podcast');
-    expect(text).toContain('https://example.com/episode.mp3');
+    expect(text).toContain('/podcasts/100');
   });
 
   it('persists playback speed to localStorage on change', () => {
