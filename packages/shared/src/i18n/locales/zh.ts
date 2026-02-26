@@ -801,6 +801,7 @@ const zh: Record<TranslationKey, string> = {
   'widgets.worshipDesc': '\u4f60\u7684\u8bd7\u6b4c\u5e93\u548c\u6536\u85cf',
   'widgets.worshipSongCount': '{count} \u9996\u8bd7\u6b4c',
   'widgets.worshipFavCount': '{count} \u4e2a\u6536\u85cf',
+  'widgets.continueListening': '\u7ee7\u7eed\u6536\u542c',
   'widgets.noWorshipSongs': '\u8fd8\u6ca1\u6709\u8bd7\u6b4c\u2014\u2014\u6dfb\u52a0\u4f60\u7684\u7b2c\u4e00\u9996\u656c\u62dc\u8bd7\u6b4c',
 
   // What's New

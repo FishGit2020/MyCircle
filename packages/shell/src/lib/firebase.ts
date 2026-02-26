@@ -92,6 +92,14 @@ if (firebaseEnabled) {
   }
 }
 
+// Last-played podcast data (synced to Firestore for cross-device resume)
+export interface LastPlayedData {
+  episode: { id: string | number; title: string; enclosureUrl: string; image?: string };
+  podcast: { id: string | number; title: string; artwork?: string } | null;
+  position: number;
+  savedAt: number;
+}
+
 // User profile type
 export interface UserProfile {
   uid: string;
@@ -113,6 +121,7 @@ export interface UserProfile {
   announcementAlertsEnabled?: boolean;
   bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
   worshipFavorites?: string[];
+  lastPlayed?: LastPlayedData;
   childName?: string;
   childBirthDate?: string;
   createdAt: Date;
@@ -385,6 +394,15 @@ export async function updatePodcastSubscriptions(uid: string, subscriptionIds: s
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     podcastSubscriptions: subscriptionIds,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateLastPlayed(uid: string, data: LastPlayedData | null) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    lastPlayed: data || null,
     updatedAt: serverTimestamp(),
   });
 }

@@ -646,6 +646,31 @@ PodcastPlayer.tsx                           GlobalAudioPlayer.tsx
          GlobalAudioPlayer stays mounted in Layout (persists across routes)
 ```
 
+**Cross-Device Podcast Resume (Continue Listening) Flow:**
+```
+GlobalAudioPlayer (play/pause/close)
+     |
+     +--> writes PODCAST_LAST_PLAYED to localStorage
+     +--> dispatches WindowEvents.LAST_PLAYED_CHANGED
+     |
+     v
+DataSync.tsx (listener)
+     |
+     +--> reads PODCAST_LAST_PLAYED from localStorage
+     +--> calls updateLastPlayed(uid, data) → Firestore users/{uid}.lastPlayed
+
+On login (AuthContext):
+     |
+     +--> reads userProfile.lastPlayed from Firestore
+     +--> writes to PODCAST_LAST_PLAYED + PODCAST_NOW_PLAYING + PODCAST_PROGRESS
+     +--> dispatches LAST_PLAYED_CHANGED → NowPlayingWidget hydrates
+
+NowPlayingWidget "Continue" button:
+     |
+     +--> navigate(/podcasts/{podcastId})
+     +--> eventBus.publish(PODCAST_PLAY_EPISODE) → GlobalAudioPlayer resumes
+```
+
 ---
 
 ## Data Flow
@@ -701,6 +726,7 @@ interface UserProfile {
   photoURL: string | null;
   darkMode: boolean;
   recentCities: RecentCity[];
+  lastPlayed?: LastPlayedData;  // Cross-device podcast resume state
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -793,6 +819,7 @@ interface Note {
 | `'podcast-subscriptions'` | JSON array of string IDs | Subscribed podcast feed IDs |
 | `'podcast-speed'` | Number (e.g., `1.5`) | Podcast playback speed multiplier |
 | `'podcast-progress'` | JSON object | Per-episode playback progress (resume position) |
+| `'podcast-last-played'` | JSON object | Last-played episode + podcast + position for cross-device resume (Firestore sync) |
 | `'weather-dashboard-widgets'` | JSON object | Weather dashboard widget visibility toggles (incl. activitySuggestions) |
 | `'widget-dashboard-layout'` | JSON array | Homepage widget order, visibility |
 | `'recent-cities'` | JSON array | Recent city searches (localStorage fallback for non-auth users) |

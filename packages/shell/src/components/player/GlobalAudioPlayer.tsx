@@ -4,6 +4,7 @@ import {
   subscribeToMFEvent,
   MFEvents,
   StorageKeys,
+  WindowEvents,
 } from '@mycircle/shared';
 import type { Episode, Podcast, PodcastPlayEpisodeEvent } from '@mycircle/shared';
 
@@ -38,6 +39,19 @@ function loadSpeed(): number {
 
 function saveSpeed(speed: number) {
   try { localStorage.setItem(StorageKeys.PODCAST_SPEED, String(speed)); } catch { /* */ }
+}
+
+function saveLastPlayed(episode: Episode, podcast: Podcast | null, position: number) {
+  try {
+    const data = {
+      episode: { id: episode.id, title: episode.title, enclosureUrl: episode.enclosureUrl, image: episode.image },
+      podcast: podcast ? { id: podcast.id, title: podcast.title, artwork: podcast.artwork } : null,
+      position,
+      savedAt: Date.now(),
+    };
+    localStorage.setItem(StorageKeys.PODCAST_LAST_PLAYED, JSON.stringify(data));
+    window.dispatchEvent(new Event(WindowEvents.LAST_PLAYED_CHANGED));
+  } catch { /* ignore */ }
 }
 
 interface QueueItem {
@@ -150,6 +164,9 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
       localStorage.setItem(StorageKeys.PODCAST_NOW_PLAYING, JSON.stringify({ episode, podcast }));
     } catch { /* ignore */ }
 
+    // Save last-played for cross-device sync (on episode change)
+    saveLastPlayed(episode, podcast, 0);
+
     audio.src = episode.enclosureUrl;
     audio.playbackRate = playbackSpeed;
 
@@ -218,6 +235,8 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
         const map = loadProgress();
         map[String(episode.id)] = { position: audio.currentTime, duration: audio.duration || 0 };
         saveProgress(map);
+        // Save last-played for cross-device sync
+        saveLastPlayed(episode, podcast, audio.currentTime);
       }
     };
 
@@ -345,6 +364,8 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
         const map = loadProgress();
         map[String(episode.id)] = { position: audio.currentTime, duration: audio.duration || 0 };
         saveProgress(map);
+        // Save last-played for cross-device sync (on close)
+        saveLastPlayed(episode, podcast, audio.currentTime);
       }
       audio.pause();
       audio.src = '';
@@ -358,7 +379,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
     setSleepMinutes(0);
     setSleepRemaining(0);
     try { localStorage.removeItem(StorageKeys.PODCAST_NOW_PLAYING); } catch { /* */ }
-  }, [episode]);
+  }, [episode, podcast]);
 
   // Sleep timer countdown
   useEffect(() => {
@@ -402,16 +423,18 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
       .replace('{episode}', episode.title)
       .replace('{podcast}', podcastName)
       .replace('{time}', timeStr);
+    const appLink = podcast ? `${window.location.origin}/podcasts/${podcast.id}` : '';
+    const fullText = appLink ? `${shareText}\n${appLink}\n${episode.enclosureUrl}` : `${shareText}\n${episode.enclosureUrl}`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: episode.title, text: shareText, url: episode.enclosureUrl });
+        await navigator.share({ title: episode.title, text: `${shareText}\n${episode.enclosureUrl}`, url: appLink || episode.enclosureUrl });
         return;
       } catch { /* user cancelled or share failed — fall through to clipboard */ }
     }
 
     try {
-      await navigator.clipboard.writeText(`${shareText}\n${episode.enclosureUrl}`);
+      await navigator.clipboard.writeText(fullText);
       setShareCopied(true);
       setTimeout(() => setShareCopied(false), 2000);
     } catch { /* clipboard not available */ }
@@ -424,7 +447,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
 
   return (
     <div
-      className="podcast-player-slide-up fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
+      className="podcast-player-slide-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-[55] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
       role="region"
       aria-label={t('podcasts.nowPlaying')}
     >

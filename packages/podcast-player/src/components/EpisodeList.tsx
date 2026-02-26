@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation, StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
 import type { Episode } from '../hooks/usePodcastData';
 import type { Podcast } from '@mycircle/shared';
@@ -76,7 +76,32 @@ export default function EpisodeList({
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | number | null>(null);
   const [visibleCount, setVisibleCount] = useState(20);
+  const [sharedEpisodeId, setSharedEpisodeId] = useState<string | number | null>(null);
   const progress = useMemo(() => loadProgress(), [currentEpisodeId]); // re-read when current episode changes
+
+  const handleShareEpisode = useCallback(async (e: React.MouseEvent, episode: Episode) => {
+    e.stopPropagation();
+    const podcastName = podcast?.title || '';
+    const shareText = t('podcasts.shareText')
+      .replace('{episode}', episode.title)
+      .replace('{podcast}', podcastName)
+      .replace('{time}', formatDuration(episode.duration));
+    const appLink = podcast ? `${window.location.origin}/podcasts/${podcast.id}` : '';
+    const fullText = appLink ? `${shareText}\n${appLink}\n${episode.enclosureUrl}` : `${shareText}\n${episode.enclosureUrl}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: episode.title, text: `${shareText}\n${episode.enclosureUrl}`, url: appLink || episode.enclosureUrl });
+        return;
+      } catch { /* user cancelled or share failed — fall through to clipboard */ }
+    }
+
+    try {
+      await navigator.clipboard.writeText(fullText);
+      setSharedEpisodeId(episode.id);
+      setTimeout(() => setSharedEpisodeId(null), 2000);
+    } catch { /* clipboard not available */ }
+  }, [podcast, t]);
 
   const visibleEpisodes = useMemo(
     () => episodes.slice(0, visibleCount),
@@ -245,6 +270,29 @@ export default function EpisodeList({
                   </button>
                 )}
 
+                {/* Share episode */}
+                <button
+                  onClick={e => handleShareEpisode(e, episode)}
+                  className={`p-1.5 transition rounded ${
+                    sharedEpisodeId === episode.id
+                      ? 'text-green-500 dark:text-green-400'
+                      : 'text-gray-400 hover:text-blue-500 dark:hover:text-blue-400'
+                  }`}
+                  aria-label={sharedEpisodeId === episode.id ? t('podcasts.shareCopied') : t('podcasts.shareEpisode')}
+                  title={sharedEpisodeId === episode.id ? t('podcasts.shareCopied') : t('podcasts.shareEpisode')}
+                  type="button"
+                >
+                  {sharedEpisodeId === episode.id ? (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                  )}
+                </button>
+
                 {/* Add to queue */}
                 {!isCurrent && (
                   <button
@@ -255,6 +303,7 @@ export default function EpisodeList({
                     className="p-1.5 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition rounded"
                     aria-label={t('podcasts.addToQueue')}
                     title={t('podcasts.addToQueue')}
+                    type="button"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h10m-10 4h6" />

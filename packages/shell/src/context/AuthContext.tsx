@@ -152,6 +152,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             window.dispatchEvent(new Event(WindowEvents.WORSHIP_FAVORITES_CHANGED));
           }
 
+          // Restore last-played podcast for cross-device resume
+          if (userProfile.lastPlayed?.episode) {
+            const lp = userProfile.lastPlayed;
+            localStorage.setItem(StorageKeys.PODCAST_LAST_PLAYED, JSON.stringify(lp));
+            localStorage.setItem(StorageKeys.PODCAST_NOW_PLAYING, JSON.stringify({
+              episode: lp.episode,
+              podcast: lp.podcast,
+            }));
+            // Merge position into progress map (take the further position)
+            try {
+              const progressRaw = localStorage.getItem(StorageKeys.PODCAST_PROGRESS);
+              const progress: Record<string, { position: number; duration: number }> = progressRaw ? JSON.parse(progressRaw) : {};
+              const key = String(lp.episode.id);
+              const existing = progress[key];
+              if (!existing || lp.position > existing.position) {
+                progress[key] = { position: lp.position, duration: existing?.duration || 0 };
+                localStorage.setItem(StorageKeys.PODCAST_PROGRESS, JSON.stringify(progress));
+              }
+            } catch { /* ignore */ }
+            window.dispatchEvent(new Event(WindowEvents.LAST_PLAYED_CHANGED));
+          }
+
           // Restore Child Development data
           if (userProfile.childName) {
             localStorage.setItem(StorageKeys.CHILD_NAME, userProfile.childName);

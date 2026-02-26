@@ -799,6 +799,7 @@ const en = {
   'widgets.worshipDesc': 'Your song library & favorites',
   'widgets.worshipSongCount': '{count} songs',
   'widgets.worshipFavCount': '{count} favorites',
+  'widgets.continueListening': 'Continue',
   'widgets.noWorshipSongs': 'No songs yet \u2014 add your first worship song',
 
   // What's New

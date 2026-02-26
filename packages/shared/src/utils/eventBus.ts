@@ -39,6 +39,7 @@ export const WindowEvents = {
   CLOUD_FILES_CHANGED: 'cloud-files-changed',
   SHARED_FILES_CHANGED: 'shared-files-changed',
   AUTH_STATE_CHANGED: 'auth-state-changed',
+  LAST_PLAYED_CHANGED: 'last-played-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -84,6 +85,7 @@ export const StorageKeys = {
   FLASHCARD_PUBLIC_CARDS: 'flashcard-public-cards',
   BABY_MILESTONES_CACHE: 'baby-milestones-cache',
   CLOUD_FILES_CACHE: 'cloud-files-cache',
+  PODCAST_LAST_PLAYED: 'podcast-last-played',
 } as const;
 
 export interface CitySelectedEvent {
