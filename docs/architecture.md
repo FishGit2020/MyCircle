@@ -248,7 +248,7 @@ Exposes `PodcastPlayer` component via Module Federation.
 - Episode listing and detail view
 - Built-in audio player for episode playback
 - **Category/genre filtering**: `TrendingPodcasts` extracts categories from podcast data (comma-separated strings), sorts by frequency (top 12), renders filter chips. `PodcastCard` displays up to 2 category badges as purple chips.
-- **Share episode clip**: Both `AudioPlayer` and `GlobalAudioPlayer` include a share button that formats episode title, podcast name, and current timestamp. Uses `navigator.share()` (Web Share API) with `navigator.clipboard.writeText()` fallback. Visual feedback via green checkmark on clipboard copy.
+- **Share episode clip**: `GlobalAudioPlayer` and `InlinePlaybackControls` include a share button that formats episode title, podcast name, and current timestamp. Uses `navigator.share()` (Web Share API) with `navigator.clipboard.writeText()` fallback. Visual feedback via green checkmark on clipboard copy.
 - **Mark as played**: Toggle button per episode in `EpisodeList`. Played episode IDs stored in localStorage (`podcast-played-episodes`) as `Set<string>`, synced to Firestore `UserProfile.podcastPlayedEpisodes` via `DataSync`. Merged with auto-complete: `isComplete = autoComplete || manuallyMarked`.
 - **Queue dropdown**: `InlinePlaybackControls` shows a clickable queue button with dropdown listing queued episode titles and remove buttons. Queue data broadcast via `PodcastPlaybackStateEvent.queue` array.
 - **Media Session API**: `GlobalAudioPlayer` sets `navigator.mediaSession` metadata (title, artist, artwork) and registers action handlers (play, pause, seekforward, seekbackward) so iOS/Android lock screens show proper Now Playing cards with transport controls.
