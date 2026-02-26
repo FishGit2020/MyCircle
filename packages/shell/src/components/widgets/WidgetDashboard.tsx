@@ -180,22 +180,22 @@ const VerseWidget = React.memo(function VerseWidget() {
         </div>
       </div>
       {bookmarks.length > 0 ? (
-        <div className="space-y-1">
-          {bookmarks.slice(0, 4).map((b, i) => (
+        <div className="flex flex-wrap gap-1.5">
+          {bookmarks.slice(0, 6).map((b, i) => (
             <Link
               key={i}
               to={`/bible?book=${encodeURIComponent(b.book)}&chapter=${b.chapter}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 bg-amber-50/50 dark:bg-amber-900/10 rounded px-2 py-1 hover:bg-amber-100 dark:hover:bg-amber-800/30 active:bg-amber-200 dark:active:bg-amber-700/30 transition-colors"
+              className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-medium hover:bg-amber-100 dark:hover:bg-amber-800/40 active:bg-amber-200 dark:active:bg-amber-700/40 transition-colors"
             >
               <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
               </svg>
-              <span className="truncate">{b.label || `${b.book} ${b.chapter}`}</span>
+              {b.label || `${b.book} ${b.chapter}`}
             </Link>
           ))}
-          {bookmarks.length > 4 && (
-            <p className="text-[10px] text-amber-500 dark:text-amber-400 text-center">+{bookmarks.length - 4} {t('widgets.moreBookmarks')}</p>
+          {bookmarks.length > 6 && (
+            <span className="text-[10px] text-amber-500 dark:text-amber-400 px-2 py-1">+{bookmarks.length - 6} {t('widgets.moreBookmarks')}</span>
           )}
         </div>
       ) : (
