@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
+import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents, useQuery, GET_PODCAST_FEED } from '@mycircle/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
 import PodcastSearch from './PodcastSearch';
@@ -72,18 +72,30 @@ export default function PodcastPlayer() {
     return () => { mounted = false; clearInterval(interval); };
   }, []);
 
+  // Fetch podcast data when navigating directly via URL (no route state)
+  const needsFetch = !!podcastId && !(location.state as any)?.podcast;
+  const { data: feedData } = useQuery(GET_PODCAST_FEED, {
+    variables: { feedId: podcastId },
+    skip: !needsFetch,
+  });
+
   // Sync URL params → selectedPodcast state
   useEffect(() => {
     if (!podcastId) {
       setSelectedPodcast(null);
     } else if ((location.state as any)?.podcast) {
       setSelectedPodcast((location.state as any).podcast);
-    } else {
-      // Direct URL without state — redirect to browse
-      navigate('/podcasts', { replace: true });
     }
+    // Direct URL without state — wait for feedData query instead of redirecting
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [podcastId]);
+
+  // Hydrate selectedPodcast from API response (shared link / direct URL)
+  useEffect(() => {
+    if (feedData?.podcastFeed && needsFetch) {
+      setSelectedPodcast(feedData.podcastFeed as Podcast);
+    }
+  }, [feedData, needsFetch]);
 
   const feedId = selectedPodcast?.id ?? (podcastId ? Number(podcastId) : null);
   const {
