@@ -131,6 +131,12 @@ const workTrackerDest = path.join(firebaseDir, 'work-tracker');
 console.log(`Copying work-tracker to ${workTrackerDest}`);
 copyDir(workTrackerDist, workTrackerDest);
 
+// 16. Copy cloud-files MF to /cloud-files
+const cloudFilesDist = path.join(rootDir, 'packages', 'cloud-files', 'dist');
+const cloudFilesDest = path.join(firebaseDir, 'cloud-files');
+console.log(`Copying cloud-files to ${cloudFilesDest}`);
+copyDir(cloudFilesDist, cloudFilesDest);
+
 console.log('\nFirebase deployment directory assembled successfully!');
 console.log(`Output: ${firebaseDir}`);
 

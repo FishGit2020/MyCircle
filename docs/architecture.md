@@ -390,6 +390,24 @@ Exposes `WorkTracker` component via Module Federation. Port **3016**.
 - `WindowEvents.WORK_TRACKER_CHANGED` for cross-tab sync
 - Route: `/work-tracker`
 
+### Cloud Files - `packages/cloud-files/`
+
+Exposes `CloudFiles` component via Module Federation. Port **3017**.
+
+**Key Behavior:**
+- Upload, share, and download files (images, PDFs, docs, spreadsheets, text/CSV)
+- Two tabs: **My Files** (personal) and **Shared Files** (community)
+- File upload via Cloud Function (`POST /cloud-files/upload`) — base64-encoded in JSON body, max 5MB
+- Share is one-way: copies file to `shared-files/` Storage path + `sharedFiles/{fileId}` Firestore doc
+- Delete: personal files via `POST /cloud-files/delete`, shared via `POST /cloud-files/delete-shared` (only original sharer)
+- **Firestore paths:** `users/{uid}/files/{fileId}` (personal), `sharedFiles/{fileId}` (shared)
+- **Storage paths:** `users/{uid}/files/{fileId}/{fileName}` (personal), `shared-files/{fileId}/{fileName}` (shared)
+- `window.__cloudFiles` bridge exposes `getAll`, `subscribe`, `upload`, `share`, `delete`, `getAllShared`, `subscribeShared`, `deleteShared`
+- Drag-and-drop upload zone with file type/size validation
+- `WindowEvents.CLOUD_FILES_CHANGED` and `SHARED_FILES_CHANGED` for cross-tab sync
+- Auth-gated: requires Firebase sign-in
+- Route: `/files`, keyboard shortcut: `g u`
+
 ---
 
 ## Navigation & Discovery
@@ -1186,6 +1204,7 @@ All Cloud Functions are defined in `functions/src/index.ts` and deployed via `fi
 | `podcastProxy` | `onRequest` | `/podcast/**` | 256 MiB | 30s | PODCASTINDEX keys |
 | `aiChat` | `onRequest` | `/ai/chat` (POST) | 256 MiB | 60s | GEMINI, OPENWEATHER, FINNHUB, RECAPTCHA keys |
 | `babyPhotos` | `onRequest` | `/baby-photos/**` | 256 MiB | 30s | — |
+| `cloudFiles` | `onRequest` | `/cloud-files/**` | 256 MiB | 30s | — |
 | `subscribeToAlerts` | `onCall` | Callable | Default | Default | — |
 | `checkWeatherAlerts` | `onSchedule` | Every 30 minutes | 256 MiB | 120s | OPENWEATHER_API_KEY |
 
@@ -1199,10 +1218,11 @@ IP-based rate limiting via `node-cache` (in-memory, per-instance):
 | `podcastProxy` | 60 requests | 60 seconds |
 | `aiChat` | 10 requests | 60 seconds |
 | `babyPhotos` | 10 requests | 60 seconds |
+| `cloudFiles` | 20 requests | 60 seconds |
 
 ### Authentication
 
-- `stockProxy`, `aiChat`, `babyPhotos`: Require Firebase Auth ID token (`Authorization: Bearer <token>`)
+- `stockProxy`, `aiChat`, `babyPhotos`, `cloudFiles`: Require Firebase Auth ID token (`Authorization: Bearer <token>`)
 - `podcastProxy`: Public (no auth required) — allows unauthenticated podcast browsing with rate limiting
 - `graphql`: Requires auth for stock/podcast operations (checked by operation name)
 - `subscribeToAlerts`: Enforces App Check

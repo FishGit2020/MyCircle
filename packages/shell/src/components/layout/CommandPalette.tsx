@@ -31,6 +31,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/english': 'commandPalette.goToEnglish',
   '/chinese': 'commandPalette.goToChinese',
   '/ai': 'commandPalette.goToAi',
+  '/files': 'commandPalette.goToCloudFiles',
 };
 
 const clockIcon = (

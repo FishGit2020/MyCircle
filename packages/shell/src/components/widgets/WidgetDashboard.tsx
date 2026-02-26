@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker' | 'cloudFiles';
 
 export interface WidgetConfig {
   id: WidgetType;
@@ -26,6 +26,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'worship', visible: true },
   { id: 'flashcards', visible: true },
   { id: 'workTracker', visible: true },
+  { id: 'cloudFiles', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -644,6 +645,26 @@ const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
   );
 });
 
+const CloudFilesWidget = React.memo(function CloudFilesWidget() {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.cloudFiles')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.cloudFilesDesc')}</p>
+        </div>
+      </div>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noCloudFiles')}</p>
+    </div>
+  );
+});
+
 // ─── Widget Registry ─────────────────────────────────────────────────────────
 
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
@@ -657,6 +678,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   worship: WorshipWidget,
   flashcards: FlashcardsWidget,
   workTracker: WorkTrackerWidget,
+  cloudFiles: CloudFilesWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -670,6 +692,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   worship: '/worship',
   flashcards: '/flashcards',
   workTracker: '/work-tracker',
+  cloudFiles: '/files',
 };
 
 // ─── Dashboard Reducer ──────────────────────────────────────────────────────

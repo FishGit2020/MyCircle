@@ -36,6 +36,8 @@ export const WindowEvents = {
   WORK_TRACKER_CHANGED: 'work-tracker-changed',
   WORSHIP_FAVORITES_CHANGED: 'worship-favorites-changed',
   BABY_MILESTONES_CHANGED: 'baby-milestones-changed',
+  CLOUD_FILES_CHANGED: 'cloud-files-changed',
+  SHARED_FILES_CHANGED: 'shared-files-changed',
   AUTH_STATE_CHANGED: 'auth-state-changed',
 } as const;
 
@@ -81,6 +83,7 @@ export const StorageKeys = {
   PODCAST_NOW_PLAYING: 'podcast-now-playing',
   FLASHCARD_PUBLIC_CARDS: 'flashcard-public-cards',
   BABY_MILESTONES_CACHE: 'baby-milestones-cache',
+  CLOUD_FILES_CACHE: 'cloud-files-cache',
 } as const;
 
 export interface CitySelectedEvent {

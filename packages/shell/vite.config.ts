@@ -144,6 +144,10 @@ const workTrackerRemote = isProduction
   ? '/work-tracker/assets/remoteEntry.js'
   : 'http://localhost:3016/assets/remoteEntry.js';
 
+const cloudFilesRemote = isProduction
+  ? '/cloud-files/assets/remoteEntry.js'
+  : 'http://localhost:3017/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -163,7 +167,8 @@ export default defineConfig({
         babyTracker: babyTrackerRemote,
         childDevelopment: childDevelopmentRemote,
         flashcards: flashcardsRemote,
-        workTracker: workTrackerRemote
+        workTracker: workTrackerRemote,
+        cloudFiles: cloudFilesRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
@@ -217,6 +222,7 @@ export default defineConfig({
           { name: 'Worship Songs', short_name: 'Worship', url: '/worship', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'AI Assistant', short_name: 'AI', url: '/ai', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Child Development', short_name: 'ChildDev', url: '/child-dev', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Cloud Files', short_name: 'Files', url: '/files', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
         ]
       },
       workbox: {
@@ -230,6 +236,7 @@ export default defineConfig({
           /^\/stock\//,
           /^\/podcast\//,
           /^\/ai\//,
+          /^\/cloud-files\//,
           /^\/api\//,
           /^\/__\//,
         ],

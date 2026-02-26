@@ -123,6 +123,16 @@ const STEPS = [
     ),
     color: 'from-red-500/10 to-orange-500/10',
   },
+  {
+    titleKey: 'onboarding.step12Title' as const,
+    descKey: 'onboarding.step12Desc' as const,
+    icon: (
+      <svg className="w-16 h-16 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+      </svg>
+    ),
+    color: 'from-cyan-500/10 to-sky-500/10',
+  },
 ];
 
 const LOCALE_LABELS: Record<string, string> = {

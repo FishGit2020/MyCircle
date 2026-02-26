@@ -14,5 +14,6 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   compare: 'nav.compare',
   flashcards: 'nav.flashcards',
   'work-tracker': 'nav.workTracker',
+  files: 'nav.cloudFiles',
   'whats-new': 'whatsNew.title',
 };

@@ -45,6 +45,16 @@ declare global {
       getProgress: () => Promise<any>;
       updateProgress: (progress: Record<string, any>) => Promise<void>;
     };
+    __cloudFiles?: {
+      getAll: () => Promise<any[]>;
+      subscribe: (callback: (files: any[]) => void) => () => void;
+      upload: (fileName: string, fileBase64: string, contentType: string) => Promise<{ fileId: string; downloadUrl: string }>;
+      share: (fileId: string) => Promise<{ ok: boolean; downloadUrl: string }>;
+      delete: (fileId: string) => Promise<{ ok: boolean }>;
+      getAllShared: () => Promise<any[]>;
+      subscribeShared: (callback: (files: any[]) => void) => () => void;
+      deleteShared: (fileId: string) => Promise<{ ok: boolean }>;
+    };
     __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
   }
 }

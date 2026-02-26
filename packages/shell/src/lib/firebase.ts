@@ -1175,6 +1175,113 @@ if (firebaseEnabled) {
   };
 }
 
+// Cloud Files — personal files (user-scoped subcollection)
+export async function getUserFiles(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'files'), orderBy('uploadedAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export function subscribeToUserFiles(uid: string, callback: (files: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'files'), orderBy('uploadedAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const files = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(files);
+  }, (error) => {
+    log.warn('User files snapshot error:', error);
+  });
+}
+
+// Shared files — public read collection
+export async function getSharedFiles() {
+  if (!db) return [];
+  const q = query(collection(db, 'sharedFiles'), orderBy('sharedAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export function subscribeToSharedFiles(callback: (files: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'sharedFiles'), orderBy('sharedAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const files = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(files);
+  }, (error) => {
+    log.warn('Shared files snapshot error:', error);
+  });
+}
+
+// Expose cloud files API for MFEs
+if (firebaseEnabled) {
+  window.__cloudFiles = {
+    getAll: () => auth?.currentUser ? getUserFiles(auth.currentUser.uid) : Promise.resolve([]),
+    subscribe: (callback: (files: Array<Record<string, any>>) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToUserFiles(auth.currentUser.uid, callback);
+    },
+    upload: async (fileName: string, fileBase64: string, contentType: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const token = await auth.currentUser.getIdToken();
+      const res = await fetch('/cloud-files/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ fileName, fileBase64, contentType }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(err.error || 'Upload failed');
+      }
+      return res.json();
+    },
+    share: async (fileId: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const token = await auth.currentUser.getIdToken();
+      const res = await fetch('/cloud-files/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ fileId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Share failed' }));
+        throw new Error(err.error || 'Share failed');
+      }
+      return res.json();
+    },
+    delete: async (fileId: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const token = await auth.currentUser.getIdToken();
+      const res = await fetch('/cloud-files/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ fileId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Delete failed' }));
+        throw new Error(err.error || 'Delete failed');
+      }
+      return res.json();
+    },
+    getAllShared: () => getSharedFiles(),
+    subscribeShared: subscribeToSharedFiles,
+    deleteShared: async (fileId: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const token = await auth.currentUser.getIdToken();
+      const res = await fetch('/cloud-files/delete-shared', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ fileId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Delete failed' }));
+        throw new Error(err.error || 'Delete failed');
+      }
+      return res.json();
+    },
+  };
+}
+
 // Expose analytics for MFEs
 window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
   logEvent(eventName, params);
