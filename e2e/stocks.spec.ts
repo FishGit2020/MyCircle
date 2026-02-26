@@ -66,8 +66,8 @@ test.describe('Stock Tracker', () => {
     await page.getByText('Apple Inc').first().click({ timeout: 10_000 });
     await expect(page.getByText('$185.92')).toBeVisible({ timeout: 10_000 });
 
-    // Click back button
-    await page.getByRole('button', { name: /back to overview/i }).click();
+    // Click breadcrumb link to navigate back
+    await page.getByRole('link', { name: /stocks/i }).click();
 
     // Should see watchlist section again
     await expect(page.getByRole('heading', { name: /watchlist/i })).toBeVisible();

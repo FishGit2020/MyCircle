@@ -53,7 +53,6 @@ const zh: Record<TranslationKey, string> = {
   'search.suggestedCities': '\u60a8\u662f\u5426\u5728\u627e\uff1f',
 
   // Weather Display
-  'weather.backToSearch': '\u8fd4\u56de\u641c\u7d22',
   'weather.refresh': '\u5237\u65b0',
   'weather.refreshing': '\u5237\u65b0\u4e2d...',
   'weather.live': '\u5b9e\u65f6',
@@ -509,7 +508,6 @@ const zh: Record<TranslationKey, string> = {
   'worship.requiredFieldLegend': '* \u5fc5\u586b\u5b57\u6bb5',
   'worship.fieldRequired': '\u6b64\u5b57\u6bb5\u4e3a\u5fc5\u586b\u9879',
   'worship.fillRequiredFields': '\u8bf7\u586b\u5199\u6240\u6709\u5fc5\u586b\u5b57\u6bb5\uff08\u6807\u9898\u548c\u5185\u5bb9\uff09\u624d\u80fd\u4fdd\u5b58',
-  'worship.back': '\u8fd4\u56de\u6b4c\u66f2\u5217\u8868',
   'worship.noSongs': '\u8fd8\u6ca1\u6709\u6b4c\u66f2\u3002\u6dfb\u52a0\u60a8\u7684\u7b2c\u4e00\u9996\u6572\u62dc\u6b4c\u66f2\uff01',
   'worship.searchPlaceholder': '\u641c\u7d22\u6b4c\u66f2...',
   'worship.transpose': '\u79fb\u8c03',
@@ -567,7 +565,6 @@ const zh: Record<TranslationKey, string> = {
   'notebook.save': '\u4fdd\u5b58',
   'notebook.saving': '\u4fdd\u5b58\u4e2d...',
   'notebook.cancel': '\u53d6\u6d88',
-  'notebook.back': '\u8fd4\u56de\u7b14\u8bb0\u5217\u8868',
   'notebook.noNotes': '\u8fd8\u6ca1\u6709\u7b14\u8bb0\u3002\u521b\u5efa\u60a8\u7684\u7b2c\u4e00\u7bc7\u7b14\u8bb0\uff01',
   'notebook.searchPlaceholder': '\u641c\u7d22\u7b14\u8bb0...',
   'notebook.noteCount': '{count} \u7bc7\u7b14\u8bb0',

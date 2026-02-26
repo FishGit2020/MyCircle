@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { useWeatherData, useHistoricalWeather, useAirQuality, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys, REVERSE_GEOCODE, useLazyQuery } from '@mycircle/shared';
 import CurrentWeather from './CurrentWeatherV1';
 import Forecast from './Forecast';
@@ -173,16 +173,6 @@ export default function WeatherDisplay() {
 
   return (
     <div className="weather-display-container space-y-6 animate-fadeIn" aria-live="polite">
-      <Link
-        to="/weather"
-        className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        {t('weather.backToSearch')}
-      </Link>
-
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{cityName}</h2>

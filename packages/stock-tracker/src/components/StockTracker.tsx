@@ -80,10 +80,6 @@ export default function StockTracker() {
     navigate(`/stocks/${symbol}?name=${encodeURIComponent(item?.companyName ?? symbol)}`);
   }, [watchlist, navigate]);
 
-  const handleBackToOverview = useCallback(() => {
-    navigate('/stocks');
-  }, [navigate]);
-
   const handleSavePortfolio = useCallback(() => {
     if (!selectedSymbol) return;
     const bp = parseFloat(buyPrice);
@@ -148,15 +144,6 @@ export default function StockTracker() {
       {selectedSymbol && (
         <div className="mb-8 stock-card-enter">
           <div className="flex items-center gap-3 mb-4">
-            <button
-              onClick={handleBackToOverview}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-500 dark:text-gray-400"
-              aria-label="Back to overview"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
             <div className="flex-1 min-w-0">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{selectedSymbol}</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{selectedName}</p>
