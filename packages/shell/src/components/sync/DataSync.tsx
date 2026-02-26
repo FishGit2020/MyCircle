@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
-import { updateLastPlayed } from '../../lib/firebase';
+import { updateLastPlayed, updatePodcastPlayedEpisodes } from '../../lib/firebase';
 import type { LastPlayedData } from '../../lib/firebase';
 
 /**
@@ -39,14 +39,24 @@ export default function DataSync() {
       } catch { /* ignore parse errors */ }
     };
 
+    const handlePlayedChanged = () => {
+      try {
+        const raw = localStorage.getItem(StorageKeys.PODCAST_PLAYED_EPISODES);
+        const ids: string[] = raw ? JSON.parse(raw) : [];
+        updatePodcastPlayedEpisodes(user.uid, ids);
+      } catch { /* ignore parse errors */ }
+    };
+
     window.addEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
     window.addEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
     window.addEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
+    window.addEventListener(WindowEvents.PODCAST_PLAYED_CHANGED, handlePlayedChanged);
 
     return () => {
       window.removeEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
       window.removeEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
       window.removeEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
+      window.removeEventListener(WindowEvents.PODCAST_PLAYED_CHANGED, handlePlayedChanged);
     };
   }, [user, syncStockWatchlist, syncPodcastSubscriptions]);
 

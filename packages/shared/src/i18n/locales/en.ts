@@ -412,6 +412,8 @@ const en = {
   'podcasts.shareText': 'Listening to "{episode}" from {podcast} at {time}',
   'podcasts.showMore': 'Show more episodes',
   'podcasts.viewPodcast': 'View podcast',
+  'podcasts.markPlayed': 'Mark as played',
+  'podcasts.markUnplayed': 'Mark as unplayed',
 
   // AI Assistant
   'ai.title': 'AI Assistant',

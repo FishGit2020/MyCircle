@@ -426,6 +426,63 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
     return () => clearInterval(interval);
   }, [sleepMinutes, isPlaying]);
 
+  // Media Session API — powers lock screen / notification media controls
+  useEffect(() => {
+    if (!episode || !('mediaSession' in navigator)) return;
+
+    const artSrc = episode.image || podcast?.artwork || '';
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: episode.title,
+      artist: podcast?.title || '',
+      album: podcast?.title || '',
+      artwork: artSrc ? [{ src: artSrc, sizes: '512x512', type: 'image/jpeg' }] : [],
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.play().then(() => setIsPlaying(true)).catch(() => {});
+      }
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      const audio = audioRef.current;
+      if (audio) { audio.pause(); setIsPlaying(false); }
+    });
+    navigator.mediaSession.setActionHandler('seekbackward', () => {
+      const audio = audioRef.current;
+      if (audio) audio.currentTime = Math.max(audio.currentTime - 15, 0);
+    });
+    navigator.mediaSession.setActionHandler('seekforward', () => {
+      const audio = audioRef.current;
+      if (audio) audio.currentTime = Math.min(audio.currentTime + 15, audio.duration || 0);
+    });
+
+    return () => {
+      // Clean up action handlers
+      try {
+        navigator.mediaSession.setActionHandler('play', null);
+        navigator.mediaSession.setActionHandler('pause', null);
+        navigator.mediaSession.setActionHandler('seekbackward', null);
+        navigator.mediaSession.setActionHandler('seekforward', null);
+      } catch { /* some browsers don't support null handlers */ }
+    };
+  }, [episode?.id, podcast?.title]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep Media Session position state in sync with playback
+  useEffect(() => {
+    if (!episode || !('mediaSession' in navigator)) return;
+    const audio = audioRef.current;
+    if (!audio || !isFinite(audio.duration) || audio.duration <= 0) return;
+
+    try {
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: Math.min(audio.currentTime, audio.duration),
+      });
+    } catch { /* ignore if not supported */ }
+  }, [episode?.id, currentTime, playbackSpeed]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Queue helpers
   const removeFromQueue = useCallback((index: number) => {
     setQueue(prev => prev.filter((_, i) => i !== index));
@@ -466,10 +523,15 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
     navigate(`/podcasts/${podcast.id}`, { state: { podcast } });
   }, [podcast, navigate]);
 
+  // Ref-stable command handlers to avoid tearing down event subscriptions
+  // on unrelated state changes (e.g. isPlaying toggling recreated togglePlayPause)
+  const commandHandlersRef = useRef({ togglePlayPause, skipForward, skipBack, changeSpeed, startSleepTimer, removeFromQueue });
+  commandHandlersRef.current = { togglePlayPause, skipForward, skipBack, changeSpeed, startSleepTimer, removeFromQueue };
+
   // Broadcast playback state to MFE when on matching podcast page
   // Use refs to avoid stale closures in the timeupdate listener
-  const stateRef = useRef({ isPlaying, playbackSpeed, sleepMinutes, sleepRemaining, queueLength: queue.length });
-  stateRef.current = { isPlaying, playbackSpeed, sleepMinutes, sleepRemaining, queueLength: queue.length };
+  const stateRef = useRef({ isPlaying, playbackSpeed, sleepMinutes, sleepRemaining, queueLength: queue.length, queue: queue.map(q => ({ id: q.episode.id, title: q.episode.title })) });
+  stateRef.current = { isPlaying, playbackSpeed, sleepMinutes, sleepRemaining, queueLength: queue.length, queue: queue.map(q => ({ id: q.episode.id, title: q.episode.title })) };
 
   useEffect(() => {
     if (!isOnMatchingPodcastPage || !episode) return;
@@ -484,6 +546,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
         sleepMinutes: stateRef.current.sleepMinutes,
         sleepRemaining: stateRef.current.sleepRemaining,
         queueLength: stateRef.current.queueLength,
+        queue: stateRef.current.queue,
       };
       eventBus.publish(MFEvents.PODCAST_PLAYBACK_STATE, state);
     };
@@ -505,24 +568,25 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
   }, [isOnMatchingPodcastPage, episode?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Subscribe to command events from MFE (InlinePlaybackControls)
+  // Uses commandHandlersRef to avoid re-subscribing when handler identities change
   useEffect(() => {
     if (!isOnMatchingPodcastPage) return;
 
     const unsubs = [
-      subscribeToMFEvent(MFEvents.PODCAST_TOGGLE_PLAY, () => togglePlayPause()),
+      subscribeToMFEvent(MFEvents.PODCAST_TOGGLE_PLAY, () => commandHandlersRef.current.togglePlayPause()),
       subscribeToMFEvent<{ time: number }>(MFEvents.PODCAST_SEEK, (data) => {
         const audio = audioRef.current;
         if (audio) audio.currentTime = data.time;
       }),
-      subscribeToMFEvent(MFEvents.PODCAST_SKIP_FORWARD, () => skipForward()),
-      subscribeToMFEvent(MFEvents.PODCAST_SKIP_BACK, () => skipBack()),
-      subscribeToMFEvent<{ speed: number }>(MFEvents.PODCAST_CHANGE_SPEED, (data) => changeSpeed(data.speed)),
-      subscribeToMFEvent<{ minutes: number }>(MFEvents.PODCAST_SET_SLEEP_TIMER, (data) => startSleepTimer(data.minutes)),
-      subscribeToMFEvent<{ index: number }>(MFEvents.PODCAST_REMOVE_FROM_QUEUE, (data) => removeFromQueue(data.index)),
+      subscribeToMFEvent(MFEvents.PODCAST_SKIP_FORWARD, () => commandHandlersRef.current.skipForward()),
+      subscribeToMFEvent(MFEvents.PODCAST_SKIP_BACK, () => commandHandlersRef.current.skipBack()),
+      subscribeToMFEvent<{ speed: number }>(MFEvents.PODCAST_CHANGE_SPEED, (data) => commandHandlersRef.current.changeSpeed(data.speed)),
+      subscribeToMFEvent<{ minutes: number }>(MFEvents.PODCAST_SET_SLEEP_TIMER, (data) => commandHandlersRef.current.startSleepTimer(data.minutes)),
+      subscribeToMFEvent<{ index: number }>(MFEvents.PODCAST_REMOVE_FROM_QUEUE, (data) => commandHandlersRef.current.removeFromQueue(data.index)),
     ];
 
     return () => unsubs.forEach(unsub => unsub());
-  }, [isOnMatchingPodcastPage, togglePlayPause, skipForward, skipBack, changeSpeed, startSleepTimer, removeFromQueue]);
+  }, [isOnMatchingPodcastPage]);
 
   if (!episode) return null;
 

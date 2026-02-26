@@ -174,6 +174,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             window.dispatchEvent(new Event(WindowEvents.LAST_PLAYED_CHANGED));
           }
 
+          // Restore podcast played episodes
+          if (userProfile.podcastPlayedEpisodes && userProfile.podcastPlayedEpisodes.length > 0) {
+            // Merge with existing local played episodes
+            try {
+              const localRaw = localStorage.getItem(StorageKeys.PODCAST_PLAYED_EPISODES);
+              const local: string[] = localRaw ? JSON.parse(localRaw) : [];
+              const merged = [...new Set([...local, ...userProfile.podcastPlayedEpisodes])];
+              localStorage.setItem(StorageKeys.PODCAST_PLAYED_EPISODES, JSON.stringify(merged));
+            } catch {
+              localStorage.setItem(StorageKeys.PODCAST_PLAYED_EPISODES, JSON.stringify(userProfile.podcastPlayedEpisodes));
+            }
+            window.dispatchEvent(new Event(WindowEvents.PODCAST_PLAYED_CHANGED));
+          }
+
           // Restore Child Development data
           if (userProfile.childName) {
             localStorage.setItem(StorageKeys.CHILD_NAME, userProfile.childName);

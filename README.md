@@ -61,6 +61,9 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Category/genre filtering** — browse trending podcasts by genre with filter chips, category badges on cards
 - **Share episode clip** — share currently playing episode with timestamp via Web Share API or clipboard fallback
 - **Offline support** — podcast artwork cached by service worker (CacheFirst, 30-day TTL), playback speed and episode progress persisted to localStorage for seamless resume
+- **Mark as played** — toggle episodes as played/unplayed with Firestore sync across devices; merges with auto-complete detection (95%+ progress)
+- **Queue management** — inline queue dropdown on podcast detail page showing queued episode titles with remove buttons
+- **Media Session API** — lock screen / notification media controls with artwork, title, and transport buttons (play, pause, skip forward/back)
 - Podcast subscriptions with "My Subscriptions" tab (visible only when signed in)
 - Subscribe/unsubscribe from any podcast feed
 

@@ -122,6 +122,7 @@ export interface UserProfile {
   bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
   worshipFavorites?: string[];
   lastPlayed?: LastPlayedData;
+  podcastPlayedEpisodes?: string[];
   childName?: string;
   childBirthDate?: string;
   createdAt: Date;
@@ -403,6 +404,15 @@ export async function updateLastPlayed(uid: string, data: LastPlayedData | null)
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     lastPlayed: data || null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updatePodcastPlayedEpisodes(uid: string, episodeIds: string[]) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    podcastPlayedEpisodes: episodeIds,
     updatedAt: serverTimestamp(),
   });
 }
