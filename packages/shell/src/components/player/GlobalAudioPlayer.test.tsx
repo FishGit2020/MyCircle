@@ -134,13 +134,13 @@ describe('GlobalAudioPlayer', () => {
     expect(screen.getByText('Test Podcast')).toBeInTheDocument();
   });
 
-  it('positions player above bottom nav on mobile with bottom-14 and z-[55]', () => {
+  it('positions player above bottom nav with safe-area padding and z-[55]', () => {
     renderWithProviders(<GlobalAudioPlayer />);
 
     act(() => { dispatchPlayEvent(); });
 
     const region = screen.getByRole('region', { name: 'Now Playing' });
-    expect(region.className).toContain('bottom-14');
+    expect(region.className).toContain('bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))]');
     expect(region.className).toContain('md:bottom-0');
     expect(region.className).toContain('z-[55]');
   });

@@ -445,7 +445,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
 
   return (
     <div
-      className="podcast-player-slide-up fixed bottom-14 md:bottom-0 left-0 right-0 z-[55] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
+      className="podcast-player-slide-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-[55] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
       role="region"
       aria-label={t('podcasts.nowPlaying')}
     >
