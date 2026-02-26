@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
+import { updateLastPlayed } from '../../lib/firebase';
+import type { LastPlayedData } from '../../lib/firebase';
 
 /**
  * Invisible component that bridges MFE localStorage events to Firestore.
@@ -29,12 +31,22 @@ export default function DataSync() {
       } catch { /* ignore parse errors */ }
     };
 
+    const handleLastPlayedChanged = () => {
+      try {
+        const raw = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
+        const data: LastPlayedData | null = raw ? JSON.parse(raw) : null;
+        updateLastPlayed(user.uid, data);
+      } catch { /* ignore parse errors */ }
+    };
+
     window.addEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
     window.addEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
+    window.addEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
 
     return () => {
       window.removeEventListener(WindowEvents.WATCHLIST_CHANGED, handleWatchlistChanged);
       window.removeEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, handleSubscriptionsChanged);
+      window.removeEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
     };
   }, [user, syncStockWatchlist, syncPodcastSubscriptions]);
 

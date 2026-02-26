@@ -16,11 +16,13 @@ vi.mock('@mycircle/shared', () => ({
     BABY_DUE_DATE_CHANGED: 'baby-due-date-changed',
     BIBLE_BOOKMARKS_CHANGED: 'bible-bookmarks-changed',
     WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
+    LAST_PLAYED_CHANGED: 'last-played-changed',
   },
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
     PODCAST_SUBSCRIPTIONS: 'podcast-subscriptions',
     PODCAST_NOW_PLAYING: 'podcast-now-playing',
+    PODCAST_LAST_PLAYED: 'podcast-last-played',
     WIDGET_LAYOUT: 'widget-dashboard-layout',
     WORSHIP_SONGS_CACHE: 'worship-songs-cache',
     WORSHIP_FAVORITES: 'worship-favorites',
@@ -37,6 +39,7 @@ vi.mock('@mycircle/shared', () => ({
     PODCAST_CLOSE_PLAYER: 'mf:podcast-close-player',
   },
   subscribeToMFEvent: () => () => {},
+  eventBus: { publish: vi.fn(), subscribe: vi.fn(() => () => {}) },
 }));
 
 vi.mock('../../context/AuthContext', () => ({
@@ -198,5 +201,45 @@ describe('WidgetDashboard', () => {
     renderWidget();
     expect(screen.getByText('Persisted Episode')).toBeInTheDocument();
     expect(screen.getByText('Persisted Podcast')).toBeInTheDocument();
+  });
+
+  it('shows Continue button when podcast data is available', () => {
+    const nowPlaying = {
+      episode: {
+        id: 42,
+        title: 'Persisted Episode',
+        description: '',
+        datePublished: 1700000000,
+        duration: 1800,
+        enclosureUrl: 'https://example.com/ep.mp3',
+        enclosureType: 'audio/mpeg',
+        image: '',
+        feedId: 10,
+      },
+      podcast: { id: 10, title: 'Persisted Podcast', author: '', artwork: '', description: '', feedUrl: '', episodeCount: 1, categories: {} },
+    };
+    getItemSpy.mockImplementation((key: string) => {
+      if (key === 'podcast-now-playing') return JSON.stringify(nowPlaying);
+      return null;
+    });
+    renderWidget();
+    expect(screen.getByText('widgets.continueListening')).toBeInTheDocument();
+  });
+
+  it('hydrates from PODCAST_LAST_PLAYED when PODCAST_NOW_PLAYING is absent', () => {
+    const lastPlayed = {
+      episode: { id: 99, title: 'Restored Episode', enclosureUrl: 'https://example.com/ep.mp3', image: '' },
+      podcast: { id: 20, title: 'Restored Podcast', artwork: '' },
+      position: 120,
+      savedAt: Date.now(),
+    };
+    getItemSpy.mockImplementation((key: string) => {
+      if (key === 'podcast-last-played') return JSON.stringify(lastPlayed);
+      return null;
+    });
+    renderWidget();
+    expect(screen.getByText('Restored Episode')).toBeInTheDocument();
+    expect(screen.getByText('Restored Podcast')).toBeInTheDocument();
+    expect(screen.getByText('widgets.continueListening')).toBeInTheDocument();
   });
 });

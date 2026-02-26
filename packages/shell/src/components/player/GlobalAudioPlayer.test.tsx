@@ -134,7 +134,7 @@ describe('GlobalAudioPlayer', () => {
     expect(screen.getByText('Test Podcast')).toBeInTheDocument();
   });
 
-  it('positions player above bottom nav on mobile with bottom-14', () => {
+  it('positions player above bottom nav on mobile with bottom-14 and z-[55]', () => {
     renderWithProviders(<GlobalAudioPlayer />);
 
     act(() => { dispatchPlayEvent(); });
@@ -142,6 +142,7 @@ describe('GlobalAudioPlayer', () => {
     const region = screen.getByRole('region', { name: 'Now Playing' });
     expect(region.className).toContain('bottom-14');
     expect(region.className).toContain('md:bottom-0');
+    expect(region.className).toContain('z-[55]');
   });
 
   it('persists now-playing state to localStorage on play', () => {
@@ -173,5 +174,16 @@ describe('GlobalAudioPlayer', () => {
     act(() => { dispatchCloseEvent(); });
 
     expect(removeItemSpy).toHaveBeenCalledWith(StorageKeys.PODCAST_NOW_PLAYING);
+  });
+
+  it('saves last-played data to localStorage on play', () => {
+    renderWithProviders(<GlobalAudioPlayer />);
+
+    act(() => { dispatchPlayEvent(); });
+
+    expect(setItemSpy).toHaveBeenCalledWith(
+      StorageKeys.PODCAST_LAST_PLAYED,
+      expect.stringContaining('Test Episode Title')
+    );
   });
 });

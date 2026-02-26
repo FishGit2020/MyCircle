@@ -1,6 +1,6 @@
 import React, { useReducer, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router';
-import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents } from '@mycircle/shared';
+import { Link, useNavigate } from 'react-router';
+import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents, eventBus } from '@mycircle/shared';
 import type { Episode, Podcast } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import ErrorBoundary from '../common/ErrorBoundary';
@@ -207,8 +207,10 @@ const VerseWidget = React.memo(function VerseWidget() {
 
 const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [episode, setEpisode] = React.useState<Episode | null>(null);
   const [podcast, setPodcast] = React.useState<Podcast | null>(null);
+  const [isActivelyPlaying, setIsActivelyPlaying] = React.useState(false);
   const [hasSubscriptions, setHasSubscriptions] = React.useState(false);
 
   useEffect(() => {
@@ -227,13 +229,22 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   }, []);
 
   useEffect(() => {
-    // Hydrate from persisted "now playing" state (written by GlobalAudioPlayer)
+    // Hydrate from persisted "now playing" or "last played" state
     try {
-      const stored = localStorage.getItem(StorageKeys.PODCAST_NOW_PLAYING);
-      if (stored) {
-        const data = JSON.parse(stored);
+      const nowPlaying = localStorage.getItem(StorageKeys.PODCAST_NOW_PLAYING);
+      if (nowPlaying) {
+        const data = JSON.parse(nowPlaying);
         if (data.episode) setEpisode(data.episode);
         if (data.podcast) setPodcast(data.podcast);
+        setIsActivelyPlaying(true);
+      } else {
+        // Fall back to last-played (cross-device restore)
+        const lastPlayed = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
+        if (lastPlayed) {
+          const data = JSON.parse(lastPlayed);
+          if (data.episode) setEpisode(data.episode as Episode);
+          if (data.podcast) setPodcast(data.podcast as Podcast);
+        }
       }
     } catch { /* ignore */ }
 
@@ -242,26 +253,53 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
       (data) => {
         setEpisode(data.episode);
         setPodcast(data.podcast);
+        setIsActivelyPlaying(true);
       }
     );
     const unsubClose = subscribeToMFEvent(MFEvents.PODCAST_CLOSE_PLAYER, () => {
-      setEpisode(null);
-      setPodcast(null);
+      // Don't clear episode/podcast — keep them for "Continue Listening"
+      setIsActivelyPlaying(false);
     });
-    return () => { unsubPlay(); unsubClose(); };
+
+    // Hydrate when last-played data is restored from Firestore (on login)
+    function handleLastPlayedChanged() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (data.episode) setEpisode(data.episode as Episode);
+          if (data.podcast) setPodcast(data.podcast as Podcast);
+        }
+      } catch { /* ignore */ }
+    }
+    window.addEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
+
+    return () => {
+      unsubPlay();
+      unsubClose();
+      window.removeEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
+    };
   }, []);
 
-  const isPlaying = !!episode;
+  const handleContinue = React.useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!podcast || !episode) return;
+    navigate(`/podcasts/${podcast.id}`, { state: { podcast } });
+    eventBus.publish(MFEvents.PODCAST_PLAY_EPISODE, { episode, podcast });
+  }, [navigate, episode, podcast]);
+
+  const hasEpisode = !!episode;
 
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-          isPlaying
+          isActivelyPlaying
             ? 'bg-purple-500 text-white animate-pulse'
             : 'bg-purple-50 dark:bg-purple-900/30 text-purple-500'
         }`}>
-          {isPlaying ? (
+          {isActivelyPlaying ? (
             /* Animated equalizer bars when playing */
             <div className="flex items-end gap-0.5 h-4" aria-hidden="true">
               <span className="w-1 bg-white rounded-full animate-bounce" style={{ height: '60%', animationDelay: '0ms', animationDuration: '600ms' }} />
@@ -279,7 +317,7 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.nowPlayingDesc')}</p>
         </div>
       </div>
-      {episode ? (
+      {hasEpisode ? (
         <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/20 rounded-lg p-2.5">
           <div className="flex items-center gap-2">
             {episode.image && (
@@ -289,12 +327,22 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
                 className="w-10 h-10 rounded object-cover flex-shrink-0 ring-2 ring-purple-300 dark:ring-purple-600"
               />
             )}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{episode.title}</p>
               {podcast && (
                 <p className="text-xs text-purple-600 dark:text-purple-400 truncate">{podcast.title}</p>
               )}
             </div>
+            {podcast && (
+              <button
+                type="button"
+                onClick={handleContinue}
+                className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-purple-500 dark:bg-purple-600 rounded-full hover:bg-purple-600 dark:hover:bg-purple-500 transition active:scale-95"
+                aria-label={t('widgets.continueListening')}
+              >
+                {t('widgets.continueListening')}
+              </button>
+            )}
           </div>
         </div>
       ) : hasSubscriptions ? (

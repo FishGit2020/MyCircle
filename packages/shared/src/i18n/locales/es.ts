@@ -801,6 +801,7 @@ const es: Record<TranslationKey, string> = {
   'widgets.worshipDesc': 'Tu biblioteca de canciones y favoritos',
   'widgets.worshipSongCount': '{count} canciones',
   'widgets.worshipFavCount': '{count} favoritos',
+  'widgets.continueListening': 'Continuar',
   'widgets.noWorshipSongs': 'Sin canciones a\u00fan \u2014 agrega tu primera canci\u00f3n',
 
   // What's New
