@@ -1,12 +1,14 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import {
   useTranslation,
   subscribeToMFEvent,
+  eventBus,
   MFEvents,
   StorageKeys,
   WindowEvents,
 } from '@mycircle/shared';
-import type { Episode, Podcast, PodcastPlayEpisodeEvent } from '@mycircle/shared';
+import type { Episode, Podcast, PodcastPlayEpisodeEvent, PodcastPlaybackStateEvent } from '@mycircle/shared';
 
 const PLAYBACK_SPEEDS = [0.5, 1, 1.25, 1.5, 2];
 const SLEEP_TIMER_OPTIONS = [0, 5, 15, 30, 45, 60]; // minutes, 0 = off
@@ -72,10 +74,13 @@ function formatTime(seconds: number): string {
 
 export interface GlobalAudioPlayerProps {
   onPlayerStateChange?: (active: boolean) => void;
+  onPlayerVisibilityChange?: (visible: boolean) => void;
 }
 
-export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPlayerProps) {
+export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibilityChange }: GlobalAudioPlayerProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [episode, setEpisode] = useState<Episode | null>(null);
   const [podcast, setPodcast] = useState<Podcast | null>(null);
@@ -100,6 +105,22 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
   const [showSleepMenu, setShowSleepMenu] = useState(false);
   const sleepMenuRef = useRef<HTMLDivElement>(null);
   const lastProgressSave = useRef(0);
+
+  // Route-based hiding: hide visual bar when on the matching podcast page
+  const isOnMatchingPodcastPage = !!(
+    podcast &&
+    episode &&
+    location.pathname === `/podcasts/${podcast.id}`
+  );
+
+  // Notify Layout when player is active but visually hidden
+  useEffect(() => {
+    if (episode) {
+      onPlayerVisibilityChange?.(!isOnMatchingPodcastPage);
+    } else {
+      onPlayerVisibilityChange?.(false);
+    }
+  }, [episode, isOnMatchingPodcastPage, onPlayerVisibilityChange]);
 
   // Subscribe to play/close/queue events from Podcast MFE
   useEffect(() => {
@@ -439,7 +460,76 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
     } catch { /* clipboard not available */ }
   }, [episode, podcast, currentTime, t]);
 
+  // Navigate to podcast detail page when tapping info area
+  const handleInfoClick = useCallback(() => {
+    if (!podcast) return;
+    navigate(`/podcasts/${podcast.id}`, { state: { podcast } });
+  }, [podcast, navigate]);
+
+  // Broadcast playback state to MFE when on matching podcast page
+  // Use refs to avoid stale closures in the timeupdate listener
+  const stateRef = useRef({ isPlaying, playbackSpeed, sleepMinutes, sleepRemaining, queueLength: queue.length });
+  stateRef.current = { isPlaying, playbackSpeed, sleepMinutes, sleepRemaining, queueLength: queue.length };
+
+  useEffect(() => {
+    if (!isOnMatchingPodcastPage || !episode) return;
+    const audio = audioRef.current;
+
+    const broadcastState = () => {
+      const state: PodcastPlaybackStateEvent = {
+        isPlaying: stateRef.current.isPlaying,
+        currentTime: audio?.currentTime ?? 0,
+        duration: audio?.duration ?? 0,
+        playbackSpeed: stateRef.current.playbackSpeed,
+        sleepMinutes: stateRef.current.sleepMinutes,
+        sleepRemaining: stateRef.current.sleepRemaining,
+        queueLength: stateRef.current.queueLength,
+      };
+      eventBus.publish(MFEvents.PODCAST_PLAYBACK_STATE, state);
+    };
+
+    // Immediate broadcast for initial hydration
+    broadcastState();
+
+    // Broadcast on timeupdate (~4x/sec)
+    if (audio) {
+      audio.addEventListener('timeupdate', broadcastState);
+      audio.addEventListener('play', broadcastState);
+      audio.addEventListener('pause', broadcastState);
+      return () => {
+        audio.removeEventListener('timeupdate', broadcastState);
+        audio.removeEventListener('play', broadcastState);
+        audio.removeEventListener('pause', broadcastState);
+      };
+    }
+  }, [isOnMatchingPodcastPage, episode?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Subscribe to command events from MFE (InlinePlaybackControls)
+  useEffect(() => {
+    if (!isOnMatchingPodcastPage) return;
+
+    const unsubs = [
+      subscribeToMFEvent(MFEvents.PODCAST_TOGGLE_PLAY, () => togglePlayPause()),
+      subscribeToMFEvent<{ time: number }>(MFEvents.PODCAST_SEEK, (data) => {
+        const audio = audioRef.current;
+        if (audio) audio.currentTime = data.time;
+      }),
+      subscribeToMFEvent(MFEvents.PODCAST_SKIP_FORWARD, () => skipForward()),
+      subscribeToMFEvent(MFEvents.PODCAST_SKIP_BACK, () => skipBack()),
+      subscribeToMFEvent<{ speed: number }>(MFEvents.PODCAST_CHANGE_SPEED, (data) => changeSpeed(data.speed)),
+      subscribeToMFEvent<{ minutes: number }>(MFEvents.PODCAST_SET_SLEEP_TIMER, (data) => startSleepTimer(data.minutes)),
+      subscribeToMFEvent<{ index: number }>(MFEvents.PODCAST_REMOVE_FROM_QUEUE, (data) => removeFromQueue(data.index)),
+    ];
+
+    return () => unsubs.forEach(unsub => unsub());
+  }, [isOnMatchingPodcastPage, togglePlayPause, skipForward, skipBack, changeSpeed, startSleepTimer, removeFromQueue]);
+
   if (!episode) return null;
+
+  // When on matching podcast page, render only the hidden <audio> to keep playback alive
+  if (isOnMatchingPodcastPage) {
+    return <audio ref={audioRef} preload="metadata" className="hidden" />;
+  }
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const artworkSrc = episode.image || podcast?.artwork || '';
@@ -473,8 +563,14 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
 
       {/* Desktop layout */}
       <div className="hidden md:flex items-center gap-4 px-4 py-3 max-w-screen-xl mx-auto">
-        {/* Artwork + info */}
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+        {/* Artwork + info (clickable → navigate to podcast page) */}
+        <button
+          type="button"
+          onClick={handleInfoClick}
+          disabled={!podcast}
+          className="flex items-center gap-3 min-w-0 flex-1 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition p-1 -m-1 disabled:hover:bg-transparent"
+          aria-label={t('podcasts.viewPodcast')}
+        >
           {artworkSrc && (
             <img
               src={artworkSrc}
@@ -492,7 +588,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
               </p>
             )}
           </div>
-        </div>
+        </button>
 
         {/* Controls */}
         <div className="flex items-center gap-2">
@@ -699,21 +795,30 @@ export default function GlobalAudioPlayer({ onPlayerStateChange }: GlobalAudioPl
       {/* Mobile layout */}
       <div className="md:hidden px-3 py-2">
         <div className="flex items-center gap-3">
-          {artworkSrc && (
-            <img
-              src={artworkSrc}
-              alt=""
-              className="w-10 h-10 rounded object-cover flex-shrink-0"
-            />
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-              {episode.title}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </p>
-          </div>
+          {/* Artwork + title (clickable → navigate to podcast page) */}
+          <button
+            type="button"
+            onClick={handleInfoClick}
+            disabled={!podcast}
+            className="flex items-center gap-3 min-w-0 flex-1 text-left rounded-lg active:bg-gray-100 dark:active:bg-gray-800 transition disabled:active:bg-transparent"
+            aria-label={t('podcasts.viewPodcast')}
+          >
+            {artworkSrc && (
+              <img
+                src={artworkSrc}
+                alt=""
+                className="w-10 h-10 rounded object-cover flex-shrink-0"
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                {episode.title}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </p>
+            </div>
+          </button>
 
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <button

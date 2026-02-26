@@ -1,12 +1,14 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents, useQuery, GET_PODCAST_FEED } from '@mycircle/shared';
+import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents, subscribeToMFEvent, useQuery, GET_PODCAST_FEED } from '@mycircle/shared';
+import type { PodcastPlayEpisodeEvent } from '@mycircle/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
 import PodcastSearch from './PodcastSearch';
 import TrendingPodcasts from './TrendingPodcasts';
 import SubscribedPodcasts from './SubscribedPodcasts';
 import EpisodeList from './EpisodeList';
+import InlinePlaybackControls from './InlinePlaybackControls';
 import './PodcastPlayer.css';
 
 /** Strip dangerous HTML elements/attributes, keep safe formatting tags */
@@ -54,6 +56,51 @@ export default function PodcastPlayer() {
   const [subscribedIds, setSubscribedIds] = useState<Set<string>>(loadSubscriptions);
   const [activeTab, setActiveTab] = useState<'discover' | 'subscribed'>('discover');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Track now-playing state from GlobalAudioPlayer for InlinePlaybackControls
+  const [nowPlayingEpisode, setNowPlayingEpisode] = useState<Episode | null>(null);
+  const [nowPlayingPodcast, setNowPlayingPodcast] = useState<Podcast | null>(null);
+
+  // Hydrate now-playing from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(StorageKeys.PODCAST_NOW_PLAYING);
+      if (stored) {
+        const data = JSON.parse(stored);
+        if (data?.episode) {
+          setNowPlayingEpisode(data.episode);
+          setNowPlayingPodcast(data.podcast ?? null);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Listen for play/close events to keep now-playing in sync
+  useEffect(() => {
+    const unsubPlay = subscribeToMFEvent<PodcastPlayEpisodeEvent>(
+      MFEvents.PODCAST_PLAY_EPISODE,
+      (data) => {
+        setNowPlayingEpisode(data.episode);
+        setNowPlayingPodcast(data.podcast ?? null);
+      },
+    );
+    const unsubClose = subscribeToMFEvent(
+      MFEvents.PODCAST_CLOSE_PLAYER,
+      () => {
+        setNowPlayingEpisode(null);
+        setNowPlayingPodcast(null);
+      },
+    );
+    return () => { unsubPlay(); unsubClose(); };
+  }, []);
+
+  // Show inline controls when the now-playing podcast matches the viewed podcast
+  const showInlineControls = !!(
+    nowPlayingEpisode &&
+    selectedPodcast &&
+    nowPlayingPodcast &&
+    String(nowPlayingPodcast.id) === String(selectedPodcast.id)
+  );
 
   // Check auth state to conditionally show Subscriptions tab
   useEffect(() => {
@@ -252,6 +299,11 @@ export default function PodcastPlayer() {
               </div>
             </div>
           </div>
+
+          {/* Inline playback controls (when now-playing matches this podcast) */}
+          {showInlineControls && nowPlayingEpisode && (
+            <InlinePlaybackControls episode={nowPlayingEpisode} podcast={nowPlayingPodcast} />
+          )}
 
           {/* Episodes */}
           <div>

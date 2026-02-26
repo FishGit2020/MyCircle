@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import GlobalAudioPlayer from './GlobalAudioPlayer';
 import { MFEvents, StorageKeys } from '@mycircle/shared';
 
@@ -53,8 +53,14 @@ function dispatchCloseEvent() {
   );
 }
 
-const renderWithProviders = (ui: React.ReactElement) => {
-  return render(<MemoryRouter>{ui}</MemoryRouter>);
+const renderWithProviders = (ui: React.ReactElement, { initialEntries = ['/'] } = {}) => {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      <Routes>
+        <Route path="*" element={ui} />
+      </Routes>
+    </MemoryRouter>
+  );
 };
 
 const setItemSpy = vi.spyOn(Storage.prototype, 'setItem');
@@ -117,7 +123,9 @@ describe('GlobalAudioPlayer', () => {
 
     rerender(
       <MemoryRouter>
-        <GlobalAudioPlayer />
+        <Routes>
+          <Route path="*" element={<GlobalAudioPlayer />} />
+        </Routes>
       </MemoryRouter>
     );
 
@@ -185,5 +193,68 @@ describe('GlobalAudioPlayer', () => {
       StorageKeys.PODCAST_LAST_PLAYED,
       expect.stringContaining('Test Episode Title')
     );
+  });
+
+  it('renders "View podcast" buttons for info area navigation', () => {
+    renderWithProviders(<GlobalAudioPlayer />);
+
+    act(() => { dispatchPlayEvent(); });
+
+    // Desktop + mobile each get a "View podcast" button
+    const viewButtons = screen.getAllByLabelText('View podcast');
+    expect(viewButtons.length).toBe(2);
+  });
+
+  it('hides visual bar on matching podcast route (only hidden audio remains)', () => {
+    const { container } = renderWithProviders(
+      <GlobalAudioPlayer />,
+      { initialEntries: [`/podcasts/${mockPodcast.id}`] },
+    );
+
+    act(() => { dispatchPlayEvent(); });
+
+    // No visible region — player bar is hidden
+    expect(container.querySelector('[role="region"]')).toBeNull();
+    // But audio element is still in the DOM
+    expect(container.querySelector('audio')).toBeInTheDocument();
+  });
+
+  it('shows visual bar on non-matching podcast route', () => {
+    renderWithProviders(
+      <GlobalAudioPlayer />,
+      { initialEntries: ['/podcasts/999'] },
+    );
+
+    act(() => { dispatchPlayEvent(); });
+
+    // Player bar should be visible since podcast ID 999 != 100
+    expect(screen.getByRole('region', { name: 'Now Playing' })).toBeInTheDocument();
+  });
+
+  it('calls onPlayerVisibilityChange correctly based on route', () => {
+    const onVisibilityChange = vi.fn();
+
+    // On a non-matching route → player visible
+    renderWithProviders(
+      <GlobalAudioPlayer onPlayerVisibilityChange={onVisibilityChange} />,
+      { initialEntries: ['/'] },
+    );
+
+    act(() => { dispatchPlayEvent(); });
+
+    expect(onVisibilityChange).toHaveBeenCalledWith(true);
+  });
+
+  it('calls onPlayerVisibilityChange(false) when on matching route', () => {
+    const onVisibilityChange = vi.fn();
+
+    renderWithProviders(
+      <GlobalAudioPlayer onPlayerVisibilityChange={onVisibilityChange} />,
+      { initialEntries: [`/podcasts/${mockPodcast.id}`] },
+    );
+
+    act(() => { dispatchPlayEvent(); });
+
+    expect(onVisibilityChange).toHaveBeenCalledWith(false);
   });
 });

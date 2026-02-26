@@ -411,6 +411,7 @@ const en = {
   'podcasts.shareCopied': 'Link copied!',
   'podcasts.shareText': 'Listening to "{episode}" from {podcast} at {time}',
   'podcasts.showMore': 'Show more episodes',
+  'podcasts.viewPodcast': 'View podcast',
 
   // AI Assistant
   'ai.title': 'AI Assistant',
