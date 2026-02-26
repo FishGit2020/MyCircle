@@ -16,6 +16,14 @@ export const MFEvents = {
   PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
   PODCAST_CLOSE_PLAYER: 'mf:podcast-close-player',
   PODCAST_QUEUE_EPISODE: 'mf:podcast-queue-episode',
+  PODCAST_PLAYBACK_STATE: 'mf:podcast-playback-state',
+  PODCAST_TOGGLE_PLAY: 'mf:podcast-toggle-play',
+  PODCAST_SEEK: 'mf:podcast-seek',
+  PODCAST_SKIP_FORWARD: 'mf:podcast-skip-forward',
+  PODCAST_SKIP_BACK: 'mf:podcast-skip-back',
+  PODCAST_CHANGE_SPEED: 'mf:podcast-change-speed',
+  PODCAST_SET_SLEEP_TIMER: 'mf:podcast-set-sleep-timer',
+  PODCAST_REMOVE_FROM_QUEUE: 'mf:podcast-remove-from-queue',
 } as const;
 
 // Window-level data-sync events (plain Event, no payload — used as invalidation signals)
@@ -107,6 +115,16 @@ export interface NavigationRequestEvent {
 export interface PodcastPlayEpisodeEvent {
   episode: import('../types/podcast').Episode;
   podcast: import('../types/podcast').Podcast | null;
+}
+
+export interface PodcastPlaybackStateEvent {
+  isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  playbackSpeed: number;
+  sleepMinutes: number;
+  sleepRemaining: number;
+  queueLength: number;
 }
 
 class EventBusImpl implements EventBus {

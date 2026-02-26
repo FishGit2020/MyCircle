@@ -413,6 +413,7 @@ const zh: Record<TranslationKey, string> = {
   'podcasts.shareCopied': '\u94fe\u63a5\u5df2\u590d\u5236\uff01',
   'podcasts.shareText': '\u6b63\u5728\u6536\u542c\u300c{podcast}\u300d\u7684\u300c{episode}\u300d\uff0c\u8fdb\u5ea6 {time}',
   'podcasts.showMore': '\u663e\u793a\u66f4\u591a\u8282\u76ee',
+  'podcasts.viewPodcast': '\u67e5\u770b\u64ad\u5ba2',
 
   // AI Assistant
   'ai.title': 'AI \u52a9\u624b',

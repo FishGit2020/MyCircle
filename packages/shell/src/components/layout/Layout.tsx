@@ -186,6 +186,7 @@ export default function Layout() {
   const { config, loading: configLoading } = useRemoteConfigContext();
   const { toggleTheme } = useTheme();
   const [hasActivePlayer, setHasActivePlayer] = useState(false);
+  const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -202,6 +203,10 @@ export default function Layout() {
 
   const handlePlayerStateChange = useCallback((active: boolean) => {
     setHasActivePlayer(active);
+  }, []);
+
+  const handlePlayerVisibilityChange = useCallback((visible: boolean) => {
+    setIsPlayerVisible(visible);
   }, []);
 
   const navLinkClass = (path: string) => {
@@ -323,27 +328,27 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-grow container mx-auto px-4 py-8 ${hasActivePlayer ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
+        className={`flex-grow container mx-auto px-4 py-8 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
       >
         <Outlet />
         {/* PWA safe area bottom spacer for notched devices */}
         <div className="md:hidden" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} aria-hidden="true" />
       </main>
 
-      <GlobalAudioPlayer onPlayerStateChange={handlePlayerStateChange} />
+      <GlobalAudioPlayer onPlayerStateChange={handlePlayerStateChange} onPlayerVisibilityChange={handlePlayerVisibilityChange} />
 
-      <BottomNav hasActivePlayer={hasActivePlayer} />
+      <BottomNav hasActivePlayer={isPlayerVisible} />
       <CommandPalette recentPages={recent} />
       <KeyboardShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
 
-      <FeedbackButton hasActivePlayer={hasActivePlayer} />
+      <FeedbackButton hasActivePlayer={isPlayerVisible} />
       <PwaInstallPrompt />
       <SyncIndicator />
 
       <footer
         role="contentinfo"
         className="bg-gray-800 dark:bg-gray-950 text-white py-6 md:pb-6 mt-12 transition-colors"
-        style={{ paddingBottom: `calc(${hasActivePlayer ? '8rem' : '4rem'} + env(safe-area-inset-bottom, 0px))` }}
+        style={{ paddingBottom: `calc(${isPlayerVisible ? '8rem' : '4rem'} + env(safe-area-inset-bottom, 0px))` }}
       >
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">

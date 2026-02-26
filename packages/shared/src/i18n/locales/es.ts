@@ -413,6 +413,7 @@ const es: Record<TranslationKey, string> = {
   'podcasts.shareCopied': '\u00a1Enlace copiado!',
   'podcasts.shareText': 'Escuchando "{episode}" de {podcast} en {time}',
   'podcasts.showMore': 'Mostrar m\u00e1s episodios',
+  'podcasts.viewPodcast': 'Ver podcast',
 
   // AI Assistant
   'ai.title': 'Asistente IA',
