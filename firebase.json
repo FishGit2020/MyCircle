@@ -98,6 +98,7 @@
   "functions": {
     "source": "functions",
     "runtime": "nodejs22",
+    "packageManager": "npm",
     "predeploy": [
       "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm ci --ignore-scripts && npx tsc"
     ]
