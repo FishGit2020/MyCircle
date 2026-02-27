@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { useFiles } from '../hooks/useFiles';
 import { useSharedFiles } from '../hooks/useSharedFiles';
 import FileUpload from './FileUpload';
@@ -13,8 +13,19 @@ export default function CloudFiles() {
   const { files, loading, error, uploadFile, shareFile, deleteFile, reload } = useFiles();
   const { files: sharedFiles, loading: sharedLoading, error: sharedError, deleteSharedFile, reload: reloadShared } = useSharedFiles();
 
-  // Auth check — shell exposes __getFirebaseIdToken when user is logged in
-  const hasAuth = typeof (window as any).__getFirebaseIdToken === 'function';
+  // Auth check — verify actual user is logged in, not just Firebase init
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = await (window as any).__getFirebaseIdToken?.();
+        setIsAuthenticated(!!token);
+      } catch { setIsAuthenticated(false); }
+    };
+    checkAuth();
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
+    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
+  }, []);
   const hasApi = typeof (window as any).__cloudFiles !== 'undefined';
 
   const handleUpload = useCallback(async (file: File) => {
@@ -36,7 +47,7 @@ export default function CloudFiles() {
     await deleteSharedFile(fileId);
   }, [deleteSharedFile, t]);
 
-  if (!hasAuth || !hasApi) {
+  if (!isAuthenticated || !hasApi) {
     return (
       <div className="text-center py-16">
         <svg className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
