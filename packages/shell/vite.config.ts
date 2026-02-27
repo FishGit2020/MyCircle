@@ -326,7 +326,7 @@ export default defineConfig({
     legalComments: 'none',
   },
   build: {
-    modulePreload: { polyfill: false },
+    modulePreload: false,
     target: 'esnext',
     minify: 'esbuild',
     cssCodeSplit: true,
