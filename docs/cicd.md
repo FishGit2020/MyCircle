@@ -303,6 +303,7 @@ The deploy workflow authenticates via Workload Identity Federation as `firebase-
 | `secretmanager.versions.get` denied | **Secret Manager Viewer** (`roles/secretmanager.viewer`) | Required to validate function secrets during deploy |
 | `iam.serviceAccounts.ActAs` denied | **Service Account User** (`roles/iam.serviceAccountUser`) | Required to deploy Cloud Functions (must be project-level) |
 | `firebaserules.googleapis.com` 403 | **Firebase Admin** (`roles/firebase.admin`) | Required to compile and deploy Firestore rules |
+| `firebaseextensions.googleapis.com` 403 | **Firebase Extensions Viewer** (`roles/firebaseextensions.viewer`) | `firebase-tools` v15+ lists extensions during deploy even when not deploying extensions |
 | "We failed to modify the IAM policy" | **Service agent bindings** (see below) | Cloud Functions v2 infrastructure needs one-time IAM setup |
 
 To add a missing role:

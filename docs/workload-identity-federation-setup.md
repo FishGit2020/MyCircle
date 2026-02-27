@@ -311,9 +311,14 @@ gcloud projects add-iam-policy-binding mycircle-dash \
 
 gcloud projects add-iam-policy-binding mycircle-dash \
   --member="serviceAccount:$SA" --role="roles/cloudscheduler.admin"
+
+gcloud projects add-iam-policy-binding mycircle-dash \
+  --member="serviceAccount:$SA" --role="roles/firebaseextensions.viewer"
 ```
 
 > **Note:** `roles/firebase.admin` is a broad role that covers Firestore rules deployment, Hosting, and other Firebase services. It overlaps with some individual Firebase roles listed above, but prevents piecemeal 403 errors from the Firebase Rules API and other Firebase-specific endpoints.
+>
+> **Note:** `roles/firebaseextensions.viewer` is required starting with `firebase-tools` v15+, which lists installed extensions during deploy even when not deploying extensions. Without this role, `firebase deploy --only functions,firestore` fails with a 403 from the Extensions API.
 
 ### Verifying roles via gcloud CLI
 
