@@ -137,6 +137,23 @@ const cloudFilesDest = path.join(firebaseDir, 'cloud-files');
 console.log(`Copying cloud-files to ${cloudFilesDest}`);
 copyDir(cloudFilesDist, cloudFilesDest);
 
+// Remove MFE index.html files — they conflict with Firebase Hosting's SPA rewrite.
+// When /notebook/ has an index.html, Firebase serves it instead of the shell's root
+// index.html, causing a blank page with "SyntaxError: Unexpected token '<'".
+const mfeDirs = [
+  'city-search', 'weather-display', 'stock-tracker', 'podcast-player',
+  'ai-assistant', 'bible-reader', 'worship-songs', 'notebook',
+  'baby-tracker', 'child-development', 'chinese-learning', 'english-learning',
+  'flashcards', 'work-tracker', 'cloud-files',
+];
+for (const mfe of mfeDirs) {
+  const mfeIndex = path.join(firebaseDir, mfe, 'index.html');
+  if (fs.existsSync(mfeIndex)) {
+    fs.unlinkSync(mfeIndex);
+    console.log(`Removed ${mfe}/index.html (prevents SPA rewrite conflict)`);
+  }
+}
+
 console.log('\nFirebase deployment directory assembled successfully!');
 console.log(`Output: ${firebaseDir}`);
 
