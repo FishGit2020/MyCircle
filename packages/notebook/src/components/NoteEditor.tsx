@@ -43,21 +43,6 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 min-h-[calc(100vh-12rem)]">
-      {/* Breadcrumb navigation */}
-      <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          {t('notebook.title')}
-        </button>
-        <span className="text-gray-400 dark:text-gray-500">/</span>
-        <span className="text-gray-700 dark:text-gray-300 font-medium">
-          {note ? t('notebook.editNote') : t('notebook.newNote')}
-        </span>
-      </nav>
-
       <div>
         <label htmlFor="note-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {t('notebook.noteTitle')}
