@@ -64,6 +64,7 @@ Run `validate_all` after adding/removing features or packages.
 
 - [Architecture](./docs/architecture.md) — MFE structure, data flow
 - [Data Patterns](./docs/data-patterns.md) — data refresh, notifications, real-time sync (onSnapshot, polling, FCM, eventBus)
+- [Firestore Transport](./docs/firestore-transport.md) — gRPC, HTTP/2, WebSocket, target multiplexing, persistence
 - [MFE Guide](./docs/mfe-guide.md) — adding new MFEs (20+ integration points), pitfalls
 - [MCP Server](./docs/mcp.md) — MCP validators, AI tool registry, adding tools
 - [PR Lifecycle](./docs/pr-lifecycle.md) — branch protection, merge workflow
