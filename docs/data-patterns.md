@@ -45,7 +45,7 @@ onSnapshot callback fires instantly when ANY client writes
 React setState → UI updates
 ```
 
-Each MFE hook (e.g., `useWorshipSongs`, `useNotes`, `useFiles`) calls `subscribe()` in a `useEffect`, which returns an unsubscribe function for cleanup.
+Each MFE hook (e.g., `useWorshipSongs`, `useNotes`, `useFiles`) calls `subscribe()` in a `useEffect`, which returns an unsubscribe function for cleanup. For a deep dive into the underlying transport (gRPC, HTTP/2, WebSocket, target multiplexing), see [Firestore Transport Architecture](./firestore-transport.md).
 
 ### Why This Pattern
 
