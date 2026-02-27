@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
 import { usePublicNotes } from '../hooks/usePublicNotes';
 import NoteList from './NoteList';
@@ -36,11 +36,22 @@ export default function Notebook() {
     }
   }, [noteId, isNewRoute, publicNotes]);
 
-  // Auth check — shell exposes __getFirebaseIdToken when user is logged in
-  const hasAuth = typeof (window as any).__getFirebaseIdToken === 'function';
+  // Auth check — verify actual user is logged in, not just Firebase init
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = await (window as any).__getFirebaseIdToken?.();
+        setIsAuthenticated(!!token);
+      } catch { setIsAuthenticated(false); }
+    };
+    checkAuth();
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
+    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
+  }, []);
   const hasApi = typeof (window as any).__notebook !== 'undefined';
 
-  if (!hasAuth || !hasApi) {
+  if (!isAuthenticated || !hasApi) {
     return (
       <div className="text-center py-16">
         <svg className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
