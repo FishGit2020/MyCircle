@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, startTransition } from 'react';
 import { WindowEvents, StorageKeys, useTranslation } from '@mycircle/shared';
 import type { Note, NoteInput } from '../types';
 
@@ -59,7 +59,8 @@ export function useNotes() {
       let received = false;
       const unsubscribe = api.subscribe((data) => {
         received = true;
-        setNotes(data);
+        // Defer note list update so it doesn't block user input (INP)
+        startTransition(() => { setNotes(data); });
         setLoading(false);
         // Update dashboard cache
         try {
