@@ -354,6 +354,7 @@ mycircle/
 │   └── generate-icons.mjs       # PWA icon generation
 ├── docs/
 │   ├── architecture.md          # Detailed architecture analysis
+│   ├── data-patterns.md         # Data refresh, notifications & real-time sync patterns
 │   (agent-guide.md removed — see CLAUDE.md at repo root)
 │   ├── analytics-and-tracking.md # Analytics & performance monitoring (Web Vitals, Firebase Perf, Lighthouse)
 │   └── web-vitals-setup.md      # Redirect → analytics-and-tracking.md
@@ -493,6 +494,7 @@ The Deploy workflow authenticates via **Workload Identity Federation** (keyless)
 See [docs/cicd.md](docs/cicd.md) for a detailed CI/CD flow guide with setup instructions and deploy troubleshooting.
 See [docs/workload-identity-federation-setup.md](docs/workload-identity-federation-setup.md) for keyless Firebase deployment using Workload Identity Federation.
 See [docs/announcements.md](docs/announcements.md) for how to add in-app "What's New" announcements.
+See [docs/data-patterns.md](docs/data-patterns.md) for all data refresh, notification, and real-time sync patterns.
 
 ## Security
 
