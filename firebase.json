@@ -90,7 +90,7 @@
     "source": "functions",
     "runtime": "nodejs22",
     "predeploy": [
-      "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm install && npx tsc"
+      "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm ci && npx tsc"
     ]
   },
   "emulators": {
