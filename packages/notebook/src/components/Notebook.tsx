@@ -51,6 +51,35 @@ export default function Notebook() {
   }, []);
   const hasApi = typeof (window as any).__notebook !== 'undefined';
 
+  // All hooks MUST be above early returns (React rules of hooks)
+  const handleSave = useCallback(async (id: string | null, data: { title: string; content: string }) => {
+    if (tab === 'public' && id) {
+      await updatePublicNote(id, data);
+    } else {
+      await saveNote(id, data);
+    }
+    navigate('/notebook');
+  }, [tab, updatePublicNote, saveNote, navigate]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (view === 'edit') {
+      if (!window.confirm(t('notebook.deleteConfirm'))) return;
+    }
+    if (tab === 'public') {
+      await deletePublicNote(id);
+    } else {
+      await deleteNote(id);
+    }
+    if (view === 'edit') {
+      navigate('/notebook');
+    }
+  }, [view, tab, deletePublicNote, deleteNote, navigate, t]);
+
+  const handlePublish = useCallback(async (data: { title: string; content: string }) => {
+    await publishNote(data);
+    navigate('/notebook');
+  }, [publishNote, navigate]);
+
   if (!isAuthenticated || !hasApi) {
     return (
       <div className="text-center py-16">
@@ -80,34 +109,6 @@ export default function Notebook() {
       </div>
     );
   }
-
-  const handleSave = useCallback(async (id: string | null, data: { title: string; content: string }) => {
-    if (tab === 'public' && id) {
-      await updatePublicNote(id, data);
-    } else {
-      await saveNote(id, data);
-    }
-    navigate('/notebook');
-  }, [tab, updatePublicNote, saveNote, navigate]);
-
-  const handleDelete = useCallback(async (id: string) => {
-    if (view === 'edit') {
-      if (!window.confirm(t('notebook.deleteConfirm'))) return;
-    }
-    if (tab === 'public') {
-      await deletePublicNote(id);
-    } else {
-      await deleteNote(id);
-    }
-    if (view === 'edit') {
-      navigate('/notebook');
-    }
-  }, [view, tab, deletePublicNote, deleteNote, navigate, t]);
-
-  const handlePublish = useCallback(async (data: { title: string; content: string }) => {
-    await publishNote(data);
-    navigate('/notebook');
-  }, [publishNote, navigate]);
 
   if (view === 'new' || view === 'edit') {
     return (
