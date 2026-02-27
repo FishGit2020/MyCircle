@@ -237,6 +237,8 @@ export default function PodcastPlayer() {
                 <img
                   src={selectedPodcast.artwork}
                   alt={selectedPodcast.title}
+                  width={128}
+                  height={128}
                   className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl object-cover shadow-md flex-shrink-0"
                   loading="lazy"
                 />
@@ -295,9 +297,12 @@ export default function PodcastPlayer() {
           </div>
 
           {/* Inline playback controls (when now-playing matches this podcast) */}
-          {showInlineControls && nowPlayingEpisode && (
-            <InlinePlaybackControls episode={nowPlayingEpisode} podcast={nowPlayingPodcast} />
-          )}
+          {/* Reserve min-height to prevent CLS when controls appear */}
+          <div className={showInlineControls && nowPlayingEpisode ? '' : 'min-h-0'}>
+            {showInlineControls && nowPlayingEpisode && (
+              <InlinePlaybackControls episode={nowPlayingEpisode} podcast={nowPlayingPodcast} />
+            )}
+          </div>
 
           {/* Episodes */}
           <div>

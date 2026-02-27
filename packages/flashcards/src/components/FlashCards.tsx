@@ -135,8 +135,20 @@ export default function FlashCards() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+      <div className="pb-20 md:pb-8">
+        <div className="mb-6">
+          <div className="h-7 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-2" />
+        </div>
+        <div className="flex gap-3 mb-4">
+          <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-40 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }

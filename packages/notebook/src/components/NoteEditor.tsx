@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { Note } from '../types';
 
@@ -13,12 +13,22 @@ interface NoteEditorProps {
 export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish }: NoteEditorProps) {
   const { t } = useTranslation();
   const [title, setTitle] = useState(note?.title ?? '');
-  const [content, setContent] = useState(note?.content ?? '');
+  // Use a ref for content to avoid re-rendering the entire form on every keystroke.
+  // The textarea is "uncontrolled" — React doesn't re-render on typing, only on submit/publish.
+  const contentRef = useRef(note?.content ?? '');
+  const [hasContent, setHasContent] = useState(!!(note?.content));
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
+  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    contentRef.current = e.target.value;
+    const hasText = e.target.value.trim().length > 0;
+    if (hasText !== hasContent) setHasContent(hasText);
+  }, [hasContent]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const content = contentRef.current;
     if (!title.trim() && !content.trim()) return;
     setSaving(true);
     try {
@@ -31,6 +41,7 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
 
   const handlePublish = async () => {
     if (!onPublish) return;
+    const content = contentRef.current;
     if (!title.trim() && !content.trim()) return;
     if (!window.confirm(t('notebook.publishConfirm'))) return;
     setPublishing(true);
@@ -64,8 +75,8 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
         </label>
         <textarea
           id="note-content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
+          defaultValue={contentRef.current}
+          onChange={handleContentChange}
           placeholder={t('notebook.contentPlaceholder')}
           className="w-full flex-1 min-h-[200px] px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-y font-mono text-sm"
         />
@@ -75,7 +86,7 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
         <div className="flex gap-2">
           <button
             type="submit"
-            disabled={saving || (!title.trim() && !content.trim())}
+            disabled={saving || (!title.trim() && !hasContent)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium text-sm"
           >
             {saving ? t('notebook.saving') : t('notebook.save')}
@@ -91,7 +102,7 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
             <button
               type="button"
               onClick={handlePublish}
-              disabled={publishing || saving || (!title.trim() && !content.trim())}
+              disabled={publishing || saving || (!title.trim() && !hasContent)}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium text-sm"
             >
               {publishing ? t('notebook.publishing') : t('notebook.publish')}
