@@ -522,15 +522,18 @@ The PWA service worker caches `remoteEntry.js` files with a `NetworkFirst` strat
 
 ### Build Configuration
 
-All packages (shell + 12 MFEs) set `modulePreload: false` in their Vite build config. All packages also use `minify: 'esbuild'` for production JS minification. The shell additionally configures esbuild to strip `console.*` and `debugger` statements and remove legal comments, and uses cssnano in its PostCSS pipeline for aggressive CSS minification:
+All MFE packages set `modulePreload: false` in their Vite build config since Vite-injected preload tags would conflict with Module Federation's own module loading. The **shell** uses `modulePreload: { polyfill: false }` to enable native `<link rel="modulepreload">` for its own chunks (layout, routing, shared deps) without a polyfill — this reduces LCP by letting the browser pre-fetch shell chunks during HTML parse. All packages use `minify: 'esbuild'` for production JS minification. The shell additionally configures esbuild to strip `console.*` and `debugger` statements and remove legal comments, and uses cssnano in its PostCSS pipeline for aggressive CSS minification:
 
 ```typescript
-// Shell esbuild options
+// Shell
 esbuild: { drop: ['console', 'debugger'], legalComments: 'none' }
+build: { modulePreload: { polyfill: false }, minify: 'esbuild' }
+
+// MFE packages
 build: { modulePreload: false, minify: 'esbuild' }
 ```
 
-`modulePreload: false` prevents Vite from injecting `<link rel="modulepreload">` tags in HTML, which would conflict with Module Federation's own module loading mechanism. This applies to the shell too — enabling modulePreload on the shell breaks federation's dynamic `import()` for remote MFE chunks (they silently fail to load). `minify: 'esbuild'` ensures all federated remote chunks are minified, reducing bundle sizes without affecting module resolution.
+MFE packages use `modulePreload: false` to prevent Vite from injecting preload tags that would conflict with Module Federation's module resolution. The shell can safely use `{ polyfill: false }` because its own chunks (not federation remotes) benefit from browser preloading, and federation's runtime `import()` for remote entries is unaffected by HTML `<link>` tags. `minify: 'esbuild'` ensures all federated remote chunks are minified, reducing bundle sizes without affecting module resolution.
 
 Heavy shared dependencies (`@apollo/client`, `graphql`) use `eager: false` in the federation config so they are not preloaded into the initial dependency graph — they are loaded on-demand when a remote MFE actually imports them.
 
