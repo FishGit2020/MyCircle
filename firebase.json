@@ -63,6 +63,15 @@
         ]
       },
       {
+        "source": "/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
         "source": "**/remoteEntry.js",
         "headers": [
           {
@@ -90,7 +99,7 @@
     "source": "functions",
     "runtime": "nodejs22",
     "predeploy": [
-      "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm cache clean --force && npm ci && npx tsc"
+      "cd \"$RESOURCE_DIR\" && rm -rf node_modules && npm ci --ignore-scripts && npx tsc"
     ]
   },
   "emulators": {
