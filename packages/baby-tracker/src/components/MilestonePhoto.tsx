@@ -69,10 +69,11 @@ export default function MilestonePhoto({
   if (!isAuthenticated && !loading) return null;
 
   // Loading state — waiting for Firestore auth + data fetch
+  // Skeleton dimensions match the actual photo button (w-16 h-16 md:w-20 md:h-20) to prevent CLS
   if (loading) {
     return (
-      <div className="flex items-center gap-2 mt-2">
-        <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <div className="flex items-center gap-3 mt-2">
+        <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse shrink-0" />
         <div className="flex-1 space-y-1.5">
           <div className="h-2.5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           <div className="h-2 w-14 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -84,8 +85,8 @@ export default function MilestonePhoto({
   // Uploading state
   if (uploading) {
     return (
-      <div className="flex items-center gap-2 mt-2">
-        <div className="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 animate-pulse" />
+      <div className="flex items-center gap-3 mt-2">
+        <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-pink-100 dark:bg-pink-900/30 animate-pulse shrink-0" />
         <span className="text-xs text-pink-500 dark:text-pink-400">{t('baby.uploading')}</span>
       </div>
     );
@@ -121,6 +122,8 @@ export default function MilestonePhoto({
             <img
               src={photoUrl}
               alt={t('baby.milestonePhoto')}
+              width={80}
+              height={80}
               className="w-full h-full object-cover"
               loading="lazy"
             />

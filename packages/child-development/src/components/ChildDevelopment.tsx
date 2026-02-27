@@ -56,20 +56,16 @@ function VerseSection() {
 export default function ChildDevelopment() {
   const { t } = useTranslation();
 
-  // State
-  const [childName, setChildName] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [inputName, setInputName] = useState('');
-  const [inputBirthDate, setInputBirthDate] = useState('');
+  // State — initialize from localStorage synchronously to prevent CLS
+  // (avoids a flash from setup form → milestone view on mount)
+  const [childName, setChildName] = useState(() => localStorage.getItem(StorageKeys.CHILD_NAME) || '');
+  const [birthDate, setBirthDate] = useState(() => {
+    const raw = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
+    return raw ? decodeSensitive(raw) : '';
+  });
+  const [inputName, setInputName] = useState(childName);
+  const [inputBirthDate, setInputBirthDate] = useState(birthDate);
   const [isEditing, setIsEditing] = useState(false);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const storedName = localStorage.getItem(StorageKeys.CHILD_NAME);
-    const storedDate = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
-    if (storedName) { setChildName(storedName); setInputName(storedName); }
-    if (storedDate) { const d = decodeSensitive(storedDate); setBirthDate(d); setInputBirthDate(d); }
-  }, []);
 
   // Listen for external changes (Firestore sync)
   useEffect(() => {

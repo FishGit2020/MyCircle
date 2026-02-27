@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import { WindowEvents, StorageKeys, useTranslation } from '@mycircle/shared';
 import type { Note, NoteInput } from '../types';
 
@@ -17,6 +17,7 @@ export function useNotes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [authVersion, setAuthVersion] = useState(0);
+  const [, startTransition] = useTransition();
 
   // Re-initialize subscriptions when auth state changes (sign-in / sign-out)
   useEffect(() => {
@@ -57,7 +58,10 @@ export function useNotes() {
 
     if (api.subscribe) {
       const unsubscribe = api.subscribe((data) => {
-        setNotes(data);
+        // Defer note list updates so they don't block user input (INP)
+        startTransition(() => {
+          setNotes(data);
+        });
         setLoading(false);
         // Update dashboard cache
         try {

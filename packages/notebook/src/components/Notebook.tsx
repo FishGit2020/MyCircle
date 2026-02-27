@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
@@ -70,16 +70,16 @@ export default function Notebook() {
     );
   }
 
-  const handleSave = async (id: string | null, data: { title: string; content: string }) => {
+  const handleSave = useCallback(async (id: string | null, data: { title: string; content: string }) => {
     if (tab === 'public' && id) {
       await updatePublicNote(id, data);
     } else {
       await saveNote(id, data);
     }
     navigate('/notebook');
-  };
+  }, [tab, updatePublicNote, saveNote, navigate]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     if (view === 'edit') {
       if (!window.confirm(t('notebook.deleteConfirm'))) return;
     }
@@ -91,12 +91,12 @@ export default function Notebook() {
     if (view === 'edit') {
       navigate('/notebook');
     }
-  };
+  }, [view, tab, deletePublicNote, deleteNote, navigate, t]);
 
-  const handlePublish = async (data: { title: string; content: string }) => {
+  const handlePublish = useCallback(async (data: { title: string; content: string }) => {
     await publishNote(data);
     navigate('/notebook');
-  };
+  }, [publishNote, navigate]);
 
   if (view === 'new' || view === 'edit') {
     return (
