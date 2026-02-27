@@ -567,87 +567,9 @@ The `visibilitychange` listener is the most impactful optimization — users ret
 
 ## Inter-MFE Communication
 
-### Event Bus
+> **Full documentation:** See [Data Refresh & Notification Patterns](./data-patterns.md) — patterns 5 (EventBus/WindowEvents) and 6 (localStorage cache).
 
-A singleton event bus (`packages/shared/src/utils/eventBus.ts`) using two delivery mechanisms:
-
-1. **In-process listeners** — for same-bundle communication (e.g., shell components)
-2. **DOM CustomEvents** — for cross-MFE communication via `window.dispatchEvent`
-
-```typescript
-class EventBusImpl {
-  private listeners: Map<string, Set<EventCallback>>;
-
-  subscribe(event, callback)    // In-process listener, returns unsubscribe fn
-  publish(event, data)          // Fires local listeners + dispatches DOM event
-}
-
-// For listening to events from OTHER micro frontends (DOM-level)
-function subscribeToMFEvent(event, callback)  // window.addEventListener wrapper
-```
-
-### Event Types
-
-```typescript
-const MFEvents = {
-  CITY_SELECTED:        'mf:city-selected',
-  WEATHER_LOADED:       'mf:weather-loaded',
-  NAVIGATION_REQUEST:   'mf:navigation-request',
-  THEME_CHANGED:        'mf:theme-changed',
-  USER_LOCATION_CHANGED: 'mf:user-location-changed',
-  PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',
-  PODCAST_CLOSE_PLAYER: 'mf:podcast-close-player',
-}
-```
-
-### Communication Flows
-
-**City Selection (primary flow):**
-```
-CitySearch.tsx                          CitySearchWrapper.tsx
-(city-search MFE)                       (shell)
-     |                                       |
-     |-- eventBus.publish(CITY_SELECTED) --> eventBus.subscribe(CITY_SELECTED)
-     |                                       |
-     |                                       +--> addCity() -> Firestore
-     |
-     +-- navigate(/weather/:coords)
-                                        WeatherDisplay.tsx
-                                        (weather-display MFE)
-                                             |
-                                        subscribeToMFEvent(CITY_SELECTED)
-                                             |
-                                             +--> setLocation() -> fetch weather
-```
-
-**Weather Widget Flow:**
-```
-WeatherWidget (WidgetDashboard.tsx)
-     |
-     +--> useAuth() -> favoriteCities[]
-     |
-     +--> Render city chips as <Link to="/weather/:lat,:lon">
-```
-
-**Persistent Podcast Player Flow:**
-```
-PodcastPlayer.tsx                           GlobalAudioPlayer.tsx
-(podcast-player MFE)                        (shell)
-     |                                           |
-     |-- eventBus.publish(PODCAST_PLAY_EPISODE) --> subscribeToMFEvent(PODCAST_PLAY_EPISODE)
-     |   { episode, podcast }                    |
-     |                                           +--> setEpisode(episode)
-     |                                           +--> setPodcast(podcast)
-     |                                           +--> <audio> starts playback
-     |                                           |
-     |-- eventBus.publish(PODCAST_CLOSE_PLAYER) --> subscribeToMFEvent(PODCAST_CLOSE_PLAYER)
-     |                                           |
-     |                                           +--> audio.pause()
-     |                                           +--> setEpisode(null)
-     |
-     +-- User navigates to /stocks, /weather, etc.
-         GlobalAudioPlayer stays mounted in Layout (persists across routes)
-```
+The event bus, MFEvents, WindowEvents, and localStorage cache patterns are documented in the consolidated data patterns guide. That document also covers Firestore `onSnapshot`, Apollo polling, FCM push notifications, and client-side threshold alerts.
 
 **Cross-Device Podcast Resume (Continue Listening) Flow:**
 ```
@@ -773,26 +695,9 @@ interface Announcement {
 
 ### Firebase Firestore — Weather Alert Subscriptions
 
-**Collection path:** `alertSubscriptions/{docId}`
+> **Full documentation:** See [Data Refresh & Notification Patterns](./data-patterns.md) — pattern 3 (FCM Push Notifications).
 
-```typescript
-interface AlertSubscription {
-  token: string;              // FCM device token
-  uid?: string;               // Firebase Auth user ID (enables cross-device unsubscribe)
-  cities: Array<{
-    lat: number;
-    lon: number;
-    name: string;
-  }>;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-```
-
-- **Subscribe:** `subscribeToAlerts` callable function — upserts by FCM token, stores `uid` from auth context
-- **Unsubscribe:** Call with empty `cities` array — deletes **all** docs for the authenticated user (cross-device), plus any legacy docs for the current token
-- **Scheduled check:** `checkWeatherAlerts` runs every 30 minutes, fetches weather for all subscribed cities, sends FCM notifications for severe conditions (thunderstorm, heavy rain/snow, tornado, squall — 19 OpenWeather condition IDs)
-- **Stale token cleanup:** Invalid/expired FCM tokens are batch-deleted after failed send attempts
+**Collection path:** `alertSubscriptions/{docId}` — stores FCM tokens, user IDs, and city coordinates for push weather alerts. The `subscribeToAlerts` Cloud Function manages subscriptions, and `checkWeatherAlerts` runs every 30 minutes to send push notifications for severe conditions.
 
 ### Firebase Firestore — Notebook Notes
 
@@ -908,31 +813,9 @@ The Cloud Functions GraphQL handler (`functions/src/index.ts`) passes `extension
 
 ### useWeatherData Hook
 
-```typescript
-// packages/shared/src/hooks/useWeatherData.ts
+> **Full documentation:** See [Data Refresh & Notification Patterns](./data-patterns.md) — pattern 2 (Apollo pollInterval).
 
-function useWeatherData(lat, lon, enableRealtime) {
-  // Always runs: HTTP query
-  const { data, loading, error } = useQuery(GET_WEATHER, { variables: { lat, lon } });
-
-  // Dev only: WebSocket subscription
-  useSubscription(WEATHER_UPDATES, {
-    skip: isProduction || !enableRealtime,
-    variables: { lat, lon },
-    onData: ({ data }) => { /* merge subscription data */ }
-  });
-
-  return {
-    current,      // Subscription data takes priority over query data
-    forecast,
-    hourly,
-    loading,
-    error,
-    isLive,       // True when subscription is active
-    lastUpdate    // Timestamp of last subscription update
-  };
-}
-```
+Uses Apollo `useQuery` with 60-second `pollInterval` in production, with an optional `useSubscription` for real-time WebSocket updates in local development (Firebase Cloud Functions don't support WebSockets).
 
 ---
 
