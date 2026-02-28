@@ -37,6 +37,7 @@ nul
 /playwright-report-integration/
 /blob-report/
 /playwright/.cache/
+e2e/smoke/.auth/
 
 # Bundle analysis
 stats.html

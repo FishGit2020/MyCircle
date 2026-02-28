@@ -56,6 +56,7 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:smoke": "playwright test --config playwright.smoke.config.ts",
     "test:e2e:emulator": "playwright test --config playwright.emulator.config.ts",
     "mock-api": "node scripts/mock-api-server.mjs",
     "seed:firestore": "node scripts/seed-firestore.mjs",
