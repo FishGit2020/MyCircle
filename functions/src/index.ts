@@ -119,7 +119,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 60,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY']
+    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL']
   },
   async (req: Request, res: Response) => {
     const server = await getServer();
