@@ -11,6 +11,7 @@ Step-by-step instructions for obtaining every API key used by MyCircle. All keys
 - [Finnhub (Stocks)](#finnhub)
 - [PodcastIndex](#podcastindex)
 - [Google Gemini (AI Assistant)](#google-gemini)
+- [Ollama (Self-Hosted AI)](#ollama)
 - [reCAPTCHA Enterprise](#recaptcha-enterprise)
 - [YouVersion (Bible)](#youversion)
 - [Sentry (Error Tracking)](#sentry)
@@ -151,6 +152,79 @@ GEMINI_API_KEY=your_key_here
 
 ---
 
+## Ollama
+
+Optional self-hosted AI backend. When `OLLAMA_BASE_URL` is set, AI chat uses Ollama instead of Google Gemini. This is useful for running a local/private model on your own hardware (e.g., a NAS via Docker).
+
+### Tool Calling
+
+MyCircle supports two modes of tool calling with Ollama:
+
+- **Native tool calling** — Models like `qwen2.5`, `llama3.1+`, and `mistral` support the OpenAI-compatible `tools` parameter. This is tried first automatically.
+- **Prompt-based fallback** — For models without native tool support (e.g., `gemma2:2b`), the system injects tool descriptions into the prompt and parses `<tool_call>` tags from the response. This works with any instruction-following model.
+
+The fallback is automatic — no configuration needed.
+
+### Requirements
+
+- [Ollama](https://ollama.ai/) running on a reachable host
+- A pulled model (default: `gemma2:2b` ~1.6GB, or `qwen2.5:7b` for native tool calling)
+- Network access from the server to Ollama (direct LAN, VPN, tunnel, or custom domain)
+
+### Setup with Custom Domain (recommended)
+
+If you have a permanent domain pointing to your Ollama instance:
+
+1. Install Ollama in Docker on your NAS/server
+2. Pull a model: `docker exec ollama ollama pull gemma2:2b`
+3. Set up a reverse proxy (Nginx, Caddy, Cloudflare Tunnel) pointing `ollama.yourdomain.com` → `localhost:11434`
+
+### Setup with Cloudflare Quick Tunnel (temporary)
+
+If Ollama runs on a NAS or remote machine without a public IP:
+
+1. Install Ollama in Docker on your NAS
+2. Pull a model: `docker exec ollama ollama pull gemma2:2b`
+3. Start a [Cloudflare Quick Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/): `cloudflared tunnel --url http://localhost:11434`
+4. Copy the generated `*.trycloudflare.com` URL
+
+> **Note:** Quick Tunnel URLs change on container restart. Use a permanent domain/tunnel for production.
+
+### Env file
+
+Root `.env`:
+```
+OLLAMA_BASE_URL=https://ollama.yourdomain.com
+OLLAMA_MODEL=gemma2:2b
+```
+
+### Firebase Secrets (production)
+
+```bash
+firebase functions:secrets:set OLLAMA_BASE_URL
+# Enter: https://ollama.yourdomain.com
+
+firebase functions:secrets:set OLLAMA_MODEL
+# Enter: gemma2:2b
+
+firebase deploy --only functions
+```
+
+When the URL changes:
+```bash
+firebase functions:secrets:set OLLAMA_BASE_URL
+# Enter: new URL
+firebase deploy --only functions
+```
+
+### Provider Priority
+
+- If `OLLAMA_BASE_URL` is set → Ollama is used (Gemini is ignored)
+- If only `GEMINI_API_KEY` is set → Gemini is used
+- If neither is set → AI chat returns a 500 error
+
+---
+
 ## reCAPTCHA Enterprise
 
 Protects the GraphQL API via Firebase App Check.
@@ -236,7 +310,9 @@ VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 | `FINNHUB_API_KEY` | Finnhub | For stocks |
 | `PODCASTINDEX_API_KEY` | PodcastIndex | For podcasts |
 | `PODCASTINDEX_API_SECRET` | PodcastIndex | For podcasts |
-| `GEMINI_API_KEY` | Google Gemini | For AI chat |
+| `GEMINI_API_KEY` | Google Gemini | For AI chat (unless Ollama set) |
+| `OLLAMA_BASE_URL` | Ollama | For self-hosted AI (optional) |
+| `OLLAMA_MODEL` | Ollama | Model name (default: gemma2:2b) |
 | `YOUVERSION_APP_KEY` | YouVersion | For Bible reader |
 | `RECAPTCHA_SECRET_KEY` | reCAPTCHA Enterprise | For App Check |
 
