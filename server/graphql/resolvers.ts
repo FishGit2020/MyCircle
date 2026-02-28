@@ -937,9 +937,9 @@ export const resolvers = {
           ).join('\n');
           const fallbackSystemPrompt = systemInstruction + '\n\n' +
             'You have access to these tools:\n' + toolPrompt + '\n\n' +
-            'If the user\'s request needs a tool, respond with ONLY:\n' +
-            '<tool_call>{"name":"toolName","args":{"param":"value"}}</tool_call>\n\n' +
-            'Otherwise, respond normally.';
+            'If the user\'s request needs a tool, respond with ONLY a JSON object in this exact format (no other text):\n' +
+            '{"name":"toolName","args":{"param":"value"}}\n\n' +
+            'Otherwise, respond normally to the user.';
           const fallbackMessages: OpenAI.ChatCompletionMessageParam[] = [
             { role: 'system', content: fallbackSystemPrompt },
             ...messages.slice(1), // skip original system message
@@ -955,7 +955,9 @@ export const resolvers = {
         // Handle prompt-based fallback: parse <tool_call> from text
         if (usedFallback) {
           const text = choice.message.content || '';
-          const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/);
+          const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/)
+            || text.match(/```(?:tool_call|json)?\s*(\{[\s\S]*?\})\s*```/)
+            || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo|addFlashcard|getBibleVerse|searchPodcasts|addBookmark|listFlashcards)"[\s\S]*?\})/);
           if (match) {
             try {
               const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
