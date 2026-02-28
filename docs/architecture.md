@@ -262,9 +262,10 @@ Exposes `PodcastPlayer` component via Module Federation.
 Exposes `AiAssistant` component via Module Federation.
 
 **Key Behavior:**
-- Conversational AI chat powered by Google Gemini
-- **Context-aware responses**: `useAiChat` hook calls `gatherUserContext()` on every message, collecting stock watchlist symbols, favorite/recent city names, podcast subscription count, locale, temperature unit, theme, and current page from localStorage. This context is sent in the request body and injected into Gemini's system instruction for personalized answers.
-- **Tool calling**: Gemini can invoke `getWeather`, `searchCities`, `getStockQuote`, `getCryptoPrices` (CoinGecko API with 2-min cache), and `navigateTo` tools. Tool calls are displayed as labeled badges (e.g., "Weather lookup", "Crypto prices") via `ToolCallDisplay`.
+- Conversational AI chat powered by **Ollama** (self-hosted, default) or **Google Gemini** (cloud fallback)
+- **Provider priority**: If `OLLAMA_BASE_URL` is set → Ollama; otherwise → Gemini
+- **Context-aware responses**: `useAiChat` hook calls `gatherUserContext()` on every message, collecting stock watchlist symbols, favorite/recent city names, podcast subscription count, locale, temperature unit, theme, and current page from localStorage. This context is sent in the request body and injected into the system instruction for personalized answers.
+- **Tool calling**: Supports `getWeather`, `searchCities`, `getStockQuote`, `getCryptoPrices` (CoinGecko API with 2-min cache), and `navigateTo` tools. With Ollama, native tool calling is tried first; for models without support (e.g., `gemma2:2b`), a prompt-based fallback parses `<tool_call>` tags. Tool calls are displayed as labeled badges (e.g., "Weather lookup", "Crypto prices") via `ToolCallDisplay`.
 - **Voice input**: `ChatInput` component includes a microphone button that uses the Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`). Lazy detection via `getSpeechRecognition()` ensures the button only renders when the browser supports it. Pulsing red animation indicates listening state. Transcribed speech is appended to the textarea.
 - Suggested prompt chips: weather, stocks, crypto, navigation, comparison
 - Authenticated requests (Firebase ID token attached)
@@ -1117,10 +1118,10 @@ All Cloud Functions are defined in `functions/src/index.ts` and deployed via `fi
 
 | Function | Type | Route / Trigger | Memory | Timeout | Secrets |
 |----------|------|----------------|--------|---------|---------|
-| `graphql` | `onRequest` | `/graphql` | 512 MiB | 60s | OPENWEATHER, FINNHUB, PODCASTINDEX keys |
+| `graphql` | `onRequest` | `/graphql` | 512 MiB | 60s | OPENWEATHER, FINNHUB, PODCASTINDEX, YOUVERSION, GEMINI, OLLAMA, CF_ACCESS keys |
 | `stockProxy` | `onRequest` | `/stock/**` | 256 MiB | 30s | FINNHUB_API_KEY |
 | `podcastProxy` | `onRequest` | `/podcast/**` | 256 MiB | 30s | PODCASTINDEX keys |
-| `aiChat` | `onRequest` | `/ai/chat` (POST) | 256 MiB | 60s | GEMINI, OPENWEATHER, FINNHUB, RECAPTCHA keys |
+| `aiChat` | `onRequest` | `/ai/chat` (POST) | 256 MiB | 60s | GEMINI, OPENWEATHER, FINNHUB, RECAPTCHA, OLLAMA, CF_ACCESS keys |
 | `babyPhotos` | `onRequest` | `/baby-photos/**` | 256 MiB | 30s | — |
 | `cloudFiles` | `onRequest` | `/cloud-files/**` | 256 MiB | 30s | — |
 | `subscribeToAlerts` | `onCall` | Callable | Default | Default | — |
@@ -1148,7 +1149,9 @@ IP-based rate limiting via `node-cache` (in-memory, per-instance):
 
 ### AI Chat Function Calling
 
-The `aiChat` function uses Gemini's function calling to execute tools:
+The AI chat supports two providers (Ollama or Gemini) with automatic tool calling. See [Ollama Setup Guide](./ollama-setup.md) for full deployment details.
+
+Tools available:
 
 | Tool | Description | External API |
 |------|-------------|-------------|
@@ -1177,8 +1180,9 @@ This is used by the emulator testing infrastructure (`.env.emulator`) to redirec
 
 ### CORS
 All Cloud Functions (`graphql`, `stockProxy`, `podcastProxy`, `aiChat`) restrict CORS to whitelisted origins:
-- `https://mycircle-app.web.app`
-- `https://mycircle-app.firebaseapp.com`
+- `https://mycircle-dash.web.app`
+- `https://mycircle-dash.firebaseapp.com`
+- `https://mycircledash.com`
 - `http://localhost:3000`
 
 ### Rate Limiting
@@ -1292,6 +1296,6 @@ Frontend (useAiChat) ←──────────────────�
 
 ### AI Chat Migration
 
-AI chat was migrated from REST (`POST /ai/chat`) to GraphQL (`Mutation.aiChat`). The frontend uses Apollo's `useMutation` hook. Tool declarations are defined once in `mfe-tools.ts` using Zod schemas and converted to Gemini format via `gemini-bridge.ts`, eliminating duplicated declarations.
+AI chat was migrated from REST (`POST /ai/chat`) to GraphQL (`Mutation.aiChat`). The frontend uses Apollo's `useMutation` hook. Tool declarations are defined once in `mfe-tools.ts` using Zod schemas and converted to Gemini format via `gemini-bridge.ts` or OpenAI format via `openai-bridge.ts` (for Ollama). Both the `graphql` Cloud Function resolver and the `server/graphql/resolvers.ts` dev server implement the full Ollama + Gemini paths. See [Ollama Setup Guide](./ollama-setup.md).
 
 See [docs/mcp.md](./mcp.md) for the full MCP server guide.
