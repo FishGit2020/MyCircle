@@ -246,6 +246,9 @@ export const typeDefs = `#graphql
     bibleVotd(day: Int!): BibleVerse!
     bibleVotdApi(day: Int!): BibleVerse!
     biblePassage(reference: String!, translation: String): BiblePassage!
+
+    # AI queries
+    ollamaModels: [String!]!
   }
 
   # ─── AI Chat Types ─────────────────────────────────────────────
@@ -275,7 +278,7 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
-    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON): AiChatResponse!
+    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String): AiChatResponse!
   }
 
   schema {

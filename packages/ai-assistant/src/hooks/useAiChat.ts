@@ -28,6 +28,7 @@ interface AiChatState {
 }
 
 const STORAGE_KEY = 'ai-chat-history';
+const MODEL_STORAGE_KEY = 'mycircle-ai-model';
 
 /** Gather user context from localStorage for context-aware AI. */
 function gatherUserContext(): Record<string, unknown> {
@@ -171,11 +172,15 @@ export function useAiChat() {
 
       const userContext = gatherUserContext();
 
+      let savedModel: string | undefined;
+      try { savedModel = localStorage.getItem(MODEL_STORAGE_KEY) || undefined; } catch { /* */ }
+
       const { data, errors } = await aiChatMutation({
         variables: {
           message: content,
           history,
           context: userContext,
+          model: savedModel,
         },
         context: {
           fetchOptions: { signal: abortRef.current.signal },

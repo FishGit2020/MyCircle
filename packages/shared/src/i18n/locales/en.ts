@@ -447,6 +447,7 @@ const en = {
   'ai.suggestFlashcard': 'Create a flashcard about React hooks',
   'ai.suggestBible': 'Look up John 3:16',
   'ai.suggestPodcast': 'Search for technology podcasts',
+  'ai.modelLabel': 'Model',
   'ai.debugToggle': 'Toggle debug mode',
   'ai.debugArgs': 'Arguments',
   'ai.debugResult': 'Result',

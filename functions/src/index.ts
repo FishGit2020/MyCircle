@@ -30,7 +30,6 @@ const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podc
 
 // Ollama (self-hosted AI) — when set, AI chat uses Ollama instead of Gemini
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || '';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma2:2b';
 
 // ─── CORS origins whitelist ─────────────────────────────────────────
 const ALLOWED_ORIGINS = [
@@ -59,6 +58,7 @@ const aiChatBodySchema = z.object({
     content: z.string(),
   })).optional(),
   context: z.record(z.unknown()).optional(),
+  model: z.string().max(100).optional(),
 });
 
 /** Verify Firebase Auth ID token from Authorization header. Returns uid or null. */
@@ -119,7 +119,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 60,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET']
+    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'OLLAMA_BASE_URL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET']
   },
   async (req: Request, res: Response) => {
     const server = await getServer();
@@ -617,7 +617,7 @@ export const aiChat = onRequest(
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 60,
-    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET'],
+    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY', 'OLLAMA_BASE_URL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET'],
   },
   async (req: Request, res: Response) => {
     if (req.method !== 'POST') {
@@ -666,7 +666,8 @@ export const aiChat = onRequest(
       return;
     }
 
-    const { message, history, context } = parseResult.data;
+    const { message, history, context, model } = parseResult.data;
+    const ollamaModel = model || 'gemma2:2b';
 
     // Build context-aware system instruction (shared by both providers)
     let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
@@ -747,7 +748,7 @@ export const aiChat = onRequest(
         let usedFallback = false;
         try {
           completion = await client.chat.completions.create({
-            model: OLLAMA_MODEL,
+            model: ollamaModel,
             messages,
             tools: ollamaTools,
           });
@@ -768,7 +769,7 @@ export const aiChat = onRequest(
             ...messages.slice(1), // skip original system message
           ];
           completion = await client.chat.completions.create({
-            model: OLLAMA_MODEL,
+            model: ollamaModel,
             messages: fallbackMessages,
           });
         }
@@ -791,7 +792,7 @@ export const aiChat = onRequest(
 
               // Send tool result back for final answer
               const followup = await client.chat.completions.create({
-                model: OLLAMA_MODEL,
+                model: ollamaModel,
                 messages: [
                   ...messages,
                   { role: 'assistant', content: text },
@@ -832,7 +833,7 @@ export const aiChat = onRequest(
           ];
 
           const followup = await client.chat.completions.create({
-            model: OLLAMA_MODEL,
+            model: ollamaModel,
             messages: followupMessages,
           });
 

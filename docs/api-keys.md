@@ -195,7 +195,6 @@ If Ollama runs on a NAS or remote machine without a public IP:
 Root `.env`:
 ```
 OLLAMA_BASE_URL=https://ollama.yourdomain.com
-OLLAMA_MODEL=gemma2:2b
 ```
 
 ### Firebase Secrets (production)
@@ -203,9 +202,6 @@ OLLAMA_MODEL=gemma2:2b
 ```bash
 firebase functions:secrets:set OLLAMA_BASE_URL
 # Enter: https://ollama.yourdomain.com
-
-firebase functions:secrets:set OLLAMA_MODEL
-# Enter: gemma2:2b
 
 firebase deploy --only functions
 ```
@@ -342,7 +338,6 @@ VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 | `PODCASTINDEX_API_SECRET` | PodcastIndex | For podcasts |
 | `GEMINI_API_KEY` | Google Gemini | For AI chat (unless Ollama set) |
 | `OLLAMA_BASE_URL` | Ollama | For self-hosted AI (optional) |
-| `OLLAMA_MODEL` | Ollama | Model name (default: gemma2:2b) |
 | `CF_ACCESS_CLIENT_ID` | Cloudflare Access | For Ollama tunnel auth |
 | `CF_ACCESS_CLIENT_SECRET` | Cloudflare Access | For Ollama tunnel auth |
 | `YOUVERSION_APP_KEY` | YouVersion | For Bible reader |
@@ -375,7 +370,6 @@ firebase functions:secrets:set PODCASTINDEX_API_SECRET
 firebase functions:secrets:set GEMINI_API_KEY
 firebase functions:secrets:set YOUVERSION_APP_KEY
 firebase functions:secrets:set OLLAMA_BASE_URL
-firebase functions:secrets:set OLLAMA_MODEL
 firebase functions:secrets:set CF_ACCESS_CLIENT_ID
 firebase functions:secrets:set CF_ACCESS_CLIENT_SECRET
 ```

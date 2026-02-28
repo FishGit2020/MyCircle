@@ -770,13 +770,14 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
     JSON: JSONScalar,
 
     Mutation: {
-      aiChat: async (_: any, { message, history, context }: {
+      aiChat: async (_: any, { message, history, context, model }: {
         message: string;
         history?: { role: string; content: string }[];
         context?: Record<string, unknown>;
+        model?: string;
       }) => {
         const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
-        const ollamaModel = process.env.OLLAMA_MODEL || 'gemma2:2b';
+        const ollamaModel = model || 'gemma2:2b';
         const geminiKey = process.env.GEMINI_API_KEY;
         if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)');
 
@@ -970,6 +971,20 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
     },
 
     Query: {
+      ollamaModels: async () => {
+        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
+        if (!ollamaBaseUrl) return [];
+        try {
+          const headers: Record<string, string> = {};
+          if (process.env.CF_ACCESS_CLIENT_ID) headers['CF-Access-Client-Id'] = process.env.CF_ACCESS_CLIENT_ID;
+          if (process.env.CF_ACCESS_CLIENT_SECRET) headers['CF-Access-Client-Secret'] = process.env.CF_ACCESS_CLIENT_SECRET;
+          const { data } = await axios.get(`${ollamaBaseUrl}/api/tags`, { headers, timeout: 5000 });
+          return (data.models || []).map((m: any) => m.name as string);
+        } catch {
+          return [];
+        }
+      },
+
       weather: async (_: any, { lat, lon }: { lat: number; lon: number }) => {
         const apiKey = getApiKey();
 
