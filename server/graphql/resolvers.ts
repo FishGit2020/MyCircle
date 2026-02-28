@@ -892,7 +892,13 @@ export const resolvers = {
       // ─── Ollama path (OpenAI-compatible API) ───────────────────
       if (ollamaBaseUrl) {
         const { default: OpenAI } = await import('openai');
-        const client = new OpenAI({ baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama' });
+        const client = new OpenAI({
+          baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
+          defaultHeaders: {
+            ...(process.env.CF_ACCESS_CLIENT_ID ? { 'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID } : {}),
+            ...(process.env.CF_ACCESS_CLIENT_SECRET ? { 'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET } : {}),
+          },
+        });
 
         // Convert shared tool definitions to OpenAI format
         const ollamaTools = toOpenAITools(ALL_TOOLS);

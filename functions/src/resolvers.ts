@@ -830,7 +830,13 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         // ─── Ollama path ──────────────────────────────────────
         if (ollamaBaseUrl) {
           const { default: OpenAI } = await import('openai');
-          const client = new OpenAI({ baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama' });
+          const client = new OpenAI({
+            baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
+            defaultHeaders: {
+              ...(process.env.CF_ACCESS_CLIENT_ID ? { 'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID } : {}),
+              ...(process.env.CF_ACCESS_CLIENT_SECRET ? { 'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET } : {}),
+            },
+          });
 
           const ollamaTools: OpenAI.ChatCompletionTool[] = [
             { type: 'function', function: { name: 'getWeather', description: 'Get current weather for a city.', parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name' } }, required: ['city'] } } },

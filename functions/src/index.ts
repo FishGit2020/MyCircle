@@ -119,7 +119,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 60,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL']
+    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET']
   },
   async (req: Request, res: Response) => {
     const server = await getServer();
@@ -617,7 +617,7 @@ export const aiChat = onRequest(
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 60,
-    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL'],
+    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET'],
   },
   async (req: Request, res: Response) => {
     if (req.method !== 'POST') {
@@ -709,7 +709,13 @@ export const aiChat = onRequest(
       // ─── Ollama path (OpenAI-compatible API) ───────────────────
       if (ollamaBaseUrl) {
         const { default: OpenAI } = await import('openai');
-        const client = new OpenAI({ baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama' });
+        const client = new OpenAI({
+          baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
+          defaultHeaders: {
+            ...(process.env.CF_ACCESS_CLIENT_ID ? { 'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID } : {}),
+            ...(process.env.CF_ACCESS_CLIENT_SECRET ? { 'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET } : {}),
+          },
+        });
 
         // Define tools in OpenAI format
         const ollamaTools: OpenAI.ChatCompletionTool[] = [
