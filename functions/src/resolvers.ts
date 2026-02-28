@@ -2,6 +2,7 @@ import axios from 'axios';
 import crypto from 'crypto';
 import NodeCache from 'node-cache';
 import { GraphQLScalarType, Kind } from 'graphql';
+import type OpenAI from 'openai';
 
 // JSON scalar for arbitrary JSON values in GraphQL
 function parseLiteralJSON(ast: import('graphql').ValueNode): unknown {
@@ -769,11 +770,194 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
     JSON: JSONScalar,
 
     Mutation: {
-      aiChat: async (_: any, { message }: { message: string }) => {
-        // In Cloud Functions, AI chat is handled by the separate aiChat REST endpoint.
-        // This mutation resolver exists so the GraphQL schema validates, but the
-        // frontend should use the REST endpoint in production.
-        throw new Error('AI chat is handled by the dedicated /ai/chat Cloud Function endpoint. Use that instead of GraphQL in production.');
+      aiChat: async (_: any, { message, history, context }: {
+        message: string;
+        history?: { role: string; content: string }[];
+        context?: Record<string, unknown>;
+      }) => {
+        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
+        const ollamaModel = process.env.OLLAMA_MODEL || 'gemma2:2b';
+        const geminiKey = process.env.GEMINI_API_KEY;
+        if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)');
+
+        const apiKey = getApiKey();
+        const finnhubKey = getFinnhubKey?.() || '';
+
+        // Build context-aware system instruction
+        let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
+
+        if (context && typeof context === 'object') {
+          const ctxParts: string[] = [];
+          if (Array.isArray(context.favoriteCities) && context.favoriteCities.length > 0) ctxParts.push(`Favorite cities: ${(context.favoriteCities as string[]).join(', ')}`);
+          if (Array.isArray(context.recentCities) && context.recentCities.length > 0) ctxParts.push(`Recently searched cities: ${(context.recentCities as string[]).join(', ')}`);
+          if (Array.isArray(context.stockWatchlist) && context.stockWatchlist.length > 0) ctxParts.push(`Stock watchlist: ${(context.stockWatchlist as string[]).join(', ')}`);
+          if (typeof context.podcastSubscriptions === 'number' && context.podcastSubscriptions > 0) ctxParts.push(`Subscribed to ${context.podcastSubscriptions} podcasts`);
+          if (context.tempUnit) ctxParts.push(`Preferred temperature unit: ${context.tempUnit === 'F' ? 'Fahrenheit' : 'Celsius'}`);
+          if (context.locale) ctxParts.push(`Language: ${context.locale === 'es' ? 'Spanish' : 'English'}`);
+          if (context.currentPage) ctxParts.push(`Currently on: ${context.currentPage}`);
+          if (ctxParts.length > 0) {
+            systemInstruction += '\n\nUser context:\n' + ctxParts.join('\n');
+            systemInstruction += '\n\nUse this context to personalize responses.';
+          }
+        }
+
+        /** Execute a tool by name */
+        async function executeTool(name: string, args: Record<string, unknown>): Promise<string> {
+          if (name === 'getWeather') {
+            const city = args.city as string;
+            const geo = await axios.get(`${OPENWEATHER_BASE}/geo/1.0/direct`, { params: { q: city, limit: 1, appid: apiKey } });
+            if (!geo.data.length) return JSON.stringify({ error: `City not found: ${city}` });
+            const { lat, lon } = geo.data[0];
+            const w = await axios.get(`${OPENWEATHER_BASE}/data/2.5/weather`, { params: { lat, lon, appid: apiKey, units: 'metric' } });
+            return JSON.stringify({ city, temp: w.data.main.temp, feels_like: w.data.main.feels_like, humidity: w.data.main.humidity, description: w.data.weather[0].description, wind: w.data.wind.speed });
+          }
+          if (name === 'searchCities') {
+            const geo = await axios.get(`${OPENWEATHER_BASE}/geo/1.0/direct`, { params: { q: args.query, limit: 5, appid: apiKey } });
+            return JSON.stringify(geo.data.map((c: any) => ({ name: c.name, country: c.country, state: c.state, lat: c.lat, lon: c.lon })));
+          }
+          if (name === 'getStockQuote') {
+            const q = await axios.get(`${FINNHUB_BASE}/api/v1/quote`, { params: { symbol: args.symbol, token: finnhubKey } });
+            return JSON.stringify({ symbol: args.symbol, price: q.data.c, change: q.data.d, changePercent: q.data.dp, high: q.data.h, low: q.data.l });
+          }
+          if (name === 'getCryptoPrices') {
+            const r = await axios.get(`${COINGECKO_BASE}/api/v3/simple/price`, { params: { ids: 'bitcoin,ethereum,solana', vs_currencies: 'usd', include_24hr_change: 'true' } });
+            return JSON.stringify(r.data);
+          }
+          if (name === 'navigateTo') return JSON.stringify({ navigateTo: args.page });
+          return JSON.stringify({ error: `Unknown tool: ${name}` });
+        }
+
+        // ─── Ollama path ──────────────────────────────────────
+        if (ollamaBaseUrl) {
+          const { default: OpenAI } = await import('openai');
+          const client = new OpenAI({ baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama' });
+
+          const ollamaTools: OpenAI.ChatCompletionTool[] = [
+            { type: 'function', function: { name: 'getWeather', description: 'Get current weather for a city.', parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name' } }, required: ['city'] } } },
+            { type: 'function', function: { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: 'object', properties: { query: { type: 'string', description: 'Search query' } }, required: ['query'] } } },
+            { type: 'function', function: { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: 'object', properties: { symbol: { type: 'string', description: 'Stock ticker' } }, required: ['symbol'] } } },
+            { type: 'function', function: { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: 'object', properties: {} } } },
+            { type: 'function', function: { name: 'navigateTo', description: 'Navigate to a page.', parameters: { type: 'object', properties: { page: { type: 'string', description: 'Page name' } }, required: ['page'] } } },
+          ];
+
+          const messages: OpenAI.ChatCompletionMessageParam[] = [
+            { role: 'system', content: systemInstruction },
+          ];
+          if (history && Array.isArray(history)) {
+            for (const msg of history) {
+              messages.push({ role: msg.role === 'assistant' ? 'assistant' : 'user', content: msg.content });
+            }
+          }
+          messages.push({ role: 'user', content: message });
+
+          const toolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
+
+          let completion: OpenAI.ChatCompletion;
+          let usedFallback = false;
+          try {
+            completion = await client.chat.completions.create({ model: ollamaModel, messages, tools: ollamaTools });
+          } catch {
+            usedFallback = true;
+            const toolPrompt = ollamaTools.map(t => {
+              const params = (t.function.parameters as Record<string, any>)?.properties || {};
+              return `- ${t.function.name}(${Object.keys(params).join(', ')}): ${t.function.description}`;
+            }).join('\n');
+            const fallbackSystemPrompt = systemInstruction + '\n\nYou have access to these tools:\n' + toolPrompt + '\n\nIf the user\'s request needs a tool, respond with ONLY:\n<tool_call>{"name":"toolName","args":{"param":"value"}}</tool_call>\n\nOtherwise, respond normally.';
+            const fallbackMessages: OpenAI.ChatCompletionMessageParam[] = [
+              { role: 'system', content: fallbackSystemPrompt },
+              ...messages.slice(1),
+            ];
+            completion = await client.chat.completions.create({ model: ollamaModel, messages: fallbackMessages });
+          }
+
+          const choice = completion.choices[0];
+
+          if (usedFallback) {
+            const text = choice.message.content || '';
+            const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/);
+            if (match) {
+              try {
+                const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
+                let result = '';
+                try { result = await executeTool(parsed.name, parsed.args); }
+                catch (err: any) { result = JSON.stringify({ error: err.message }); }
+                toolCalls.push({ name: parsed.name, args: parsed.args, result });
+                const followup = await client.chat.completions.create({
+                  model: ollamaModel,
+                  messages: [...messages, { role: 'assistant', content: text }, { role: 'user', content: `Tool result for ${parsed.name}: ${result}\n\nPlease provide a helpful response based on this data.` }],
+                });
+                return { response: followup.choices[0].message.content, toolCalls, actions: null };
+              } catch { /* JSON parse failed */ }
+            }
+            return { response: text || 'Sorry, I could not generate a response.', toolCalls: null, actions: null };
+          }
+
+          if (choice.finish_reason === 'tool_calls' && choice.message.tool_calls) {
+            for (const tc of choice.message.tool_calls) {
+              const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
+              let result = '';
+              try { result = await executeTool(tc.function.name, args); }
+              catch (err: any) { result = JSON.stringify({ error: err.message }); }
+              toolCalls.push({ name: tc.function.name, args, result });
+            }
+            const followupMessages: OpenAI.ChatCompletionMessageParam[] = [
+              ...messages, choice.message,
+              ...choice.message.tool_calls.map((tc, i) => ({ role: 'tool' as const, tool_call_id: tc.id, content: toolCalls[i].result || '' })),
+            ];
+            const followup = await client.chat.completions.create({ model: ollamaModel, messages: followupMessages });
+            return { response: followup.choices[0].message.content || 'I found some information but had trouble formatting it.', toolCalls, actions: null };
+          }
+
+          return { response: choice.message.content || 'Sorry, I could not generate a response.', toolCalls: null, actions: null };
+        }
+
+        // ─── Gemini path ──────────────────────────────────────
+        const { GoogleGenAI, Type } = await import('@google/genai');
+        type FD = import('@google/genai').FunctionDeclaration;
+        const ai = new GoogleGenAI({ apiKey: geminiKey! });
+        const functionDeclarations: FD[] = [
+          { name: 'getWeather', description: 'Get current weather for a city.', parameters: { type: Type.OBJECT, properties: { city: { type: Type.STRING, description: 'City name' } }, required: ['city'] } },
+          { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: Type.OBJECT, properties: { query: { type: Type.STRING, description: 'Search query' } }, required: ['query'] } },
+          { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: Type.OBJECT, properties: { symbol: { type: Type.STRING, description: 'Stock ticker' } }, required: ['symbol'] } },
+          { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: Type.OBJECT, properties: {} } },
+          { name: 'navigateTo', description: 'Navigate to a page.', parameters: { type: Type.OBJECT, properties: { page: { type: Type.STRING, description: 'Page name' } }, required: ['page'] } },
+        ];
+        const tools = [{ functionDeclarations }];
+
+        const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+        if (history && Array.isArray(history)) {
+          for (const msg of history) {
+            contents.push({ role: msg.role === 'assistant' ? 'model' : 'user', parts: [{ text: msg.content }] });
+          }
+        }
+        contents.push({ role: 'user', parts: [{ text: message }] });
+
+        const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents, config: { tools, systemInstruction } });
+        const toolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
+        const parts = response.candidates?.[0]?.content?.parts || [];
+        let hasToolCalls = false;
+        for (const part of parts) {
+          if (part.functionCall) {
+            hasToolCalls = true;
+            const args = (part.functionCall.args || {}) as Record<string, unknown>;
+            let result = '';
+            try { result = await executeTool(part.functionCall.name!, args); }
+            catch (err: any) { result = JSON.stringify({ error: err.message }); }
+            toolCalls.push({ name: part.functionCall.name!, args, result });
+          }
+        }
+        if (hasToolCalls && toolCalls.length > 0) {
+          const toolResponseParts = toolCalls.map(tc => ({ functionResponse: { name: tc.name, response: { result: tc.result } } }));
+          const followup = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: [...contents, { role: 'model', parts }, { role: 'user', parts: toolResponseParts }],
+            config: { systemInstruction },
+          });
+          const finalText = followup.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join('') || 'I found some information but had trouble formatting it.';
+          return { response: finalText, toolCalls, actions: null };
+        }
+        const textResponse = parts.map((p: any) => p.text).filter(Boolean).join('') || 'Sorry, I could not generate a response.';
+        return { response: textResponse, toolCalls: null, actions: null };
       },
     },
 
