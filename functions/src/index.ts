@@ -14,6 +14,7 @@ import NodeCache from 'node-cache';
 import crypto from 'crypto';
 import { z } from 'zod';
 import type { FunctionDeclaration } from '@google/genai';
+import type OpenAI from 'openai';
 import { verifyRecaptchaToken } from './recaptcha.js';
 
 // Initialize Firebase Admin (idempotent)
@@ -27,10 +28,15 @@ const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
 const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.com';
 const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podcastindex.org';
 
+// Ollama (self-hosted AI) — when set, AI chat uses Ollama instead of Gemini
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || '';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma2:2b';
+
 // ─── CORS origins whitelist ─────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://mycircle-dash.web.app',
   'https://mycircle-dash.firebaseapp.com',
+  'https://mycircledash.com',
   'http://localhost:3000',
 ];
 
@@ -615,7 +621,7 @@ export const aiChat = onRequest(
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 60,
-    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY'],
+    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_MODEL'],
   },
   async (req: Request, res: Response) => {
     if (req.method !== 'POST') {
@@ -650,9 +656,10 @@ export const aiChat = onRequest(
       }
     }
 
+    const ollamaBaseUrl = OLLAMA_BASE_URL;
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (!geminiKey) {
-      res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
+    if (!ollamaBaseUrl && !geminiKey) {
+      res.status(500).json({ error: 'No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)' });
       return;
     }
 
@@ -665,10 +672,180 @@ export const aiChat = onRequest(
 
     const { message, history, context } = parseResult.data;
 
+    // Build context-aware system instruction (shared by both providers)
+    let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
+
+    if (context && typeof context === 'object') {
+      const ctxParts: string[] = [];
+      if (Array.isArray(context.favoriteCities) && context.favoriteCities.length > 0) {
+        ctxParts.push(`Favorite cities: ${(context.favoriteCities as string[]).join(', ')}`);
+      }
+      if (Array.isArray(context.recentCities) && context.recentCities.length > 0) {
+        ctxParts.push(`Recently searched cities: ${(context.recentCities as string[]).join(', ')}`);
+      }
+      if (Array.isArray(context.stockWatchlist) && context.stockWatchlist.length > 0) {
+        ctxParts.push(`Stock watchlist: ${(context.stockWatchlist as string[]).join(', ')}`);
+      }
+      if (typeof context.podcastSubscriptions === 'number' && context.podcastSubscriptions > 0) {
+        ctxParts.push(`Subscribed to ${context.podcastSubscriptions} podcasts`);
+      }
+      if (context.tempUnit) ctxParts.push(`Preferred temperature unit: ${context.tempUnit === 'F' ? 'Fahrenheit' : 'Celsius'}`);
+      if (context.locale) ctxParts.push(`Language: ${context.locale === 'es' ? 'Spanish' : 'English'}`);
+      if (context.currentPage) ctxParts.push(`Currently on: ${context.currentPage}`);
+
+      if (ctxParts.length > 0) {
+        systemInstruction += '\n\nUser context:\n' + ctxParts.join('\n');
+        systemInstruction += '\n\nUse this context to personalize responses. For example, if the user asks "how is the weather?" you can check their favorite or recent cities. If they ask about stocks, reference their watchlist.';
+      }
+    }
+
+    /** Execute a tool by name (inline version for Cloud Functions) */
+    async function executeTool(name: string, args: Record<string, unknown>): Promise<string> {
+      if (name === 'getWeather') return await executeGetWeather(args.city as string);
+      if (name === 'searchCities') return await executeSearchCities(args.query as string);
+      if (name === 'getStockQuote') return await executeGetStockQuote(args.symbol as string);
+      if (name === 'getCryptoPrices') return await executeGetCryptoPrices();
+      if (name === 'navigateTo') return JSON.stringify({ navigateTo: args.page });
+      return JSON.stringify({ error: `Unknown tool: ${name}` });
+    }
+
     try {
-      // Dynamically import the Google Gen AI SDK
+      // ─── Ollama path (OpenAI-compatible API) ───────────────────
+      if (ollamaBaseUrl) {
+        const { default: OpenAI } = await import('openai');
+        const client = new OpenAI({ baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama' });
+
+        // Define tools in OpenAI format
+        const ollamaTools: OpenAI.ChatCompletionTool[] = [
+          { type: 'function', function: { name: 'getWeather', description: 'Get current weather for a city.', parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name' } }, required: ['city'] } } },
+          { type: 'function', function: { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: 'object', properties: { query: { type: 'string', description: 'Search query' } }, required: ['query'] } } },
+          { type: 'function', function: { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: 'object', properties: { symbol: { type: 'string', description: 'Stock ticker' } }, required: ['symbol'] } } },
+          { type: 'function', function: { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: 'object', properties: {} } } },
+          { type: 'function', function: { name: 'navigateTo', description: 'Navigate to a page.', parameters: { type: 'object', properties: { page: { type: 'string', description: 'Page name' } }, required: ['page'] } } },
+        ];
+
+        // Build OpenAI message array
+        const messages: OpenAI.ChatCompletionMessageParam[] = [
+          { role: 'system', content: systemInstruction },
+        ];
+        if (history && Array.isArray(history)) {
+          for (const msg of history) {
+            messages.push({
+              role: msg.role === 'assistant' ? 'assistant' : 'user',
+              content: msg.content,
+            });
+          }
+        }
+        messages.push({ role: 'user', content: message });
+
+        const toolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
+
+        // Try native tool calling first (works with qwen2.5, llama3.1+)
+        let completion: OpenAI.ChatCompletion;
+        let usedFallback = false;
+        try {
+          completion = await client.chat.completions.create({
+            model: OLLAMA_MODEL,
+            messages,
+            tools: ollamaTools,
+          });
+        } catch {
+          // Model doesn't support native tools (e.g., gemma2:2b) — prompt-based fallback
+          usedFallback = true;
+          const toolPrompt = ollamaTools.map(t => {
+            const params = (t.function.parameters as Record<string, any>)?.properties || {};
+            return `- ${t.function.name}(${Object.keys(params).join(', ')}): ${t.function.description}`;
+          }).join('\n');
+          const fallbackSystemPrompt = systemInstruction + '\n\n' +
+            'You have access to these tools:\n' + toolPrompt + '\n\n' +
+            'If the user\'s request needs a tool, respond with ONLY:\n' +
+            '<tool_call>{"name":"toolName","args":{"param":"value"}}</tool_call>\n\n' +
+            'Otherwise, respond normally.';
+          const fallbackMessages: OpenAI.ChatCompletionMessageParam[] = [
+            { role: 'system', content: fallbackSystemPrompt },
+            ...messages.slice(1), // skip original system message
+          ];
+          completion = await client.chat.completions.create({
+            model: OLLAMA_MODEL,
+            messages: fallbackMessages,
+          });
+        }
+
+        const choice = completion.choices[0];
+
+        // Handle prompt-based fallback: parse <tool_call> from text
+        if (usedFallback) {
+          const text = choice.message.content || '';
+          const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/);
+          if (match) {
+            try {
+              const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
+              let result = '';
+              try { result = await executeTool(parsed.name, parsed.args); }
+              catch (err: any) { result = JSON.stringify({ error: err.message }); }
+              toolCalls.push({ name: parsed.name, args: parsed.args, result });
+
+              // Send tool result back for final answer
+              const followup = await client.chat.completions.create({
+                model: OLLAMA_MODEL,
+                messages: [
+                  ...messages,
+                  { role: 'assistant', content: text },
+                  { role: 'user', content: `Tool result for ${parsed.name}: ${result}\n\nPlease provide a helpful response based on this data.` },
+                ],
+              });
+              res.status(200).json({ response: followup.choices[0].message.content, toolCalls });
+              return;
+            } catch { /* JSON parse failed — treat as plain text */ }
+          }
+          // No tool call parsed — return as plain text
+          res.status(200).json({ response: text || 'Sorry, I could not generate a response.' });
+          return;
+        }
+
+        // Native tool calls path
+        if (choice.finish_reason === 'tool_calls' && choice.message.tool_calls) {
+          for (const tc of choice.message.tool_calls) {
+            const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
+            let result = '';
+            try {
+              result = await executeTool(tc.function.name, args);
+            } catch (err: any) {
+              result = JSON.stringify({ error: err.message });
+            }
+            toolCalls.push({ name: tc.function.name, args, result });
+          }
+
+          // Send tool results back for final response
+          const followupMessages: OpenAI.ChatCompletionMessageParam[] = [
+            ...messages,
+            choice.message,
+            ...choice.message.tool_calls.map((tc, i) => ({
+              role: 'tool' as const,
+              tool_call_id: tc.id,
+              content: toolCalls[i].result || '',
+            })),
+          ];
+
+          const followup = await client.chat.completions.create({
+            model: OLLAMA_MODEL,
+            messages: followupMessages,
+          });
+
+          const finalText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
+          res.status(200).json({ response: finalText, toolCalls });
+          return;
+        }
+
+        // No tool calls — return direct text response
+        const text = choice.message.content || 'Sorry, I could not generate a response.';
+        res.status(200).json({ response: text });
+        return;
+      }
+
+      // ─── Gemini path (existing behavior) ───────────────────────
       const { GoogleGenAI, Type } = await import('@google/genai');
-      const ai = new GoogleGenAI({ apiKey: geminiKey });
+      const ai = new GoogleGenAI({ apiKey: geminiKey! });
 
       // Define tools for function calling
       const getWeatherDecl: FunctionDeclaration = {
@@ -744,33 +921,6 @@ export const aiChat = onRequest(
       }
       contents.push({ role: 'user', parts: [{ text: message }] });
 
-      // Build context-aware system instruction
-      let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
-
-      if (context && typeof context === 'object') {
-        const parts: string[] = [];
-        if (Array.isArray(context.favoriteCities) && context.favoriteCities.length > 0) {
-          parts.push(`Favorite cities: ${(context.favoriteCities as string[]).join(', ')}`);
-        }
-        if (Array.isArray(context.recentCities) && context.recentCities.length > 0) {
-          parts.push(`Recently searched cities: ${(context.recentCities as string[]).join(', ')}`);
-        }
-        if (Array.isArray(context.stockWatchlist) && context.stockWatchlist.length > 0) {
-          parts.push(`Stock watchlist: ${(context.stockWatchlist as string[]).join(', ')}`);
-        }
-        if (typeof context.podcastSubscriptions === 'number' && context.podcastSubscriptions > 0) {
-          parts.push(`Subscribed to ${context.podcastSubscriptions} podcasts`);
-        }
-        if (context.tempUnit) parts.push(`Preferred temperature unit: ${context.tempUnit === 'F' ? 'Fahrenheit' : 'Celsius'}`);
-        if (context.locale) parts.push(`Language: ${context.locale === 'es' ? 'Spanish' : 'English'}`);
-        if (context.currentPage) parts.push(`Currently on: ${context.currentPage}`);
-
-        if (parts.length > 0) {
-          systemInstruction += '\n\nUser context:\n' + parts.join('\n');
-          systemInstruction += '\n\nUse this context to personalize responses. For example, if the user asks "how is the weather?" you can check their favorite or recent cities. If they ask about stocks, reference their watchlist.';
-        }
-      }
-
       // Call Gemini
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -794,19 +944,8 @@ export const aiChat = onRequest(
           const args = (fc.args || {}) as Record<string, unknown>;
           let result = '';
 
-          // Execute tool
           try {
-            if (fc.name === 'getWeather') {
-              result = await executeGetWeather(args.city as string);
-            } else if (fc.name === 'searchCities') {
-              result = await executeSearchCities(args.query as string);
-            } else if (fc.name === 'getStockQuote') {
-              result = await executeGetStockQuote(args.symbol as string);
-            } else if (fc.name === 'getCryptoPrices') {
-              result = await executeGetCryptoPrices();
-            } else if (fc.name === 'navigateTo') {
-              result = JSON.stringify({ navigateTo: args.page });
-            }
+            result = await executeTool(fc.name!, args);
           } catch (err: any) {
             result = JSON.stringify({ error: err.message });
           }
@@ -824,7 +963,6 @@ export const aiChat = onRequest(
           },
         }));
 
-        // Add the assistant's function call parts and our tool responses
         const followupContents = [
           ...contents,
           { role: 'model', parts },

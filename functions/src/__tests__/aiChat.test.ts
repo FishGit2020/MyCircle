@@ -103,12 +103,13 @@ describe('aiChat', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Invalid request body' }));
   });
 
-  it('returns 500 when GEMINI_API_KEY is not set', async () => {
+  it('returns 500 when no AI provider is configured', async () => {
     delete process.env.GEMINI_API_KEY;
+    delete process.env.OLLAMA_BASE_URL;
     const req = createMockReq({});
     const res = createMockRes();
     await aiChat(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: 'GEMINI_API_KEY not configured' });
+    expect(res.json).toHaveBeenCalledWith({ error: 'No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)' });
   });
 });

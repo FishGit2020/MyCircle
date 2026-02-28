@@ -8,6 +8,7 @@ import { getCacheKey, getCachedData, setCachedData } from '../middleware/cache.j
 import { pubsub, WEATHER_UPDATE } from './pubsub.js';
 import { ALL_TOOLS } from '../../scripts/mcp-tools/mfe-tools.js';
 import { toGeminiFunctionDeclarations } from '../../scripts/mcp-tools/gemini-bridge.js';
+import { toOpenAITools } from '../../scripts/mcp-tools/openai-bridge.js';
 
 // Caches for stock, crypto, podcast, weather, and bible data
 const stockCache = new NodeCache({ stdTTL: 30, checkperiod: 10 });
@@ -856,29 +857,12 @@ export const resolvers = {
       history?: { role: string; content: string }[];
       context?: Record<string, unknown>;
     }) => {
+      const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
+      const ollamaModel = process.env.OLLAMA_MODEL || 'gemma2:2b';
       const geminiKey = process.env.GEMINI_API_KEY;
-      if (!geminiKey) throw new Error('GEMINI_API_KEY not configured');
+      if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)');
 
-      const { GoogleGenAI } = await import('@google/genai');
-      const ai = new GoogleGenAI({ apiKey: geminiKey });
-
-      // Convert shared tool definitions to Gemini format
-      const functionDeclarations = toGeminiFunctionDeclarations(ALL_TOOLS);
-      const tools = [{ functionDeclarations }];
-
-      // Build conversation history
-      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
-      if (history && Array.isArray(history)) {
-        for (const msg of history) {
-          contents.push({
-            role: msg.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: msg.content }],
-          });
-        }
-      }
-      contents.push({ role: 'user', parts: [{ text: message }] });
-
-      // Build context-aware system instruction
+      // Build context-aware system instruction (shared by both providers)
       let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, navigate users around the app, create flashcards, look up Bible verses, search podcasts, and bookmark Bible passages. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
 
       if (context && typeof context === 'object') {
@@ -904,6 +888,159 @@ export const resolvers = {
           systemInstruction += '\n\nUse this context to personalize responses. For example, if the user asks "how is the weather?" you can check their favorite or recent cities. If they ask about stocks, reference their watchlist.';
         }
       }
+
+      // ─── Ollama path (OpenAI-compatible API) ───────────────────
+      if (ollamaBaseUrl) {
+        const { default: OpenAI } = await import('openai');
+        const client = new OpenAI({ baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama' });
+
+        // Convert shared tool definitions to OpenAI format
+        const ollamaTools = toOpenAITools(ALL_TOOLS);
+
+        // Build OpenAI message array
+        const messages: OpenAI.ChatCompletionMessageParam[] = [
+          { role: 'system', content: systemInstruction },
+        ];
+        if (history && Array.isArray(history)) {
+          for (const msg of history) {
+            messages.push({
+              role: msg.role === 'assistant' ? 'assistant' : 'user',
+              content: msg.content,
+            });
+          }
+        }
+        messages.push({ role: 'user', content: message });
+
+        const toolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
+        const allActions: Array<{ type: string; payload: unknown }> = [];
+
+        // Try native tool calling first (works with qwen2.5, llama3.1+)
+        let completion: OpenAI.ChatCompletion;
+        let usedFallback = false;
+        try {
+          completion = await client.chat.completions.create({
+            model: ollamaModel,
+            messages,
+            tools: ollamaTools,
+          });
+        } catch {
+          // Model doesn't support native tools (e.g., gemma2:2b) — prompt-based fallback
+          usedFallback = true;
+          const toolPrompt = ollamaTools.map((t: any) =>
+            `- ${t.function.name}(${Object.keys(t.function.parameters.properties || {}).join(', ')}): ${t.function.description}`
+          ).join('\n');
+          const fallbackSystemPrompt = systemInstruction + '\n\n' +
+            'You have access to these tools:\n' + toolPrompt + '\n\n' +
+            'If the user\'s request needs a tool, respond with ONLY:\n' +
+            '<tool_call>{"name":"toolName","args":{"param":"value"}}</tool_call>\n\n' +
+            'Otherwise, respond normally.';
+          const fallbackMessages: OpenAI.ChatCompletionMessageParam[] = [
+            { role: 'system', content: fallbackSystemPrompt },
+            ...messages.slice(1), // skip original system message
+          ];
+          completion = await client.chat.completions.create({
+            model: ollamaModel,
+            messages: fallbackMessages,
+          });
+        }
+
+        const choice = completion.choices[0];
+
+        // Handle prompt-based fallback: parse <tool_call> from text
+        if (usedFallback) {
+          const text = choice.message.content || '';
+          const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/);
+          if (match) {
+            try {
+              const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
+              try {
+                const { result, actions } = await executeAiTool(parsed.name, parsed.args);
+                toolCalls.push({ name: parsed.name, args: parsed.args, result });
+                if (actions) allActions.push(...actions);
+              } catch (err: any) {
+                toolCalls.push({ name: parsed.name, args: parsed.args, result: JSON.stringify({ error: err.message }) });
+              }
+
+              // Send tool result back for final answer
+              const followup = await client.chat.completions.create({
+                model: ollamaModel,
+                messages: [
+                  ...messages,
+                  { role: 'assistant', content: text },
+                  { role: 'user', content: `Tool result for ${parsed.name}: ${toolCalls[0].result}\n\nPlease provide a helpful response based on this data.` },
+                ],
+              });
+              return {
+                response: followup.choices[0].message.content,
+                toolCalls,
+                actions: allActions.length > 0 ? allActions : null,
+              };
+            } catch { /* JSON parse failed — treat as plain text */ }
+          }
+          // No tool call parsed — return as plain text
+          return { response: text || 'Sorry, I could not generate a response.', toolCalls: null, actions: null };
+        }
+
+        // Native tool calls path
+        if (choice.finish_reason === 'tool_calls' && choice.message.tool_calls) {
+          for (const tc of choice.message.tool_calls) {
+            const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
+            try {
+              const { result, actions } = await executeAiTool(tc.function.name, args);
+              toolCalls.push({ name: tc.function.name, args, result });
+              if (actions) allActions.push(...actions);
+            } catch (err: any) {
+              toolCalls.push({ name: tc.function.name, args, result: JSON.stringify({ error: err.message }) });
+            }
+          }
+
+          // Send tool results back for final response
+          const followupMessages: OpenAI.ChatCompletionMessageParam[] = [
+            ...messages,
+            choice.message,
+            ...choice.message.tool_calls.map((tc, i) => ({
+              role: 'tool' as const,
+              tool_call_id: tc.id,
+              content: toolCalls[i].result || '',
+            })),
+          ];
+
+          const followup = await client.chat.completions.create({
+            model: ollamaModel,
+            messages: followupMessages,
+          });
+
+          const finalText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
+          return {
+            response: finalText,
+            toolCalls,
+            actions: allActions.length > 0 ? allActions : null,
+          };
+        }
+
+        const text = choice.message.content || 'Sorry, I could not generate a response.';
+        return { response: text, toolCalls: null, actions: null };
+      }
+
+      // ─── Gemini path (existing behavior) ───────────────────────
+      const { GoogleGenAI } = await import('@google/genai');
+      const ai = new GoogleGenAI({ apiKey: geminiKey! });
+
+      // Convert shared tool definitions to Gemini format
+      const functionDeclarations = toGeminiFunctionDeclarations(ALL_TOOLS);
+      const tools = [{ functionDeclarations }];
+
+      // Build conversation history
+      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+      if (history && Array.isArray(history)) {
+        for (const msg of history) {
+          contents.push({
+            role: msg.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: msg.content }],
+          });
+        }
+      }
+      contents.push({ role: 'user', parts: [{ text: message }] });
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
