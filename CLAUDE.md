@@ -70,3 +70,4 @@ Run `validate_all` after adding/removing features or packages.
 - [MCP Server](./docs/mcp.md) — MCP validators, AI tool registry, adding tools
 - [PR Lifecycle](./docs/pr-lifecycle.md) — branch protection, merge workflow
 - [CI/CD Pipeline](./docs/cicd.md) — pipeline details, troubleshooting
+- [Ollama Setup](./docs/ollama-setup.md) — self-hosted AI, Cloudflare tunnel/access, Firebase secrets, troubleshooting
