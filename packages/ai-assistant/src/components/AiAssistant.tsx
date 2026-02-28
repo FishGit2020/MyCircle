@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, useQuery, GET_OLLAMA_MODELS } from '@mycircle/shared';
 import { useAiChat } from '../hooks/useAiChat';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -16,11 +16,34 @@ const SUGGESTION_KEYS = [
 ] as const;
 
 const DEBUG_STORAGE_KEY = 'ai-debug-mode';
+const MODEL_STORAGE_KEY = 'mycircle-ai-model';
 
 export default function AiAssistant() {
   const { t } = useTranslation();
   const { messages, loading, error, canRetry, sendMessage, clearChat, retry } = useAiChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { data: modelsData } = useQuery(GET_OLLAMA_MODELS);
+  const models: string[] = modelsData?.ollamaModels ?? [];
+
+  const [selectedModel, setSelectedModel] = useState(() => {
+    try { return localStorage.getItem(MODEL_STORAGE_KEY) || ''; } catch { return ''; }
+  });
+
+  // Reset to first available model if saved model is no longer in the list
+  useEffect(() => {
+    if (models.length > 0 && (!selectedModel || !models.includes(selectedModel))) {
+      const first = models[0];
+      setSelectedModel(first);
+      try { localStorage.setItem(MODEL_STORAGE_KEY, first); } catch { /* */ }
+    }
+  }, [models, selectedModel]);
+
+  const handleModelChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const model = e.target.value;
+    setSelectedModel(model);
+    try { localStorage.setItem(MODEL_STORAGE_KEY, model); } catch { /* */ }
+  }, []);
 
   const [debugMode, setDebugMode] = useState(() => {
     try { return localStorage.getItem(DEBUG_STORAGE_KEY) === 'true'; } catch { return false; }
@@ -54,6 +77,22 @@ export default function AiAssistant() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Model selector — only shown when Ollama models are available */}
+          {models.length > 0 && (
+            <>
+              <label className="sr-only" htmlFor="ai-model-select">{t('ai.modelLabel')}</label>
+              <select
+                id="ai-model-select"
+                value={selectedModel}
+                onChange={handleModelChange}
+                className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              >
+                {models.map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </>
+          )}
           {/* Debug toggle */}
           <button
             type="button"

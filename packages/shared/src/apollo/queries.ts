@@ -383,9 +383,15 @@ export const GET_BIBLE_VERSIONS = gql`
   }
 `;
 
+export const GET_OLLAMA_MODELS = gql`
+  query GetOllamaModels {
+    ollamaModels
+  }
+`;
+
 export const AI_CHAT = gql`
-  mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON) {
-    aiChat(message: $message, history: $history, context: $context) {
+  mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON, $model: String) {
+    aiChat(message: $message, history: $history, context: $context, model: $model) {
       response
       toolCalls {
         name

@@ -449,6 +449,7 @@ const es: Record<TranslationKey, string> = {
   'ai.suggestFlashcard': 'Crea una tarjeta sobre hooks de React',
   'ai.suggestBible': 'Busca Juan 3:16',
   'ai.suggestPodcast': 'Busca podcasts de tecnolog\u00eda',
+  'ai.modelLabel': 'Modelo',
   'ai.debugToggle': 'Modo depuraci\u00f3n',
   'ai.debugArgs': 'Argumentos',
   'ai.debugResult': 'Resultado',

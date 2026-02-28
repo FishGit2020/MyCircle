@@ -449,6 +449,7 @@ const zh: Record<TranslationKey, string> = {
   'ai.suggestFlashcard': '\u521b\u5efa\u4e00\u5f20\u5173\u4e8eReact Hooks\u7684\u95ea\u5361',
   'ai.suggestBible': '\u67e5\u627e\u7ea6\u7ff0\u798f\u97f3 3:16',
   'ai.suggestPodcast': '\u641c\u7d22\u79d1\u6280\u64ad\u5ba2',
+  'ai.modelLabel': '\u6a21\u578b',
   'ai.debugToggle': '\u8c03\u8bd5\u6a21\u5f0f',
   'ai.debugArgs': '\u53c2\u6570',
   'ai.debugResult': '\u7ed3\u679c',

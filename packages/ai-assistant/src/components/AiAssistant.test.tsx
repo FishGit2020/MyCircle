@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
+import { MockedProvider } from '@apollo/client/testing/react';
+import { GET_OLLAMA_MODELS } from '@mycircle/shared';
 import AiAssistant from './AiAssistant';
 
 // Mock fetch globally
@@ -28,9 +30,16 @@ vi.mock('../hooks/useAiChat', () => {
 import { useAiChat } from '../hooks/useAiChat';
 const mockUseAiChat = vi.mocked(useAiChat);
 
+const ollamaModelsMock = {
+  request: { query: GET_OLLAMA_MODELS },
+  result: { data: { ollamaModels: [] } },
+};
+
 const renderWithProviders = (ui: React.ReactElement) => {
   return render(
-    <MemoryRouter>{ui}</MemoryRouter>
+    <MockedProvider mocks={[ollamaModelsMock]} addTypename={false}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </MockedProvider>
   );
 };
 
