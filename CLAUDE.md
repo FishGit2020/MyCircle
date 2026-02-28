@@ -28,6 +28,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **Responsive**: Mobile-first (`md:` = main breakpoint). Content needs `pb-20 md:pb-8` for BottomNav.
 - **Spanish i18n**: File uses Unicode escapes (`\u00f3`). Always read the exact line before editing.
 - **PR merge**: Always run `gh pr checks <PR#> --watch` and confirm **all** checks (ci, e2e, e2e-emulator) pass before merging. Never merge with failing or pending checks.
+- **Firebase secrets**: Use `printf` not `echo` when piping values — `echo` appends a trailing newline (`\n`) that corrupts URLs and tokens. Always: `printf "value" | npx firebase functions:secrets:set SECRET_NAME`
 
 ## Test Gotchas
 
