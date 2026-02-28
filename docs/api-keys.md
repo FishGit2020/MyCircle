@@ -217,6 +217,36 @@ firebase functions:secrets:set OLLAMA_BASE_URL
 firebase deploy --only functions
 ```
 
+### Cloudflare Access (tunnel authentication)
+
+If your Ollama instance is behind a Cloudflare Tunnel with Access protection, Cloud Functions needs a **Service Token** to authenticate.
+
+#### Setup steps
+
+1. Go to [Cloudflare Zero Trust](https://one.dash.cloudflare.com/) → **Access controls** → **Service credentials**
+2. Click **Create Service Token** → name: `cloud-functions` → **Non-expiring**
+3. Copy the **Client ID** and **Client Secret** (secret only shown once!)
+4. Go to **Access controls** → **Applications** → **Add application** → **Self-hosted**
+   - Application name: `Ollama API`
+   - Public hostname: `ollama.mycircledash.com`
+5. Add a policy:
+   - Action: **Service Auth**
+   - Include: **Service Token** → select `cloud-functions`
+6. Save the application
+7. Set Firebase secrets:
+
+```bash
+firebase functions:secrets:set CF_ACCESS_CLIENT_ID
+# Enter: your-client-id.access
+
+firebase functions:secrets:set CF_ACCESS_CLIENT_SECRET
+# Enter: your-client-secret
+
+firebase deploy --only functions
+```
+
+The code automatically passes `CF-Access-Client-Id` and `CF-Access-Client-Secret` headers when calling Ollama. If these secrets are not set, the headers are omitted (for setups without Cloudflare Access).
+
 ### Provider Priority
 
 - If `OLLAMA_BASE_URL` is set → Ollama is used (Gemini is ignored)
@@ -313,6 +343,8 @@ VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 | `GEMINI_API_KEY` | Google Gemini | For AI chat (unless Ollama set) |
 | `OLLAMA_BASE_URL` | Ollama | For self-hosted AI (optional) |
 | `OLLAMA_MODEL` | Ollama | Model name (default: gemma2:2b) |
+| `CF_ACCESS_CLIENT_ID` | Cloudflare Access | For Ollama tunnel auth |
+| `CF_ACCESS_CLIENT_SECRET` | Cloudflare Access | For Ollama tunnel auth |
 | `YOUVERSION_APP_KEY` | YouVersion | For Bible reader |
 | `RECAPTCHA_SECRET_KEY` | reCAPTCHA Enterprise | For App Check |
 
@@ -342,6 +374,10 @@ firebase functions:secrets:set PODCASTINDEX_API_KEY
 firebase functions:secrets:set PODCASTINDEX_API_SECRET
 firebase functions:secrets:set GEMINI_API_KEY
 firebase functions:secrets:set YOUVERSION_APP_KEY
+firebase functions:secrets:set OLLAMA_BASE_URL
+firebase functions:secrets:set OLLAMA_MODEL
+firebase functions:secrets:set CF_ACCESS_CLIENT_ID
+firebase functions:secrets:set CF_ACCESS_CLIENT_SECRET
 ```
 
 ### Emulator Testing (`.env.emulator`)
