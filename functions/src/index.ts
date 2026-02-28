@@ -125,19 +125,15 @@ export const graphql = onRequest(
     const server = await getServer();
 
     // App Check: verify request comes from our app (bot protection)
+    // Non-blocking — log failures but allow request to proceed.
+    // This avoids hard 403s when the custom domain (mycircledash.com)
+    // isn't yet in the reCAPTCHA Enterprise key's domain list.
     const appCheckToken = req.headers['x-firebase-appcheck'] as string;
     if (appCheckToken) {
       try {
         await getAppCheck().verifyToken(appCheckToken);
       } catch (err) {
-        logger.warn('App Check verification failed', { error: String(err) });
-        res.status(403).json({
-          errors: [{
-            message: 'App Check verification failed',
-            extensions: { code: 'UNAUTHENTICATED' }
-          }]
-        });
-        return;
+        logger.warn('App Check verification failed (non-blocking)', { error: String(err) });
       }
     }
 
