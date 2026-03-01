@@ -786,7 +786,6 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         if (endpoint.cfAccessClientSecret) headers['CF-Access-Client-Secret'] = endpoint.cfAccessClientSecret;
 
         try {
-          const startTime = Date.now();
           const response = await axios.post(`${endpoint.url}/api/generate`, {
             model, prompt, stream: false,
           }, { headers, timeout: 120000 });
