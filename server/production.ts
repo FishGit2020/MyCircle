@@ -11,7 +11,7 @@
  */
 import 'dotenv/config';
 import { resolve, join } from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
 import crypto from 'node:crypto';
 import express from 'express';
 import cors from 'cors';
@@ -58,18 +58,28 @@ function getPodcastIndexHeaders(apiKey: string, apiSecret: string): Record<strin
   };
 }
 
-// ─── MFE prefixes (must match assemble-firebase.mjs) ─────────────────
-const MFE_PREFIXES = [
-  'city-search', 'weather-display', 'stock-tracker', 'podcast-player',
-  'ai-assistant', 'bible-reader', 'worship-songs', 'notebook', 'baby-tracker',
-  'child-development', 'chinese-learning', 'english-learning',
-  'flashcards', 'work-tracker', 'cloud-files', 'model-benchmark',
-];
+// ─── MFE prefixes (auto-discovered from dist/firebase/) ──────────────
+// Any subdirectory containing assets/remoteEntry.js is treated as an MFE.
+// This eliminates the need to maintain a hardcoded list when adding new packages.
+function discoverMfePrefixes(staticRoot: string): string[] {
+  try {
+    return readdirSync(staticRoot)
+      .filter(name => {
+        const dir = join(staticRoot, name);
+        return statSync(dir).isDirectory()
+          && existsSync(join(dir, 'assets', 'remoteEntry.js'));
+      });
+  } catch {
+    return [];
+  }
+}
 
 async function startProduction() {
   const { app, httpServer, apolloServer } = await createApp();
 
   const STATIC_ROOT = resolve('dist/firebase');
+  const MFE_PREFIXES = discoverMfePrefixes(STATIC_ROOT);
+  console.log(`Discovered ${MFE_PREFIXES.length} MFE prefixes:`, MFE_PREFIXES);
 
   // ─── Health check ─────────────────────────────────────────────────
   app.get('/health', (_req, res) => {
