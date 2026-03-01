@@ -4,6 +4,7 @@ import { WindowEvents, StorageKeys, getApolloClient } from '@mycircle/shared';
 import {
   subscribeToAuthChanges,
   signInWithGoogle,
+  signInWithGoogleHint,
   signInWithEmail as firebaseSignInWithEmail,
   signUpWithEmail as firebaseSignUpWithEmail,
   resetPassword as firebaseResetPassword,
@@ -33,7 +34,37 @@ import {
   RecentCity,
   FavoriteCity,
   WatchlistItem,
+  KnownAccount,
 } from '../lib/firebase';
+import { useKnownAccounts } from '../hooks/useKnownAccounts';
+
+/** Keys preserved across sign-out (device-level prefs + account list) */
+const keysToPreserve = new Set([
+  StorageKeys.THEME,
+  StorageKeys.LOCALE,
+  StorageKeys.WEATHER_ALERTS,
+  StorageKeys.ANNOUNCEMENT_ALERTS,
+  StorageKeys.KNOWN_ACCOUNTS,
+]);
+
+/** Clear user-specific localStorage and dispatch change events */
+function clearUserSpecificStorage() {
+  Object.values(StorageKeys).forEach((key) => {
+    if (!keysToPreserve.has(key)) {
+      localStorage.removeItem(key);
+    }
+  });
+  window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
+}
 
 interface AuthContextType {
   user: User | null;
@@ -58,6 +89,9 @@ interface AuthContextType {
   recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
   refreshProfile: () => Promise<void>;
+  knownAccounts: KnownAccount[];
+  switchToAccount: (account: KnownAccount, password?: string) => Promise<void>;
+  removeKnownAccount: (uid: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -68,6 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [recentCities, setRecentCities] = useState<RecentCity[]>([]);
   const [favoriteCities, setFavoriteCities] = useState<FavoriteCity[]>([]);
+  const { accounts: knownAccounts, addOrUpdate, remove: removeKnownAccount, getOthers } = useKnownAccounts();
 
   const refreshProfile = async () => {
     if (user) {
@@ -84,12 +119,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = subscribeToAuthChanges(async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
+        // Track this account in the known accounts list
+        addOrUpdate(firebaseUser);
+
         // Link analytics sessions to this authenticated user
         const method = firebaseUser.providerData[0]?.providerId === 'password' ? 'email' : 'google';
         identifyUser(firebaseUser.uid, {
           sign_in_method: method,
         });
         logEvent('login', { method });
+
+        // Clear previous user's data before restoring from Firestore
+        clearUserSpecificStorage();
 
         const userProfile = await getUserProfile(firebaseUser.uid);
         setProfile(userProfile);
@@ -265,31 +306,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOutUser = async () => {
     try {
       await logOut();
-
-      // Clear user-specific localStorage keys, preserving device-level preferences
-      const keysToPreserve = new Set([
-        StorageKeys.THEME,
-        StorageKeys.LOCALE,
-        StorageKeys.WEATHER_ALERTS,
-        StorageKeys.ANNOUNCEMENT_ALERTS,
-      ]);
-      Object.values(StorageKeys).forEach((key) => {
-        if (!keysToPreserve.has(key)) {
-          localStorage.removeItem(key);
-        }
-      });
-
-      // Notify all widgets that data has been cleared
-      window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
-      window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
+      clearUserSpecificStorage();
       window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
 
       // Clear Apollo GraphQL cache to prevent stale queries from previous user
@@ -302,6 +319,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Sign out failed:', error);
       throw error;
     }
+  };
+
+  const switchToAccount = async (account: KnownAccount, password?: string) => {
+    if (account.providerId === 'google.com') {
+      await signInWithGoogleHint(account.email!);
+    } else {
+      if (!password) throw new Error('Password required for email accounts');
+      await firebaseSignInWithEmail(account.email!, password);
+    }
+    // onAuthStateChanged will handle clearing old data + restoring new profile
   };
 
   const updateDarkMode = async (darkMode: boolean) => {
@@ -501,6 +528,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         recentCities,
         favoriteCities,
         refreshProfile,
+        knownAccounts,
+        switchToAccount,
+        removeKnownAccount,
       }}
     >
       {children}

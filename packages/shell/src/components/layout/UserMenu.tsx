@@ -3,25 +3,59 @@ import { useTranslation } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { logEvent } from '../../lib/firebase';
+import type { KnownAccount } from '../../lib/firebase';
 import AuthModal from './AuthModal';
+
+function AccountAvatar({ account, size = 'sm' }: { account: { displayName: string | null; email: string | null; photoURL: string | null }; size?: 'sm' | 'md' }) {
+  const px = size === 'md' ? 'w-8 h-8' : 'w-6 h-6';
+  const textSize = size === 'md' ? 'text-sm' : 'text-xs';
+  if (account.photoURL) {
+    return (
+      <img
+        src={account.photoURL}
+        alt={account.displayName || 'User'}
+        className={`${px} rounded-full flex-shrink-0`}
+      />
+    );
+  }
+  return (
+    <div className={`${px} rounded-full bg-blue-500 flex items-center justify-center text-white font-medium flex-shrink-0 ${textSize}`}>
+      {account.displayName?.charAt(0) || account.email?.charAt(0) || 'U'}
+    </div>
+  );
+}
 
 export default function UserMenu() {
   const { t } = useTranslation();
-  const { user, loading, signOut, updateDarkMode } = useAuth();
+  const { user, loading, signOut, updateDarkMode, knownAccounts, switchToAccount, removeKnownAccount } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [switchingUid, setSwitchingUid] = useState<string | null>(null);
+  const [passwordPromptUid, setPasswordPromptUid] = useState<string | null>(null);
+  const [password, setPassword] = useState('');
+  const [switchError, setSwitchError] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setPasswordPromptUid(null);
+        setPassword('');
+        setSwitchError('');
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (passwordPromptUid && passwordInputRef.current) {
+      passwordInputRef.current.focus();
+    }
+  }, [passwordPromptUid]);
 
   if (loading) {
     return (
@@ -66,6 +100,44 @@ export default function UserMenu() {
     );
   }
 
+  const otherAccounts = knownAccounts.filter((a) => a.uid !== user.uid).sort((a, b) => b.lastSignedInAt - a.lastSignedInAt);
+
+  const handleSwitchAccount = async (account: KnownAccount) => {
+    if (account.providerId === 'password') {
+      setPasswordPromptUid(account.uid);
+      setPassword('');
+      setSwitchError('');
+      return;
+    }
+    setSwitchingUid(account.uid);
+    try {
+      await switchToAccount(account);
+      setIsOpen(false);
+    } catch {
+      setSwitchingUid(null);
+    }
+  };
+
+  const handlePasswordSwitch = async (account: KnownAccount) => {
+    setSwitchingUid(account.uid);
+    setSwitchError('');
+    try {
+      await switchToAccount(account, password);
+      setIsOpen(false);
+      setPasswordPromptUid(null);
+      setPassword('');
+    } catch {
+      setSwitchError(t('auth.errorInvalidCredential'));
+      setSwitchingUid(null);
+    }
+  };
+
+  const handleRemoveAccount = (uid: string) => {
+    if (window.confirm(t('auth.accountRemoveConfirm'))) {
+      removeKnownAccount(uid);
+    }
+  };
+
   return (
     <div className="relative" ref={menuRef}>
       <button
@@ -89,17 +161,117 @@ export default function UserMenu() {
       </button>
 
       {isOpen && (
-        <div role="menu" className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+        <div role="menu" className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+          {/* Current account */}
           <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-            <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
-              {user.displayName || 'User'}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-              {user.email}
-            </p>
+            <div className="flex items-center gap-2">
+              <AccountAvatar account={user} size="md" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                  {user.displayName || 'User'}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {user.email}
+                </p>
+              </div>
+              <span className="text-xs text-green-600 dark:text-green-400 font-medium flex-shrink-0">
+                {t('auth.currentAccount')}
+              </span>
+            </div>
           </div>
+
+          {/* Other accounts */}
+          {otherAccounts.length > 0 && (
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              {otherAccounts.map((account) => (
+                <div key={account.uid}>
+                  <div className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchAccount(account)}
+                      disabled={switchingUid === account.uid}
+                      className="flex items-center gap-2 min-w-0 flex-1 text-left"
+                      aria-label={`Switch to ${account.displayName || account.email}`}
+                    >
+                      <AccountAvatar account={account} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-gray-800 dark:text-white truncate">
+                          {switchingUid === account.uid ? t('auth.switchingAccount') : (account.displayName || 'User')}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {account.email}
+                        </p>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAccount(account.uid)}
+                      className="p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors flex-shrink-0"
+                      aria-label={t('auth.removeAccount')}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Inline password prompt for email accounts */}
+                  {passwordPromptUid === account.uid && (
+                    <div className="px-4 pb-2">
+                      <div className="flex gap-1">
+                        <input
+                          ref={passwordInputRef}
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && password) handlePasswordSwitch(account);
+                            if (e.key === 'Escape') { setPasswordPromptUid(null); setPassword(''); setSwitchError(''); }
+                          }}
+                          placeholder={t('auth.enterPassword')}
+                          className="flex-1 min-w-0 text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-white placeholder-gray-400"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handlePasswordSwitch(account)}
+                          disabled={!password || switchingUid === account.uid}
+                          className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                        >
+                          {t('auth.switchButton')}
+                        </button>
+                      </div>
+                      {switchError && (
+                        <p className="text-xs text-red-500 mt-1">{switchError}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add another account */}
           <button
             role="menuitem"
+            type="button"
+            onClick={() => {
+              if (knownAccounts.length >= 5) return;
+              setAuthModalOpen(true);
+              setIsOpen(false);
+            }}
+            disabled={knownAccounts.length >= 5}
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            {knownAccounts.length >= 5 ? t('auth.maxAccountsReached') : t('auth.addAnotherAccount')}
+          </button>
+
+          {/* Theme toggle */}
+          <button
+            role="menuitem"
+            type="button"
             onClick={handleThemeToggle}
             className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
           >
@@ -110,18 +282,25 @@ export default function UserMenu() {
             )}
             {theme === 'light' ? t('theme.dark') : t('theme.light')}
           </button>
+
+          {/* Sign out */}
           <button
             role="menuitem"
+            type="button"
             onClick={() => {
               signOut();
               setIsOpen(false);
             }}
-            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
           >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
             {t('auth.signOut')}
           </button>
         </div>
       )}
+      <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </div>
   );
 }

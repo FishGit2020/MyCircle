@@ -209,6 +209,14 @@ const es: Record<TranslationKey, string> = {
   'auth.errorPasswordMismatch': 'Las contrase\u00f1as no coinciden.',
   'auth.errorEnterEmail': 'Ingresa tu correo electr\u00f3nico primero.',
   'auth.errorGeneric': 'Error de autenticaci\u00f3n. Int\u00e9ntalo de nuevo.',
+  'auth.addAnotherAccount': 'Agregar otra cuenta',
+  'auth.removeAccount': 'Eliminar cuenta',
+  'auth.switchingAccount': 'Cambiando...',
+  'auth.enterPassword': 'Ingresa la contrase\u00f1a para cambiar',
+  'auth.switchButton': 'Cambiar',
+  'auth.currentAccount': 'Actual',
+  'auth.accountRemoveConfirm': '\u00bfEliminar esta cuenta de la lista?',
+  'auth.maxAccountsReached': 'M\u00e1ximo de cuentas alcanzado',
 
   // Errors
   'error.somethingWentWrong': 'Algo sali\u00f3 mal',
