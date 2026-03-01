@@ -39,6 +39,16 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - Rebuild shared before MFE tests: `pnpm --filter @mycircle/shared build`
 - e2e tests live in top-level `e2e/` — search entire repo when removing features
 
+## Adding New MFE Packages
+
+When adding a new micro frontend, update ALL of these integration points:
+
+1. **Shell**: `App.tsx` (lazy import + route), `vite.config.ts` (federation remote URL), `remotes.d.ts` (type declaration), `tailwind.config.js` (content path), `WidgetDashboard.tsx` (WidgetType + DEFAULT_LAYOUT + WIDGET_COMPONENTS + WIDGET_ROUTES), `BottomNav.tsx` (nav item + icon)
+2. **Testing**: Mock file in `packages/shell/src/test/mocks/`, alias in **both** root `vitest.config.ts` AND `packages/shell/vitest.config.ts`, update hardcoded widget/nav counts in existing tests
+3. **Deployment**: `deploy/docker/Dockerfile` (COPY in build + runtime stages), `scripts/assemble-firebase.mjs` (copy block + mfeDirs array), `server/production.ts` (`MFE_PREFIXES` array)
+4. **Other**: `firestore.rules` (if new subcollections), root `package.json` (`dev:*` and `preview:*` scripts), i18n keys in all 3 locales, `docs/architecture.md`, `README.md`
+5. **functions/ has separate strict tsconfig**: `noUnusedLocals: true` — root `pnpm typecheck` doesn't catch it. Always verify with `cd functions && npx tsc --noEmit` before pushing backend changes.
+
 ## Removing Features
 
 Filter stale localStorage IDs or the app crashes (`undefined is not a function`):

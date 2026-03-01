@@ -63,6 +63,7 @@ const MFE_PREFIXES = [
   'city-search', 'weather-display', 'stock-tracker', 'podcast-player',
   'ai-assistant', 'bible-reader', 'worship-songs', 'notebook', 'baby-tracker',
   'child-development', 'chinese-learning', 'english-learning',
+  'flashcards', 'work-tracker', 'cloud-files', 'model-benchmark',
 ];
 
 async function startProduction() {
