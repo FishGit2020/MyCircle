@@ -3,6 +3,9 @@ import crypto from 'crypto';
 import NodeCache from 'node-cache';
 import { GraphQLScalarType, Kind } from 'graphql';
 import type OpenAI from 'openai';
+import { getFirestore } from 'firebase-admin/firestore';
+import { logAiChatInteraction } from './aiChatLogger.js';
+import type { AiToolCallTiming } from './aiChatLogger.js';
 
 // JSON scalar for arbitrary JSON values in GraphQL
 function parseLiteralJSON(ast: import('graphql').ValueNode): unknown {
@@ -776,6 +779,13 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         context?: Record<string, unknown>;
         model?: string;
       }) => {
+        const startTime = Date.now();
+        let inputTokens = 0;
+        let outputTokens = 0;
+        const toolCallTimings: AiToolCallTiming[] = [];
+        let trackedProvider = '';
+        let trackedModel = '';
+
         const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
         const ollamaModel = model || 'gemma2:2b';
         const geminiKey = process.env.GEMINI_API_KEY;
@@ -830,6 +840,8 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
 
         // ─── Ollama path ──────────────────────────────────────
         if (ollamaBaseUrl) {
+          trackedProvider = 'ollama';
+          trackedModel = ollamaModel;
           const { default: OpenAI } = await import('openai');
           const client = new OpenAI({
             baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
@@ -863,6 +875,8 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           let usedFallback = false;
           try {
             completion = await client.chat.completions.create({ model: ollamaModel, messages, tools: ollamaTools });
+            inputTokens += completion.usage?.prompt_tokens || 0;
+            outputTokens += completion.usage?.completion_tokens || 0;
           } catch {
             usedFallback = true;
             const toolPrompt = ollamaTools.map(t => {
@@ -875,6 +889,8 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
               ...messages.slice(1),
             ];
             completion = await client.chat.completions.create({ model: ollamaModel, messages: fallbackMessages });
+            inputTokens += completion.usage?.prompt_tokens || 0;
+            outputTokens += completion.usage?.completion_tokens || 0;
           }
 
           const choice = completion.choices[0];
@@ -888,16 +904,23 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
               try {
                 const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
                 let result = '';
+                const toolStart = Date.now();
                 try { result = await executeTool(parsed.name, parsed.args); }
                 catch (err: any) { result = JSON.stringify({ error: err.message }); }
+                toolCallTimings.push({ name: parsed.name, durationMs: Date.now() - toolStart });
                 toolCalls.push({ name: parsed.name, args: parsed.args, result });
                 const followup = await client.chat.completions.create({
                   model: ollamaModel,
                   messages: [...messages, { role: 'assistant', content: text }, { role: 'user', content: `Tool result for ${parsed.name}: ${result}\n\nPlease provide a helpful response based on this data.` }],
                 });
-                return { response: followup.choices[0].message.content, toolCalls, actions: null };
+                inputTokens += followup.usage?.prompt_tokens || 0;
+                outputTokens += followup.usage?.completion_tokens || 0;
+                const answerText = followup.choices[0].message.content || '';
+                logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true });
+                return { response: answerText, toolCalls, actions: null };
               } catch { /* JSON parse failed */ }
             }
+            logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: true });
             return { response: text || 'Sorry, I could not generate a response.', toolCalls: null, actions: null };
           }
 
@@ -905,8 +928,10 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             for (const tc of choice.message.tool_calls) {
               const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
               let result = '';
+              const toolStart = Date.now();
               try { result = await executeTool(tc.function.name, args); }
               catch (err: any) { result = JSON.stringify({ error: err.message }); }
+              toolCallTimings.push({ name: tc.function.name, durationMs: Date.now() - toolStart });
               toolCalls.push({ name: tc.function.name, args, result });
             }
             const followupMessages: OpenAI.ChatCompletionMessageParam[] = [
@@ -914,13 +939,21 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
               ...choice.message.tool_calls.map((tc, i) => ({ role: 'tool' as const, tool_call_id: tc.id, content: toolCalls[i].result || '' })),
             ];
             const followup = await client.chat.completions.create({ model: ollamaModel, messages: followupMessages });
-            return { response: followup.choices[0].message.content || 'I found some information but had trouble formatting it.', toolCalls, actions: null };
+            inputTokens += followup.usage?.prompt_tokens || 0;
+            outputTokens += followup.usage?.completion_tokens || 0;
+            const answerText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
+            logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: false });
+            return { response: answerText, toolCalls, actions: null };
           }
 
-          return { response: choice.message.content || 'Sorry, I could not generate a response.', toolCalls: null, actions: null };
+          const ollamaText = choice.message.content || 'Sorry, I could not generate a response.';
+          logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: ollamaText, status: 'success', usedFallback: false });
+          return { response: ollamaText, toolCalls: null, actions: null };
         }
 
         // ─── Gemini path ──────────────────────────────────────
+        trackedProvider = 'gemini';
+        trackedModel = 'gemini-2.5-flash';
         const { GoogleGenAI, Type } = await import('@google/genai');
         type FD = import('@google/genai').FunctionDeclaration;
         const ai = new GoogleGenAI({ apiKey: geminiKey! });
@@ -942,6 +975,8 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         contents.push({ role: 'user', parts: [{ text: message }] });
 
         const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents, config: { tools, systemInstruction } });
+        inputTokens += (response as any).usageMetadata?.promptTokenCount || 0;
+        outputTokens += (response as any).usageMetadata?.candidatesTokenCount || 0;
         const toolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
         const parts = response.candidates?.[0]?.content?.parts || [];
         let hasToolCalls = false;
@@ -950,8 +985,10 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             hasToolCalls = true;
             const args = (part.functionCall.args || {}) as Record<string, unknown>;
             let result = '';
+            const toolStart = Date.now();
             try { result = await executeTool(part.functionCall.name!, args); }
             catch (err: any) { result = JSON.stringify({ error: err.message }); }
+            toolCallTimings.push({ name: part.functionCall.name!, durationMs: Date.now() - toolStart });
             toolCalls.push({ name: part.functionCall.name!, args, result });
           }
         }
@@ -962,10 +999,14 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             contents: [...contents, { role: 'model', parts }, { role: 'user', parts: toolResponseParts }],
             config: { systemInstruction },
           });
+          inputTokens += (followup as any).usageMetadata?.promptTokenCount || 0;
+          outputTokens += (followup as any).usageMetadata?.candidatesTokenCount || 0;
           const finalText = followup.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join('') || 'I found some information but had trouble formatting it.';
+          logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false });
           return { response: finalText, toolCalls, actions: null };
         }
         const textResponse = parts.map((p: any) => p.text).filter(Boolean).join('') || 'Sorry, I could not generate a response.';
+        logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: textResponse, status: 'success', usedFallback: false });
         return { response: textResponse, toolCalls: null, actions: null };
       },
     },
@@ -983,6 +1024,119 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         } catch {
           return [];
         }
+      },
+
+      aiUsageSummary: async (_: any, { days = 7 }: { days?: number }) => {
+        const db = getFirestore();
+        const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        const snap = await db.collection('aiChatLogs')
+          .where('timestamp', '>=', since)
+          .orderBy('timestamp', 'desc')
+          .get();
+
+        let totalInputTokens = 0;
+        let totalOutputTokens = 0;
+        let ollamaCalls = 0;
+        let geminiCalls = 0;
+        let totalLatency = 0;
+        let errorCount = 0;
+        const dailyMap: Record<string, { calls: number; latencySum: number; tokens: number; errors: number }> = {};
+
+        for (const doc of snap.docs) {
+          const d = doc.data();
+          totalInputTokens += d.inputTokens || 0;
+          totalOutputTokens += d.outputTokens || 0;
+          totalLatency += d.latencyMs || 0;
+          if (d.provider === 'ollama') ollamaCalls++;
+          else geminiCalls++;
+          if (d.status === 'error') errorCount++;
+
+          const dateKey = d.timestamp?.toDate?.()
+            ? d.timestamp.toDate().toISOString().slice(0, 10)
+            : new Date().toISOString().slice(0, 10);
+          if (!dailyMap[dateKey]) dailyMap[dateKey] = { calls: 0, latencySum: 0, tokens: 0, errors: 0 };
+          dailyMap[dateKey].calls++;
+          dailyMap[dateKey].latencySum += d.latencyMs || 0;
+          dailyMap[dateKey].tokens += (d.inputTokens || 0) + (d.outputTokens || 0);
+          if (d.status === 'error') dailyMap[dateKey].errors++;
+        }
+
+        const totalCalls = snap.size;
+        const dailyBreakdown = Object.entries(dailyMap)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([date, stats]) => ({
+            date,
+            calls: stats.calls,
+            avgLatencyMs: stats.calls > 0 ? Math.round(stats.latencySum / stats.calls) : 0,
+            tokens: stats.tokens,
+            errors: stats.errors,
+          }));
+
+        return {
+          totalCalls,
+          totalInputTokens,
+          totalOutputTokens,
+          ollamaCalls,
+          geminiCalls,
+          avgLatencyMs: totalCalls > 0 ? Math.round(totalLatency / totalCalls) : 0,
+          errorCount,
+          errorRate: totalCalls > 0 ? errorCount / totalCalls : 0,
+          dailyBreakdown,
+          since: since.toISOString(),
+        };
+      },
+
+      ollamaStatus: async () => {
+        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
+        if (!ollamaBaseUrl) return { models: [], reachable: false, latencyMs: null };
+        try {
+          const headers: Record<string, string> = {};
+          if (process.env.CF_ACCESS_CLIENT_ID) headers['CF-Access-Client-Id'] = process.env.CF_ACCESS_CLIENT_ID;
+          if (process.env.CF_ACCESS_CLIENT_SECRET) headers['CF-Access-Client-Secret'] = process.env.CF_ACCESS_CLIENT_SECRET;
+          const start = Date.now();
+          const { data } = await axios.get(`${ollamaBaseUrl}/api/ps`, { headers, timeout: 5000 });
+          const latencyMs = Date.now() - start;
+          const models = (data.models || []).map((m: any) => ({
+            name: m.name || '',
+            size: (m.size || 0) / 1e9,
+            sizeVram: (m.size_vram || 0) / 1e9,
+            expiresAt: m.expires_at || '',
+          }));
+          return { models, reachable: true, latencyMs };
+        } catch {
+          return { models: [], reachable: false, latencyMs: null };
+        }
+      },
+
+      aiRecentLogs: async (_: any, { limit = 20 }: { limit?: number }) => {
+        const db = getFirestore();
+        const cap = Math.min(limit, 50);
+        const snap = await db.collection('aiChatLogs')
+          .orderBy('timestamp', 'desc')
+          .limit(cap)
+          .get();
+
+        return snap.docs.map(doc => {
+          const d = doc.data();
+          return {
+            id: doc.id,
+            timestamp: d.timestamp?.toDate?.()?.toISOString() || new Date().toISOString(),
+            provider: d.provider || 'unknown',
+            model: d.model || 'unknown',
+            inputTokens: d.inputTokens || 0,
+            outputTokens: d.outputTokens || 0,
+            latencyMs: d.latencyMs || 0,
+            toolCalls: (d.toolCalls || []).map((tc: any) => ({
+              name: tc.name || '',
+              durationMs: tc.durationMs ?? null,
+              error: tc.error ?? null,
+            })),
+            questionPreview: d.questionPreview || '',
+            answerPreview: d.answerPreview || '',
+            status: d.status || 'unknown',
+            error: d.error ?? null,
+          };
+        });
       },
 
       weather: async (_: any, { lat, lon }: { lat: number; lon: number }) => {

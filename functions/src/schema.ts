@@ -249,6 +249,66 @@ export const typeDefs = `#graphql
 
     # AI queries
     ollamaModels: [String!]!
+    aiUsageSummary(days: Int = 7): AiUsageSummary!
+    ollamaStatus: OllamaStatus!
+    aiRecentLogs(limit: Int = 20): [AiChatLogEntry!]!
+  }
+
+  # ─── AI Usage & Monitoring Types ──────────────────────────────
+
+  type AiUsageSummary {
+    totalCalls: Int!
+    totalInputTokens: Int!
+    totalOutputTokens: Int!
+    ollamaCalls: Int!
+    geminiCalls: Int!
+    avgLatencyMs: Float!
+    errorCount: Int!
+    errorRate: Float!
+    dailyBreakdown: [AiDailyStats!]!
+    since: String!
+  }
+
+  type AiDailyStats {
+    date: String!
+    calls: Int!
+    avgLatencyMs: Float!
+    tokens: Int!
+    errors: Int!
+  }
+
+  type OllamaRunningModel {
+    name: String!
+    size: Float!
+    sizeVram: Float!
+    expiresAt: String!
+  }
+
+  type OllamaStatus {
+    models: [OllamaRunningModel!]!
+    reachable: Boolean!
+    latencyMs: Int
+  }
+
+  type AiToolCallLog {
+    name: String!
+    durationMs: Int
+    error: String
+  }
+
+  type AiChatLogEntry {
+    id: String!
+    timestamp: String!
+    provider: String!
+    model: String!
+    inputTokens: Int!
+    outputTokens: Int!
+    latencyMs: Int!
+    toolCalls: [AiToolCallLog!]!
+    questionPreview: String!
+    answerPreview: String!
+    status: String!
+    error: String
   }
 
   # ─── AI Chat Types ─────────────────────────────────────────────
