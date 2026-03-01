@@ -412,6 +412,24 @@ Exposes `CloudFiles` component via Module Federation. Port **3017**.
 - Auth-gated: requires Firebase sign-in
 - Route: `/files`, keyboard shortcut: `g u`
 
+### Model Benchmark - `packages/model-benchmark/`
+
+Exposes `ModelBenchmark` component via Module Federation. Port **3004**.
+
+**Key Behavior:**
+- Compare AI model performance across different Ollama endpoints (e.g. CPU NAS vs GPU server)
+- Tabbed UI: **Run** (execute benchmarks), **Endpoints** (CRUD for Ollama endpoints), **Results** (comparison table), **History** (past runs from Firestore)
+- Uses Ollama's native `/api/generate` endpoint (not OpenAI-compat) for nanosecond-precision timing data: `eval_count`, `eval_duration`, `prompt_eval_duration`, `load_duration`, `total_duration`
+- Computed metrics: tokens/second, prompt tokens/second, time-to-first-token, speedup ratio
+- 5 built-in benchmark prompts (simple, reasoning, code, summary, creative) + custom prompt support
+- Endpoints support optional Cloudflare Access credentials (CF Client ID + Secret)
+- Results persisted in Firestore: `users/{uid}/benchmarkEndpoints/{id}` and `users/{uid}/benchmarkRuns/{id}`
+- Dashboard widget reads summary from `StorageKeys.BENCHMARK_CACHE` localStorage
+- `WindowEvents.BENCHMARK_CHANGED` for cross-tab sync
+- Auth-gated: requires Firebase sign-in
+- GraphQL rate limit: 5 benchmark operations per minute per user
+- Route: `/benchmark`
+
 ---
 
 ## Navigation & Discovery

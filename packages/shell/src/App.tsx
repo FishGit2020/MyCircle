@@ -27,6 +27,7 @@ const ChildDevelopmentMF = tracedLazy('mfe_childdev_load', () => import('childDe
 const FlashCardsMF = tracedLazy('mfe_flashcards_load', () => import('flashcards/FlashCards'), getPerf);
 const WorkTrackerMF = tracedLazy('mfe_work_tracker_load', () => import('workTracker/WorkTracker'), getPerf);
 const CloudFilesMF = tracedLazy('mfe_cloud_files_load', () => import('cloudFiles/CloudFiles'), getPerf);
+const ModelBenchmarkMF = tracedLazy('mfe_benchmark_load', () => import('modelBenchmark/ModelBenchmark'), getPerf);
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -379,6 +380,23 @@ function CloudFilesPage() {
   );
 }
 
+// Fallback for Model Benchmark MFE
+const ModelBenchmarkFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Model Benchmark module is loading...</p>
+  </div>
+);
+
+function BenchmarkPage() {
+  return (
+    <ErrorBoundary fallback={<ModelBenchmarkFallback />}>
+      <Suspense fallback={<Loading />}>
+        <ModelBenchmarkMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -415,6 +433,7 @@ export default function App() {
         <Route path="flashcards" element={<FlashCardsPage />} />
         <Route path="work-tracker" element={<WorkTrackerPage />} />
         <Route path="files" element={<CloudFilesPage />} />
+        <Route path="benchmark" element={<BenchmarkPage />} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />

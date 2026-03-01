@@ -75,3 +75,8 @@ declare module 'cloudFiles/CloudFiles' {
   const CloudFiles: React.ComponentType;
   export default CloudFiles;
 }
+
+declare module 'modelBenchmark/ModelBenchmark' {
+  const ModelBenchmark: React.ComponentType;
+  export default ModelBenchmark;
+}

@@ -148,6 +148,10 @@ const cloudFilesRemote = isProduction
   ? '/cloud-files/assets/remoteEntry.js'
   : 'http://localhost:3017/assets/remoteEntry.js';
 
+const modelBenchmarkRemote = isProduction
+  ? '/model-benchmark/assets/remoteEntry.js'
+  : 'http://localhost:3004/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -168,7 +172,8 @@ export default defineConfig({
         childDevelopment: childDevelopmentRemote,
         flashcards: flashcardsRemote,
         workTracker: workTrackerRemote,
-        cloudFiles: cloudFilesRemote
+        cloudFiles: cloudFilesRemote,
+        modelBenchmark: modelBenchmarkRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

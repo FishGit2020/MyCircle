@@ -467,6 +467,95 @@ export const AI_CHAT = gql`
   }
 `;
 
+// ─── Benchmark Queries ─────────────────────────────────────
+
+export const GET_BENCHMARK_ENDPOINTS = gql`
+  query GetBenchmarkEndpoints {
+    benchmarkEndpoints {
+      id
+      url
+      name
+      hasCfAccess
+    }
+  }
+`;
+
+export const GET_BENCHMARK_HISTORY = gql`
+  query GetBenchmarkHistory($limit: Int) {
+    benchmarkHistory(limit: $limit) {
+      id
+      userId
+      results
+      createdAt
+    }
+  }
+`;
+
+export const GET_BENCHMARK_SUMMARY = gql`
+  query GetBenchmarkSummary {
+    benchmarkSummary {
+      lastRunId
+      lastRunAt
+      endpointCount
+      fastestEndpoint
+      fastestTps
+    }
+  }
+`;
+
+export const RUN_BENCHMARK = gql`
+  mutation RunBenchmark($endpointId: String!, $model: String!, $prompt: String!) {
+    runBenchmark(endpointId: $endpointId, model: $model, prompt: $prompt) {
+      endpointId
+      endpointName
+      model
+      prompt
+      response
+      timing {
+        totalDuration
+        loadDuration
+        promptEvalCount
+        promptEvalDuration
+        evalCount
+        evalDuration
+        tokensPerSecond
+        promptTokensPerSecond
+        timeToFirstToken
+      }
+      error
+      timestamp
+    }
+  }
+`;
+
+export const SAVE_BENCHMARK_ENDPOINT = gql`
+  mutation SaveBenchmarkEndpoint($input: BenchmarkEndpointInput!) {
+    saveBenchmarkEndpoint(input: $input) {
+      id
+      url
+      name
+      hasCfAccess
+    }
+  }
+`;
+
+export const DELETE_BENCHMARK_ENDPOINT = gql`
+  mutation DeleteBenchmarkEndpoint($id: String!) {
+    deleteBenchmarkEndpoint(id: $id)
+  }
+`;
+
+export const SAVE_BENCHMARK_RUN = gql`
+  mutation SaveBenchmarkRun($results: JSON!) {
+    saveBenchmarkRun(results: $results) {
+      id
+      userId
+      results
+      createdAt
+    }
+  }
+`;
+
 export const WEATHER_UPDATES = gql`
   ${WEATHER_CONDITION_FRAGMENT}
   subscription WeatherUpdates($lat: Float!, $lon: Float!) {

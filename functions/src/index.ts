@@ -155,6 +155,17 @@ export const graphql = onRequest(
     // Firebase already parses the body, so we use it directly
     const { body, headers } = req;
 
+    // Extract uid for resolvers that need authenticated Firestore access
+    const uid = await verifyAuthToken(req);
+
+    // Rate-limit benchmark mutations (5 req/min per user)
+    if (uid && opName.includes('benchmark')) {
+      if (checkRateLimit(`benchmark:${uid}`, 5, 60)) {
+        res.status(429).json({ errors: [{ message: 'Benchmark rate limit exceeded. Please wait a moment.' }] });
+        return;
+      }
+    }
+
     try {
       const result = await server.executeOperation(
         {
@@ -164,7 +175,7 @@ export const graphql = onRequest(
           extensions: body.extensions,
         },
         {
-          contextValue: { headers }
+          contextValue: { headers, uid }
         }
       );
 

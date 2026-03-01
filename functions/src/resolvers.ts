@@ -773,6 +773,86 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
     JSON: JSONScalar,
 
     Mutation: {
+      runBenchmark: async (_: any, { endpointId, model, prompt }: { endpointId: string; model: string; prompt: string }, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+        const endpointDoc = await db.doc(`users/${uid}/benchmarkEndpoints/${endpointId}`).get();
+        if (!endpointDoc.exists) throw new Error('Endpoint not found');
+        const endpoint = endpointDoc.data()!;
+
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (endpoint.cfAccessClientId) headers['CF-Access-Client-Id'] = endpoint.cfAccessClientId;
+        if (endpoint.cfAccessClientSecret) headers['CF-Access-Client-Secret'] = endpoint.cfAccessClientSecret;
+
+        try {
+          const startTime = Date.now();
+          const response = await axios.post(`${endpoint.url}/api/generate`, {
+            model, prompt, stream: false,
+          }, { headers, timeout: 120000 });
+
+          const d = response.data;
+          const evalDurationSec = (d.eval_duration || 1) / 1e9;
+          const promptEvalDurationSec = (d.prompt_eval_duration || 1) / 1e9;
+          const timing = {
+            totalDuration: (d.total_duration || 0) / 1e9,
+            loadDuration: (d.load_duration || 0) / 1e9,
+            promptEvalCount: d.prompt_eval_count || 0,
+            promptEvalDuration: promptEvalDurationSec,
+            evalCount: d.eval_count || 0,
+            evalDuration: evalDurationSec,
+            tokensPerSecond: (d.eval_count || 0) / evalDurationSec,
+            promptTokensPerSecond: (d.prompt_eval_count || 0) / promptEvalDurationSec,
+            timeToFirstToken: ((d.prompt_eval_duration || 0) + (d.load_duration || 0)) / 1e9,
+          };
+
+          return {
+            endpointId, endpointName: endpoint.name, model, prompt,
+            response: d.response || '', timing, error: null,
+            timestamp: new Date().toISOString(),
+          };
+        } catch (err: any) {
+          return {
+            endpointId, endpointName: endpoint.name, model, prompt,
+            response: '', timing: null, error: err.message || 'Benchmark failed',
+            timestamp: new Date().toISOString(),
+          };
+        }
+      },
+
+      saveBenchmarkEndpoint: async (_: any, { input }: { input: { url: string; name: string; cfAccessClientId?: string; cfAccessClientSecret?: string } }, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+        const ref = db.collection(`users/${uid}/benchmarkEndpoints`).doc();
+        const data = {
+          url: input.url, name: input.name,
+          cfAccessClientId: input.cfAccessClientId || null,
+          cfAccessClientSecret: input.cfAccessClientSecret || null,
+          createdAt: new Date().toISOString(),
+        };
+        await ref.set(data);
+        return { id: ref.id, url: input.url, name: input.name, hasCfAccess: !!(input.cfAccessClientId && input.cfAccessClientSecret) };
+      },
+
+      deleteBenchmarkEndpoint: async (_: any, { id }: { id: string }, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+        await db.doc(`users/${uid}/benchmarkEndpoints/${id}`).delete();
+        return true;
+      },
+
+      saveBenchmarkRun: async (_: any, { results }: { results: any }, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+        const ref = db.collection(`users/${uid}/benchmarkRuns`).doc();
+        const data = { userId: uid, results, createdAt: new Date().toISOString() };
+        await ref.set(data);
+        return { id: ref.id, ...data };
+      },
+
       aiChat: async (_: any, { message, history, context, model }: {
         message: string;
         history?: { role: string; content: string }[];
@@ -1326,6 +1406,63 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         const parsed = translation ? parseInt(translation, 10) : NaN;
         const bibleId = isNaN(parsed) ? DEFAULT_YOUVERSION_BIBLE_ID : parsed;
         return await getYouVersionPassage(bibleId, reference, yvKey);
+      },
+
+      // ─── Benchmark Resolvers ──────────────────────────────────
+
+      benchmarkEndpoints: async (_: any, __: any, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+        const snap = await db.collection(`users/${uid}/benchmarkEndpoints`).get();
+        return snap.docs.map(doc => {
+          const d = doc.data();
+          return {
+            id: doc.id, url: d.url, name: d.name,
+            hasCfAccess: !!(d.cfAccessClientId && d.cfAccessClientSecret),
+          };
+        });
+      },
+
+      benchmarkHistory: async (_: any, { limit = 10 }: { limit?: number }, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+        const cap = Math.min(limit, 50);
+        const snap = await db.collection(`users/${uid}/benchmarkRuns`)
+          .orderBy('createdAt', 'desc').limit(cap).get();
+        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      },
+
+      benchmarkSummary: async (_: any, __: any, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+
+        const endpointSnap = await db.collection(`users/${uid}/benchmarkEndpoints`).get();
+        const endpointCount = endpointSnap.size;
+
+        const runSnap = await db.collection(`users/${uid}/benchmarkRuns`)
+          .orderBy('createdAt', 'desc').limit(1).get();
+
+        if (runSnap.empty) {
+          return { lastRunId: null, lastRunAt: null, endpointCount, fastestEndpoint: null, fastestTps: null };
+        }
+
+        const lastDoc = runSnap.docs[0];
+        const lastRun = lastDoc.data();
+        const results = lastRun.results || [];
+        let fastestEndpoint: string | null = null;
+        let fastestTps: number | null = null;
+        for (const r of results) {
+          const tps = r.timing?.tokensPerSecond || 0;
+          if (tps > (fastestTps || 0)) {
+            fastestTps = tps;
+            fastestEndpoint = r.endpointName;
+          }
+        }
+
+        return { lastRunId: lastDoc.id, lastRunAt: lastRun.createdAt, endpointCount, fastestEndpoint, fastestTps };
       },
     }
   };
