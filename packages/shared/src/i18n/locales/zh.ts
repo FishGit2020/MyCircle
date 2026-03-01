@@ -209,6 +209,14 @@ const zh: Record<TranslationKey, string> = {
   'auth.errorPasswordMismatch': '\u4e24\u6b21\u5bc6\u7801\u4e0d\u4e00\u81f4\u3002',
   'auth.errorEnterEmail': '\u8bf7\u5148\u8f93\u5165\u90ae\u7bb1\u5730\u5740\u3002',
   'auth.errorGeneric': '\u8eab\u4efd\u9a8c\u8bc1\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002',
+  'auth.addAnotherAccount': '\u6dfb\u52a0\u5176\u4ed6\u8d26\u6237',
+  'auth.removeAccount': '\u79fb\u9664\u8d26\u6237',
+  'auth.switchingAccount': '\u5207\u6362\u4e2d...',
+  'auth.enterPassword': '\u8f93\u5165\u5bc6\u7801\u4ee5\u5207\u6362',
+  'auth.switchButton': '\u5207\u6362',
+  'auth.currentAccount': '\u5f53\u524d',
+  'auth.accountRemoveConfirm': '\u4ece\u5217\u8868\u4e2d\u79fb\u9664\u6b64\u8d26\u6237\uff1f',
+  'auth.maxAccountsReached': '\u5df2\u8fbe\u5230\u6700\u5927\u8d26\u6237\u6570',
 
   // Errors
   'error.somethingWentWrong': '\u51fa\u4e86\u70b9\u95ee\u9898',

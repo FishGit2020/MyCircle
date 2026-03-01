@@ -207,6 +207,14 @@ const en = {
   'auth.errorPasswordMismatch': 'Passwords do not match.',
   'auth.errorEnterEmail': 'Enter your email address first.',
   'auth.errorGeneric': 'Authentication failed. Please try again.',
+  'auth.addAnotherAccount': 'Add another account',
+  'auth.removeAccount': 'Remove account',
+  'auth.switchingAccount': 'Switching...',
+  'auth.enterPassword': 'Enter password to switch',
+  'auth.switchButton': 'Switch',
+  'auth.currentAccount': 'Current',
+  'auth.accountRemoveConfirm': 'Remove this account from the list?',
+  'auth.maxAccountsReached': 'Maximum accounts reached',
 
   // Errors
   'error.somethingWentWrong': 'Something went wrong',

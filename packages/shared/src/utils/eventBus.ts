@@ -96,6 +96,7 @@ export const StorageKeys = {
   CLOUD_FILES_CACHE: 'cloud-files-cache',
   PODCAST_LAST_PLAYED: 'podcast-last-played',
   PODCAST_PLAYED_EPISODES: 'podcast-played-episodes',
+  KNOWN_ACCOUNTS: 'known-accounts',
 } as const;
 
 export interface CitySelectedEvent {

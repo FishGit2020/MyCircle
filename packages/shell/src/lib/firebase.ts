@@ -153,6 +153,16 @@ export interface RecentCity {
   searchedAt: Date;
 }
 
+// Known account metadata for multi-account switching
+export interface KnownAccount {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  providerId: 'google.com' | 'password';
+  lastSignedInAt: number;
+}
+
 // Auth functions
 
 // Handle redirect result on page load (fires after signInWithRedirect returns)
@@ -188,6 +198,32 @@ export async function signInWithGoogle() {
       return null; // page will redirect
     }
     log.error('Error signing in with Google:', error);
+    throw error;
+  }
+}
+
+export async function signInWithGoogleHint(email: string) {
+  if (!auth || !googleProvider) return null;
+  const hintedProvider = new GoogleAuthProvider();
+  hintedProvider.setCustomParameters({ login_hint: email });
+  try {
+    const result = await signInWithPopup(auth, hintedProvider);
+    await ensureUserProfile(result.user);
+    return result.user;
+  } catch (error: any) {
+    const code = error?.code || '';
+    if (
+      code === 'auth/internal-error' ||
+      code === 'auth/popup-blocked' ||
+      code === 'auth/popup-closed-by-user' ||
+      code === 'auth/cancelled-popup-request'
+    ) {
+      log.warn('Popup sign-in (hint) failed, falling back to redirect:', code);
+      hintedProvider.setCustomParameters({ login_hint: email });
+      await signInWithRedirect(auth!, hintedProvider);
+      return null;
+    }
+    log.error('Error signing in with Google (hint):', error);
     throw error;
   }
 }

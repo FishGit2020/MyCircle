@@ -7,6 +7,8 @@ const mockSignInWithEmail = vi.fn();
 const mockSignUpWithEmail = vi.fn();
 const mockResetPassword = vi.fn();
 const mockSignOut = vi.fn();
+const mockSwitchToAccount = vi.fn();
+const mockRemoveKnownAccount = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -16,6 +18,7 @@ vi.mock('@mycircle/shared', () => ({
 
 let mockUser: any = null;
 let mockLoading = false;
+let mockKnownAccounts: any[] = [];
 
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
@@ -27,6 +30,9 @@ vi.mock('../../context/AuthContext', () => ({
     resetPassword: mockResetPassword,
     signOut: mockSignOut,
     updateDarkMode: vi.fn(),
+    knownAccounts: mockKnownAccounts,
+    switchToAccount: mockSwitchToAccount,
+    removeKnownAccount: mockRemoveKnownAccount,
   }),
 }));
 
@@ -42,6 +48,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockUser = null;
   mockLoading = false;
+  mockKnownAccounts = [];
+  // Reset window.confirm
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
 });
 
 describe('UserMenu', () => {
@@ -60,7 +69,6 @@ describe('UserMenu', () => {
   it('opens auth modal when sign in button is clicked', () => {
     render(<UserMenu />);
     fireEvent.click(screen.getByText('auth.signIn'));
-    // AuthModal renders a dialog
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
@@ -122,5 +130,109 @@ describe('UserMenu', () => {
 
     fireEvent.mouseDown(document);
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('shows "Current" badge for current account', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    mockKnownAccounts = [
+      { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
+    ];
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    expect(screen.getByText('auth.currentAccount')).toBeInTheDocument();
+  });
+
+  it('shows other accounts in dropdown', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    mockKnownAccounts = [
+      { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 2000 },
+      { uid: 'user2', email: 'other@test.com', displayName: 'Other', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
+    ];
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    expect(screen.getByText('Other')).toBeInTheDocument();
+    expect(screen.getByText('other@test.com')).toBeInTheDocument();
+  });
+
+  it('calls switchToAccount when clicking a Google account', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    const otherAccount = { uid: 'user2', email: 'other@test.com', displayName: 'Other', photoURL: null, providerId: 'google.com' as const, lastSignedInAt: 1000 };
+    mockKnownAccounts = [
+      { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 2000 },
+      otherAccount,
+    ];
+    mockSwitchToAccount.mockResolvedValue(undefined);
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    fireEvent.click(screen.getByLabelText('Switch to Other'));
+    expect(mockSwitchToAccount).toHaveBeenCalledWith(otherAccount);
+  });
+
+  it('shows password prompt for email accounts', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    mockKnownAccounts = [
+      { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 2000 },
+      { uid: 'user2', email: 'email@test.com', displayName: 'Email User', photoURL: null, providerId: 'password', lastSignedInAt: 1000 },
+    ];
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    fireEvent.click(screen.getByLabelText('Switch to Email User'));
+    // Password prompt should appear
+    expect(screen.getByPlaceholderText('auth.enterPassword')).toBeInTheDocument();
+    expect(screen.getByText('auth.switchButton')).toBeInTheDocument();
+  });
+
+  it('calls removeKnownAccount after confirmation', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    mockKnownAccounts = [
+      { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 2000 },
+      { uid: 'user2', email: 'other@test.com', displayName: 'Other', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
+    ];
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    fireEvent.click(screen.getByLabelText('auth.removeAccount'));
+    expect(window.confirm).toHaveBeenCalledWith('auth.accountRemoveConfirm');
+    expect(mockRemoveKnownAccount).toHaveBeenCalledWith('user2');
+  });
+
+  it('shows "Add another account" button', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    mockKnownAccounts = [];
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    expect(screen.getByText('auth.addAnotherAccount')).toBeInTheDocument();
+  });
+
+  it('shows max accounts message when 5 accounts reached', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    mockKnownAccounts = Array.from({ length: 5 }, (_, i) => ({
+      uid: `user${i}`,
+      email: `user${i}@test.com`,
+      displayName: `User ${i}`,
+      photoURL: null,
+      providerId: 'google.com',
+      lastSignedInAt: 1000 + i,
+    }));
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    expect(screen.getByText('auth.maxAccountsReached')).toBeInTheDocument();
+  });
+
+  it('does not show other accounts section when there are none', () => {
+    mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
+    mockKnownAccounts = [
+      { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
+    ];
+    render(<UserMenu />);
+
+    fireEvent.click(screen.getByLabelText('auth.userMenu'));
+    expect(screen.queryByLabelText('auth.removeAccount')).not.toBeInTheDocument();
   });
 });
