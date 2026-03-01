@@ -54,5 +54,8 @@ auth-users.json
 # Capacitor
 ios/App/Pods/
 
+# Claude Code local settings (personal permissions)
+.claude/settings.local.json
+
 # Stray scripts
 replace_weather.ps1
