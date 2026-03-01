@@ -389,6 +389,67 @@ export const GET_OLLAMA_MODELS = gql`
   }
 `;
 
+export const GET_AI_USAGE_SUMMARY = gql`
+  query GetAiUsageSummary($days: Int) {
+    aiUsageSummary(days: $days) {
+      totalCalls
+      totalInputTokens
+      totalOutputTokens
+      ollamaCalls
+      geminiCalls
+      avgLatencyMs
+      errorCount
+      errorRate
+      dailyBreakdown {
+        date
+        calls
+        avgLatencyMs
+        tokens
+        errors
+      }
+      since
+    }
+  }
+`;
+
+export const GET_OLLAMA_STATUS = gql`
+  query GetOllamaStatus {
+    ollamaStatus {
+      models {
+        name
+        size
+        sizeVram
+        expiresAt
+      }
+      reachable
+      latencyMs
+    }
+  }
+`;
+
+export const GET_AI_RECENT_LOGS = gql`
+  query GetAiRecentLogs($limit: Int) {
+    aiRecentLogs(limit: $limit) {
+      id
+      timestamp
+      provider
+      model
+      inputTokens
+      outputTokens
+      latencyMs
+      toolCalls {
+        name
+        durationMs
+        error
+      }
+      questionPreview
+      answerPreview
+      status
+      error
+    }
+  }
+`;
+
 export const AI_CHAT = gql`
   mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON, $model: String) {
     aiChat(message: $message, history: $history, context: $context, model: $model) {

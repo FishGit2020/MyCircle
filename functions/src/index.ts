@@ -16,6 +16,8 @@ import { z } from 'zod';
 import type { FunctionDeclaration } from '@google/genai';
 import type OpenAI from 'openai';
 import { verifyRecaptchaToken } from './recaptcha.js';
+import { logAiChatInteraction } from './aiChatLogger.js';
+import type { AiToolCallTiming } from './aiChatLogger.js';
 
 // Initialize Firebase Admin (idempotent)
 if (getApps().length === 0) {
@@ -706,9 +708,20 @@ export const aiChat = onRequest(
       return JSON.stringify({ error: `Unknown tool: ${name}` });
     }
 
+    // ─── Metrics tracking ──────────────────────────────────────
+    const startTime = Date.now();
+    let inputTokens = 0;
+    let outputTokens = 0;
+    const toolCallTimings: AiToolCallTiming[] = [];
+    let trackedProvider = '';
+    let trackedModel = '';
+    let answerText = '';
+
     try {
       // ─── Ollama path (OpenAI-compatible API) ───────────────────
       if (ollamaBaseUrl) {
+        trackedProvider = 'ollama';
+        trackedModel = ollamaModel;
         const { default: OpenAI } = await import('openai');
         const client = new OpenAI({
           baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
@@ -752,6 +765,8 @@ export const aiChat = onRequest(
             messages,
             tools: ollamaTools,
           });
+          inputTokens += completion.usage?.prompt_tokens || 0;
+          outputTokens += completion.usage?.completion_tokens || 0;
         } catch {
           // Model doesn't support native tools (e.g., gemma2:2b) — prompt-based fallback
           usedFallback = true;
@@ -772,6 +787,8 @@ export const aiChat = onRequest(
             model: ollamaModel,
             messages: fallbackMessages,
           });
+          inputTokens += completion.usage?.prompt_tokens || 0;
+          outputTokens += completion.usage?.completion_tokens || 0;
         }
 
         const choice = completion.choices[0];
@@ -786,8 +803,10 @@ export const aiChat = onRequest(
             try {
               const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
               let result = '';
+              const toolStart = Date.now();
               try { result = await executeTool(parsed.name, parsed.args); }
               catch (err: any) { result = JSON.stringify({ error: err.message }); }
+              toolCallTimings.push({ name: parsed.name, durationMs: Date.now() - toolStart });
               toolCalls.push({ name: parsed.name, args: parsed.args, result });
 
               // Send tool result back for final answer
@@ -799,12 +818,20 @@ export const aiChat = onRequest(
                   { role: 'user', content: `Tool result for ${parsed.name}: ${result}\n\nPlease provide a helpful response based on this data.` },
                 ],
               });
-              res.status(200).json({ response: followup.choices[0].message.content, toolCalls });
+              inputTokens += followup.usage?.prompt_tokens || 0;
+              outputTokens += followup.usage?.completion_tokens || 0;
+              answerText = followup.choices[0].message.content || '';
+              logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true });
+              logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
+              res.status(200).json({ response: answerText, toolCalls });
               return;
             } catch { /* JSON parse failed — treat as plain text */ }
           }
           // No tool call parsed — return as plain text
-          res.status(200).json({ response: text || 'Sorry, I could not generate a response.' });
+          answerText = text || 'Sorry, I could not generate a response.';
+          logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true });
+          logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
+          res.status(200).json({ response: answerText });
           return;
         }
 
@@ -813,11 +840,13 @@ export const aiChat = onRequest(
           for (const tc of choice.message.tool_calls) {
             const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
             let result = '';
+            const toolStart = Date.now();
             try {
               result = await executeTool(tc.function.name, args);
             } catch (err: any) {
               result = JSON.stringify({ error: err.message });
             }
+            toolCallTimings.push({ name: tc.function.name, durationMs: Date.now() - toolStart });
             toolCalls.push({ name: tc.function.name, args, result });
           }
 
@@ -836,19 +865,27 @@ export const aiChat = onRequest(
             model: ollamaModel,
             messages: followupMessages,
           });
+          inputTokens += followup.usage?.prompt_tokens || 0;
+          outputTokens += followup.usage?.completion_tokens || 0;
 
           const finalText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
+          logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false });
+          logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
           res.status(200).json({ response: finalText, toolCalls });
           return;
         }
 
         // No tool calls — return direct text response
         const text = choice.message.content || 'Sorry, I could not generate a response.';
+        logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: false });
+        logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
         res.status(200).json({ response: text });
         return;
       }
 
       // ─── Gemini path (existing behavior) ───────────────────────
+      trackedProvider = 'gemini';
+      trackedModel = 'gemini-2.5-flash';
       const { GoogleGenAI, Type } = await import('@google/genai');
       const ai = new GoogleGenAI({ apiKey: geminiKey! });
 
@@ -935,6 +972,8 @@ export const aiChat = onRequest(
           systemInstruction,
         },
       });
+      inputTokens += (response as any).usageMetadata?.promptTokenCount || 0;
+      outputTokens += (response as any).usageMetadata?.candidatesTokenCount || 0;
 
       // Process function calls if any
       const toolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
@@ -949,11 +988,13 @@ export const aiChat = onRequest(
           const args = (fc.args || {}) as Record<string, unknown>;
           let result = '';
 
+          const toolStart = Date.now();
           try {
             result = await executeTool(fc.name!, args);
           } catch (err: any) {
             result = JSON.stringify({ error: err.message });
           }
+          toolCallTimings.push({ name: fc.name!, durationMs: Date.now() - toolStart });
 
           toolCalls.push({ name: fc.name!, args, result });
         }
@@ -981,17 +1022,24 @@ export const aiChat = onRequest(
             systemInstruction: 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. Summarize the tool results in a natural, helpful way. Be concise.',
           },
         });
+        inputTokens += (followup as any).usageMetadata?.promptTokenCount || 0;
+        outputTokens += (followup as any).usageMetadata?.candidatesTokenCount || 0;
 
         const finalText = followup.text || 'I found some information but had trouble formatting it.';
+        logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false });
+        logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
         res.status(200).json({ response: finalText, toolCalls });
         return;
       }
 
       // No tool calls — return direct text response
       const text = response.text || 'Sorry, I could not generate a response.';
+      logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: false });
+      logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
       res.status(200).json({ response: text });
     } catch (err: any) {
       logger.error('AI Chat error', { error: err.message || String(err), status: err.status });
+      logAiChatInteraction({ userId: aiUid!, provider: trackedProvider || 'unknown', model: trackedModel || 'unknown', inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: '', status: 'error', error: err.message || String(err), usedFallback: false });
       if (err.status === 429) {
         res.status(429).json({ error: 'Rate limit exceeded. Please try again in a moment.' });
         return;

@@ -1,8 +1,10 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useTranslation, useQuery, GET_OLLAMA_MODELS } from '@mycircle/shared';
 import { useAiChat } from '../hooks/useAiChat';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
+
+const AiMonitor = lazy(() => import('./AiMonitor'));
 
 const SUGGESTION_KEYS = [
   'ai.suggestWeather',
@@ -25,6 +27,8 @@ export default function AiAssistant() {
 
   const { data: modelsData } = useQuery(GET_OLLAMA_MODELS);
   const models: string[] = modelsData?.ollamaModels ?? [];
+
+  const [activeTab, setActiveTab] = useState<'chat' | 'monitor'>('chat');
 
   const [selectedModel, setSelectedModel] = useState(() => {
     try { return localStorage.getItem(MODEL_STORAGE_KEY) || ''; } catch { return ''; }
@@ -78,7 +82,7 @@ export default function AiAssistant() {
         </div>
         <div className="flex items-center gap-2">
           {/* Model selector — only shown when Ollama models are available */}
-          {models.length > 0 && (
+          {activeTab === 'chat' && models.length > 0 && (
             <>
               <label className="sr-only" htmlFor="ai-model-select">{t('ai.modelLabel')}</label>
               <select
@@ -94,22 +98,24 @@ export default function AiAssistant() {
             </>
           )}
           {/* Debug toggle */}
-          <button
-            type="button"
-            onClick={toggleDebug}
-            className={`text-xs px-2 py-1 rounded transition-colors ${
-              debugMode
-                ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
-            }`}
-            aria-label={t('ai.debugToggle')}
-            title={t('ai.debugToggle')}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-          </button>
-          {messages.length > 0 && (
+          {activeTab === 'chat' && (
+            <button
+              type="button"
+              onClick={toggleDebug}
+              className={`text-xs px-2 py-1 rounded transition-colors ${
+                debugMode
+                  ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                  : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+              }`}
+              aria-label={t('ai.debugToggle')}
+              title={t('ai.debugToggle')}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </button>
+          )}
+          {activeTab === 'chat' && messages.length > 0 && (
             <button
               type="button"
               onClick={clearChat}
@@ -122,77 +128,112 @@ export default function AiAssistant() {
         </div>
       </div>
 
-      {/* Messages area */}
-      <div
-        className={`flex-1 space-y-4 mb-4 min-h-0 ${messages.length > 0 || loading ? 'overflow-y-auto' : 'overflow-hidden'}`}
-        role="list"
-        aria-label={t('ai.chatMessages')}
-        aria-live="polite"
-      >
-        {messages.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 dark:text-gray-500">
-            <svg className="w-16 h-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-            <p className="text-lg font-medium">{t('ai.emptyTitle')}</p>
-            <p className="text-sm mt-2 max-w-sm">{t('ai.emptyHint')}</p>
-
-            {/* Suggested prompts */}
-            <div className="flex flex-wrap justify-center gap-2 mt-6 max-w-md">
-              {SUGGESTION_KEYS.map(key => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => sendMessage(t(key))}
-                  className="px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                >
-                  {t(key)}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {messages.map(msg => (
-          <ChatMessage key={msg.id} message={msg} debugMode={debugMode} />
-        ))}
-
-        {loading && (
-          <div className="flex justify-start" role="status" aria-label={t('ai.thinking')}>
-            <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
-              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="flex gap-1">
-                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </span>
-                {t('ai.thinking')}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
+      {/* Tab bar */}
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+        <button
+          type="button"
+          onClick={() => setActiveTab('chat')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'chat'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          {t('ai.tabChat')}
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('monitor')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'monitor'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          {t('ai.tabMonitor')}
+        </button>
       </div>
 
-      {/* Error display with retry */}
-      {error && (
-        <div className="mb-3 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center justify-between gap-2" role="alert">
-          <span className="text-red-600 dark:text-red-400 text-sm">{error}</span>
-          {canRetry && (
-            <button
-              type="button"
-              onClick={retry}
-              className="flex-shrink-0 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline transition-colors"
-            >
-              {t('ai.retry')}
-            </button>
-          )}
-        </div>
-      )}
+      {/* Tab content */}
+      {activeTab === 'monitor' ? (
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">Loading...</div>}>
+          <AiMonitor />
+        </Suspense>
+      ) : (
+        <>
+          {/* Messages area */}
+          <div
+            className={`flex-1 space-y-4 mb-4 min-h-0 ${messages.length > 0 || loading ? 'overflow-y-auto' : 'overflow-hidden'}`}
+            role="list"
+            aria-label={t('ai.chatMessages')}
+            aria-live="polite"
+          >
+            {messages.length === 0 && !loading && (
+              <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 dark:text-gray-500">
+                <svg className="w-16 h-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <p className="text-lg font-medium">{t('ai.emptyTitle')}</p>
+                <p className="text-sm mt-2 max-w-sm">{t('ai.emptyHint')}</p>
 
-      {/* Input */}
-      <ChatInput onSend={sendMessage} disabled={loading} />
+                {/* Suggested prompts */}
+                <div className="flex flex-wrap justify-center gap-2 mt-6 max-w-md">
+                  {SUGGESTION_KEYS.map(key => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => sendMessage(t(key))}
+                      className="px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    >
+                      {t(key)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {messages.map(msg => (
+              <ChatMessage key={msg.id} message={msg} debugMode={debugMode} />
+            ))}
+
+            {loading && (
+              <div className="flex justify-start" role="status" aria-label={t('ai.thinking')}>
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="flex gap-1">
+                      <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </span>
+                    {t('ai.thinking')}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Error display with retry */}
+          {error && (
+            <div className="mb-3 px-4 py-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center justify-between gap-2" role="alert">
+              <span className="text-red-600 dark:text-red-400 text-sm">{error}</span>
+              {canRetry && (
+                <button
+                  type="button"
+                  onClick={retry}
+                  className="flex-shrink-0 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 underline transition-colors"
+                >
+                  {t('ai.retry')}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Input */}
+          <ChatInput onSend={sendMessage} disabled={loading} />
+        </>
+      )}
     </div>
   );
 }
