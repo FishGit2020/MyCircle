@@ -212,6 +212,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Flashcards** | Unified learning hub: quiz mode, handwriting practice canvas, character editor with Pinyin keyboard, 88 English phrases, 3D flip cards, Bible verses, custom cards, and mastery tracking | `FlashCards` |
 | **Work Tracker** | Firestore-backed daily work log with timeline view and real-time sync | `WorkTracker` |
 | **Cloud Files** | Upload, share, and download files (images, PDFs, docs) via Cloud Function | `CloudFiles` |
+| **Model Benchmark** | Compare AI model performance across Ollama endpoints (CPU vs GPU), nanosecond-precision timing | `ModelBenchmark` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets

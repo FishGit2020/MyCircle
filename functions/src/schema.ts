@@ -252,6 +252,11 @@ export const typeDefs = `#graphql
     aiUsageSummary(days: Int = 7): AiUsageSummary!
     ollamaStatus: OllamaStatus!
     aiRecentLogs(limit: Int = 20): [AiChatLogEntry!]!
+
+    # Benchmark queries
+    benchmarkEndpoints: [BenchmarkEndpoint!]!
+    benchmarkHistory(limit: Int = 10): [BenchmarkRun!]!
+    benchmarkSummary: BenchmarkSummary!
   }
 
   # ─── AI Usage & Monitoring Types ──────────────────────────────
@@ -337,8 +342,66 @@ export const typeDefs = `#graphql
     content: String!
   }
 
+  # ─── Benchmark Types ──────────────────────────────────────────
+
+  input BenchmarkEndpointInput {
+    url: String!
+    name: String!
+    cfAccessClientId: String
+    cfAccessClientSecret: String
+  }
+
+  type BenchmarkEndpoint {
+    id: String!
+    url: String!
+    name: String!
+    hasCfAccess: Boolean!
+  }
+
+  type BenchmarkTimingResult {
+    totalDuration: Float!
+    loadDuration: Float!
+    promptEvalCount: Int!
+    promptEvalDuration: Float!
+    evalCount: Int!
+    evalDuration: Float!
+    tokensPerSecond: Float!
+    promptTokensPerSecond: Float!
+    timeToFirstToken: Float!
+  }
+
+  type BenchmarkRunResult {
+    endpointId: String!
+    endpointName: String!
+    model: String!
+    prompt: String!
+    response: String!
+    timing: BenchmarkTimingResult
+    error: String
+    timestamp: String!
+  }
+
+  type BenchmarkRun {
+    id: String!
+    userId: String!
+    results: [BenchmarkRunResult!]!
+    createdAt: String!
+  }
+
+  type BenchmarkSummary {
+    lastRunId: String
+    lastRunAt: String
+    endpointCount: Int!
+    fastestEndpoint: String
+    fastestTps: Float
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String): AiChatResponse!
+    runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
+    saveBenchmarkEndpoint(input: BenchmarkEndpointInput!): BenchmarkEndpoint!
+    deleteBenchmarkEndpoint(id: String!): Boolean!
+    saveBenchmarkRun(results: JSON!): BenchmarkRun!
   }
 
   schema {
