@@ -35,6 +35,7 @@ export default defineConfig({
       'flashcards/FlashCards': resolve(__dirname, './src/test/mocks/FlashCardsMock.tsx'),
       'workTracker/WorkTracker': resolve(__dirname, './src/test/mocks/WorkTrackerMock.tsx'),
       'cloudFiles/CloudFiles': resolve(__dirname, './src/test/mocks/CloudFilesMock.tsx'),
+      'modelBenchmark/ModelBenchmark': resolve(__dirname, './src/test/mocks/ModelBenchmarkMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './src/test/mocks/pwaRegisterReactMock.ts')
     }
   }
