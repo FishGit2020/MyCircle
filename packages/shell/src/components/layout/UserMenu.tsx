@@ -1,10 +1,67 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { logEvent } from '../../lib/firebase';
 import type { KnownAccount } from '../../lib/firebase';
 import AuthModal from './AuthModal';
+
+const EXPORT_VERSION = 1;
+
+// Keys to skip during export (sensitive or device-specific)
+const SKIP_KEYS = new Set(['known-accounts']);
+
+function exportUserData() {
+  const data: Record<string, unknown> = {};
+  const allKeys = Object.values(StorageKeys);
+  for (const key of allKeys) {
+    if (SKIP_KEYS.has(key)) continue;
+    const value = localStorage.getItem(key);
+    if (value !== null) {
+      try { data[key] = JSON.parse(value); } catch { data[key] = value; }
+    }
+  }
+  const exportObj = {
+    version: EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    data,
+  };
+  const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mycircle-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importUserData(file: File): Promise<{ imported: number; skipped: number }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result as string);
+        if (!parsed.version || !parsed.data || typeof parsed.data !== 'object') {
+          reject(new Error('Invalid backup file format'));
+          return;
+        }
+        const validKeys = new Set(Object.values(StorageKeys));
+        let imported = 0;
+        let skipped = 0;
+        for (const [key, value] of Object.entries(parsed.data)) {
+          if (SKIP_KEYS.has(key) || !validKeys.has(key)) { skipped++; continue; }
+          localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+          imported++;
+        }
+        resolve({ imported, skipped });
+      } catch {
+        reject(new Error('Failed to parse backup file'));
+      }
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsText(file);
+  });
+}
 
 function AccountAvatar({ account, size = 'sm' }: { account: { displayName: string | null; email: string | null; photoURL: string | null }; size?: 'sm' | 'md' }) {
   const px = size === 'md' ? 'w-8 h-8' : 'w-6 h-6';
@@ -35,8 +92,30 @@ export default function UserMenu() {
   const [passwordPromptUid, setPasswordPromptUid] = useState<string | null>(null);
   const [password, setPassword] = useState('');
   const [switchError, setSwitchError] = useState('');
+  const [importStatus, setImportStatus] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = useCallback(() => {
+    exportUserData();
+    logEvent('data_export');
+    setIsOpen(false);
+  }, []);
+
+  const handleImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { imported } = await importUserData(file);
+      setImportStatus(`${imported} items restored`);
+      logEvent('data_import', { imported });
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (err: unknown) {
+      setImportStatus(err instanceof Error ? err.message : 'Import failed');
+    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -282,6 +361,37 @@ export default function UserMenu() {
             )}
             {theme === 'light' ? t('theme.dark') : t('theme.light')}
           </button>
+
+          {/* Export data */}
+          <button
+            role="menuitem"
+            type="button"
+            onClick={handleExport}
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            {t('settings.exportData')}
+          </button>
+
+          {/* Import data */}
+          <button
+            role="menuitem"
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            {t('settings.importData')}
+          </button>
+          <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
+
+          {importStatus && (
+            <div className="px-4 py-2 text-xs text-blue-600 dark:text-blue-400">{importStatus}</div>
+          )}
 
           {/* Sign out */}
           <button
