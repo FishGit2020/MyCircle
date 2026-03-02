@@ -275,6 +275,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   aiChat: AiChatResponse;
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
+  deleteBenchmarkRun: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
@@ -291,6 +292,11 @@ export type MutationAiChatArgs = {
 
 
 export type MutationDeleteBenchmarkEndpointArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteBenchmarkRunArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -832,7 +838,14 @@ export type GetBenchmarkHistoryQueryVariables = Exact<{
 }>;
 
 
-export type GetBenchmarkHistoryQuery = { __typename?: 'Query', benchmarkHistory: Array<{ __typename?: 'BenchmarkRun', id: string, createdAt: string, results: Array<{ __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, error?: string | null, timing?: { __typename?: 'BenchmarkTimingResult', tokensPerSecond: number } | null }> }> };
+export type GetBenchmarkHistoryQuery = { __typename?: 'Query', benchmarkHistory: Array<{ __typename?: 'BenchmarkRun', id: string, createdAt: string, results: Array<{ __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, prompt: string, error?: string | null, timing?: { __typename?: 'BenchmarkTimingResult', tokensPerSecond: number, promptTokensPerSecond: number, timeToFirstToken: number, totalDuration: number } | null }> }> };
+
+export type DeleteBenchmarkRunMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type DeleteBenchmarkRunMutation = { __typename?: 'Mutation', deleteBenchmarkRun: boolean };
 
 export type GetBenchmarkSummaryQueryVariables = Exact<{ [key: string]: never; }>;
 

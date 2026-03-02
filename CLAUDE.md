@@ -30,6 +30,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **Spanish i18n**: File uses Unicode escapes (`\u00f3`). Always read the exact line before editing.
 - **PR merge**: Always run `gh pr checks <PR#> --watch` and confirm **all** checks (ci, e2e, e2e-emulator) pass before merging. Never merge with failing or pending checks.
 - **Firebase secrets**: Use `printf` not `echo` when piping values — `echo` appends a trailing newline (`\n`) that corrupts URLs and tokens. Always: `printf "value" | npx firebase functions:secrets:set SECRET_NAME`. PodcastIndex uses a combined JSON secret (`PODCASTINDEX_CREDS`). There are 6 secrets total — Ollama/CF secrets were removed (endpoints are per-user in Firestore).
+- **GraphQL codegen**: When the schema changes (`functions/src/schema.ts`) or queries change (`packages/shared/src/apollo/queries.ts`), run `pnpm codegen` to regenerate `packages/shared/src/apollo/generated.ts`. Always commit the regenerated file. Auto-runs on `pnpm install` via `postinstall` hook.
 
 ## Test Gotchas
 
