@@ -357,8 +357,7 @@ mycircle/
 │   ├── architecture.md          # Detailed architecture analysis
 │   ├── data-patterns.md         # Data refresh, notifications & real-time sync patterns
 │   (agent-guide.md removed — see CLAUDE.md at repo root)
-│   ├── analytics-and-tracking.md # Analytics & performance monitoring (Web Vitals, Firebase Perf, Lighthouse)
-│   └── web-vitals-setup.md      # Redirect → analytics-and-tracking.md
+│   └── analytics-and-tracking.md # Analytics & performance monitoring (Web Vitals, Firebase Perf, Lighthouse)
 ├── firebase.json                # Firebase hosting + functions config
 ├── firestore.rules              # Firestore security rules
 ├── pnpm-workspace.yaml          # Workspace package declarations
