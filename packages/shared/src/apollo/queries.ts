@@ -557,8 +557,6 @@ export const SAVE_BENCHMARK_RUN = gql`
   mutation SaveBenchmarkRun($results: JSON!) {
     saveBenchmarkRun(results: $results) {
       id
-      userId
-      results
       createdAt
     }
   }
