@@ -11,6 +11,7 @@ Complete guide for running AI chat with Ollama on your own hardware instead of G
 - [NAS Docker Setup](#nas-docker-setup)
 - [Cloudflare Tunnel (Permanent Domain)](#cloudflare-tunnel-permanent-domain)
 - [Cloudflare Access (Service Token Auth)](#cloudflare-access-service-token-auth)
+- [Quick Setup (Free Tunnel, No Domain Needed)](#quick-setup-free-tunnel-no-domain-needed)
 - [Provider Priority](#provider-priority)
 - [Tool Calling](#tool-calling)
 - [Troubleshooting](#troubleshooting)
@@ -142,17 +143,81 @@ services:
 
 **Important**: Both containers must be in the same `docker-compose.yml` so they share a Docker network. The `cloudflared` container reaches Ollama via the service name `ollama` (not `localhost`).
 
-### Pull the model
+### Pull a model
 
 ```bash
-docker exec ollama ollama pull gemma2:2b
+docker exec ollama ollama pull gemma3:4b
 ```
+
+### Available Models
+
+Pick a model based on your machine's available RAM/VRAM. All numbers below are for **Q4_K_M** quantization (recommended sweet spot for quality vs memory).
+
+#### Lightweight (4–8 GB RAM) — Good for NAS, Raspberry Pi 5, old laptops
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `gemma3:1b` | 1B | ~2 GB | No | Fastest responses, simple Q&A |
+| `gemma2:2b` | 2B | ~3 GB | No (prompt fallback) | Current default, low resource baseline |
+| `llama3.2:3b` | 3B | ~3.6 GB | Yes (native) | Lightweight with tool support |
+| `gemma3:4b` | 4B | ~4 GB | No | Best quality-per-GB ratio |
+| `qwen3:4b` | 4B | ~4 GB | Yes (native) | Multilingual + tools, thinking mode |
+| `phi3:3.8b` | 3.8B | ~4 GB | No | Strong reasoning for its size |
+
+#### Mid-range (8–16 GB RAM) — Desktops, gaming PCs, Mac M1/M2
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `llama3.1:8b` | 8B | ~6.2 GB | Yes (native) | General purpose, great tool support |
+| `qwen3:8b` | 8B | ~6.5 GB | Yes (native) | Beats llama3.1:8b on most benchmarks |
+| `mistral:7b` | 7B | ~6 GB | Yes (native) | Fast, good for European languages |
+| `gemma3:12b` | 12B | ~12.4 GB | No | High quality, Google's latest |
+| `qwen3:14b` | 14B | ~10.7 GB | Yes (native) | Best 14B model, strong reasoning |
+| `phi4:14b` | 14B | ~11 GB | No | Microsoft's reasoning model |
+| `deepseek-r1:14b` | 14B | ~11 GB | No | Chain-of-thought reasoning |
+
+#### High-end (16–32 GB RAM) — Workstations, Mac M2 Pro/Max, GPU servers
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `gemma3:27b` | 27B | ~22.5 GB | No | Near-GPT-4 quality on many tasks |
+| `qwen3:32b` | 32B | ~22.2 GB | Yes (native) | Best open model under 32B, tools + thinking |
+| `command-r:35b` | 35B | ~24 GB | Yes (native) | Built for RAG and tool use |
+
+#### Workstation (48+ GB RAM/VRAM) — Dual GPU, cloud instances
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `llama3.3:70b` | 70B | ~45.6 GB | Yes (native) | Near-frontier quality |
+| `qwen2.5:72b` | 72B | ~50.5 GB | Yes (native) | Best open-weight large model |
+
+### Recommendations for MyCircle
+
+| Scenario | Recommended model | Why |
+|----------|------------------|-----|
+| **NAS / low-power device** | `qwen3:4b` | Smallest model with native tool calling (weather, stocks, crypto tools work) |
+| **Desktop / 16 GB Mac** | `qwen3:8b` | Best balance of speed, quality, and tool support |
+| **Beefy machine / GPU** | `qwen3:14b` or `qwen3:32b` | Top-tier quality with full tool calling |
+| **Benchmarking / comparison** | Pull 2-3 different sizes | e.g., `qwen3:4b` + `qwen3:8b` + `gemma3:12b` |
+| **Code assistance** | `qwen2.5-coder:7b` | Specialized for code generation |
+
+> **Tool calling matters for MyCircle**: Models with native tool calling can use weather, stock, crypto, and navigation tools automatically. Models without it fall back to a prompt-based approach (works but less reliable). The `qwen3` family is recommended because it has native tool support at every size.
+
+### Pull multiple models for benchmarking
+
+```bash
+docker exec ollama ollama pull qwen3:4b
+docker exec ollama ollama pull qwen3:8b
+docker exec ollama ollama pull gemma3:12b
+```
+
+Models are auto-discovered — after pulling, they appear in the AI Chat model dropdown and Benchmark model selector immediately.
 
 ### Verify locally
 
 ```bash
 curl http://localhost:11434/v1/models
-# Should return: {"object":"list","data":[{"id":"gemma2:2b",...}]}
+# Should list all pulled models
 ```
 
 ---
@@ -218,6 +283,73 @@ When adding an endpoint in the UI, you can optionally provide Cloudflare Access 
 2. **Policy name**: `MyCircle Service Auth`
 3. **Action**: **Service Auth** (NOT "Allow" or "Bypass")
 4. **Include** > Selector: **Service Token** > Value: your token
+
+---
+
+## Quick Setup (Free Tunnel, No Domain Needed)
+
+If you don't have a Cloudflare account or custom domain, you can use Cloudflare's **free quick tunnel** to expose Ollama instantly. The URL is temporary (changes on every container restart), but MyCircle's Endpoint Manager UI makes it easy to update.
+
+### 1. docker-compose.yml
+
+```yaml
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama-models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --url http://ollama:11434
+```
+
+### 2. Start and pull a model
+
+```bash
+docker compose up -d
+docker exec ollama ollama pull qwen3:4b
+```
+
+### 3. Get your tunnel URL
+
+```bash
+docker logs cloudflared 2>&1 | grep "trycloudflare.com"
+# Example output: https://random-words-here.trycloudflare.com
+```
+
+The URL looks like `https://some-random-words.trycloudflare.com`. Copy it.
+
+### 4. Add the endpoint in MyCircle
+
+1. Open MyCircle and go to **AI Chat** > **Endpoints** tab
+2. Click **Add Endpoint**
+3. Paste the `*.trycloudflare.com` URL as the endpoint URL
+4. Give it a name (e.g., "My Laptop", "Home Server")
+5. Leave CF Access fields empty (free tunnels don't need auth)
+6. Save — models are auto-discovered and appear in the model dropdown
+
+### 5. Use it
+
+Switch to the **Chat** tab, select your endpoint and model from the dropdowns, and start chatting. You can also use the **Model Benchmark** page to compare performance across endpoints.
+
+> **URL changes on restart**: Free tunnels generate a new URL each time `cloudflared` restarts. When that happens, edit the endpoint in the Endpoints tab and update the URL. Everything else (name, chat history) stays the same.
+
+> **No WAF or Access config needed**: Free tunnels bypass Cloudflare's Bot Fight Mode and don't require Access policies. The tradeoff is no authentication — anyone with the URL can reach your Ollama instance (the URL is random and hard to guess, but not secret).
 
 ---
 
