@@ -29,6 +29,7 @@ export default function CloudFiles() {
   const hasApi = typeof (window as any).__cloudFiles !== 'undefined';
 
   const handleUpload = useCallback(async (file: File) => {
+    window.__logAnalyticsEvent?.('file_upload', { file_type: file.type, file_size: file.size });
     await uploadFile(file);
   }, [uploadFile]);
 
@@ -39,6 +40,7 @@ export default function CloudFiles() {
 
   const handleDelete = useCallback(async (fileId: string) => {
     if (!window.confirm(t('cloudFiles.deleteConfirm'))) return;
+    window.__logAnalyticsEvent?.('file_delete');
     await deleteFile(fileId);
   }, [deleteFile, t]);
 

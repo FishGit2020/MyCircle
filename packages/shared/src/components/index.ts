@@ -3,4 +3,5 @@ export type { Toast, ToastType } from './Toast';
 export { SkeletonLine, SkeletonCircle, SkeletonCard, SkeletonList, SkeletonChart } from './Skeleton';
 export { Breadcrumb } from './Breadcrumb';
 export type { BreadcrumbItem } from './Breadcrumb';
+export { default as EndpointManager } from './EndpointManager';
 

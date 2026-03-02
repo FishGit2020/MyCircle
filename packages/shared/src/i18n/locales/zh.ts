@@ -468,7 +468,9 @@ const zh: Record<TranslationKey, string> = {
 
   // AI Monitor
   'ai.tabChat': '\u804a\u5929',
+  'ai.tabEndpoints': '\u7aef\u70b9',
   'ai.tabMonitor': '\u76d1\u63a7',
+  'ai.noEndpointsHint': '\u5728\u7aef\u70b9\u6807\u7b7e\u9875\u6dfb\u52a0 Ollama \u7aef\u70b9\u4ee5\u5f00\u59cb\u4f7f\u7528',
   'ai.monitor.totalCalls': '\u603b\u8c03\u7528\u6b21\u6570',
   'ai.monitor.inputTokens': '\u8f93\u5165\u4ee4\u724c',
   'ai.monitor.outputTokens': '\u8f93\u51fa\u4ee4\u724c',
@@ -1532,6 +1534,10 @@ const zh: Record<TranslationKey, string> = {
   'benchmark.history.runAt': '\u8fd0\u884c\u4e8e {date}',
   'benchmark.history.endpoints': '{count} \u4e2a\u7aef\u70b9',
   'benchmark.signInRequired': '\u767b\u5f55\u540e\u4f7f\u7528\u6027\u80fd\u6d4b\u8bd5',
+
+  // Endpoint source labels
+  'endpoints.sourceChat': '\u804a\u5929',
+  'endpoints.sourceBenchmark': '\u6027\u80fd\u6d4b\u8bd5',
 
   // Immigration Tracker
   'nav.immigration': '\u79fb\u6c11',

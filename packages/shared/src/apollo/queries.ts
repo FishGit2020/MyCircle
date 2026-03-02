@@ -482,6 +482,7 @@ export const GET_BENCHMARK_ENDPOINTS = gql`
       url
       name
       hasCfAccess
+      source
     }
   }
 `;
@@ -541,6 +542,7 @@ export const SAVE_BENCHMARK_ENDPOINT = gql`
       url
       name
       hasCfAccess
+      source
     }
   }
 `;
