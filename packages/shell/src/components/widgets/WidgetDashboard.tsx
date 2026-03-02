@@ -10,9 +10,12 @@ import { logEvent } from '../../lib/firebase';
 
 export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker' | 'cloudFiles' | 'benchmark' | 'immigration';
 
+export type WidgetSize = 'small' | 'medium' | 'large';
+
 export interface WidgetConfig {
   id: WidgetType;
   visible: boolean;
+  size?: WidgetSize;
 }
 
 const DEFAULT_LAYOUT: WidgetConfig[] = [
@@ -47,7 +50,8 @@ function loadLayout(): WidgetConfig[] {
       for (const def of DEFAULT_LAYOUT) {
         if (!ids.has(def.id)) filtered.push(def);
       }
-      return filtered;
+      // Migrate: ensure every widget has a size (default 'medium')
+      return filtered.map(w => ({ ...w, size: w.size || 'medium' }));
     }
   } catch { /* ignore */ }
   return DEFAULT_LAYOUT;
@@ -908,6 +912,7 @@ type DashboardAction =
   | { type: 'DRAG_END' }
   | { type: 'MOVE_WIDGET'; index: number; direction: -1 | 1 }
   | { type: 'TOGGLE_VISIBILITY'; index: number }
+  | { type: 'RESIZE_WIDGET'; index: number; size: WidgetSize }
   | { type: 'RESET' };
 
 interface DashboardState {
@@ -952,6 +957,13 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
         ...state,
         layout: state.layout.map((w, i) =>
           i === action.index ? { ...w, visible: !w.visible } : w
+        ),
+      };
+    case 'RESIZE_WIDGET':
+      return {
+        ...state,
+        layout: state.layout.map((w, i) =>
+          i === action.index ? { ...w, size: action.size } : w
         ),
       };
     case 'RESET':
@@ -1114,6 +1126,26 @@ export default function WidgetDashboard() {
 
                   <span className="flex-1" />
 
+                  {/* Size selector */}
+                  <div className="flex items-center gap-0.5 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+                    {(['small', 'medium', 'large'] as const).map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => dispatch({ type: 'RESIZE_WIDGET', index, size: s })}
+                        className={`text-xs px-2 py-1 transition-colors ${
+                          (widget.size || 'medium') === s
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        }`}
+                        aria-label={`${t('widgets.size')} ${s}`}
+                        aria-pressed={(widget.size || 'medium') === s}
+                      >
+                        {s === 'small' ? 'S' : s === 'medium' ? 'M' : 'L'}
+                      </button>
+                    ))}
+                  </div>
+
                   {/* Visibility toggle */}
                   <button
                     type="button"
@@ -1145,11 +1177,13 @@ export default function WidgetDashboard() {
             const WidgetComponent = WIDGET_COMPONENTS[widget.id];
             const routeDef = WIDGET_ROUTES[widget.id];
             const to = typeof routeDef === 'function' ? routeDef({ favoriteCities }) : routeDef;
+            const size = widget.size || 'medium';
+            const spanClass = size === 'large' ? 'sm:col-span-2' : size === 'small' ? 'col-span-1' : '';
             return (
               <Link
                 key={widget.id}
                 to={to}
-                className="block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all min-h-[120px]"
+                className={`block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all min-h-[120px] ${spanClass}`}
               >
                 <ErrorBoundary>
                   <WidgetComponent />

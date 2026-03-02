@@ -845,6 +845,7 @@ const en = {
   'widgets.publicNoteCount': '{count} public notes shared',
   'widgets.hidden': 'Hidden',
   'widgets.visible': 'Visible',
+  'widgets.size': 'Size',
   'widgets.moveUp': 'Move widget up',
   'widgets.moveDown': 'Move widget down',
   'widgets.worship': 'Worship Songs',

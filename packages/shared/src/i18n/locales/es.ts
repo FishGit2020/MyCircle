@@ -847,6 +847,7 @@ const es: Record<TranslationKey, string> = {
   'widgets.publicNoteCount': '{count} notas p\u00fablicas compartidas',
   'widgets.hidden': 'Oculto',
   'widgets.visible': 'Visible',
+  'widgets.size': 'Tama\u00f1o',
   'widgets.moveUp': 'Mover widget arriba',
   'widgets.moveDown': 'Mover widget abajo',
   'widgets.worship': 'Canciones de Adoraci\u00f3n',
