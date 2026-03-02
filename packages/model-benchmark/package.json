@@ -12,9 +12,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@apollo/client": "catalog:",
     "@mycircle/shared": "workspace:*",
-    "graphql": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router": "catalog:"

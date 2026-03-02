@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { useMutation } from '@apollo/client';
 import {
+  useMutation,
   RUN_BENCHMARK,
   SAVE_BENCHMARK_RUN,
   StorageKeys,
