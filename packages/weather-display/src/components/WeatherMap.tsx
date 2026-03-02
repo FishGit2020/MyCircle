@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from '@mycircle/shared';
 
 interface Props {
@@ -30,7 +30,9 @@ export default function WeatherMap({ lat, lon }: Props) {
   const [activeLayer, setActiveLayer] = useState<MapLayer>('temp');
   const [zoom, setZoom] = useState(6);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [visible, setVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapAreaRef = useRef<HTMLDivElement>(null);
 
   // Guard: don't render until we have valid coordinates (not default 0,0)
   const hasCoords = lat !== 0 || lon !== 0;
@@ -52,13 +54,31 @@ export default function WeatherMap({ lat, lon }: Props) {
   }, [isFullscreen]);
 
   // Listen for fullscreen exit via Escape key
-  React.useEffect(() => {
+  useEffect(() => {
     function onFullscreenChange() {
       if (!document.fullscreenElement) setIsFullscreen(false);
     }
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
   }, []);
+
+  // Lazy-load iframe when map area scrolls into view
+  useEffect(() => {
+    const el = mapAreaRef.current;
+    if (!el || visible) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [visible]);
 
   return (
     <div
@@ -114,16 +134,25 @@ export default function WeatherMap({ lat, lon }: Props) {
         </div>
       </div>
 
-      <div className="relative" style={{ height: isFullscreen ? 'calc(100vh - 72px)' : 350 }}>
+      <div ref={mapAreaRef} className="relative" style={{ height: isFullscreen ? 'calc(100vh - 72px)' : 350 }}>
         {hasCoords ? (
-          <iframe
-            key={`${lat},${lon}`}
-            src={mapUrl}
-            className="w-full h-full border-0"
-            title={`Weather map - ${activeLayer}`}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-          />
+          visible ? (
+            <iframe
+              key={`${lat},${lon}`}
+              src={mapUrl}
+              className="w-full h-full border-0"
+              title={`Weather map - ${activeLayer}`}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 animate-pulse" data-testid="map-skeleton">
+              <svg className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              <span className="text-sm text-gray-400 dark:text-gray-500">{t('map.loading')}</span>
+            </div>
+          )
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
             {t('map.waitingForLocation')}

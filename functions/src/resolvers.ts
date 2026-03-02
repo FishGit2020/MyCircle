@@ -184,15 +184,17 @@ async function getForecast(apiKey: string, lat: number, lon: number): Promise<Fo
 }
 
 async function getHourlyForecast(apiKey: string, lat: number, lon: number): Promise<HourlyForecast[]> {
-  const client = createWeatherClient(apiKey);
-  const response = await client.get('/forecast', { params: { lat, lon, cnt: 16 } });
+  const response = await axios.get(`${OPENWEATHER_BASE}/data/3.0/onecall`, {
+    params: { lat, lon, exclude: 'minutely,daily,alerts,current', appid: apiKey, units: 'metric' },
+    timeout: 5000,
+  });
 
-  return response.data.list.map((item: any) => ({
+  return (response.data.hourly as any[]).slice(0, 24).map((item: any) => ({
     dt: item.dt,
-    temp: Math.round(item.main.temp),
+    temp: Math.round(item.temp),
     weather: item.weather,
-    pop: item.pop,
-    wind_speed: item.wind.speed
+    pop: item.pop ?? 0,
+    wind_speed: item.wind_speed ?? 0,
   }));
 }
 
