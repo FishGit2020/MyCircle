@@ -55,6 +55,12 @@ declare global {
       subscribeShared: (callback: (files: any[]) => void) => () => void;
       deleteShared: (fileId: string) => Promise<{ ok: boolean }>;
     };
+    __immigrationTracker?: {
+      getAll: () => Promise<any[]>;
+      add: (data: { receiptNumber: string; formType: string; nickname: string }) => Promise<string>;
+      delete: (id: string) => Promise<void>;
+      subscribe?: (callback: (cases: any[]) => void) => () => void;
+    };
     __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
   }
 }

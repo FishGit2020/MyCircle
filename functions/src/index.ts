@@ -1663,3 +1663,107 @@ export const babyPhotos = onRequest(
     }
   }
 );
+
+// ─── USCIS Case Status Proxy ─────────────────────────────────────────
+const uscisCache = new NodeCache({ stdTTL: 14400 }); // 4 hour default TTL
+
+export const uscisStatus = onRequest(
+  {
+    cors: ALLOWED_ORIGINS,
+    invoker: 'public',
+    maxInstances: 5,
+    memory: '256MiB',
+    timeoutSeconds: 30,
+  },
+  async (req: Request, res: Response) => {
+    const uid = await verifyAuthToken(req);
+    if (!uid) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    const clientIp = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
+    if (checkRateLimit(clientIp, 10, 60)) {
+      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+      return;
+    }
+
+    const path = req.path.replace(/^\/api\/uscis\/?/, '').replace(/^\/+/, '');
+
+    if (path !== 'status' || req.method !== 'GET') {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+
+    const receiptNumber = (req.query.receiptNumber as string || '').trim().toUpperCase();
+    if (!receiptNumber) {
+      res.status(400).json({ error: 'receiptNumber parameter required' });
+      return;
+    }
+    if (!/^[A-Z]{3}\d{10}$/.test(receiptNumber)) {
+      res.status(400).json({ error: 'Invalid receipt number format. Expected 3 letters followed by 10 digits (e.g., MSC2190012345).' });
+      return;
+    }
+
+    // Check cache
+    const cacheKey = `uscis:${receiptNumber}`;
+    const cached = uscisCache.get<any>(cacheKey);
+    if (cached) {
+      res.status(200).json(cached);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'https://egov.uscis.gov/casestatus/mycasestatus.do',
+        `appReceiptNum=${encodeURIComponent(receiptNumber)}`,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'Mozilla/5.0 (compatible; MyCircle/1.0)',
+          },
+          timeout: 15000,
+        },
+      );
+
+      const html = response.data as string;
+
+      // Extract status title from <h1>
+      const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+      const status = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : 'Unknown Status';
+
+      // Extract description from first <p> after h1
+      const pMatch = html.match(/<h1[^>]*>[\s\S]*?<\/h1>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
+      const statusDescription = pMatch ? pMatch[1].replace(/<[^>]+>/g, '').trim() : '';
+
+      // Extract form type from description
+      const formMatch = statusDescription.match(/Form I-\d+/i);
+      const formType = formMatch ? formMatch[0] : '';
+
+      const result = {
+        receiptNumber,
+        formType,
+        status,
+        statusDescription,
+        checkedAt: new Date().toISOString(),
+      };
+
+      uscisCache.set(cacheKey, result);
+      logger.info('USCIS status fetched', { uid, receiptNumber, status });
+      res.status(200).json(result);
+    } catch (err: any) {
+      logger.error('USCIS proxy error', { receiptNumber, error: err.message });
+
+      if (err.response?.status === 403) {
+        res.status(503).json({ error: 'USCIS service temporarily unavailable' });
+        return;
+      }
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        res.status(504).json({ error: 'USCIS service timed out' });
+        return;
+      }
+
+      res.status(500).json({ error: 'Failed to fetch USCIS case status' });
+    }
+  }
+);
