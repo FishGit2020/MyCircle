@@ -12,13 +12,13 @@ test.describe('Weather Display', () => {
 
   test('displays current temperature', async ({ page }) => {
     // Wait for weather data to load, then check for a temperature value
-    await expect(page.getByText('Humidity')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('Humidity').first()).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/\-?\d+°[CF]/).first()).toBeVisible();
   });
 
   test('shows weather details like humidity and wind', async ({ page }) => {
     // Verify that the humidity label and a percentage value render
-    await expect(page.getByText('Humidity')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('Humidity').first()).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/\d+%/).first()).toBeVisible({ timeout: 15_000 });
   });
 
