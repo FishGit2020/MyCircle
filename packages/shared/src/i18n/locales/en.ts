@@ -183,6 +183,8 @@ const en = {
   // Auth
   'auth.signIn': 'Sign In',
   'auth.signOut': 'Sign Out',
+  'settings.exportData': 'Export Data',
+  'settings.importData': 'Import Data',
   'theme.dark': 'Dark Mode',
   'theme.light': 'Light Mode',
   'auth.signUp': 'Sign Up',

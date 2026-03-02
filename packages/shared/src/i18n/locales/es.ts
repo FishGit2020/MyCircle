@@ -185,6 +185,8 @@ const es: Record<TranslationKey, string> = {
   // Auth
   'auth.signIn': 'Iniciar sesi\u00f3n',
   'auth.signOut': 'Cerrar sesi\u00f3n',
+  'settings.exportData': 'Exportar datos',
+  'settings.importData': 'Importar datos',
   'theme.dark': 'Modo Oscuro',
   'theme.light': 'Modo Claro',
   'auth.signUp': 'Registrarse',
