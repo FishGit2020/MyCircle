@@ -37,6 +37,7 @@ export default defineConfig({
       'e2e/**',
       'functions/**',
       'packages/cloud-files/**',
+      'packages/immigration-tracker/**',
     ],
     coverage: {
       provider: 'v8',
