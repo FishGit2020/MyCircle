@@ -4,21 +4,12 @@ import {
   SAVE_BENCHMARK_ENDPOINT,
   DELETE_BENCHMARK_ENDPOINT,
 } from '../apollo/queries';
+import type { GetBenchmarkEndpointsQuery, BenchmarkEndpoint } from '../apollo/generated';
 
-export interface Endpoint {
-  id: string;
-  url: string;
-  name: string;
-  hasCfAccess: boolean;
-  source: string;
-}
-
-interface EndpointsResponse {
-  benchmarkEndpoints: Endpoint[];
-}
+export type Endpoint = BenchmarkEndpoint;
 
 export function useEndpoints() {
-  const { data, loading, refetch } = useQuery<EndpointsResponse>(GET_BENCHMARK_ENDPOINTS, {
+  const { data, loading, refetch } = useQuery<GetBenchmarkEndpointsQuery>(GET_BENCHMARK_ENDPOINTS, {
     fetchPolicy: 'cache-and-network',
   });
 

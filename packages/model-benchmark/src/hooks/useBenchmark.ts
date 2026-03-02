@@ -7,29 +7,13 @@ import {
   StorageKeys,
   WindowEvents,
 } from '@mycircle/shared';
+import type {
+  BenchmarkTimingResult,
+  BenchmarkRunResult,
+} from '@mycircle/shared';
 
-export interface BenchmarkTimingResult {
-  totalDuration: number;
-  loadDuration: number;
-  promptEvalCount: number;
-  promptEvalDuration: number;
-  evalCount: number;
-  evalDuration: number;
-  tokensPerSecond: number;
-  promptTokensPerSecond: number;
-  timeToFirstToken: number;
-}
-
-export interface BenchmarkRunResult {
-  endpointId: string;
-  endpointName: string;
-  model: string;
-  prompt: string;
-  response: string;
-  timing: BenchmarkTimingResult | null;
-  error: string | null;
-  timestamp: string;
-}
+// Re-export generated types for downstream consumers
+export type { BenchmarkTimingResult, BenchmarkRunResult };
 
 export const BENCHMARK_PROMPTS = [
   { id: 'simple', labelKey: 'benchmark.promptSimple' as const, prompt: 'What is the capital of France?' },

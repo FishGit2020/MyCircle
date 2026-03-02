@@ -23,9 +23,6 @@ vi.mock('@mycircle/shared', () => ({
   GET_CURRENT_WEATHER: 'GET_CURRENT_WEATHER',
   getWeatherIconUrl: (icon: string) => `https://icons/${icon}.png`,
   formatTemperature: (temp: number) => `${Math.round(temp)}°`,
-}));
-
-vi.mock('@apollo/client/react', () => ({
   useQuery: () => ({
     data: {
       currentWeather: {

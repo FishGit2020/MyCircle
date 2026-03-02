@@ -46,7 +46,7 @@
     "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:work-tracker\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\"",
     "build": "pnpm build:shared && pnpm build:mf",
     "codegen": "node scripts/extract-schema.mjs && graphql-codegen --config codegen.ts",
-    "build:shared": "pnpm --filter @mycircle/shared build",
+    "build:shared": "pnpm codegen && pnpm --filter @mycircle/shared build",
     "build:mf": "pnpm --filter @mycircle/shell build && pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
     "start": "cross-env NODE_ENV=production tsx server/index.ts",
     "start:static": "node scripts/serve-static.mjs",
@@ -84,6 +84,7 @@
     "check:shared-versions": "node scripts/check-shared-versions.mjs",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist dist functions/node_modules functions/lib",
     "clean:install": "pnpm clean && pnpm install",
+    "postinstall": "pnpm codegen",
     "prepare": "husky"
   },
   "dependencies": {

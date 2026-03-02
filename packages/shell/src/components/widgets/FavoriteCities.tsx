@@ -1,21 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { useQuery } from '@apollo/client/react';
-import { GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature, useTranslation } from '@mycircle/shared';
+import { useQuery, GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature, useTranslation } from '@mycircle/shared';
+import type { GetCurrentWeatherQuery } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import { FavoriteCity } from '../../lib/firebase';
-
-interface WeatherCardData {
-  currentWeather: {
-    temp: number;
-    weather: Array<{ icon: string; main: string; description: string }>;
-  };
-}
 
 function FavoriteCityCard({ city }: { city: FavoriteCity }) {
   const navigate = useNavigate();
   const { tempUnit } = useUnits();
-  const { data, loading } = useQuery<WeatherCardData>(GET_CURRENT_WEATHER, {
+  const { data, loading } = useQuery<GetCurrentWeatherQuery>(GET_CURRENT_WEATHER, {
     variables: { lat: city.lat, lon: city.lon },
     fetchPolicy: 'cache-first',
   });

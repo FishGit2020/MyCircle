@@ -1,5 +1,6 @@
 import { useQuery, GET_BIBLE_VOTD_API, getDailyVerse } from '@mycircle/shared';
 import type { DailyVerse } from '@mycircle/shared';
+import type { GetBibleVotdApiQuery } from '@mycircle/shared';
 
 export type { DailyVerse };
 
@@ -9,20 +10,11 @@ function getDayOfYear(): number {
   return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-interface VotdApiResponse {
-  bibleVotdApi: {
-    text: string;
-    reference: string;
-    translation: string | null;
-    copyright: string | null;
-  };
-}
-
 export function useDailyVerse() {
   const day = getDayOfYear();
   const localVerse = getDailyVerse();
 
-  const { data, loading } = useQuery<VotdApiResponse>(GET_BIBLE_VOTD_API, {
+  const { data, loading } = useQuery<GetBibleVotdApiQuery>(GET_BIBLE_VOTD_API, {
     variables: { day },
     fetchPolicy: 'cache-first',
   });

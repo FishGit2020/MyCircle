@@ -1,7 +1,7 @@
 import { useQuery, useSubscription } from '@apollo/client/react';
 import { GET_WEATHER, WEATHER_UPDATES } from '../apollo/queries';
 import { createLogger } from '../utils/logger';
-import type { CurrentWeather, ForecastDay, HourlyForecast } from '../types';
+import type { GetWeatherQuery, WeatherUpdatesSubscription } from '../apollo/generated';
 
 const logger = createLogger('useWeatherData');
 
@@ -10,23 +10,6 @@ const isProduction = typeof window !== 'undefined' &&
   !window.location.hostname.includes('localhost') &&
   window.location.hostname !== '127.0.0.1' &&
   window.location.hostname !== '[::1]';
-
-interface WeatherResponse {
-  weather: {
-    current: CurrentWeather;
-    forecast: ForecastDay[];
-    hourly: HourlyForecast[];
-  };
-}
-
-interface WeatherUpdateResponse {
-  weatherUpdates: {
-    lat: number;
-    lon: number;
-    timestamp: string;
-    current: CurrentWeather;
-  };
-}
 
 export function useWeatherData(
   lat: number | null,
@@ -42,7 +25,7 @@ export function useWeatherData(
     loading: queryLoading,
     error: queryError,
     refetch,
-  } = useQuery<WeatherResponse>(GET_WEATHER, {
+  } = useQuery<GetWeatherQuery>(GET_WEATHER, {
     variables: { lat, lon },
     skip: !hasCoords,
     fetchPolicy: 'cache-and-network',
@@ -55,7 +38,7 @@ export function useWeatherData(
   const {
     data: subscriptionData,
     error: subscriptionError
-  } = useSubscription<WeatherUpdateResponse>(WEATHER_UPDATES, {
+  } = useSubscription<WeatherUpdatesSubscription>(WEATHER_UPDATES, {
     variables: { lat, lon },
     skip: !shouldSubscribe || lat === null || lon === null,
     onData: ({ data }) => {

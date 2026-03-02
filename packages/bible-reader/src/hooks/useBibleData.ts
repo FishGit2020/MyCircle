@@ -1,46 +1,20 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useLazyQuery, GET_BIBLE_VOTD_API, GET_BIBLE_PASSAGE, GET_BIBLE_VERSIONS } from '@mycircle/shared';
+import type {
+  GetBibleVotdApiQuery,
+  GetBiblePassageQuery,
+  GetBibleVersionsQuery,
+  BibleVerse as GeneratedBibleVerse,
+  BibleVerseItem as GeneratedBibleVerseItem,
+  BibleVersion as GeneratedBibleVersion,
+} from '@mycircle/shared';
 
-// --- Types ---
-
-export interface BibleVerse {
-  text: string;
-  reference: string;
-  translation: string | null;
-  copyright: string | null;
-}
-
-export interface BibleVerseItem {
-  number: number;
-  text: string;
-}
-
-export interface BiblePassage {
-  text: string;
-  reference: string;
-  translation: string | null;
-  verseCount: number;
-  copyright: string | null;
-  verses: BibleVerseItem[];
-}
-
-export interface BibleVersion {
-  id: number;
-  abbreviation: string;
-  title: string;
-}
-
-interface VotdApiResponse {
-  bibleVotdApi: BibleVerse;
-}
-
-interface PassageResponse {
-  biblePassage: BiblePassage;
-}
-
-interface VersionsResponse {
-  bibleVersions: BibleVersion[];
-}
+// Re-export entity types as aliases from generated schema types
+export type BibleVerse = GeneratedBibleVerse;
+export type BibleVerseItem = GeneratedBibleVerseItem;
+export type BibleVersion = GeneratedBibleVersion;
+// BiblePassage from the query result (includes only queried fields)
+export type BiblePassage = GetBiblePassageQuery['biblePassage'];
 
 // 66 canonical books with chapter counts
 export const BIBLE_BOOKS = [
@@ -77,7 +51,7 @@ function getDayOfYear(): number {
 /** Hook to get the Verse of the Day via YouVersion API */
 export function useVotd() {
   const day = getDayOfYear();
-  const { data, loading, error } = useQuery<VotdApiResponse>(GET_BIBLE_VOTD_API, {
+  const { data, loading, error } = useQuery<GetBibleVotdApiQuery>(GET_BIBLE_VOTD_API, {
     variables: { day },
     fetchPolicy: 'cache-first',
   });
@@ -91,7 +65,7 @@ export function useVotd() {
 
 /** Hook to fetch available Bible versions from YouVersion API */
 export function useBibleVersions() {
-  const { data, loading, error } = useQuery<VersionsResponse>(GET_BIBLE_VERSIONS, {
+  const { data, loading, error } = useQuery<GetBibleVersionsQuery>(GET_BIBLE_VERSIONS, {
     fetchPolicy: 'cache-first',
   });
 
@@ -107,7 +81,7 @@ export function useBiblePassage() {
   const [selectedBook, setSelectedBook] = useState<string>('');
   const [selectedChapter, setSelectedChapter] = useState<number>(0);
 
-  const [fetchPassage, { data, loading, error }] = useLazyQuery<PassageResponse>(GET_BIBLE_PASSAGE, {
+  const [fetchPassage, { data, loading, error }] = useLazyQuery<GetBiblePassageQuery>(GET_BIBLE_PASSAGE, {
     fetchPolicy: 'cache-first',
   });
 
