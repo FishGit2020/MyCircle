@@ -788,6 +788,7 @@ const zh: Record<TranslationKey, string> = {
   'map.zoomOut': '\u7f29\u5c0f',
   'map.fullscreen': '\u5168\u5c4f',
   'map.exitFullscreen': '\u9000\u51fa\u5168\u5c4f',
+  'map.waitingForLocation': '\u7b49\u5f85\u4f4d\u7f6e\u4fe1\u606f...',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': '\u7d2b\u5916\u7ebf\u8b66\u62a5',
