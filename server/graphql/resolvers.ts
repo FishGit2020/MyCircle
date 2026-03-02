@@ -668,13 +668,23 @@ export const resolvers = {
 
   Query: {
     ollamaModels: async () => {
+      // Dev server: use env var for local Ollama (production uses per-user Firestore endpoints)
       const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
       if (!ollamaBaseUrl) return [];
       try {
-        const headers: Record<string, string> = {};
-        if (process.env.CF_ACCESS_CLIENT_ID) headers['CF-Access-Client-Id'] = process.env.CF_ACCESS_CLIENT_ID;
-        if (process.env.CF_ACCESS_CLIENT_SECRET) headers['CF-Access-Client-Secret'] = process.env.CF_ACCESS_CLIENT_SECRET;
-        const { data } = await axios.get(`${ollamaBaseUrl}/api/tags`, { headers, timeout: 5000 });
+        const { data } = await axios.get(`${ollamaBaseUrl}/api/tags`, { timeout: 5000 });
+        return (data.models || []).map((m: any) => m.name as string);
+      } catch {
+        return [];
+      }
+    },
+
+    benchmarkEndpointModels: async (_: any, { endpointId: _endpointId }: { endpointId: string }) => {
+      // Dev server: use env var (production uses per-user endpoints from Firestore)
+      const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
+      if (!ollamaBaseUrl) return [];
+      try {
+        const { data } = await axios.get(`${ollamaBaseUrl}/api/tags`, { timeout: 5000 });
         return (data.models || []).map((m: any) => m.name as string);
       } catch {
         return [];
@@ -871,11 +881,13 @@ export const resolvers = {
       history?: { role: string; content: string }[];
       context?: Record<string, unknown>;
       model?: string;
+      endpointId?: string;
     }) => {
+      // Dev server: use env var for local Ollama (production uses per-user endpoints from Firestore)
       const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
       const ollamaModel = model || 'gemma2:2b';
       const geminiKey = process.env.GEMINI_API_KEY;
-      if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)');
+      if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured — add an Ollama endpoint in Settings or set GEMINI_API_KEY');
 
       // Build context-aware system instruction (shared by both providers)
       let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, navigate users around the app, create flashcards, look up Bible verses, search podcasts, and bookmark Bible passages. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
@@ -909,10 +921,6 @@ export const resolvers = {
         const { default: OpenAI } = await import('openai');
         const client = new OpenAI({
           baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
-          defaultHeaders: {
-            ...(process.env.CF_ACCESS_CLIENT_ID ? { 'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID } : {}),
-            ...(process.env.CF_ACCESS_CLIENT_SECRET ? { 'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET } : {}),
-          },
         });
 
         // Convert shared tool definitions to OpenAI format

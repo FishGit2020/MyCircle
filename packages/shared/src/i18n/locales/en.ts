@@ -458,6 +458,7 @@ const en = {
   'ai.suggestBible': 'Look up John 3:16',
   'ai.suggestPodcast': 'Search for technology podcasts',
   'ai.modelLabel': 'Model',
+  'ai.endpointLabel': 'Endpoint',
   'ai.debugToggle': 'Toggle debug mode',
   'ai.debugArgs': 'Arguments',
   'ai.debugResult': 'Result',

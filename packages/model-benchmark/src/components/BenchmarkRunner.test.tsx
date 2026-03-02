@@ -9,6 +9,8 @@ vi.mock('@mycircle/shared', () => ({
     t: (key: string) => key,
   }),
   useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
+  useLazyQuery: vi.fn(() => [vi.fn(), { data: null }]),
+  GET_BENCHMARK_ENDPOINT_MODELS: {},
   StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache' },
   WindowEvents: { BENCHMARK_CHANGED: 'benchmark-changed' },
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),

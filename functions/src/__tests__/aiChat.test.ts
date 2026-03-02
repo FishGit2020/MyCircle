@@ -9,7 +9,21 @@ vi.mock('firebase-admin/auth', () => ({
   getAuth: () => ({ verifyIdToken: vi.fn().mockResolvedValue({ uid: 'test-user' }) }),
 }));
 vi.mock('firebase-admin/firestore', () => ({
-  getFirestore: vi.fn(),
+  getFirestore: vi.fn(() => ({
+    collection: () => ({
+      orderBy: () => ({
+        limit: () => ({
+          get: vi.fn().mockResolvedValue({ empty: true, docs: [] }),
+        }),
+      }),
+      get: vi.fn().mockResolvedValue({ docs: [] }),
+    }),
+    doc: () => ({
+      get: vi.fn().mockResolvedValue({ exists: false }),
+      set: vi.fn(),
+      delete: vi.fn(),
+    }),
+  })),
   FieldValue: { serverTimestamp: vi.fn() },
 }));
 vi.mock('firebase-admin/messaging', () => ({
@@ -105,11 +119,10 @@ describe('aiChat', () => {
 
   it('returns 500 when no AI provider is configured', async () => {
     delete process.env.GEMINI_API_KEY;
-    delete process.env.OLLAMA_BASE_URL;
     const req = createMockReq({});
     const res = createMockRes();
     await aiChat(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: 'No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)' });
+    expect(res.json).toHaveBeenCalledWith({ error: 'No AI provider configured — add an Ollama endpoint in Settings or contact admin for Gemini' });
   });
 });

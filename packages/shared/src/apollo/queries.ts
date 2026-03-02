@@ -451,8 +451,8 @@ export const GET_AI_RECENT_LOGS = gql`
 `;
 
 export const AI_CHAT = gql`
-  mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON, $model: String) {
-    aiChat(message: $message, history: $history, context: $context, model: $model) {
+  mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON, $model: String, $endpointId: ID) {
+    aiChat(message: $message, history: $history, context: $context, model: $model, endpointId: $endpointId) {
       response
       toolCalls {
         name
@@ -468,6 +468,12 @@ export const AI_CHAT = gql`
 `;
 
 // ─── Benchmark Queries ─────────────────────────────────────
+
+export const GET_BENCHMARK_ENDPOINT_MODELS = gql`
+  query GetBenchmarkEndpointModels($endpointId: ID!) {
+    benchmarkEndpointModels(endpointId: $endpointId)
+  }
+`;
 
 export const GET_BENCHMARK_ENDPOINTS = gql`
   query GetBenchmarkEndpoints {
