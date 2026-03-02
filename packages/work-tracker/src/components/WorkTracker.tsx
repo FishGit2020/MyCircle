@@ -95,7 +95,7 @@ export default function WorkTracker() {
 
       {/* Entry form */}
       <div className="mb-6">
-        <EntryForm onSubmit={async (content) => { await addEntry(content); }} />
+        <EntryForm onSubmit={async (content) => { window.__logAnalyticsEvent?.('work_entry_add'); await addEntry(content); }} />
       </div>
 
       {/* Filter chips */}

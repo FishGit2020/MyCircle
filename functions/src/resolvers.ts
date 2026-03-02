@@ -20,6 +20,7 @@ const saveBenchmarkEndpointSchema = z.object({
   name: z.string().min(1).max(100),
   cfAccessClientId: z.string().max(200).optional().nullable(),
   cfAccessClientSecret: z.string().max(200).optional().nullable(),
+  source: z.string().max(50).optional().nullable(),
 });
 
 const idParamSchema = z.object({
@@ -895,7 +896,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         }
       },
 
-      saveBenchmarkEndpoint: async (_: any, { input }: { input: { url: string; name: string; cfAccessClientId?: string; cfAccessClientSecret?: string } }, ctx: any) => {
+      saveBenchmarkEndpoint: async (_: any, { input }: { input: { url: string; name: string; cfAccessClientId?: string; cfAccessClientSecret?: string; source?: string } }, ctx: any) => {
         const validated = saveBenchmarkEndpointSchema.parse(input);
         const uid = ctx?.uid;
         if (!uid) throw new Error('Authentication required');
@@ -905,10 +906,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           url: validated.url, name: validated.name,
           cfAccessClientId: validated.cfAccessClientId || null,
           cfAccessClientSecret: validated.cfAccessClientSecret || null,
+          source: validated.source || 'benchmark',
           createdAt: new Date().toISOString(),
         };
         await ref.set(data);
-        return { id: ref.id, url: validated.url, name: validated.name, hasCfAccess: !!(validated.cfAccessClientId && validated.cfAccessClientSecret) };
+        return { id: ref.id, url: validated.url, name: validated.name, hasCfAccess: !!(validated.cfAccessClientId && validated.cfAccessClientSecret), source: data.source };
       },
 
       deleteBenchmarkEndpoint: async (_: any, args: { id: string }, ctx: any) => {
@@ -1512,6 +1514,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           return {
             id: doc.id, url: d.url, name: d.name,
             hasCfAccess: !!(d.cfAccessClientId && d.cfAccessClientSecret),
+            source: d.source || 'benchmark',
           };
         });
       },

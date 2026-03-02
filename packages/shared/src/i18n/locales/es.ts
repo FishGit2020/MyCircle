@@ -468,7 +468,9 @@ const es: Record<TranslationKey, string> = {
 
   // AI Monitor
   'ai.tabChat': 'Chat',
+  'ai.tabEndpoints': 'Endpoints',
   'ai.tabMonitor': 'Monitor',
+  'ai.noEndpointsHint': 'Agrega endpoints de Ollama en la pesta\u00f1a Endpoints para comenzar',
   'ai.monitor.totalCalls': 'Total de llamadas',
   'ai.monitor.inputTokens': 'Tokens de entrada',
   'ai.monitor.outputTokens': 'Tokens de salida',
@@ -1532,6 +1534,10 @@ const es: Record<TranslationKey, string> = {
   'benchmark.history.runAt': 'Ejecutado el {date}',
   'benchmark.history.endpoints': '{count} endpoints',
   'benchmark.signInRequired': 'Inicia sesi\u00f3n para usar benchmarks',
+
+  // Endpoint source labels
+  'endpoints.sourceChat': 'Chat',
+  'endpoints.sourceBenchmark': 'Benchmark',
 
   // Immigration Tracker
   'nav.immigration': 'Inmigraci\u00f3n',

@@ -160,8 +160,9 @@ export const graphql = onRequest(
     // Extract uid for resolvers that need authenticated Firestore access
     const uid = await verifyAuthToken(req);
 
-    // Rate-limit benchmark mutations (5 req/min per user)
-    if (uid && opName.includes('benchmark')) {
+    // Rate-limit expensive benchmark mutations (5 req/min per user)
+    const BENCHMARK_RATE_LIMITED_OPS = ['RunBenchmark', 'SaveBenchmarkRun'];
+    if (uid && BENCHMARK_RATE_LIMITED_OPS.includes(opName)) {
       if (checkRateLimit(`benchmark:${uid}`, 5, 60)) {
         res.status(429).json({ errors: [{ message: 'Benchmark rate limit exceeded. Please wait a moment.' }] });
         return;

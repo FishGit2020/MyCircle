@@ -350,6 +350,7 @@ export const typeDefs = `#graphql
     name: String!
     cfAccessClientId: String
     cfAccessClientSecret: String
+    source: String
   }
 
   type BenchmarkEndpoint {
@@ -357,6 +358,7 @@ export const typeDefs = `#graphql
     url: String!
     name: String!
     hasCfAccess: Boolean!
+    source: String!
   }
 
   type BenchmarkTimingResult {

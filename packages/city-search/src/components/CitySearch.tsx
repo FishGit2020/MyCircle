@@ -181,6 +181,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
   }, []);
 
   const handleCityClick = useCallback((city: City | RecentCity) => {
+    window.__logAnalyticsEvent?.('city_selected', { city_name: city.name });
     eventBus.publish(MFEvents.CITY_SELECTED, { city });
     addToLocalRecents(city);
 

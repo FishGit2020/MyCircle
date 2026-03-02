@@ -77,9 +77,10 @@ describe('BenchmarkRunner', () => {
     expect(runBtn).not.toBeDisabled();
   });
 
-  it('shows model input with default value', () => {
+  it('shows model dropdown with loading state when no models discovered', () => {
     render(<BenchmarkRunner onResults={onResults} />);
-    const modelInput = screen.getByPlaceholderText('gemma2:2b');
-    expect(modelInput).toHaveValue('gemma2:2b');
+    const modelSelect = screen.getByRole('combobox');
+    expect(modelSelect).toBeDisabled();
+    expect(screen.getByText('app.loading')).toBeInTheDocument();
   });
 });

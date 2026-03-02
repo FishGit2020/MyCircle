@@ -466,7 +466,9 @@ const en = {
 
   // AI Monitor
   'ai.tabChat': 'Chat',
+  'ai.tabEndpoints': 'Endpoints',
   'ai.tabMonitor': 'Monitor',
+  'ai.noEndpointsHint': 'Add Ollama endpoints in the Endpoints tab to get started',
   'ai.monitor.totalCalls': 'Total Calls',
   'ai.monitor.inputTokens': 'Input Tokens',
   'ai.monitor.outputTokens': 'Output Tokens',
@@ -1530,6 +1532,10 @@ const en = {
   'benchmark.history.runAt': 'Run at {date}',
   'benchmark.history.endpoints': '{count} endpoints',
   'benchmark.signInRequired': 'Sign in to use benchmarks',
+
+  // Endpoint source labels
+  'endpoints.sourceChat': 'Chat',
+  'endpoints.sourceBenchmark': 'Benchmark',
 
   // Immigration Tracker
   'nav.immigration': 'Immigration',

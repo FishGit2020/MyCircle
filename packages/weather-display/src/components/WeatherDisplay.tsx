@@ -62,6 +62,7 @@ export default function WeatherDisplay() {
     const unsubscribe = subscribeToMFEvent<CitySelectedEvent>(
       MFEvents.CITY_SELECTED,
       (data) => {
+        window.__logAnalyticsEvent?.('weather_city_view', { city_name: data.city.name });
         setLocation({ lat: data.city.lat, lon: data.city.lon });
       }
     );

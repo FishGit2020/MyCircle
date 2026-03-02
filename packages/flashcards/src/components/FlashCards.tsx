@@ -89,6 +89,7 @@ export default function FlashCards() {
 
   const handlePracticeAll = () => {
     if (filteredCards.length > 0) {
+      window.__logAnalyticsEvent?.('flashcard_practice', { card_count: filteredCards.length });
       setPracticeStart(0);
       setPracticeCards(filteredCards);
     }

@@ -28,6 +28,9 @@ export default function ModelBenchmark() {
     setSaving(true);
     try {
       await saveRun(latestResults);
+      window.__logAnalyticsEvent?.('benchmark_run_saved', {
+        result_count: latestResults.length,
+      });
     } finally {
       setSaving(false);
     }

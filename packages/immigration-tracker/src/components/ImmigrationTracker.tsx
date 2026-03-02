@@ -72,6 +72,7 @@ export default function ImmigrationTracker() {
         <div className="mb-6">
           <AddCaseForm
             onAdd={async (data) => {
+              window.__logAnalyticsEvent?.('immigration_case_save', { case_type: data.caseType || 'unknown' });
               await addCase(data);
               setShowAddForm(false);
             }}
