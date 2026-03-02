@@ -1,5 +1,6 @@
 import { useQuery, getAllDailyVerses, GET_BIBLE_PASSAGE } from '@mycircle/shared';
 import type { DailyVerse } from '@mycircle/shared';
+import type { GetBiblePassageQuery, BibleVerseItem } from '@mycircle/shared';
 
 export type { DailyVerse };
 
@@ -9,20 +10,7 @@ function getDayOfYear(): number {
   return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export interface VerseFragment {
-  number: number;
-  text: string;
-}
-
-interface PassageResponse {
-  biblePassage: {
-    text: string;
-    reference: string;
-    translation: string | null;
-    copyright: string | null;
-    verses: VerseFragment[] | null;
-  };
-}
+export type VerseFragment = BibleVerseItem;
 
 export function useCuratedVerse() {
   const verses = getAllDailyVerses();
@@ -32,7 +20,7 @@ export function useCuratedVerse() {
   const offset = Math.floor(verses.length / 2);
   const localVerse = verses[(day + offset) % verses.length];
 
-  const { data, loading } = useQuery<PassageResponse>(GET_BIBLE_PASSAGE, {
+  const { data, loading } = useQuery<GetBiblePassageQuery>(GET_BIBLE_PASSAGE, {
     variables: { reference: localVerse.usfm ?? localVerse.reference },
     fetchPolicy: 'cache-first',
   });

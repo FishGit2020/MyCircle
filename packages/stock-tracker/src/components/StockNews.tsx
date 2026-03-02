@@ -1,20 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuery, GET_COMPANY_NEWS, useTranslation } from '@mycircle/shared';
-
-interface CompanyNewsArticle {
-  id: number;
-  category: string;
-  datetime: number;
-  headline: string;
-  image: string | null;
-  source: string;
-  summary: string;
-  url: string;
-}
-
-interface CompanyNewsResponse {
-  companyNews: CompanyNewsArticle[];
-}
+import type { GetCompanyNewsQuery } from '@mycircle/shared';
 
 function formatRelativeTime(timestamp: number): string {
   const now = Math.floor(Date.now() / 1000);
@@ -40,7 +26,7 @@ export default function StockNews({ symbol }: StockNewsProps) {
     };
   }, []);
 
-  const { data, loading } = useQuery<CompanyNewsResponse>(GET_COMPANY_NEWS, {
+  const { data, loading } = useQuery<GetCompanyNewsQuery>(GET_COMPANY_NEWS, {
     variables: { symbol, from, to },
     fetchPolicy: 'cache-first',
   });

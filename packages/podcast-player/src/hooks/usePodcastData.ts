@@ -6,32 +6,14 @@ import {
   GET_PODCAST_EPISODES,
 } from '@mycircle/shared';
 import type { Podcast, Episode, PodcastSearchResult } from '@mycircle/shared';
+import type {
+  SearchPodcastsQuery,
+  GetTrendingPodcastsQuery,
+  GetPodcastEpisodesQuery,
+} from '@mycircle/shared';
 
 // Re-export types for backward compatibility
 export type { Podcast, Episode, PodcastSearchResult };
-
-// --- GraphQL Response Types ---
-
-interface SearchPodcastsResponse {
-  searchPodcasts: {
-    feeds: Podcast[];
-    count: number;
-  };
-}
-
-interface TrendingPodcastsResponse {
-  trendingPodcasts: {
-    feeds: Podcast[];
-    count: number;
-  };
-}
-
-interface PodcastEpisodesResponse {
-  podcastEpisodes: {
-    items: Episode[];
-    count: number;
-  };
-}
 
 // --- Hook: usePodcastSearch ---
 
@@ -66,7 +48,7 @@ export function usePodcastSearch(query: string): FetchState<PodcastSearchResult>
     };
   }, [query]);
 
-  const { data, loading, error } = useQuery<SearchPodcastsResponse>(SEARCH_PODCASTS, {
+  const { data, loading, error } = useQuery<SearchPodcastsQuery>(SEARCH_PODCASTS, {
     variables: { query: debouncedQuery },
     skip: debouncedQuery.length < 2,
     fetchPolicy: 'cache-first',
@@ -86,7 +68,7 @@ export function usePodcastSearch(query: string): FetchState<PodcastSearchResult>
 // --- Hook: useTrendingPodcasts ---
 
 export function useTrendingPodcasts() {
-  const { data, loading, error, refetch } = useQuery<TrendingPodcastsResponse>(
+  const { data, loading, error, refetch } = useQuery<GetTrendingPodcastsQuery>(
     GET_TRENDING_PODCASTS,
     { fetchPolicy: 'cache-and-network' }
   );
@@ -102,7 +84,7 @@ export function useTrendingPodcasts() {
 // --- Hook: usePodcastEpisodes ---
 
 export function usePodcastEpisodes(feedId: string | number | null) {
-  const { data, loading, error } = useQuery<PodcastEpisodesResponse>(GET_PODCAST_EPISODES, {
+  const { data, loading, error } = useQuery<GetPodcastEpisodesQuery>(GET_PODCAST_EPISODES, {
     variables: { feedId: feedId! },
     skip: feedId === null,
     fetchPolicy: 'cache-and-network',
