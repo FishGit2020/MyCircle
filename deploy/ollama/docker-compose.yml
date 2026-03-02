@@ -3,6 +3,19 @@
 # Requires a Cloudflare Zero Trust account with a tunnel token.
 # See docs/ollama-setup.md for full setup instructions.
 #
+# GPU Support:
+#   Check available hardware before running:
+#     - GPU: nvidia-smi
+#     - CPU: [System.Environment]::ProcessorCount (or Get-ComputerInfo -Property LogicalProcessorCount)
+#     - Memory: Get-WmiObject -Class Win32_ComputerSystem | Select-Object TotalPhysicalMemory
+#   If nvidia-smi works, GPU acceleration is enabled below.
+#
+# Configuration Note:
+#   The following settings are optimized for: RTX 2080 (8GB VRAM), 20 CPU cores, 191GB RAM
+#   - OLLAMA_NUM_PARALLEL=8      (adjust based on your CPU cores: cores/2 is a good baseline)
+#   - OLLAMA_MAX_LOADED_MODELS=3 (adjust based on VRAM: 3-4 for 8GB VRAM, more for 16GB+)
+#   - memory: 64G                (adjust based on available system RAM)
+#
 # Usage:
 #   1. Replace <your-tunnel-token> with your Cloudflare tunnel token
 #   2. docker compose up -d
@@ -22,12 +35,17 @@ services:
       - ./ollama-models:/root/.ollama
     environment:
       - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_NUM_PARALLEL=1
-      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=8
+      - OLLAMA_MAX_LOADED_MODELS=3
     deploy:
       resources:
         limits:
-          memory: 6G
+          memory: 64G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   cloudflared:
     image: cloudflare/cloudflared:latest
