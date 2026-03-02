@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useState, useEffect } from 'react';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import Loading from './Loading';
 
@@ -11,9 +11,26 @@ export default function RequireAuth({ children }: Props) {
   const { t } = useTranslation();
   const { user, loading, signIn } = useAuth();
 
+  // Also check the __getFirebaseIdToken bridge used by MFEs and e2e tests
+  const [hasToken, setHasToken] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      try {
+        const token = await (window as any).__getFirebaseIdToken?.();
+        if (mounted) setHasToken(!!token);
+      } catch {
+        if (mounted) setHasToken(false);
+      }
+    };
+    check();
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, check);
+    return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, check); };
+  }, []);
+
   if (loading) return <Loading />;
 
-  if (!user) {
+  if (!user && !hasToken) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
         <svg className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
