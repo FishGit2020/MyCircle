@@ -25,7 +25,7 @@ localeCache.set('en', en);
 interface I18nContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: TranslationKey, params?: Record<string, string>) => string;
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -67,8 +67,14 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     } catch { /* ignore */ }
   }, []);
 
-  const t = useCallback((key: TranslationKey): string => {
-    return loadedStrings[key] ?? en[key] ?? key;
+  const t = useCallback((key: TranslationKey, params?: Record<string, string>): string => {
+    let str = loadedStrings[key] ?? en[key] ?? key;
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+      }
+    }
+    return str;
   }, [loadedStrings]);
 
   const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
@@ -83,7 +89,15 @@ export function useTranslation() {
     return {
       locale: 'en' as Locale,
       setLocale: () => {},
-      t: (key: TranslationKey) => en[key] ?? key,
+      t: (key: TranslationKey, params?: Record<string, string>): string => {
+        let str: string = en[key] ?? key;
+        if (params) {
+          for (const [k, v] of Object.entries(params)) {
+            str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+          }
+        }
+        return str;
+      },
     };
   }
   return context;

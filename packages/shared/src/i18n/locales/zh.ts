@@ -1543,6 +1543,8 @@ const zh: Record<TranslationKey, string> = {
   'benchmark.history.none': '\u6682\u65e0\u6d4b\u8bd5\u5386\u53f2',
   'benchmark.history.runAt': '\u8fd0\u884c\u4e8e {date}',
   'benchmark.history.endpoints': '{count} \u4e2a\u7aef\u70b9',
+  'benchmark.history.delete': '\u5220\u9664\u8fd0\u884c',
+  'benchmark.history.deleteConfirm': '\u786e\u5b9a\u5220\u9664\u6b64\u6d4b\u8bd5\u8fd0\u884c\uff1f',
   'benchmark.signInRequired': '\u767b\u5f55\u540e\u4f7f\u7528\u6027\u80fd\u6d4b\u8bd5',
 
   // Endpoint source labels

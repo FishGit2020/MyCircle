@@ -1541,6 +1541,8 @@ const en = {
   'benchmark.history.none': 'No benchmark history yet',
   'benchmark.history.runAt': 'Run at {date}',
   'benchmark.history.endpoints': '{count} endpoints',
+  'benchmark.history.delete': 'Delete run',
+  'benchmark.history.deleteConfirm': 'Delete this benchmark run?',
   'benchmark.signInRequired': 'Sign in to use benchmarks',
 
   // Endpoint source labels

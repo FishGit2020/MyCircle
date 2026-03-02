@@ -1543,6 +1543,8 @@ const es: Record<TranslationKey, string> = {
   'benchmark.history.none': 'Sin historial de benchmarks',
   'benchmark.history.runAt': 'Ejecutado el {date}',
   'benchmark.history.endpoints': '{count} endpoints',
+  'benchmark.history.delete': 'Eliminar ejecuci\u00f3n',
+  'benchmark.history.deleteConfirm': '\u00bfEliminar esta ejecuci\u00f3n de benchmark?',
   'benchmark.signInRequired': 'Inicia sesi\u00f3n para usar benchmarks',
 
   // Endpoint source labels
