@@ -26,7 +26,7 @@ COPY packages/cloud-files/package.json packages/cloud-files/
 COPY packages/model-benchmark/package.json packages/model-benchmark/
 COPY packages/immigration-tracker/package.json packages/immigration-tracker/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source
 COPY . .
