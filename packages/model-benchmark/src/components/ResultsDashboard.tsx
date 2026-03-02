@@ -6,9 +6,10 @@ interface Props {
   results: BenchmarkRunResult[];
   onSave: () => void;
   saving: boolean;
+  saveError?: string;
 }
 
-export default function ResultsDashboard({ results, onSave, saving }: Props) {
+export default function ResultsDashboard({ results, onSave, saving, saveError }: Props) {
   const { t } = useTranslation();
 
   if (results.length === 0) {
@@ -40,6 +41,11 @@ export default function ResultsDashboard({ results, onSave, saving }: Props) {
           {saving ? '...' : t('benchmark.results.save')}
         </button>
       </div>
+      {saveError && (
+        <div className="px-3 py-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg" role="alert">
+          {saveError}
+        </div>
+      )}
 
       {/* Results Table */}
       <div className="overflow-x-auto">

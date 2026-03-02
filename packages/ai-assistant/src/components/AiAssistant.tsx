@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback, lazy, Suspense } from 'react';
+import { useSearchParams } from 'react-router';
 import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS, EndpointManager } from '@mycircle/shared';
 import { useAiChat } from '../hooks/useAiChat';
 import ChatMessage from './ChatMessage';
@@ -27,7 +28,9 @@ export default function AiAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's Ollama endpoints
-  const { data: endpointsData } = useQuery(GET_BENCHMARK_ENDPOINTS);
+  const { data: endpointsData } = useQuery(GET_BENCHMARK_ENDPOINTS, {
+    fetchPolicy: 'cache-and-network',
+  });
   const endpoints: Array<{ id: string; url: string; name: string }> = endpointsData?.benchmarkEndpoints ?? [];
 
   const [selectedEndpoint, setSelectedEndpoint] = useState(() => {
@@ -45,7 +48,13 @@ export default function AiAssistant() {
   // Use endpoint-specific models if available, else default
   const displayModels = selectedEndpoint && models.length > 0 ? models : defaultModels;
 
-  const [activeTab, setActiveTab] = useState<'chat' | 'endpoints' | 'monitor'>('chat');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const VALID_TABS = new Set(['chat', 'endpoints', 'monitor']);
+  const activeTab: 'chat' | 'endpoints' | 'monitor' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'chat';
+  const setActiveTab = useCallback((tab: 'chat' | 'endpoints' | 'monitor') => {
+    setSearchParams(tab === 'chat' ? {} : { tab }, { replace: true });
+  }, [setSearchParams]);
 
   const [selectedModel, setSelectedModel] = useState(() => {
     try { return localStorage.getItem(MODEL_STORAGE_KEY) || ''; } catch { return ''; }
