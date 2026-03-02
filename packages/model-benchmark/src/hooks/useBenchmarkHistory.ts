@@ -1,5 +1,4 @@
-import { useQuery } from '@apollo/client';
-import { GET_BENCHMARK_HISTORY } from '@mycircle/shared';
+import { useQuery, GET_BENCHMARK_HISTORY } from '@mycircle/shared';
 
 export interface BenchmarkRun {
   id: string;

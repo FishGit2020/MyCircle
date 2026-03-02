@@ -3,20 +3,15 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BenchmarkRunner from './BenchmarkRunner';
 
-// Mock @mycircle/shared
+// Mock @mycircle/shared (includes Apollo hooks)
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+  useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
   StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache' },
   WindowEvents: { BENCHMARK_CHANGED: 'benchmark-changed' },
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
-}));
-
-// Mock Apollo
-vi.mock('@apollo/client', () => ({
-  useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
-  gql: (str: TemplateStringsArray) => str,
 }));
 
 vi.mock('../hooks/useEndpoints', () => ({
