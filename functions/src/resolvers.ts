@@ -767,6 +767,49 @@ const DAILY_VERSES = [
 // Default Bible version (NIV 2011 = 111 on YouVersion)
 const DEFAULT_YOUVERSION_BIBLE_ID = 111;
 
+// ─── Per-user Ollama endpoint helpers ──────────────────────
+interface OllamaEndpoint {
+  id: string;
+  url: string;
+  name: string;
+  cfAccessClientId?: string;
+  cfAccessClientSecret?: string;
+}
+
+async function getUserOllamaEndpoints(uid: string): Promise<OllamaEndpoint[]> {
+  const db = getFirestore();
+  const snap = await db.collection(`users/${uid}/benchmarkEndpoints`).orderBy('createdAt').get();
+  return snap.docs.map(doc => {
+    const d = doc.data();
+    return {
+      id: doc.id,
+      url: d.url,
+      name: d.name,
+      cfAccessClientId: d.cfAccessClientId || undefined,
+      cfAccessClientSecret: d.cfAccessClientSecret || undefined,
+    };
+  });
+}
+
+async function getUserOllamaEndpoint(uid: string, endpointId?: string): Promise<OllamaEndpoint | null> {
+  const db = getFirestore();
+  if (endpointId) {
+    const doc = await db.doc(`users/${uid}/benchmarkEndpoints/${endpointId}`).get();
+    if (!doc.exists) return null;
+    const d = doc.data()!;
+    return { id: doc.id, url: d.url, name: d.name, cfAccessClientId: d.cfAccessClientId || undefined, cfAccessClientSecret: d.cfAccessClientSecret || undefined };
+  }
+  const endpoints = await getUserOllamaEndpoints(uid);
+  return endpoints[0] || null;
+}
+
+function buildEndpointHeaders(endpoint: OllamaEndpoint): Record<string, string> {
+  const headers: Record<string, string> = {};
+  if (endpoint.cfAccessClientId) headers['CF-Access-Client-Id'] = endpoint.cfAccessClientId;
+  if (endpoint.cfAccessClientSecret) headers['CF-Access-Client-Secret'] = endpoint.cfAccessClientSecret;
+  return headers;
+}
+
 // Resolver factory
 export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => string, getPodcastKeys?: () => { apiKey: string; apiSecret: string }, getYouVersionKey?: () => string) {
   return {
@@ -852,12 +895,14 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         return { id: ref.id, ...data };
       },
 
-      aiChat: async (_: any, { message, history, context, model }: {
+      aiChat: async (_: any, { message, history, context, model, endpointId }: {
         message: string;
         history?: { role: string; content: string }[];
         context?: Record<string, unknown>;
         model?: string;
-      }) => {
+        endpointId?: string;
+      }, ctx: any) => {
+        const uid = ctx?.uid;
         const startTime = Date.now();
         let inputTokens = 0;
         let outputTokens = 0;
@@ -865,10 +910,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         let trackedProvider = '';
         let trackedModel = '';
 
-        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
+        const endpoint = uid ? await getUserOllamaEndpoint(uid, endpointId || undefined) : null;
+        const ollamaBaseUrl = endpoint?.url || '';
         const ollamaModel = model || 'gemma2:2b';
         const geminiKey = process.env.GEMINI_API_KEY;
-        if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)');
+        if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured — add an Ollama endpoint in Settings or contact admin for Gemini');
 
         const apiKey = getApiKey();
         const finnhubKey = getFinnhubKey?.() || '';
@@ -918,16 +964,13 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         }
 
         // ─── Ollama path ──────────────────────────────────────
-        if (ollamaBaseUrl) {
+        if (ollamaBaseUrl && endpoint) {
           trackedProvider = 'ollama';
           trackedModel = ollamaModel;
           const { default: OpenAI } = await import('openai');
           const client = new OpenAI({
             baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
-            defaultHeaders: {
-              ...(process.env.CF_ACCESS_CLIENT_ID ? { 'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID } : {}),
-              ...(process.env.CF_ACCESS_CLIENT_SECRET ? { 'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET } : {}),
-            },
+            defaultHeaders: buildEndpointHeaders(endpoint),
           });
 
           const ollamaTools: OpenAI.ChatCompletionTool[] = [
@@ -1091,14 +1134,28 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
     },
 
     Query: {
-      ollamaModels: async () => {
-        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
-        if (!ollamaBaseUrl) return [];
+      ollamaModels: async (_: any, __: any, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) return [];
         try {
-          const headers: Record<string, string> = {};
-          if (process.env.CF_ACCESS_CLIENT_ID) headers['CF-Access-Client-Id'] = process.env.CF_ACCESS_CLIENT_ID;
-          if (process.env.CF_ACCESS_CLIENT_SECRET) headers['CF-Access-Client-Secret'] = process.env.CF_ACCESS_CLIENT_SECRET;
-          const { data } = await axios.get(`${ollamaBaseUrl}/api/tags`, { headers, timeout: 5000 });
+          const endpoint = await getUserOllamaEndpoint(uid);
+          if (!endpoint) return [];
+          const headers = buildEndpointHeaders(endpoint);
+          const { data } = await axios.get(`${endpoint.url}/api/tags`, { headers, timeout: 5000 });
+          return (data.models || []).map((m: any) => m.name as string);
+        } catch {
+          return [];
+        }
+      },
+
+      benchmarkEndpointModels: async (_: any, { endpointId }: { endpointId: string }, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const endpoint = await getUserOllamaEndpoint(uid, endpointId);
+        if (!endpoint) return [];
+        try {
+          const headers = buildEndpointHeaders(endpoint);
+          const { data } = await axios.get(`${endpoint.url}/api/tags`, { headers, timeout: 5000 });
           return (data.models || []).map((m: any) => m.name as string);
         } catch {
           return [];
@@ -1165,15 +1222,15 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         };
       },
 
-      ollamaStatus: async () => {
-        const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
-        if (!ollamaBaseUrl) return { models: [], reachable: false, latencyMs: null };
+      ollamaStatus: async (_: any, __: any, ctx: any) => {
+        const uid = ctx?.uid;
+        if (!uid) return { models: [], reachable: false, latencyMs: null };
         try {
-          const headers: Record<string, string> = {};
-          if (process.env.CF_ACCESS_CLIENT_ID) headers['CF-Access-Client-Id'] = process.env.CF_ACCESS_CLIENT_ID;
-          if (process.env.CF_ACCESS_CLIENT_SECRET) headers['CF-Access-Client-Secret'] = process.env.CF_ACCESS_CLIENT_SECRET;
+          const endpoint = await getUserOllamaEndpoint(uid);
+          if (!endpoint) return { models: [], reachable: false, latencyMs: null };
+          const headers = buildEndpointHeaders(endpoint);
           const start = Date.now();
-          const { data } = await axios.get(`${ollamaBaseUrl}/api/ps`, { headers, timeout: 5000 });
+          const { data } = await axios.get(`${endpoint.url}/api/ps`, { headers, timeout: 5000 });
           const latencyMs = Date.now() - start;
           const models = (data.models || []).map((m: any) => ({
             name: m.name || '',

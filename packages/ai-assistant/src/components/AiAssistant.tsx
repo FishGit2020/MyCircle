@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, lazy, Suspense } from 'react';
-import { useTranslation, useQuery, GET_OLLAMA_MODELS } from '@mycircle/shared';
+import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
 import { useAiChat } from '../hooks/useAiChat';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -19,14 +19,31 @@ const SUGGESTION_KEYS = [
 
 const DEBUG_STORAGE_KEY = 'ai-debug-mode';
 const MODEL_STORAGE_KEY = 'mycircle-ai-model';
+const ENDPOINT_STORAGE_KEY = 'mycircle-ai-endpoint';
 
 export default function AiAssistant() {
   const { t } = useTranslation();
   const { messages, loading, error, canRetry, sendMessage, clearChat, retry } = useAiChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: modelsData } = useQuery(GET_OLLAMA_MODELS);
-  const models: string[] = modelsData?.ollamaModels ?? [];
+  // Fetch user's Ollama endpoints
+  const { data: endpointsData } = useQuery(GET_BENCHMARK_ENDPOINTS);
+  const endpoints: Array<{ id: string; url: string; name: string }> = endpointsData?.benchmarkEndpoints ?? [];
+
+  const [selectedEndpoint, setSelectedEndpoint] = useState(() => {
+    try { return localStorage.getItem(ENDPOINT_STORAGE_KEY) || ''; } catch { return ''; }
+  });
+
+  // Fetch models for the selected endpoint
+  const [fetchModels, { data: modelsData }] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
+  const models: string[] = modelsData?.benchmarkEndpointModels ?? [];
+
+  // Also keep the old ollamaModels query as fallback for default endpoint
+  const { data: defaultModelsData } = useQuery(GET_OLLAMA_MODELS);
+  const defaultModels: string[] = defaultModelsData?.ollamaModels ?? [];
+
+  // Use endpoint-specific models if available, else default
+  const displayModels = selectedEndpoint && models.length > 0 ? models : defaultModels;
 
   const [activeTab, setActiveTab] = useState<'chat' | 'monitor'>('chat');
 
@@ -34,14 +51,38 @@ export default function AiAssistant() {
     try { return localStorage.getItem(MODEL_STORAGE_KEY) || ''; } catch { return ''; }
   });
 
+  // When endpoints load, auto-select saved or first endpoint
+  useEffect(() => {
+    if (endpoints.length > 0) {
+      if (!selectedEndpoint || !endpoints.some(ep => ep.id === selectedEndpoint)) {
+        const first = endpoints[0].id;
+        setSelectedEndpoint(first);
+        try { localStorage.setItem(ENDPOINT_STORAGE_KEY, first); } catch { /* */ }
+      }
+    }
+  }, [endpoints, selectedEndpoint]);
+
+  // Fetch models when selected endpoint changes
+  useEffect(() => {
+    if (selectedEndpoint) {
+      fetchModels({ variables: { endpointId: selectedEndpoint } });
+    }
+  }, [selectedEndpoint, fetchModels]);
+
   // Reset to first available model if saved model is no longer in the list
   useEffect(() => {
-    if (models.length > 0 && (!selectedModel || !models.includes(selectedModel))) {
-      const first = models[0];
+    if (displayModels.length > 0 && (!selectedModel || !displayModels.includes(selectedModel))) {
+      const first = displayModels[0];
       setSelectedModel(first);
       try { localStorage.setItem(MODEL_STORAGE_KEY, first); } catch { /* */ }
     }
-  }, [models, selectedModel]);
+  }, [displayModels, selectedModel]);
+
+  const handleEndpointChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setSelectedEndpoint(id);
+    try { localStorage.setItem(ENDPOINT_STORAGE_KEY, id); } catch { /* */ }
+  }, []);
 
   const handleModelChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const model = e.target.value;
@@ -81,20 +122,35 @@ export default function AiAssistant() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Model selector — only shown when Ollama models are available */}
-          {activeTab === 'chat' && models.length > 0 && (
+          {/* Endpoint + Model selectors — shown when user has Ollama endpoints */}
+          {activeTab === 'chat' && endpoints.length > 0 && (
             <>
-              <label className="sr-only" htmlFor="ai-model-select">{t('ai.modelLabel')}</label>
+              <label className="sr-only" htmlFor="ai-endpoint-select">{t('ai.endpointLabel')}</label>
               <select
-                id="ai-model-select"
-                value={selectedModel}
-                onChange={handleModelChange}
-                className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                id="ai-endpoint-select"
+                value={selectedEndpoint}
+                onChange={handleEndpointChange}
+                className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 max-w-[120px] truncate"
               >
-                {models.map(m => (
-                  <option key={m} value={m}>{m}</option>
+                {endpoints.map(ep => (
+                  <option key={ep.id} value={ep.id}>{ep.name}</option>
                 ))}
               </select>
+              {displayModels.length > 0 && (
+                <>
+                  <label className="sr-only" htmlFor="ai-model-select">{t('ai.modelLabel')}</label>
+                  <select
+                    id="ai-model-select"
+                    value={selectedModel}
+                    onChange={handleModelChange}
+                    className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  >
+                    {displayModels.map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </>
+              )}
             </>
           )}
           {/* Debug toggle */}

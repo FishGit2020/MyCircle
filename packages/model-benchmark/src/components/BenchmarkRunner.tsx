@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useState, useEffect } from 'react';
+import { useTranslation, useLazyQuery, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
 import { useEndpoints } from '../hooks/useEndpoints';
 import { useBenchmark, BENCHMARK_PROMPTS } from '../hooks/useBenchmark';
 import type { BenchmarkRunResult } from '../hooks/useBenchmark';
@@ -14,9 +14,21 @@ export default function BenchmarkRunner({ onResults }: Props) {
   const { running, currentEndpoint, runBenchmark } = useBenchmark();
 
   const [selectedEndpoints, setSelectedEndpoints] = useState<string[]>([]);
-  const [model, setModel] = useState('gemma2:2b');
+  const [model, setModel] = useState(() => {
+    try { return localStorage.getItem('benchmark-model') || 'gemma2:2b'; } catch { return 'gemma2:2b'; }
+  });
   const [selectedPromptId, setSelectedPromptId] = useState('simple');
   const [customPrompt, setCustomPrompt] = useState('');
+
+  // Model discovery: fetch models from the first selected endpoint
+  const [fetchModels, { data: modelsData }] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
+  const discoveredModels: string[] = modelsData?.benchmarkEndpointModels ?? [];
+
+  useEffect(() => {
+    if (selectedEndpoints.length > 0) {
+      fetchModels({ variables: { endpointId: selectedEndpoints[0] } });
+    }
+  }, [selectedEndpoints, fetchModels]);
 
   const toggleEndpoint = (id: string) => {
     setSelectedEndpoints(prev =>
@@ -66,14 +78,27 @@ export default function BenchmarkRunner({ onResults }: Props) {
       {/* Model Selection */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('benchmark.runner.selectModel')}</label>
-        <input
-          type="text"
-          value={model}
-          onChange={e => setModel(e.target.value)}
-          placeholder="gemma2:2b"
-          disabled={running}
-          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-        />
+        {discoveredModels.length > 0 ? (
+          <select
+            value={model}
+            onChange={e => { setModel(e.target.value); try { localStorage.setItem('benchmark-model', e.target.value); } catch { /* */ } }}
+            disabled={running}
+            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          >
+            {discoveredModels.map(m => (
+              <option key={m} value={m}>{m}</option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            value={model}
+            onChange={e => { setModel(e.target.value); try { localStorage.setItem('benchmark-model', e.target.value); } catch { /* */ } }}
+            placeholder="gemma2:2b"
+            disabled={running}
+            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          />
+        )}
       </div>
 
       {/* Prompt Selection */}

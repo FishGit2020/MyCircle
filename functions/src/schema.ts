@@ -255,6 +255,7 @@ export const typeDefs = `#graphql
 
     # Benchmark queries
     benchmarkEndpoints: [BenchmarkEndpoint!]!
+    benchmarkEndpointModels(endpointId: ID!): [String!]!
     benchmarkHistory(limit: Int = 10): [BenchmarkRun!]!
     benchmarkSummary: BenchmarkSummary!
   }
@@ -397,7 +398,7 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
-    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String): AiChatResponse!
+    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
     saveBenchmarkEndpoint(input: BenchmarkEndpointInput!): BenchmarkEndpoint!
     deleteBenchmarkEndpoint(id: String!): Boolean!

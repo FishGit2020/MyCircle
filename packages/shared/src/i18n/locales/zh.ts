@@ -460,6 +460,7 @@ const zh: Record<TranslationKey, string> = {
   'ai.suggestBible': '\u67e5\u627e\u7ea6\u7ff0\u798f\u97f3 3:16',
   'ai.suggestPodcast': '\u641c\u7d22\u79d1\u6280\u64ad\u5ba2',
   'ai.modelLabel': '\u6a21\u578b',
+  'ai.endpointLabel': '\u7aef\u70b9',
   'ai.debugToggle': '\u8c03\u8bd5\u6a21\u5f0f',
   'ai.debugArgs': '\u53c2\u6570',
   'ai.debugResult': '\u7ed3\u679c',
