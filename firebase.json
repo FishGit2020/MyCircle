@@ -35,6 +35,10 @@
         "function": "babyPhotos"
       },
       {
+        "source": "/api/uscis/**",
+        "function": "uscisStatus"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

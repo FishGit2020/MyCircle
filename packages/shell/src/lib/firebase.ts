@@ -961,6 +961,58 @@ if (firebaseEnabled) {
   };
 }
 
+// Immigration Tracker — user-scoped subcollection
+export async function getImmigrationCases(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'immigrationCases'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function addImmigrationCase(uid: string, data: { receiptNumber: string; formType: string; nickname: string }) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'users', uid, 'immigrationCases'), {
+    ...data,
+    createdAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function deleteImmigrationCase(uid: string, caseId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'users', uid, 'immigrationCases', caseId));
+}
+
+export function subscribeToImmigrationCases(uid: string, callback: (cases: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'immigrationCases'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    const cases = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(cases);
+  }, (error) => {
+    log.warn('Immigration cases snapshot error:', error);
+  });
+}
+
+// Expose immigration tracker API for MFEs
+if (firebaseEnabled) {
+  window.__immigrationTracker = {
+    getAll: () => auth?.currentUser ? getImmigrationCases(auth.currentUser.uid) : Promise.resolve([]),
+    add: (data: { receiptNumber: string; formType: string; nickname: string }) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addImmigrationCase(auth.currentUser.uid, data);
+    },
+    delete: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteImmigrationCase(auth.currentUser.uid, id);
+    },
+    subscribe: (callback: (cases: Array<Record<string, any>>) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToImmigrationCases(auth.currentUser.uid, callback);
+    },
+  };
+}
+
 // Public Flashcards — shared collection (public read, auth write)
 export async function getPublicFlashcards() {
   if (!db) return [];
