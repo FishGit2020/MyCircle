@@ -287,7 +287,7 @@ Tests pass locally with `pnpm --filter @mycircle/shell test:run` but fail in CI 
 
 When adding a new MFE remote, update **both** configs and create a mock:
 
-1. **Create the mock** in `packages/shell/src/test/mocks/<Name>Mock.tsx`:
+1. **Create the mock** in `packages/shell/test/mocks/<Name>Mock.tsx`:
 
 ```tsx
 export default function BabyTrackerMock() {
@@ -298,16 +298,16 @@ export default function BabyTrackerMock() {
 2. **Add alias to shell config** (`packages/shell/vitest.config.ts`):
 
 ```ts
-'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx'),
+'babyTracker/BabyTracker': resolve(__dirname, './test/mocks/BabyTrackerMock.tsx'),
 ```
 
 3. **Add alias to root config** (`vitest.config.ts`):
 
 ```ts
-'babyTracker/BabyTracker': resolve(__dirname, './packages/shell/src/test/mocks/BabyTrackerMock.tsx'),
+'babyTracker/BabyTracker': resolve(__dirname, './packages/shell/test/mocks/BabyTrackerMock.tsx'),
 ```
 
-Note the path difference: the root config uses `./packages/shell/src/test/mocks/...` while the shell config uses `./src/test/mocks/...` (relative to each config's location).
+Note the path difference: the root config uses `./packages/shell/test/mocks/...` while the shell config uses `./test/mocks/...` (relative to each config's location).
 
 ### Full Checklist for Adding a New MFE
 
@@ -322,7 +322,7 @@ When adding a new micro-frontend, update **all** of the following. Items marked 
 
 #### Test Infrastructure
 
-- [ ] Create mock at `packages/shell/src/test/mocks/<Name>Mock.tsx`
+- [ ] Create mock at `packages/shell/test/mocks/<Name>Mock.tsx`
 - [ ] Add alias to `packages/shell/vitest.config.ts`
 - [ ] Add alias to root `vitest.config.ts` (different relative path — see note above)
 - [ ] Verify with `pnpm test:run` (root) — not just `pnpm --filter @mycircle/shell test:run`

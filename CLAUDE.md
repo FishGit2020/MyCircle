@@ -45,7 +45,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 When adding a new micro frontend, update ALL of these integration points:
 
 1. **Shell**: `App.tsx` (lazy import + route), `vite.config.ts` (federation remote URL), `remotes.d.ts` (type declaration), `tailwind.config.js` (content path), `WidgetDashboard.tsx` (WidgetType + DEFAULT_LAYOUT + WIDGET_COMPONENTS + WIDGET_ROUTES), `BottomNav.tsx` (nav item + icon)
-2. **Testing**: Mock file in `packages/shell/src/test/mocks/`, alias in **both** root `vitest.config.ts` AND `packages/shell/vitest.config.ts`, update hardcoded widget/nav counts in existing tests
+2. **Testing**: Mock file in `packages/shell/test/mocks/`, alias in **both** root `vitest.config.ts` AND `packages/shell/vitest.config.ts`, update hardcoded widget/nav counts in existing tests
 3. **Deployment**: `deploy/docker/Dockerfile` (COPY in build + runtime stages), `scripts/assemble-firebase.mjs` (copy block + mfeDirs array), `server/production.ts` (`MFE_PREFIXES` array)
 4. **Other**: `firestore.rules` (if new subcollections), root `package.json` (`dev:*` and `preview:*` scripts **AND** the `"dev"` + `"dev:mf"` concurrently commands — missing this means the MFE won't start in local dev and the route silently fails), i18n keys in all 3 locales, `docs/architecture.md`, `README.md`
 5. **functions/ has separate strict tsconfig**: `noUnusedLocals: true` — root `pnpm typecheck` doesn't catch it. Always verify with `cd functions && npx tsc --noEmit` before pushing backend changes.

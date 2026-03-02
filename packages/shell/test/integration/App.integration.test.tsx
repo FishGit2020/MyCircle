@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { ThemeProvider } from '../../context/ThemeContext';
-import { AuthProvider } from '../../context/AuthContext';
-import App from '../../App';
+import { ThemeProvider } from '../../src/context/ThemeContext';
+import { AuthProvider } from '../../src/context/AuthContext';
+import App from '../../src/App';
 
 // Mock the remote modules
 vi.mock('citySearch/CitySearch', () => ({
@@ -16,7 +16,7 @@ vi.mock('weatherDisplay/WeatherDisplay', () => ({
 }));
 
 // Mock the firebase lib so AuthProvider doesn't need real Firebase
-vi.mock('../../lib/firebase', () => ({
+vi.mock('../../src/lib/firebase', () => ({
   firebaseEnabled: false,
   app: null,
   auth: null,
