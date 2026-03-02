@@ -3,6 +3,7 @@ import {
   useMutation,
   RUN_BENCHMARK,
   SAVE_BENCHMARK_RUN,
+  GET_BENCHMARK_HISTORY,
   StorageKeys,
   WindowEvents,
 } from '@mycircle/shared';
@@ -44,7 +45,9 @@ export function useBenchmark() {
   const [currentEndpoint, setCurrentEndpoint] = useState<string | null>(null);
 
   const [runMutation] = useMutation(RUN_BENCHMARK);
-  const [saveMutation] = useMutation(SAVE_BENCHMARK_RUN);
+  const [saveMutation] = useMutation(SAVE_BENCHMARK_RUN, {
+    refetchQueries: [{ query: GET_BENCHMARK_HISTORY }],
+  });
 
   const runBenchmark = useCallback(async (
     endpointIds: string[],

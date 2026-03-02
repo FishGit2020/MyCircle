@@ -42,6 +42,7 @@ export default function Breadcrumbs() {
   if (!labelKey) return null;
 
   const hasDetail = segments.length > 1;
+  const tabParam = searchParams.get('tab');
 
   return (
     <nav aria-label={t('nav.breadcrumbLabel')} className="container mx-auto px-4 py-2">
@@ -68,6 +69,21 @@ export default function Breadcrumbs() {
             <li aria-hidden="true" className="select-none">/</li>
             <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200">
               {resolveDetailLabel(firstSegment, segments, searchParams, t)}
+            </li>
+          </>
+        ) : tabParam ? (
+          <>
+            <li>
+              <Link
+                to={`/${firstSegment}`}
+                className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+              >
+                {t(labelKey)}
+              </Link>
+            </li>
+            <li aria-hidden="true" className="select-none">/</li>
+            <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200">
+              {t(`${firstSegment}.tabs.${tabParam}` as any)}
             </li>
           </>
         ) : (
