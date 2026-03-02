@@ -109,6 +109,8 @@ query GetBenchmarkEndpointModels($endpointId: ID!) {
 
 ### docker-compose.yml
 
+> **Ready-to-use file**: [`deploy/ollama/docker-compose.yml`](../deploy/ollama/docker-compose.yml)
+
 ```yaml
 version: "3.8"
 
@@ -290,7 +292,9 @@ When adding an endpoint in the UI, you can optionally provide Cloudflare Access 
 
 If you don't have a Cloudflare account or custom domain, you can use Cloudflare's **free quick tunnel** to expose Ollama instantly. The URL is temporary (changes on every container restart), but MyCircle's Endpoint Manager UI makes it easy to update.
 
-### 1. docker-compose.yml
+### 1. docker-compose.quick.yml
+
+> **Ready-to-use file**: [`deploy/ollama/docker-compose.quick.yml`](../deploy/ollama/docker-compose.quick.yml)
 
 ```yaml
 version: "3.8"
@@ -316,6 +320,8 @@ services:
     container_name: cloudflared
     restart: unless-stopped
     command: tunnel --url http://ollama:11434
+    depends_on:
+      - ollama
 ```
 
 ### 2. Start and pull a model
