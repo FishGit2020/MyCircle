@@ -32,6 +32,9 @@ export default function WeatherMap({ lat, lon }: Props) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Guard: don't render until we have valid coordinates (not default 0,0)
+  const hasCoords = lat !== 0 || lon !== 0;
+
   const mapUrl = `https://openweathermap.org/weathermap?basemap=map&cities=true&layer=${layerCodes[activeLayer]}&lat=${lat}&lon=${lon}&zoom=${zoom}`;
 
   const handleZoomIn = useCallback(() => setZoom(z => Math.min(z + 1, MAX_ZOOM)), []);
@@ -112,13 +115,20 @@ export default function WeatherMap({ lat, lon }: Props) {
       </div>
 
       <div className="relative" style={{ height: isFullscreen ? 'calc(100vh - 72px)' : 350 }}>
-        <iframe
-          src={mapUrl}
-          className="w-full h-full border-0"
-          title={`Weather map - ${activeLayer}`}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-        />
+        {hasCoords ? (
+          <iframe
+            key={`${lat},${lon}`}
+            src={mapUrl}
+            className="w-full h-full border-0"
+            title={`Weather map - ${activeLayer}`}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
+            {t('map.waitingForLocation')}
+          </div>
+        )}
 
         {/* Location marker overlay */}
         <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-md text-xs text-gray-700 dark:text-gray-300">
