@@ -41,7 +41,15 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck:all
 
-      - name: Unit tests
-        run: pnpm test:all
+      - name: Unit tests with coverage
+        run: pnpm test:all -- --coverage
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: packages/*/coverage/
+          retention-days: 14
