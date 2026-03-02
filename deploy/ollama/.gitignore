@@ -1,0 +1,8 @@
+# Private keys - NEVER commit these
+id_ed25519
+id_ed25519.pub
+
+# Model files (large, regenerable from Ollama)
+ollama-models/models/
+ollama-models/blobs/
+ollama-models/manifests/
