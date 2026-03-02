@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation, useLazyQuery, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
+import React, { useState, useCallback } from 'react';
+import { useTranslation, useLazyQuery, GET_BENCHMARK_ENDPOINT_MODELS, StorageKeys } from '@mycircle/shared';
 import { useEndpoints } from '../hooks/useEndpoints';
 import { useBenchmark, BENCHMARK_PROMPTS } from '../hooks/useBenchmark';
 import type { BenchmarkRunResult } from '../hooks/useBenchmark';
@@ -14,37 +14,58 @@ export default function BenchmarkRunner({ onResults }: Props) {
   const { running, currentEndpoint, runBenchmark } = useBenchmark();
 
   const [selectedEndpoints, setSelectedEndpoints] = useState<string[]>([]);
-  const [model, setModel] = useState(() => {
-    try { return localStorage.getItem('benchmark-model') || 'gemma2:2b'; } catch { return 'gemma2:2b'; }
+  const [modelMap, setModelMap] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem(StorageKeys.BENCHMARK_MODEL_MAP);
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
   });
+  const [discoveredModels, setDiscoveredModels] = useState<Record<string, string[]>>({});
+  const [discoveryLoading, setDiscoveryLoading] = useState<Record<string, boolean>>({});
   const [selectedPromptId, setSelectedPromptId] = useState('simple');
   const [customPrompt, setCustomPrompt] = useState('');
 
-  // Model discovery: fetch models from the first selected endpoint (or first available)
-  const [fetchModels, { data: modelsData }] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
-  const discoveredModels: string[] = modelsData?.benchmarkEndpointModels ?? [];
+  const [fetchModelsQuery] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
 
-  // Auto-discover from first available endpoint even before user checks any
-  const discoveryEndpointId = selectedEndpoints[0] || endpoints[0]?.id;
-  useEffect(() => {
-    if (discoveryEndpointId) {
-      fetchModels({ variables: { endpointId: discoveryEndpointId } });
-    }
-  }, [discoveryEndpointId, fetchModels]);
+  const persistModelMap = useCallback((next: Record<string, string>) => {
+    setModelMap(next);
+    try { localStorage.setItem(StorageKeys.BENCHMARK_MODEL_MAP, JSON.stringify(next)); } catch { /* */ }
+  }, []);
 
-  // Sync model state when discovered models arrive and current value isn't valid
-  useEffect(() => {
-    if (discoveredModels.length > 0 && !discoveredModels.includes(model)) {
-      const newModel = discoveredModels[0];
-      setModel(newModel);
-      try { localStorage.setItem('benchmark-model', newModel); } catch { /* */ }
-    }
-  }, [discoveredModels]); // eslint-disable-line react-hooks/exhaustive-deps
+  const discoverModels = useCallback(async (endpointId: string) => {
+    setDiscoveryLoading(prev => ({ ...prev, [endpointId]: true }));
+    try {
+      const { data } = await fetchModelsQuery({ variables: { endpointId } });
+      const models: string[] = data?.benchmarkEndpointModels ?? [];
+      setDiscoveredModels(prev => ({ ...prev, [endpointId]: models }));
+      // Auto-select first model if current selection is not valid
+      setModelMap(prev => {
+        if (models.length > 0 && !models.includes(prev[endpointId] ?? '')) {
+          const next = { ...prev, [endpointId]: models[0] };
+          try { localStorage.setItem(StorageKeys.BENCHMARK_MODEL_MAP, JSON.stringify(next)); } catch { /* */ }
+          return next;
+        }
+        return prev;
+      });
+    } catch { /* ignore */ }
+    setDiscoveryLoading(prev => ({ ...prev, [endpointId]: false }));
+  }, [fetchModelsQuery]);
 
   const toggleEndpoint = (id: string) => {
-    setSelectedEndpoints(prev =>
-      prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
-    );
+    setSelectedEndpoints(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(e => e !== id);
+      }
+      // Discover models when checking an endpoint
+      if (!discoveredModels[id]) {
+        discoverModels(id);
+      }
+      return [...prev, id];
+    });
+  };
+
+  const handleModelChange = (endpointId: string, model: string) => {
+    persistModelMap({ ...modelMap, [endpointId]: model });
   };
 
   const handleRun = async () => {
@@ -53,7 +74,13 @@ export default function BenchmarkRunner({ onResults }: Props) {
       : BENCHMARK_PROMPTS.find(p => p.id === selectedPromptId)?.prompt || '';
     if (!prompt || selectedEndpoints.length === 0) return;
 
-    const results = await runBenchmark(selectedEndpoints, model, prompt);
+    const endpointModels = selectedEndpoints.map(id => ({
+      endpointId: id,
+      model: modelMap[id] || '',
+    }));
+    if (endpointModels.some(em => !em.model.trim())) return;
+
+    const results = await runBenchmark(endpointModels, prompt);
     onResults(results);
 
     // Analytics: track benchmark run completion
@@ -61,9 +88,10 @@ export default function BenchmarkRunner({ onResults }: Props) {
     const avgTps = successful.length > 0
       ? successful.reduce((sum, r) => sum + (r.timing?.tokensPerSecond || 0), 0) / successful.length
       : 0;
+    const uniqueModels = [...new Set(endpointModels.map(em => em.model))];
     window.__logAnalyticsEvent?.('benchmark_run_complete', {
       endpoint_count: selectedEndpoints.length,
-      model,
+      models: uniqueModels.join(','),
       prompt_type: selectedPromptId,
       successful_count: successful.length,
       error_count: results.length - successful.length,
@@ -71,52 +99,66 @@ export default function BenchmarkRunner({ onResults }: Props) {
     });
   };
 
+  const runDisabled = running
+    || selectedEndpoints.length === 0
+    || selectedEndpoints.some(id => !modelMap[id]?.trim());
+
   return (
     <div className="space-y-5">
-      {/* Endpoint Selection */}
+      {/* Endpoint Selection with inline model dropdowns */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('benchmark.runner.selectEndpoints')}</label>
         {endpoints.length === 0 ? (
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('benchmark.runner.noEndpoints')}</p>
         ) : (
           <div className="space-y-1.5">
-            {endpoints.map(ep => (
-              <label key={ep.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                <input
-                  type="checkbox"
-                  checked={selectedEndpoints.includes(ep.id)}
-                  onChange={() => toggleEndpoint(ep.id)}
-                  className="rounded text-blue-600"
-                  disabled={running}
-                />
-                <span className="text-sm text-gray-800 dark:text-white">{ep.name}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">({ep.url})</span>
-                {running && currentEndpoint === ep.id && (
-                  <span className="ml-auto text-xs text-blue-600 dark:text-blue-400 animate-pulse">{t('benchmark.runner.running')}</span>
-                )}
-              </label>
-            ))}
+            {endpoints.map(ep => {
+              const isSelected = selectedEndpoints.includes(ep.id);
+              const epModels = discoveredModels[ep.id] ?? [];
+              const isLoading = discoveryLoading[ep.id] ?? false;
+
+              return (
+                <div key={ep.id} className="rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                  <label className="flex items-center gap-2 cursor-pointer p-2">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleEndpoint(ep.id)}
+                      className="rounded text-blue-600"
+                      disabled={running}
+                    />
+                    <span className="text-sm text-gray-800 dark:text-white">{ep.name}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">({ep.url})</span>
+                    {running && currentEndpoint === ep.id && (
+                      <span className="ml-auto text-xs text-blue-600 dark:text-blue-400 animate-pulse">{t('benchmark.runner.running')}</span>
+                    )}
+                  </label>
+                  {isSelected && (
+                    <div className="pl-8 pb-2">
+                      <select
+                        value={modelMap[ep.id] || ''}
+                        onChange={e => handleModelChange(ep.id, e.target.value)}
+                        disabled={running || isLoading || epModels.length === 0}
+                        aria-label={t('benchmark.runner.selectModelFor', { endpoint: ep.name })}
+                        className="w-full max-w-xs px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                      >
+                        {isLoading ? (
+                          <option value="">{t('app.loading')}</option>
+                        ) : epModels.length === 0 ? (
+                          <option value="">{t('benchmark.runner.noModels')}</option>
+                        ) : (
+                          epModels.map(m => (
+                            <option key={m} value={m}>{m}</option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
-      </div>
-
-      {/* Model Selection */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('benchmark.runner.selectModel')}</label>
-        <select
-          value={model}
-          onChange={e => { setModel(e.target.value); try { localStorage.setItem('benchmark-model', e.target.value); } catch { /* */ } }}
-          disabled={running || selectedEndpoints.length === 0 || discoveredModels.length === 0}
-          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-        >
-          {discoveredModels.length === 0 ? (
-            <option value="">{t('app.loading')}</option>
-          ) : (
-            discoveredModels.map(m => (
-              <option key={m} value={m}>{m}</option>
-            ))
-          )}
-        </select>
       </div>
 
       {/* Prompt Selection */}
@@ -167,7 +209,7 @@ export default function BenchmarkRunner({ onResults }: Props) {
       <button
         type="button"
         onClick={handleRun}
-        disabled={running || selectedEndpoints.length === 0 || !model.trim()}
+        disabled={runDisabled}
         className="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition flex items-center justify-center gap-2"
       >
         {running ? (

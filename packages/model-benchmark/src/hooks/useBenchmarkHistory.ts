@@ -20,5 +20,12 @@ export function useBenchmarkHistory(limit = 10) {
     await deleteMutation({ variables: { id } });
   };
 
-  return { runs, loading, refetch, deleteRun };
+  const clearAll = async () => {
+    for (const run of runs) {
+      await deleteMutation({ variables: { id: run.id } });
+    }
+    await refetch();
+  };
+
+  return { runs, loading, refetch, deleteRun, clearAll };
 }

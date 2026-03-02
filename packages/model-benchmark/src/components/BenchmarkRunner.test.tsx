@@ -3,15 +3,19 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BenchmarkRunner from './BenchmarkRunner';
 
+const mockFetchModels = vi.fn().mockResolvedValue({
+  data: { benchmarkEndpointModels: ['gemma2:2b', 'llama3:8b'] },
+});
+
 // Mock @mycircle/shared (includes Apollo hooks)
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
-    t: (key: string) => key,
+    t: (key: string, opts?: any) => opts?.endpoint ? `${key} ${opts.endpoint}` : key,
   }),
   useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
-  useLazyQuery: vi.fn(() => [vi.fn(), { data: null }]),
+  useLazyQuery: vi.fn(() => [mockFetchModels, { data: null }]),
   GET_BENCHMARK_ENDPOINT_MODELS: {},
-  StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache' },
+  StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache', BENCHMARK_MODEL_MAP: 'benchmark-model-map' },
   WindowEvents: { BENCHMARK_CHANGED: 'benchmark-changed' },
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
 }));
@@ -48,6 +52,7 @@ describe('BenchmarkRunner', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   it('renders endpoint checkboxes', () => {
@@ -68,19 +73,41 @@ describe('BenchmarkRunner', () => {
     expect(runBtn).toBeDisabled();
   });
 
-  it('run button enables when endpoint is selected', async () => {
+  it('shows per-endpoint model dropdown when endpoint is checked', async () => {
     const user = userEvent.setup();
     render(<BenchmarkRunner onResults={onResults} />);
+
+    // No model dropdowns before selecting
+    expect(screen.queryAllByRole('combobox')).toHaveLength(0);
+
+    // Check first endpoint
     const checkboxes = screen.getAllByRole('checkbox');
     await user.click(checkboxes[0]);
-    const runBtn = screen.getByText('benchmark.runner.run');
-    expect(runBtn).not.toBeDisabled();
+
+    // Model dropdown should appear for the selected endpoint
+    const selects = screen.getAllByRole('combobox');
+    expect(selects).toHaveLength(1);
   });
 
-  it('shows model dropdown with loading state when no models discovered', () => {
+  it('shows model dropdowns for each selected endpoint', async () => {
+    const user = userEvent.setup();
     render(<BenchmarkRunner onResults={onResults} />);
-    const modelSelect = screen.getByRole('combobox');
-    expect(modelSelect).toBeDisabled();
-    expect(screen.getByText('app.loading')).toBeInTheDocument();
+
+    const checkboxes = screen.getAllByRole('checkbox');
+    await user.click(checkboxes[0]);
+    await user.click(checkboxes[1]);
+
+    const selects = screen.getAllByRole('combobox');
+    expect(selects).toHaveLength(2);
+  });
+
+  it('discovers models when endpoint is checked', async () => {
+    const user = userEvent.setup();
+    render(<BenchmarkRunner onResults={onResults} />);
+
+    const checkboxes = screen.getAllByRole('checkbox');
+    await user.click(checkboxes[0]);
+
+    expect(mockFetchModels).toHaveBeenCalledWith({ variables: { endpointId: '1' } });
   });
 });
