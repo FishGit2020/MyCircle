@@ -62,11 +62,20 @@ If you registered `mycircledash.com` through Cloudflare Registrar:
 
 ## Step 2: Firebase Hosting — Remove Custom Domain
 
-1. Go to **Firebase Console > mycircle-dash > Hosting**
-2. Under **Custom domains**, find `mycircledash.com`
-3. Click the 3-dot menu > **Remove** (or **Disconnect**)
-4. Firebase will stop serving content on that domain
-5. Your app remains accessible at `mycircle-dash.web.app`
+1. Go to **https://console.firebase.google.com/project/mycircle-dash/hosting/sites**
+2. Under your site `mycircle-dash`, find the **Custom domains** section
+3. Find `mycircledash.com` in the list
+4. Click the **three-dot menu** (⋮) next to it
+5. Click **Remove** (or **Disconnect**)
+6. Confirm the removal
+7. Firebase will stop serving content on that domain
+8. Your app remains accessible at `https://mycircle-dash.web.app`
+
+> **Note:** There is no Firebase CLI command for this — it must be done in the web console.
+
+### Quick option: Just stop the website, keep the Ollama API
+
+If you only want to **stop `mycircledash.com` from serving the website** but keep `ollama.mycircledash.com` working for the AI chat API, this step alone is all you need. The Ollama subdomain routes through a completely separate Cloudflare Tunnel and is unaffected by Firebase Hosting changes. Optionally clean up the CORS allowlist (Step 5a) afterward.
 
 ---
 
