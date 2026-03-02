@@ -3,7 +3,13 @@
  * Extract the GraphQL schema from functions/src/schema.ts to a standalone .graphql file
  * for use with graphql-codegen.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+
+// Gracefully skip if functions/ is not available (e.g., Docker build context)
+if (!existsSync('functions/src/schema.ts')) {
+  console.log('functions/src/schema.ts not found — skipping schema extraction (Docker build?)');
+  process.exit(0);
+}
 
 const schemaTs = readFileSync('functions/src/schema.ts', 'utf-8');
 // Extract the template literal content between backticks after `#graphql
