@@ -49,9 +49,16 @@ describe('DayNode', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Freeze time to 2026-03-01 noon UTC so today/yesterday are deterministic
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2026-03-01T12:00:00Z'));
     onUpdate = vi.fn().mockResolvedValue(undefined);
     onDelete = vi.fn().mockResolvedValue(undefined);
     onMoveEntry = vi.fn().mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders formatted date and entries', () => {
