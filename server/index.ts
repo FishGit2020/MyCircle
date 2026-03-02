@@ -9,6 +9,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/use/ws';
+import depthLimit from 'graphql-depth-limit';
 import { typeDefs } from './graphql/schema.js';
 import { resolvers, cleanupSubscriptions } from './graphql/resolvers.js';
 import { recaptchaMiddleware } from './middleware/recaptcha.js';
@@ -65,14 +66,25 @@ export async function createApp() {
         }
       }
     ],
-    introspection: true
+    introspection: process.env.NODE_ENV !== 'production',
+    validationRules: [depthLimit(10)],
   });
 
   await apolloServer.start();
 
   // Middleware
   app.use(compression());
-  app.use(express.json());
+  app.use(express.json({ limit: '1mb' }));
+
+  // Request timeout — prevent long-running requests from hanging
+  app.use((req, res, next) => {
+    res.setTimeout(30_000, () => {
+      if (!res.headersSent) {
+        res.status(408).json({ error: 'Request timeout' });
+      }
+    });
+    next();
+  });
 
   // Apollo GraphQL endpoint (AI chat is now handled via Mutation.aiChat)
   app.use(

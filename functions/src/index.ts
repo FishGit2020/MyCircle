@@ -91,6 +91,8 @@ async function getServer() {
       const podcastApiSecret = piCreds.apiSecret || '';
       const youversionKey = process.env.YOUVERSION_APP_KEY || '';
 
+      const depthLimit = (await import('graphql-depth-limit')).default;
+
       const schema = makeExecutableSchema({
         typeDefs,
         resolvers: createResolvers(
@@ -103,7 +105,8 @@ async function getServer() {
 
       const server = new ApolloServer({
         schema,
-        introspection: true
+        introspection: process.env.NODE_ENV !== 'production',
+        validationRules: [depthLimit(10)],
       });
 
       await server.start();

@@ -4,8 +4,38 @@ import NodeCache from 'node-cache';
 import { GraphQLScalarType, Kind } from 'graphql';
 import type OpenAI from 'openai';
 import { getFirestore } from 'firebase-admin/firestore';
+import { z } from 'zod';
 import { logAiChatInteraction } from './aiChatLogger.js';
 import type { AiToolCallTiming } from './aiChatLogger.js';
+
+// ─── Zod validation schemas for GraphQL mutations ────────────────────
+const runBenchmarkSchema = z.object({
+  endpointId: z.string().min(1).max(200),
+  model: z.string().min(1).max(100),
+  prompt: z.string().min(1).max(10000),
+});
+
+const saveBenchmarkEndpointSchema = z.object({
+  url: z.string().url().max(500),
+  name: z.string().min(1).max(100),
+  cfAccessClientId: z.string().max(200).optional().nullable(),
+  cfAccessClientSecret: z.string().max(200).optional().nullable(),
+});
+
+const idParamSchema = z.object({
+  id: z.string().min(1).max(200),
+});
+
+const aiChatSchema = z.object({
+  message: z.string().min(1).max(5000),
+  history: z.array(z.object({
+    role: z.string(),
+    content: z.string().max(10000),
+  })).max(100).optional(),
+  context: z.record(z.unknown()).optional(),
+  model: z.string().max(100).optional(),
+  endpointId: z.string().max(200).optional(),
+});
 
 // JSON scalar for arbitrary JSON values in GraphQL
 function parseLiteralJSON(ast: import('graphql').ValueNode): unknown {
@@ -818,7 +848,8 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
     JSON: JSONScalar,
 
     Mutation: {
-      runBenchmark: async (_: any, { endpointId, model, prompt }: { endpointId: string; model: string; prompt: string }, ctx: any) => {
+      runBenchmark: async (_: any, args: { endpointId: string; model: string; prompt: string }, ctx: any) => {
+        const { endpointId, model, prompt } = runBenchmarkSchema.parse(args);
         const uid = ctx?.uid;
         if (!uid) throw new Error('Authentication required');
         const db = getFirestore();
@@ -865,21 +896,23 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
       },
 
       saveBenchmarkEndpoint: async (_: any, { input }: { input: { url: string; name: string; cfAccessClientId?: string; cfAccessClientSecret?: string } }, ctx: any) => {
+        const validated = saveBenchmarkEndpointSchema.parse(input);
         const uid = ctx?.uid;
         if (!uid) throw new Error('Authentication required');
         const db = getFirestore();
         const ref = db.collection(`users/${uid}/benchmarkEndpoints`).doc();
         const data = {
-          url: input.url, name: input.name,
-          cfAccessClientId: input.cfAccessClientId || null,
-          cfAccessClientSecret: input.cfAccessClientSecret || null,
+          url: validated.url, name: validated.name,
+          cfAccessClientId: validated.cfAccessClientId || null,
+          cfAccessClientSecret: validated.cfAccessClientSecret || null,
           createdAt: new Date().toISOString(),
         };
         await ref.set(data);
-        return { id: ref.id, url: input.url, name: input.name, hasCfAccess: !!(input.cfAccessClientId && input.cfAccessClientSecret) };
+        return { id: ref.id, url: validated.url, name: validated.name, hasCfAccess: !!(validated.cfAccessClientId && validated.cfAccessClientSecret) };
       },
 
-      deleteBenchmarkEndpoint: async (_: any, { id }: { id: string }, ctx: any) => {
+      deleteBenchmarkEndpoint: async (_: any, args: { id: string }, ctx: any) => {
+        const { id } = idParamSchema.parse(args);
         const uid = ctx?.uid;
         if (!uid) throw new Error('Authentication required');
         const db = getFirestore();
@@ -897,13 +930,14 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         return { id: ref.id, ...data };
       },
 
-      aiChat: async (_: any, { message, history, context, model, endpointId }: {
+      aiChat: async (_: any, args: {
         message: string;
         history?: { role: string; content: string }[];
         context?: Record<string, unknown>;
         model?: string;
         endpointId?: string;
       }, ctx: any) => {
+        const { message, history, context, model, endpointId } = aiChatSchema.parse(args);
         const uid = ctx?.uid;
         const startTime = Date.now();
         let inputTokens = 0;
