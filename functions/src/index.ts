@@ -86,8 +86,9 @@ async function getServer() {
 
       const apiKey = process.env.OPENWEATHER_API_KEY || '';
       const finnhubKey = process.env.FINNHUB_API_KEY || '';
-      const podcastApiKey = process.env.PODCASTINDEX_API_KEY || '';
-      const podcastApiSecret = process.env.PODCASTINDEX_API_SECRET || '';
+      const piCreds = JSON.parse(process.env.PODCASTINDEX_CREDS || '{}');
+      const podcastApiKey = piCreds.apiKey || '';
+      const podcastApiSecret = piCreds.apiSecret || '';
       const youversionKey = process.env.YOUVERSION_APP_KEY || '';
 
       const schema = makeExecutableSchema({
@@ -119,7 +120,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 60,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY']
+    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_CREDS', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY']
   },
   async (req: Request, res: Response) => {
     const server = await getServer();
@@ -1219,11 +1220,12 @@ export const podcastProxy = onRequest(
     maxInstances: 10,
     memory: '256MiB',
     timeoutSeconds: 30,
-    secrets: ['PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET'],
+    secrets: ['PODCASTINDEX_CREDS'],
   },
   async (req: Request, res: Response) => {
-    const apiKey = process.env.PODCASTINDEX_API_KEY;
-    const apiSecret = process.env.PODCASTINDEX_API_SECRET;
+    const piCreds = JSON.parse(process.env.PODCASTINDEX_CREDS || '{}');
+    const apiKey = piCreds.apiKey;
+    const apiSecret = piCreds.apiSecret;
     if (!apiKey || !apiSecret) {
       res.status(500).json({ error: 'PodcastIndex API credentials not configured' });
       return;
