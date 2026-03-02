@@ -39,6 +39,9 @@ nul
 /playwright/.cache/
 e2e/smoke/.auth/
 
+# Test coverage
+**/coverage/
+
 # Bundle analysis
 stats.html
 
