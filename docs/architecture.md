@@ -262,8 +262,8 @@ Exposes `PodcastPlayer` component via Module Federation.
 Exposes `AiAssistant` component via Module Federation.
 
 **Key Behavior:**
-- Conversational AI chat powered by **Ollama** (self-hosted, default) or **Google Gemini** (cloud fallback)
-- **Provider priority**: If `OLLAMA_BASE_URL` is set → Ollama; otherwise → Gemini
+- Conversational AI chat powered by **Ollama** (per-user endpoints) or **Google Gemini** (cloud fallback)
+- **Provider priority**: If user has Ollama endpoints → Ollama (using selected endpoint); otherwise → Gemini
 - **Context-aware responses**: `useAiChat` hook calls `gatherUserContext()` on every message, collecting stock watchlist symbols, favorite/recent city names, podcast subscription count, locale, temperature unit, theme, and current page from localStorage. This context is sent in the request body and injected into the system instruction for personalized answers.
 - **Tool calling**: Supports `getWeather`, `searchCities`, `getStockQuote`, `getCryptoPrices` (CoinGecko API with 2-min cache), and `navigateTo` tools. With Ollama, native tool calling is tried first; for models without support (e.g., `gemma2:2b`), a prompt-based fallback parses `<tool_call>` tags. Tool calls are displayed as labeled badges (e.g., "Weather lookup", "Crypto prices") via `ToolCallDisplay`.
 - **Voice input**: `ChatInput` component includes a microphone button that uses the Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`). Lazy detection via `getSpeechRecognition()` ensures the button only renders when the browser supports it. Pulsing red animation indicates listening state. Transcribed speech is appended to the textarea.

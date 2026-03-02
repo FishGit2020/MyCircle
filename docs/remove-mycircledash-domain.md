@@ -34,7 +34,7 @@ User browser
 
 1. Go to **Cloudflare Dashboard > Zero Trust > Access > Applications**
 2. Find the application for `ollama.mycircledash.com`
-3. Delete it — this invalidates the service token (CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET)
+3. Delete it — users with this endpoint will need to update their CF Access credentials in Settings
 
 ### 1c. Remove Cloudflare WAF rule
 
@@ -80,20 +80,9 @@ If you registered `mycircledash.com` through Cloudflare Registrar:
 
 ---
 
-## Step 4: Firebase Secrets — Update or Remove Ollama Secrets
+## Step 4: Ollama Endpoints
 
-If you are **keeping Ollama** but changing the domain:
-```bash
-printf "https://ollama.yournewdomain.com" | npx firebase functions:secrets:set OLLAMA_BASE_URL
-```
-
-If you are **removing Ollama entirely**:
-```bash
-npx firebase functions:secrets:delete OLLAMA_BASE_URL
-npx firebase functions:secrets:delete OLLAMA_MODEL
-npx firebase functions:secrets:delete CF_ACCESS_CLIENT_ID
-npx firebase functions:secrets:delete CF_ACCESS_CLIENT_SECRET
-```
+Ollama endpoints are now per-user (stored in Firestore, configured in Settings > Benchmark Endpoints). There are no server-wide Ollama/CF secrets to update. Users who had endpoints pointing to `ollama.mycircledash.com` will need to update their endpoint URLs in the UI.
 
 ---
 
@@ -174,7 +163,7 @@ After making all changes:
 | 5 | Cloudflare Registrar | Disable auto-renew (optional) | ☐ |
 | 6 | Firebase Hosting | Remove `mycircledash.com` custom domain | ☐ |
 | 7 | reCAPTCHA Enterprise | Remove `mycircledash.com` from allowed domains | ☐ |
-| 8 | Firebase Secrets | Delete/update OLLAMA_BASE_URL, CF_ACCESS_* secrets | ☐ |
+| 8 | Ollama Endpoints | Users update their endpoint URLs in Settings UI | ☐ |
 | 9 | `functions/src/index.ts` | Remove `mycircledash.com` from CORS allowlist | ☐ |
 | 10 | `docs/architecture.md` | Remove custom domain from CORS docs | ☐ |
 | 11 | `docs/ollama-setup.md` | Update or archive Cloudflare setup docs | ☐ |

@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { GET_OLLAMA_MODELS } from '@mycircle/shared';
+import { GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
 import AiAssistant from './AiAssistant';
 
 // Mock fetch globally
@@ -35,9 +35,14 @@ const ollamaModelsMock = {
   result: { data: { ollamaModels: [] } },
 };
 
+const endpointsMock = {
+  request: { query: GET_BENCHMARK_ENDPOINTS },
+  result: { data: { benchmarkEndpoints: [] } },
+};
+
 const renderWithProviders = (ui: React.ReactElement) => {
   return render(
-    <MockedProvider mocks={[ollamaModelsMock]} addTypename={false}>
+    <MockedProvider mocks={[ollamaModelsMock, endpointsMock]} addTypename={false}>
       <MemoryRouter>{ui}</MemoryRouter>
     </MockedProvider>
   );

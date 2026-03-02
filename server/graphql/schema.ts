@@ -249,6 +249,7 @@ export const typeDefs = `#graphql
 
     # AI queries
     ollamaModels: [String!]!
+    benchmarkEndpointModels(endpointId: ID!): [String!]!
   }
 
   # ─── AI Chat Types ─────────────────────────────────────────────
@@ -278,7 +279,7 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
-    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String): AiChatResponse!
+    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID): AiChatResponse!
   }
 
   type Subscription {

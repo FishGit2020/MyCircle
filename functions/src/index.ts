@@ -30,8 +30,7 @@ const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
 const COINGECKO_BASE = process.env.COINGECKO_BASE_URL || 'https://api.coingecko.com';
 const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podcastindex.org';
 
-// Ollama (self-hosted AI) — when set, AI chat uses Ollama instead of Gemini
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || '';
+// Ollama endpoints are now per-user (stored in Firestore), not env vars
 
 // ─── CORS origins whitelist ─────────────────────────────────────────
 const ALLOWED_ORIGINS = [
@@ -120,7 +119,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 60,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'OLLAMA_BASE_URL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET']
+    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_API_KEY', 'PODCASTINDEX_API_SECRET', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY']
   },
   async (req: Request, res: Response) => {
     const server = await getServer();
@@ -617,6 +616,30 @@ function getPodcastIndexHeaders(apiKey: string, apiSecret: string): Record<strin
 
 const aiChatCache = new NodeCache();
 
+// ─── Per-user Ollama endpoint helpers (REST handler) ──────
+interface OllamaEndpoint {
+  id: string;
+  url: string;
+  name: string;
+  cfAccessClientId?: string;
+  cfAccessClientSecret?: string;
+}
+
+async function getUserOllamaEndpoint(uid: string, endpointId?: string): Promise<OllamaEndpoint | null> {
+  const db = getFirestore();
+  if (endpointId) {
+    const doc = await db.doc(`users/${uid}/benchmarkEndpoints/${endpointId}`).get();
+    if (!doc.exists) return null;
+    const d = doc.data()!;
+    return { id: doc.id, url: d.url, name: d.name, cfAccessClientId: d.cfAccessClientId || undefined, cfAccessClientSecret: d.cfAccessClientSecret || undefined };
+  }
+  const snap = await db.collection(`users/${uid}/benchmarkEndpoints`).orderBy('createdAt').limit(1).get();
+  if (snap.empty) return null;
+  const doc = snap.docs[0];
+  const d = doc.data();
+  return { id: doc.id, url: d.url, name: d.name, cfAccessClientId: d.cfAccessClientId || undefined, cfAccessClientSecret: d.cfAccessClientSecret || undefined };
+}
+
 /**
  * AI Chat endpoint using Google Gemini with function calling.
  * POST /ai/chat — Body: { message: string, history: { role: string, content: string }[] }
@@ -629,7 +652,7 @@ export const aiChat = onRequest(
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 60,
-    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY', 'OLLAMA_BASE_URL', 'CF_ACCESS_CLIENT_ID', 'CF_ACCESS_CLIENT_SECRET'],
+    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY'],
   },
   async (req: Request, res: Response) => {
     if (req.method !== 'POST') {
@@ -664,13 +687,6 @@ export const aiChat = onRequest(
       }
     }
 
-    const ollamaBaseUrl = OLLAMA_BASE_URL;
-    const geminiKey = process.env.GEMINI_API_KEY;
-    if (!ollamaBaseUrl && !geminiKey) {
-      res.status(500).json({ error: 'No AI provider configured (set GEMINI_API_KEY or OLLAMA_BASE_URL)' });
-      return;
-    }
-
     // Validate request body with Zod
     const parseResult = aiChatBodySchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -679,6 +695,15 @@ export const aiChat = onRequest(
     }
 
     const { message, history, context, model } = parseResult.data;
+    const reqEndpointId = req.body.endpointId as string | undefined;
+
+    const endpoint = await getUserOllamaEndpoint(aiUid!, reqEndpointId || undefined);
+    const ollamaBaseUrl = endpoint?.url || '';
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (!ollamaBaseUrl && !geminiKey) {
+      res.status(500).json({ error: 'No AI provider configured — add an Ollama endpoint in Settings or contact admin for Gemini' });
+      return;
+    }
     const ollamaModel = model || 'gemma2:2b';
 
     // Build context-aware system instruction (shared by both providers)
@@ -729,16 +754,16 @@ export const aiChat = onRequest(
 
     try {
       // ─── Ollama path (OpenAI-compatible API) ───────────────────
-      if (ollamaBaseUrl) {
+      if (ollamaBaseUrl && endpoint) {
         trackedProvider = 'ollama';
         trackedModel = ollamaModel;
         const { default: OpenAI } = await import('openai');
+        const cfHeaders: Record<string, string> = {};
+        if (endpoint.cfAccessClientId) cfHeaders['CF-Access-Client-Id'] = endpoint.cfAccessClientId;
+        if (endpoint.cfAccessClientSecret) cfHeaders['CF-Access-Client-Secret'] = endpoint.cfAccessClientSecret;
         const client = new OpenAI({
           baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
-          defaultHeaders: {
-            ...(process.env.CF_ACCESS_CLIENT_ID ? { 'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID } : {}),
-            ...(process.env.CF_ACCESS_CLIENT_SECRET ? { 'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET } : {}),
-          },
+          defaultHeaders: cfHeaders,
         });
 
         // Define tools in OpenAI format

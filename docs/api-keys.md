@@ -152,102 +152,37 @@ GEMINI_API_KEY=your_key_here
 
 ---
 
-## Ollama
+## Ollama (Per-User Endpoints)
 
-Optional self-hosted AI backend. When `OLLAMA_BASE_URL` is set, AI chat uses Ollama instead of Google Gemini. This is useful for running a local/private model on your own hardware (e.g., a NAS via Docker).
+Ollama endpoints are now configured **per-user** through the UI, not as server-wide env vars. Each user adds their own Ollama endpoints in **Settings > Benchmark Endpoints**, with optional Cloudflare Access credentials.
+
+### How it works
+
+1. Users add Ollama endpoints in the UI (URL, name, optional CF Access creds)
+2. AI Chat reads the user's endpoint from Firestore (`users/{uid}/benchmarkEndpoints`)
+3. If the user has no endpoints, Gemini is used as fallback
+4. Both AI Chat and Model Benchmark share the same endpoint configuration
 
 ### Tool Calling
 
 MyCircle supports two modes of tool calling with Ollama:
 
-- **Native tool calling** — Models like `qwen2.5`, `llama3.1+`, and `mistral` support the OpenAI-compatible `tools` parameter. This is tried first automatically.
-- **Prompt-based fallback** — For models without native tool support (e.g., `gemma2:2b`), the system injects tool descriptions into the prompt and parses `<tool_call>` tags from the response. This works with any instruction-following model.
+- **Native tool calling** — Models like `qwen2.5`, `llama3.1+`, and `mistral` support the OpenAI-compatible `tools` parameter
+- **Prompt-based fallback** — For models without native tool support (e.g., `gemma2:2b`), tool descriptions are injected into the prompt
 
 The fallback is automatic — no configuration needed.
 
-### Requirements
-
-- [Ollama](https://ollama.ai/) running on a reachable host
-- A pulled model (default: `gemma2:2b` ~1.6GB, or `qwen2.5:7b` for native tool calling)
-- Network access from the server to Ollama (direct LAN, VPN, tunnel, or custom domain)
-
-### Setup with Custom Domain (recommended)
-
-If you have a permanent domain pointing to your Ollama instance:
-
-1. Install Ollama in Docker on your NAS/server
-2. Pull a model: `docker exec ollama ollama pull gemma2:2b`
-3. Set up a reverse proxy (Nginx, Caddy, Cloudflare Tunnel) pointing `ollama.yourdomain.com` → `localhost:11434`
-
-### Setup with Cloudflare Quick Tunnel (temporary)
-
-If Ollama runs on a NAS or remote machine without a public IP:
-
-1. Install Ollama in Docker on your NAS
-2. Pull a model: `docker exec ollama ollama pull gemma2:2b`
-3. Start a [Cloudflare Quick Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/): `cloudflared tunnel --url http://localhost:11434`
-4. Copy the generated `*.trycloudflare.com` URL
-
-> **Note:** Quick Tunnel URLs change on container restart. Use a permanent domain/tunnel for production.
-
-### Env file
-
-Root `.env`:
-```
-OLLAMA_BASE_URL=https://ollama.yourdomain.com
-```
-
-### Firebase Secrets (production)
-
-```bash
-firebase functions:secrets:set OLLAMA_BASE_URL
-# Enter: https://ollama.yourdomain.com
-
-firebase deploy --only functions
-```
-
-When the URL changes:
-```bash
-firebase functions:secrets:set OLLAMA_BASE_URL
-# Enter: new URL
-firebase deploy --only functions
-```
-
-### Cloudflare Access (tunnel authentication)
-
-If your Ollama instance is behind a Cloudflare Tunnel with Access protection, Cloud Functions needs a **Service Token** to authenticate.
-
-#### Setup steps
-
-1. Go to [Cloudflare Zero Trust](https://one.dash.cloudflare.com/) → **Access controls** → **Service credentials**
-2. Click **Create Service Token** → name: `cloud-functions` → **Non-expiring**
-3. Copy the **Client ID** and **Client Secret** (secret only shown once!)
-4. Go to **Access controls** → **Applications** → **Add application** → **Self-hosted**
-   - Application name: `Ollama API`
-   - Public hostname: `ollama.mycircledash.com`
-5. Add a policy:
-   - Action: **Service Auth**
-   - Include: **Service Token** → select `cloud-functions`
-6. Save the application
-7. Set Firebase secrets:
-
-```bash
-firebase functions:secrets:set CF_ACCESS_CLIENT_ID
-# Enter: your-client-id.access
-
-firebase functions:secrets:set CF_ACCESS_CLIENT_SECRET
-# Enter: your-client-secret
-
-firebase deploy --only functions
-```
-
-The code automatically passes `CF-Access-Client-Id` and `CF-Access-Client-Secret` headers when calling Ollama. If these secrets are not set, the headers are omitted (for setups without Cloudflare Access).
-
 ### Provider Priority
 
-- If `OLLAMA_BASE_URL` is set → Ollama is used (Gemini is ignored)
-- If only `GEMINI_API_KEY` is set → Gemini is used
-- If neither is set → AI chat returns a 500 error
+1. User has Ollama endpoints → **Ollama** (using selected endpoint)
+2. No endpoints but `GEMINI_API_KEY` is set → **Gemini** (server-wide fallback)
+3. Neither → AI chat returns an error
+
+### Local Development
+
+For local dev, set `OLLAMA_BASE_URL` in `.env` to point to your local Ollama instance. The dev server uses env vars directly (no Firestore).
+
+See [Ollama Setup Guide](./ollama-setup.md) for detailed NAS/Docker/Cloudflare setup instructions.
 
 ---
 
@@ -369,9 +304,7 @@ firebase functions:secrets:set PODCASTINDEX_API_KEY
 firebase functions:secrets:set PODCASTINDEX_API_SECRET
 firebase functions:secrets:set GEMINI_API_KEY
 firebase functions:secrets:set YOUVERSION_APP_KEY
-firebase functions:secrets:set OLLAMA_BASE_URL
-firebase functions:secrets:set CF_ACCESS_CLIENT_ID
-firebase functions:secrets:set CF_ACCESS_CLIENT_SECRET
+# Ollama/CF secrets removed — endpoints are now per-user (stored in Firestore)
 ```
 
 ### Emulator Testing (`.env.emulator`)
