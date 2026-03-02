@@ -12,8 +12,6 @@ import './StockTracker.css';
 interface WatchlistItem {
   symbol: string;
   companyName: string;
-  buyPrice?: number;
-  quantity?: number;
 }
 
 function loadWatchlist(): WatchlistItem[] {
@@ -39,9 +37,6 @@ export default function StockTracker() {
 
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(loadWatchlist);
   const [timeframe, setTimeframe] = useState<Timeframe>('1M');
-  const [showPortfolioForm, setShowPortfolioForm] = useState(false);
-  const [buyPrice, setBuyPrice] = useState('');
-  const [quantity, setQuantity] = useState('');
 
   const { quote: selectedQuote, loading: quoteLoading, lastUpdated, refetch } = useStockQuote(
     selectedSymbol,
@@ -58,7 +53,6 @@ export default function StockTracker() {
   // Reset form state when navigating to a different stock
   useEffect(() => {
     setTimeframe('1M');
-    setShowPortfolioForm(false);
   }, [routeSymbol]);
 
   const handleStockSelect = useCallback((symbol: string, description: string) => {
@@ -80,23 +74,7 @@ export default function StockTracker() {
     navigate(`/stocks/${symbol}?name=${encodeURIComponent(item?.companyName ?? symbol)}`);
   }, [watchlist, navigate]);
 
-  const handleSavePortfolio = useCallback(() => {
-    if (!selectedSymbol) return;
-    const bp = parseFloat(buyPrice);
-    const qty = parseFloat(quantity);
-    if (isNaN(bp) || bp <= 0) return;
-    setWatchlist(prev => prev.map(item =>
-      item.symbol === selectedSymbol
-        ? { ...item, buyPrice: bp, quantity: isNaN(qty) ? undefined : qty }
-        : item
-    ));
-    setBuyPrice('');
-    setQuantity('');
-    setShowPortfolioForm(false);
-  }, [selectedSymbol, buyPrice, quantity]);
-
   const isInWatchlist = selectedSymbol ? watchlist.some(item => item.symbol === selectedSymbol) : false;
-  const watchlistItem = selectedSymbol ? watchlist.find(item => item.symbol === selectedSymbol) : null;
 
   const isPositive = selectedQuote ? selectedQuote.d >= 0 : true;
   const changeColor = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
@@ -219,97 +197,6 @@ export default function StockTracker() {
                   <p className="font-medium text-gray-900 dark:text-white">${selectedQuote.pc.toFixed(2)}</p>
                 </div>
               </div>
-
-              {/* Portfolio tracking */}
-              {isInWatchlist && watchlistItem && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  {watchlistItem.buyPrice ? (
-                    <div className="flex flex-wrap items-center gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-500 dark:text-gray-400">{t('stocks.costBasis')}</p>
-                        <p className="font-medium text-gray-900 dark:text-white">${watchlistItem.buyPrice.toFixed(2)}</p>
-                      </div>
-                      {watchlistItem.quantity && (
-                        <div>
-                          <p className="text-gray-500 dark:text-gray-400">{t('stocks.shares')}</p>
-                          <p className="font-medium text-gray-900 dark:text-white">{watchlistItem.quantity}</p>
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-gray-500 dark:text-gray-400">{t('stocks.gainLoss')}</p>
-                        {(() => {
-                          const gain = selectedQuote.c - watchlistItem.buyPrice;
-                          const gainPct = (gain / watchlistItem.buyPrice) * 100;
-                          const isUp = gain >= 0;
-                          return (
-                            <p className={`font-medium ${isUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                              {isUp ? '+' : ''}{gain.toFixed(2)} ({isUp ? '+' : ''}{gainPct.toFixed(2)}%)
-                            </p>
-                          );
-                        })()}
-                      </div>
-                      {watchlistItem.quantity && (
-                        <div>
-                          <p className="text-gray-500 dark:text-gray-400">{t('stocks.totalValue')}</p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            ${(selectedQuote.c * watchlistItem.quantity).toFixed(2)}
-                          </p>
-                        </div>
-                      )}
-                      <button
-                        onClick={() => {
-                          setWatchlist(prev => prev.map(item =>
-                            item.symbol === selectedSymbol ? { ...item, buyPrice: undefined, quantity: undefined } : item
-                          ));
-                        }}
-                        className="text-xs text-gray-400 hover:text-red-500 transition"
-                      >
-                        {t('stocks.clearPosition')}
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setShowPortfolioForm(prev => !prev)}
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                      </svg>
-                      {t('stocks.addPosition')}
-                    </button>
-                  )}
-
-                  {showPortfolioForm && !watchlistItem.buyPrice && (
-                    <div className="mt-3 flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={buyPrice}
-                        onChange={(e) => setBuyPrice(e.target.value)}
-                        placeholder={t('stocks.buyPricePlaceholder')}
-                        className="flex-1 px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-                        step="0.01"
-                        min="0"
-                      />
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        placeholder={t('stocks.quantityPlaceholder')}
-                        className="w-24 px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-                        step="1"
-                        min="0"
-                      />
-                      <button
-                        onClick={handleSavePortfolio}
-                        disabled={!buyPrice}
-                        className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                      >
-                        {t('stocks.save')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           ) : null}
 
