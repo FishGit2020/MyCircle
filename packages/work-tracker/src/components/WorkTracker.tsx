@@ -1,30 +1,66 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import { useWorkEntries } from '../hooks/useWorkEntries';
 import { getLocalDateString } from '../utils/localDate';
 import EntryForm from './EntryForm';
 import TimelineView from './TimelineView';
 
 type TimeFilter = 'today' | 'thisMonth' | 'all';
+type DayFilter = { weekdays: boolean; weekends: boolean };
+
+function loadDayFilter(): DayFilter {
+  try {
+    const raw = localStorage.getItem(StorageKeys.DAILY_LOG_DAY_FILTER);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return { weekdays: true, weekends: true };
+}
+
+function saveDayFilter(f: DayFilter) {
+  try { localStorage.setItem(StorageKeys.DAILY_LOG_DAY_FILTER, JSON.stringify(f)); } catch { /* ignore */ }
+}
+
+function isWeekend(dateStr: string): boolean {
+  const day = new Date(dateStr + 'T00:00:00').getDay();
+  return day === 0 || day === 6;
+}
 
 export default function WorkTracker() {
   const { t } = useTranslation();
-  const { entries, loading, isAuthenticated, authChecked, addEntry, updateEntry, deleteEntry } = useWorkEntries();
+  const { entries, loading, isAuthenticated, authChecked, addEntry, updateEntry, deleteEntry, moveEntry } = useWorkEntries();
   const [filter, setFilter] = useState<TimeFilter>('all');
+  const [dayFilter, setDayFilter] = useState<DayFilter>(loadDayFilter);
 
   const today = getLocalDateString();
   const currentMonth = today.slice(0, 7); // "2026-02"
 
+  const toggleDayFilter = (key: keyof DayFilter) => {
+    setDayFilter(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      saveDayFilter(next);
+      return next;
+    });
+  };
+
   const filteredEntries = useMemo(() => {
+    let result = entries;
     switch (filter) {
       case 'today':
-        return entries.filter(e => e.date === today);
+        result = result.filter(e => e.date === today);
+        break;
       case 'thisMonth':
-        return entries.filter(e => e.date.startsWith(currentMonth));
-      default:
-        return entries;
+        result = result.filter(e => e.date.startsWith(currentMonth));
+        break;
     }
-  }, [entries, filter, today, currentMonth]);
+    // Apply day type filter
+    if (!dayFilter.weekdays || !dayFilter.weekends) {
+      result = result.filter(e => {
+        const weekend = isWeekend(e.date);
+        return weekend ? dayFilter.weekends : dayFilter.weekdays;
+      });
+    }
+    return result;
+  }, [entries, filter, today, currentMonth, dayFilter]);
 
   if (!authChecked || loading) {
     return (
@@ -63,7 +99,7 @@ export default function WorkTracker() {
       </div>
 
       {/* Filter chips */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         {([
           { key: 'today' as const, label: t('workTracker.today') },
           { key: 'thisMonth' as const, label: t('workTracker.thisMonth') },
@@ -82,7 +118,34 @@ export default function WorkTracker() {
             {f.label}
           </button>
         ))}
-        <span className="flex items-center text-xs text-gray-400 dark:text-gray-500 ml-2">
+
+        {/* Day type toggles */}
+        <div className="flex gap-1 ml-auto">
+          <button
+            type="button"
+            onClick={() => toggleDayFilter('weekdays')}
+            className={`px-2.5 py-1 rounded-full text-xs font-medium transition ${
+              dayFilter.weekdays
+                ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 line-through'
+            }`}
+          >
+            {t('workTracker.weekdays')}
+          </button>
+          <button
+            type="button"
+            onClick={() => toggleDayFilter('weekends')}
+            className={`px-2.5 py-1 rounded-full text-xs font-medium transition ${
+              dayFilter.weekends
+                ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 line-through'
+            }`}
+          >
+            {t('workTracker.weekends')}
+          </button>
+        </div>
+
+        <span className="flex items-center text-xs text-gray-400 dark:text-gray-500 w-full sm:w-auto sm:ml-2">
           {t('workTracker.entriesCount').replace('{count}', String(filteredEntries.length))}
         </span>
       </div>
@@ -92,6 +155,7 @@ export default function WorkTracker() {
         entries={filteredEntries}
         onUpdate={updateEntry}
         onDelete={deleteEntry}
+        onMoveEntry={moveEntry}
       />
     </div>
   );
