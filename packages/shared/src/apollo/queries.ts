@@ -496,9 +496,13 @@ export const GET_BENCHMARK_HISTORY = gql`
         endpointId
         endpointName
         model
+        prompt
         error
         timing {
           tokensPerSecond
+          promptTokensPerSecond
+          timeToFirstToken
+          totalDuration
         }
       }
     }
