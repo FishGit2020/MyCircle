@@ -3,21 +3,16 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ModelBenchmark from './ModelBenchmark';
 
-// Mock @mycircle/shared
+// Mock @mycircle/shared (includes Apollo hooks)
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+  useQuery: vi.fn(() => ({ data: null, loading: false, refetch: vi.fn() })),
+  useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
   StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache' },
   WindowEvents: { BENCHMARK_CHANGED: 'benchmark-changed' },
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
-}));
-
-// Mock Apollo hooks
-vi.mock('@apollo/client', () => ({
-  useQuery: vi.fn(() => ({ data: null, loading: false, refetch: vi.fn() })),
-  useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
-  gql: (str: TemplateStringsArray) => str,
 }));
 
 // Mock child components

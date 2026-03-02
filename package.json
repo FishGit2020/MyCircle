@@ -8,7 +8,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "dev": "pnpm build:remotes && concurrently -n server,shell,city,weather,stock,podcast,ai,bible,worship,notebook,baby,child-dev,chinese,english -c blue,green,yellow,magenta,cyan,white,red,#d97706,#8b5cf6,#10b981,#ec4899,#14b8a6,#f59e0b,#6366f1 \"pnpm dev:server\" \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\"",
+    "dev": "pnpm build:remotes && concurrently -n server,shell,city,weather,stock,podcast,ai,bible,worship,notebook,baby,child-dev,chinese,english,flashcards,work-tracker,cloud-files,benchmark,immigration -c blue,green,yellow,magenta,cyan,white,red,#d97706,#8b5cf6,#10b981,#ec4899,#14b8a6,#f59e0b,#6366f1,#f97316,#a855f7,#06b6d4,#84cc16,#e11d48 \"pnpm dev:server\" \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:work-tracker\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\"",
     "dev:server": "tsx server/index.ts",
     "dev:shell": "pnpm --filter @mycircle/shell dev",
     "dev:city": "pnpm --filter @mycircle/city-search dev",
@@ -43,7 +43,7 @@
     "preview:benchmark": "pnpm --filter @mycircle/model-benchmark preview",
     "preview:immigration": "pnpm --filter @mycircle/immigration-tracker preview",
     "build:remotes": "pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
-    "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\"",
+    "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:work-tracker\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\"",
     "build": "pnpm build:shared && pnpm build:mf",
     "build:shared": "pnpm --filter @mycircle/shared build",
     "build:mf": "pnpm --filter @mycircle/shell build && pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
@@ -136,6 +136,7 @@
     "@types/react-dom": "^18.2.18",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.17",
     "concurrently": "^9.2.1",
     "firebase-tools": "^15.5.1",

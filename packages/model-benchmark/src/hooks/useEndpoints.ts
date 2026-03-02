@@ -1,5 +1,6 @@
-import { useQuery, useMutation } from '@apollo/client';
 import {
+  useQuery,
+  useMutation,
   GET_BENCHMARK_ENDPOINTS,
   SAVE_BENCHMARK_ENDPOINT,
   DELETE_BENCHMARK_ENDPOINT,
