@@ -505,6 +505,12 @@ export const GET_BENCHMARK_HISTORY = gql`
   }
 `;
 
+export const DELETE_BENCHMARK_RUN = gql`
+  mutation DeleteBenchmarkRun($id: String!) {
+    deleteBenchmarkRun(id: $id)
+  }
+`;
+
 export const GET_BENCHMARK_SUMMARY = gql`
   query GetBenchmarkSummary {
     benchmarkSummary {

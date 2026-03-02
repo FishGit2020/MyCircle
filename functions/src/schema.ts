@@ -405,6 +405,7 @@ export const typeDefs = `#graphql
     saveBenchmarkEndpoint(input: BenchmarkEndpointInput!): BenchmarkEndpoint!
     deleteBenchmarkEndpoint(id: String!): Boolean!
     saveBenchmarkRun(results: JSON!): BenchmarkRun!
+    deleteBenchmarkRun(id: String!): Boolean!
   }
 
   schema {

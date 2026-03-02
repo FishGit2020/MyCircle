@@ -9,7 +9,9 @@ vi.mock('@mycircle/shared', () => {
   return {
     useTranslation: () => ({ t }),
     useQuery: (...args: any[]) => mockUseQuery(...args),
+    useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
     GET_BENCHMARK_HISTORY: 'GET_BENCHMARK_HISTORY',
+    DELETE_BENCHMARK_RUN: 'DELETE_BENCHMARK_RUN',
     createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
   };
 });

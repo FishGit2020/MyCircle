@@ -4,7 +4,7 @@ import { useBenchmarkHistory } from '../hooks/useBenchmarkHistory';
 
 export default function BenchmarkHistory() {
   const { t } = useTranslation();
-  const { runs, loading } = useBenchmarkHistory(20);
+  const { runs, loading, deleteRun } = useBenchmarkHistory(20);
 
   if (loading) {
     return <div className="py-12 text-center text-gray-500 dark:text-gray-400 text-sm">{t('app.loading')}</div>;
@@ -17,6 +17,11 @@ export default function BenchmarkHistory() {
       </div>
     );
   }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm(t('benchmark.history.deleteConfirm'))) return;
+    await deleteRun(id);
+  };
 
   return (
     <div className="space-y-3">
@@ -33,9 +38,22 @@ export default function BenchmarkHistory() {
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 {t('benchmark.history.runAt', { date: new Date(run.createdAt).toLocaleString() })}
               </div>
-              <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
-                {t('benchmark.history.endpoints', { count: String(results.length) })}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+                  {t('benchmark.history.endpoints', { count: String(results.length) })}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(run.id)}
+                  className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-0.5"
+                  aria-label={t('benchmark.history.delete')}
+                  title={t('benchmark.history.delete')}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </div>
             {results.length > 0 && (
               <div className="space-y-1.5">

@@ -932,6 +932,15 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         return { id: ref.id, ...data };
       },
 
+      deleteBenchmarkRun: async (_: any, args: { id: string }, ctx: any) => {
+        const { id } = idParamSchema.parse(args);
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+        const db = getFirestore();
+        await db.doc(`users/${uid}/benchmarkRuns/${id}`).delete();
+        return true;
+      },
+
       aiChat: async (_: any, args: {
         message: string;
         history?: { role: string; content: string }[];
