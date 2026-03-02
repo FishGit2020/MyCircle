@@ -99,6 +99,7 @@ export const StorageKeys = {
   PODCAST_PLAYED_EPISODES: 'podcast-played-episodes',
   KNOWN_ACCOUNTS: 'known-accounts',
   BENCHMARK_CACHE: 'benchmark-cache',
+  DAILY_LOG_DAY_FILTER: 'daily-log-day-filter',
 } as const;
 
 export interface CitySelectedEvent {
