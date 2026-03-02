@@ -18,27 +18,13 @@ import cors from 'cors';
 import axios from 'axios';
 import NodeCache from 'node-cache';
 import { createApp } from './index.js';
+import { checkRateLimit, getClientIp } from './middleware/rateLimit.js';
 
 const PORT = Number(process.env.PORT) || 3000;
 
 // ─── External API base URLs ──────────────────────────────────────────
 const FINNHUB_BASE = process.env.FINNHUB_BASE_URL || 'https://finnhub.io';
 const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podcastindex.org';
-
-// ─── Rate limiter ────────────────────────────────────────────────────
-const rateLimitCache = new NodeCache({ stdTTL: 60, checkperiod: 30 });
-
-function checkRateLimit(ip: string, limit: number, windowSec: number): boolean {
-  const key = `rate:${ip}:${windowSec}`;
-  const current = rateLimitCache.get<number>(key) || 0;
-  if (current >= limit) return true;
-  rateLimitCache.set(key, current + 1, windowSec);
-  return false;
-}
-
-function getClientIp(req: express.Request): string {
-  return (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || 'unknown';
-}
 
 // ─── Caches ──────────────────────────────────────────────────────────
 const stockCache = new NodeCache();
