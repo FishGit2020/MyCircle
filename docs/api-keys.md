@@ -123,11 +123,13 @@ Provides podcast search, trending feeds, and episode data.
 
 ### Env file
 
-Root `.env`:
+Root `.env` (for local dev server):
 ```
 PODCASTINDEX_API_KEY=your_key_here
 PODCASTINDEX_API_SECRET=your_secret_here
 ```
+
+> **Firebase Functions:** In production, these are combined into a single `PODCASTINDEX_CREDS` JSON secret: `{"apiKey":"...","apiSecret":"..."}`
 
 ---
 
@@ -269,14 +271,13 @@ VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 |----------|---------|----------|
 | `OPENWEATHER_API_KEY` | OpenWeatherMap | Yes |
 | `FINNHUB_API_KEY` | Finnhub | For stocks |
-| `PODCASTINDEX_API_KEY` | PodcastIndex | For podcasts |
-| `PODCASTINDEX_API_SECRET` | PodcastIndex | For podcasts |
-| `GEMINI_API_KEY` | Google Gemini | For AI chat (unless Ollama set) |
-| `OLLAMA_BASE_URL` | Ollama | For self-hosted AI (optional) |
-| `CF_ACCESS_CLIENT_ID` | Cloudflare Access | For Ollama tunnel auth |
-| `CF_ACCESS_CLIENT_SECRET` | Cloudflare Access | For Ollama tunnel auth |
+| `PODCASTINDEX_API_KEY` | PodcastIndex | For podcasts (local dev) |
+| `PODCASTINDEX_API_SECRET` | PodcastIndex | For podcasts (local dev) |
+| `GEMINI_API_KEY` | Google Gemini | For AI chat |
 | `YOUVERSION_APP_KEY` | YouVersion | For Bible reader |
 | `RECAPTCHA_SECRET_KEY` | reCAPTCHA Enterprise | For App Check |
+
+> **Note:** Ollama endpoints are now per-user (configured in Settings > Benchmark Endpoints, stored in Firestore). No server-side `OLLAMA_BASE_URL` or `CF_ACCESS_*` env vars needed.
 
 ### `packages/shell/.env` (Client-side — Browser)
 
@@ -298,14 +299,15 @@ VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
 For production, store server-side keys as Firebase secrets:
 
 ```bash
-firebase functions:secrets:set OPENWEATHER_API_KEY
-firebase functions:secrets:set FINNHUB_API_KEY
-firebase functions:secrets:set PODCASTINDEX_API_KEY
-firebase functions:secrets:set PODCASTINDEX_API_SECRET
-firebase functions:secrets:set GEMINI_API_KEY
-firebase functions:secrets:set YOUVERSION_APP_KEY
-# Ollama/CF secrets removed — endpoints are now per-user (stored in Firestore)
+printf "value" | npx firebase functions:secrets:set OPENWEATHER_API_KEY
+printf "value" | npx firebase functions:secrets:set FINNHUB_API_KEY
+printf '{"apiKey":"...","apiSecret":"..."}' | npx firebase functions:secrets:set PODCASTINDEX_CREDS
+printf "value" | npx firebase functions:secrets:set GEMINI_API_KEY
+printf "value" | npx firebase functions:secrets:set YOUVERSION_APP_KEY
+printf "value" | npx firebase functions:secrets:set RECAPTCHA_SECRET_KEY
 ```
+
+> **6 Firebase secrets total.** Ollama/CF secrets removed (endpoints are per-user in Firestore). PodcastIndex key+secret combined into single `PODCASTINDEX_CREDS` JSON secret.
 
 ### Emulator Testing (`.env.emulator`)
 
