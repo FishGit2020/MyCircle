@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useRef } from 'react';
+import React, { Suspense, useState, useRef, useEffect } from 'react';
 import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { Layout } from './components/layout';
@@ -427,6 +427,25 @@ function NotFound() {
 }
 
 export default function App() {
+  useEffect(() => {
+    if (import.meta.env.PROD) {
+      const prefetchPaths = [
+        '/weather-display/assets/remoteEntry.js',
+        '/stock-tracker/assets/remoteEntry.js',
+        '/podcast-player/assets/remoteEntry.js',
+        '/bible-reader/assets/remoteEntry.js',
+        '/ai-assistant/assets/remoteEntry.js',
+      ];
+      prefetchPaths.forEach(path => {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = path;
+        link.as = 'script';
+        document.head.appendChild(link);
+      });
+    }
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

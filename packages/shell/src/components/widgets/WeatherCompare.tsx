@@ -62,7 +62,7 @@ function CityWeatherCard({ city, label }: { city: SelectableCity | null; label: 
         <>
           <div className="flex items-center gap-3 mb-4">
             {w.weather[0] && (
-              <img src={getWeatherIconUrl(w.weather[0].icon)} alt={w.weather[0].main} className="w-16 h-16" />
+              <img src={getWeatherIconUrl(w.weather[0].icon)} alt={w.weather[0].main} className="w-16 h-16" width={64} height={64} />
             )}
             <div>
               <p className="text-4xl font-bold text-gray-800 dark:text-white">{formatTemperature(w.temp, tempUnit)}</p>

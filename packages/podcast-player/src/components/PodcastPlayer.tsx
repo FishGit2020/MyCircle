@@ -106,6 +106,7 @@ export default function PodcastPlayer() {
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
+      if (document.visibilityState === 'hidden') return;
       try {
         const getToken = (window as any).__getFirebaseIdToken;
         const token = getToken ? await getToken() : null;
