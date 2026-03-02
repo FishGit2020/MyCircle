@@ -21,13 +21,13 @@ describe('BenchmarkHistory', () => {
   });
 
   it('shows loading state', () => {
-    mockUseBenchmarkHistory.mockReturnValue({ runs: [], loading: true });
+    mockUseBenchmarkHistory.mockReturnValue({ runs: [], loading: true, deleteRun: vi.fn(), clearAll: vi.fn() });
     render(<BenchmarkHistory />);
     expect(screen.getByText('app.loading')).toBeInTheDocument();
   });
 
   it('shows empty state when no runs', () => {
-    mockUseBenchmarkHistory.mockReturnValue({ runs: [], loading: false });
+    mockUseBenchmarkHistory.mockReturnValue({ runs: [], loading: false, deleteRun: vi.fn(), clearAll: vi.fn() });
     render(<BenchmarkHistory />);
     expect(screen.getByText('benchmark.history.none')).toBeInTheDocument();
   });
@@ -55,6 +55,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);
@@ -82,6 +84,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);
@@ -106,6 +110,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);
@@ -131,6 +137,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);
@@ -160,6 +168,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);
@@ -182,6 +192,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);
@@ -189,7 +201,7 @@ describe('BenchmarkHistory', () => {
   });
 
   it('passes limit of 20 to useBenchmarkHistory hook', () => {
-    mockUseBenchmarkHistory.mockReturnValue({ runs: [], loading: false });
+    mockUseBenchmarkHistory.mockReturnValue({ runs: [], loading: false, deleteRun: vi.fn(), clearAll: vi.fn() });
     render(<BenchmarkHistory />);
     expect(mockUseBenchmarkHistory).toHaveBeenCalledWith(20);
   });
@@ -204,6 +216,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);
@@ -221,6 +235,8 @@ describe('BenchmarkHistory', () => {
         },
       ],
       loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BenchmarkHistory />);

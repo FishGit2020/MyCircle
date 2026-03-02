@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { BenchmarkRunResult } from '../hooks/useBenchmark';
 
 interface Props {
   results: BenchmarkRunResult[];
-  onSave: () => void;
-  saving: boolean;
+  saved: boolean;
   saveError?: string;
+  onClear: () => void;
 }
 
-export default function ResultsDashboard({ results, onSave, saving, saveError }: Props) {
+export default function ResultsDashboard({ results, saved, saveError, onClear }: Props) {
   const { t } = useTranslation();
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   if (results.length === 0) {
     return (
@@ -32,14 +33,23 @@ export default function ResultsDashboard({ results, onSave, saving, saveError }:
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{t('benchmark.results.title')}</h3>
-        <button
-          type="button"
-          onClick={onSave}
-          disabled={saving}
-          className="px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-lg transition"
-        >
-          {saving ? '...' : t('benchmark.results.save')}
-        </button>
+        <div className="flex items-center gap-3">
+          {saved && (
+            <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              {t('benchmark.results.autoSaved')}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => { if (confirm(t('benchmark.results.clearConfirm'))) onClear(); }}
+            className="text-xs text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
+          >
+            {t('benchmark.results.clearAll')}
+          </button>
+        </div>
       </div>
       {saveError && (
         <div className="px-3 py-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg" role="alert">
@@ -65,50 +75,65 @@ export default function ResultsDashboard({ results, onSave, saving, saveError }:
           </thead>
           <tbody>
             {results.map((r, i) => (
-              <tr key={i} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                <td className="py-2.5 px-3">
-                  <div className="font-medium text-gray-800 dark:text-white">{r.endpointName}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">{r.model}</div>
-                </td>
-                {r.error ? (
-                  <td colSpan={results.length > 1 ? 6 : 5} className="py-2.5 px-3 text-red-500 text-sm">
-                    {t('benchmark.results.error')}: {r.error}
+              <React.Fragment key={i}>
+                <tr
+                  className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition cursor-pointer"
+                  onClick={() => setExpandedIdx(expandedIdx === i ? null : i)}
+                >
+                  <td className="py-2.5 px-3">
+                    <div className="font-medium text-gray-800 dark:text-white">{r.endpointName}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{r.model}</div>
                   </td>
-                ) : r.timing ? (
-                  <>
-                    <td className="py-2.5 px-3 text-right">
-                      <span className={`font-mono font-semibold ${r.timing.tokensPerSecond === fastestTps ? 'text-green-600 dark:text-green-400' : 'text-gray-800 dark:text-white'}`}>
-                        {r.timing.tokensPerSecond.toFixed(1)}
-                      </span>
+                  {r.error ? (
+                    <td colSpan={results.length > 1 ? 6 : 5} className="py-2.5 px-3 text-red-500 text-sm">
+                      {t('benchmark.results.error')}: {r.error}
                     </td>
-                    <td className="py-2.5 px-3 text-right hidden md:table-cell font-mono text-gray-700 dark:text-gray-300">
-                      {r.timing.promptTokensPerSecond.toFixed(1)}
-                    </td>
-                    <td className="py-2.5 px-3 text-right hidden md:table-cell font-mono text-gray-700 dark:text-gray-300">
-                      {r.timing.timeToFirstToken.toFixed(2)}s
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-gray-700 dark:text-gray-300">
-                      {r.timing.totalDuration.toFixed(2)}s
-                    </td>
-                    <td className="py-2.5 px-3 text-right hidden lg:table-cell font-mono text-gray-700 dark:text-gray-300">
-                      {r.timing.loadDuration.toFixed(2)}s
-                    </td>
-                    {results.length > 1 && (
+                  ) : r.timing ? (
+                    <>
                       <td className="py-2.5 px-3 text-right">
-                        {r.timing.tokensPerSecond === fastestTps ? (
-                          <span className="text-green-600 dark:text-green-400 font-semibold">
-                            {slowestTps > 0 ? `${(fastestTps / slowestTps).toFixed(1)}x` : '—'}
-                          </span>
-                        ) : (
-                          <span className="text-gray-500 dark:text-gray-400">1.0x</span>
-                        )}
+                        <span className={`font-mono font-semibold ${r.timing.tokensPerSecond === fastestTps ? 'text-green-600 dark:text-green-400' : 'text-gray-800 dark:text-white'}`}>
+                          {r.timing.tokensPerSecond.toFixed(1)}
+                        </span>
                       </td>
-                    )}
-                  </>
-                ) : (
-                  <td colSpan={results.length > 1 ? 6 : 5} className="py-2.5 px-3 text-gray-500 text-sm">—</td>
+                      <td className="py-2.5 px-3 text-right hidden md:table-cell font-mono text-gray-700 dark:text-gray-300">
+                        {r.timing.promptTokensPerSecond.toFixed(1)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right hidden md:table-cell font-mono text-gray-700 dark:text-gray-300">
+                        {r.timing.timeToFirstToken.toFixed(2)}s
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-mono text-gray-700 dark:text-gray-300">
+                        {r.timing.totalDuration.toFixed(2)}s
+                      </td>
+                      <td className="py-2.5 px-3 text-right hidden lg:table-cell font-mono text-gray-700 dark:text-gray-300">
+                        {r.timing.loadDuration.toFixed(2)}s
+                      </td>
+                      {results.length > 1 && (
+                        <td className="py-2.5 px-3 text-right">
+                          {r.timing.tokensPerSecond === fastestTps ? (
+                            <span className="text-green-600 dark:text-green-400 font-semibold">
+                              {slowestTps > 0 ? `${(fastestTps / slowestTps).toFixed(1)}x` : '—'}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500 dark:text-gray-400">1.0x</span>
+                          )}
+                        </td>
+                      )}
+                    </>
+                  ) : (
+                    <td colSpan={results.length > 1 ? 6 : 5} className="py-2.5 px-3 text-gray-500 text-sm">—</td>
+                  )}
+                </tr>
+                {expandedIdx === i && r.response && (
+                  <tr className="bg-gray-50 dark:bg-gray-800/50">
+                    <td colSpan={results.length > 1 ? 7 : 6} className="px-3 py-3">
+                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('benchmark.results.response')}</div>
+                      <div className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 max-h-48 overflow-y-auto">
+                        {r.response}
+                      </div>
+                    </td>
+                  </tr>
                 )}
-              </tr>
+              </React.Fragment>
             ))}
           </tbody>
         </table>

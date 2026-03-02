@@ -80,7 +80,10 @@ describe('useBenchmark', () => {
 
     let runPromise: Promise<any>;
     act(() => {
-      runPromise = result.current.runBenchmark(['ep-1'], 'gemma2:2b', 'test');
+      runPromise = result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
+        'test',
+      );
     });
 
     // Should be running
@@ -128,7 +131,10 @@ describe('useBenchmark', () => {
 
     let returnedResults: any;
     await act(async () => {
-      returnedResults = await result.current.runBenchmark(['ep-1', 'ep-2'], 'gemma2:2b', 'test');
+      returnedResults = await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'gemma2:2b' }],
+        'test',
+      );
     });
 
     expect(returnedResults).toHaveLength(2);
@@ -144,7 +150,10 @@ describe('useBenchmark', () => {
 
     let returnedResults: any;
     await act(async () => {
-      returnedResults = await result.current.runBenchmark(['ep-1'], 'gemma2:2b', 'test');
+      returnedResults = await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
+        'test',
+      );
     });
 
     expect(returnedResults).toHaveLength(1);
@@ -161,7 +170,10 @@ describe('useBenchmark', () => {
 
     let returnedResults: any;
     await act(async () => {
-      returnedResults = await result.current.runBenchmark(['ep-1'], 'gemma2:2b', 'test');
+      returnedResults = await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
+        'test',
+      );
     });
 
     expect(returnedResults[0].error).toBe('Unknown error');
@@ -201,7 +213,10 @@ describe('useBenchmark', () => {
     const { result } = renderHook(() => useBenchmark());
 
     await act(async () => {
-      await result.current.runBenchmark(['ep-1', 'ep-2'], 'gemma2:2b', 'test');
+      await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'gemma2:2b' }],
+        'test',
+      );
     });
 
     const cache = JSON.parse(localStorage.getItem('benchmark-cache') || '{}');
@@ -230,7 +245,10 @@ describe('useBenchmark', () => {
     const { result } = renderHook(() => useBenchmark());
 
     await act(async () => {
-      await result.current.runBenchmark(['ep-1'], 'gemma2:2b', 'test');
+      await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
+        'test',
+      );
     });
 
     expect(window.dispatchEvent).toHaveBeenCalledWith(
@@ -239,10 +257,7 @@ describe('useBenchmark', () => {
   });
 
   it('runBenchmark sets currentEndpoint for each iteration', async () => {
-    const endpointOrder: (string | null)[] = [];
-
     mockRunMutation.mockImplementation(async ({ variables }: any) => {
-      // Capture currentEndpoint at call time (checked after act)
       return {
         data: {
           runBenchmark: {
@@ -262,7 +277,10 @@ describe('useBenchmark', () => {
     const { result } = renderHook(() => useBenchmark());
 
     await act(async () => {
-      await result.current.runBenchmark(['ep-1', 'ep-2'], 'gemma2:2b', 'test');
+      await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'llama3:8b' }],
+        'test',
+      );
     });
 
     // After completion, currentEndpoint should be null
@@ -276,11 +294,65 @@ describe('useBenchmark', () => {
 
     let returnedResults: any;
     await act(async () => {
-      returnedResults = await result.current.runBenchmark(['ep-1'], 'gemma2:2b', 'test');
+      returnedResults = await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
+        'test',
+      );
     });
 
     // No results added when data is null
     expect(returnedResults).toHaveLength(0);
+  });
+
+  it('runBenchmark passes different models per endpoint', async () => {
+    mockRunMutation
+      .mockResolvedValueOnce({
+        data: {
+          runBenchmark: {
+            endpointId: 'ep-1',
+            endpointName: 'NAS',
+            model: 'gemma2:2b',
+            prompt: 'test',
+            response: 'r1',
+            timing: { tokensPerSecond: 15 },
+            error: null,
+            timestamp: '2026-01-15T10:00:00Z',
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        data: {
+          runBenchmark: {
+            endpointId: 'ep-2',
+            endpointName: 'GPU',
+            model: 'llama3:8b',
+            prompt: 'test',
+            response: 'r2',
+            timing: { tokensPerSecond: 40 },
+            error: null,
+            timestamp: '2026-01-15T10:00:01Z',
+          },
+        },
+      });
+
+    const { result } = renderHook(() => useBenchmark());
+
+    let returnedResults: any;
+    await act(async () => {
+      returnedResults = await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'llama3:8b' }],
+        'test',
+      );
+    });
+
+    expect(returnedResults).toHaveLength(2);
+    // Verify each endpoint was called with its own model
+    expect(mockRunMutation).toHaveBeenCalledWith({
+      variables: { endpointId: 'ep-1', model: 'gemma2:2b', prompt: 'test' },
+    });
+    expect(mockRunMutation).toHaveBeenCalledWith({
+      variables: { endpointId: 'ep-2', model: 'llama3:8b', prompt: 'test' },
+    });
   });
 
   it('saveRun calls save mutation with results', async () => {

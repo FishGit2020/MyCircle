@@ -34,15 +34,14 @@ export function useBenchmark() {
   });
 
   const runBenchmark = useCallback(async (
-    endpointIds: string[],
-    model: string,
+    endpointModels: Array<{ endpointId: string; model: string }>,
     prompt: string,
   ) => {
     setRunning(true);
     setResults([]);
     const newResults: BenchmarkRunResult[] = [];
 
-    for (const endpointId of endpointIds) {
+    for (const { endpointId, model } of endpointModels) {
       setCurrentEndpoint(endpointId);
       try {
         const { data } = await runMutation({
@@ -81,7 +80,7 @@ export function useBenchmark() {
           lastRunAt: new Date().toISOString(),
           fastestEndpoint: fastest?.endpointName ?? null,
           fastestTps: fastest?.timing?.tokensPerSecond ?? null,
-          endpointCount: endpointIds.length,
+          endpointCount: endpointModels.length,
         }));
         window.dispatchEvent(new Event(WindowEvents.BENCHMARK_CHANGED));
       } catch { /* ignore */ }

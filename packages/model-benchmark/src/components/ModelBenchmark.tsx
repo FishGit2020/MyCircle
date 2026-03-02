@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, StorageKeys } from '@mycircle/shared';
 import BenchmarkRunner from './BenchmarkRunner';
 import EndpointManager from './EndpointManager';
 import ResultsDashboard from './ResultsDashboard';
@@ -23,32 +23,40 @@ export default function ModelBenchmark() {
     setSearchParams(tab === 'run' ? {} : { tab }, { replace: true });
   }, [setSearchParams]);
 
-  const [latestResults, setLatestResults] = useState<BenchmarkRunResult[]>([]);
+  const [latestResults, setLatestResults] = useState<BenchmarkRunResult[]>(() => {
+    try {
+      const saved = localStorage.getItem(StorageKeys.BENCHMARK_RESULTS);
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
   const { saveRun } = useBenchmark();
-  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
 
-  const handleResults = useCallback((results: BenchmarkRunResult[]) => {
+  const handleResults = useCallback(async (results: BenchmarkRunResult[]) => {
     setLatestResults(results);
-    setActiveTab('results');
-  }, [setActiveTab]);
-
-  const handleSave = useCallback(async () => {
-    if (latestResults.length === 0) return;
-    setSaving(true);
+    try { localStorage.setItem(StorageKeys.BENCHMARK_RESULTS, JSON.stringify(results)); } catch { /* */ }
+    setSaved(false);
     setSaveError('');
+    setActiveTab('results');
+    // Auto-save to history
     try {
-      await saveRun(latestResults);
+      await saveRun(results);
+      setSaved(true);
       window.__logAnalyticsEvent?.('benchmark_run_saved', {
-        result_count: latestResults.length,
+        result_count: results.length,
       });
-      setActiveTab('history');
     } catch (err: unknown) {
       setSaveError(err instanceof Error ? err.message : 'Failed to save');
-    } finally {
-      setSaving(false);
     }
-  }, [latestResults, saveRun, setActiveTab]);
+  }, [saveRun, setActiveTab]);
+
+  const handleClearResults = useCallback(() => {
+    setLatestResults([]);
+    setSaved(false);
+    setSaveError('');
+    try { localStorage.removeItem(StorageKeys.BENCHMARK_RESULTS); } catch { /* */ }
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto pb-20 md:pb-8">
@@ -86,7 +94,7 @@ export default function ModelBenchmark() {
       <div>
         {activeTab === 'run' && <BenchmarkRunner onResults={handleResults} />}
         {activeTab === 'endpoints' && <EndpointManager />}
-        {activeTab === 'results' && <ResultsDashboard results={latestResults} onSave={handleSave} saving={saving} saveError={saveError} />}
+        {activeTab === 'results' && <ResultsDashboard results={latestResults} saved={saved} saveError={saveError} onClear={handleClearResults} />}
         {activeTab === 'history' && <BenchmarkHistory />}
       </div>
     </div>
