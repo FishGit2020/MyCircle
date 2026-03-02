@@ -20,15 +20,26 @@ export default function BenchmarkRunner({ onResults }: Props) {
   const [selectedPromptId, setSelectedPromptId] = useState('simple');
   const [customPrompt, setCustomPrompt] = useState('');
 
-  // Model discovery: fetch models from the first selected endpoint
+  // Model discovery: fetch models from the first selected endpoint (or first available)
   const [fetchModels, { data: modelsData }] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
   const discoveredModels: string[] = modelsData?.benchmarkEndpointModels ?? [];
 
+  // Auto-discover from first available endpoint even before user checks any
+  const discoveryEndpointId = selectedEndpoints[0] || endpoints[0]?.id;
   useEffect(() => {
-    if (selectedEndpoints.length > 0) {
-      fetchModels({ variables: { endpointId: selectedEndpoints[0] } });
+    if (discoveryEndpointId) {
+      fetchModels({ variables: { endpointId: discoveryEndpointId } });
     }
-  }, [selectedEndpoints, fetchModels]);
+  }, [discoveryEndpointId, fetchModels]);
+
+  // Sync model state when discovered models arrive and current value isn't valid
+  useEffect(() => {
+    if (discoveredModels.length > 0 && !discoveredModels.includes(model)) {
+      const newModel = discoveredModels[0];
+      setModel(newModel);
+      try { localStorage.setItem('benchmark-model', newModel); } catch { /* */ }
+    }
+  }, [discoveredModels]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleEndpoint = (id: string) => {
     setSelectedEndpoints(prev =>
@@ -44,6 +55,20 @@ export default function BenchmarkRunner({ onResults }: Props) {
 
     const results = await runBenchmark(selectedEndpoints, model, prompt);
     onResults(results);
+
+    // Analytics: track benchmark run completion
+    const successful = results.filter(r => !r.error);
+    const avgTps = successful.length > 0
+      ? successful.reduce((sum, r) => sum + (r.timing?.tokensPerSecond || 0), 0) / successful.length
+      : 0;
+    window.__logAnalyticsEvent?.('benchmark_run_complete', {
+      endpoint_count: selectedEndpoints.length,
+      model,
+      prompt_type: selectedPromptId,
+      successful_count: successful.length,
+      error_count: results.length - successful.length,
+      avg_tokens_per_sec: Math.round(avgTps * 10) / 10,
+    });
   };
 
   return (
@@ -78,27 +103,20 @@ export default function BenchmarkRunner({ onResults }: Props) {
       {/* Model Selection */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('benchmark.runner.selectModel')}</label>
-        {discoveredModels.length > 0 ? (
-          <select
-            value={model}
-            onChange={e => { setModel(e.target.value); try { localStorage.setItem('benchmark-model', e.target.value); } catch { /* */ } }}
-            disabled={running}
-            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-          >
-            {discoveredModels.map(m => (
+        <select
+          value={model}
+          onChange={e => { setModel(e.target.value); try { localStorage.setItem('benchmark-model', e.target.value); } catch { /* */ } }}
+          disabled={running || discoveredModels.length === 0}
+          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          {discoveredModels.length === 0 ? (
+            <option value="">{t('app.loading')}</option>
+          ) : (
+            discoveredModels.map(m => (
               <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-        ) : (
-          <input
-            type="text"
-            value={model}
-            onChange={e => { setModel(e.target.value); try { localStorage.setItem('benchmark-model', e.target.value); } catch { /* */ } }}
-            placeholder="gemma2:2b"
-            disabled={running}
-            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-          />
-        )}
+            ))
+          )}
+        </select>
       </div>
 
       {/* Prompt Selection */}

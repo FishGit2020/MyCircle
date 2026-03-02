@@ -233,6 +233,7 @@ export default defineConfig({
           { name: 'AI Assistant', short_name: 'AI', url: '/ai', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Child Development', short_name: 'ChildDev', url: '/child-dev', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
           { name: 'Cloud Files', short_name: 'Files', url: '/files', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
+          { name: 'Flashcards', short_name: 'Cards', url: '/flashcards', icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }] },
         ]
       },
       workbox: {

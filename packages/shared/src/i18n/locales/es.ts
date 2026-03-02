@@ -382,6 +382,8 @@ const es: Record<TranslationKey, string> = {
   'podcasts.search': 'Buscar podcasts...',
   'podcasts.trending': 'Tendencia',
   'podcasts.subscriptions': 'Mis Suscripciones',
+  'podcasts.tabs.discover': 'Tendencia',
+  'podcasts.tabs.subscribed': 'Mis Suscripciones',
   'podcasts.subscribe': 'Suscribirse',
   'podcasts.unsubscribe': 'Cancelar suscripci\u00f3n',
   'podcasts.episodes': 'Episodios',
@@ -468,7 +470,12 @@ const es: Record<TranslationKey, string> = {
 
   // AI Monitor
   'ai.tabChat': 'Chat',
+  'ai.tabEndpoints': 'Endpoints',
   'ai.tabMonitor': 'Monitor',
+  'ai.tabs.chat': 'Chat',
+  'ai.tabs.endpoints': 'Endpoints',
+  'ai.tabs.monitor': 'Monitor',
+  'ai.noEndpointsHint': 'Agrega endpoints de Ollama en la pesta\u00f1a Endpoints para comenzar',
   'ai.monitor.totalCalls': 'Total de llamadas',
   'ai.monitor.inputTokens': 'Tokens de entrada',
   'ai.monitor.outputTokens': 'Tokens de salida',
@@ -615,6 +622,8 @@ const es: Record<TranslationKey, string> = {
   'notebook.loadError': 'Error al cargar las notas',
   'notebook.myNotes': 'Mis Notas',
   'notebook.publicNotes': 'Notas P\u00fablicas',
+  'notebook.tabs.my': 'Mis Notas',
+  'notebook.tabs.public': 'Notas P\u00fablicas',
   'notebook.publish': 'Publicar',
   'notebook.publishing': 'Publicando...',
   'notebook.publishConfirm': '\u00bfPublicar esta nota p\u00fablicamente? Esto no se puede deshacer.',
@@ -1532,6 +1541,10 @@ const es: Record<TranslationKey, string> = {
   'benchmark.history.runAt': 'Ejecutado el {date}',
   'benchmark.history.endpoints': '{count} endpoints',
   'benchmark.signInRequired': 'Inicia sesi\u00f3n para usar benchmarks',
+
+  // Endpoint source labels
+  'endpoints.sourceChat': 'Chat',
+  'endpoints.sourceBenchmark': 'Benchmark',
 
   // Immigration Tracker
   'nav.immigration': 'Inmigraci\u00f3n',

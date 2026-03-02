@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router';
 import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
 import { usePublicNotes } from '../hooks/usePublicNotes';
@@ -17,7 +17,13 @@ export default function Notebook() {
   const navigate = useNavigate();
   const { notes, loading, error, saveNote, deleteNote, reload } = useNotes();
   const { notes: publicNotes, loading: publicLoading, error: publicError, publishNote, updateNote: updatePublicNote, deleteNote: deletePublicNote, reload: reloadPublic } = usePublicNotes();
-  const [tab, setTab] = useState<Tab>('my');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const VALID_TABS = new Set(['my', 'public']);
+  const tab: Tab = tabParam && VALID_TABS.has(tabParam) ? (tabParam as Tab) : 'my';
+  const setTab = useCallback((t: Tab) => {
+    setSearchParams(t === 'my' ? {} : { tab: t }, { replace: true });
+  }, [setSearchParams]);
 
   // Derive view from URL
   const isNewRoute = location.pathname === '/notebook/new';

@@ -17,6 +17,7 @@ vi.mock('@mycircle/shared', () => {
     }),
     RUN_BENCHMARK: 'RUN_BENCHMARK',
     SAVE_BENCHMARK_RUN: 'SAVE_BENCHMARK_RUN',
+    GET_BENCHMARK_HISTORY: 'GET_BENCHMARK_HISTORY',
     StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache' },
     WindowEvents: { BENCHMARK_CHANGED: 'benchmark-changed' },
     createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),

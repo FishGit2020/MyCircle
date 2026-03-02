@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router';
 import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents, subscribeToMFEvent, useQuery, GET_PODCAST_FEED } from '@mycircle/shared';
 import type { PodcastPlayEpisodeEvent } from '@mycircle/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
@@ -50,11 +50,18 @@ export default function PodcastPlayer() {
   const { podcastId } = useParams<{ podcastId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const VALID_TABS = new Set(['discover', 'subscribed']);
+  const activeTab: 'discover' | 'subscribed' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'discover';
+  const setActiveTab = useCallback((tab: 'discover' | 'subscribed') => {
+    setSearchParams(tab === 'discover' ? {} : { tab }, { replace: true });
+  }, [setSearchParams]);
+
   const [selectedPodcast, setSelectedPodcast] = useState<Podcast | null>(null);
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [subscribedIds, setSubscribedIds] = useState<Set<string>>(loadSubscriptions);
-  const [activeTab, setActiveTab] = useState<'discover' | 'subscribed'>('discover');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Track now-playing state from GlobalAudioPlayer for InlinePlaybackControls
@@ -106,6 +113,7 @@ export default function PodcastPlayer() {
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
+      if (document.visibilityState === 'hidden') return;
       try {
         const getToken = (window as any).__getFirebaseIdToken;
         const token = getToken ? await getToken() : null;

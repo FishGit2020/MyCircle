@@ -50,6 +50,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
   const handleSubmit = () => {
     const trimmed = value.trim();
     if (!trimmed || disabled) return;
+    window.__logAnalyticsEvent?.('ai_chat_sent', { message_length: trimmed.length });
     onSend(trimmed);
     setValue('');
     // Reset height after clearing

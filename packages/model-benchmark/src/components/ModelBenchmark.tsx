@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import BenchmarkRunner from './BenchmarkRunner';
 import EndpointManager from './EndpointManager';
@@ -10,28 +11,44 @@ import type { BenchmarkRunResult } from '../hooks/useBenchmark';
 type Tab = 'run' | 'endpoints' | 'results' | 'history';
 
 const TAB_KEYS: Tab[] = ['run', 'endpoints', 'results', 'history'];
+const VALID_TABS = new Set<string>(TAB_KEYS);
 
 export default function ModelBenchmark() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<Tab>('run');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const activeTab: Tab = tabParam && VALID_TABS.has(tabParam) ? (tabParam as Tab) : 'run';
+
+  const setActiveTab = useCallback((tab: Tab) => {
+    setSearchParams(tab === 'run' ? {} : { tab }, { replace: true });
+  }, [setSearchParams]);
+
   const [latestResults, setLatestResults] = useState<BenchmarkRunResult[]>([]);
   const { saveRun } = useBenchmark();
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const handleResults = useCallback((results: BenchmarkRunResult[]) => {
     setLatestResults(results);
     setActiveTab('results');
-  }, []);
+  }, [setActiveTab]);
 
   const handleSave = useCallback(async () => {
     if (latestResults.length === 0) return;
     setSaving(true);
+    setSaveError('');
     try {
       await saveRun(latestResults);
+      window.__logAnalyticsEvent?.('benchmark_run_saved', {
+        result_count: latestResults.length,
+      });
+      setActiveTab('history');
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save');
     } finally {
       setSaving(false);
     }
-  }, [latestResults, saveRun]);
+  }, [latestResults, saveRun, setActiveTab]);
 
   return (
     <div className="max-w-4xl mx-auto pb-20 md:pb-8">
@@ -69,7 +86,7 @@ export default function ModelBenchmark() {
       <div>
         {activeTab === 'run' && <BenchmarkRunner onResults={handleResults} />}
         {activeTab === 'endpoints' && <EndpointManager />}
-        {activeTab === 'results' && <ResultsDashboard results={latestResults} onSave={handleSave} saving={saving} />}
+        {activeTab === 'results' && <ResultsDashboard results={latestResults} onSave={handleSave} saving={saving} saveError={saveError} />}
         {activeTab === 'history' && <BenchmarkHistory />}
       </div>
     </div>

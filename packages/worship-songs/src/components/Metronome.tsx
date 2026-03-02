@@ -85,6 +85,23 @@ export default function Metronome({ initialBpm = 120 }: MetronomeProps) {
     }
   }, [bpm, playing, playClick]);
 
+  // Pause metronome when tab is hidden, resume when visible
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+      } else if (playing) {
+        const interval = 60000 / bpm;
+        timerRef.current = setInterval(playClick, interval);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [playing, bpm, playClick]);
+
   const handleBpmChange = useCallback((newBpm: number) => {
     setBpm(Math.max(MIN_BPM, Math.min(MAX_BPM, newBpm)));
   }, []);

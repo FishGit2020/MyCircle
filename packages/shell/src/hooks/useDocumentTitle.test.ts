@@ -3,10 +3,12 @@ import { renderHook } from '@testing-library/react';
 import { useDocumentTitle } from './useDocumentTitle';
 
 let mockPathname = '/';
+let mockSearchParams = new URLSearchParams();
 const mockLogEvent = vi.fn();
 
 vi.mock('react-router', () => ({
-  useLocation: () => ({ pathname: mockPathname, search: '', hash: '', state: null, key: 'default' }),
+  useLocation: () => ({ pathname: mockPathname, search: mockSearchParams.toString() ? `?${mockSearchParams.toString()}` : '', hash: '', state: null, key: 'default' }),
+  useSearchParams: () => [mockSearchParams],
 }));
 
 vi.mock('@mycircle/shared', () => ({
@@ -20,6 +22,7 @@ vi.mock('../lib/firebase', () => ({
 
 beforeEach(() => {
   mockPathname = '/';
+  mockSearchParams = new URLSearchParams();
   mockLogEvent.mockClear();
   document.title = '';
 });
@@ -72,6 +75,13 @@ describe('useDocumentTitle', () => {
     });
   });
 
+  it('includes tab name in title when ?tab= is present', () => {
+    mockPathname = '/benchmark';
+    mockSearchParams = new URLSearchParams({ tab: 'results' });
+    renderHook(() => useDocumentTitle());
+    expect(document.title).toBe('benchmark.tabs.results - nav.benchmark - MyCircle');
+  });
+
   it('updates title when route changes', () => {
     const { rerender } = renderHook(() => useDocumentTitle());
     expect(document.title).toBe('MyCircle');
@@ -102,6 +112,19 @@ describe('useDocumentTitle', () => {
     expect(mockLogEvent).toHaveBeenCalledWith('page_view', {
       page_path: '/',
       page_title: 'MyCircle',
+    });
+  });
+
+  it('fires page_view with search params in path for tab changes', () => {
+    mockPathname = '/benchmark';
+    const { rerender } = renderHook(() => useDocumentTitle());
+
+    mockSearchParams = new URLSearchParams({ tab: 'history' });
+    rerender();
+
+    expect(mockLogEvent).toHaveBeenCalledWith('page_view', {
+      page_path: '/benchmark?tab=history',
+      page_title: 'benchmark.tabs.history - nav.benchmark - MyCircle',
     });
   });
 });

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback, lazy, Suspense } from 'react';
-import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
+import { useSearchParams } from 'react-router';
+import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS, EndpointManager } from '@mycircle/shared';
 import { useAiChat } from '../hooks/useAiChat';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -27,7 +28,9 @@ export default function AiAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's Ollama endpoints
-  const { data: endpointsData } = useQuery(GET_BENCHMARK_ENDPOINTS);
+  const { data: endpointsData } = useQuery(GET_BENCHMARK_ENDPOINTS, {
+    fetchPolicy: 'cache-and-network',
+  });
   const endpoints: Array<{ id: string; url: string; name: string }> = endpointsData?.benchmarkEndpoints ?? [];
 
   const [selectedEndpoint, setSelectedEndpoint] = useState(() => {
@@ -45,7 +48,13 @@ export default function AiAssistant() {
   // Use endpoint-specific models if available, else default
   const displayModels = selectedEndpoint && models.length > 0 ? models : defaultModels;
 
-  const [activeTab, setActiveTab] = useState<'chat' | 'monitor'>('chat');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const VALID_TABS = new Set(['chat', 'endpoints', 'monitor']);
+  const activeTab: 'chat' | 'endpoints' | 'monitor' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'chat';
+  const setActiveTab = useCallback((tab: 'chat' | 'endpoints' | 'monitor') => {
+    setSearchParams(tab === 'chat' ? {} : { tab }, { replace: true });
+  }, [setSearchParams]);
 
   const [selectedModel, setSelectedModel] = useState(() => {
     try { return localStorage.getItem(MODEL_STORAGE_KEY) || ''; } catch { return ''; }
@@ -199,6 +208,17 @@ export default function AiAssistant() {
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab('endpoints')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'endpoints'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          {t('ai.tabEndpoints')}
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('monitor')}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'monitor'
@@ -211,7 +231,11 @@ export default function AiAssistant() {
       </div>
 
       {/* Tab content */}
-      {activeTab === 'monitor' ? (
+      {activeTab === 'endpoints' ? (
+        <div className="flex-1 overflow-y-auto">
+          <EndpointManager source="chat" />
+        </div>
+      ) : activeTab === 'monitor' ? (
         <Suspense fallback={<div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">Loading...</div>}>
           <AiMonitor />
         </Suspense>
@@ -231,6 +255,10 @@ export default function AiAssistant() {
                 </svg>
                 <p className="text-lg font-medium">{t('ai.emptyTitle')}</p>
                 <p className="text-sm mt-2 max-w-sm">{t('ai.emptyHint')}</p>
+
+                {endpoints.length === 0 && (
+                  <p className="text-sm mt-3 max-w-sm text-amber-500 dark:text-amber-400">{t('ai.noEndpointsHint')}</p>
+                )}
 
                 {/* Suggested prompts */}
                 <div className="flex flex-wrap justify-center gap-2 mt-6 max-w-md">

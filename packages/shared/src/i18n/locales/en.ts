@@ -380,6 +380,8 @@ const en = {
   'podcasts.search': 'Search podcasts...',
   'podcasts.trending': 'Trending',
   'podcasts.subscriptions': 'My Subscriptions',
+  'podcasts.tabs.discover': 'Trending',
+  'podcasts.tabs.subscribed': 'My Subscriptions',
   'podcasts.subscribe': 'Subscribe',
   'podcasts.unsubscribe': 'Unsubscribe',
   'podcasts.episodes': 'Episodes',
@@ -466,7 +468,12 @@ const en = {
 
   // AI Monitor
   'ai.tabChat': 'Chat',
+  'ai.tabEndpoints': 'Endpoints',
   'ai.tabMonitor': 'Monitor',
+  'ai.tabs.chat': 'Chat',
+  'ai.tabs.endpoints': 'Endpoints',
+  'ai.tabs.monitor': 'Monitor',
+  'ai.noEndpointsHint': 'Add Ollama endpoints in the Endpoints tab to get started',
   'ai.monitor.totalCalls': 'Total Calls',
   'ai.monitor.inputTokens': 'Input Tokens',
   'ai.monitor.outputTokens': 'Output Tokens',
@@ -613,6 +620,8 @@ const en = {
   'notebook.loadError': 'Failed to load notes',
   'notebook.myNotes': 'My Notes',
   'notebook.publicNotes': 'Public Notes',
+  'notebook.tabs.my': 'My Notes',
+  'notebook.tabs.public': 'Public Notes',
   'notebook.publish': 'Publish',
   'notebook.publishing': 'Publishing...',
   'notebook.publishConfirm': 'Publish this note publicly? This cannot be undone.',
@@ -1530,6 +1539,10 @@ const en = {
   'benchmark.history.runAt': 'Run at {date}',
   'benchmark.history.endpoints': '{count} endpoints',
   'benchmark.signInRequired': 'Sign in to use benchmarks',
+
+  // Endpoint source labels
+  'endpoints.sourceChat': 'Chat',
+  'endpoints.sourceBenchmark': 'Benchmark',
 
   // Immigration Tracker
   'nav.immigration': 'Immigration',

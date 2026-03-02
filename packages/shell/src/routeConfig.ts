@@ -16,4 +16,6 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   'work-tracker': 'nav.workTracker',
   files: 'nav.cloudFiles',
   'whats-new': 'whatsNew.title',
+  immigration: 'nav.immigration',
+  benchmark: 'nav.benchmark',
 };
