@@ -129,30 +129,108 @@ services:
         limits:
           memory: 6G
 
+  # Option A: Free quick tunnel (no Cloudflare account needed)
+  # Generates a random *.trycloudflare.com URL on startup — check container logs for the URL.
+  # Good for testing, but the URL changes on every restart.
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=<your-tunnel-token>
-    depends_on:
-      - ollama
+    command: tunnel --url http://ollama:11434
+
+  # Option B: Named tunnel with permanent domain (requires Cloudflare Zero Trust)
+  # Gives a stable subdomain like ollama.mycircledash.com.
+  # See "Cloudflare Tunnel (Permanent Domain)" section below for setup.
+  #cloudflared:
+  #  image: cloudflare/cloudflared:latest
+  #  container_name: cloudflared
+  #  restart: unless-stopped
+  #  command: tunnel run
+  #  environment:
+  #    - TUNNEL_TOKEN=<your-tunnel-token>
+  #  depends_on:
+  #    - ollama
 ```
 
 **Important**: Both containers must be in the same `docker-compose.yml` so they share a Docker network. The `cloudflared` container reaches Ollama via the service name `ollama` (not `localhost`).
 
-### Pull the model
+> **Option A vs B**: Use Option A to get running in seconds — check `docker logs cloudflared` for your URL. Switch to Option B when you want a permanent subdomain (comment out A, uncomment B).
+
+### Pull a model
 
 ```bash
-docker exec ollama ollama pull gemma2:2b
+docker exec ollama ollama pull gemma3:4b
 ```
+
+### Available Models
+
+Pick a model based on your machine's available RAM/VRAM. All numbers below are for **Q4_K_M** quantization (recommended sweet spot for quality vs memory).
+
+#### Lightweight (4–8 GB RAM) — Good for NAS, Raspberry Pi 5, old laptops
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `gemma3:1b` | 1B | ~2 GB | No | Fastest responses, simple Q&A |
+| `gemma2:2b` | 2B | ~3 GB | No (prompt fallback) | Current default, low resource baseline |
+| `llama3.2:3b` | 3B | ~3.6 GB | Yes (native) | Lightweight with tool support |
+| `gemma3:4b` | 4B | ~4 GB | No | Best quality-per-GB ratio |
+| `qwen3:4b` | 4B | ~4 GB | Yes (native) | Multilingual + tools, thinking mode |
+| `phi3:3.8b` | 3.8B | ~4 GB | No | Strong reasoning for its size |
+
+#### Mid-range (8–16 GB RAM) — Desktops, gaming PCs, Mac M1/M2
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `llama3.1:8b` | 8B | ~6.2 GB | Yes (native) | General purpose, great tool support |
+| `qwen3:8b` | 8B | ~6.5 GB | Yes (native) | Beats llama3.1:8b on most benchmarks |
+| `mistral:7b` | 7B | ~6 GB | Yes (native) | Fast, good for European languages |
+| `gemma3:12b` | 12B | ~12.4 GB | No | High quality, Google's latest |
+| `qwen3:14b` | 14B | ~10.7 GB | Yes (native) | Best 14B model, strong reasoning |
+| `phi4:14b` | 14B | ~11 GB | No | Microsoft's reasoning model |
+| `deepseek-r1:14b` | 14B | ~11 GB | No | Chain-of-thought reasoning |
+
+#### High-end (16–32 GB RAM) — Workstations, Mac M2 Pro/Max, GPU servers
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `gemma3:27b` | 27B | ~22.5 GB | No | Near-GPT-4 quality on many tasks |
+| `qwen3:32b` | 32B | ~22.2 GB | Yes (native) | Best open model under 32B, tools + thinking |
+| `command-r:35b` | 35B | ~24 GB | Yes (native) | Built for RAG and tool use |
+
+#### Workstation (48+ GB RAM/VRAM) — Dual GPU, cloud instances
+
+| Model | Params | RAM needed | Tool calling | Best for |
+|-------|--------|-----------|--------------|----------|
+| `llama3.3:70b` | 70B | ~45.6 GB | Yes (native) | Near-frontier quality |
+| `qwen2.5:72b` | 72B | ~50.5 GB | Yes (native) | Best open-weight large model |
+
+### Recommendations for MyCircle
+
+| Scenario | Recommended model | Why |
+|----------|------------------|-----|
+| **NAS / low-power device** | `qwen3:4b` | Smallest model with native tool calling (weather, stocks, crypto tools work) |
+| **Desktop / 16 GB Mac** | `qwen3:8b` | Best balance of speed, quality, and tool support |
+| **Beefy machine / GPU** | `qwen3:14b` or `qwen3:32b` | Top-tier quality with full tool calling |
+| **Benchmarking / comparison** | Pull 2-3 different sizes | e.g., `qwen3:4b` + `qwen3:8b` + `gemma3:12b` |
+| **Code assistance** | `qwen2.5-coder:7b` | Specialized for code generation |
+
+> **Tool calling matters for MyCircle**: Models with native tool calling can use weather, stock, crypto, and navigation tools automatically. Models without it fall back to a prompt-based approach (works but less reliable). The `qwen3` family is recommended because it has native tool support at every size.
+
+### Pull multiple models for benchmarking
+
+```bash
+docker exec ollama ollama pull qwen3:4b
+docker exec ollama ollama pull qwen3:8b
+docker exec ollama ollama pull gemma3:12b
+```
+
+Models are auto-discovered — after pulling, they appear in the AI Chat model dropdown and Benchmark model selector immediately.
 
 ### Verify locally
 
 ```bash
 curl http://localhost:11434/v1/models
-# Should return: {"object":"list","data":[{"id":"gemma2:2b",...}]}
+# Should list all pulled models
 ```
 
 ---
