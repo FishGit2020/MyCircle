@@ -7,12 +7,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    setupFiles: ['./test/setup.ts'],
+    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}', 'test/**/*.{test,spec}.{js,jsx,ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'src/test/']
+      exclude: ['node_modules/', 'test/']
     }
   },
   resolve: {
@@ -20,24 +20,24 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
       '@mycircle/shared': resolve(__dirname, '../shared/src'),
       // Mock remote modules for testing
-      'citySearch/CitySearch': resolve(__dirname, './src/test/mocks/CitySearchMock.tsx'),
-      'weatherDisplay/WeatherDisplay': resolve(__dirname, './src/test/mocks/WeatherDisplayMock.tsx'),
-      'stockTracker/StockTracker': resolve(__dirname, './src/test/mocks/StockTrackerMock.tsx'),
-      'podcastPlayer/PodcastPlayer': resolve(__dirname, './src/test/mocks/PodcastPlayerMock.tsx'),
-      'aiAssistant/AiAssistant': resolve(__dirname, './src/test/mocks/AiAssistantMock.tsx'),
-      'bibleReader/BibleReader': resolve(__dirname, './src/test/mocks/BibleReaderMock.tsx'),
-      'worshipSongs/WorshipSongs': resolve(__dirname, './src/test/mocks/WorshipSongsMock.tsx'),
-      'notebook/Notebook': resolve(__dirname, './src/test/mocks/NotebookMock.tsx'),
-      'babyTracker/BabyTracker': resolve(__dirname, './src/test/mocks/BabyTrackerMock.tsx'),
-      'childDevelopment/ChildDevelopment': resolve(__dirname, './src/test/mocks/ChildDevelopmentMock.tsx'),
-      'chineseLearning/ChineseLearning': resolve(__dirname, './src/test/mocks/ChineseLearningMock.tsx'),
-      'englishLearning/EnglishLearning': resolve(__dirname, './src/test/mocks/EnglishLearningMock.tsx'),
-      'flashcards/FlashCards': resolve(__dirname, './src/test/mocks/FlashCardsMock.tsx'),
-      'workTracker/WorkTracker': resolve(__dirname, './src/test/mocks/WorkTrackerMock.tsx'),
-      'cloudFiles/CloudFiles': resolve(__dirname, './src/test/mocks/CloudFilesMock.tsx'),
-      'modelBenchmark/ModelBenchmark': resolve(__dirname, './src/test/mocks/ModelBenchmarkMock.tsx'),
-      'immigrationTracker/ImmigrationTracker': resolve(__dirname, './src/test/mocks/ImmigrationTrackerMock.tsx'),
-      'virtual:pwa-register/react': resolve(__dirname, './src/test/mocks/pwaRegisterReactMock.ts')
+      'citySearch/CitySearch': resolve(__dirname, './test/mocks/CitySearchMock.tsx'),
+      'weatherDisplay/WeatherDisplay': resolve(__dirname, './test/mocks/WeatherDisplayMock.tsx'),
+      'stockTracker/StockTracker': resolve(__dirname, './test/mocks/StockTrackerMock.tsx'),
+      'podcastPlayer/PodcastPlayer': resolve(__dirname, './test/mocks/PodcastPlayerMock.tsx'),
+      'aiAssistant/AiAssistant': resolve(__dirname, './test/mocks/AiAssistantMock.tsx'),
+      'bibleReader/BibleReader': resolve(__dirname, './test/mocks/BibleReaderMock.tsx'),
+      'worshipSongs/WorshipSongs': resolve(__dirname, './test/mocks/WorshipSongsMock.tsx'),
+      'notebook/Notebook': resolve(__dirname, './test/mocks/NotebookMock.tsx'),
+      'babyTracker/BabyTracker': resolve(__dirname, './test/mocks/BabyTrackerMock.tsx'),
+      'childDevelopment/ChildDevelopment': resolve(__dirname, './test/mocks/ChildDevelopmentMock.tsx'),
+      'chineseLearning/ChineseLearning': resolve(__dirname, './test/mocks/ChineseLearningMock.tsx'),
+      'englishLearning/EnglishLearning': resolve(__dirname, './test/mocks/EnglishLearningMock.tsx'),
+      'flashcards/FlashCards': resolve(__dirname, './test/mocks/FlashCardsMock.tsx'),
+      'workTracker/WorkTracker': resolve(__dirname, './test/mocks/WorkTrackerMock.tsx'),
+      'cloudFiles/CloudFiles': resolve(__dirname, './test/mocks/CloudFilesMock.tsx'),
+      'modelBenchmark/ModelBenchmark': resolve(__dirname, './test/mocks/ModelBenchmarkMock.tsx'),
+      'immigrationTracker/ImmigrationTracker': resolve(__dirname, './test/mocks/ImmigrationTrackerMock.tsx'),
+      'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }
 });

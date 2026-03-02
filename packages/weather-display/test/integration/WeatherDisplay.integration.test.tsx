@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
-import WeatherDisplay from '../../components/WeatherDisplay';
+import WeatherDisplay from '../../src/components/WeatherDisplay';
 import { GET_WEATHER, WEATHER_UPDATES } from '@mycircle/shared';
 
 const mockWeatherResponse = {
