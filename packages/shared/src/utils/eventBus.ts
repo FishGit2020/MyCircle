@@ -50,6 +50,7 @@ export const WindowEvents = {
   LAST_PLAYED_CHANGED: 'last-played-changed',
   PODCAST_PLAYED_CHANGED: 'podcast-played-changed',
   BENCHMARK_CHANGED: 'benchmark-changed',
+  IMMIGRATION_CASES_CHANGED: 'immigration-cases-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -99,6 +100,7 @@ export const StorageKeys = {
   PODCAST_PLAYED_EPISODES: 'podcast-played-episodes',
   KNOWN_ACCOUNTS: 'known-accounts',
   BENCHMARK_CACHE: 'benchmark-cache',
+  IMMIGRATION_CASES_CACHE: 'immigration-cases-cache',
 } as const;
 
 export interface CitySelectedEvent {

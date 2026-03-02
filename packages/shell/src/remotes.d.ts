@@ -80,3 +80,8 @@ declare module 'modelBenchmark/ModelBenchmark' {
   const ModelBenchmark: React.ComponentType;
   export default ModelBenchmark;
 }
+
+declare module 'immigrationTracker/ImmigrationTracker' {
+  const ImmigrationTracker: React.ComponentType;
+  export default ImmigrationTracker;
+}
