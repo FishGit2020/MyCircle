@@ -363,14 +363,6 @@ const es: Record<TranslationKey, string> = {
   'stocks.sparkline7d': 'Tendencia 7 d\u00edas',
   'stocks.refresh': 'Actualizar',
   'stocks.lastUpdated': '\u00daltima actualizaci\u00f3n',
-  'stocks.costBasis': 'Costo base',
-  'stocks.shares': 'Acciones',
-  'stocks.gainLoss': 'Ganancia / P\u00e9rdida',
-  'stocks.totalValue': 'Valor total',
-  'stocks.clearPosition': 'Eliminar posici\u00f3n',
-  'stocks.addPosition': 'Agregar posici\u00f3n',
-  'stocks.buyPricePlaceholder': 'Precio compra',
-  'stocks.quantityPlaceholder': 'Cant.',
   'stocks.save': 'Guardar',
   'stocks.news': 'Noticias',
   'stocks.newsNoArticles': 'No hay noticias recientes disponibles para esta acci\u00f3n.',
@@ -790,6 +782,7 @@ const es: Record<TranslationKey, string> = {
   'map.fullscreen': 'Pantalla completa',
   'map.exitFullscreen': 'Salir de pantalla completa',
   'map.waitingForLocation': 'Esperando ubicaci\u00f3n...',
+  'map.loading': 'Cargando mapa...',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'Alerta UV',

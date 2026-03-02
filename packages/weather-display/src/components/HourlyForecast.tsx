@@ -18,7 +18,7 @@ export default function HourlyForecast({ data }: Props) {
   return (
     <div className="overflow-x-auto" role="region" aria-label={t('weather.hourlyForecast')} tabIndex={0}>
       <div className="flex space-x-4 pb-4">
-        {data.slice(0, 12).map((hour, index) => (
+        {data.slice(0, 24).map((hour, index) => (
           <div
             key={hour.dt}
             className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-md text-center min-w-[80px]"

@@ -361,14 +361,6 @@ const en = {
   'stocks.sparkline7d': '7-day trend',
   'stocks.refresh': 'Refresh',
   'stocks.lastUpdated': 'Last updated',
-  'stocks.costBasis': 'Cost Basis',
-  'stocks.shares': 'Shares',
-  'stocks.gainLoss': 'Gain / Loss',
-  'stocks.totalValue': 'Total Value',
-  'stocks.clearPosition': 'Clear position',
-  'stocks.addPosition': 'Add Position',
-  'stocks.buyPricePlaceholder': 'Buy price',
-  'stocks.quantityPlaceholder': 'Qty',
   'stocks.save': 'Save',
   'stocks.news': 'News',
   'stocks.newsNoArticles': 'No recent news available for this stock.',
@@ -788,6 +780,7 @@ const en = {
   'map.fullscreen': 'Fullscreen',
   'map.exitFullscreen': 'Exit fullscreen',
   'map.waitingForLocation': 'Waiting for location...',
+  'map.loading': 'Loading map...',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'UV Warning',

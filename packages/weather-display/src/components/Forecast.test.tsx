@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Forecast from './Forecast';
 import { ForecastDay } from '@mycircle/shared';
 
@@ -48,9 +48,9 @@ describe('Forecast', () => {
   it('renders max and min temperatures', () => {
     render(<Forecast data={mockForecastData} />);
 
-    // First day: max 22, min 15
+    // First day: max 22, min 15 (15° also appears as day 2 night temp)
     expect(screen.getByText('22°')).toBeInTheDocument();
-    expect(screen.getByText('15°')).toBeInTheDocument();
+    expect(screen.getAllByText('15°').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders weather descriptions', () => {
@@ -102,42 +102,32 @@ describe('Forecast', () => {
     expect(screen.queryAllByText('Today').length).toBe(1);
   });
 
-  it('expands forecast card to show details on click', () => {
+  it('shows day/night temps, humidity, and wind inline for all cards', () => {
     render(<Forecast data={mockForecastData} />);
 
-    // Click the first day card
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[0]);
+    // All 3 cards should show Day, Night, Humidity, Wind labels
+    expect(screen.getAllByText('Day')).toHaveLength(3);
+    expect(screen.getAllByText('Night')).toHaveLength(3);
+    expect(screen.getAllByText('Humidity')).toHaveLength(3);
+    expect(screen.getAllByText('Wind')).toHaveLength(3);
 
-    // Should show expanded details: day temp, night temp, humidity, wind
-    expect(screen.getByText('Day')).toBeInTheDocument();
-    expect(screen.getByText('Night')).toBeInTheDocument();
-    expect(screen.getByText('Humidity')).toBeInTheDocument();
-    expect(screen.getByText('Wind')).toBeInTheDocument();
+    // First day details
     expect(screen.getByText('60%')).toBeInTheDocument(); // humidity
     expect(screen.getByText('5 m/s')).toBeInTheDocument(); // wind
+
+    // Second day details
+    expect(screen.getByText('75%')).toBeInTheDocument();
+    expect(screen.getByText('8 m/s')).toBeInTheDocument();
+
+    // Third day details
+    expect(screen.getByText('70%')).toBeInTheDocument();
+    expect(screen.getByText('6 m/s')).toBeInTheDocument();
   });
 
-  it('collapses expanded card when clicked again', () => {
+  it('does not render click-to-expand buttons', () => {
     render(<Forecast data={mockForecastData} />);
 
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[0]); // expand
-    expect(screen.getByText('Day')).toBeInTheDocument();
-
-    fireEvent.click(buttons[0]); // collapse
-    expect(screen.queryByText('Day')).not.toBeInTheDocument();
-  });
-
-  it('only one card is expanded at a time', () => {
-    render(<Forecast data={mockForecastData} />);
-
-    const buttons = screen.getAllByRole('button');
-    fireEvent.click(buttons[0]); // expand first
-    expect(screen.getByText('60%')).toBeInTheDocument(); // first day humidity
-
-    fireEvent.click(buttons[1]); // expand second
-    expect(screen.getByText('75%')).toBeInTheDocument(); // second day humidity
-    expect(screen.queryByText('60%')).not.toBeInTheDocument(); // first day no longer expanded
+    // Cards should not have role="button"
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
 });

@@ -23,12 +23,14 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }));
 
-// Mock IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+// Mock IntersectionObserver (class-based — vi.fn() arrow fns can't be called with `new`)
+class MockIntersectionObserver {
+  constructor(_cb: IntersectionObserverCallback, _opts?: IntersectionObserverInit) {}
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+global.IntersectionObserver = MockIntersectionObserver as any;
 
 // Mock scrollIntoView (not available in jsdom)
 window.HTMLElement.prototype.scrollIntoView = vi.fn();

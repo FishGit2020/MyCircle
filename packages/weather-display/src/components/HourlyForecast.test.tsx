@@ -21,7 +21,7 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 const now = Math.floor(Date.now() / 1000);
-const mockHourly: HourlyForecastType[] = Array.from({ length: 12 }, (_, i) => ({
+const mockHourly: HourlyForecastType[] = Array.from({ length: 24 }, (_, i) => ({
   dt: now + i * 3600,
   temp: 20 + i,
   weather: [{ id: 800, main: 'Clear', description: 'clear sky', icon: '01d' }],
@@ -30,10 +30,10 @@ const mockHourly: HourlyForecastType[] = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 describe('HourlyForecast', () => {
-  it('renders 12 hourly cards', () => {
+  it('renders 24 hourly cards', () => {
     render(<HourlyForecast data={mockHourly} />);
     const temps = screen.getAllByText(/°C/);
-    expect(temps).toHaveLength(12);
+    expect(temps).toHaveLength(24);
   });
 
   it('shows "Now" for the first hour', () => {
@@ -49,7 +49,7 @@ describe('HourlyForecast', () => {
   it('renders weather icons', () => {
     render(<HourlyForecast data={mockHourly} />);
     const icons = screen.getAllByRole('img');
-    expect(icons).toHaveLength(12);
+    expect(icons).toHaveLength(24);
     expect(icons[0]).toHaveAttribute('alt', 'clear sky');
   });
 
@@ -64,8 +64,8 @@ describe('HourlyForecast', () => {
     expect(screen.getByRole('region', { name: 'Hourly Forecast' })).toBeInTheDocument();
   });
 
-  it('limits display to 12 hours even with more data', () => {
-    const extraData = Array.from({ length: 24 }, (_, i) => ({
+  it('limits display to 24 hours even with more data', () => {
+    const extraData = Array.from({ length: 48 }, (_, i) => ({
       dt: now + i * 3600,
       temp: 20,
       weather: [{ id: 800, main: 'Clear', description: 'clear sky', icon: '01d' }],
@@ -74,6 +74,6 @@ describe('HourlyForecast', () => {
     }));
     render(<HourlyForecast data={extraData} />);
     const temps = screen.getAllByText('20°C');
-    expect(temps).toHaveLength(12);
+    expect(temps).toHaveLength(24);
   });
 });

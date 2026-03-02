@@ -363,14 +363,6 @@ const zh: Record<TranslationKey, string> = {
   'stocks.sparkline7d': '7\u5929\u8d70\u52bf',
   'stocks.refresh': '\u5237\u65b0',
   'stocks.lastUpdated': '\u4e0a\u6b21\u66f4\u65b0',
-  'stocks.costBasis': '\u6210\u672c',
-  'stocks.shares': '\u80a1\u6570',
-  'stocks.gainLoss': '\u76c8\u4e8f',
-  'stocks.totalValue': '\u603b\u4ef7\u503c',
-  'stocks.clearPosition': '\u6e05\u9664\u6301\u4ed3',
-  'stocks.addPosition': '\u6dfb\u52a0\u6301\u4ed3',
-  'stocks.buyPricePlaceholder': '\u4e70\u5165\u4ef7',
-  'stocks.quantityPlaceholder': '\u6570\u91cf',
   'stocks.save': '\u4fdd\u5b58',
   'stocks.news': '\u65b0\u95fb',
   'stocks.newsNoArticles': '\u6682\u65e0\u8be5\u80a1\u7968\u7684\u8fd1\u671f\u65b0\u95fb\u3002',
@@ -790,6 +782,7 @@ const zh: Record<TranslationKey, string> = {
   'map.fullscreen': '\u5168\u5c4f',
   'map.exitFullscreen': '\u9000\u51fa\u5168\u5c4f',
   'map.waitingForLocation': '\u7b49\u5f85\u4f4d\u7f6e\u4fe1\u606f...',
+  'map.loading': '\u52a0\u8f7d\u5730\u56fe...',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': '\u7d2b\u5916\u7ebf\u8b66\u62a5',
