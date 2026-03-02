@@ -170,8 +170,14 @@ export default function StockTracker() {
                 <span className="text-4xl font-bold text-gray-900 dark:text-white">
                   ${selectedQuote.c.toFixed(2)}
                 </span>
-                <span className={`text-xl font-semibold ${changeColor}`}>
-                  {isPositive ? '+' : ''}{selectedQuote.d.toFixed(2)} ({isPositive ? '+' : ''}{selectedQuote.dp.toFixed(2)}%)
+                <span className={`inline-flex items-center gap-1 text-xl font-semibold ${changeColor}`}>
+                  <svg className={`w-4 h-4 ${isPositive ? '' : 'rotate-180'}`} fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>
+                    <span className="sr-only">{isPositive ? 'Up' : 'Down'}</span>
+                    {isPositive ? '+' : ''}{selectedQuote.d.toFixed(2)} ({isPositive ? '+' : ''}{selectedQuote.dp.toFixed(2)}%)
+                  </span>
                 </span>
               </div>
               {lastUpdated && (
