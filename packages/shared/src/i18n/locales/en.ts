@@ -784,6 +784,7 @@ const en = {
   'map.zoomOut': 'Zoom out',
   'map.fullscreen': 'Fullscreen',
   'map.exitFullscreen': 'Exit fullscreen',
+  'map.waitingForLocation': 'Waiting for location...',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'UV Warning',

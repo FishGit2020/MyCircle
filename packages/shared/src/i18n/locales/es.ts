@@ -786,6 +786,7 @@ const es: Record<TranslationKey, string> = {
   'map.zoomOut': 'Alejar',
   'map.fullscreen': 'Pantalla completa',
   'map.exitFullscreen': 'Salir de pantalla completa',
+  'map.waitingForLocation': 'Esperando ubicaci\u00f3n...',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'Alerta UV',
