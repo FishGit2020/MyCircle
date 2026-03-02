@@ -1,5 +1,8 @@
 import { getRemoteConfig, fetchAndActivate, getValue, RemoteConfig } from 'firebase/remote-config';
+import { createLogger } from '@mycircle/shared';
 import { app } from './firebase';
+
+const logger = createLogger('remoteConfig');
 
 let remoteConfig: RemoteConfig | null = null;
 
@@ -25,7 +28,7 @@ export async function initRemoteConfig(): Promise<Record<string, string>> {
   try {
     await fetchAndActivate(remoteConfig);
   } catch (err) {
-    console.warn('Remote Config fetch failed, using defaults:', err);
+    logger.warn('Remote Config fetch failed, using defaults:', err);
   }
 
   // Return all config values as a flat string map

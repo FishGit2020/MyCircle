@@ -1,7 +1,9 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { eventBus, MFEvents } from '@mycircle/shared';
+import { eventBus, MFEvents, createLogger } from '@mycircle/shared';
 import { Loading, ErrorBoundary } from '../common';
+
+const logger = createLogger('CitySearchWrapper');
 
 const CitySearchMF = lazy(() => import('citySearch/CitySearch'));
 
@@ -30,7 +32,7 @@ export default function CitySearchWrapper() {
             lon: city.lon,
           });
         } catch (error) {
-          console.error('Failed to save recent city:', error);
+          logger.error('Failed to save recent city:', error);
         }
       }
     });

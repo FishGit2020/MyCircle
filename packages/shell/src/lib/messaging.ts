@@ -1,7 +1,9 @@
 import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from './firebase';
-import { isNativePlatform } from '@mycircle/shared';
+import { isNativePlatform, createLogger } from '@mycircle/shared';
+
+const logger = createLogger('messaging');
 
 let messaging: Messaging | null = null;
 
@@ -36,7 +38,7 @@ export async function requestNotificationPermission(): Promise<string | null> {
 
   const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
   if (!vapidKey) {
-    console.warn('VITE_FIREBASE_VAPID_KEY not set — push notifications disabled');
+    logger.warn('VITE_FIREBASE_VAPID_KEY not set — push notifications disabled');
     return null;
   }
 
@@ -47,7 +49,7 @@ export async function requestNotificationPermission(): Promise<string | null> {
     });
     return token;
   } catch (err) {
-    console.error('Failed to get FCM token:', err);
+    logger.error('Failed to get FCM token:', err);
     return null;
   }
 }
@@ -83,7 +85,7 @@ export async function subscribeToWeatherAlerts(
     await subscribeFn({ token, cities });
     return true;
   } catch (err) {
-    console.error('Failed to subscribe to weather alerts:', err);
+    logger.error('Failed to subscribe to weather alerts:', err);
     return false;
   }
 }
@@ -100,7 +102,7 @@ export async function unsubscribeFromWeatherAlerts(token: string): Promise<boole
     await subscribeFn({ token, cities: [] });
     return true;
   } catch (err) {
-    console.error('Failed to unsubscribe from weather alerts:', err);
+    logger.error('Failed to unsubscribe from weather alerts:', err);
     return false;
   }
 }
@@ -116,7 +118,7 @@ export async function subscribeToTopic(token: string, topic: string): Promise<bo
     await manageFn({ token, topic, subscribe: true });
     return true;
   } catch (err) {
-    console.error(`Failed to subscribe to topic ${topic}:`, err);
+    logger.error(`Failed to subscribe to topic ${topic}:`, err);
     return false;
   }
 }
@@ -132,7 +134,7 @@ export async function unsubscribeFromTopic(token: string, topic: string): Promis
     await manageFn({ token, topic, subscribe: false });
     return true;
   } catch (err) {
-    console.error(`Failed to unsubscribe from topic ${topic}:`, err);
+    logger.error(`Failed to unsubscribe from topic ${topic}:`, err);
     return false;
   }
 }

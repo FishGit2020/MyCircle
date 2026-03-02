@@ -1,6 +1,6 @@
 import React, { Suspense, useState, useRef, useEffect } from 'react';
 import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, createLogger } from '@mycircle/shared';
 import { Layout } from './components/layout';
 import { Loading, ErrorBoundary, RequireAuth } from './components/common';
 import { UnitToggle, SpeedToggle } from './components/settings';
@@ -11,6 +11,8 @@ import WhatsNewPage from './pages/WhatsNewPage';
 import { useAuth } from './context/AuthContext';
 import { tracedLazy } from './lib/tracedLazy';
 import { perf } from './lib/firebase';
+
+const logger = createLogger('App');
 
 const getPerf = () => perf;
 
@@ -139,7 +141,7 @@ function ShareButton({ weatherRef }: { weatherRef: React.RefObject<HTMLDivElemen
       link.href = dataUrl;
       link.click();
     } catch (err) {
-      console.error('Failed to capture weather image:', err);
+      logger.error('Failed to capture weather image:', err);
     } finally {
       setCapturing(false);
     }

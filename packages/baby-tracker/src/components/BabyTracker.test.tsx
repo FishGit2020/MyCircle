@@ -20,6 +20,7 @@ vi.mock('@mycircle/shared', () => ({
     loading: false,
     shuffle: vi.fn(),
   }),
+  createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
 }));
 
 describe('BabyTracker', () => {

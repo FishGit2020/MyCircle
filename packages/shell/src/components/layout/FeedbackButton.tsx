@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, createLogger } from '@mycircle/shared';
 import { submitFeedback, FeedbackData, logEvent } from '../../lib/firebase';
 import { useAuth } from '../../context/AuthContext';
+
+const logger = createLogger('FeedbackButton');
 
 type Category = FeedbackData['category'];
 
@@ -116,7 +118,7 @@ export default function FeedbackButton({ hasActivePlayer }: { hasActivePlayer?: 
         reset();
       }, 1500);
     } catch (err) {
-      console.error('[Feedback] submission failed:', err);
+      logger.error('Submission failed:', err);
       setStatus('error');
     }
   };

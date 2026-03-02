@@ -1,6 +1,9 @@
 import { useQuery, useSubscription } from '@apollo/client/react';
 import { GET_WEATHER, WEATHER_UPDATES } from '../apollo/queries';
+import { createLogger } from '../utils/logger';
 import type { CurrentWeather, ForecastDay, HourlyForecast } from '../types';
+
+const logger = createLogger('useWeatherData');
 
 // Check if we're in production (Firebase doesn't support WebSocket subscriptions)
 const isProduction = typeof window !== 'undefined' &&
@@ -57,7 +60,7 @@ export function useWeatherData(
     skip: !shouldSubscribe || lat === null || lon === null,
     onData: ({ data }) => {
       if (data.data) {
-        console.log('Received weather update:', data.data.weatherUpdates.timestamp);
+        logger.info('Received weather update:', data.data.weatherUpdates.timestamp);
       }
     }
   });

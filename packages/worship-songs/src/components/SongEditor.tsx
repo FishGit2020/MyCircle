@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, createLogger } from '@mycircle/shared';
 import type { WorshipSong, SongFormat } from '../types';
+
+const logger = createLogger('SongEditor');
 
 const KEYS = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
 
@@ -68,7 +70,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
         tags: tags.length > 0 ? tags : undefined,
       });
     } catch (err) {
-      console.error('Failed to save song:', err);
+      logger.error('Failed to save song:', err);
     } finally {
       setSaving(false);
     }
@@ -80,7 +82,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
     try {
       await onDelete();
     } catch (err) {
-      console.error('Failed to delete song:', err);
+      logger.error('Failed to delete song:', err);
     } finally {
       setSaving(false);
       setShowDeleteConfirm(false);
