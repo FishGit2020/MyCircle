@@ -11,6 +11,7 @@ Complete guide for running AI chat with Ollama on your own hardware instead of G
 - [NAS Docker Setup](#nas-docker-setup)
 - [Cloudflare Tunnel (Permanent Domain)](#cloudflare-tunnel-permanent-domain)
 - [Cloudflare Access (Service Token Auth)](#cloudflare-access-service-token-auth)
+- [Quick Setup (Free Tunnel, No Domain Needed)](#quick-setup-free-tunnel-no-domain-needed)
 - [Provider Priority](#provider-priority)
 - [Tool Calling](#tool-calling)
 - [Troubleshooting](#troubleshooting)
@@ -129,32 +130,18 @@ services:
         limits:
           memory: 6G
 
-  # Option A: Free quick tunnel (no Cloudflare account needed)
-  # Generates a random *.trycloudflare.com URL on startup — check container logs for the URL.
-  # Good for testing, but the URL changes on every restart.
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
-    command: tunnel --url http://ollama:11434
-
-  # Option B: Named tunnel with permanent domain (requires Cloudflare Zero Trust)
-  # Gives a stable subdomain like ollama.mycircledash.com.
-  # See "Cloudflare Tunnel (Permanent Domain)" section below for setup.
-  #cloudflared:
-  #  image: cloudflare/cloudflared:latest
-  #  container_name: cloudflared
-  #  restart: unless-stopped
-  #  command: tunnel run
-  #  environment:
-  #    - TUNNEL_TOKEN=<your-tunnel-token>
-  #  depends_on:
-  #    - ollama
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=<your-tunnel-token>
+    depends_on:
+      - ollama
 ```
 
 **Important**: Both containers must be in the same `docker-compose.yml` so they share a Docker network. The `cloudflared` container reaches Ollama via the service name `ollama` (not `localhost`).
-
-> **Option A vs B**: Use Option A to get running in seconds — check `docker logs cloudflared` for your URL. Switch to Option B when you want a permanent subdomain (comment out A, uncomment B).
 
 ### Pull a model
 
@@ -296,6 +283,73 @@ When adding an endpoint in the UI, you can optionally provide Cloudflare Access 
 2. **Policy name**: `MyCircle Service Auth`
 3. **Action**: **Service Auth** (NOT "Allow" or "Bypass")
 4. **Include** > Selector: **Service Token** > Value: your token
+
+---
+
+## Quick Setup (Free Tunnel, No Domain Needed)
+
+If you don't have a Cloudflare account or custom domain, you can use Cloudflare's **free quick tunnel** to expose Ollama instantly. The URL is temporary (changes on every container restart), but MyCircle's Endpoint Manager UI makes it easy to update.
+
+### 1. docker-compose.yml
+
+```yaml
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama-models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --url http://ollama:11434
+```
+
+### 2. Start and pull a model
+
+```bash
+docker compose up -d
+docker exec ollama ollama pull qwen3:4b
+```
+
+### 3. Get your tunnel URL
+
+```bash
+docker logs cloudflared 2>&1 | grep "trycloudflare.com"
+# Example output: https://random-words-here.trycloudflare.com
+```
+
+The URL looks like `https://some-random-words.trycloudflare.com`. Copy it.
+
+### 4. Add the endpoint in MyCircle
+
+1. Open MyCircle and go to **AI Chat** > **Endpoints** tab
+2. Click **Add Endpoint**
+3. Paste the `*.trycloudflare.com` URL as the endpoint URL
+4. Give it a name (e.g., "My Laptop", "Home Server")
+5. Leave CF Access fields empty (free tunnels don't need auth)
+6. Save — models are auto-discovered and appear in the model dropdown
+
+### 5. Use it
+
+Switch to the **Chat** tab, select your endpoint and model from the dropdowns, and start chatting. You can also use the **Model Benchmark** page to compare performance across endpoints.
+
+> **URL changes on restart**: Free tunnels generate a new URL each time `cloudflared` restarts. When that happens, edit the endpoint in the Endpoints tab and update the URL. Everything else (name, chat history) stays the same.
+
+> **No WAF or Access config needed**: Free tunnels bypass Cloudflare's Bot Fight Mode and don't require Access policies. The tradeoff is no authentication — anyone with the URL can reach your Ollama instance (the URL is random and hard to guess, but not secret).
 
 ---
 
