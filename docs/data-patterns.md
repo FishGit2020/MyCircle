@@ -146,7 +146,7 @@ Cloud Function upserts Firestore doc:
     ... time passes, app may be closed ...
     │
     ▼
-checkWeatherAlerts (scheduled, every 30 min)
+checkWeatherAlerts (scheduled, every 24 hours)
     ├─ Fetch weather for all subscribed cities
     ├─ Check for severe conditions (19 OpenWeather IDs)
     └─ Send FCM push to matching tokens

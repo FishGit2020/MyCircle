@@ -195,8 +195,7 @@ Cloud Functions that declare `secrets: [...]` require the secrets to exist in **
 |-------------|---------|
 | `OPENWEATHER_API_KEY` | graphql, checkWeatherAlerts, aiChat |
 | `FINNHUB_API_KEY` | graphql, stockProxy, aiChat |
-| `PODCASTINDEX_API_KEY` | graphql, podcastProxy |
-| `PODCASTINDEX_API_SECRET` | graphql, podcastProxy |
+| `PODCASTINDEX_CREDS` | graphql, podcastProxy (JSON: `{"apiKey":"...","apiSecret":"..."}`) |
 | `GEMINI_API_KEY` | aiChat |
 | `RECAPTCHA_SECRET_KEY` | aiChat |
 | `YOUVERSION_APP_KEY` | graphql (Bible verse of the day) |
@@ -248,7 +247,7 @@ The WIF service account (`firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceacco
 | **Service Usage Consumer** | Check which APIs are enabled (Firebase CLI preflight check) |
 | **Secret Manager Viewer** | Validate Cloud Functions secrets exist during deploy (`versions.get` metadata) |
 | **Secret Manager Secret Accessor** | Read secret values at runtime (`versions.access` payload) |
-| **Cloud Scheduler Admin** | Create/update scheduled function jobs (e.g., `checkWeatherAlerts` every 30 min) |
+| **Cloud Scheduler Admin** | Create/update scheduled function jobs (e.g., `checkWeatherAlerts` every 24 hours) |
 
 > **Important:** The **Service Account User** role must be granted at the **project level** (in the IAM page), not on a specific service account resource. A project-level grant allows `actAs` on *all* service accounts in the project, including the App Engine default SA that Cloud Functions run as.
 

@@ -719,7 +719,7 @@ interface Announcement {
 
 > **Full documentation:** See [Data Refresh & Notification Patterns](./data-patterns.md) — pattern 3 (FCM Push Notifications).
 
-**Collection path:** `alertSubscriptions/{docId}` — stores FCM tokens, user IDs, and city coordinates for push weather alerts. The `subscribeToAlerts` Cloud Function manages subscriptions, and `checkWeatherAlerts` runs every 30 minutes to send push notifications for severe conditions.
+**Collection path:** `alertSubscriptions/{docId}` — stores FCM tokens, user IDs, and city coordinates for push weather alerts. The `subscribeToAlerts` Cloud Function manages subscriptions, and `checkWeatherAlerts` runs every 24 hours to send push notifications for severe conditions.
 
 ### Firebase Firestore — Notebook Notes
 
@@ -1139,11 +1139,11 @@ All Cloud Functions are defined in `functions/src/index.ts` and deployed via `fi
 | `graphql` | `onRequest` | `/graphql` | 512 MiB | 60s | OPENWEATHER, FINNHUB, PODCASTINDEX, YOUVERSION, GEMINI, OLLAMA, CF_ACCESS keys |
 | `stockProxy` | `onRequest` | `/stock/**` | 256 MiB | 30s | FINNHUB_API_KEY |
 | `podcastProxy` | `onRequest` | `/podcast/**` | 256 MiB | 30s | PODCASTINDEX keys |
-| `aiChat` | `onRequest` | `/ai/chat` (POST) | 256 MiB | 60s | GEMINI, OPENWEATHER, FINNHUB, RECAPTCHA, OLLAMA, CF_ACCESS keys |
+| `aiChat` | `onRequest` | `/ai/chat` (POST) | 256 MiB | 60s | GEMINI, OPENWEATHER, FINNHUB, RECAPTCHA keys |
 | `babyPhotos` | `onRequest` | `/baby-photos/**` | 256 MiB | 30s | — |
 | `cloudFiles` | `onRequest` | `/cloud-files/**` | 256 MiB | 30s | — |
 | `subscribeToAlerts` | `onCall` | Callable | Default | Default | — |
-| `checkWeatherAlerts` | `onSchedule` | Every 30 minutes | 256 MiB | 120s | OPENWEATHER_API_KEY |
+| `checkWeatherAlerts` | `onSchedule` | Every 24 hours | 256 MiB | 120s | OPENWEATHER_API_KEY |
 
 ### Rate Limiting
 

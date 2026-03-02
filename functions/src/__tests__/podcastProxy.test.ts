@@ -69,8 +69,7 @@ describe('podcastProxy', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    process.env.PODCASTINDEX_API_KEY = 'test-key';
-    process.env.PODCASTINDEX_API_SECRET = 'test-secret';
+    process.env.PODCASTINDEX_CREDS = JSON.stringify({ apiKey: 'test-key', apiSecret: 'test-secret' });
     const mod = await import('../index.js');
     podcastProxy = mod.podcastProxy;
   });
@@ -130,7 +129,7 @@ describe('podcastProxy', () => {
   });
 
   it('returns 500 when API credentials are missing', async () => {
-    delete process.env.PODCASTINDEX_API_KEY;
+    delete process.env.PODCASTINDEX_CREDS;
     const req = createMockReq({});
     const res = createMockRes();
     await podcastProxy(req, res);

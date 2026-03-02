@@ -398,7 +398,7 @@ mycircle/
    |----------|--------|
    | `OPENWEATHER_API_KEY` | [openweathermap.org](https://home.openweathermap.org/api_keys) |
    | `FINNHUB_API_KEY` | [finnhub.io](https://finnhub.io/dashboard) |
-   | `PODCASTINDEX_API_KEY` / `SECRET` | [podcastindex.org](https://api.podcastindex.org/) |
+   | `PODCASTINDEX_API_KEY` / `SECRET` | [podcastindex.org](https://api.podcastindex.org/) (combined as `PODCASTINDEX_CREDS` JSON in Firebase) |
    | `GEMINI_API_KEY` | [aistudio.google.com](https://aistudio.google.com/apikey) |
    | `RECAPTCHA_SECRET_KEY` | [Google reCAPTCHA admin](https://www.google.com/recaptcha/admin) |
 
@@ -534,11 +534,12 @@ firebase login
 ### Step 3: Set Cloud Function Secrets
 
 ```bash
-firebase functions:secrets:set OPENWEATHER_API_KEY
-firebase functions:secrets:set FINNHUB_API_KEY
-firebase functions:secrets:set PODCASTINDEX_API_KEY
-firebase functions:secrets:set PODCASTINDEX_API_SECRET
-firebase functions:secrets:set GEMINI_API_KEY
+printf "value" | npx firebase functions:secrets:set OPENWEATHER_API_KEY
+printf "value" | npx firebase functions:secrets:set FINNHUB_API_KEY
+printf '{"apiKey":"...","apiSecret":"..."}' | npx firebase functions:secrets:set PODCASTINDEX_CREDS
+printf "value" | npx firebase functions:secrets:set GEMINI_API_KEY
+printf "value" | npx firebase functions:secrets:set YOUVERSION_APP_KEY
+printf "value" | npx firebase functions:secrets:set RECAPTCHA_SECRET_KEY
 ```
 
 ### Step 4: Deploy
@@ -692,10 +693,12 @@ Three layers prevent version drift across micro frontends:
 |----------|-------------|----------|
 | `OPENWEATHER_API_KEY` | OpenWeather API key (weather + air pollution) | Yes |
 | `FINNHUB_API_KEY` | Finnhub stock API key | For stocks |
-| `PODCASTINDEX_API_KEY` | PodcastIndex API key | For podcasts |
-| `PODCASTINDEX_API_SECRET` | PodcastIndex API secret | For podcasts |
+| `PODCASTINDEX_API_KEY` | PodcastIndex API key | For podcasts (local dev) |
+| `PODCASTINDEX_API_SECRET` | PodcastIndex API secret | For podcasts (local dev) |
 | `GEMINI_API_KEY` | Google Gemini API key | For AI chat |
 | `RECAPTCHA_SECRET_KEY` | reCAPTCHA v3 secret | For bot protection |
+
+> **Firebase secrets:** In production, PodcastIndex key+secret are combined into `PODCASTINDEX_CREDS` JSON secret. See [API Keys](./docs/api-keys.md) for details.
 | `PORT` | Server port (default: 3000) | No |
 | `NODE_ENV` | `development` or `production` | No |
 
