@@ -24,6 +24,7 @@ COPY packages/flashcards/package.json packages/flashcards/
 COPY packages/work-tracker/package.json packages/work-tracker/
 COPY packages/cloud-files/package.json packages/cloud-files/
 COPY packages/model-benchmark/package.json packages/model-benchmark/
+COPY packages/immigration-tracker/package.json packages/immigration-tracker/
 
 RUN pnpm install --frozen-lockfile
 
@@ -75,6 +76,7 @@ COPY --from=builder /app/packages/flashcards/package.json packages/flashcards/
 COPY --from=builder /app/packages/work-tracker/package.json packages/work-tracker/
 COPY --from=builder /app/packages/cloud-files/package.json packages/cloud-files/
 COPY --from=builder /app/packages/model-benchmark/package.json packages/model-benchmark/
+COPY --from=builder /app/packages/immigration-tracker/package.json packages/immigration-tracker/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune
