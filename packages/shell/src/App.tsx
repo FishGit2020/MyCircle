@@ -2,7 +2,7 @@ import React, { Suspense, useState, useRef } from 'react';
 import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { Layout } from './components/layout';
-import { Loading, ErrorBoundary } from './components/common';
+import { Loading, ErrorBoundary, RequireAuth } from './components/common';
 import { UnitToggle, SpeedToggle } from './components/settings';
 import { WeatherCompare } from './components/widgets';
 import DashboardPage from './pages/DashboardPage';
@@ -437,22 +437,22 @@ export default function App() {
         <Route path="stocks/:symbol" element={<StocksPage />} />
         <Route path="podcasts" element={<PodcastsPage />} />
         <Route path="podcasts/:podcastId" element={<PodcastsPage />} />
-        <Route path="ai" element={<AiPage />} />
-        <Route path="bible" element={<BiblePage />} />
-        <Route path="worship" element={<WorshipPage />} />
-        <Route path="worship/new" element={<WorshipPage />} />
-        <Route path="worship/:songId" element={<WorshipPage />} />
-        <Route path="worship/:songId/edit" element={<WorshipPage />} />
-        <Route path="notebook" element={<NotebookPage />} />
-        <Route path="notebook/new" element={<NotebookPage />} />
-        <Route path="notebook/:noteId" element={<NotebookPage />} />
-        <Route path="baby" element={<BabyPage />} />
-        <Route path="child-dev" element={<ChildDevPage />} />
-        <Route path="flashcards" element={<FlashCardsPage />} />
-        <Route path="work-tracker" element={<WorkTrackerPage />} />
-        <Route path="files" element={<CloudFilesPage />} />
-        <Route path="benchmark" element={<BenchmarkPage />} />
-        <Route path="immigration" element={<ImmigrationPage />} />
+        <Route path="ai" element={<RequireAuth><AiPage /></RequireAuth>} />
+        <Route path="bible" element={<RequireAuth><BiblePage /></RequireAuth>} />
+        <Route path="worship" element={<RequireAuth><WorshipPage /></RequireAuth>} />
+        <Route path="worship/new" element={<RequireAuth><WorshipPage /></RequireAuth>} />
+        <Route path="worship/:songId" element={<RequireAuth><WorshipPage /></RequireAuth>} />
+        <Route path="worship/:songId/edit" element={<RequireAuth><WorshipPage /></RequireAuth>} />
+        <Route path="notebook" element={<RequireAuth><NotebookPage /></RequireAuth>} />
+        <Route path="notebook/new" element={<RequireAuth><NotebookPage /></RequireAuth>} />
+        <Route path="notebook/:noteId" element={<RequireAuth><NotebookPage /></RequireAuth>} />
+        <Route path="baby" element={<RequireAuth><BabyPage /></RequireAuth>} />
+        <Route path="child-dev" element={<RequireAuth><ChildDevPage /></RequireAuth>} />
+        <Route path="flashcards" element={<RequireAuth><FlashCardsPage /></RequireAuth>} />
+        <Route path="work-tracker" element={<RequireAuth><WorkTrackerPage /></RequireAuth>} />
+        <Route path="files" element={<RequireAuth><CloudFilesPage /></RequireAuth>} />
+        <Route path="benchmark" element={<RequireAuth><BenchmarkPage /></RequireAuth>} />
+        <Route path="immigration" element={<RequireAuth><ImmigrationPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />

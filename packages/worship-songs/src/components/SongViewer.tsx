@@ -304,7 +304,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
       </div>
 
       {/* Song content */}
-      <div ref={contentRef} className="mb-8" data-print-show>
+      <div ref={contentRef} className="mb-8 overflow-x-auto" data-print-show>
         {isChordPro ? (
           <div className="space-y-1">
             {transposedContent.split('\n').map((line, i) => (

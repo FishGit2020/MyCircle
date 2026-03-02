@@ -58,7 +58,7 @@ export default function Notebook() {
     } else {
       await saveNote(id, data);
     }
-    navigate('/notebook');
+    navigate('/notebook', { replace: true });
   }, [tab, updatePublicNote, saveNote, navigate]);
 
   const handleDelete = useCallback(async (id: string) => {
@@ -77,7 +77,8 @@ export default function Notebook() {
 
   const handlePublish = useCallback(async (data: { title: string; content: string }) => {
     await publishNote(data);
-    navigate('/notebook');
+    setTab('public');
+    navigate('/notebook', { replace: true });
   }, [publishNote, navigate]);
 
   if (!isAuthenticated || !hasApi) {

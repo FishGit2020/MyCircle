@@ -8,7 +8,7 @@ declare global {
     __workTracker?: {
       getAll: () => Promise<WorkEntry[]>;
       add: (entry: { date: string; content: string }) => Promise<string>;
-      update: (id: string, updates: Partial<{ content: string }>) => Promise<void>;
+      update: (id: string, updates: Partial<{ content: string; date: string }>) => Promise<void>;
       delete: (id: string) => Promise<void>;
       subscribe?: (callback: (entries: WorkEntry[]) => void) => () => void;
     };
@@ -98,6 +98,12 @@ export function useWorkEntries() {
     window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
   }, []);
 
+  const moveEntry = useCallback(async (id: string, newDate: string) => {
+    if (!window.__workTracker) throw new Error('Work tracker API not available');
+    await window.__workTracker.update(id, { date: newDate });
+    window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+  }, []);
+
   return {
     entries,
     loading,
@@ -106,6 +112,7 @@ export function useWorkEntries() {
     addEntry,
     updateEntry,
     deleteEntry,
+    moveEntry,
     refresh: loadEntries,
   };
 }
