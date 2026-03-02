@@ -1200,7 +1200,6 @@ This is used by the emulator testing infrastructure (`.env.emulator`) to redirec
 All Cloud Functions (`graphql`, `stockProxy`, `podcastProxy`, `aiChat`) restrict CORS to whitelisted origins:
 - `https://mycircle-dash.web.app`
 - `https://mycircle-dash.firebaseapp.com`
-- `https://mycircledash.com`
 - `http://localhost:3000`
 
 ### Rate Limiting

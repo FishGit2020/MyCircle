@@ -37,7 +37,6 @@ const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || '';
 const ALLOWED_ORIGINS = [
   'https://mycircle-dash.web.app',
   'https://mycircle-dash.firebaseapp.com',
-  'https://mycircledash.com',
   'http://localhost:3000',
 ];
 
