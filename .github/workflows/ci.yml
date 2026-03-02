@@ -53,3 +53,32 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 14
+
+      - name: Build all packages (bundle size analysis)
+        run: pnpm build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      - name: Generate bundle size report
+        run: |
+          echo "# Bundle Size Report" > bundle-report.md
+          echo "" >> bundle-report.md
+          echo "| Package | Files | Size |" >> bundle-report.md
+          echo "|---------|-------|------|" >> bundle-report.md
+          for dir in packages/*/dist; do
+            pkg=$(basename $(dirname "$dir"))
+            if [ -d "$dir" ]; then
+              size=$(du -sh "$dir" 2>/dev/null | cut -f1)
+              count=$(find "$dir" -type f | wc -l)
+              echo "| $pkg | $count | $size |" >> bundle-report.md
+            fi
+          done
+          cat bundle-report.md
+
+      - name: Upload bundle size report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-size-report
+          path: bundle-report.md
+          retention-days: 30

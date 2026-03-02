@@ -63,7 +63,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
   const shapeKey = capoFret > 0 && isChordPro ? getKeyName(soundingKey, -capoFret) : null;
   const currentKey = soundingKey;
 
-  // Auto-scroll with adjustable speed
+  // Auto-scroll with adjustable speed — pause when tab is hidden
   useEffect(() => {
     if (autoScroll) {
       scrollIntervalRef.current = setInterval(() => {
@@ -73,8 +73,27 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
       clearInterval(scrollIntervalRef.current);
       scrollIntervalRef.current = null;
     }
+
+    const onVisibilityChange = () => {
+      if (!autoScroll) return;
+      if (document.visibilityState === 'hidden') {
+        if (scrollIntervalRef.current) {
+          clearInterval(scrollIntervalRef.current);
+          scrollIntervalRef.current = null;
+        }
+      } else {
+        if (!scrollIntervalRef.current) {
+          scrollIntervalRef.current = setInterval(() => {
+            window.scrollBy({ top: 1, behavior: 'auto' });
+          }, scrollSpeed);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     return () => {
       if (scrollIntervalRef.current) clearInterval(scrollIntervalRef.current);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [autoScroll, scrollSpeed]);
 

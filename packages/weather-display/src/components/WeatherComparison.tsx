@@ -88,7 +88,7 @@ function CompareCard({ city, color }: { city: City; color: 'blue' | 'orange' }) 
         <>
           <div className="flex items-center gap-3 mb-3">
             {w.weather[0] && (
-              <img src={getWeatherIconUrl(w.weather[0].icon)} alt={w.weather[0].main} className="w-14 h-14" />
+              <img src={getWeatherIconUrl(w.weather[0].icon)} alt={w.weather[0].main} className="w-14 h-14" width={56} height={56} />
             )}
             <div>
               <p className="text-3xl font-bold text-gray-800 dark:text-white">{formatTemperature(w.temp, tempUnit)}</p>

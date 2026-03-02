@@ -81,6 +81,7 @@ export function useFlashCards() {
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
+      if (document.visibilityState === 'hidden') return;
       try {
         const token = await window.__getFirebaseIdToken?.();
         if (mounted) setIsAuthenticated(!!token);

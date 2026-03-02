@@ -23,6 +23,10 @@ export default defineConfig({
       }
     })
   ],
+  esbuild: {
+    drop: ['console', 'debugger'],
+    legalComments: 'none',
+  },
   build: {
     modulePreload: false,
     target: 'esnext',
