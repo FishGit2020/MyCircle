@@ -1,0 +1,40 @@
+# Ollama + Cloudflare Named Tunnel (permanent domain)
+#
+# Requires a Cloudflare Zero Trust account with a tunnel token.
+# See docs/ollama-setup.md for full setup instructions.
+#
+# Usage:
+#   1. Replace <your-tunnel-token> with your Cloudflare tunnel token
+#   2. docker compose up -d
+#   3. docker exec ollama ollama pull qwen3:4b
+#   4. Add https://ollama.yourdomain.com as an endpoint in MyCircle
+
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama-models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=<your-tunnel-token>
+    depends_on:
+      - ollama
