@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, StorageKeys } from '@mycircle/shared';
+import { WindowEvents, StorageKeys, createLogger } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
+
+const logger = createLogger('useWorshipSongs');
 
 // The shell exposes these on the window object
 declare global {
@@ -64,7 +66,7 @@ export function useWorshipSongs() {
         setCachedSongs(data);
       }
     } catch (err) {
-      console.error('Failed to load worship songs:', err);
+      logger.error('Failed to load worship songs:', err);
     } finally {
       setLoading(false);
     }
@@ -109,13 +111,13 @@ export function useWorshipSongs() {
 
   const getSong = useCallback(async (id: string): Promise<WorshipSong | null> => {
     if (!window.__worshipSongs) {
-      console.warn('Worship songs API not available');
+      logger.warn('Worship songs API not available');
       return null;
     }
     try {
       return await window.__worshipSongs.get(id);
     } catch (err) {
-      console.error('Failed to get worship song:', id, err);
+      logger.error('Failed to get worship song:', id, err);
       return null;
     }
   }, []);

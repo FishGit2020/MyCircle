@@ -1,3 +1,7 @@
+import { createLogger } from './logger';
+
+const logger = createLogger('eventBus');
+
 // Event bus for micro frontend communication
 type EventCallback = (data: any) => void;
 
@@ -162,7 +166,7 @@ class EventBusImpl implements EventBus {
       try {
         callback(data);
       } catch (error) {
-        console.error(`Error in event listener for ${event}:`, error);
+        logger.error(`Error in event listener for ${event}:`, error);
       }
     });
   }

@@ -3,6 +3,9 @@ import { SetContextLink } from '@apollo/client/link/context';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
+import { createLogger } from '../utils/logger';
+
+const logger = createLogger('apollo');
 
 // Check if we're on the client side
 const isBrowser = typeof window !== 'undefined';
@@ -64,9 +67,9 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
       url: finalWsUrl,
       connectionParams: () => ({}),
       on: {
-        connected: () => console.log('WebSocket connected'),
-        closed: () => console.log('WebSocket closed'),
-        error: (error) => console.error('WebSocket error:', error)
+        connected: () => logger.info('WebSocket connected'),
+        closed: () => logger.info('WebSocket closed'),
+        error: (error) => logger.error('WebSocket error:', error)
       }
     });
     wsLink = new GraphQLWsLink(wsClient);

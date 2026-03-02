@@ -1,7 +1,10 @@
 import React from 'react';
+import { createLogger } from '@mycircle/shared';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { logEvent } from '../../lib/firebase';
+
+const logger = createLogger('ThemeToggle');
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -15,7 +18,7 @@ export default function ThemeToggle() {
       try {
         await updateDarkMode(newDarkMode);
       } catch (error) {
-        console.error('Failed to save theme preference:', error);
+        logger.error('Failed to save theme preference:', error);
       }
     }
   };

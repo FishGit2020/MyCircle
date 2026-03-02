@@ -491,9 +491,16 @@ export const GET_BENCHMARK_HISTORY = gql`
   query GetBenchmarkHistory($limit: Int) {
     benchmarkHistory(limit: $limit) {
       id
-      userId
-      results
       createdAt
+      results {
+        endpointId
+        endpointName
+        model
+        error
+        timing {
+          tokensPerSecond
+        }
+      }
     }
   }
 `;

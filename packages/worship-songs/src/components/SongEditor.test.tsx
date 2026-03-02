@@ -9,6 +9,7 @@ vi.mock('@mycircle/shared', () => ({
     t: (key: string) => key,
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
+  createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
 }));
 
 const baseSong: WorshipSong = {

@@ -1,4 +1,7 @@
 import type { Metric } from 'web-vitals';
+import { createLogger } from './logger';
+
+const logger = createLogger('webVitals');
 
 type AnalyticsLogger = (eventName: string, params?: Record<string, any>) => void;
 
@@ -14,8 +17,7 @@ export function reportWebVitals(analyticsLogger?: AnalyticsLogger) {
       const route = window.location.pathname;
 
       if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.log(`[Web Vitals] ${metric.name}: ${metric.value.toFixed(1)} (${route})`);
+        logger.info(`${metric.name}: ${metric.value.toFixed(1)} (${route})`);
         return;
       }
 

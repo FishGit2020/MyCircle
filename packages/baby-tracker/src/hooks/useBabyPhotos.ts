@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { StorageKeys, WindowEvents } from '@mycircle/shared';
+import { StorageKeys, WindowEvents, createLogger } from '@mycircle/shared';
 import { compressImage } from '../utils/compressImage';
+
+const logger = createLogger('useBabyPhotos');
 
 declare global {
   interface Window {
@@ -122,7 +124,7 @@ export function useBabyPhotos() {
       const msg = err?.message || 'Upload failed';
       setError(msg);
       setErrorStageId(stageId);
-      console.error('Baby photo upload failed:', err);
+      logger.error('Baby photo upload failed:', err);
     } finally {
       setUploading(null);
     }

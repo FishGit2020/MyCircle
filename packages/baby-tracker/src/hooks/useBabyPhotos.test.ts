@@ -13,6 +13,7 @@ vi.mock('@mycircle/shared', () => {
     StorageKeys: {
       BABY_MILESTONES_CACHE: 'baby-milestones-cache',
     },
+    createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
   };
 });
 

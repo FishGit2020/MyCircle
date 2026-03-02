@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { User } from 'firebase/auth';
-import { WindowEvents, StorageKeys, getApolloClient } from '@mycircle/shared';
+import { WindowEvents, StorageKeys, getApolloClient, createLogger } from '@mycircle/shared';
 import {
   subscribeToAuthChanges,
   signInWithGoogle,
@@ -37,6 +37,8 @@ import {
   KnownAccount,
 } from '../lib/firebase';
 import { useKnownAccounts } from '../hooks/useKnownAccounts';
+
+const logger = createLogger('AuthContext');
 
 /** Keys preserved across sign-out (device-level prefs + account list) */
 const keysToPreserve = new Set([
@@ -271,7 +273,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await signInWithGoogle();
     } catch (error) {
-      console.error('Sign in failed:', error);
+      logger.error('Sign in failed:', error);
       throw error;
     }
   };
@@ -280,7 +282,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await firebaseSignInWithEmail(email, password);
     } catch (error) {
-      console.error('Email sign in failed:', error);
+      logger.error('Email sign in failed:', error);
       throw error;
     }
   };
@@ -289,7 +291,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await firebaseSignUpWithEmail(email, password, displayName);
     } catch (error) {
-      console.error('Email sign up failed:', error);
+      logger.error('Email sign up failed:', error);
       throw error;
     }
   };
@@ -298,7 +300,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await firebaseResetPassword(email);
     } catch (error) {
-      console.error('Password reset failed:', error);
+      logger.error('Password reset failed:', error);
       throw error;
     }
   };
@@ -316,7 +318,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRecentCities([]);
       setFavoriteCities([]);
     } catch (error) {
-      console.error('Sign out failed:', error);
+      logger.error('Sign out failed:', error);
       throw error;
     }
   };
