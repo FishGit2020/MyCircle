@@ -1,8 +1,79 @@
 export { createApolloClient, getApolloClient, ApolloClient, InMemoryCache } from './client';
 export * from './queries';
-// Generated GraphQL operation types available via direct import:
-//   import type { GetWeatherQuery } from '@mycircle/shared/apollo/generated'
-// Not re-exported from barrel to avoid TS union type expansion issues.
+// Re-export generated GraphQL operation types (named exports to avoid conflicts
+// with entity types in ./types that share names like City, CurrentWeather, etc.)
+export type {
+  // Query operation types
+  SearchStocksQuery,
+  GetStockQuoteQuery,
+  GetStockCandlesQuery,
+  GetCompanyNewsQuery,
+  SearchPodcastsQuery,
+  GetTrendingPodcastsQuery,
+  GetPodcastEpisodesQuery,
+  GetPodcastFeedQuery,
+  GetBibleVotdQuery,
+  GetBibleVotdApiQuery,
+  GetBiblePassageQuery,
+  GetBibleVersionsQuery,
+  GetCurrentWeatherQuery,
+  GetForecastQuery,
+  GetHourlyForecastQuery,
+  GetWeatherQuery,
+  GetAirQualityQuery,
+  GetHistoricalWeatherQuery,
+  SearchCitiesQuery,
+  ReverseGeocodeQuery,
+  GetCryptoPricesQuery,
+  GetOllamaModelsQuery,
+  GetOllamaStatusQuery,
+  GetAiUsageSummaryQuery,
+  GetAiRecentLogsQuery,
+  GetBenchmarkEndpointsQuery,
+  GetBenchmarkEndpointModelsQuery,
+  GetBenchmarkHistoryQuery,
+  GetBenchmarkSummaryQuery,
+  // Mutation operation types
+  AiChatMutation,
+  RunBenchmarkMutation,
+  SaveBenchmarkEndpointMutation,
+  DeleteBenchmarkEndpointMutation,
+  SaveBenchmarkRunMutation,
+  // Subscription operation types
+  WeatherUpdatesSubscription,
+  // Schema entity types (only those that don't conflict with ./types)
+  StockSearchResult,
+  StockQuote,
+  StockCandle,
+  CompanyNews,
+  BibleVerse,
+  BibleVerseItem,
+  BiblePassage,
+  BibleVersion,
+  BenchmarkTimingResult,
+  BenchmarkRunResult,
+  BenchmarkRun,
+  BenchmarkEndpoint,
+  BenchmarkSummary,
+  PodcastFeed,
+  PodcastEpisode,
+  PodcastSearchResponse,
+  PodcastTrendingResponse,
+  PodcastEpisodesResponse,
+  AiChatResponse,
+  AiAction,
+  AiUsageSummary,
+  AiDailyStats,
+  AiChatLogEntry,
+  AiToolCallLog,
+  OllamaStatus,
+  OllamaRunningModel,
+  ToolCallResult,
+  Temperature,
+  Clouds,
+  WeatherData,
+  WeatherUpdate,
+} from './generated';
 
 // Re-export Apollo React hooks so MFEs can import from @mycircle/shared
 // instead of @apollo/client/react (which Module Federation doesn't share as a subpath)

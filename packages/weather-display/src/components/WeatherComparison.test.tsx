@@ -6,45 +6,51 @@ import { MemoryRouter } from 'react-router';
 import WeatherComparison from './WeatherComparison';
 
 // Mock @mycircle/shared — identity t(), metric units, passthrough helpers
-vi.mock('@mycircle/shared', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    locale: 'en',
-  }),
-  useUnits: () => ({
-    tempUnit: 'C' as const,
-    speedUnit: 'ms' as const,
-    setTempUnit: vi.fn(),
-    setSpeedUnit: vi.fn(),
-  }),
-  GET_CURRENT_WEATHER: {
-    kind: 'Document',
-    definitions: [],
-  },
-  GET_FORECAST: {
-    kind: 'Document',
-    definitions: [],
-  },
-  SEARCH_CITIES: {
-    kind: 'Document',
-    definitions: [{
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'SearchCities' },
-      variableDefinitions: [],
-      selectionSet: { kind: 'SelectionSet', selections: [] },
-    }],
-  },
-  getWeatherIconUrl: (icon: string) => `https://openweathermap.org/img/wn/${icon}@2x.png`,
-  getWindDirection: (deg: number) => {
-    const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    return dirs[Math.round(deg / 45) % 8];
-  },
-  formatTemperature: (temp: number) => `${Math.round(temp)}\u00B0C`,
-  formatWindSpeed: (speed: number) => `${Math.round(speed)} m/s`,
-  convertTemp: (temp: number) => Math.round(temp),
-  tempUnitSymbol: () => '\u00B0C',
-}));
+// useQuery/useLazyQuery from actual @apollo/client/react so MockedProvider works
+vi.mock('@mycircle/shared', async () => {
+  const apolloReact = await import('@apollo/client/react');
+  return {
+    useQuery: apolloReact.useQuery,
+    useLazyQuery: apolloReact.useLazyQuery,
+    useTranslation: () => ({
+      t: (key: string) => key,
+      locale: 'en',
+    }),
+    useUnits: () => ({
+      tempUnit: 'C' as const,
+      speedUnit: 'ms' as const,
+      setTempUnit: vi.fn(),
+      setSpeedUnit: vi.fn(),
+    }),
+    GET_CURRENT_WEATHER: {
+      kind: 'Document',
+      definitions: [],
+    },
+    GET_FORECAST: {
+      kind: 'Document',
+      definitions: [],
+    },
+    SEARCH_CITIES: {
+      kind: 'Document',
+      definitions: [{
+        kind: 'OperationDefinition',
+        operation: 'query',
+        name: { kind: 'Name', value: 'SearchCities' },
+        variableDefinitions: [],
+        selectionSet: { kind: 'SelectionSet', selections: [] },
+      }],
+    },
+    getWeatherIconUrl: (icon: string) => `https://openweathermap.org/img/wn/${icon}@2x.png`,
+    getWindDirection: (deg: number) => {
+      const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      return dirs[Math.round(deg / 45) % 8];
+    },
+    formatTemperature: (temp: number) => `${Math.round(temp)}\u00B0C`,
+    formatWindSpeed: (speed: number) => `${Math.round(speed)} m/s`,
+    convertTemp: (temp: number) => Math.round(temp),
+    tempUnitSymbol: () => '\u00B0C',
+  };
+});
 
 const currentCity = { id: '1', name: 'London', lat: 51.5, lon: -0.12 };
 

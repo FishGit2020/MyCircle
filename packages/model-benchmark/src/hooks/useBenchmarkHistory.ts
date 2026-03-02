@@ -1,13 +1,11 @@
 import { useQuery, useMutation, GET_BENCHMARK_HISTORY, DELETE_BENCHMARK_RUN } from '@mycircle/shared';
+import type { GetBenchmarkHistoryQuery } from '@mycircle/shared';
 
-export interface BenchmarkRun {
-  id: string;
-  results: any[];
-  createdAt: string;
-}
+// Use the generated query result type for individual runs
+export type BenchmarkRun = GetBenchmarkHistoryQuery['benchmarkHistory'][number];
 
 export function useBenchmarkHistory(limit = 10) {
-  const { data, loading, refetch } = useQuery(GET_BENCHMARK_HISTORY, {
+  const { data, loading, refetch } = useQuery<GetBenchmarkHistoryQuery>(GET_BENCHMARK_HISTORY, {
     variables: { limit },
     fetchPolicy: 'cache-and-network',
   });

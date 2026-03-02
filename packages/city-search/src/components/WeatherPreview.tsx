@@ -1,13 +1,6 @@
 import React from 'react';
-import { useQuery } from '@apollo/client/react';
-import { GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature } from '@mycircle/shared';
-
-interface CurrentWeatherData {
-  currentWeather: {
-    temp: number;
-    weather: Array<{ icon: string; main: string }>;
-  };
-}
+import { useQuery, GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature } from '@mycircle/shared';
+import type { GetCurrentWeatherQuery } from '@mycircle/shared';
 
 interface Props {
   lat: number;
@@ -16,7 +9,7 @@ interface Props {
 
 export default function WeatherPreview({ lat, lon }: Props) {
   const { tempUnit } = useUnits();
-  const { data, loading } = useQuery<CurrentWeatherData>(GET_CURRENT_WEATHER, {
+  const { data, loading } = useQuery<GetCurrentWeatherQuery>(GET_CURRENT_WEATHER, {
     variables: { lat, lon },
     fetchPolicy: 'cache-first',
   });

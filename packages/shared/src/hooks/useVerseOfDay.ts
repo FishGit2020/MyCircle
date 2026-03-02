@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '../apollo';
 import { GET_BIBLE_PASSAGE } from '../apollo/queries';
+import type { GetBiblePassageQuery } from '../apollo/generated';
 
 export interface VerseRef {
   reference: string;
@@ -31,7 +32,7 @@ export function useVerseOfDay(
 
   const verse = verses[verseIndex];
 
-  const { data, loading } = useQuery<{ biblePassage?: { text?: string } }>(GET_BIBLE_PASSAGE, {
+  const { data, loading } = useQuery<GetBiblePassageQuery>(GET_BIBLE_PASSAGE, {
     variables: { reference: verse.reference },
     errorPolicy: 'ignore',
   });

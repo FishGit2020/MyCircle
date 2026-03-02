@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery, useLazyQuery } from '@apollo/client/react';
-import { GET_CURRENT_WEATHER, GET_FORECAST, SEARCH_CITIES, getWeatherIconUrl, getWindDirection, useTranslation, useUnits, formatTemperature, formatWindSpeed, convertTemp, tempUnitSymbol } from '@mycircle/shared';
+import { useQuery, useLazyQuery, GET_CURRENT_WEATHER, GET_FORECAST, SEARCH_CITIES, getWeatherIconUrl, getWindDirection, useTranslation, useUnits, formatTemperature, formatWindSpeed, convertTemp, tempUnitSymbol } from '@mycircle/shared';
+import type { GetCurrentWeatherQuery, GetForecastQuery, SearchCitiesQuery } from '@mycircle/shared';
 
 interface City {
   id: string;
@@ -9,29 +9,6 @@ interface City {
   state?: string;
   lat: number;
   lon: number;
-}
-
-interface WeatherData {
-  currentWeather: {
-    temp: number;
-    feels_like: number;
-    humidity: number;
-    pressure: number;
-    wind: { speed: number; deg: number };
-    clouds: { all: number };
-    weather: Array<{ icon: string; main: string; description: string }>;
-  };
-}
-
-interface ForecastData {
-  forecast: Array<{
-    dt: number;
-    temp: { min: number; max: number; day: number; night: number };
-    weather: Array<{ icon: string; main: string; description: string }>;
-    humidity: number;
-    wind_speed: number;
-    pop: number;
-  }>;
 }
 
 /** Side-by-side comparison metric bar */
@@ -60,7 +37,7 @@ function CompareBar({ label, valueA, valueB, unit, max }: { label: string; value
 function CompareCard({ city, color }: { city: City; color: 'blue' | 'orange' }) {
   const { t } = useTranslation();
   const { tempUnit, speedUnit } = useUnits();
-  const { data, loading } = useQuery<WeatherData>(GET_CURRENT_WEATHER, {
+  const { data, loading } = useQuery<GetCurrentWeatherQuery>(GET_CURRENT_WEATHER, {
     variables: { lat: city.lat, lon: city.lon },
     fetchPolicy: 'cache-first',
   });
@@ -123,11 +100,11 @@ function CompareCard({ city, color }: { city: City; color: 'blue' | 'orange' }) 
 function MetricComparison({ cityA, cityB }: { cityA: City; cityB: City }) {
   const { t } = useTranslation();
   const { speedUnit } = useUnits();
-  const { data: dataA } = useQuery<WeatherData>(GET_CURRENT_WEATHER, {
+  const { data: dataA } = useQuery<GetCurrentWeatherQuery>(GET_CURRENT_WEATHER, {
     variables: { lat: cityA.lat, lon: cityA.lon },
     fetchPolicy: 'cache-first',
   });
-  const { data: dataB } = useQuery<WeatherData>(GET_CURRENT_WEATHER, {
+  const { data: dataB } = useQuery<GetCurrentWeatherQuery>(GET_CURRENT_WEATHER, {
     variables: { lat: cityB.lat, lon: cityB.lon },
     fetchPolicy: 'cache-first',
   });
@@ -157,11 +134,11 @@ function MetricComparison({ cityA, cityB }: { cityA: City; cityB: City }) {
 function MiniComparisonChart({ cityA, cityB }: { cityA: City; cityB: City }) {
   const { t, locale } = useTranslation();
   const { tempUnit } = useUnits();
-  const { data: forecastA } = useQuery<ForecastData>(GET_FORECAST, {
+  const { data: forecastA } = useQuery<GetForecastQuery>(GET_FORECAST, {
     variables: { lat: cityA.lat, lon: cityA.lon },
     fetchPolicy: 'cache-first',
   });
-  const { data: forecastB } = useQuery<ForecastData>(GET_FORECAST, {
+  const { data: forecastB } = useQuery<GetForecastQuery>(GET_FORECAST, {
     variables: { lat: cityB.lat, lon: cityB.lon },
     fetchPolicy: 'cache-first',
   });
@@ -254,7 +231,7 @@ function MiniComparisonChart({ cityA, cityB }: { cityA: City; cityB: City }) {
 function CitySearchInline({ onSelect }: { onSelect: (city: City) => void }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
-  const [searchCities, { data, loading }] = useLazyQuery<{ searchCities: City[] }>(SEARCH_CITIES);
+  const [searchCities, { data, loading }] = useLazyQuery<SearchCitiesQuery>(SEARCH_CITIES);
 
   const handleSearch = (value: string) => {
     setQuery(value);
