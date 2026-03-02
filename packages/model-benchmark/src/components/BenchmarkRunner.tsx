@@ -106,7 +106,7 @@ export default function BenchmarkRunner({ onResults }: Props) {
         <select
           value={model}
           onChange={e => { setModel(e.target.value); try { localStorage.setItem('benchmark-model', e.target.value); } catch { /* */ } }}
-          disabled={running || discoveredModels.length === 0}
+          disabled={running || selectedEndpoints.length === 0 || discoveredModels.length === 0}
           className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         >
           {discoveredModels.length === 0 ? (
