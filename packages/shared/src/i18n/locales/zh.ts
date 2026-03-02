@@ -847,6 +847,7 @@ const zh: Record<TranslationKey, string> = {
   'widgets.publicNoteCount': '{count} \u7bc7\u516c\u5f00\u7b14\u8bb0',
   'widgets.hidden': '\u5df2\u9690\u85cf',
   'widgets.visible': '\u53ef\u89c1',
+  'widgets.size': '\u5c3a\u5bf8',
   'widgets.moveUp': '\u4e0a\u79fb\u7ec4\u4ef6',
   'widgets.moveDown': '\u4e0b\u79fb\u7ec4\u4ef6',
   'widgets.worship': '\u656c\u62dc\u8bd7\u6b4c',
