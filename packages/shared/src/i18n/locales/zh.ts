@@ -1576,6 +1576,12 @@ const zh: Record<TranslationKey, string> = {
   'benchmark.history.hideDetails': '\u9690\u85cf\u8be6\u60c5',
   'benchmark.history.clearAll': '\u6e05\u9664\u5168\u90e8',
   'benchmark.history.clearAllConfirm': '\u786e\u5b9a\u5220\u9664\u6240\u6709\u6d4b\u8bd5\u5386\u53f2\uff1f',
+  'benchmark.runner.judgeModel': '\u8bc4\u5ba1\u6a21\u578b',
+  'benchmark.runner.judgeGemini': 'Gemini (\u4e91\u7aef)',
+  'benchmark.runner.judgeNone': '\u65e0 (\u8df3\u8fc7\u8bc4\u5206)',
+  'benchmark.runner.scoring': '\u8bc4\u5206\u4e2d...',
+  'benchmark.results.quality': '\u8d28\u91cf',
+  'benchmark.results.qualityJudge': '\u8bc4\u5ba1',
   'benchmark.signInRequired': '\u767b\u5f55\u540e\u4f7f\u7528\u6027\u80fd\u6d4b\u8bd5',
 
   // Endpoint source labels

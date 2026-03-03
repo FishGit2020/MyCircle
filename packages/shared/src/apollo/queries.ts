@@ -509,6 +509,9 @@ export const GET_BENCHMARK_HISTORY = gql`
           timeToFirstToken
           totalDuration
         }
+        qualityScore
+        qualityFeedback
+        qualityJudge
       }
     }
   }
@@ -553,6 +556,9 @@ export const RUN_BENCHMARK = gql`
       }
       error
       timestamp
+      qualityScore
+      qualityFeedback
+      qualityJudge
     }
   }
 `;
@@ -572,6 +578,16 @@ export const SAVE_BENCHMARK_ENDPOINT = gql`
 export const DELETE_BENCHMARK_ENDPOINT = gql`
   mutation DeleteBenchmarkEndpoint($id: String!) {
     deleteBenchmarkEndpoint(id: $id)
+  }
+`;
+
+export const SCORE_BENCHMARK_RESPONSE = gql`
+  mutation ScoreBenchmarkResponse($prompt: String!, $response: String!, $judgeProvider: String!, $judgeEndpointId: String, $judgeModel: String) {
+    scoreBenchmarkResponse(prompt: $prompt, response: $response, judgeProvider: $judgeProvider, judgeEndpointId: $judgeEndpointId, judgeModel: $judgeModel) {
+      score
+      feedback
+      judge
+    }
   }
 `;
 

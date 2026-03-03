@@ -15,7 +15,7 @@ vi.mock('@mycircle/shared', () => ({
   useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
   useLazyQuery: vi.fn(() => [mockFetchModels, { data: null }]),
   GET_BENCHMARK_ENDPOINT_MODELS: {},
-  StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache', BENCHMARK_MODEL_MAP: 'benchmark-model-map' },
+  StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache', BENCHMARK_MODEL_MAP: 'benchmark-model-map', BENCHMARK_JUDGE: 'benchmark-judge' },
   WindowEvents: { BENCHMARK_CHANGED: 'benchmark-changed' },
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
 }));
@@ -37,9 +37,11 @@ vi.mock('../hooks/useEndpoints', () => ({
 vi.mock('../hooks/useBenchmark', () => ({
   useBenchmark: () => ({
     running: false,
+    scoring: false,
     currentEndpoint: null,
     runBenchmark: vi.fn(async () => []),
     saveRun: vi.fn(),
+    scoreResults: vi.fn(async (results: any) => results),
   }),
   BENCHMARK_PROMPTS: [
     { id: 'simple', labelKey: 'benchmark.promptSimple', prompt: 'Test' },
@@ -77,16 +79,16 @@ describe('BenchmarkRunner', () => {
     const user = userEvent.setup();
     render(<BenchmarkRunner onResults={onResults} />);
 
-    // No model dropdowns before selecting
-    expect(screen.queryAllByRole('combobox')).toHaveLength(0);
+    // Only judge dropdown before selecting endpoints
+    expect(screen.queryAllByRole('combobox')).toHaveLength(1);
 
     // Check first endpoint
     const checkboxes = screen.getAllByRole('checkbox');
     await user.click(checkboxes[0]);
 
-    // Model dropdown should appear for the selected endpoint
+    // Model dropdown should appear for the selected endpoint (+ judge dropdown = 2)
     const selects = screen.getAllByRole('combobox');
-    expect(selects).toHaveLength(1);
+    expect(selects).toHaveLength(2);
   });
 
   it('shows model dropdowns for each selected endpoint', async () => {
@@ -98,7 +100,8 @@ describe('BenchmarkRunner', () => {
     await user.click(checkboxes[1]);
 
     const selects = screen.getAllByRole('combobox');
-    expect(selects).toHaveLength(2);
+    // 2 model dropdowns + 1 judge dropdown = 3
+    expect(selects).toHaveLength(3);
   });
 
   it('discovers models when endpoint is checked', async () => {

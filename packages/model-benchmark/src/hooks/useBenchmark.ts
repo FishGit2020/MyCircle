@@ -3,6 +3,7 @@ import {
   useMutation,
   RUN_BENCHMARK,
   SAVE_BENCHMARK_RUN,
+  SCORE_BENCHMARK_RESPONSE,
   GET_BENCHMARK_HISTORY,
   StorageKeys,
   WindowEvents,
@@ -15,6 +16,13 @@ import type {
 // Re-export generated types for downstream consumers
 export type { BenchmarkTimingResult, BenchmarkRunResult };
 
+export interface JudgeConfig {
+  provider: 'gemini' | 'ollama';
+  endpointId?: string;
+  model?: string;
+  label: string;
+}
+
 export const BENCHMARK_PROMPTS = [
   { id: 'simple', labelKey: 'benchmark.promptSimple' as const, prompt: 'What is the capital of France?' },
   { id: 'reasoning', labelKey: 'benchmark.promptReasoning' as const, prompt: 'Explain why the sky is blue in 3 sentences.' },
@@ -26,12 +34,14 @@ export const BENCHMARK_PROMPTS = [
 export function useBenchmark() {
   const [results, setResults] = useState<BenchmarkRunResult[]>([]);
   const [running, setRunning] = useState(false);
+  const [scoring, setScoring] = useState(false);
   const [currentEndpoint, setCurrentEndpoint] = useState<string | null>(null);
 
   const [runMutation] = useMutation(RUN_BENCHMARK);
   const [saveMutation] = useMutation(SAVE_BENCHMARK_RUN, {
     refetchQueries: [{ query: GET_BENCHMARK_HISTORY }],
   });
+  const [scoreMutation] = useMutation(SCORE_BENCHMARK_RESPONSE);
 
   const runBenchmark = useCallback(async (
     endpointModels: Array<{ endpointId: string; model: string }>,
@@ -93,5 +103,49 @@ export function useBenchmark() {
     await saveMutation({ variables: { results: runResults } });
   }, [saveMutation]);
 
-  return { results, running, currentEndpoint, runBenchmark, saveRun };
+  const scoreResults = useCallback(async (
+    runResults: BenchmarkRunResult[],
+    judge: JudgeConfig,
+  ): Promise<BenchmarkRunResult[]> => {
+    setScoring(true);
+    const scored: BenchmarkRunResult[] = [];
+
+    for (const r of runResults) {
+      if (r.error || !r.response) {
+        scored.push(r);
+        continue;
+      }
+      try {
+        const { data } = await scoreMutation({
+          variables: {
+            prompt: r.prompt,
+            response: r.response,
+            judgeProvider: judge.provider,
+            judgeEndpointId: judge.endpointId || null,
+            judgeModel: judge.model || null,
+          },
+        });
+        const q = data?.scoreBenchmarkResponse;
+        scored.push({
+          ...r,
+          qualityScore: q?.score ?? null,
+          qualityFeedback: q?.feedback ?? null,
+          qualityJudge: q?.judge ?? null,
+        });
+      } catch {
+        scored.push({
+          ...r,
+          qualityScore: null,
+          qualityFeedback: 'Scoring failed',
+          qualityJudge: judge.label,
+        });
+      }
+    }
+
+    setScoring(false);
+    setResults(scored);
+    return scored;
+  }, [scoreMutation]);
+
+  return { results, running, scoring, currentEndpoint, runBenchmark, saveRun, scoreResults };
 }

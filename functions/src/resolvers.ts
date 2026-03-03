@@ -27,6 +27,14 @@ const idParamSchema = z.object({
   id: z.string().min(1).max(200),
 });
 
+const scoreBenchmarkResponseSchema = z.object({
+  prompt: z.string().min(1).max(10000),
+  response: z.string().min(1).max(50000),
+  judgeProvider: z.enum(['gemini', 'ollama']),
+  judgeEndpointId: z.string().max(200).optional().nullable(),
+  judgeModel: z.string().max(100).optional().nullable(),
+});
+
 const aiChatSchema = z.object({
   message: z.string().min(1).max(5000),
   history: z.array(z.object({
@@ -919,6 +927,69 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         const db = getFirestore();
         await db.doc(`users/${uid}/benchmarkEndpoints/${id}`).delete();
         return true;
+      },
+
+      scoreBenchmarkResponse: async (_: any, args: { prompt: string; response: string; judgeProvider: string; judgeEndpointId?: string; judgeModel?: string }, ctx: any) => {
+        const { prompt, response, judgeProvider, judgeEndpointId, judgeModel } = scoreBenchmarkResponseSchema.parse(args);
+        const uid = ctx?.uid;
+        if (!uid) throw new Error('Authentication required');
+
+        const scoringPrompt = `Rate the following AI response on a scale of 1-10 for accuracy, relevance, completeness, and clarity.
+
+Question: ${prompt}
+
+Response: ${response}
+
+Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": "<brief explanation>"}`;
+
+        try {
+          if (judgeProvider === 'gemini') {
+            const geminiKey = process.env.GEMINI_API_KEY;
+            if (!geminiKey) throw new Error('Gemini API key not configured');
+            const { GoogleGenAI } = await import('@google/genai');
+            const ai = new GoogleGenAI({ apiKey: geminiKey });
+            const result = await ai.models.generateContent({
+              model: 'gemini-2.5-flash',
+              contents: [{ role: 'user', parts: [{ text: scoringPrompt }] }],
+            });
+            const text = result.text ?? '';
+            const jsonMatch = text.match(/\{[\s\S]*?\}/);
+            if (!jsonMatch) return { score: 0, feedback: 'Failed to parse judge response', judge: 'gemini-2.5-flash' };
+            const parsed = JSON.parse(jsonMatch[0]);
+            return {
+              score: Math.max(1, Math.min(10, Number(parsed.score) || 0)),
+              feedback: String(parsed.feedback || '').slice(0, 500),
+              judge: 'gemini-2.5-flash',
+            };
+          }
+
+          // Ollama judge path
+          if (!judgeEndpointId || !judgeModel) throw new Error('Ollama judge requires endpointId and model');
+          const db = getFirestore();
+          const endpointDoc = await db.doc(`users/${uid}/benchmarkEndpoints/${judgeEndpointId}`).get();
+          if (!endpointDoc.exists) throw new Error('Judge endpoint not found');
+          const endpoint = endpointDoc.data()!;
+
+          const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+          if (endpoint.cfAccessClientId) headers['CF-Access-Client-Id'] = endpoint.cfAccessClientId;
+          if (endpoint.cfAccessClientSecret) headers['CF-Access-Client-Secret'] = endpoint.cfAccessClientSecret;
+
+          const ollamaRes = await axios.post(`${endpoint.url}/api/generate`, {
+            model: judgeModel, prompt: scoringPrompt, stream: false,
+          }, { headers, timeout: 120000 });
+
+          const text = ollamaRes.data?.response || '';
+          const jsonMatch = text.match(/\{[\s\S]*?\}/);
+          if (!jsonMatch) return { score: 0, feedback: 'Failed to parse judge response', judge: judgeModel };
+          const parsed = JSON.parse(jsonMatch[0]);
+          return {
+            score: Math.max(1, Math.min(10, Number(parsed.score) || 0)),
+            feedback: String(parsed.feedback || '').slice(0, 500),
+            judge: `${endpoint.name}/${judgeModel}`,
+          };
+        } catch (err: any) {
+          return { score: 0, feedback: `Scoring failed: ${err.message}`, judge: judgeProvider === 'gemini' ? 'gemini-2.5-flash' : (judgeModel || 'unknown') };
+        }
       },
 
       saveBenchmarkRun: async (_: any, { results }: { results: any }, ctx: any) => {

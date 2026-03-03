@@ -110,6 +110,15 @@ export default function BenchmarkHistory() {
                         <span className={fastest && r === fastest ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-gray-600 dark:text-gray-400'}>
                           {r.timing.tokensPerSecond?.toFixed(1)} tok/s
                         </span>
+                        {r.qualityScore != null && r.qualityScore > 0 && (
+                          <span className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
+                            r.qualityScore >= 8 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : r.qualityScore >= 5 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          }`}>
+                            {r.qualityScore.toFixed(1)}
+                          </span>
+                        )}
                         <span className="text-gray-400 dark:text-gray-500 hidden sm:inline" title={t('benchmark.results.ttft')}>
                           TTFT {r.timing.timeToFirstToken?.toFixed(2)}s
                         </span>
@@ -161,6 +170,20 @@ export default function BenchmarkHistory() {
                           <span className="block text-gray-400 dark:text-gray-500">{t('benchmark.results.loadTime')}</span>
                           <span className="font-mono">{r.timing.loadDuration?.toFixed(2)}s</span>
                         </div>
+                      </div>
+                    )}
+                    {r.qualityFeedback && (
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                        <span className="text-gray-400 dark:text-gray-500">{t('benchmark.results.quality')}: </span>
+                        {r.qualityScore != null && r.qualityScore > 0 && (
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full font-semibold mr-1 ${
+                            r.qualityScore >= 8 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : r.qualityScore >= 5 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          }`}>{r.qualityScore.toFixed(1)}</span>
+                        )}
+                        {r.qualityFeedback}
+                        {r.qualityJudge && <span className="ml-1 text-gray-400">({t('benchmark.results.qualityJudge')}: {r.qualityJudge})</span>}
                       </div>
                     )}
                     {r.prompt && (

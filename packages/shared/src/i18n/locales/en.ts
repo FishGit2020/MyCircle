@@ -1574,6 +1574,12 @@ const en = {
   'benchmark.history.hideDetails': 'Hide details',
   'benchmark.history.clearAll': 'Clear all',
   'benchmark.history.clearAllConfirm': 'Delete all benchmark history?',
+  'benchmark.runner.judgeModel': 'Judge Model',
+  'benchmark.runner.judgeGemini': 'Gemini (cloud)',
+  'benchmark.runner.judgeNone': 'None (skip scoring)',
+  'benchmark.runner.scoring': 'Scoring responses...',
+  'benchmark.results.quality': 'Quality',
+  'benchmark.results.qualityJudge': 'Judged by',
   'benchmark.signInRequired': 'Sign in to use benchmarks',
 
   // Endpoint source labels

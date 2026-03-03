@@ -106,6 +106,7 @@ export const StorageKeys = {
   BENCHMARK_CACHE: 'benchmark-cache',
   BENCHMARK_MODEL_MAP: 'benchmark-model-map',
   BENCHMARK_RESULTS: 'benchmark-results',
+  BENCHMARK_JUDGE: 'benchmark-judge',
   DAILY_LOG_DAY_FILTER: 'daily-log-day-filter',
   IMMIGRATION_CASES_CACHE: 'immigration-cases-cache',
 } as const;
