@@ -1,0 +1,40 @@
+# Cloudflare Quick Tunnel ONLY — for native Ollama on Apple Silicon
+#
+# Use this when Ollama is running natively on macOS (not in Docker)
+# to get Metal GPU acceleration. This file ONLY runs the tunnel.
+#
+# Why native instead of Docker?
+#   Docker Desktop on macOS runs a Linux VM that cannot access Apple Metal.
+#   Native Ollama gets full Metal GPU acceleration from the M3 Pro, which is
+#   roughly 3-5x faster than CPU-only inference inside Docker.
+#   Native Ollama can also use all 18GB unified memory (vs 12GB Docker limit).
+#
+# Prerequisites:
+#   1. Install Ollama natively:  brew install ollama
+#   2. Start the server:         ollama serve
+#   3. Pull a model:             ollama pull qwen3:4b
+#   4. Verify it works:          curl http://localhost:11434/api/tags
+#
+# Usage:
+#   1. Make sure "ollama serve" is running in another terminal
+#   2. docker compose -f docker-compose.macpro-native.yml up -d
+#   3. docker logs cloudflared 2>&1 | grep "trycloudflare.com"
+#   4. Copy the URL and add it as an endpoint in MyCircle
+#
+# Note: The URL changes on every restart. Update it in MyCircle's
+#       AI Chat > Endpoints tab when that happens.
+#
+# How it connects:
+#   Browser → Cloudflare Tunnel → host.docker.internal:11434 → native Ollama
+#   "host.docker.internal" is a special Docker DNS name that resolves to
+#   your Mac's localhost, allowing the container to reach native Ollama.
+
+version: "3.8"
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    # Points to your Mac's native Ollama via Docker's host gateway
+    command: tunnel --url http://host.docker.internal:11434
