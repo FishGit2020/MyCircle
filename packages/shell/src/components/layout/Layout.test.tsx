@@ -64,7 +64,7 @@ describe('Layout', () => {
     expect(screen.getByText('Faith')).toBeInTheDocument();
     expect(screen.getByText('Family')).toBeInTheDocument();
     expect(screen.getByText('Learning')).toBeInTheDocument();
-    expect(screen.getByText('Tools')).toBeInTheDocument();
+    expect(screen.getByText('Workspace')).toBeInTheDocument();
   });
 
   it('clicking Daily opens dropdown with Weather, Stocks, Podcasts links', () => {

@@ -16,7 +16,7 @@ const zh: Record<TranslationKey, string> = {
   'nav.group.faith': '\u4fe1\u4ef0',
   'nav.group.family': '\u5bb6\u5ead',
   'nav.group.learning': '\u5b66\u4e60',
-  'nav.group.tools': '\u5de5\u5177',
+  'nav.group.workspace': '\u5de5\u4f5c\u533a',
 
   // Home page
   'home.title': '\u6b22\u8fce\u6765\u5230 MyCircle',
