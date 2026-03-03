@@ -808,6 +808,7 @@ const en = {
   'map.exitFullscreen': 'Exit fullscreen',
   'map.waitingForLocation': 'Waiting for location...',
   'map.loading': 'Loading map...',
+  'map.showMap': 'Show Interactive Map',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'UV Warning',
@@ -824,6 +825,9 @@ const en = {
   'compare.searchCity': 'Search for a city to compare',
   'compare.addCity': 'Add city',
   'compare.compareButton': 'Compare',
+  'compare.ctaTitle': 'Compare Your Cities',
+  'compare.ctaDesc': 'Side-by-side weather for {{cityA}} and {{cityB}}',
+  'compare.compareLink': 'Compare',
 
   // What to Wear comfort labels
   'wear.comfortExtremeCold': 'Extreme cold — bundle up!',

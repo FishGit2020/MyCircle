@@ -7,7 +7,7 @@ import { UnitToggle, SpeedToggle } from '../components/settings';
 
 export default function WeatherLandingPage() {
   const { t } = useTranslation();
-  const { recentCities } = useAuth();
+  const { user, recentCities, favoriteCities } = useAuth();
 
   return (
     <div className="space-y-8">
@@ -31,6 +31,33 @@ export default function WeatherLandingPage() {
 
       {/* Favorites section */}
       <FavoriteCities />
+
+      {/* Compare CTA — shown when user has 2+ favorites */}
+      {user && favoriteCities.length >= 2 && (
+        <section>
+          <Link
+            to="/compare"
+            className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition group"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800/40 text-blue-600 dark:text-blue-400">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300">{t('compare.ctaTitle')}</h3>
+                <p className="text-xs text-blue-600 dark:text-blue-400 truncate">
+                  {t('compare.ctaDesc', { cityA: favoriteCities[0].name, cityB: favoriteCities[1].name })}
+                </p>
+              </div>
+            </div>
+            <svg className="w-5 h-5 text-blue-400 dark:text-blue-500 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </section>
+      )}
 
       {/* Recent searches */}
       {recentCities.length > 0 && (
