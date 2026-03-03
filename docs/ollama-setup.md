@@ -382,6 +382,29 @@ For models without native tool support:
 
 The fallback is automatic — if the native `tools` API call throws, the system retries with the prompt-based approach.
 
+### Available tools (16)
+
+| Tool | Category | Description |
+|------|----------|-------------|
+| `getWeather` | Weather | Get current weather for a city |
+| `searchCities` | City search | Search for cities by name |
+| `getStockQuote` | Stocks | Get stock quote by ticker symbol |
+| `getCryptoPrices` | Crypto | Get cryptocurrency prices (CoinGecko, 2-min cache) |
+| `navigateTo` | Navigation | Navigate to an app page (frontend action) |
+| `getBibleVerse` | Bible | Look up a Bible verse or passage |
+| `searchPodcasts` | Podcasts | Search for podcasts by keyword |
+| `addFlashcard` | Flashcards | Create a flashcard (frontend action) |
+| `listFlashcards` | Flashcards | List existing flashcards |
+| `addBookmark` | Bible | Bookmark a Bible passage (frontend action) |
+| `checkCaseStatus` | Immigration | Check USCIS case status |
+| `addNote` | Notebook | Create a note |
+| `addWorkEntry` | Work log | Log a work entry |
+| `setBabyDueDate` | Baby tracker | Set a baby due date |
+| `addChildMilestone` | Baby tracker | Record a child milestone |
+| `addImmigrationCase` | Immigration | Add an immigration case to track |
+
+Tool definitions are shared between the MCP server and Gemini/Ollama backends via `scripts/mcp-tools/mfe-tools.ts`.
+
 ---
 
 ## Troubleshooting

@@ -75,6 +75,9 @@ function createMockRes() {
   return res;
 }
 
+// Note: toolMode is an optional parameter on the aiChat mutation (defaults to 'native').
+// Existing tests remain valid without it — toolMode only affects the tool execution path,
+// not authentication, validation, or provider selection tested here.
 describe('aiChat', () => {
   let aiChat: any;
 
