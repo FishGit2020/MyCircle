@@ -864,7 +864,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         try {
           const response = await axios.post(`${endpoint.url}/api/generate`, {
             model, prompt, stream: false,
-          }, { headers, timeout: 120000 });
+          }, { headers, timeout: 300000 });
 
           const d = response.data;
           const evalDurationSec = (d.eval_duration || 1) / 1e9;
