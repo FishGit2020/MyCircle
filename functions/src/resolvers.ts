@@ -1294,12 +1294,18 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
       ollamaModels: async (_: any, __: any, ctx: any) => {
         const uid = ctx?.uid;
         if (!uid) return [];
+        const endpoint = await getUserOllamaEndpoint(uid);
+        if (!endpoint) return [];
+        const headers = buildEndpointHeaders(endpoint);
+        // Try Ollama /api/tags first, then OpenAI-compatible /v1/models
         try {
-          const endpoint = await getUserOllamaEndpoint(uid);
-          if (!endpoint) return [];
-          const headers = buildEndpointHeaders(endpoint);
           const { data } = await axios.get(`${endpoint.url}/api/tags`, { headers, timeout: 5000 });
-          return (data.models || []).map((m: any) => m.name as string);
+          const models = (data.models || []).map((m: any) => m.name as string);
+          if (models.length > 0) return models;
+        } catch { /* fall through */ }
+        try {
+          const { data } = await axios.get(`${endpoint.url}/v1/models`, { headers, timeout: 5000 });
+          return (data.data || []).map((m: any) => m.id as string);
         } catch {
           return [];
         }
@@ -1310,10 +1316,16 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         if (!uid) throw new Error('Authentication required');
         const endpoint = await getUserOllamaEndpoint(uid, endpointId);
         if (!endpoint) return [];
+        const headers = buildEndpointHeaders(endpoint);
+        // Try Ollama /api/tags first, then OpenAI-compatible /v1/models
         try {
-          const headers = buildEndpointHeaders(endpoint);
           const { data } = await axios.get(`${endpoint.url}/api/tags`, { headers, timeout: 5000 });
-          return (data.models || []).map((m: any) => m.name as string);
+          const models = (data.models || []).map((m: any) => m.name as string);
+          if (models.length > 0) return models;
+        } catch { /* fall through */ }
+        try {
+          const { data } = await axios.get(`${endpoint.url}/v1/models`, { headers, timeout: 5000 });
+          return (data.data || []).map((m: any) => m.id as string);
         } catch {
           return [];
         }
