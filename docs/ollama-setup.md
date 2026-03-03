@@ -12,6 +12,7 @@ Complete guide for running AI chat with Ollama on your own hardware instead of G
 - [Cloudflare Tunnel (Permanent Domain)](#cloudflare-tunnel-permanent-domain)
 - [Cloudflare Access (Service Token Auth)](#cloudflare-access-service-token-auth)
 - [Quick Setup (Free Tunnel, No Domain Needed)](#quick-setup-free-tunnel-no-domain-needed)
+- [Apple Silicon Mac Setup](#apple-silicon-mac-setup)
 - [Provider Priority](#provider-priority)
 - [Tool Calling](#tool-calling)
 - [Troubleshooting](#troubleshooting)
@@ -356,6 +357,118 @@ Switch to the **Chat** tab, select your endpoint and model from the dropdowns, a
 > **URL changes on restart**: Free tunnels generate a new URL each time `cloudflared` restarts. When that happens, edit the endpoint in the Endpoints tab and update the URL. Everything else (name, chat history) stays the same.
 
 > **No WAF or Access config needed**: Free tunnels bypass Cloudflare's Bot Fight Mode and don't require Access policies. The tradeoff is no authentication — anyone with the URL can reach your Ollama instance (the URL is random and hard to guess, but not secret).
+
+---
+
+## Apple Silicon Mac Setup
+
+Docker Desktop on macOS runs a Linux VM that **cannot access Apple Metal GPU**. You have two options: everything in Docker (CPU-only, simpler) or native Ollama with a Docker tunnel (Metal GPU, faster).
+
+### Option A: Everything in Docker (CPU-only)
+
+Simpler setup but slower — Ollama runs on CPU only inside the Docker VM.
+
+> **Ready-to-use file**: [`deploy/ollama/docker-compose.macpro.yml`](../deploy/ollama/docker-compose.macpro.yml)
+
+**Tuned for Apple M3 Pro (11 cores, 18GB unified RAM):**
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| `OLLAMA_NUM_PARALLEL` | 4 | 11 cores / ~2.5 — leaves headroom for macOS |
+| `OLLAMA_MAX_LOADED_MODELS` | 1 | 12GB Docker limit — keep 1 model hot to avoid OOM |
+| `memory` | 12G | 18GB total minus ~6GB for macOS + Docker VM overhead |
+| GPU reservation | None | Docker VM cannot access Metal |
+
+```bash
+cd deploy/ollama
+docker compose -f docker-compose.macpro.yml up -d
+docker exec ollama ollama pull qwen3:4b
+docker logs cloudflared 2>&1 | grep "trycloudflare.com"
+```
+
+**Recommended models for CPU-only Docker (12GB limit):**
+
+| Model | RAM needed | Speed | Notes |
+|-------|-----------|-------|-------|
+| `qwen3:4b` | ~2.5 GB | Good | Best balance of speed + tool calling |
+| `llama3.2:3b` | ~2.0 GB | Good | Fast, good quality |
+| `gemma2:2b` | ~1.6 GB | Fastest | Lightweight |
+| `llama3.1:8b` | ~4.7 GB | Slow | Largest practical size on CPU |
+
+Avoid 27B+ models — they won't fit in 12GB and will swap or crash.
+
+### Option B: Native Ollama + Docker Tunnel (Recommended)
+
+Run Ollama directly on macOS for **full Metal GPU acceleration** (3-5x faster than CPU-only Docker). Only use Docker for the Cloudflare tunnel.
+
+> **Ready-to-use file**: [`deploy/ollama/docker-compose.macpro-native.yml`](../deploy/ollama/docker-compose.macpro-native.yml)
+
+**How it connects:**
+
+```
+Browser → Cloudflare CDN → trycloudflare.com tunnel
+    → Docker cloudflared container
+    → host.docker.internal:11434  (Docker DNS for the Mac host)
+    → native Ollama with Metal GPU
+```
+
+`host.docker.internal` is a special hostname Docker Desktop provides that lets containers reach services running on the Mac.
+
+#### Step 1: Install and run Ollama natively
+
+```bash
+brew install ollama
+ollama serve
+```
+
+#### Step 2: Pull a model (in a new terminal)
+
+```bash
+ollama pull qwen3:4b
+curl http://localhost:11434/api/tags   # verify it works
+```
+
+With Metal GPU, you can run larger models than in Docker:
+
+| Model | RAM needed | Viable on M3 Pro 18GB? |
+|-------|-----------|----------------------|
+| `qwen3:4b` | ~2.5 GB | Yes, fast |
+| `llama3.1:8b` | ~4.7 GB | Yes, good speed |
+| `qwen3:14b` | ~9 GB | Yes, usable |
+| `gemma3:27b` | ~16 GB | Tight but possible |
+
+#### Step 3: Start the tunnel
+
+```bash
+cd deploy/ollama
+docker compose -f docker-compose.macpro-native.yml up -d
+docker logs cloudflared 2>&1 | grep "trycloudflare.com"
+```
+
+#### Step 4: Add the endpoint in MyCircle
+
+Same as [Quick Setup step 4](#4-add-the-endpoint-in-mycircle) — paste the `*.trycloudflare.com` URL in **AI Chat > Endpoints**.
+
+### Compose file summary
+
+| File | Hardware | GPU? | Use case |
+|------|----------|------|----------|
+| `docker-compose.yml` | NVIDIA Linux (permanent tunnel) | CUDA | Production server |
+| `docker-compose.quick.yml` | NVIDIA Linux (free tunnel) | CUDA | Quick test on Linux |
+| `docker-compose.macpro.yml` | Apple Silicon (all Docker) | No (CPU-only) | Simple Mac setup |
+| `docker-compose.macpro-native.yml` | Apple Silicon (native + tunnel) | Metal | Best Mac performance |
+
+### Adjusting for other Macs
+
+The `macpro` files are tuned for M3 Pro 18GB. For other configurations:
+
+| Your Mac | memory limit | NUM_PARALLEL | MAX_LOADED_MODELS | Notes |
+|----------|-------------|--------------|-------------------|-------|
+| M1/M2 8GB | 4G | 2 | 1 | Stick to 2B-4B models |
+| M1/M2 16GB | 10G | 3 | 1 | 8B models work well |
+| M3 Pro 18GB | 12G | 4 | 1 | Current defaults |
+| M2/M3 Pro 32GB | 24G | 5 | 2 | Can run 14B comfortably |
+| M2/M3 Max 64GB | 48G | 6 | 3 | 32B+ models viable |
 
 ---
 

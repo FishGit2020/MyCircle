@@ -1,0 +1,65 @@
+# Ollama + Cloudflare Free Quick Tunnel — Apple Silicon Mac
+#
+# Optimized for: Apple M3 Pro, 11 CPU cores, 18GB unified RAM
+# Generates a random *.trycloudflare.com URL on startup.
+# No Cloudflare account or domain required.
+# See docs/ollama-setup.md for full setup instructions.
+#
+# Why no GPU section?
+#   Docker Desktop on macOS runs inside a Linux VM that cannot access
+#   Apple Metal. Ollama inside Docker uses CPU-only inference.
+#   For Metal GPU acceleration, run Ollama natively instead:
+#     brew install ollama && ollama serve
+#
+# Configuration Note (tuned for 18GB unified memory Mac):
+#   - OLLAMA_NUM_PARALLEL=4      (11 cores / ~2.5 — conservative to leave headroom for macOS)
+#   - OLLAMA_MAX_LOADED_MODELS=1 (only 12GB available to Docker; keep 1 model hot to avoid OOM)
+#   - memory: 12G                (18GB total minus ~6GB for macOS + Docker VM overhead)
+#
+# Recommended models (CPU-only, 12GB Docker limit):
+#   - qwen3:4b    (~2.5GB) — best balance of speed + tool calling support
+#   - llama3.2:3b (~2.0GB) — fast, good quality
+#   - gemma2:2b   (~1.6GB) — fastest, lightweight
+#   - llama3.1:8b (~4.7GB) — largest practical size, slower on CPU
+#   Avoid 27B+ models — they won't fit in 12GB and will swap/crash.
+#
+# Usage:
+#   1. docker compose -f docker-compose.macpro.yml up -d
+#   2. docker exec ollama ollama pull qwen3:4b
+#   3. docker logs cloudflared 2>&1 | grep "trycloudflare.com"
+#   4. Copy the URL and add it as an endpoint in MyCircle
+#
+# Note: The URL changes on every restart. Update it in MyCircle's
+#       AI Chat > Endpoints tab when that happens.
+
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama-models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      # 11 cores / ~2.5 = 4 parallel requests (leaves CPU for macOS)
+      - OLLAMA_NUM_PARALLEL=4
+      # Only 1 model loaded at a time (18GB shared RAM is tight)
+      - OLLAMA_MAX_LOADED_MODELS=1
+    deploy:
+      resources:
+        limits:
+          # 18GB total - 6GB for macOS/Docker VM = 12GB for Ollama
+          memory: 12G
+    # No GPU reservation — Docker Desktop on Mac cannot access Metal
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --url http://ollama:11434
+    depends_on:
+      - ollama
