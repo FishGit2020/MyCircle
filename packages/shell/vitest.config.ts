@@ -37,6 +37,7 @@ export default defineConfig({
       'cloudFiles/CloudFiles': resolve(__dirname, './test/mocks/CloudFilesMock.tsx'),
       'modelBenchmark/ModelBenchmark': resolve(__dirname, './test/mocks/ModelBenchmarkMock.tsx'),
       'immigrationTracker/ImmigrationTracker': resolve(__dirname, './test/mocks/ImmigrationTrackerMock.tsx'),
+      'digitalLibrary/DigitalLibrary': resolve(__dirname, './test/mocks/DigitalLibraryMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

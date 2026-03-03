@@ -23,6 +23,7 @@ export default defineConfig({
       'cloudFiles/CloudFiles': resolve(__dirname, './packages/shell/test/mocks/CloudFilesMock.tsx'),
       'modelBenchmark/ModelBenchmark': resolve(__dirname, './packages/shell/test/mocks/ModelBenchmarkMock.tsx'),
       'immigrationTracker/ImmigrationTracker': resolve(__dirname, './packages/shell/test/mocks/ImmigrationTrackerMock.tsx'),
+      'digitalLibrary/DigitalLibrary': resolve(__dirname, './packages/shell/test/mocks/DigitalLibraryMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/test/mocks/pwaRegisterReactMock.ts'),
       '@weather/shared': resolve(__dirname, './packages/shared/src'),
     }
@@ -38,6 +39,7 @@ export default defineConfig({
       'functions/**',
       'packages/cloud-files/**',
       'packages/immigration-tracker/**',
+      'packages/digital-library/**',
     ],
     coverage: {
       provider: 'v8',

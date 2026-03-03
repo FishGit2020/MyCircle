@@ -18,4 +18,5 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   'whats-new': 'whatsNew.title',
   immigration: 'nav.immigration',
   benchmark: 'nav.benchmark',
+  library: 'nav.digitalLibrary',
 };

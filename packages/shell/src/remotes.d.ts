@@ -85,3 +85,8 @@ declare module 'immigrationTracker/ImmigrationTracker' {
   const ImmigrationTracker: React.ComponentType;
   export default ImmigrationTracker;
 }
+
+declare module 'digitalLibrary/DigitalLibrary' {
+  const DigitalLibrary: React.ComponentType;
+  export default DigitalLibrary;
+}

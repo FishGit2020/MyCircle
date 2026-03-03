@@ -1771,3 +1771,216 @@ export const uscisStatus = onRequest(
     }
   }
 );
+
+// ─── Digital Library ────────────────────────────────────────────────
+export const digitalLibrary = onRequest(
+  {
+    region: 'us-central1',
+    memory: '1GiB',
+    timeoutSeconds: 300,
+    maxInstances: 5,
+    cors: ALLOWED_ORIGINS,
+  },
+  async (req: Request, res: Response) => {
+    const uid = await verifyAuthToken(req);
+    if (!uid) { res.status(401).json({ error: 'Authentication required' }); return; }
+
+    const route = req.path.replace(/^\/digital-library-api\//, '').replace(/^\//, '');
+    const db = getFirestore();
+    const bucket = getStorage().bucket();
+
+    // POST /digital-library-api/upload-url
+    if (req.method === 'POST' && route === 'upload-url') {
+      const { fileName, contentType, fileSize } = req.body;
+      if (!fileName || !contentType) { res.status(400).json({ error: 'fileName and contentType required' }); return; }
+      if (fileSize && fileSize > 50 * 1024 * 1024) { res.status(400).json({ error: 'File too large (max 50MB)' }); return; }
+
+      const bookId = crypto.randomUUID();
+      const storagePath = `books/${bookId}/original.epub`;
+      const file = bucket.file(storagePath);
+
+      const [uploadUrl] = await file.getSignedUrl({
+        version: 'v4',
+        action: 'write',
+        expires: Date.now() + 15 * 60 * 1000,
+        contentType: 'application/epub+zip',
+      });
+
+      res.json({ uploadUrl, bookId });
+      return;
+    }
+
+    // POST /digital-library-api/register
+    if (req.method === 'POST' && route === 'register') {
+      const { bookId } = req.body;
+      if (!bookId) { res.status(400).json({ error: 'bookId required' }); return; }
+
+      const storagePath = `books/${bookId}/original.epub`;
+      const file = bucket.file(storagePath);
+      const [exists] = await file.exists();
+      if (!exists) { res.status(404).json({ error: 'EPUB file not found in storage' }); return; }
+
+      try {
+        // Download EPUB to temp
+        const [buffer] = await file.download();
+        const [metadata] = await file.getMetadata();
+        const fileSize = Number(metadata.size) || buffer.length;
+
+        // Extract metadata using epub2
+        const epub2Module = await import('epub2');
+        const EPub = epub2Module.EPub;
+        const tmpPath = `/tmp/${bookId}.epub`;
+        const fs = await import('fs');
+        fs.writeFileSync(tmpPath, buffer);
+
+        const epub = await (EPub as unknown as { createAsync(path: string): Promise<any> }).createAsync(tmpPath);
+
+        const title = epub.metadata?.title || 'Untitled';
+        const author = epub.metadata?.creator || 'Unknown';
+        const description = epub.metadata?.description || '';
+        const language = epub.metadata?.language || 'en';
+
+        // Extract cover image
+        let coverUrl = '';
+        let coverStoragePath = '';
+        try {
+          const coverId = epub.metadata?.cover;
+          if (coverId && epub.manifest?.[coverId]) {
+            const coverItem = epub.manifest[coverId];
+            const [coverData] = await new Promise<[Buffer, string]>((resolve, reject) => {
+              epub.getImage(coverId, (err: Error | null, data: Buffer, mimeType: string) => {
+                if (err) reject(err);
+                else resolve([data, mimeType]);
+              });
+            });
+            coverStoragePath = `books/${bookId}/cover.jpg`;
+            const coverFile = bucket.file(coverStoragePath);
+            await coverFile.save(coverData, { metadata: { contentType: coverItem.mediaType || 'image/jpeg' } });
+            const downloadToken = crypto.randomUUID();
+            await coverFile.setMetadata({ metadata: { firebaseStorageDownloadTokens: downloadToken } });
+            const bucketName = bucket.name;
+            coverUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(coverStoragePath)}?alt=media&token=${downloadToken}`;
+          }
+        } catch (coverErr) {
+          logger.warn('Failed to extract cover image', { bookId, error: String(coverErr) });
+        }
+
+        // Build EPUB download URL
+        const epubToken = crypto.randomUUID();
+        await file.setMetadata({ metadata: { firebaseStorageDownloadTokens: epubToken } });
+        const bucketName = bucket.name;
+        const epubUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(storagePath)}?alt=media&token=${epubToken}`;
+
+        // Get chapters from flow/toc
+        const chapters: Array<{ index: number; title: string; href: string; characterCount: number }> = [];
+        const flow = epub.flow || [];
+        let totalCharacters = 0;
+
+        for (let i = 0; i < flow.length; i++) {
+          const ch = flow[i];
+          let text = '';
+          try {
+            text = await new Promise<string>((resolve, reject) => {
+              epub.getChapter(ch.id, (err: Error | null, data: string) => {
+                if (err) reject(err);
+                else resolve(data || '');
+              });
+            });
+          } catch { /* skip */ }
+          // Strip HTML tags
+          const plainText = text.replace(/<[^>]+>/g, '').trim();
+          const charCount = plainText.length;
+          totalCharacters += charCount;
+
+          const tocItem = epub.toc?.find((t: { href: string }) => ch.href && t.href?.includes(ch.href.split('#')[0]));
+          chapters.push({
+            index: i,
+            title: tocItem?.title || `Chapter ${i + 1}`,
+            href: ch.href || '',
+            characterCount: charCount,
+          });
+        }
+
+        // Get uploader display name
+        let displayName = 'Unknown';
+        try {
+          const userRecord = await getAuth().getUser(uid);
+          displayName = userRecord.displayName || userRecord.email || 'Unknown';
+        } catch { /* ignore */ }
+
+        // Save book doc
+        await db.collection('books').doc(bookId).set({
+          title, author, description, language,
+          coverUrl, epubUrl,
+          storagePath, coverStoragePath,
+          fileSize, chapterCount: chapters.length, totalCharacters,
+          uploadedBy: { uid, displayName },
+          uploadedAt: FieldValue.serverTimestamp(),
+          audioStatus: 'none',
+          audioProgress: 0,
+        });
+
+        // Save chapter docs
+        const batch = db.batch();
+        for (const ch of chapters) {
+          const chRef = db.collection('books').doc(bookId).collection('chapters').doc(`ch-${String(ch.index).padStart(4, '0')}`);
+          batch.set(chRef, ch);
+        }
+        await batch.commit();
+
+        // Cleanup temp
+        try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
+
+        logger.info('Book registered', { bookId, title, chapters: chapters.length });
+        res.json({ ok: true, bookId, title, chapterCount: chapters.length });
+      } catch (err) {
+        logger.error('Failed to register book', { bookId, error: String(err) });
+        res.status(500).json({ error: 'Failed to process EPUB' });
+      }
+      return;
+    }
+
+    // GET /digital-library-api/list
+    if (req.method === 'GET' && route === 'list') {
+      const snapshot = await db.collection('books').orderBy('uploadedAt', 'desc').get();
+      const books = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      res.json({ books });
+      return;
+    }
+
+    // POST /digital-library-api/delete
+    if (req.method === 'POST' && route === 'delete') {
+      const { bookId } = req.body;
+      if (!bookId) { res.status(400).json({ error: 'bookId required' }); return; }
+
+      const bookRef = db.collection('books').doc(bookId);
+      const bookDoc = await bookRef.get();
+      if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
+
+      const bookData = bookDoc.data()!;
+      if (bookData.uploadedBy?.uid !== uid) { res.status(403).json({ error: 'Only the uploader can delete this book' }); return; }
+
+      // Delete chapters subcollection
+      const chaptersSnap = await bookRef.collection('chapters').get();
+      const batch = db.batch();
+      for (const doc of chaptersSnap.docs) batch.delete(doc.ref);
+      batch.delete(bookRef);
+      await batch.commit();
+
+      // Delete storage files (ignore errors)
+      try { await bucket.file(`books/${bookId}/original.epub`).delete(); } catch { /* ignore */ }
+      try { await bucket.file(`books/${bookId}/cover.jpg`).delete(); } catch { /* ignore */ }
+      // Delete audio files if any
+      try {
+        const [audioFiles] = await bucket.getFiles({ prefix: `books/${bookId}/audio/` });
+        for (const f of audioFiles) { try { await f.delete(); } catch { /* ignore */ } }
+      } catch { /* ignore */ }
+
+      logger.info('Book deleted', { bookId });
+      res.json({ ok: true });
+      return;
+    }
+
+    res.status(404).json({ error: 'Not found' });
+  }
+);

@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker' | 'cloudFiles' | 'benchmark' | 'immigration';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary';
 
 export type WidgetSize = 'small' | 'medium' | 'large';
 
@@ -32,6 +32,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'cloudFiles', visible: true },
   { id: 'benchmark', visible: true },
   { id: 'immigration', visible: true },
+  { id: 'digitalLibrary', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -874,6 +875,25 @@ const ImmigrationWidget = React.memo(function ImmigrationWidget() {
   );
 });
 
+const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.digitalLibrary')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.digitalLibraryDesc')}</p>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   weather: WeatherWidget,
   stocks: StockWidget,
@@ -888,6 +908,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   cloudFiles: CloudFilesWidget,
   benchmark: BenchmarkWidget,
   immigration: ImmigrationWidget,
+  digitalLibrary: DigitalLibraryWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -904,6 +925,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   cloudFiles: '/files',
   benchmark: '/benchmark',
   immigration: '/immigration',
+  digitalLibrary: '/library',
 };
 
 // ─── Dashboard Reducer ──────────────────────────────────────────────────────

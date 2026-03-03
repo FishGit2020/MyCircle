@@ -1418,6 +1418,22 @@ export async function getBenchmarkSummary(uid: string): Promise<{ lastRunAt?: st
   return { lastRunAt: lastRun.createdAt, fastestEndpoint: fastestEndpoint ?? undefined, fastestTps: fastestTps ?? undefined };
 }
 
+// Expose digital library API base for MFEs
+window.__digitalLibraryApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:5001/mycircle-dash/us-central1/digitalLibrary';
+  }
+  return '';
+};
+
+// Expose current user uid for MFEs
+window.__currentUid = auth?.currentUser?.uid ?? null;
+if (auth) {
+  onAuthStateChanged(auth, (user) => {
+    (window as Record<string, unknown>).__currentUid = user?.uid ?? null;
+  });
+}
+
 // Expose analytics for MFEs
 window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
   logEvent(eventName, params);
