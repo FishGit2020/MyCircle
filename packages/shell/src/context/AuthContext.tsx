@@ -27,6 +27,10 @@ import {
   updateBibleBookmarks,
   updateWorshipFavorites,
   updateChildData,
+  getWorkEntries,
+  getUserFiles,
+  getWorshipSongs,
+  getBenchmarkSummary,
   identifyUser,
   clearUserIdentity,
   logEvent,
@@ -249,10 +253,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
           }
 
-          // Restore notebook count
           window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-          window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-          window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+
+          // Restore subcollection data for dashboard widgets (non-blocking)
+          const uid = firebaseUser.uid;
+          getWorkEntries(uid).then(entries => {
+            if (entries.length > 0) {
+              localStorage.setItem(StorageKeys.WORK_TRACKER_CACHE, JSON.stringify(entries));
+            }
+            window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+          }).catch(() => {});
+          getUserFiles(uid).then(files => {
+            if (files.length > 0) {
+              localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(files));
+            }
+            window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
+          }).catch(() => {});
+          getWorshipSongs().then(songs => {
+            if (songs.length > 0) {
+              localStorage.setItem(StorageKeys.WORSHIP_SONGS_CACHE, JSON.stringify(songs));
+            }
+            window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
+          }).catch(() => {});
+          getBenchmarkSummary(uid).then(summary => {
+            if (summary) {
+              localStorage.setItem(StorageKeys.BENCHMARK_CACHE, JSON.stringify(summary));
+            }
+            window.dispatchEvent(new Event(WindowEvents.BENCHMARK_CHANGED));
+          }).catch(() => {});
         }
         // Notify all MFE hooks that auth state changed (sign-in)
         window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));

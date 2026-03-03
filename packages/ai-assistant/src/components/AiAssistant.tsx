@@ -44,7 +44,7 @@ export default function AiAssistant() {
   });
 
   // Fetch models for the selected endpoint
-  const [fetchModels, { data: modelsData }] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
+  const [fetchModels, { data: modelsData, loading: modelsLoading }] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
   const models: string[] = modelsData?.benchmarkEndpointModels ?? [];
 
   // Also keep the old ollamaModels query as fallback for default endpoint
@@ -160,21 +160,24 @@ export default function AiAssistant() {
                   <option key={ep.id} value={ep.id}>{ep.name}</option>
                 ))}
               </select>
-              {displayModels.length > 0 && (
-                <>
-                  <label className="sr-only" htmlFor="ai-model-select">{t('ai.modelLabel')}</label>
-                  <select
-                    id="ai-model-select"
-                    value={selectedModel}
-                    onChange={handleModelChange}
-                    className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                  >
-                    {displayModels.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                </>
-              )}
+              <label className="sr-only" htmlFor="ai-model-select">{t('ai.modelLabel')}</label>
+              <select
+                id="ai-model-select"
+                value={selectedModel}
+                onChange={handleModelChange}
+                disabled={modelsLoading || displayModels.length === 0}
+                className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
+              >
+                {modelsLoading ? (
+                  <option value="">{t('app.loading')}</option>
+                ) : displayModels.length === 0 ? (
+                  <option value="">{t('benchmark.runner.noModels')}</option>
+                ) : (
+                  displayModels.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))
+                )}
+              </select>
             </>
           )}
           {/* Tool mode toggle (Native / MCP) */}
