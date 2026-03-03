@@ -1724,7 +1724,13 @@ export const uscisStatus = onRequest(
         {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'Mozilla/5.0 (compatible; MyCircle/1.0)',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Cache-Control': 'no-cache',
+            'Origin': 'https://egov.uscis.gov',
+            'Referer': 'https://egov.uscis.gov/casestatus/landing.do',
           },
           timeout: 15000,
         },
@@ -1988,6 +1994,162 @@ export const digitalLibrary = onRequest(
 
       logger.info('Book deleted', { bookId });
       res.json({ ok: true });
+      return;
+    }
+
+    // GET /digital-library-api/progress/:bookId
+    if (req.method === 'GET' && route.startsWith('progress/')) {
+      const bookId = route.replace('progress/', '');
+      if (!bookId) { res.status(400).json({ error: 'bookId required' }); return; }
+      const bookDoc = await db.collection('books').doc(bookId).get();
+      if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
+      const data = bookDoc.data()!;
+      res.json({
+        audioStatus: data.audioStatus || 'none',
+        audioProgress: data.audioProgress || 0,
+        audioError: data.audioError || null,
+      });
+      return;
+    }
+
+    // POST /digital-library-api/convert-to-audio
+    if (req.method === 'POST' && route === 'convert-to-audio') {
+      const { bookId } = req.body;
+      if (!bookId) { res.status(400).json({ error: 'bookId required' }); return; }
+
+      const bookRef = db.collection('books').doc(bookId);
+      const bookDoc = await bookRef.get();
+      if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
+
+      const bookData = bookDoc.data()!;
+      if (bookData.audioStatus === 'processing') { res.status(409).json({ error: 'Conversion already in progress' }); return; }
+
+      // Mark as processing
+      await bookRef.update({ audioStatus: 'processing', audioProgress: 0, audioError: FieldValue.delete() });
+
+      // Start async conversion (respond immediately)
+      res.json({ ok: true, message: 'Conversion started' });
+
+      // Process in background
+      try {
+        const ttsClient = new (await import('@google-cloud/text-to-speech')).TextToSpeechClient();
+
+        const chaptersSnap = await bookRef.collection('chapters').orderBy('index').get();
+        const totalChapters = chaptersSnap.size;
+        let completedChapters = 0;
+
+        // Download EPUB for text extraction
+        const epubFile = bucket.file(bookData.storagePath);
+        const [epubBuffer] = await epubFile.download();
+        const fs = await import('fs');
+        const tmpPath = `/tmp/${bookId}-tts.epub`;
+        fs.writeFileSync(tmpPath, epubBuffer);
+
+        const epub2Module = await import('epub2');
+        const EPub = epub2Module.EPub;
+        const epub = await (EPub as unknown as { createAsync(path: string): Promise<any> }).createAsync(tmpPath);
+
+        const language = bookData.language || 'en';
+        const voiceName = language.startsWith('zh') ? 'cmn-CN-Neural2-A'
+          : language.startsWith('es') ? 'es-US-Neural2-A'
+          : 'en-US-Neural2-D';
+        const languageCode = language.startsWith('zh') ? 'cmn-CN'
+          : language.startsWith('es') ? 'es-US'
+          : 'en-US';
+
+        for (const chapterDoc of chaptersSnap.docs) {
+          const chData = chapterDoc.data();
+
+          // Extract chapter text
+          let chapterText = '';
+          try {
+            const flow = epub.flow || [];
+            const flowItem = flow[chData.index];
+            if (flowItem) {
+              chapterText = await new Promise<string>((resolve, reject) => {
+                epub.getChapter(flowItem.id, (err: Error | null, data: string) => {
+                  if (err) reject(err);
+                  else resolve(data || '');
+                });
+              });
+              // Strip HTML
+              chapterText = chapterText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            }
+          } catch {
+            logger.warn('Failed to extract chapter text for TTS', { bookId, chapter: chData.index });
+          }
+
+          if (!chapterText || chapterText.length < 10) {
+            completedChapters++;
+            continue;
+          }
+
+          // Split into chunks of 4500 bytes (API limit is 5000)
+          const MAX_BYTES = 4500;
+          const chunks: string[] = [];
+          let remaining = chapterText;
+          while (remaining.length > 0) {
+            if (remaining.length <= MAX_BYTES) {
+              chunks.push(remaining);
+              break;
+            }
+            let splitAt = remaining.lastIndexOf('. ', MAX_BYTES);
+            if (splitAt === -1) splitAt = remaining.lastIndexOf(' ', MAX_BYTES);
+            if (splitAt === -1) splitAt = MAX_BYTES;
+            chunks.push(remaining.slice(0, splitAt + 1));
+            remaining = remaining.slice(splitAt + 1).trimStart();
+          }
+
+          // Synthesize each chunk and concatenate
+          const audioBuffers: Buffer[] = [];
+          for (const chunk of chunks) {
+            const [ttsResponse] = await ttsClient.synthesizeSpeech({
+              input: { text: chunk },
+              voice: { languageCode, name: voiceName },
+              audioConfig: { audioEncoding: 'MP3', speakingRate: 1.0 },
+            });
+            if (ttsResponse.audioContent) {
+              audioBuffers.push(Buffer.from(ttsResponse.audioContent as Uint8Array));
+            }
+          }
+
+          if (audioBuffers.length > 0) {
+            const combinedAudio = Buffer.concat(audioBuffers);
+            const audioPath = `books/${bookId}/audio/chapter-${String(chData.index).padStart(4, '0')}.mp3`;
+            const audioFile = bucket.file(audioPath);
+            await audioFile.save(combinedAudio, { metadata: { contentType: 'audio/mpeg' } });
+
+            const audioToken = crypto.randomUUID();
+            await audioFile.setMetadata({ metadata: { firebaseStorageDownloadTokens: audioToken } });
+            const bucketName = bucket.name;
+            const audioUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(audioPath)}?alt=media&token=${audioToken}`;
+
+            // Estimate duration (rough: 150 words/min at normal speed)
+            const wordCount = chapterText.split(/\s+/).length;
+            const estimatedDuration = Math.round((wordCount / 150) * 60);
+
+            await chapterDoc.ref.update({
+              audioUrl,
+              audioStoragePath: audioPath,
+              audioDuration: estimatedDuration,
+            });
+          }
+
+          completedChapters++;
+          const progress = Math.round((completedChapters / totalChapters) * 100);
+          await bookRef.update({ audioProgress: progress });
+        }
+
+        await bookRef.update({ audioStatus: 'complete', audioProgress: 100 });
+
+        // Cleanup
+        try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
+
+        logger.info('Audio conversion complete', { bookId, chapters: totalChapters });
+      } catch (err) {
+        logger.error('Audio conversion failed', { bookId, error: String(err) });
+        await bookRef.update({ audioStatus: 'error', audioError: String(err).slice(0, 200) }).catch(() => {});
+      }
       return;
     }
 
