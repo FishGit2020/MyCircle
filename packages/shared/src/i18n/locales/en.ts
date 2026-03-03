@@ -1553,6 +1553,7 @@ const en = {
   'benchmark.results.noResults': 'Run a benchmark to see results',
   'benchmark.results.error': 'Error',
   'benchmark.results.tokens': 'tokens',
+  'benchmark.results.request': 'Request',
   'benchmark.results.response': 'Response',
   'benchmark.results.autoSaved': 'Saved to history',
   'benchmark.results.clearAll': 'Clear results',

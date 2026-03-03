@@ -1555,6 +1555,7 @@ const zh: Record<TranslationKey, string> = {
   'benchmark.results.noResults': '\u8fd0\u884c\u6d4b\u8bd5\u4ee5\u67e5\u770b\u7ed3\u679c',
   'benchmark.results.error': '\u9519\u8bef',
   'benchmark.results.tokens': 'tokens',
+  'benchmark.results.request': '\u8bf7\u6c42',
   'benchmark.results.response': '\u54cd\u5e94',
   'benchmark.results.autoSaved': '\u5df2\u4fdd\u5b58\u5230\u5386\u53f2',
   'benchmark.results.clearAll': '\u6e05\u9664\u7ed3\u679c',

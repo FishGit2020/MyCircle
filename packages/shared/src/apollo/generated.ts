@@ -841,7 +841,7 @@ export type GetBenchmarkHistoryQueryVariables = Exact<{
 }>;
 
 
-export type GetBenchmarkHistoryQuery = { __typename?: 'Query', benchmarkHistory: Array<{ __typename?: 'BenchmarkRun', id: string, createdAt: string, results: Array<{ __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, prompt: string, error?: string | null, timing?: { __typename?: 'BenchmarkTimingResult', tokensPerSecond: number, promptTokensPerSecond: number, timeToFirstToken: number, totalDuration: number } | null }> }> };
+export type GetBenchmarkHistoryQuery = { __typename?: 'Query', benchmarkHistory: Array<{ __typename?: 'BenchmarkRun', id: string, createdAt: string, results: Array<{ __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, prompt: string, response: string, error?: string | null, timing?: { __typename?: 'BenchmarkTimingResult', tokensPerSecond: number, promptTokensPerSecond: number, timeToFirstToken: number, totalDuration: number } | null }> }> };
 
 export type DeleteBenchmarkRunMutationVariables = Exact<{
   id: Scalars['String']['input'];
