@@ -52,16 +52,14 @@ export default function BenchmarkRunner({ onResults }: Props) {
   }, [fetchModelsQuery]);
 
   const toggleEndpoint = (id: string) => {
-    setSelectedEndpoints(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(e => e !== id);
-      }
-      // Discover models when checking an endpoint
-      if (!discoveredModels[id]) {
-        discoverModels(id);
-      }
-      return [...prev, id];
-    });
+    const isRemoving = selectedEndpoints.includes(id);
+    setSelectedEndpoints(prev =>
+      prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
+    );
+    // Discover models when checking (not unchecking) an endpoint
+    if (!isRemoving && !discoveredModels[id]) {
+      discoverModels(id);
+    }
   };
 
   const handleModelChange = (endpointId: string, model: string) => {
