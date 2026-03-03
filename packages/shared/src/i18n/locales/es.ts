@@ -16,7 +16,7 @@ const es: Record<TranslationKey, string> = {
   'nav.group.faith': 'Fe',
   'nav.group.family': 'Familia',
   'nav.group.learning': 'Aprendizaje',
-  'nav.group.tools': 'Herramientas',
+  'nav.group.workspace': 'Espacio de trabajo',
 
   // Home page
   'home.title': 'Bienvenido a MyCircle',

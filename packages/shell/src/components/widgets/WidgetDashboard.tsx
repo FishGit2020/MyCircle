@@ -1172,13 +1172,13 @@ export default function WidgetDashboard() {
         </div>
       ) : (
         /* Normal mode: only visible widgets with data in a responsive grid */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
           {visibleWidgets.map(widget => {
             const WidgetComponent = WIDGET_COMPONENTS[widget.id];
             const routeDef = WIDGET_ROUTES[widget.id];
             const to = typeof routeDef === 'function' ? routeDef({ favoriteCities }) : routeDef;
             const size = widget.size || 'medium';
-            const spanClass = size === 'large' ? 'sm:col-span-2' : size === 'small' ? 'col-span-1' : '';
+            const spanClass = size === 'large' ? 'col-span-2' : size === 'small' ? 'col-span-1' : 'col-span-2 lg:col-span-1';
             return (
               <Link
                 key={widget.id}

@@ -103,17 +103,17 @@ const NAV_GROUPS: NavGroup[] = [
   { labelKey: 'nav.group.family', items: [
     { path: '/baby',      labelKey: 'nav.baby',     icon: 'baby' },
     { path: '/child-dev', labelKey: 'nav.childDev', icon: 'child-dev' },
+    { path: '/immigration', labelKey: 'nav.immigration', icon: 'immigration' },
   ]},
   { labelKey: 'nav.group.learning', items: [
     { path: '/flashcards', labelKey: 'nav.flashcards', icon: 'flashcards' },
+    { path: '/ai',       labelKey: 'nav.ai',      icon: 'ai' },
+    { path: '/benchmark', labelKey: 'nav.benchmark', icon: 'benchmark' },
   ]},
-  { labelKey: 'nav.group.tools', items: [
+  { labelKey: 'nav.group.workspace', items: [
     { path: '/notebook', labelKey: 'nav.notebook', icon: 'notebook' },
     { path: '/files', labelKey: 'nav.cloudFiles', icon: 'cloud-files' },
     { path: '/work-tracker', labelKey: 'nav.workTracker', icon: 'work-tracker' },
-    { path: '/ai',       labelKey: 'nav.ai',      icon: 'ai' },
-    { path: '/benchmark', labelKey: 'nav.benchmark', icon: 'benchmark' },
-    { path: '/immigration', labelKey: 'nav.immigration', icon: 'immigration' },
   ]},
 ];
 

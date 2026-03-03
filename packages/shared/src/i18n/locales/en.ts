@@ -14,7 +14,7 @@ const en = {
   'nav.group.faith': 'Faith',
   'nav.group.family': 'Family',
   'nav.group.learning': 'Learning',
-  'nav.group.tools': 'Tools',
+  'nav.group.workspace': 'Workspace',
 
   // Home page
   'home.title': 'Welcome to MyCircle',

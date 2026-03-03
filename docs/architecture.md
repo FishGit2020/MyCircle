@@ -111,7 +111,7 @@ The orchestrator that loads and composes all remote micro frontends.
 
 **Responsibilities:**
 - Application routing (React Router v7)
-- Layout: sticky header with grouped nav dropdowns (Daily, Faith, Family, Learning, Tools), toggles, notifications, "What's New" button, user menu
+- Layout: sticky header with grouped nav dropdowns (Daily, Faith, Family, Learning, Workspace), toggles, notifications, "What's New" button, user menu
 - Authentication context (Firebase Auth)
 - Theme context (dark/light mode with system preference detection)
 - i18n / language selection (English, Spanish, Chinese)
