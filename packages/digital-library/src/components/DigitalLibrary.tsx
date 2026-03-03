@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation, WindowEvents, createLogger } from '@mycircle/shared';
+import BookReader from './BookReader';
 
 const logger = createLogger('DigitalLibrary');
 
@@ -211,11 +212,21 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
   );
 }
 
+interface Chapter {
+  index: number;
+  title: string;
+  href: string;
+  characterCount: number;
+  audioUrl?: string;
+}
+
 export default function DigitalLibrary() {
   const { t } = useTranslation();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUid, setCurrentUid] = useState<string | null>(null);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
 
   const fetchBooks = useCallback(async () => {
     try {
@@ -279,9 +290,40 @@ export default function DigitalLibrary() {
     }
   }, [t]);
 
-  const handleSelect = useCallback((book: Book) => {
-    window.dispatchEvent(new CustomEvent('navigate', { detail: `/library/${book.id}` }));
+  const handleSelect = useCallback(async (book: Book) => {
+    try {
+      const token = await window.__getFirebaseIdToken?.();
+      if (!token) return;
+      const apiBase = window.__digitalLibraryApiBase?.() || '';
+      const res = await fetch(`${apiBase}/digital-library-api/chapters/${book.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setChapters(data.chapters || []);
+      }
+    } catch (err) {
+      logger.error('Failed to fetch chapters', err);
+    }
+    setSelectedBook(book);
   }, []);
+
+  const handleBack = useCallback(() => {
+    setSelectedBook(null);
+    setChapters([]);
+  }, []);
+
+  if (selectedBook) {
+    return (
+      <BookReader
+        bookId={selectedBook.id}
+        epubUrl={selectedBook.epubUrl}
+        title={selectedBook.title}
+        chapters={chapters}
+        onBack={handleBack}
+      />
+    );
+  }
 
   return (
     <div className="pb-20 md:pb-8">

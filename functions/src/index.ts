@@ -1948,6 +1948,16 @@ export const digitalLibrary = onRequest(
       return;
     }
 
+    // GET /digital-library-api/chapters/:bookId
+    if (req.method === 'GET' && route.startsWith('chapters/')) {
+      const bookId = route.replace('chapters/', '');
+      if (!bookId) { res.status(400).json({ error: 'bookId required' }); return; }
+      const snapshot = await db.collection('books').doc(bookId).collection('chapters').orderBy('index').get();
+      const chapters = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      res.json({ chapters });
+      return;
+    }
+
     // POST /digital-library-api/delete
     if (req.method === 'POST' && route === 'delete') {
       const { bookId } = req.body;
