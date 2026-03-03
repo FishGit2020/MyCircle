@@ -444,6 +444,9 @@ export const GET_AI_RECENT_LOGS = gql`
       }
       questionPreview
       answerPreview
+      fullQuestion
+      fullAnswer
+      endpointId
       status
       error
     }

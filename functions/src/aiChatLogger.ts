@@ -21,6 +21,12 @@ export interface AiChatLogEntry {
   status: 'success' | 'error';
   error?: string;
   usedFallback: boolean;
+  /** Full untruncated user message */
+  fullQuestion?: string;
+  /** Full untruncated AI response */
+  fullAnswer?: string;
+  /** Endpoint ID for correlating with benchmark data */
+  endpointId?: string;
 }
 
 /** Truncate text to a maximum length, adding ellipsis if truncated. */
@@ -40,6 +46,8 @@ export function logAiChatInteraction(entry: AiChatLogEntry): void {
       ...entry,
       questionPreview: truncate(entry.questionPreview, 200),
       answerPreview: truncate(entry.answerPreview, 500),
+      fullQuestion: truncate(entry.fullQuestion || '', 5000),
+      fullAnswer: truncate(entry.fullAnswer || '', 10000),
       timestamp: FieldValue.serverTimestamp(),
     }).catch((err) => {
       logger.warn('Failed to log AI chat interaction', { error: String(err) });

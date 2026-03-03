@@ -517,6 +517,9 @@ const en = {
   'ai.monitor.question': 'Question',
   'ai.monitor.answer': 'Answer',
   'ai.monitor.last7days': 'Last 7 days',
+  'ai.monitor.endpoint': 'Endpoint',
+  'ai.monitor.showRaw': 'Show full',
+  'ai.monitor.showPreview': 'Show preview',
 
   // Feedback
   'feedback.button': 'Feedback',

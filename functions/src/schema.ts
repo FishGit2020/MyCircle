@@ -313,6 +313,9 @@ export const typeDefs = `#graphql
     toolCalls: [AiToolCallLog!]!
     questionPreview: String!
     answerPreview: String!
+    fullQuestion: String
+    fullAnswer: String
+    endpointId: String
     status: String!
     error: String
   }

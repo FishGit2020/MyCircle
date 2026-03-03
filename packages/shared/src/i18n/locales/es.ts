@@ -519,6 +519,9 @@ const es: Record<TranslationKey, string> = {
   'ai.monitor.question': 'Pregunta',
   'ai.monitor.answer': 'Respuesta',
   'ai.monitor.last7days': '\u00daltimos 7 d\u00edas',
+  'ai.monitor.endpoint': 'Endpoint',
+  'ai.monitor.showRaw': 'Ver completo',
+  'ai.monitor.showPreview': 'Ver resumen',
 
   // Feedback
   'feedback.button': 'Comentarios',
