@@ -35,7 +35,7 @@ export default function BenchmarkRunner({ onResults }: Props) {
   const discoverModels = useCallback(async (endpointId: string) => {
     setDiscoveryLoading(prev => ({ ...prev, [endpointId]: true }));
     try {
-      const { data } = await fetchModelsQuery({ variables: { endpointId } });
+      const { data } = await fetchModelsQuery({ variables: { endpointId }, fetchPolicy: 'network-only' });
       const models: string[] = data?.benchmarkEndpointModels ?? [];
       setDiscoveredModels(prev => ({ ...prev, [endpointId]: models }));
       // Auto-select first model if current selection is not valid

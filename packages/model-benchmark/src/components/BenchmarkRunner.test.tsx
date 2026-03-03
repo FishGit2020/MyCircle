@@ -108,6 +108,6 @@ describe('BenchmarkRunner', () => {
     const checkboxes = screen.getAllByRole('checkbox');
     await user.click(checkboxes[0]);
 
-    expect(mockFetchModels).toHaveBeenCalledWith({ variables: { endpointId: '1' } });
+    expect(mockFetchModels).toHaveBeenCalledWith({ variables: { endpointId: '1' }, fetchPolicy: 'network-only' });
   });
 });
