@@ -3,6 +3,8 @@ import { useTranslation, createLogger } from '@mycircle/shared';
 import TableOfContents from './TableOfContents';
 import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
+import ConversionStatus from './ConversionStatus';
+import AudioPlayer from './AudioPlayer';
 
 const logger = createLogger('BookReader');
 
@@ -19,10 +21,12 @@ interface BookReaderProps {
   epubUrl: string;
   title: string;
   chapters: Chapter[];
+  audioStatus: 'none' | 'processing' | 'complete' | 'error';
+  audioProgress: number;
   onBack: () => void;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, onBack }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, audioStatus, audioProgress, onBack }: BookReaderProps) {
   const { t } = useTranslation();
   const viewerRef = useRef<HTMLDivElement>(null);
   const renditionRef = useRef<any>(null);
@@ -32,6 +36,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, onBack }:
   const [tocOpen, setTocOpen] = useState(false);
   const [ttsText, setTtsText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showAudioPlayer, setShowAudioPlayer] = useState(audioStatus === 'complete');
 
   // Initialize EPUB renderer
   useEffect(() => {
@@ -212,6 +217,29 @@ export default function BookReader({ bookId, epubUrl, title, chapters, onBack }:
           totalChapters={chapters.length}
         />
         <BrowserTTS text={ttsText} />
+        <ConversionStatus
+          bookId={bookId}
+          initialStatus={audioStatus}
+          initialProgress={audioProgress}
+          onComplete={() => setShowAudioPlayer(true)}
+          onConvert={async () => {
+            try {
+              const token = await window.__getFirebaseIdToken?.();
+              if (!token) return;
+              const apiBase = window.__digitalLibraryApiBase?.() || '';
+              await fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ bookId }),
+              });
+            } catch (err) {
+              logger.error('Failed to start conversion', err);
+            }
+          }}
+        />
+        {showAudioPlayer && (
+          <AudioPlayer chapters={chapters} bookTitle={title} />
+        )}
       </div>
     </div>
   );

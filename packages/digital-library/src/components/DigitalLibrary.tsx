@@ -320,6 +320,8 @@ export default function DigitalLibrary() {
         epubUrl={selectedBook.epubUrl}
         title={selectedBook.title}
         chapters={chapters}
+        audioStatus={selectedBook.audioStatus}
+        audioProgress={selectedBook.audioProgress}
         onBack={handleBack}
       />
     );
