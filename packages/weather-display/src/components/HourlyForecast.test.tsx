@@ -8,7 +8,7 @@ vi.mock('@mycircle/shared', () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
         'weather.now': 'Now',
-        'weather.hourlyForecast': 'Hourly Forecast',
+        'weather.hourlyForecast': '3-Hour Forecast',
       };
       return map[key] ?? key;
     },
@@ -61,7 +61,7 @@ describe('HourlyForecast', () => {
 
   it('has scrollable region with accessible label', () => {
     render(<HourlyForecast data={mockHourly} />);
-    expect(screen.getByRole('region', { name: 'Hourly Forecast' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '3-Hour Forecast' })).toBeInTheDocument();
   });
 
   it('limits display to 24 hours even with more data', () => {
