@@ -440,12 +440,15 @@ curl http://localhost:11434/api/tags   # verify it works
 
 With Metal GPU, you can run larger models than in Docker:
 
-| Model | RAM needed | Viable on M3 Pro 18GB? |
-|-------|-----------|----------------------|
-| `qwen3:4b` | ~2.5 GB | Yes, fast |
-| `llama3.1:8b` | ~4.7 GB | Yes, good speed |
-| `qwen3:14b` | ~9 GB | Yes, usable |
-| `gemma3:27b` | ~16 GB | Tight but possible |
+| Model | RAM needed | Viable on M3 Pro 18GB? | Tool calling |
+|-------|-----------|----------------------|--------------|
+| `qwen3:4b` | ~2.5 GB | Yes, fast | Yes |
+| `qwen3:8b` | ~6.5 GB | Yes, recommended | Yes |
+| `llama3.1:8b` | ~4.7 GB | Yes, good speed | Yes |
+| `gemma3:12b` | ~12.4 GB | Yes, but slower | No |
+| `qwen3:14b` | ~9 GB | Yes, usable | Yes |
+| `gemma3:27b` | ~16 GB | No — macOS needs ~4GB overhead, will swap | No |
+| `qwen3:32b` | ~22 GB | No — needs 32GB+ Mac | Yes |
 
 #### Step 3: Start the tunnel
 
