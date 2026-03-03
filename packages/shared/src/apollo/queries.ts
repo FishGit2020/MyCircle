@@ -454,8 +454,8 @@ export const GET_AI_RECENT_LOGS = gql`
 `;
 
 export const AI_CHAT = gql`
-  mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON, $model: String, $endpointId: ID) {
-    aiChat(message: $message, history: $history, context: $context, model: $model, endpointId: $endpointId) {
+  mutation AiChat($message: String!, $history: [AiChatHistoryInput!], $context: JSON, $model: String, $endpointId: ID, $toolMode: String) {
+    aiChat(message: $message, history: $history, context: $context, model: $model, endpointId: $endpointId, toolMode: $toolMode) {
       response
       toolCalls {
         name
@@ -466,6 +466,7 @@ export const AI_CHAT = gql`
         type
         payload
       }
+      toolMode
     }
   }
 `;

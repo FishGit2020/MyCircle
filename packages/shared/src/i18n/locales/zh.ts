@@ -458,6 +458,8 @@ const zh: Record<TranslationKey, string> = {
   'ai.modelLabel': '\u6a21\u578b',
   'ai.endpointLabel': '\u7aef\u70b9',
   'ai.debugToggle': '\u8c03\u8bd5\u6a21\u5f0f',
+  'ai.toolModeNative': '\u5de5\u5177',
+  'ai.toolModeMcp': 'MCP',
   'ai.debugArgs': '\u53c2\u6570',
   'ai.debugResult': '\u7ed3\u679c',
   'ai.debugNoResult': '\u65e0\u8fd4\u56de\u7ed3\u679c',

@@ -458,6 +458,8 @@ const es: Record<TranslationKey, string> = {
   'ai.modelLabel': 'Modelo',
   'ai.endpointLabel': 'Punto de conexi\u00f3n',
   'ai.debugToggle': 'Modo depuraci\u00f3n',
+  'ai.toolModeNative': 'Herramientas',
+  'ai.toolModeMcp': 'MCP',
   'ai.debugArgs': 'Argumentos',
   'ai.debugResult': 'Resultado',
   'ai.debugNoResult': 'Sin resultado',

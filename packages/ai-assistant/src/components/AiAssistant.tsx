@@ -26,6 +26,7 @@ const SUGGESTION_KEYS = [
 const DEBUG_STORAGE_KEY = 'ai-debug-mode';
 const MODEL_STORAGE_KEY = 'mycircle-ai-model';
 const ENDPOINT_STORAGE_KEY = 'mycircle-ai-endpoint';
+const TOOL_MODE_STORAGE_KEY = 'mycircle-ai-tool-mode';
 
 export default function AiAssistant() {
   const { t } = useTranslation();
@@ -108,12 +109,21 @@ export default function AiAssistant() {
     try { return localStorage.getItem(DEBUG_STORAGE_KEY) === 'true'; } catch { return false; }
   });
 
+  const [toolMode, setToolMode] = useState<'native' | 'mcp'>(() => {
+    try { return (localStorage.getItem(TOOL_MODE_STORAGE_KEY) as 'native' | 'mcp') || 'native'; } catch { return 'native'; }
+  });
+
   const toggleDebug = useCallback(() => {
     setDebugMode(prev => {
       const next = !prev;
       try { localStorage.setItem(DEBUG_STORAGE_KEY, String(next)); } catch { /* */ }
       return next;
     });
+  }, []);
+
+  const handleToolModeChange = useCallback((mode: 'native' | 'mcp') => {
+    setToolMode(mode);
+    try { localStorage.setItem(TOOL_MODE_STORAGE_KEY, mode); } catch { /* */ }
   }, []);
 
   useEffect(() => {
@@ -166,6 +176,27 @@ export default function AiAssistant() {
                 </>
               )}
             </>
+          )}
+          {/* Tool mode toggle (Native / MCP) */}
+          {activeTab === 'chat' && endpoints.length > 0 && (
+            <div className="flex items-center gap-0.5 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => handleToolModeChange('native')}
+                className={`text-xs px-2 py-1 transition-colors ${toolMode === 'native' ? 'bg-blue-500 text-white' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                title={t('ai.toolModeNative')}
+              >
+                {t('ai.toolModeNative')}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToolModeChange('mcp')}
+                className={`text-xs px-2 py-1 transition-colors ${toolMode === 'mcp' ? 'bg-purple-500 text-white' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                title={t('ai.toolModeMcp')}
+              >
+                MCP
+              </button>
+            </div>
           )}
           {/* Debug toggle */}
           {activeTab === 'chat' && (
