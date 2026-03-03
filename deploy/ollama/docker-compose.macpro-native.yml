@@ -11,7 +11,11 @@
 #
 # Prerequisites:
 #   1. Install Ollama natively:  brew install ollama
-#   2. Start the server:         ollama serve
+#   2. Bind to all interfaces so Docker can reach it:
+#        export OLLAMA_HOST=0.0.0.0
+#      Or for brew services:
+#        launchctl setenv OLLAMA_HOST 0.0.0.0
+#        brew services start ollama
 #   3. Pull a model:             ollama pull qwen3:4b
 #   4. Verify it works:          curl http://localhost:11434/api/tags
 #
@@ -37,4 +41,4 @@ services:
     container_name: cloudflared
     restart: unless-stopped
     # Points to your Mac's native Ollama via Docker's host gateway
-    command: tunnel --url http://host.docker.internal:11434
+    command: tunnel --protocol http2 --url http://host.docker.internal:11434

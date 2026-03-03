@@ -418,7 +418,17 @@ Browser → Cloudflare CDN → trycloudflare.com tunnel
 
 ```bash
 brew install ollama
-ollama serve
+```
+
+**Important**: Ollama defaults to binding on `127.0.0.1`, but Docker's `host.docker.internal` connects from the VM network — not localhost. You must set `OLLAMA_HOST=0.0.0.0` so Ollama listens on all interfaces:
+
+```bash
+# Option A: manual start
+OLLAMA_HOST=0.0.0.0 ollama serve
+
+# Option B: brew services (persistent across reboots)
+launchctl setenv OLLAMA_HOST 0.0.0.0
+brew services start ollama
 ```
 
 #### Step 2: Pull a model (in a new terminal)
@@ -444,6 +454,8 @@ cd deploy/ollama
 docker compose -f docker-compose.macpro-native.yml up -d
 docker logs cloudflared 2>&1 | grep "trycloudflare.com"
 ```
+
+> **Note**: The compose file uses `--protocol http2` because the default QUIC protocol can cause timeout errors on some networks.
 
 #### Step 4: Add the endpoint in MyCircle
 
