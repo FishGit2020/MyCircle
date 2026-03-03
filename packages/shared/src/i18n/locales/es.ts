@@ -810,6 +810,7 @@ const es: Record<TranslationKey, string> = {
   'map.exitFullscreen': 'Salir de pantalla completa',
   'map.waitingForLocation': 'Esperando ubicaci\u00f3n...',
   'map.loading': 'Cargando mapa...',
+  'map.showMap': 'Mostrar mapa interactivo',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'Alerta UV',
@@ -826,6 +827,9 @@ const es: Record<TranslationKey, string> = {
   'compare.searchCity': 'Buscar una ciudad para comparar',
   'compare.addCity': 'Agregar ciudad',
   'compare.compareButton': 'Comparar',
+  'compare.ctaTitle': 'Compara tus ciudades',
+  'compare.ctaDesc': 'Clima lado a lado para {{cityA}} y {{cityB}}',
+  'compare.compareLink': 'Comparar',
 
   // What to Wear comfort labels
   'wear.comfortExtremeCold': 'Fr\u00edo extremo \u2014 \u00a1abr\u00edgate bien!',

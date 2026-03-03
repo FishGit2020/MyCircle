@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import WeatherMap from './WeatherMap';
 
 vi.mock('@mycircle/shared', () => {
@@ -16,6 +16,7 @@ vi.mock('@mycircle/shared', () => {
       'map.exitFullscreen': 'Exit fullscreen',
       'map.waitingForLocation': 'Waiting for location...',
       'map.loading': 'Loading map...',
+      'map.showMap': 'Show Interactive Map',
     };
     return map[key] ?? key;
   };
@@ -24,32 +25,9 @@ vi.mock('@mycircle/shared', () => {
   };
 });
 
-// Class-based IntersectionObserver mock (vi.fn arrow fns can't be called with `new`)
-let intersectionCallback: IntersectionObserverCallback;
-const mockObserve = vi.fn();
-const mockDisconnect = vi.fn();
-
 beforeEach(() => {
   vi.clearAllMocks();
-  class TestIntersectionObserver {
-    constructor(cb: IntersectionObserverCallback) {
-      intersectionCallback = cb;
-    }
-    observe = mockObserve;
-    unobserve = vi.fn();
-    disconnect = mockDisconnect;
-  }
-  global.IntersectionObserver = TestIntersectionObserver as any;
 });
-
-function simulateIntersection(isIntersecting: boolean) {
-  act(() => {
-    intersectionCallback(
-      [{ isIntersecting } as IntersectionObserverEntry],
-      {} as IntersectionObserver
-    );
-  });
-}
 
 describe('WeatherMap', () => {
   it('renders the map title', () => {
@@ -58,35 +36,25 @@ describe('WeatherMap', () => {
     expect(screen.getByText('Weather Map')).toBeInTheDocument();
   });
 
-  it('shows skeleton placeholder before intersection', () => {
+  it('shows click-to-load placeholder before loading', () => {
     render(<WeatherMap lat={40.7} lon={-74.0} />);
 
-    // Before intersection, should show skeleton, not iframe
-    expect(screen.getByTestId('map-skeleton')).toBeInTheDocument();
-    expect(screen.getByText('Loading map...')).toBeInTheDocument();
+    expect(screen.getByTestId('map-placeholder')).toBeInTheDocument();
+    expect(screen.getByText('Show Interactive Map')).toBeInTheDocument();
     expect(document.querySelector('iframe')).not.toBeInTheDocument();
   });
 
-  it('renders iframe after intersection', () => {
+  it('renders iframe after clicking Show Interactive Map', () => {
     render(<WeatherMap lat={40.7} lon={-74.0} />);
 
-    // Simulate scroll into view
-    simulateIntersection(true);
+    fireEvent.click(screen.getByText('Show Interactive Map'));
 
     const iframe = document.querySelector('iframe');
     expect(iframe).toBeInTheDocument();
     expect(iframe?.getAttribute('title')).toBe('Weather map - temp');
     expect(iframe?.getAttribute('src')).toContain('lat=40.7');
     expect(iframe?.getAttribute('src')).toContain('lon=-74');
-    expect(screen.queryByTestId('map-skeleton')).not.toBeInTheDocument();
-  });
-
-  it('disconnects observer after intersection', () => {
-    render(<WeatherMap lat={40.7} lon={-74.0} />);
-
-    simulateIntersection(true);
-
-    expect(mockDisconnect).toHaveBeenCalled();
+    expect(screen.queryByTestId('map-placeholder')).not.toBeInTheDocument();
   });
 
   it('shows waiting message when coordinates are 0,0', () => {
@@ -100,8 +68,8 @@ describe('WeatherMap', () => {
     render(<WeatherMap lat={0} lon={-74.0} />);
 
     // hasCoords is true when lat !== 0 || lon !== 0
-    // Should show skeleton (not waiting message)
-    expect(screen.getByTestId('map-skeleton')).toBeInTheDocument();
+    // Should show placeholder (not waiting message)
+    expect(screen.getByTestId('map-placeholder')).toBeInTheDocument();
   });
 
   it('renders layer selection buttons', () => {
@@ -117,10 +85,9 @@ describe('WeatherMap', () => {
   it('switches layer when a layer button is clicked', () => {
     render(<WeatherMap lat={40.7} lon={-74.0} />);
 
-    simulateIntersection(true);
-
-    // Click the Rain layer button
+    // Click Rain layer, then load the map
     fireEvent.click(screen.getByTitle('Rain'));
+    fireEvent.click(screen.getByText('Show Interactive Map'));
 
     const iframe = document.querySelector('iframe');
     expect(iframe?.getAttribute('src')).toContain('precipitation_new');
@@ -194,9 +161,31 @@ describe('WeatherMap', () => {
     expect(screen.getByText('40.70, -74.00')).toBeInTheDocument();
   });
 
-  it('renders fullscreen toggle button', () => {
+  it('shows fullscreen toggle after map is loaded', () => {
     render(<WeatherMap lat={40.7} lon={-74.0} />);
 
+    // Fullscreen toggle is hidden before loading
+    expect(screen.queryByLabelText('Fullscreen')).not.toBeInTheDocument();
+
+    // Load the map
+    fireEvent.click(screen.getByText('Show Interactive Map'));
+
     expect(screen.getByLabelText('Fullscreen')).toBeInTheDocument();
+  });
+
+  it('shows selected layer and zoom in placeholder', () => {
+    render(<WeatherMap lat={40.7} lon={-74.0} />);
+
+    // Placeholder shows current layer and zoom as combined text
+    const placeholder = screen.getByTestId('map-placeholder');
+    expect(placeholder.textContent).toContain('Temperature');
+    expect(placeholder.textContent).toContain('6x');
+
+    // Change layer and zoom
+    fireEvent.click(screen.getByTitle('Wind'));
+    fireEvent.click(screen.getByLabelText('Zoom in'));
+
+    expect(placeholder.textContent).toContain('Wind');
+    expect(placeholder.textContent).toContain('7x');
   });
 });

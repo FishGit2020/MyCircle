@@ -810,6 +810,7 @@ const zh: Record<TranslationKey, string> = {
   'map.exitFullscreen': '\u9000\u51fa\u5168\u5c4f',
   'map.waitingForLocation': '\u7b49\u5f85\u4f4d\u7f6e\u4fe1\u606f...',
   'map.loading': '\u52a0\u8f7d\u5730\u56fe...',
+  'map.showMap': '\u663e\u793a\u4ea4\u4e92\u5730\u56fe',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': '\u7d2b\u5916\u7ebf\u8b66\u62a5',
@@ -826,6 +827,9 @@ const zh: Record<TranslationKey, string> = {
   'compare.searchCity': '\u641c\u7d22\u57ce\u5e02\u8fdb\u884c\u5bf9\u6bd4',
   'compare.addCity': '\u6dfb\u52a0\u57ce\u5e02',
   'compare.compareButton': '\u5bf9\u6bd4',
+  'compare.ctaTitle': '\u6bd4\u8f83\u4f60\u7684\u57ce\u5e02',
+  'compare.ctaDesc': '{{cityA}}\u548c{{cityB}}\u7684\u5929\u6c14\u5bf9\u6bd4',
+  'compare.compareLink': '\u6bd4\u8f83',
 
   // What to Wear comfort labels
   'wear.comfortExtremeCold': '\u6781\u5bd2\u2014\u2014\u6ce8\u610f\u4fdd\u6696\uff01',
