@@ -1398,6 +1398,26 @@ if (firebaseEnabled) {
   };
 }
 
+// Benchmark summary — fetch latest run for dashboard widget
+export async function getBenchmarkSummary(uid: string): Promise<{ lastRunAt?: string; fastestEndpoint?: string; fastestTps?: number } | null> {
+  if (!db) return null;
+  const q = query(collection(db, 'users', uid, 'benchmarkRuns'), orderBy('createdAt', 'desc'), limit(1));
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return null;
+  const lastRun = snapshot.docs[0].data();
+  const results: any[] = lastRun.results || [];
+  let fastestEndpoint: string | null = null;
+  let fastestTps: number | null = null;
+  for (const r of results) {
+    const tps = r.timing?.tokensPerSecond || 0;
+    if (tps > (fastestTps || 0)) {
+      fastestTps = tps;
+      fastestEndpoint = r.endpointName;
+    }
+  }
+  return { lastRunAt: lastRun.createdAt, fastestEndpoint: fastestEndpoint ?? undefined, fastestTps: fastestTps ?? undefined };
+}
+
 // Expose analytics for MFEs
 window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
   logEvent(eventName, params);

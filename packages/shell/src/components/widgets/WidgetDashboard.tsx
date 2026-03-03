@@ -602,7 +602,11 @@ const WorshipWidget = React.memo(function WorshipWidget() {
     }
     load();
     window.addEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, load);
-    return () => window.removeEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, load);
+    window.addEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, load);
+    return () => {
+      window.removeEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, load);
+      window.removeEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, load);
+    };
   }, []);
 
   return (
@@ -618,11 +622,13 @@ const WorshipWidget = React.memo(function WorshipWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.worshipDesc')}</p>
         </div>
       </div>
-      {songCount > 0 ? (
+      {songCount > 0 || favCount > 0 ? (
         <div className="space-y-1">
-          <p className="text-sm text-violet-600 dark:text-violet-400 font-medium">
-            {t('widgets.worshipSongCount').replace('{count}', String(songCount))}
-          </p>
+          {songCount > 0 && (
+            <p className="text-sm text-violet-600 dark:text-violet-400 font-medium">
+              {t('widgets.worshipSongCount').replace('{count}', String(songCount))}
+            </p>
+          )}
           {favCount > 0 && (
             <p className="text-xs text-violet-500 dark:text-violet-400/70">
               {t('widgets.worshipFavCount').replace('{count}', String(favCount))}
