@@ -80,7 +80,7 @@ export default function AiAssistant() {
   // Fetch models when selected endpoint changes
   useEffect(() => {
     if (selectedEndpoint) {
-      fetchModels({ variables: { endpointId: selectedEndpoint } });
+      fetchModels({ variables: { endpointId: selectedEndpoint }, fetchPolicy: 'network-only' });
     }
   }, [selectedEndpoint, fetchModels]);
 
