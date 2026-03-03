@@ -55,9 +55,9 @@ export const getCryptoPricesTool: ToolDef = {
 
 export const navigateToTool: ToolDef = {
   name: 'navigateTo',
-  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, ai.',
+  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai.',
   parameters: z.object({
-    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "compare", "bible", "worship", "notebook", "flashcards", "baby", "ai"'),
+    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "compare", "bible", "worship", "notebook", "flashcards", "baby", "child-dev", "work-tracker", "files", "benchmark", "immigration", "ai"'),
   }),
   category: 'navigation',
   isFrontendAction: true,
@@ -117,6 +117,70 @@ export const listFlashcardsTool: ToolDef = {
   isFrontendAction: true,
 };
 
+export const checkCaseStatusTool: ToolDef = {
+  name: 'checkCaseStatus',
+  description: 'Check the status of a USCIS immigration case by receipt number. Returns the current status, form type, and description.',
+  parameters: z.object({
+    receiptNumber: z.string().describe('USCIS receipt number (e.g., "MSC2190012345")'),
+  }),
+  category: 'immigration',
+};
+
+export const addNoteTool: ToolDef = {
+  name: 'addNote',
+  description: 'Create a new note in the user\'s notebook. Returns an action for the frontend to execute.',
+  parameters: z.object({
+    title: z.string().describe('Note title'),
+    content: z.string().describe('Note content (supports markdown)'),
+  }),
+  category: 'notebook',
+  isFrontendAction: true,
+};
+
+export const addWorkEntryTool: ToolDef = {
+  name: 'addWorkEntry',
+  description: 'Add a work time entry for the user. Returns an action for the frontend to execute.',
+  parameters: z.object({
+    date: z.string().describe('Date for the entry (YYYY-MM-DD format)'),
+    content: z.string().describe('Description of work done'),
+  }),
+  category: 'work-tracker',
+  isFrontendAction: true,
+};
+
+export const setBabyDueDateTool: ToolDef = {
+  name: 'setBabyDueDate',
+  description: 'Set or update the baby due date. Returns an action for the frontend to execute.',
+  parameters: z.object({
+    dueDate: z.string().describe('Due date in YYYY-MM-DD format'),
+  }),
+  category: 'baby-tracker',
+  isFrontendAction: true,
+};
+
+export const addChildMilestoneTool: ToolDef = {
+  name: 'addChildMilestone',
+  description: 'Record a child development milestone. Returns an action for the frontend to execute.',
+  parameters: z.object({
+    milestone: z.string().describe('Description of the milestone achieved'),
+    date: z.string().optional().describe('Date achieved (YYYY-MM-DD), defaults to today'),
+  }),
+  category: 'child-development',
+  isFrontendAction: true,
+};
+
+export const addImmigrationCaseTool: ToolDef = {
+  name: 'addImmigrationCase',
+  description: 'Add a USCIS immigration case to track. Returns an action for the frontend to execute.',
+  parameters: z.object({
+    receiptNumber: z.string().describe('USCIS receipt number (e.g., "MSC2190012345")'),
+    formType: z.string().optional().describe('Form type (e.g., "I-485", "I-140")'),
+    nickname: z.string().optional().describe('A friendly name for this case'),
+  }),
+  category: 'immigration',
+  isFrontendAction: true,
+};
+
 // ─── All tools registry ───────────────────────────────────────
 
 export const ALL_TOOLS: ToolDef[] = [
@@ -130,6 +194,12 @@ export const ALL_TOOLS: ToolDef[] = [
   searchPodcastsTool,
   addBookmarkTool,
   listFlashcardsTool,
+  checkCaseStatusTool,
+  addNoteTool,
+  addWorkEntryTool,
+  setBabyDueDateTool,
+  addChildMilestoneTool,
+  addImmigrationCaseTool,
 ];
 
 /** Tools that execute on the backend (return data) */

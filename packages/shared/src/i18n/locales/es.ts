@@ -469,6 +469,17 @@ const es: Record<TranslationKey, string> = {
   'ai.voiceInput': 'Entrada de voz',
   'ai.voiceListening': 'Escuchando...',
   'ai.voiceNotSupported': 'La entrada de voz no es compatible con este navegador',
+  'ai.toolCheckCase': 'Estado del caso',
+  'ai.toolAddNote': 'Agregar nota',
+  'ai.toolAddWorkEntry': 'Agregar entrada de trabajo',
+  'ai.toolSetDueDate': 'Establecer fecha de parto',
+  'ai.toolAddMilestone': 'Agregar hito',
+  'ai.toolAddCase': 'Agregar caso',
+  'ai.suggestNote': 'Crea una nota sobre puntos de la reuni\u00f3n',
+  'ai.suggestWorkEntry': 'Registra mis horas de trabajo de hoy',
+  'ai.suggestBaby': '\u00bfCu\u00e1ndo es la fecha de parto de mi beb\u00e9?',
+  'ai.suggestImmigration': 'Revisa el estado de mi caso USCIS',
+  'ai.suggestChildDev': 'Registra un nuevo hito de mi hijo',
 
   // AI Monitor
   'ai.tabChat': 'Chat',

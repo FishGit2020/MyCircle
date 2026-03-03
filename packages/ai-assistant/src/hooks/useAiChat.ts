@@ -71,6 +71,44 @@ function gatherUserContext(): Record<string, unknown> {
       }
     }
 
+    // Baby tracker
+    const babyDueDate = localStorage.getItem('baby-due-date');
+    if (babyDueDate) ctx.babyDueDate = babyDueDate;
+
+    // Child development
+    const childName = localStorage.getItem('child-name');
+    if (childName) ctx.childName = childName;
+    const childBirthDate = localStorage.getItem('child-birth-date');
+    if (childBirthDate) ctx.childBirthDate = childBirthDate;
+    const milestones = localStorage.getItem('child-milestones');
+    if (milestones) {
+      try { const parsed = JSON.parse(milestones); if (Array.isArray(parsed)) ctx.childMilestonesCount = parsed.length; } catch { /* */ }
+    }
+
+    // Worship favorites
+    const worshipFavs = localStorage.getItem('worship-favorites');
+    if (worshipFavs) {
+      try { const parsed = JSON.parse(worshipFavs); if (Array.isArray(parsed)) ctx.worshipFavoritesCount = parsed.length; } catch { /* */ }
+    }
+
+    // Cloud files
+    const cloudFiles = localStorage.getItem('cloud-files-cache');
+    if (cloudFiles) {
+      try { const parsed = JSON.parse(cloudFiles); if (Array.isArray(parsed)) ctx.cloudFilesCount = parsed.length; } catch { /* */ }
+    }
+
+    // Immigration cases
+    const immCases = localStorage.getItem('immigration-cases-cache');
+    if (immCases) {
+      try { const parsed = JSON.parse(immCases); if (Array.isArray(parsed)) ctx.immigrationCasesCount = parsed.length; } catch { /* */ }
+    }
+
+    // Work entries
+    const workEntries = localStorage.getItem('work-tracker-cache');
+    if (workEntries) {
+      try { const parsed = JSON.parse(workEntries); if (Array.isArray(parsed)) ctx.workEntriesCount = parsed.length; } catch { /* */ }
+    }
+
     // User preferences
     const locale = localStorage.getItem('mycircle-locale');
     if (locale) ctx.locale = locale;
@@ -123,6 +161,29 @@ function handleActions(actions: AiAction[]) {
         break;
       case 'listFlashcards':
         window.dispatchEvent(new CustomEvent('flashcards-list', { detail: action.payload }));
+        break;
+      case 'addNote':
+        (window as any).__notebook?.add(action.payload);
+        break;
+      case 'addWorkEntry':
+        (window as any).__workTracker?.add(action.payload);
+        break;
+      case 'setBabyDueDate':
+        try {
+          localStorage.setItem('baby-due-date', action.payload.dueDate as string);
+          window.dispatchEvent(new CustomEvent('baby-due-date-changed', { detail: action.payload }));
+        } catch { /* */ }
+        break;
+      case 'addChildMilestone':
+        try {
+          const existing = JSON.parse(localStorage.getItem('child-milestones') || '[]');
+          existing.push({ milestone: action.payload.milestone, date: action.payload.date || new Date().toISOString().slice(0, 10) });
+          localStorage.setItem('child-milestones', JSON.stringify(existing));
+          window.dispatchEvent(new CustomEvent('child-milestones-changed', { detail: action.payload }));
+        } catch { /* */ }
+        break;
+      case 'addImmigrationCase':
+        (window as any).__immigrationTracker?.add(action.payload);
         break;
     }
   }

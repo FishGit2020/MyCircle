@@ -709,7 +709,11 @@ export const aiChat = onRequest(
       res.status(500).json({ error: 'No AI provider configured — add an Ollama endpoint in Settings or contact admin for Gemini' });
       return;
     }
-    const ollamaModel = model || 'gemma2:2b';
+    const ollamaModel = model || '';
+    if (ollamaBaseUrl && !ollamaModel) {
+      res.status(400).json({ error: 'Model is required — select a model before chatting' });
+      return;
+    }
 
     // Build context-aware system instruction (shared by both providers)
     let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';

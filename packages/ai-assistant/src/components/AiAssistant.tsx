@@ -16,6 +16,11 @@ const SUGGESTION_KEYS = [
   'ai.suggestFlashcard',
   'ai.suggestBible',
   'ai.suggestPodcast',
+  'ai.suggestNote',
+  'ai.suggestWorkEntry',
+  'ai.suggestBaby',
+  'ai.suggestImmigration',
+  'ai.suggestChildDev',
 ] as const;
 
 const DEBUG_STORAGE_KEY = 'ai-debug-mode';

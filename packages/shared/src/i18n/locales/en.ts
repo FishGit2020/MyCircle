@@ -467,6 +467,17 @@ const en = {
   'ai.voiceInput': 'Voice input',
   'ai.voiceListening': 'Listening...',
   'ai.voiceNotSupported': 'Voice input is not supported in this browser',
+  'ai.toolCheckCase': 'Case status',
+  'ai.toolAddNote': 'Add note',
+  'ai.toolAddWorkEntry': 'Add work entry',
+  'ai.toolSetDueDate': 'Set due date',
+  'ai.toolAddMilestone': 'Add milestone',
+  'ai.toolAddCase': 'Add case',
+  'ai.suggestNote': 'Create a note about meeting highlights',
+  'ai.suggestWorkEntry': 'Log my work hours for today',
+  'ai.suggestBaby': "When is my baby's due date?",
+  'ai.suggestImmigration': 'Check my USCIS case status',
+  'ai.suggestChildDev': 'Record a new milestone for my child',
 
   // AI Monitor
   'ai.tabChat': 'Chat',
