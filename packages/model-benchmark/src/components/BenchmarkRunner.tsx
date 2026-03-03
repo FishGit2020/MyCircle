@@ -1,17 +1,19 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation, useLazyQuery, GET_BENCHMARK_ENDPOINT_MODELS, StorageKeys } from '@mycircle/shared';
 import { useEndpoints } from '../hooks/useEndpoints';
-import { useBenchmark, BENCHMARK_PROMPTS } from '../hooks/useBenchmark';
+import { BENCHMARK_PROMPTS } from '../hooks/useBenchmark';
 import type { BenchmarkRunResult, JudgeConfig } from '../hooks/useBenchmark';
+import type { useBenchmark } from '../hooks/useBenchmark';
 
 interface Props {
   onResults: (results: BenchmarkRunResult[]) => void;
+  benchmark: ReturnType<typeof useBenchmark>;
 }
 
-export default function BenchmarkRunner({ onResults }: Props) {
+export default function BenchmarkRunner({ onResults, benchmark }: Props) {
   const { t } = useTranslation();
   const { endpoints } = useEndpoints();
-  const { running, scoring, currentEndpoint, runBenchmark, scoreResults } = useBenchmark();
+  const { running, scoring, currentEndpoint, runBenchmark, scoreResults } = benchmark;
 
   const [selectedEndpoints, setSelectedEndpoints] = useState<string[]>([]);
   const [modelMap, setModelMap] = useState<Record<string, string>>(() => {

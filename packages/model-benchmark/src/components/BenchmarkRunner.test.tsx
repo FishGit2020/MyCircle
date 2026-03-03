@@ -34,20 +34,15 @@ vi.mock('../hooks/useEndpoints', () => ({
   }),
 }));
 
-vi.mock('../hooks/useBenchmark', () => ({
-  useBenchmark: () => ({
-    running: false,
-    scoring: false,
-    currentEndpoint: null,
-    runBenchmark: vi.fn(async () => []),
-    saveRun: vi.fn(),
-    scoreResults: vi.fn(async (results: any) => results),
-  }),
-  BENCHMARK_PROMPTS: [
-    { id: 'simple', labelKey: 'benchmark.promptSimple', prompt: 'Test' },
-    { id: 'code', labelKey: 'benchmark.promptCode', prompt: 'Code test' },
-  ],
-}));
+const mockBenchmark = {
+  running: false,
+  scoring: false,
+  currentEndpoint: null,
+  results: [],
+  runBenchmark: vi.fn(async () => []),
+  saveRun: vi.fn(),
+  scoreResults: vi.fn(async (results: any) => results),
+};
 
 describe('BenchmarkRunner', () => {
   const onResults = vi.fn();
@@ -58,26 +53,26 @@ describe('BenchmarkRunner', () => {
   });
 
   it('renders endpoint checkboxes', () => {
-    render(<BenchmarkRunner onResults={onResults} />);
+    render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
     expect(screen.getByText('NAS')).toBeInTheDocument();
     expect(screen.getByText('GPU')).toBeInTheDocument();
   });
 
   it('renders prompt selection buttons', () => {
-    render(<BenchmarkRunner onResults={onResults} />);
+    render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
     expect(screen.getByText('benchmark.promptSimple')).toBeInTheDocument();
     expect(screen.getByText('benchmark.promptCode')).toBeInTheDocument();
   });
 
   it('run button is disabled when no endpoints selected', () => {
-    render(<BenchmarkRunner onResults={onResults} />);
+    render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
     const runBtn = screen.getByText('benchmark.runner.run');
     expect(runBtn).toBeDisabled();
   });
 
   it('shows per-endpoint model dropdown when endpoint is checked', async () => {
     const user = userEvent.setup();
-    render(<BenchmarkRunner onResults={onResults} />);
+    render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
 
     // Only judge dropdown before selecting endpoints
     expect(screen.queryAllByRole('combobox')).toHaveLength(1);
@@ -93,7 +88,7 @@ describe('BenchmarkRunner', () => {
 
   it('shows model dropdowns for each selected endpoint', async () => {
     const user = userEvent.setup();
-    render(<BenchmarkRunner onResults={onResults} />);
+    render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
 
     const checkboxes = screen.getAllByRole('checkbox');
     await user.click(checkboxes[0]);
@@ -106,7 +101,7 @@ describe('BenchmarkRunner', () => {
 
   it('discovers models when endpoint is checked', async () => {
     const user = userEvent.setup();
-    render(<BenchmarkRunner onResults={onResults} />);
+    render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
 
     const checkboxes = screen.getAllByRole('checkbox');
     await user.click(checkboxes[0]);

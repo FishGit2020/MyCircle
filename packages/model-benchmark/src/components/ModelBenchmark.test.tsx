@@ -20,7 +20,7 @@ vi.mock('@mycircle/shared', () => ({
 vi.mock('./BenchmarkRunner', () => ({
   default: ({ onResults }: { onResults: (r: any[]) => void }) => (
     <div data-testid="benchmark-runner">
-      <button onClick={() => onResults([])}>mock-run</button>
+      <button type="button" onClick={() => onResults([])}>mock-run</button>
     </div>
   ),
 }));
@@ -34,7 +34,15 @@ vi.mock('./BenchmarkHistory', () => ({
   default: () => <div data-testid="benchmark-history">BenchmarkHistory</div>,
 }));
 vi.mock('../hooks/useBenchmark', () => ({
-  useBenchmark: () => ({ saveRun: vi.fn() }),
+  useBenchmark: () => ({
+    running: false,
+    scoring: false,
+    currentEndpoint: null,
+    results: [],
+    runBenchmark: vi.fn(async () => []),
+    saveRun: vi.fn(),
+    scoreResults: vi.fn(async (r: any) => r),
+  }),
   BENCHMARK_PROMPTS: [],
 }));
 
@@ -57,11 +65,13 @@ describe('ModelBenchmark', () => {
     expect(screen.getByTestId('benchmark-runner')).toBeInTheDocument();
   });
 
-  it('switches to endpoints tab when clicked', async () => {
+  it('keeps runner mounted when switching to endpoints tab', async () => {
     const user = userEvent.setup();
     render(<MemoryRouter><ModelBenchmark /></MemoryRouter>);
     await user.click(screen.getByText('benchmark.tabs.endpoints'));
     expect(screen.getByTestId('endpoint-manager')).toBeInTheDocument();
+    // Runner should still be in the DOM (hidden)
+    expect(screen.getByTestId('benchmark-runner')).toBeInTheDocument();
   });
 
   it('switches to history tab when clicked', async () => {

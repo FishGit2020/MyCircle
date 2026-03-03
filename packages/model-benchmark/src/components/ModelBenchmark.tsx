@@ -29,7 +29,8 @@ export default function ModelBenchmark() {
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
-  const { saveRun } = useBenchmark();
+  const benchmark = useBenchmark();
+  const { saveRun, running, scoring } = benchmark;
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
 
@@ -58,6 +59,8 @@ export default function ModelBenchmark() {
     try { localStorage.removeItem(StorageKeys.BENCHMARK_RESULTS); } catch { /* */ }
   }, []);
 
+  const busy = running || scoring;
+
   return (
     <div className="max-w-4xl mx-auto pb-20 md:pb-8">
       <div className="mb-6">
@@ -81,6 +84,12 @@ export default function ModelBenchmark() {
             aria-selected={activeTab === tab}
           >
             {t(`benchmark.tabs.${tab}`)}
+            {tab === 'run' && busy && (
+              <svg className="inline-block w-3.5 h-3.5 ml-1.5 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
             {tab === 'results' && latestResults.length > 0 && (
               <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
                 {latestResults.length}
@@ -90,9 +99,11 @@ export default function ModelBenchmark() {
         ))}
       </div>
 
-      {/* Tab Content */}
+      {/* Tab Content — Runner stays mounted (hidden) to preserve state during benchmark */}
       <div>
-        {activeTab === 'run' && <BenchmarkRunner onResults={handleResults} />}
+        <div className={activeTab === 'run' ? '' : 'hidden'}>
+          <BenchmarkRunner onResults={handleResults} benchmark={benchmark} />
+        </div>
         {activeTab === 'endpoints' && <EndpointManager />}
         {activeTab === 'results' && <ResultsDashboard results={latestResults} saved={saved} saveError={saveError} onClear={handleClearResults} />}
         {activeTab === 'history' && <BenchmarkHistory />}
