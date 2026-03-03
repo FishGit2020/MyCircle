@@ -50,6 +50,7 @@ export type AiChatResponse = {
   actions?: Maybe<Array<AiAction>>;
   response: Scalars['String']['output'];
   toolCalls?: Maybe<Array<ToolCallResult>>;
+  toolMode?: Maybe<Scalars['String']['output']>;
 };
 
 export type AiDailyStats = {
@@ -291,6 +292,7 @@ export type MutationAiChatArgs = {
   history?: InputMaybe<Array<AiChatHistoryInput>>;
   message: Scalars['String']['input'];
   model?: InputMaybe<Scalars['String']['input']>;
+  toolMode?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -819,10 +821,11 @@ export type AiChatMutationVariables = Exact<{
   context?: InputMaybe<Scalars['JSON']['input']>;
   model?: InputMaybe<Scalars['String']['input']>;
   endpointId?: InputMaybe<Scalars['ID']['input']>;
+  toolMode?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type AiChatMutation = { __typename?: 'Mutation', aiChat: { __typename?: 'AiChatResponse', response: string, toolCalls?: Array<{ __typename?: 'ToolCallResult', name: string, args?: Record<string, unknown> | null, result?: string | null }> | null, actions?: Array<{ __typename?: 'AiAction', type: string, payload?: Record<string, unknown> | null }> | null } };
+export type AiChatMutation = { __typename?: 'Mutation', aiChat: { __typename?: 'AiChatResponse', response: string, toolMode?: string | null, toolCalls?: Array<{ __typename?: 'ToolCallResult', name: string, args?: Record<string, unknown> | null, result?: string | null }> | null, actions?: Array<{ __typename?: 'AiAction', type: string, payload?: Record<string, unknown> | null }> | null } };
 
 export type GetBenchmarkEndpointModelsQueryVariables = Exact<{
   endpointId: Scalars['ID']['input'];
