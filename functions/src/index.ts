@@ -122,7 +122,7 @@ export const graphql = onRequest(
     cors: ALLOWED_ORIGINS,
     maxInstances: 10,
     memory: '512MiB',
-    timeoutSeconds: 60,
+    timeoutSeconds: 300,
     secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_CREDS', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY']
   },
   async (req: Request, res: Response) => {
