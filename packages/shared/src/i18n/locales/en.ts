@@ -456,6 +456,8 @@ const en = {
   'ai.modelLabel': 'Model',
   'ai.endpointLabel': 'Endpoint',
   'ai.debugToggle': 'Toggle debug mode',
+  'ai.toolModeNative': 'Tools',
+  'ai.toolModeMcp': 'MCP',
   'ai.debugArgs': 'Arguments',
   'ai.debugResult': 'Result',
   'ai.debugNoResult': 'No result returned',

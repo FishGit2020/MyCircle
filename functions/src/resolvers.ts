@@ -947,8 +947,10 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
         context?: Record<string, unknown>;
         model?: string;
         endpointId?: string;
+        toolMode?: string;
       }, ctx: any) => {
         const { message, history, context, model, endpointId } = aiChatSchema.parse(args);
+        const useMcp = args.toolMode === 'mcp';
         const uid = ctx?.uid;
         const startTime = Date.now();
         let inputTokens = 0;
@@ -1049,20 +1051,52 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           if (name === 'setBabyDueDate') return JSON.stringify({ action: 'setBabyDueDate', dueDate: args.dueDate });
           if (name === 'addChildMilestone') return JSON.stringify({ action: 'addChildMilestone', milestone: args.milestone, date: args.date });
           if (name === 'addImmigrationCase') return JSON.stringify({ action: 'addImmigrationCase', receiptNumber: args.receiptNumber, formType: args.formType, nickname: args.nickname });
+          if (name === 'addFlashcard') return JSON.stringify({ success: true, message: 'Flashcard will be added' });
+          if (name === 'getBibleVerse') {
+            try {
+              const yvKey = getYouVersionKey?.();
+              if (!yvKey) return JSON.stringify({ error: 'YOUVERSION_APP_KEY not configured' });
+              const parsed = args.translation ? parseInt(args.translation as string, 10) : NaN;
+              const bibleId = isNaN(parsed) ? DEFAULT_YOUVERSION_BIBLE_ID : parsed;
+              const passage = await getYouVersionPassage(bibleId, args.reference as string, yvKey);
+              return JSON.stringify(passage);
+            } catch (err: any) {
+              return JSON.stringify({ error: err.message || 'Failed to look up Bible verse' });
+            }
+          }
+          if (name === 'searchPodcasts') {
+            try {
+              const podKeys = getPodcastKeys?.();
+              if (!podKeys) return JSON.stringify({ error: 'PodcastIndex API credentials not configured' });
+              const data = await searchPodcastsAPI(podKeys.apiKey, podKeys.apiSecret, args.query as string);
+              const feeds = (data.feeds ?? []).slice(0, 5);
+              return JSON.stringify({ feeds, count: feeds.length });
+            } catch (err: any) {
+              return JSON.stringify({ error: err.message || 'Failed to search podcasts' });
+            }
+          }
+          if (name === 'addBookmark') return JSON.stringify({ success: true, message: 'Bookmark will be added' });
+          if (name === 'listFlashcards') return JSON.stringify({ message: 'Flashcard list will be retrieved from frontend' });
           return JSON.stringify({ error: `Unknown tool: ${name}` });
         }
 
-        // ─── Ollama path ──────────────────────────────────────
-        if (ollamaBaseUrl && endpoint) {
-          trackedProvider = 'ollama';
-          trackedModel = ollamaModel;
-          const { default: OpenAI } = await import('openai');
-          const client = new OpenAI({
-            baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
-            defaultHeaders: buildEndpointHeaders(endpoint),
-          });
+        // ─── MCP wrapper (optional) ─────────────────────────
+        let mcpClient: Awaited<ReturnType<typeof import('./mcpToolServer.js').createMcpToolClient>> | null = null;
 
-          const ollamaTools: OpenAI.ChatCompletionTool[] = [
+        /** Execute tool — routes through MCP protocol or direct call */
+        async function executeToolCall(name: string, args: Record<string, unknown>): Promise<string> {
+          if (useMcp) {
+            if (!mcpClient) {
+              const { createMcpToolClient } = await import('./mcpToolServer.js');
+              mcpClient = await createMcpToolClient({ executeTool, tools: ollamaToolDefs });
+            }
+            return mcpClient.callTool(name, args);
+          }
+          return executeTool(name, args);
+        }
+
+        // Shared tool definitions in OpenAI format (used by Ollama, Gemini, and MCP)
+        const ollamaToolDefs = [
             { type: 'function', function: { name: 'getWeather', description: 'Get current weather for a city.', parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name' } }, required: ['city'] } } },
             { type: 'function', function: { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: 'object', properties: { query: { type: 'string', description: 'Search query' } }, required: ['query'] } } },
             { type: 'function', function: { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: 'object', properties: { symbol: { type: 'string', description: 'Stock ticker' } }, required: ['symbol'] } } },
@@ -1074,7 +1108,24 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             { type: 'function', function: { name: 'setBabyDueDate', description: 'Set the baby due date.', parameters: { type: 'object', properties: { dueDate: { type: 'string', description: 'Due date (YYYY-MM-DD)' } }, required: ['dueDate'] } } },
             { type: 'function', function: { name: 'addChildMilestone', description: 'Record a child development milestone.', parameters: { type: 'object', properties: { milestone: { type: 'string', description: 'Milestone description' }, date: { type: 'string', description: 'Date achieved (YYYY-MM-DD)' } }, required: ['milestone'] } } },
             { type: 'function', function: { name: 'addImmigrationCase', description: 'Add a USCIS case to track.', parameters: { type: 'object', properties: { receiptNumber: { type: 'string', description: 'Receipt number' }, formType: { type: 'string', description: 'Form type (e.g., I-485)' }, nickname: { type: 'string', description: 'Friendly name' } }, required: ['receiptNumber'] } } },
-          ];
+            { type: 'function', function: { name: 'addFlashcard', description: 'Create a new flashcard for the user to study.', parameters: { type: 'object', properties: { front: { type: 'string', description: 'Question or prompt side' }, back: { type: 'string', description: 'Answer side' }, category: { type: 'string', description: 'Category (e.g., custom, bible, chinese)' }, type: { type: 'string', description: 'Card type: custom, bible, chinese, english' } }, required: ['front', 'back'] } } },
+            { type: 'function', function: { name: 'getBibleVerse', description: 'Look up a Bible verse or passage. Returns the verse text and reference.', parameters: { type: 'object', properties: { reference: { type: 'string', description: 'Bible reference (e.g., "John 3:16", "Psalm 23:1-6")' }, translation: { type: 'string', description: 'Bible translation/version ID (defaults to NIV)' } }, required: ['reference'] } } },
+            { type: 'function', function: { name: 'searchPodcasts', description: 'Search for podcasts by keyword. Returns matching podcast feeds.', parameters: { type: 'object', properties: { query: { type: 'string', description: 'Search query for podcast name or topic' } }, required: ['query'] } } },
+            { type: 'function', function: { name: 'addBookmark', description: 'Bookmark a Bible passage for the user.', parameters: { type: 'object', properties: { reference: { type: 'string', description: 'Bible reference to bookmark (e.g., "John 3:16")' } }, required: ['reference'] } } },
+            { type: 'function', function: { name: 'listFlashcards', description: "List the user's flashcards, optionally filtered by type.", parameters: { type: 'object', properties: { type: { type: 'string', description: 'Filter by card type: custom, bible, chinese, english' } } } } },
+        ] as any[];
+
+        // ─── Ollama path ──────────────────────────────────────
+        if (ollamaBaseUrl && endpoint) {
+          trackedProvider = 'ollama';
+          trackedModel = ollamaModel;
+          const { default: OpenAI } = await import('openai');
+          const client = new OpenAI({
+            baseURL: `${ollamaBaseUrl}/v1`, apiKey: 'ollama',
+            defaultHeaders: buildEndpointHeaders(endpoint),
+          });
+
+          const ollamaTools = ollamaToolDefs as OpenAI.ChatCompletionTool[];
 
           const messages: OpenAI.ChatCompletionMessageParam[] = [
             { role: 'system', content: systemInstruction },
@@ -1116,13 +1167,13 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             const text = choice.message.content || '';
             const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/)
               || text.match(/```(?:tool_call|json)?\s*(\{[\s\S]*?\})\s*```/)
-              || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo|checkCaseStatus|addNote|addWorkEntry|setBabyDueDate|addChildMilestone|addImmigrationCase)"[\s\S]*?\})/);
+              || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo|checkCaseStatus|addNote|addWorkEntry|setBabyDueDate|addChildMilestone|addImmigrationCase|addFlashcard|getBibleVerse|searchPodcasts|addBookmark|listFlashcards)"[\s\S]*?\})/);
             if (match) {
               try {
                 const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
                 let result = '';
                 const toolStart = Date.now();
-                try { result = await executeTool(parsed.name, parsed.args); }
+                try { result = await executeToolCall(parsed.name, parsed.args); }
                 catch (err: any) { result = JSON.stringify({ error: err.message }); }
                 toolCallTimings.push({ name: parsed.name, durationMs: Date.now() - toolStart });
                 toolCalls.push({ name: parsed.name, args: parsed.args, result });
@@ -1134,11 +1185,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
                 outputTokens += followup.usage?.completion_tokens || 0;
                 const answerText = followup.choices[0].message.content || '';
                 logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true, fullQuestion: message, fullAnswer: answerText, endpointId: endpointId || undefined });
-                return { response: answerText, toolCalls, actions: extractActions(toolCalls) };
+                return { response: answerText, toolCalls, actions: extractActions(toolCalls), toolMode: useMcp ? 'mcp' : 'native' };
               } catch { /* JSON parse failed */ }
             }
             logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: true, fullQuestion: message, fullAnswer: text, endpointId: endpointId || undefined });
-            return { response: text || 'Sorry, I could not generate a response.', toolCalls: null, actions: null };
+            return { response: text || 'Sorry, I could not generate a response.', toolCalls: null, actions: null, toolMode: useMcp ? 'mcp' : 'native' };
           }
 
           if (choice.finish_reason === 'tool_calls' && choice.message.tool_calls) {
@@ -1146,7 +1197,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
               const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
               let result = '';
               const toolStart = Date.now();
-              try { result = await executeTool(tc.function.name, args); }
+              try { result = await executeToolCall(tc.function.name, args); }
               catch (err: any) { result = JSON.stringify({ error: err.message }); }
               toolCallTimings.push({ name: tc.function.name, durationMs: Date.now() - toolStart });
               toolCalls.push({ name: tc.function.name, args, result });
@@ -1160,12 +1211,12 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             outputTokens += followup.usage?.completion_tokens || 0;
             const answerText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
             logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: answerText, endpointId: endpointId || undefined });
-            return { response: answerText, toolCalls, actions: extractActions(toolCalls) };
+            return { response: answerText, toolCalls, actions: extractActions(toolCalls), toolMode: useMcp ? 'mcp' : 'native' };
           }
 
           const ollamaText = choice.message.content || 'Sorry, I could not generate a response.';
           logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: ollamaText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: ollamaText, endpointId: endpointId || undefined });
-          return { response: ollamaText, toolCalls: null, actions: null };
+          return { response: ollamaText, toolCalls: null, actions: null, toolMode: useMcp ? 'mcp' : 'native' };
         }
 
         // ─── Gemini path ──────────────────────────────────────
@@ -1186,6 +1237,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           { name: 'setBabyDueDate', description: 'Set the baby due date.', parameters: { type: Type.OBJECT, properties: { dueDate: { type: Type.STRING, description: 'Due date (YYYY-MM-DD)' } }, required: ['dueDate'] } },
           { name: 'addChildMilestone', description: 'Record a child development milestone.', parameters: { type: Type.OBJECT, properties: { milestone: { type: Type.STRING, description: 'Milestone description' }, date: { type: Type.STRING, description: 'Date achieved (YYYY-MM-DD)' } }, required: ['milestone'] } },
           { name: 'addImmigrationCase', description: 'Add a USCIS case to track.', parameters: { type: Type.OBJECT, properties: { receiptNumber: { type: Type.STRING, description: 'Receipt number' }, formType: { type: Type.STRING, description: 'Form type (e.g., I-485)' }, nickname: { type: Type.STRING, description: 'Friendly name' } }, required: ['receiptNumber'] } },
+          { name: 'addFlashcard', description: 'Create a new flashcard for the user to study.', parameters: { type: Type.OBJECT, properties: { front: { type: Type.STRING, description: 'Question or prompt side' }, back: { type: Type.STRING, description: 'Answer side' }, category: { type: Type.STRING, description: 'Category (e.g., custom, bible, chinese)' }, type: { type: Type.STRING, description: 'Card type: custom, bible, chinese, english' } }, required: ['front', 'back'] } },
+          { name: 'getBibleVerse', description: 'Look up a Bible verse or passage. Returns the verse text and reference.', parameters: { type: Type.OBJECT, properties: { reference: { type: Type.STRING, description: 'Bible reference (e.g., "John 3:16", "Psalm 23:1-6")' }, translation: { type: Type.STRING, description: 'Bible translation/version ID (defaults to NIV)' } }, required: ['reference'] } },
+          { name: 'searchPodcasts', description: 'Search for podcasts by keyword. Returns matching podcast feeds.', parameters: { type: Type.OBJECT, properties: { query: { type: Type.STRING, description: 'Search query for podcast name or topic' } }, required: ['query'] } },
+          { name: 'addBookmark', description: 'Bookmark a Bible passage for the user.', parameters: { type: Type.OBJECT, properties: { reference: { type: Type.STRING, description: 'Bible reference to bookmark (e.g., "John 3:16")' } }, required: ['reference'] } },
+          { name: 'listFlashcards', description: "List the user's flashcards, optionally filtered by type.", parameters: { type: Type.OBJECT, properties: { type: { type: Type.STRING, description: 'Filter by card type: custom, bible, chinese, english' } } } },
         ];
         const tools = [{ functionDeclarations }];
 
@@ -1209,7 +1265,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             const args = (part.functionCall.args || {}) as Record<string, unknown>;
             let result = '';
             const toolStart = Date.now();
-            try { result = await executeTool(part.functionCall.name!, args); }
+            try { result = await executeToolCall(part.functionCall.name!, args); }
             catch (err: any) { result = JSON.stringify({ error: err.message }); }
             toolCallTimings.push({ name: part.functionCall.name!, durationMs: Date.now() - toolStart });
             toolCalls.push({ name: part.functionCall.name!, args, result });
@@ -1226,11 +1282,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           outputTokens += (followup as any).usageMetadata?.candidatesTokenCount || 0;
           const finalText = followup.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join('') || 'I found some information but had trouble formatting it.';
           logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: finalText, endpointId: endpointId || undefined });
-          return { response: finalText, toolCalls, actions: extractActions(toolCalls) };
+          return { response: finalText, toolCalls, actions: extractActions(toolCalls), toolMode: useMcp ? 'mcp' : 'native' };
         }
         const textResponse = parts.map((p: any) => p.text).filter(Boolean).join('') || 'Sorry, I could not generate a response.';
         logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: textResponse, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: textResponse, endpointId: endpointId || undefined });
-        return { response: textResponse, toolCalls: null, actions: null };
+        return { response: textResponse, toolCalls: null, actions: null, toolMode: useMcp ? 'mcp' : 'native' };
       },
     },
 

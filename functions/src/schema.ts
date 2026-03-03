@@ -339,6 +339,7 @@ export const typeDefs = `#graphql
     response: String!
     toolCalls: [ToolCallResult!]
     actions: [AiAction!]
+    toolMode: String
   }
 
   input AiChatHistoryInput {
@@ -403,7 +404,7 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
-    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID): AiChatResponse!
+    aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
     saveBenchmarkEndpoint(input: BenchmarkEndpointInput!): BenchmarkEndpoint!
     deleteBenchmarkEndpoint(id: String!): Boolean!

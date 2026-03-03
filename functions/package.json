@@ -21,6 +21,7 @@
     "@google-cloud/functions-framework": "^5.0.1",
     "@google/genai": "^1.0.0",
     "@graphql-tools/schema": "^10.0.31",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "axios": "^1.6.5",
     "cors": "^2.8.5",
     "express": "^4.18.2",
