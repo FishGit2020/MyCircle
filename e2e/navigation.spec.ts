@@ -43,8 +43,8 @@ test.describe('Navigation', () => {
 
   test('AI link navigates to AI page', async ({ page }) => {
     await page.goto('/');
-    // Open the Tools dropdown first, then click AI
-    await page.getByRole('navigation', { name: /main/i }).getByRole('button', { name: /tools/i }).click();
+    // Open the Learning dropdown first, then click AI
+    await page.getByRole('navigation', { name: /main/i }).getByRole('button', { name: /learning/i }).click();
     await page.getByRole('menuitem', { name: 'AI', exact: true }).click();
 
     await expect(page).toHaveURL('/ai');
