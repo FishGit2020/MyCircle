@@ -885,9 +885,10 @@ export const resolvers = {
     }) => {
       // Dev server: use env var for local Ollama (production uses per-user endpoints from Firestore)
       const ollamaBaseUrl = process.env.OLLAMA_BASE_URL || '';
-      const ollamaModel = model || 'gemma2:2b';
+      const ollamaModel = model || '';
       const geminiKey = process.env.GEMINI_API_KEY;
       if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured — add an Ollama endpoint in Settings or set GEMINI_API_KEY');
+      if (ollamaBaseUrl && !ollamaModel) throw new Error('Model is required — select a model before chatting');
 
       // Build context-aware system instruction (shared by both providers)
       let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, navigate users around the app, create flashcards, look up Bible verses, search podcasts, and bookmark Bible passages. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';

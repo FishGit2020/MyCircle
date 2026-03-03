@@ -18,6 +18,12 @@ const TOOL_ICONS: Record<string, string> = {
   searchPodcasts: '\uD83C\uDFA7',
   addBookmark: '\uD83D\uDD16',
   listFlashcards: '\uD83D\uDCCB',
+  checkCaseStatus: '\uD83D\uDDC2\uFE0F',
+  addNote: '\uD83D\uDDD2\uFE0F',
+  addWorkEntry: '\u23F1\uFE0F',
+  setBabyDueDate: '\uD83D\uDC76',
+  addChildMilestone: '\uD83C\uDF1F',
+  addImmigrationCase: '\uD83D\uDCCE',
 };
 
 const TOOL_LABEL_KEYS: Record<string, string> = {
@@ -31,6 +37,12 @@ const TOOL_LABEL_KEYS: Record<string, string> = {
   searchPodcasts: 'ai.toolPodcastSearch',
   addBookmark: 'ai.toolBookmark',
   listFlashcards: 'ai.toolFlashcardList',
+  checkCaseStatus: 'ai.toolCheckCase',
+  addNote: 'ai.toolAddNote',
+  addWorkEntry: 'ai.toolAddWorkEntry',
+  setBabyDueDate: 'ai.toolSetDueDate',
+  addChildMilestone: 'ai.toolAddMilestone',
+  addImmigrationCase: 'ai.toolAddCase',
 };
 
 function JsonBlock({ data, label }: { data: unknown; label: string }) {

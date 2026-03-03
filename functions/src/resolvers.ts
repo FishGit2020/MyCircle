@@ -959,15 +959,16 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
 
         const endpoint = uid ? await getUserOllamaEndpoint(uid, endpointId || undefined) : null;
         const ollamaBaseUrl = endpoint?.url || '';
-        const ollamaModel = model || 'gemma2:2b';
+        const ollamaModel = model || '';
         const geminiKey = process.env.GEMINI_API_KEY;
         if (!ollamaBaseUrl && !geminiKey) throw new Error('No AI provider configured — add an Ollama endpoint in Settings or contact admin for Gemini');
+        if (ollamaBaseUrl && !ollamaModel) throw new Error('Model is required — select a model before chatting');
 
         const apiKey = getApiKey();
         const finnhubKey = getFinnhubKey?.() || '';
 
         // Build context-aware system instruction
-        let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, and navigate users around the app. Be concise and helpful. When users ask about weather, stocks, or crypto, use the tools to get real data.';
+        let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, search podcasts, look up Bible verses, manage flashcards, check USCIS case status, create notes, log work entries, set baby due dates, record child milestones, add immigration cases, and navigate users to any page. Be concise and helpful. When users ask about weather, stocks, crypto, or immigration cases, use the tools to get real data. For notes, work entries, baby info, milestones, and immigration tracking, use the frontend action tools.';
 
         if (context && typeof context === 'object') {
           const ctxParts: string[] = [];
@@ -975,8 +976,19 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           if (Array.isArray(context.recentCities) && context.recentCities.length > 0) ctxParts.push(`Recently searched cities: ${(context.recentCities as string[]).join(', ')}`);
           if (Array.isArray(context.stockWatchlist) && context.stockWatchlist.length > 0) ctxParts.push(`Stock watchlist: ${(context.stockWatchlist as string[]).join(', ')}`);
           if (typeof context.podcastSubscriptions === 'number' && context.podcastSubscriptions > 0) ctxParts.push(`Subscribed to ${context.podcastSubscriptions} podcasts`);
+          if (context.babyDueDate) ctxParts.push(`Baby due date: ${context.babyDueDate}`);
+          if (context.childName) {
+            let childInfo = `Child's name: ${context.childName}`;
+            if (context.childBirthDate) childInfo += ` (born ${context.childBirthDate})`;
+            ctxParts.push(childInfo);
+          }
+          if (typeof context.childMilestonesCount === 'number' && context.childMilestonesCount > 0) ctxParts.push(`${context.childMilestonesCount} child milestones recorded`);
+          if (typeof context.worshipFavoritesCount === 'number' && context.worshipFavoritesCount > 0) ctxParts.push(`${context.worshipFavoritesCount} favorite worship songs`);
+          if (typeof context.cloudFilesCount === 'number' && context.cloudFilesCount > 0) ctxParts.push(`${context.cloudFilesCount} cloud files uploaded`);
+          if (typeof context.immigrationCasesCount === 'number' && context.immigrationCasesCount > 0) ctxParts.push(`Tracking ${context.immigrationCasesCount} immigration cases`);
+          if (typeof context.workEntriesCount === 'number' && context.workEntriesCount > 0) ctxParts.push(`${context.workEntriesCount} work entries logged`);
           if (context.tempUnit) ctxParts.push(`Preferred temperature unit: ${context.tempUnit === 'F' ? 'Fahrenheit' : 'Celsius'}`);
-          if (context.locale) ctxParts.push(`Language: ${context.locale === 'es' ? 'Spanish' : 'English'}`);
+          if (context.locale) ctxParts.push(`Language: ${context.locale === 'es' ? 'Spanish' : context.locale === 'zh' ? 'Chinese' : 'English'}`);
           if (context.currentPage) ctxParts.push(`Currently on: ${context.currentPage}`);
           if (ctxParts.length > 0) {
             systemInstruction += '\n\nUser context:\n' + ctxParts.join('\n');
@@ -1007,6 +1019,23 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             return JSON.stringify(r.data);
           }
           if (name === 'navigateTo') return JSON.stringify({ navigateTo: args.page });
+          if (name === 'checkCaseStatus') {
+            const rn = (args.receiptNumber as string || '').trim().toUpperCase();
+            if (!/^[A-Z]{3}\d{10}$/.test(rn)) return JSON.stringify({ error: 'Invalid receipt number format. Expected 3 letters + 10 digits (e.g., MSC2190012345).' });
+            const resp = await axios.post('https://egov.uscis.gov/casestatus/mycasestatus.do', `appReceiptNum=${encodeURIComponent(rn)}`, { headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'Mozilla/5.0 (compatible; MyCircle/1.0)' }, timeout: 15000 });
+            const html = resp.data as string;
+            const h1m = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+            const status = h1m ? h1m[1].replace(/<[^>]+>/g, '').trim() : 'Unknown Status';
+            const pm = html.match(/<h1[^>]*>[\s\S]*?<\/h1>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
+            const desc = pm ? pm[1].replace(/<[^>]+>/g, '').trim() : '';
+            const fm = desc.match(/Form I-\d+/i);
+            return JSON.stringify({ receiptNumber: rn, formType: fm ? fm[0] : '', status, statusDescription: desc, checkedAt: new Date().toISOString() });
+          }
+          if (name === 'addNote') return JSON.stringify({ action: 'addNote', title: args.title, content: args.content });
+          if (name === 'addWorkEntry') return JSON.stringify({ action: 'addWorkEntry', date: args.date, content: args.content });
+          if (name === 'setBabyDueDate') return JSON.stringify({ action: 'setBabyDueDate', dueDate: args.dueDate });
+          if (name === 'addChildMilestone') return JSON.stringify({ action: 'addChildMilestone', milestone: args.milestone, date: args.date });
+          if (name === 'addImmigrationCase') return JSON.stringify({ action: 'addImmigrationCase', receiptNumber: args.receiptNumber, formType: args.formType, nickname: args.nickname });
           return JSON.stringify({ error: `Unknown tool: ${name}` });
         }
 
@@ -1025,7 +1054,13 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             { type: 'function', function: { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: 'object', properties: { query: { type: 'string', description: 'Search query' } }, required: ['query'] } } },
             { type: 'function', function: { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: 'object', properties: { symbol: { type: 'string', description: 'Stock ticker' } }, required: ['symbol'] } } },
             { type: 'function', function: { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: 'object', properties: {} } } },
-            { type: 'function', function: { name: 'navigateTo', description: 'Navigate to a page.', parameters: { type: 'object', properties: { page: { type: 'string', description: 'Page name' } }, required: ['page'] } } },
+            { type: 'function', function: { name: 'navigateTo', description: 'Navigate to a page. Pages: weather, stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai.', parameters: { type: 'object', properties: { page: { type: 'string', description: 'Page name' } }, required: ['page'] } } },
+            { type: 'function', function: { name: 'checkCaseStatus', description: 'Check USCIS immigration case status by receipt number.', parameters: { type: 'object', properties: { receiptNumber: { type: 'string', description: 'USCIS receipt number (e.g., MSC2190012345)' } }, required: ['receiptNumber'] } } },
+            { type: 'function', function: { name: 'addNote', description: 'Create a note in the notebook.', parameters: { type: 'object', properties: { title: { type: 'string', description: 'Note title' }, content: { type: 'string', description: 'Note content' } }, required: ['title', 'content'] } } },
+            { type: 'function', function: { name: 'addWorkEntry', description: 'Add a work time entry.', parameters: { type: 'object', properties: { date: { type: 'string', description: 'Date (YYYY-MM-DD)' }, content: { type: 'string', description: 'Work description' } }, required: ['date', 'content'] } } },
+            { type: 'function', function: { name: 'setBabyDueDate', description: 'Set the baby due date.', parameters: { type: 'object', properties: { dueDate: { type: 'string', description: 'Due date (YYYY-MM-DD)' } }, required: ['dueDate'] } } },
+            { type: 'function', function: { name: 'addChildMilestone', description: 'Record a child development milestone.', parameters: { type: 'object', properties: { milestone: { type: 'string', description: 'Milestone description' }, date: { type: 'string', description: 'Date achieved (YYYY-MM-DD)' } }, required: ['milestone'] } } },
+            { type: 'function', function: { name: 'addImmigrationCase', description: 'Add a USCIS case to track.', parameters: { type: 'object', properties: { receiptNumber: { type: 'string', description: 'Receipt number' }, formType: { type: 'string', description: 'Form type (e.g., I-485)' }, nickname: { type: 'string', description: 'Friendly name' } }, required: ['receiptNumber'] } } },
           ];
 
           const messages: OpenAI.ChatCompletionMessageParam[] = [
@@ -1068,7 +1103,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             const text = choice.message.content || '';
             const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/)
               || text.match(/```(?:tool_call|json)?\s*(\{[\s\S]*?\})\s*```/)
-              || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo)"[\s\S]*?\})/);
+              || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo|checkCaseStatus|addNote|addWorkEntry|setBabyDueDate|addChildMilestone|addImmigrationCase)"[\s\S]*?\})/);
             if (match) {
               try {
                 const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
@@ -1131,7 +1166,13 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: Type.OBJECT, properties: { query: { type: Type.STRING, description: 'Search query' } }, required: ['query'] } },
           { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: Type.OBJECT, properties: { symbol: { type: Type.STRING, description: 'Stock ticker' } }, required: ['symbol'] } },
           { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: Type.OBJECT, properties: {} } },
-          { name: 'navigateTo', description: 'Navigate to a page.', parameters: { type: Type.OBJECT, properties: { page: { type: Type.STRING, description: 'Page name' } }, required: ['page'] } },
+          { name: 'navigateTo', description: 'Navigate to a page. Pages: weather, stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai.', parameters: { type: Type.OBJECT, properties: { page: { type: Type.STRING, description: 'Page name' } }, required: ['page'] } },
+          { name: 'checkCaseStatus', description: 'Check USCIS immigration case status by receipt number.', parameters: { type: Type.OBJECT, properties: { receiptNumber: { type: Type.STRING, description: 'USCIS receipt number (e.g., MSC2190012345)' } }, required: ['receiptNumber'] } },
+          { name: 'addNote', description: 'Create a note in the notebook.', parameters: { type: Type.OBJECT, properties: { title: { type: Type.STRING, description: 'Note title' }, content: { type: Type.STRING, description: 'Note content' } }, required: ['title', 'content'] } },
+          { name: 'addWorkEntry', description: 'Add a work time entry.', parameters: { type: Type.OBJECT, properties: { date: { type: Type.STRING, description: 'Date (YYYY-MM-DD)' }, content: { type: Type.STRING, description: 'Work description' } }, required: ['date', 'content'] } },
+          { name: 'setBabyDueDate', description: 'Set the baby due date.', parameters: { type: Type.OBJECT, properties: { dueDate: { type: Type.STRING, description: 'Due date (YYYY-MM-DD)' } }, required: ['dueDate'] } },
+          { name: 'addChildMilestone', description: 'Record a child development milestone.', parameters: { type: Type.OBJECT, properties: { milestone: { type: Type.STRING, description: 'Milestone description' }, date: { type: Type.STRING, description: 'Date achieved (YYYY-MM-DD)' } }, required: ['milestone'] } },
+          { name: 'addImmigrationCase', description: 'Add a USCIS case to track.', parameters: { type: Type.OBJECT, properties: { receiptNumber: { type: Type.STRING, description: 'Receipt number' }, formType: { type: Type.STRING, description: 'Form type (e.g., I-485)' }, nickname: { type: Type.STRING, description: 'Friendly name' } }, required: ['receiptNumber'] } },
         ];
         const tools = [{ functionDeclarations }];
 

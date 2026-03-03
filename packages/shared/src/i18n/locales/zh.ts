@@ -469,6 +469,17 @@ const zh: Record<TranslationKey, string> = {
   'ai.voiceInput': '\u8bed\u97f3\u8f93\u5165',
   'ai.voiceListening': '\u6b63\u5728\u542c...',
   'ai.voiceNotSupported': '\u8be5\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u8bed\u97f3\u8f93\u5165',
+  'ai.toolCheckCase': '\u6848\u4ef6\u72b6\u6001',
+  'ai.toolAddNote': '\u6dfb\u52a0\u7b14\u8bb0',
+  'ai.toolAddWorkEntry': '\u6dfb\u52a0\u5de5\u4f5c\u8bb0\u5f55',
+  'ai.toolSetDueDate': '\u8bbe\u7f6e\u9884\u4ea7\u671f',
+  'ai.toolAddMilestone': '\u6dfb\u52a0\u91cc\u7a0b\u7891',
+  'ai.toolAddCase': '\u6dfb\u52a0\u6848\u4ef6',
+  'ai.suggestNote': '\u521b\u5efa\u4e00\u7bc7\u4f1a\u8bae\u8981\u70b9\u7b14\u8bb0',
+  'ai.suggestWorkEntry': '\u8bb0\u5f55\u4eca\u5929\u7684\u5de5\u4f5c\u65f6\u95f4',
+  'ai.suggestBaby': '\u6211\u5b9d\u5b9d\u7684\u9884\u4ea7\u671f\u662f\u4ec0\u4e48\u65f6\u5019\uff1f',
+  'ai.suggestImmigration': '\u67e5\u8be2\u6211\u7684USCIS\u6848\u4ef6\u72b6\u6001',
+  'ai.suggestChildDev': '\u8bb0\u5f55\u5b69\u5b50\u7684\u65b0\u91cc\u7a0b\u7891',
 
   // AI Monitor
   'ai.tabChat': '\u804a\u5929',
