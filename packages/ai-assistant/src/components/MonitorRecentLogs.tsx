@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 
 interface ToolCallLog {
@@ -18,6 +18,9 @@ interface LogEntry {
   toolCalls: ToolCallLog[];
   questionPreview: string;
   answerPreview: string;
+  fullQuestion: string | null;
+  fullAnswer: string | null;
+  endpointId: string | null;
   status: string;
   error: string | null;
 }
@@ -46,6 +49,14 @@ function formatTime(iso: string): string {
 export default function MonitorRecentLogs({ logs, loading }: Props) {
   const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showRawIds, setShowRawIds] = useState<Set<string>>(new Set());
+  const toggleRaw = useCallback((id: string) => {
+    setShowRawIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
 
   if (loading && !logs) {
     return (
@@ -111,20 +122,38 @@ export default function MonitorRecentLogs({ logs, loading }: Props) {
                 {/* Expanded details */}
                 {isExpanded && (
                   <div className="px-3 pb-3 pt-1 text-xs space-y-2">
-                    <div className="flex gap-2 text-gray-400 dark:text-gray-500">
+                    <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500">
                       <span>{formatTime(log.timestamp)}</span>
                       <span>{log.model}</span>
+                      {log.endpointId && (
+                        <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-[10px]">
+                          {t('ai.monitor.endpoint')}: {log.endpointId}
+                        </span>
+                      )}
+                      {(log.fullQuestion || log.fullAnswer) && (
+                        <button
+                          type="button"
+                          onClick={() => toggleRaw(log.id)}
+                          className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors"
+                        >
+                          {showRawIds.has(log.id) ? t('ai.monitor.showPreview') : t('ai.monitor.showRaw')}
+                        </button>
+                      )}
                     </div>
                     {log.questionPreview && (
                       <div>
                         <p className="font-medium text-gray-500 dark:text-gray-400">{t('ai.monitor.question')}</p>
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{log.questionPreview}</p>
+                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                          {showRawIds.has(log.id) && log.fullQuestion ? log.fullQuestion : log.questionPreview}
+                        </p>
                       </div>
                     )}
                     {log.answerPreview && (
                       <div>
                         <p className="font-medium text-gray-500 dark:text-gray-400">{t('ai.monitor.answer')}</p>
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{log.answerPreview}</p>
+                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap max-h-96 overflow-y-auto">
+                          {showRawIds.has(log.id) && log.fullAnswer ? log.fullAnswer : log.answerPreview}
+                        </p>
                       </div>
                     )}
                     {log.toolCalls.length > 0 && (

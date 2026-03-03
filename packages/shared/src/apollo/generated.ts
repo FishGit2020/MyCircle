@@ -29,7 +29,10 @@ export type AiChatHistoryInput = {
 export type AiChatLogEntry = {
   __typename?: 'AiChatLogEntry';
   answerPreview: Scalars['String']['output'];
+  endpointId?: Maybe<Scalars['String']['output']>;
   error?: Maybe<Scalars['String']['output']>;
+  fullAnswer?: Maybe<Scalars['String']['output']>;
+  fullQuestion?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   inputTokens: Scalars['Int']['output'];
   latencyMs: Scalars['Int']['output'];
@@ -808,7 +811,7 @@ export type GetAiRecentLogsQueryVariables = Exact<{
 }>;
 
 
-export type GetAiRecentLogsQuery = { __typename?: 'Query', aiRecentLogs: Array<{ __typename?: 'AiChatLogEntry', id: string, timestamp: string, provider: string, model: string, inputTokens: number, outputTokens: number, latencyMs: number, questionPreview: string, answerPreview: string, status: string, error?: string | null, toolCalls: Array<{ __typename?: 'AiToolCallLog', name: string, durationMs?: number | null, error?: string | null }> }> };
+export type GetAiRecentLogsQuery = { __typename?: 'Query', aiRecentLogs: Array<{ __typename?: 'AiChatLogEntry', id: string, timestamp: string, provider: string, model: string, inputTokens: number, outputTokens: number, latencyMs: number, questionPreview: string, answerPreview: string, fullQuestion?: string | null, fullAnswer?: string | null, endpointId?: string | null, status: string, error?: string | null, toolCalls: Array<{ __typename?: 'AiToolCallLog', name: string, durationMs?: number | null, error?: string | null }> }> };
 
 export type AiChatMutationVariables = Exact<{
   message: Scalars['String']['input'];

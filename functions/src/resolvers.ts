@@ -1120,11 +1120,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
                 inputTokens += followup.usage?.prompt_tokens || 0;
                 outputTokens += followup.usage?.completion_tokens || 0;
                 const answerText = followup.choices[0].message.content || '';
-                logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true });
+                logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true, fullQuestion: message, fullAnswer: answerText, endpointId: endpointId || undefined });
                 return { response: answerText, toolCalls, actions: null };
               } catch { /* JSON parse failed */ }
             }
-            logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: true });
+            logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: true, fullQuestion: message, fullAnswer: text, endpointId: endpointId || undefined });
             return { response: text || 'Sorry, I could not generate a response.', toolCalls: null, actions: null };
           }
 
@@ -1146,12 +1146,12 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             inputTokens += followup.usage?.prompt_tokens || 0;
             outputTokens += followup.usage?.completion_tokens || 0;
             const answerText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
-            logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: false });
+            logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: answerText, endpointId: endpointId || undefined });
             return { response: answerText, toolCalls, actions: null };
           }
 
           const ollamaText = choice.message.content || 'Sorry, I could not generate a response.';
-          logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: ollamaText, status: 'success', usedFallback: false });
+          logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: ollamaText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: ollamaText, endpointId: endpointId || undefined });
           return { response: ollamaText, toolCalls: null, actions: null };
         }
 
@@ -1212,11 +1212,11 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           inputTokens += (followup as any).usageMetadata?.promptTokenCount || 0;
           outputTokens += (followup as any).usageMetadata?.candidatesTokenCount || 0;
           const finalText = followup.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join('') || 'I found some information but had trouble formatting it.';
-          logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false });
+          logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: finalText, endpointId: endpointId || undefined });
           return { response: finalText, toolCalls, actions: null };
         }
         const textResponse = parts.map((p: any) => p.text).filter(Boolean).join('') || 'Sorry, I could not generate a response.';
-        logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: textResponse, status: 'success', usedFallback: false });
+        logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: textResponse, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: textResponse, endpointId: endpointId || undefined });
         return { response: textResponse, toolCalls: null, actions: null };
       },
     },
@@ -1357,6 +1357,9 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             })),
             questionPreview: d.questionPreview || '',
             answerPreview: d.answerPreview || '',
+            fullQuestion: d.fullQuestion ?? null,
+            fullAnswer: d.fullAnswer ?? null,
+            endpointId: d.endpointId ?? null,
             status: d.status || 'unknown',
             error: d.error ?? null,
           };

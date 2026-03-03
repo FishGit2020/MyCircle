@@ -519,6 +519,9 @@ const zh: Record<TranslationKey, string> = {
   'ai.monitor.question': '\u95ee\u9898',
   'ai.monitor.answer': '\u56de\u7b54',
   'ai.monitor.last7days': '\u8fc7\u53bb7\u5929',
+  'ai.monitor.endpoint': '\u7aef\u70b9',
+  'ai.monitor.showRaw': '\u663e\u793a\u5b8c\u6574',
+  'ai.monitor.showPreview': '\u663e\u793a\u6458\u8981',
 
   // Feedback
   'feedback.button': '\u53cd\u9988',
