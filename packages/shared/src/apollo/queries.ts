@@ -500,6 +500,7 @@ export const GET_BENCHMARK_HISTORY = gql`
         endpointName
         model
         prompt
+        response
         error
         timing {
           tokensPerSecond

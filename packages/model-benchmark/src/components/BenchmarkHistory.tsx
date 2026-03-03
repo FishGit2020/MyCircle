@@ -163,6 +163,14 @@ export default function BenchmarkHistory() {
                         </div>
                       </div>
                     )}
+                    {r.prompt && (
+                      <div>
+                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('benchmark.results.request')}</div>
+                        <div className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-2 max-h-32 overflow-y-auto">
+                          {r.prompt}
+                        </div>
+                      </div>
+                    )}
                     {r.response && (
                       <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('benchmark.results.response')}</div>

@@ -996,27 +996,40 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           }
         }
 
-        /** Execute a tool by name */
+        /** Frontend action tools — their args become actions dispatched to the client */
+        const FRONTEND_ACTIONS = new Set([
+          'navigateTo', 'addFlashcard', 'addBookmark', 'listFlashcards',
+          'addNote', 'addWorkEntry', 'setBabyDueDate', 'addChildMilestone', 'addImmigrationCase',
+        ]);
+
+        function extractActions(toolCalls: Array<{ name: string; args: Record<string, unknown> }>) {
+          const actions = toolCalls
+            .filter(tc => FRONTEND_ACTIONS.has(tc.name))
+            .map(tc => ({ type: tc.name, payload: tc.args }));
+          return actions.length > 0 ? actions : null;
+        }
+
+        /** Execute a tool by name — reuses existing cached helpers instead of raw HTTP calls */
         async function executeTool(name: string, args: Record<string, unknown>): Promise<string> {
           if (name === 'getWeather') {
             const city = args.city as string;
-            const geo = await axios.get(`${OPENWEATHER_BASE}/geo/1.0/direct`, { params: { q: city, limit: 1, appid: apiKey } });
-            if (!geo.data.length) return JSON.stringify({ error: `City not found: ${city}` });
-            const { lat, lon } = geo.data[0];
-            const w = await axios.get(`${OPENWEATHER_BASE}/data/2.5/weather`, { params: { lat, lon, appid: apiKey, units: 'metric' } });
-            return JSON.stringify({ city, temp: w.data.main.temp, feels_like: w.data.main.feels_like, humidity: w.data.main.humidity, description: w.data.weather[0].description, wind: w.data.wind.speed });
+            const cities = await searchCities(apiKey, city, 1);
+            if (!cities.length) return JSON.stringify({ error: `City not found: ${city}` });
+            const { lat, lon } = cities[0];
+            const w = await getCurrentWeather(apiKey, lat, lon);
+            return JSON.stringify({ city, temp: w.temp, feels_like: w.feels_like, humidity: w.humidity, description: w.weather?.[0]?.description, wind: w.wind?.speed });
           }
           if (name === 'searchCities') {
-            const geo = await axios.get(`${OPENWEATHER_BASE}/geo/1.0/direct`, { params: { q: args.query, limit: 5, appid: apiKey } });
-            return JSON.stringify(geo.data.map((c: any) => ({ name: c.name, country: c.country, state: c.state, lat: c.lat, lon: c.lon })));
+            const cities = await searchCities(apiKey, args.query as string, 5);
+            return JSON.stringify(cities.map(c => ({ name: c.name, country: c.country, state: c.state, lat: c.lat, lon: c.lon })));
           }
           if (name === 'getStockQuote') {
-            const q = await axios.get(`${FINNHUB_BASE}/api/v1/quote`, { params: { symbol: args.symbol, token: finnhubKey } });
-            return JSON.stringify({ symbol: args.symbol, price: q.data.c, change: q.data.d, changePercent: q.data.dp, high: q.data.h, low: q.data.l });
+            const q = await getStockQuote(finnhubKey, args.symbol as string);
+            return JSON.stringify({ symbol: args.symbol, price: q.c, change: q.d, changePercent: q.dp, high: q.h, low: q.l });
           }
           if (name === 'getCryptoPrices') {
-            const r = await axios.get(`${COINGECKO_BASE}/api/v3/simple/price`, { params: { ids: 'bitcoin,ethereum,solana', vs_currencies: 'usd', include_24hr_change: 'true' } });
-            return JSON.stringify(r.data);
+            const prices = await getCryptoPrices(['bitcoin', 'ethereum', 'solana'], 'usd');
+            return JSON.stringify(prices.map((c: any) => ({ id: c.id, name: c.name, price: c.current_price, change24h: c.price_change_percentage_24h })));
           }
           if (name === 'navigateTo') return JSON.stringify({ navigateTo: args.page });
           if (name === 'checkCaseStatus') {
@@ -1121,7 +1134,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
                 outputTokens += followup.usage?.completion_tokens || 0;
                 const answerText = followup.choices[0].message.content || '';
                 logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true, fullQuestion: message, fullAnswer: answerText, endpointId: endpointId || undefined });
-                return { response: answerText, toolCalls, actions: null };
+                return { response: answerText, toolCalls, actions: extractActions(toolCalls) };
               } catch { /* JSON parse failed */ }
             }
             logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: true, fullQuestion: message, fullAnswer: text, endpointId: endpointId || undefined });
@@ -1147,7 +1160,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
             outputTokens += followup.usage?.completion_tokens || 0;
             const answerText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
             logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: answerText, endpointId: endpointId || undefined });
-            return { response: answerText, toolCalls, actions: null };
+            return { response: answerText, toolCalls, actions: extractActions(toolCalls) };
           }
 
           const ollamaText = choice.message.content || 'Sorry, I could not generate a response.';
@@ -1213,7 +1226,7 @@ export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => s
           outputTokens += (followup as any).usageMetadata?.candidatesTokenCount || 0;
           const finalText = followup.candidates?.[0]?.content?.parts?.map((p: any) => p.text).filter(Boolean).join('') || 'I found some information but had trouble formatting it.';
           logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: finalText, endpointId: endpointId || undefined });
-          return { response: finalText, toolCalls, actions: null };
+          return { response: finalText, toolCalls, actions: extractActions(toolCalls) };
         }
         const textResponse = parts.map((p: any) => p.text).filter(Boolean).join('') || 'Sorry, I could not generate a response.';
         logAiChatInteraction({ userId: 'graphql', provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: textResponse, status: 'success', usedFallback: false, fullQuestion: message, fullAnswer: textResponse, endpointId: endpointId || undefined });

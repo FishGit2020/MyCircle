@@ -1555,6 +1555,7 @@ const es: Record<TranslationKey, string> = {
   'benchmark.results.noResults': 'Ejecuta un benchmark para ver resultados',
   'benchmark.results.error': 'Error',
   'benchmark.results.tokens': 'tokens',
+  'benchmark.results.request': 'Solicitud',
   'benchmark.results.response': 'Respuesta',
   'benchmark.results.autoSaved': 'Guardado en historial',
   'benchmark.results.clearAll': 'Borrar resultados',
