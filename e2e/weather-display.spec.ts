@@ -22,8 +22,8 @@ test.describe('Weather Display', () => {
     await expect(page.getByText(/\d+%/).first()).toBeVisible({ timeout: 15_000 });
   });
 
-  test('displays hourly forecast section', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /hourly forecast/i })).toBeVisible({ timeout: 15_000 });
+  test('displays 3-hour forecast section', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: /3-hour forecast/i })).toBeVisible({ timeout: 15_000 });
   });
 
   test('displays 7-day forecast section', async ({ page }) => {
