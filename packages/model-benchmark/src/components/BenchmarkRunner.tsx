@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useTranslation, useLazyQuery, GET_BENCHMARK_ENDPOINT_MODELS, StorageKeys } from '@mycircle/shared';
 import { useEndpoints } from '../hooks/useEndpoints';
 import { useBenchmark, BENCHMARK_PROMPTS } from '../hooks/useBenchmark';
-import type { BenchmarkRunResult } from '../hooks/useBenchmark';
+import type { BenchmarkRunResult, JudgeConfig } from '../hooks/useBenchmark';
 
 interface Props {
   onResults: (results: BenchmarkRunResult[]) => void;
@@ -11,7 +11,7 @@ interface Props {
 export default function BenchmarkRunner({ onResults }: Props) {
   const { t } = useTranslation();
   const { endpoints } = useEndpoints();
-  const { running, currentEndpoint, runBenchmark } = useBenchmark();
+  const { running, scoring, currentEndpoint, runBenchmark, scoreResults } = useBenchmark();
 
   const [selectedEndpoints, setSelectedEndpoints] = useState<string[]>([]);
   const [modelMap, setModelMap] = useState<Record<string, string>>(() => {
@@ -24,6 +24,11 @@ export default function BenchmarkRunner({ onResults }: Props) {
   const [discoveryLoading, setDiscoveryLoading] = useState<Record<string, boolean>>({});
   const [selectedPromptId, setSelectedPromptId] = useState('simple');
   const [customPrompt, setCustomPrompt] = useState('');
+  const [judgeKey, setJudgeKey] = useState<string>(() => {
+    try {
+      return localStorage.getItem(StorageKeys.BENCHMARK_JUDGE) || 'gemini';
+    } catch { return 'gemini'; }
+  });
 
   const [fetchModelsQuery] = useLazyQuery(GET_BENCHMARK_ENDPOINT_MODELS);
 
@@ -66,6 +71,25 @@ export default function BenchmarkRunner({ onResults }: Props) {
     persistModelMap({ ...modelMap, [endpointId]: model });
   };
 
+  const handleJudgeChange = (key: string) => {
+    setJudgeKey(key);
+    try { localStorage.setItem(StorageKeys.BENCHMARK_JUDGE, key); } catch { /* */ }
+  };
+
+  const getJudgeConfig = useCallback((): JudgeConfig | null => {
+    if (judgeKey === 'none') return null;
+    if (judgeKey === 'gemini') return { provider: 'gemini', label: 'Gemini (cloud)' };
+    // Format: "ollama:{endpointId}:{model}"
+    const parts = judgeKey.split(':');
+    if (parts.length >= 3 && parts[0] === 'ollama') {
+      const epId = parts[1];
+      const model = parts.slice(2).join(':');
+      const ep = endpoints.find(e => e.id === epId);
+      return { provider: 'ollama', endpointId: epId, model, label: `${ep?.name || epId}/${model}` };
+    }
+    return { provider: 'gemini', label: 'Gemini (cloud)' };
+  }, [judgeKey, endpoints]);
+
   const handleRun = async () => {
     const prompt = selectedPromptId === 'custom'
       ? customPrompt
@@ -78,7 +102,14 @@ export default function BenchmarkRunner({ onResults }: Props) {
     }));
     if (endpointModels.some(em => !em.model.trim())) return;
 
-    const results = await runBenchmark(endpointModels, prompt);
+    let results = await runBenchmark(endpointModels, prompt);
+
+    // Score results with judge model if configured
+    const judge = getJudgeConfig();
+    if (judge) {
+      results = await scoreResults(results, judge);
+    }
+
     onResults(results);
 
     // Analytics: track benchmark run completion
@@ -97,7 +128,7 @@ export default function BenchmarkRunner({ onResults }: Props) {
     });
   };
 
-  const runDisabled = running
+  const runDisabled = running || scoring
     || selectedEndpoints.length === 0
     || selectedEndpoints.some(id => !modelMap[id]?.trim());
 
@@ -203,6 +234,29 @@ export default function BenchmarkRunner({ onResults }: Props) {
         )}
       </div>
 
+      {/* Judge Model Selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('benchmark.runner.judgeModel')}</label>
+        <select
+          value={judgeKey}
+          onChange={e => handleJudgeChange(e.target.value)}
+          disabled={running || scoring}
+          aria-label={t('benchmark.runner.judgeModel')}
+          className="w-full max-w-xs px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <option value="none">{t('benchmark.runner.judgeNone')}</option>
+          <option value="gemini">{t('benchmark.runner.judgeGemini')}</option>
+          {endpoints.map(ep => {
+            const epModels = discoveredModels[ep.id] ?? [];
+            return epModels.map(m => (
+              <option key={`ollama:${ep.id}:${m}`} value={`ollama:${ep.id}:${m}`}>
+                {ep.name} / {m}
+              </option>
+            ));
+          })}
+        </select>
+      </div>
+
       {/* Run Button */}
       <button
         type="button"
@@ -210,13 +264,13 @@ export default function BenchmarkRunner({ onResults }: Props) {
         disabled={runDisabled}
         className="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition flex items-center justify-center gap-2"
       >
-        {running ? (
+        {running || scoring ? (
           <>
             <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            {t('benchmark.runner.running')}
+            {scoring ? t('benchmark.runner.scoring') : t('benchmark.runner.running')}
           </>
         ) : (
           t('benchmark.runner.run')

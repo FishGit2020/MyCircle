@@ -386,6 +386,15 @@ export const typeDefs = `#graphql
     timing: BenchmarkTimingResult
     error: String
     timestamp: String!
+    qualityScore: Float
+    qualityFeedback: String
+    qualityJudge: String
+  }
+
+  type BenchmarkQualityResult {
+    score: Float!
+    feedback: String!
+    judge: String!
   }
 
   type BenchmarkRun {
@@ -408,6 +417,7 @@ export const typeDefs = `#graphql
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
     saveBenchmarkEndpoint(input: BenchmarkEndpointInput!): BenchmarkEndpoint!
     deleteBenchmarkEndpoint(id: String!): Boolean!
+    scoreBenchmarkResponse(prompt: String!, response: String!, judgeProvider: String!, judgeEndpointId: String, judgeModel: String): BenchmarkQualityResult!
     saveBenchmarkRun(results: JSON!): BenchmarkRun!
     deleteBenchmarkRun(id: String!): Boolean!
   }

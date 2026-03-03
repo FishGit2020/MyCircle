@@ -112,6 +112,13 @@ export type BenchmarkEndpointInput = {
   url: Scalars['String']['input'];
 };
 
+export type BenchmarkQualityResult = {
+  __typename?: 'BenchmarkQualityResult';
+  feedback: Scalars['String']['output'];
+  judge: Scalars['String']['output'];
+  score: Scalars['Float']['output'];
+};
+
 export type BenchmarkRun = {
   __typename?: 'BenchmarkRun';
   createdAt: Scalars['String']['output'];
@@ -127,6 +134,9 @@ export type BenchmarkRunResult = {
   error?: Maybe<Scalars['String']['output']>;
   model: Scalars['String']['output'];
   prompt: Scalars['String']['output'];
+  qualityFeedback?: Maybe<Scalars['String']['output']>;
+  qualityJudge?: Maybe<Scalars['String']['output']>;
+  qualityScore?: Maybe<Scalars['Float']['output']>;
   response: Scalars['String']['output'];
   timestamp: Scalars['String']['output'];
   timing?: Maybe<BenchmarkTimingResult>;
@@ -283,6 +293,7 @@ export type Mutation = {
   runBenchmark: BenchmarkRunResult;
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
+  scoreBenchmarkResponse: BenchmarkQualityResult;
 };
 
 
@@ -320,6 +331,15 @@ export type MutationSaveBenchmarkEndpointArgs = {
 
 export type MutationSaveBenchmarkRunArgs = {
   results: Scalars['JSON']['input'];
+};
+
+
+export type MutationScoreBenchmarkResponseArgs = {
+  judgeEndpointId?: InputMaybe<Scalars['String']['input']>;
+  judgeModel?: InputMaybe<Scalars['String']['input']>;
+  judgeProvider: Scalars['String']['input'];
+  prompt: Scalars['String']['input'];
+  response: Scalars['String']['input'];
 };
 
 export type OllamaRunningModel = {
@@ -844,7 +864,7 @@ export type GetBenchmarkHistoryQueryVariables = Exact<{
 }>;
 
 
-export type GetBenchmarkHistoryQuery = { __typename?: 'Query', benchmarkHistory: Array<{ __typename?: 'BenchmarkRun', id: string, createdAt: string, results: Array<{ __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, prompt: string, response: string, error?: string | null, timing?: { __typename?: 'BenchmarkTimingResult', tokensPerSecond: number, promptTokensPerSecond: number, timeToFirstToken: number, totalDuration: number } | null }> }> };
+export type GetBenchmarkHistoryQuery = { __typename?: 'Query', benchmarkHistory: Array<{ __typename?: 'BenchmarkRun', id: string, createdAt: string, results: Array<{ __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, prompt: string, response: string, error?: string | null, qualityScore?: number | null, qualityFeedback?: string | null, qualityJudge?: string | null, timing?: { __typename?: 'BenchmarkTimingResult', tokensPerSecond: number, promptTokensPerSecond: number, timeToFirstToken: number, totalDuration: number } | null }> }> };
 
 export type DeleteBenchmarkRunMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -865,7 +885,7 @@ export type RunBenchmarkMutationVariables = Exact<{
 }>;
 
 
-export type RunBenchmarkMutation = { __typename?: 'Mutation', runBenchmark: { __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, prompt: string, response: string, error?: string | null, timestamp: string, timing?: { __typename?: 'BenchmarkTimingResult', totalDuration: number, loadDuration: number, promptEvalCount: number, promptEvalDuration: number, evalCount: number, evalDuration: number, tokensPerSecond: number, promptTokensPerSecond: number, timeToFirstToken: number } | null } };
+export type RunBenchmarkMutation = { __typename?: 'Mutation', runBenchmark: { __typename?: 'BenchmarkRunResult', endpointId: string, endpointName: string, model: string, prompt: string, response: string, error?: string | null, timestamp: string, qualityScore?: number | null, qualityFeedback?: string | null, qualityJudge?: string | null, timing?: { __typename?: 'BenchmarkTimingResult', totalDuration: number, loadDuration: number, promptEvalCount: number, promptEvalDuration: number, evalCount: number, evalDuration: number, tokensPerSecond: number, promptTokensPerSecond: number, timeToFirstToken: number } | null } };
 
 export type SaveBenchmarkEndpointMutationVariables = Exact<{
   input: BenchmarkEndpointInput;
@@ -880,6 +900,17 @@ export type DeleteBenchmarkEndpointMutationVariables = Exact<{
 
 
 export type DeleteBenchmarkEndpointMutation = { __typename?: 'Mutation', deleteBenchmarkEndpoint: boolean };
+
+export type ScoreBenchmarkResponseMutationVariables = Exact<{
+  prompt: Scalars['String']['input'];
+  response: Scalars['String']['input'];
+  judgeProvider: Scalars['String']['input'];
+  judgeEndpointId?: InputMaybe<Scalars['String']['input']>;
+  judgeModel?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ScoreBenchmarkResponseMutation = { __typename?: 'Mutation', scoreBenchmarkResponse: { __typename?: 'BenchmarkQualityResult', score: number, feedback: string, judge: string } };
 
 export type SaveBenchmarkRunMutationVariables = Exact<{
   results: Scalars['JSON']['input'];

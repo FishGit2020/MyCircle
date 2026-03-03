@@ -5,6 +5,8 @@ import { useBenchmark, BENCHMARK_PROMPTS } from './useBenchmark';
 const mockRunMutation = vi.fn();
 const mockSaveMutation = vi.fn();
 
+const mockScoreMutation = vi.fn();
+
 vi.mock('@mycircle/shared', () => {
   const t = (key: string) => key;
   return {
@@ -13,10 +15,12 @@ vi.mock('@mycircle/shared', () => {
       // Return different mutation fns based on query
       if (query === 'RUN_BENCHMARK') return [mockRunMutation, { loading: false }];
       if (query === 'SAVE_BENCHMARK_RUN') return [mockSaveMutation, { loading: false }];
+      if (query === 'SCORE_BENCHMARK_RESPONSE') return [mockScoreMutation, { loading: false }];
       return [vi.fn(), { loading: false }];
     }),
     RUN_BENCHMARK: 'RUN_BENCHMARK',
     SAVE_BENCHMARK_RUN: 'SAVE_BENCHMARK_RUN',
+    SCORE_BENCHMARK_RESPONSE: 'SCORE_BENCHMARK_RESPONSE',
     GET_BENCHMARK_HISTORY: 'GET_BENCHMARK_HISTORY',
     StorageKeys: { BENCHMARK_CACHE: 'benchmark-cache' },
     WindowEvents: { BENCHMARK_CHANGED: 'benchmark-changed' },
@@ -56,9 +60,11 @@ describe('useBenchmark', () => {
     const { result } = renderHook(() => useBenchmark());
     expect(result.current.results).toEqual([]);
     expect(result.current.running).toBe(false);
+    expect(result.current.scoring).toBe(false);
     expect(result.current.currentEndpoint).toBeNull();
     expect(typeof result.current.runBenchmark).toBe('function');
     expect(typeof result.current.saveRun).toBe('function');
+    expect(typeof result.current.scoreResults).toBe('function');
   });
 
   it('runBenchmark sets running to true during execution', async () => {

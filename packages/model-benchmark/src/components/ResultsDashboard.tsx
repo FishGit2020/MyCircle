@@ -2,6 +2,19 @@ import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { BenchmarkRunResult } from '../hooks/useBenchmark';
 
+function QualityBadge({ score }: { score: number }) {
+  const color = score >= 8
+    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+    : score >= 5
+      ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+      : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+  return (
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold ${color}`}>
+      {score.toFixed(1)}
+    </span>
+  );
+}
+
 interface Props {
   results: BenchmarkRunResult[];
   saved: boolean;
@@ -28,6 +41,9 @@ export default function ResultsDashboard({ results, saved, saveError, onClear }:
   const slowestTps = Math.min(
     ...results.filter(r => r.timing).map(r => r.timing!.tokensPerSecond)
   );
+
+  const hasQuality = results.some(r => r.qualityScore != null && r.qualityScore > 0);
+  const baseColSpan = 5 + (results.length > 1 ? 1 : 0) + (hasQuality ? 1 : 0);
 
   return (
     <div className="space-y-4">
@@ -64,6 +80,9 @@ export default function ResultsDashboard({ results, saved, saveError, onClear }:
             <tr className="border-b border-gray-200 dark:border-gray-700">
               <th className="py-2 px-3 text-left text-gray-600 dark:text-gray-400 font-medium">{t('benchmark.results.endpoint')}</th>
               <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-400 font-medium">{t('benchmark.results.tps')}</th>
+              {hasQuality && (
+                <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-400 font-medium">{t('benchmark.results.quality')}</th>
+              )}
               <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-400 font-medium hidden md:table-cell">{t('benchmark.results.promptTps')}</th>
               <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-400 font-medium hidden md:table-cell">{t('benchmark.results.ttft')}</th>
               <th className="py-2 px-3 text-right text-gray-600 dark:text-gray-400 font-medium">{t('benchmark.results.totalTime')}</th>
@@ -85,7 +104,7 @@ export default function ResultsDashboard({ results, saved, saveError, onClear }:
                     <div className="text-xs text-gray-500 dark:text-gray-400">{r.model}</div>
                   </td>
                   {r.error ? (
-                    <td colSpan={results.length > 1 ? 6 : 5} className="py-2.5 px-3 text-red-500 text-sm">
+                    <td colSpan={baseColSpan} className="py-2.5 px-3 text-red-500 text-sm">
                       {t('benchmark.results.error')}: {r.error}
                     </td>
                   ) : r.timing ? (
@@ -95,6 +114,15 @@ export default function ResultsDashboard({ results, saved, saveError, onClear }:
                           {r.timing.tokensPerSecond.toFixed(1)}
                         </span>
                       </td>
+                      {hasQuality && (
+                        <td className="py-2.5 px-3 text-right">
+                          {r.qualityScore != null && r.qualityScore > 0 ? (
+                            <QualityBadge score={r.qualityScore} />
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+                      )}
                       <td className="py-2.5 px-3 text-right hidden md:table-cell font-mono text-gray-700 dark:text-gray-300">
                         {r.timing.promptTokensPerSecond.toFixed(1)}
                       </td>
@@ -120,16 +148,32 @@ export default function ResultsDashboard({ results, saved, saveError, onClear }:
                       )}
                     </>
                   ) : (
-                    <td colSpan={results.length > 1 ? 6 : 5} className="py-2.5 px-3 text-gray-500 text-sm">—</td>
+                    <td colSpan={baseColSpan} className="py-2.5 px-3 text-gray-500 text-sm">—</td>
                   )}
                 </tr>
-                {expandedIdx === i && r.response && (
+                {expandedIdx === i && (
                   <tr className="bg-gray-50 dark:bg-gray-800/50">
-                    <td colSpan={results.length > 1 ? 7 : 6} className="px-3 py-3">
-                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('benchmark.results.response')}</div>
-                      <div className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 max-h-48 overflow-y-auto">
-                        {r.response}
-                      </div>
+                    <td colSpan={baseColSpan + 1} className="px-3 py-3 space-y-2">
+                      {r.qualityFeedback && (
+                        <div>
+                          <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                            {t('benchmark.results.quality')}
+                            {r.qualityJudge && <span className="ml-1 font-normal">({t('benchmark.results.qualityJudge')}: {r.qualityJudge})</span>}
+                          </div>
+                          <div className="text-sm text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-2">
+                            {r.qualityScore != null && r.qualityScore > 0 && <QualityBadge score={r.qualityScore} />}
+                            <span className="ml-2">{r.qualityFeedback}</span>
+                          </div>
+                        </div>
+                      )}
+                      {r.response && (
+                        <div>
+                          <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('benchmark.results.response')}</div>
+                          <div className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-3 max-h-48 overflow-y-auto">
+                            {r.response}
+                          </div>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 )}

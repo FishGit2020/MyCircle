@@ -1576,6 +1576,12 @@ const es: Record<TranslationKey, string> = {
   'benchmark.history.hideDetails': 'Ocultar detalles',
   'benchmark.history.clearAll': 'Borrar todo',
   'benchmark.history.clearAllConfirm': '\u00bfEliminar todo el historial de benchmarks?',
+  'benchmark.runner.judgeModel': 'Modelo juez',
+  'benchmark.runner.judgeGemini': 'Gemini (nube)',
+  'benchmark.runner.judgeNone': 'Ninguno (omitir puntuaci\u00f3n)',
+  'benchmark.runner.scoring': 'Evaluando respuestas...',
+  'benchmark.results.quality': 'Calidad',
+  'benchmark.results.qualityJudge': 'Evaluado por',
   'benchmark.signInRequired': 'Inicia sesi\u00f3n para usar benchmarks',
 
   // Endpoint source labels
