@@ -1763,6 +1763,7 @@ export const digitalLibrary = onRequest(
     const bucket = getStorage().bucket();
 
     // POST /digital-library-api/upload-url
+    // Returns a resumable upload URI (no signBlob permission needed)
     if (req.method === 'POST' && route === 'upload-url') {
       const { fileName, contentType, fileSize } = req.body;
       if (!fileName || !contentType) { res.status(400).json({ error: 'fileName and contentType required' }); return; }
@@ -1772,11 +1773,11 @@ export const digitalLibrary = onRequest(
       const storagePath = `books/${bookId}/original.epub`;
       const file = bucket.file(storagePath);
 
-      const [uploadUrl] = await file.getSignedUrl({
-        version: 'v4',
-        action: 'write',
-        expires: Date.now() + 15 * 60 * 1000,
-        contentType: 'application/epub+zip',
+      const [uploadUrl] = await file.createResumableUpload({
+        metadata: {
+          contentType: 'application/epub+zip',
+          metadata: { uploadedBy: uid },
+        },
       });
 
       res.json({ uploadUrl, bookId });
