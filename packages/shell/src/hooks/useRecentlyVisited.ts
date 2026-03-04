@@ -11,7 +11,7 @@ export interface RecentPage {
 const MAX_RECENT = 5;
 
 /** Routes that should not be tracked (home is always accessible) */
-const EXCLUDED = new Set(['/', '/compare']);
+const EXCLUDED = new Set(['/', '/weather/compare']);
 
 function load(): RecentPage[] {
   try {

@@ -77,11 +77,10 @@ export function useFlashCards() {
   const migratedRef = useRef(false);
   const chineseMigratedRef = useRef(false);
 
-  // Auth state detection
+  // Auth state detection — event-driven instead of polling
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
-      if (document.visibilityState === 'hidden') return;
       try {
         const token = await window.__getFirebaseIdToken?.();
         if (mounted) setIsAuthenticated(!!token);
@@ -90,8 +89,9 @@ export function useFlashCards() {
       }
     };
     checkAuth();
-    const interval = setInterval(checkAuth, 5000);
-    return () => { mounted = false; clearInterval(interval); };
+    const handler = () => { checkAuth(); };
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler); };
   }, []);
 
   // Map raw Chinese characters to FlashCards
@@ -212,6 +212,7 @@ export function useFlashCards() {
         };
         setProgress(p);
         saveToStorage(StorageKeys.FLASHCARD_PROGRESS, p);
+        window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
       }
     }).catch(() => { /* ignore */ });
 

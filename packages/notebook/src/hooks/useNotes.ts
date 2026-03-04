@@ -65,6 +65,7 @@ export function useNotes() {
         // Update dashboard cache
         try {
           localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(data.length));
+          window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
         } catch { /* ignore */ }
       });
       // Safety: stop loading if subscription doesn't fire (e.g. not authenticated)

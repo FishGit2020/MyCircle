@@ -11,6 +11,7 @@ function resolveDetailLabel(
 ): string {
   switch (firstSegment) {
     case 'weather':
+      if (segments[1] === 'compare') return t('nav.compare');
       return searchParams.get('name') || t('nav.detail');
     case 'stocks':
       return segments[1];

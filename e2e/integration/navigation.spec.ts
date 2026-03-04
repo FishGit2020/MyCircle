@@ -10,7 +10,7 @@ test.describe('Navigation Integration', () => {
     { path: '/stocks', name: 'Stocks', expectedText: /stock|search|market/i },
     { path: '/podcasts', name: 'Podcasts', expectedText: /podcast|trending|search|discover/i },
     { path: '/ai', name: 'AI Assistant', expectedText: /assistant|chat|ai|message/i },
-    { path: '/compare', name: 'Compare', expectedText: /compare|cities|favorite/i },
+    { path: '/weather/compare', name: 'Compare', expectedText: /compare|cities|favorite/i },
   ];
 
   for (const route of routes) {
