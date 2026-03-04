@@ -432,6 +432,25 @@ Exposes `ModelBenchmark` component via Module Federation. Port **3004**.
 - GraphQL rate limit: 5 benchmark operations per minute per user
 - Route: `/benchmark`
 
+### Family Games - `packages/family-games/`
+
+Exposes `FamilyGames` component via Module Federation. Port **3020**.
+
+**Key Behavior:**
+- 5 family-friendly mini-games: **Trivia Quiz**, **Math Challenge**, **Word Game** (Wordle-style), **Memory Match**, **Heads Up!** (charades-style)
+- Shared scoreboard backed by Firestore `games/scores/{gameType}` collection with real-time `onSnapshot` leaderboards
+- Trivia: 100+ bundled questions across 4 categories (science, history, geography, pop culture), 10 per round, 15s timer per question with speed bonus scoring
+- Math Challenge: random arithmetic (add/subtract/multiply/divide), 3 difficulty levels, 60s timed mode with streak bonuses
+- Word Game: daily 5-letter word puzzle (date-seeded, same for all users), 6 attempts, green/yellow/gray feedback, on-screen keyboard
+- Memory Match: emoji card grid (4x4, 5x4, 6x6 for easy/medium/hard), flip pairs to match, scored by time + flip count
+- Heads Up: hold phone to forehead, others describe the word, 60s rounds, 100 bundled words
+- All game data bundled (no API calls) — offline-capable
+- Per-user game progress stored at `users/{uid}/gameProgress/{docId}`
+- Bridge API on `window.__familyGames` (getScores, subscribe, saveScore)
+- Dashboard widget shows game overview
+- Auth-gated: requires Firebase sign-in
+- Route: `/family-games`
+
 ---
 
 ## Navigation & Discovery

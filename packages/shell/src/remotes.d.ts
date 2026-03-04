@@ -90,3 +90,8 @@ declare module 'digitalLibrary/DigitalLibrary' {
   const DigitalLibrary: React.ComponentType;
   export default DigitalLibrary;
 }
+
+declare module 'familyGames/FamilyGames' {
+  const FamilyGames: React.ComponentType;
+  export default FamilyGames;
+}

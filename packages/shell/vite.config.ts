@@ -160,6 +160,10 @@ const digitalLibraryRemote = isProduction
   ? '/digital-library/assets/remoteEntry.js'
   : 'http://localhost:3019/assets/remoteEntry.js';
 
+const familyGamesRemote = isProduction
+  ? '/family-games/assets/remoteEntry.js'
+  : 'http://localhost:3020/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -183,7 +187,8 @@ export default defineConfig({
         cloudFiles: cloudFilesRemote,
         modelBenchmark: modelBenchmarkRemote,
         immigrationTracker: immigrationTrackerRemote,
-        digitalLibrary: digitalLibraryRemote
+        digitalLibrary: digitalLibraryRemote,
+        familyGames: familyGamesRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

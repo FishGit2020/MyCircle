@@ -50,6 +50,11 @@ service cloud.firestore {
       match /immigrationCases/{caseId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Game progress subcollection - private per-user game stats
+      match /gameProgress/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Feedback collection - anyone can submit feedback (write-only inbox)
@@ -96,6 +101,11 @@ service cloud.firestore {
     // Announcements - public read, admin-only write (via Firebase console/backend)
     match /announcements/{announcementId} {
       allow read: if true;
+    }
+
+    // Game scores - shared scoreboard, any authenticated user can read/write
+    match /games/scores/{scoreId} {
+      allow read, write: if request.auth != null;
     }
 
     // Books - shared library, authenticated read, uploader can write/delete

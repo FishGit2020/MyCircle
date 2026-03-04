@@ -19,4 +19,5 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   immigration: 'nav.immigration',
   benchmark: 'nav.benchmark',
   library: 'nav.digitalLibrary',
+  'family-games': 'nav.familyGames',
 };

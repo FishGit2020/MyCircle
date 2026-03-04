@@ -59,6 +59,7 @@ export const WindowEvents = {
   WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
   BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
   BREADCRUMB_DETAIL: 'breadcrumb-detail',
+  FAMILY_GAMES_CHANGED: 'family-games-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -116,6 +117,7 @@ export const StorageKeys = {
   BOOKS_CACHE: 'books-cache',
   BOOK_BOOKMARKS: 'book-bookmarks',
   BOOK_AUDIO_PROGRESS: 'book-audio-progress',
+  FAMILY_GAMES_CACHE: 'family-games-cache',
 } as const;
 
 export interface CitySelectedEvent {
