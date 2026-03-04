@@ -348,6 +348,7 @@ export default function DigitalLibrary() {
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}
         onBack={handleBack}
+        isAdmin={!!(window as Record<string, unknown>).__isAdmin}
       />
     );
   }

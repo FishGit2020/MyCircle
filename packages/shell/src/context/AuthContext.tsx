@@ -116,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       const userProfile = await getUserProfile(user.uid);
       setProfile(userProfile);
+      (window as Record<string, unknown>).__isAdmin = userProfile?.isAdmin ?? false;
       if (userProfile) {
         setRecentCities(userProfile.recentCities || []);
         setFavoriteCities(userProfile.favoriteCities || []);

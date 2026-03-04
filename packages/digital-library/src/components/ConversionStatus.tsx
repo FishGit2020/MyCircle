@@ -24,9 +24,10 @@ interface ConversionStatusProps {
   initialProgress: number;
   onComplete: () => void;
   onConvert: (voiceName: string) => Promise<Response | undefined>;
+  isAdmin?: boolean;
 }
 
-export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert }: ConversionStatusProps) {
+export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert, isAdmin }: ConversionStatusProps) {
   const { t } = useTranslation();
   const [status, setStatus] = useState(initialStatus);
   const [progress, setProgress] = useState(initialProgress);
@@ -34,6 +35,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const [converting, setConverting] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState(getDefaultVoice(language));
   const [checking, setChecking] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const langCode = getLangCode(language);
   const voiceOptions = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
@@ -103,6 +105,40 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [onConvert, selectedVoice, t]);
 
+  const handleAdminReset = useCallback(async () => {
+    setResetting(true);
+    try {
+      const token = await window.__getFirebaseIdToken?.();
+      if (!token) return;
+      const apiBase = window.__digitalLibraryApiBase?.() || '';
+      const res = await fetch(`${apiBase}/digital-library-api/admin/reset-conversion/${bookId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        setStatus('none');
+        setProgress(0);
+        setError(null);
+        logger.info('Admin reset conversion', { bookId });
+      }
+    } catch (err) {
+      logger.error('Admin reset failed', err);
+    } finally {
+      setResetting(false);
+    }
+  }, [bookId]);
+
+  const adminResetButton = isAdmin && (status === 'processing' || status === 'error') ? (
+    <button
+      type="button"
+      onClick={handleAdminReset}
+      disabled={resetting}
+      className="text-xs text-orange-600 dark:text-orange-400 hover:underline min-h-[44px] disabled:opacity-50"
+    >
+      {resetting ? t('library.resetting') : t('library.adminForceReset')}
+    </button>
+  ) : null;
+
   const voicePicker = (
     <div className="flex items-center gap-2 mb-2">
       <label htmlFor={`voice-select-${bookId}`} className="text-sm text-gray-600 dark:text-gray-400">
@@ -155,14 +191,17 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
             <div className="h-full bg-purple-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
           </div>
         )}
-        <button
-          type="button"
-          onClick={handleCheckStatus}
-          disabled={checking}
-          className="text-xs text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] disabled:opacity-50"
-        >
-          {checking ? t('library.converting') : t('library.convertingRefresh')}
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={handleCheckStatus}
+            disabled={checking}
+            className="text-xs text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] disabled:opacity-50"
+          >
+            {checking ? t('library.converting') : t('library.convertingRefresh')}
+          </button>
+          {adminResetButton}
+        </div>
       </div>
     );
   }
@@ -174,14 +213,17 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           <span className="text-sm text-red-600 dark:text-red-400">{error || t('library.conversionFailed')}</span>
         </div>
         {voicePicker}
-        <button
-          type="button"
-          onClick={handleConvert}
-          disabled={converting}
-          className="text-sm text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] text-left disabled:opacity-50"
-        >
-          {converting ? t('library.converting') : t('library.convertToAudio')}
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={handleConvert}
+            disabled={converting}
+            className="text-sm text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] text-left disabled:opacity-50"
+          >
+            {converting ? t('library.converting') : t('library.convertToAudio')}
+          </button>
+          {adminResetButton}
+        </div>
       </div>
     );
   }

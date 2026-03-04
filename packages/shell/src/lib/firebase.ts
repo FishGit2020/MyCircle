@@ -126,6 +126,7 @@ export interface UserProfile {
   widgetLayout?: Array<{ id: string; visible: boolean; size?: string }>;
   bookBookmarks?: Array<{ bookId: string; bookTitle: string; cfi: string; label: string; createdAt: number }>;
   bookAudioProgress?: Record<string, { position: number; duration: number; chapter: number }>;
+  isAdmin?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -1445,6 +1446,9 @@ window.__digitalLibraryApiBase = () => {
   }
   return '';
 };
+
+// Expose admin status for MFEs (set via AuthContext when profile loads)
+(window as Record<string, unknown>).__isAdmin = false;
 
 // Expose current user uid for MFEs
 window.__currentUid = auth?.currentUser?.uid ?? null;
