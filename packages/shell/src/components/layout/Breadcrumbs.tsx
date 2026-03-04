@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { ROUTE_LABEL_KEYS } from '../../routeConfig';
 
 function resolveDetailLabel(
@@ -30,6 +30,17 @@ export default function Breadcrumbs() {
   const { t } = useTranslation();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const [mfeDetail, setMfeDetail] = useState<string | null>(null);
+
+  // Listen for MFE-provided breadcrumb detail (e.g. book title from digital library)
+  useEffect(() => {
+    const handler = (e: Event) => setMfeDetail((e as CustomEvent).detail || null);
+    window.addEventListener(WindowEvents.BREADCRUMB_DETAIL, handler);
+    return () => window.removeEventListener(WindowEvents.BREADCRUMB_DETAIL, handler);
+  }, []);
+
+  // Clear MFE detail on route change
+  useEffect(() => { setMfeDetail(null); }, [location.pathname]);
 
   // Don't show breadcrumbs on the home page
   if (location.pathname === '/') return null;
@@ -84,6 +95,21 @@ export default function Breadcrumbs() {
             <li aria-hidden="true" className="select-none">/</li>
             <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200">
               {t(`${firstSegment}.tabs.${tabParam}` as any)}
+            </li>
+          </>
+        ) : mfeDetail ? (
+          <>
+            <li>
+              <Link
+                to={`/${firstSegment}`}
+                className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+              >
+                {t(labelKey)}
+              </Link>
+            </li>
+            <li aria-hidden="true" className="select-none">/</li>
+            <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200 truncate max-w-[200px]">
+              {mfeDetail}
             </li>
           </>
         ) : (
