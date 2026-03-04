@@ -1842,7 +1842,7 @@ export const digitalLibrary = onRequest(
         // Extract metadata using epub2
         const epub2Module = await import('epub2');
         const EPub = epub2Module.EPub;
-        const tmpPath = `/tmp/${bookId}.epub`;
+        const tmpPath = `/tmp/epub-${crypto.randomUUID()}.epub`;
         const fs = await import('fs');
         fs.writeFileSync(tmpPath, buffer);
 
@@ -2052,7 +2052,7 @@ export const digitalLibrary = onRequest(
         const epubFile = bucket.file(bookData.storagePath);
         const [epubBuffer] = await epubFile.download();
         const fs = await import('fs');
-        const tmpPath = `/tmp/${bookId}-tts.epub`;
+        const tmpPath = `/tmp/tts-${crypto.randomUUID()}.epub`;
         fs.writeFileSync(tmpPath, epubBuffer);
 
         const epub2Module = await import('epub2');
