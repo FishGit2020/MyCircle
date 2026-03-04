@@ -45,6 +45,66 @@ test.describe('Emulator Smoke Tests', () => {
     await expect(page.locator('body')).not.toBeEmpty();
   });
 
+  test('notebook page loads', async ({ page }) => {
+    await page.goto('/notebook');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('baby tracker page loads', async ({ page }) => {
+    await page.goto('/baby');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('child development page loads', async ({ page }) => {
+    await page.goto('/child-dev');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('flashcards page loads', async ({ page }) => {
+    await page.goto('/flashcards');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('work tracker page loads', async ({ page }) => {
+    await page.goto('/work-tracker');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('immigration tracker page loads', async ({ page }) => {
+    await page.goto('/immigration');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('model benchmark page loads', async ({ page }) => {
+    await page.goto('/benchmark');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('digital library page loads', async ({ page }) => {
+    await page.goto('/library');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('worship songs page loads', async ({ page }) => {
+    await page.goto('/worship');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
+  test('AI assistant page loads', async ({ page }) => {
+    await page.goto('/ai');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('body')).not.toBeEmpty();
+  });
+
   test('navigation between pages works', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
