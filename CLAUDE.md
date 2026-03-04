@@ -49,7 +49,8 @@ When adding a new micro frontend, update ALL of these integration points:
 2. **Testing**: Mock file in `packages/shell/test/mocks/`, alias in **both** root `vitest.config.ts` AND `packages/shell/vitest.config.ts`, update hardcoded widget/nav counts in existing tests
 3. **Deployment**: `deploy/docker/Dockerfile` (COPY in build + runtime stages), `scripts/assemble-firebase.mjs` (copy block + mfeDirs array), `server/production.ts` (`MFE_PREFIXES` array)
 4. **Other**: `firestore.rules` (if new subcollections), root `package.json` (`dev:*` and `preview:*` scripts **AND** the `"dev"` + `"dev:mf"` concurrently commands — missing this means the MFE won't start in local dev and the route silently fails), i18n keys in all 3 locales, `docs/architecture.md`, `README.md`
-5. **functions/ has separate strict tsconfig**: `noUnusedLocals: true` — root `pnpm typecheck` doesn't catch it. Always verify with `cd functions && npx tsc --noEmit` before pushing backend changes.
+5. **Cloud Function endpoints**: If the MFE has its own Cloud Function (REST API), add a `firebase.json` hosting rewrite **before** the catch-all `** → /index.html` rule: `{ "source": "/your-api-path/**", "function": "yourFunction" }`. Missing this causes the API to return HTML (index.html) instead of JSON in production.
+6. **functions/ has separate strict tsconfig**: `noUnusedLocals: true` — root `pnpm typecheck` doesn't catch it. Always verify with `cd functions && npx tsc --noEmit` before pushing backend changes.
 
 ## Removing Features
 
