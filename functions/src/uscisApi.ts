@@ -5,7 +5,8 @@ import { logger } from 'firebase-functions';
 let oauthToken: string | null = null;
 let tokenExpiresAt = 0;
 
-const USCIS_API_BASE = 'https://api.uscis.gov';
+const DEFAULT_API_BASE = 'https://api.uscis.gov';
+const DEFAULT_OAUTH_URL = 'https://api.uscis.gov/oauth/accesstoken';
 
 interface UscisHistoryEntry {
   date: string;
@@ -23,8 +24,25 @@ interface UscisResult {
   history?: UscisHistoryEntry[];
 }
 
+// ─── RFC-9457 Error Extraction ───────────────────────────────────────
+function extractErrorMessage(err: any): string {
+  // RFC-9457 errors array format
+  const rfcMessage = err.response?.data?.errors?.[0]?.message;
+  if (rfcMessage) return rfcMessage;
+
+  // Simple message format (e.g. 404 "receipt not recognized")
+  const simpleMessage = err.response?.data?.message;
+  if (simpleMessage) return simpleMessage;
+
+  return err.message || 'Unknown USCIS API error';
+}
+
 // ─── OAuth Access Token ──────────────────────────────────────────────
-async function getAccessToken(clientId: string, clientSecret: string): Promise<string> {
+async function getAccessToken(
+  clientId: string,
+  clientSecret: string,
+  oauthUrl: string,
+): Promise<string> {
   const now = Date.now();
   if (oauthToken && now < tokenExpiresAt) {
     return oauthToken;
@@ -32,7 +50,7 @@ async function getAccessToken(clientId: string, clientSecret: string): Promise<s
 
   const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
   const resp = await axios.post(
-    `${USCIS_API_BASE}/oauth/accesstoken`,
+    oauthUrl,
     'grant_type=client_credentials',
     {
       headers: {
@@ -56,17 +74,22 @@ async function fetchFromUscisApi(
   receiptNumber: string,
   clientId: string,
   clientSecret: string,
+  apiBase: string,
+  oauthUrl: string,
+  demoId?: string,
   retried = false,
 ): Promise<UscisResult> {
-  const token = await getAccessToken(clientId, clientSecret);
+  const token = await getAccessToken(clientId, clientSecret, oauthUrl);
 
   try {
+    const headers: Record<string, string> = { 'Authorization': `Bearer ${token}` };
+    if (demoId) {
+      headers['demo_id'] = demoId;
+    }
+
     const resp = await axios.get(
-      `${USCIS_API_BASE}/case-status/${receiptNumber}`,
-      {
-        headers: { 'Authorization': `Bearer ${token}` },
-        timeout: 10000,
-      },
+      `${apiBase}/case-status/${receiptNumber}`,
+      { headers, timeout: 10000 },
     );
 
     const cs = resp.data?.case_status;
@@ -98,22 +121,32 @@ async function fetchFromUscisApi(
     if (err.response?.status === 401 && !retried) {
       oauthToken = null;
       tokenExpiresAt = 0;
-      return fetchFromUscisApi(receiptNumber, clientId, clientSecret, true);
+      return fetchFromUscisApi(receiptNumber, clientId, clientSecret, apiBase, oauthUrl, demoId, true);
     }
-    throw err;
+    // Extract RFC-9457 or simple error message
+    const message = extractErrorMessage(err);
+    const status = err.response?.status;
+    const enriched = new Error(message);
+    (enriched as any).statusCode = status;
+    throw enriched;
   }
 }
 
 // ─── Entry Point ─────────────────────────────────────────────────────
 export async function fetchUscisStatus(receiptNumber: string): Promise<UscisResult> {
   const creds = JSON.parse(process.env.USCIS_CREDS || '{}');
-  const { clientId, clientSecret } = creds;
+  const { clientId, clientSecret, apiBase, oauthUrl, demoId } = creds;
 
   if (!clientId || !clientSecret) {
     throw new Error('USCIS_CREDS secret not configured');
   }
 
-  const result = await fetchFromUscisApi(receiptNumber, clientId, clientSecret);
+  const resolvedApiBase = apiBase || DEFAULT_API_BASE;
+  const resolvedOauthUrl = oauthUrl || DEFAULT_OAUTH_URL;
+
+  const result = await fetchFromUscisApi(
+    receiptNumber, clientId, clientSecret, resolvedApiBase, resolvedOauthUrl, demoId,
+  );
   logger.info('USCIS status fetched', { receiptNumber, status: result.status });
   return result;
 }

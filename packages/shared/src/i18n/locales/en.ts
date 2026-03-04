@@ -328,6 +328,8 @@ const en = {
   // Footer
   'footer.dataProvider': 'Powered by',
   'footer.builtWith': 'Built with React, Vite, and Micro Frontend Architecture',
+  'footer.privacyPolicy': 'Privacy Policy',
+  'footer.termsOfService': 'Terms of Service',
 
   // Language
   'language.label': 'Language',
@@ -1726,6 +1728,40 @@ const en = {
   'games.round': 'Round',
   'games.ready': 'Ready?',
   'games.holdUp': 'Hold the phone up to your forehead!',
+
+  // Privacy Policy
+  'privacy.title': 'Privacy Policy',
+  'privacy.lastUpdated': 'Last updated: March 2026',
+  'privacy.introTitle': 'Introduction',
+  'privacy.introText': 'MyCircle ("we", "us", or "our") respects your privacy. This Privacy Policy explains how we collect, use, and protect your information when you use our application.',
+  'privacy.collectTitle': 'Information We Collect',
+  'privacy.collectText': 'We collect information you provide directly, such as account details and preferences. We also collect usage data to improve our services, including pages visited and features used.',
+  'privacy.useTitle': 'How We Use Your Information',
+  'privacy.useText': 'We use your information to provide and improve our services, personalize your experience, and communicate with you about updates and changes.',
+  'privacy.sharingTitle': 'Information Sharing',
+  'privacy.sharingText': 'We do not sell your personal information. We may share data with third-party service providers that help us operate our application, subject to confidentiality agreements.',
+  'privacy.securityTitle': 'Data Security',
+  'privacy.securityText': 'We implement industry-standard security measures to protect your data. However, no method of electronic transmission or storage is completely secure.',
+  'privacy.contactTitle': 'Contact Us',
+  'privacy.contactText': 'If you have questions about this Privacy Policy, please contact us through our GitHub repository.',
+
+  // Terms of Service
+  'terms.title': 'Terms of Service',
+  'terms.lastUpdated': 'Last updated: March 2026',
+  'terms.introTitle': 'Acceptance of Terms',
+  'terms.introText': 'By accessing or using MyCircle, you agree to be bound by these Terms of Service. If you do not agree, please do not use the application.',
+  'terms.useTitle': 'Use of Service',
+  'terms.useText': 'You may use MyCircle for lawful purposes only. You agree not to misuse our services or help anyone else do so.',
+  'terms.accountsTitle': 'Accounts',
+  'terms.accountsText': 'You are responsible for maintaining the security of your account credentials. You must notify us immediately of any unauthorized use of your account.',
+  'terms.contentTitle': 'User Content',
+  'terms.contentText': 'You retain ownership of content you create. By using our services, you grant us a limited license to store and display your content as necessary to provide the service.',
+  'terms.disclaimerTitle': 'Disclaimer',
+  'terms.disclaimerText': 'MyCircle is provided "as is" without warranties of any kind. We do not guarantee the accuracy, completeness, or reliability of any content or data provided through the application.',
+  'terms.limitationTitle': 'Limitation of Liability',
+  'terms.limitationText': 'To the maximum extent permitted by law, MyCircle shall not be liable for any indirect, incidental, or consequential damages arising from your use of the application.',
+  'terms.contactTitle': 'Contact Us',
+  'terms.contactText': 'If you have questions about these Terms of Service, please contact us through our GitHub repository.',
 } as const;
 
 export default en;

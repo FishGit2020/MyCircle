@@ -418,6 +418,11 @@ export default function Layout() {
               GitHub
             </a>
           </p>
+          <p className="text-xs text-gray-400 mt-2">
+            <Link to="/privacy" className="text-blue-400 hover:underline">{t('footer.privacyPolicy')}</Link>
+            {' · '}
+            <Link to="/terms" className="text-blue-400 hover:underline">{t('footer.termsOfService')}</Link>
+          </p>
           {!configLoading && Object.keys(config).length > 0 && (
             <div className="mt-2 flex flex-wrap justify-center gap-1">
               {Object.entries(config).map(([key, value]) => (
