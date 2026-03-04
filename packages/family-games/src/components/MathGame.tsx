@@ -5,6 +5,13 @@ import GameOver from './GameOver';
 type Difficulty = 'easy' | 'medium' | 'hard';
 type Op = '+' | '-' | '\u00d7' | '\u00f7';
 
+const NUMPAD_KEYS = [
+  ['1', '2', '3'],
+  ['4', '5', '6'],
+  ['7', '8', '9'],
+  ['C', '0', '='],
+];
+
 const GAME_DURATION_MS = 60_000;
 
 function generateProblem(difficulty: Difficulty): { a: number; b: number; op: Op; answer: number } {
@@ -60,7 +67,6 @@ export default function MathGame({ onBack }: MathGameProps) {
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION_MS);
   const startRef = useRef(Date.now());
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -95,14 +101,7 @@ export default function MathGame({ onBack }: MathGameProps) {
     return () => stopTimer();
   }, [stopTimer]);
 
-  useEffect(() => {
-    if (phase === 'playing') {
-      inputRef.current?.focus();
-    }
-  }, [phase, problem]);
-
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const submitAnswer = useCallback(() => {
     const userAnswer = parseInt(input, 10);
     if (isNaN(userAnswer)) return;
 
@@ -120,9 +119,33 @@ export default function MathGame({ onBack }: MathGameProps) {
       setProblem(generateProblem(difficulty));
       setInput('');
       setFeedback(null);
-      inputRef.current?.focus();
     }, 400);
   }, [input, problem, difficulty, streak]);
+
+  const handleKey = useCallback((key: string) => {
+    if (phase !== 'playing') return;
+    if (key >= '0' && key <= '9') {
+      setInput(prev => prev + key);
+    } else if (key === 'C') {
+      setInput('');
+    } else if (key === 'Backspace') {
+      setInput(prev => prev.slice(0, -1));
+    } else if (key === '=' || key === 'Enter') {
+      submitAnswer();
+    }
+  }, [phase, submitAnswer]);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if ((e.key >= '0' && e.key <= '9') || e.key === 'Backspace' || e.key === 'Enter') {
+        e.preventDefault();
+        handleKey(e.key);
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleKey]);
 
   if (phase === 'over') {
     const elapsed = Date.now() - startRef.current;
@@ -217,26 +240,34 @@ export default function MathGame({ onBack }: MathGameProps) {
         )}
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="flex gap-3">
-        <input
-          ref={inputRef}
-          type="number"
-          inputMode="numeric"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="?"
-          className="flex-1 px-4 py-3 text-center text-2xl font-mono font-bold bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-blue-400 dark:focus:border-blue-500 focus:outline-none text-gray-900 dark:text-white"
-          autoComplete="off"
-          aria-label="Answer"
-        />
-        <button
-          type="submit"
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-lg transition active:scale-95"
-        >
-          =
-        </button>
-      </form>
+      {/* Answer display */}
+      <div
+        className="w-full px-4 py-3 text-center text-2xl font-mono font-bold bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white min-h-[52px]"
+        aria-label="Answer"
+        aria-live="polite"
+      >
+        {input || <span className="text-gray-400 dark:text-gray-500">?</span>}
+      </div>
+
+      {/* Number pad */}
+      <div className="grid grid-cols-3 gap-2">
+        {NUMPAD_KEYS.flat().map(key => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => handleKey(key)}
+            className={`h-14 rounded-xl font-bold text-xl transition active:scale-95 ${
+              key === '='
+                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                : key === 'C'
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            {key}
+          </button>
+        ))}
+      </div>
 
       {/* Feedback */}
       {feedback && (
