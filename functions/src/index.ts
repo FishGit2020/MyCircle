@@ -122,7 +122,7 @@ export const graphql = onRequest(
     cors: ALLOWED_ORIGINS,
     maxInstances: 10,
     memory: '512MiB',
-    timeoutSeconds: 60,
+    timeoutSeconds: 300,
     secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_CREDS', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY']
   },
   async (req: Request, res: Response) => {
@@ -1724,7 +1724,13 @@ export const uscisStatus = onRequest(
         {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'Mozilla/5.0 (compatible; MyCircle/1.0)',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Cache-Control': 'no-cache',
+            'Origin': 'https://egov.uscis.gov',
+            'Referer': 'https://egov.uscis.gov/casestatus/landing.do',
           },
           timeout: 15000,
         },
