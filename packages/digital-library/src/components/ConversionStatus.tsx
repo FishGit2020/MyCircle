@@ -8,7 +8,7 @@ interface ConversionStatusProps {
   initialStatus: 'none' | 'processing' | 'complete' | 'error';
   initialProgress: number;
   onComplete: () => void;
-  onConvert: () => void;
+  onConvert: () => Promise<Response | undefined>;
 }
 
 export default function ConversionStatus({ bookId, initialStatus, initialProgress, onComplete, onConvert }: ConversionStatusProps) {
@@ -16,6 +16,7 @@ export default function ConversionStatus({ bookId, initialStatus, initialProgres
   const [status, setStatus] = useState(initialStatus);
   const [progress, setProgress] = useState(initialProgress);
   const [error, setError] = useState<string | null>(null);
+  const [converting, setConverting] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const pollProgress = useCallback(async () => {
@@ -48,17 +49,39 @@ export default function ConversionStatus({ bookId, initialStatus, initialProgres
     }
   }, [status, pollProgress]);
 
+  const handleConvert = useCallback(async () => {
+    setConverting(true);
+    setError(null);
+    try {
+      const res = await onConvert();
+      if (res && res.status === 429) {
+        const data = await res.json();
+        const usedMB = ((data.used || 0) / 1_000_000).toFixed(1);
+        const limitMB = ((data.limit || 0) / 1_000_000).toFixed(1);
+        setError(t('library.quotaReached').replace('{used}', usedMB).replace('{limit}', limitMB));
+        setStatus('error');
+      } else if (res && res.ok) {
+        setStatus('processing');
+      }
+    } catch (err) {
+      logger.error('Failed to start conversion', err);
+    } finally {
+      setConverting(false);
+    }
+  }, [onConvert, t]);
+
   if (status === 'none') {
     return (
       <button
         type="button"
-        onClick={onConvert}
-        className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition text-sm font-medium min-h-[44px]"
+        onClick={handleConvert}
+        disabled={converting}
+        className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition text-sm font-medium min-h-[44px] disabled:opacity-50"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
         </svg>
-        {t('library.convertToAudio')}
+        {converting ? t('library.converting') : t('library.convertToAudio')}
       </button>
     );
   }
@@ -90,15 +113,17 @@ export default function ConversionStatus({ bookId, initialStatus, initialProgres
 
   if (status === 'error') {
     return (
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-red-600 dark:text-red-400">{t('library.conversionFailed')}</span>
-        {error && <span className="text-xs text-gray-500 dark:text-gray-400">({error})</span>}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-red-600 dark:text-red-400">{error || t('library.conversionFailed')}</span>
+        </div>
         <button
           type="button"
-          onClick={onConvert}
-          className="text-sm text-blue-600 dark:text-blue-400 hover:underline min-h-[44px]"
+          onClick={handleConvert}
+          disabled={converting}
+          className="text-sm text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] text-left disabled:opacity-50"
         >
-          {t('library.convertToAudio')}
+          {converting ? t('library.converting') : t('library.convertToAudio')}
         </button>
       </div>
     );

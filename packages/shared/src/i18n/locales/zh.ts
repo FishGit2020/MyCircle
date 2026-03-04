@@ -1656,6 +1656,7 @@ const zh: Record<TranslationKey, string> = {
   'library.nextChapter': '\u4e0b\u4e00\u7ae0',
   'library.prevChapter': '\u4e0a\u4e00\u7ae0',
   'library.download': '\u4e0b\u8f7d',
+  'library.quotaReached': '\u6708\u5ea6TTS\u914d\u989d\u5df2\u7528\u5c3d ({used}M / {limit}M \u5b57\u7b26)\u3002\u4e0b\u6708\u91cd\u7f6e\u3002',
 };
 
 export default zh;

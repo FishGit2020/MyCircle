@@ -2022,6 +2022,28 @@ export const digitalLibrary = onRequest(
       return;
     }
 
+    // ── TTS Monthly Quota ─────────────────────────────────────────────
+    // 3.5M chars/month (~87% of the 4M free tier) — prevents surprise bills
+    const TTS_MONTHLY_CHAR_LIMIT = 3_500_000;
+
+    async function getTtsUsage(): Promise<{ ref: FirebaseFirestore.DocumentReference; chars: number }> {
+      const month = new Date().toISOString().slice(0, 7); // e.g. "2026-03"
+      const ref = db.collection('ttsUsage').doc(month);
+      const snap = await ref.get();
+      return { ref, chars: snap.exists ? (snap.data()?.totalCharacters ?? 0) : 0 };
+    }
+
+    async function incrementTtsUsage(ref: FirebaseFirestore.DocumentReference, chars: number) {
+      await ref.set({ totalCharacters: FieldValue.increment(chars), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    }
+
+    // GET /digital-library-api/tts-quota
+    if (req.method === 'GET' && route === 'tts-quota') {
+      const { chars } = await getTtsUsage();
+      res.json({ used: chars, limit: TTS_MONTHLY_CHAR_LIMIT, remaining: Math.max(0, TTS_MONTHLY_CHAR_LIMIT - chars) });
+      return;
+    }
+
     // POST /digital-library-api/convert-to-audio
     if (req.method === 'POST' && route === 'convert-to-audio') {
       const bookId = validateBookId(req.body.bookId);
@@ -2033,6 +2055,21 @@ export const digitalLibrary = onRequest(
 
       const bookData = bookDoc.data()!;
       if (bookData.audioStatus === 'processing') { res.status(409).json({ error: 'Conversion already in progress' }); return; }
+
+      // Check monthly TTS quota before starting
+      const quota = await getTtsUsage();
+      const bookChars = bookData.totalCharacters || 0;
+      if (quota.chars + bookChars > TTS_MONTHLY_CHAR_LIMIT) {
+        const remaining = Math.max(0, TTS_MONTHLY_CHAR_LIMIT - quota.chars);
+        res.status(429).json({
+          error: 'Monthly TTS quota reached',
+          used: quota.chars,
+          limit: TTS_MONTHLY_CHAR_LIMIT,
+          remaining,
+          bookChars,
+        });
+        return;
+      }
 
       // Mark as processing
       await bookRef.update({ audioStatus: 'processing', audioProgress: 0, audioError: FieldValue.delete() });
@@ -2047,6 +2084,7 @@ export const digitalLibrary = onRequest(
         const chaptersSnap = await bookRef.collection('chapters').orderBy('index').get();
         const totalChapters = chaptersSnap.size;
         let completedChapters = 0;
+        let totalCharsUsed = 0;
 
         // Download EPUB for text extraction
         const epubFile = bucket.file(bookData.storagePath);
@@ -2126,6 +2164,9 @@ export const digitalLibrary = onRequest(
             }
           }
 
+          // Track characters sent to TTS
+          totalCharsUsed += chapterText.length;
+
           if (audioBuffers.length > 0) {
             const combinedAudio = Buffer.concat(audioBuffers);
             const audioPath = `books/${bookId}/audio/chapter-${String(chData.index).padStart(4, '0')}.mp3`;
@@ -2153,12 +2194,15 @@ export const digitalLibrary = onRequest(
           await bookRef.update({ audioProgress: progress });
         }
 
+        // Record actual TTS usage for the month
+        await incrementTtsUsage(quota.ref, totalCharsUsed);
+
         await bookRef.update({ audioStatus: 'complete', audioProgress: 100 });
 
         // Cleanup
         try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
 
-        logger.info('Audio conversion complete', { bookId, chapters: totalChapters });
+        logger.info('Audio conversion complete', { bookId, chapters: totalChapters, charsUsed: totalCharsUsed });
       } catch (err) {
         logger.error('Audio conversion failed', { bookId, error: String(err) });
         await bookRef.update({ audioStatus: 'error', audioError: String(err).slice(0, 200) }).catch(() => {});
