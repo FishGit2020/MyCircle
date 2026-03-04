@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useLocation, useSearchParams, useNavigate } from 'react-router';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { ROUTE_LABEL_KEYS } from '../../routeConfig';
 
@@ -39,18 +39,8 @@ export default function Breadcrumbs() {
     return () => window.removeEventListener(WindowEvents.BREADCRUMB_DETAIL, handler);
   }, []);
 
-  const navigate = useNavigate();
-
   // Clear MFE detail on route change
   useEffect(() => { setMfeDetail(null); }, [location.pathname]);
-
-  // Handle breadcrumb click when on the same route (SPA internal navigation)
-  const handleMfeParentClick = useCallback((e: React.MouseEvent, path: string) => {
-    e.preventDefault();
-    window.dispatchEvent(new Event('breadcrumb-navigate-parent'));
-    setMfeDetail(null);
-    navigate(path);
-  }, [navigate]);
 
   // Don't show breadcrumbs on the home page
   if (location.pathname === '/') return null;
@@ -110,13 +100,16 @@ export default function Breadcrumbs() {
         ) : mfeDetail ? (
           <>
             <li>
-              <a
-                href={`/${firstSegment}`}
-                onClick={(e) => handleMfeParentClick(e, `/${firstSegment}`)}
-                className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors cursor-pointer"
+              <Link
+                to={`/${firstSegment}`}
+                onClick={() => {
+                  window.dispatchEvent(new Event('breadcrumb-navigate-parent'));
+                  setMfeDetail(null);
+                }}
+                className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
               >
                 {t(labelKey)}
-              </a>
+              </Link>
             </li>
             <li aria-hidden="true" className="select-none">/</li>
             <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200 truncate max-w-[200px]">
