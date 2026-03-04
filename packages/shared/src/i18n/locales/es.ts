@@ -1661,6 +1661,10 @@ const es: Record<TranslationKey, string> = {
   'library.prevChapter': 'Cap\u00edtulo Anterior',
   'library.download': 'Descargar',
   'library.quotaReached': 'Cuota mensual de TTS alcanzada ({used}M / {limit}M caracteres). Se renueva el pr\u00f3ximo mes.',
+  'library.selectVoice': 'Seleccionar Voz',
+  'library.conversionTimedOut': 'La conversi\u00f3n expir\u00f3. Reintenta para continuar \u2014 los cap\u00edtulos completados se omitir\u00e1n.',
+  'library.tooManyConversions': 'Demasiadas conversiones en progreso. Int\u00e9ntalo m\u00e1s tarde.',
+  'library.convertingRefresh': 'Conversi\u00f3n de audio en progreso. Actualiza para ver el estado.',
 };
 
 export default es;

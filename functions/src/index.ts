@@ -2268,10 +2268,25 @@ export const digitalLibrary = onRequest(
       const bookDoc = await db.collection('books').doc(bookId).get();
       if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
       const data = bookDoc.data()!;
+      let audioStatus = data.audioStatus || 'none';
+      const audioError = data.audioError || null;
+
+      // Detect stale conversions: if processing for >10 min, auto-reset to error
+      if (audioStatus === 'processing' && data.updatedAt) {
+        const updatedMs = data.updatedAt.toMillis ? data.updatedAt.toMillis() : Date.now();
+        if (Date.now() - updatedMs > 10 * 60 * 1000) {
+          audioStatus = 'error';
+          await bookDoc.ref.update({
+            audioStatus: 'error',
+            audioError: 'Conversion timed out. You can retry — already-converted chapters will be skipped.',
+          });
+        }
+      }
+
       res.json({
-        audioStatus: data.audioStatus || 'none',
+        audioStatus,
         audioProgress: data.audioProgress || 0,
-        audioError: data.audioError || null,
+        audioError: audioStatus === 'error' && data.audioError ? data.audioError : audioError,
       });
       return;
     }
@@ -2308,7 +2323,31 @@ export const digitalLibrary = onRequest(
       if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
 
       const bookData = bookDoc.data()!;
-      if (bookData.audioStatus === 'processing') { res.status(409).json({ error: 'Conversion already in progress' }); return; }
+      if (bookData.audioStatus === 'processing') {
+        // Allow retry if stale (>10 min since last update)
+        const updatedMs = bookData.updatedAt?.toMillis ? bookData.updatedAt.toMillis() : Date.now();
+        if (Date.now() - updatedMs < 10 * 60 * 1000) {
+          res.status(409).json({ error: 'Conversion already in progress' });
+          return;
+        }
+      }
+
+      // Global concurrency limit: max 2 concurrent conversions
+      const processingSnap = await db.collection('books').where('audioStatus', '==', 'processing').get();
+      // Exclude current book from count (it might be a stale retry)
+      const activeCount = processingSnap.docs.filter(d => d.id !== bookId).length;
+      if (activeCount >= 2) {
+        res.status(429).json({ error: 'Too many conversions in progress. Try again later.' });
+        return;
+      }
+
+      // Validate optional voiceName
+      const voiceNameParam = req.body.voiceName as string | undefined;
+      const VOICE_REGEX = /^(en-US|es-US|cmn-CN)-Neural2-[A-J]$/;
+      if (voiceNameParam && !VOICE_REGEX.test(voiceNameParam)) {
+        res.status(400).json({ error: 'Invalid voiceName format' });
+        return;
+      }
 
       // Check monthly TTS quota before starting
       const quota = await getTtsUsage();
@@ -2325,8 +2364,8 @@ export const digitalLibrary = onRequest(
         return;
       }
 
-      // Mark as processing
-      await bookRef.update({ audioStatus: 'processing', audioProgress: 0, audioError: FieldValue.delete() });
+      // Mark as processing (updatedAt for stale detection)
+      await bookRef.update({ audioStatus: 'processing', audioProgress: 0, audioError: FieldValue.delete(), updatedAt: FieldValue.serverTimestamp() });
 
       // Start async conversion (respond immediately)
       res.json({ ok: true, message: 'Conversion started' });
@@ -2352,15 +2391,22 @@ export const digitalLibrary = onRequest(
         const epub = await (EPub as unknown as { createAsync(path: string): Promise<any> }).createAsync(tmpPath);
 
         const language = bookData.language || 'en';
-        const voiceName = language.startsWith('zh') ? 'cmn-CN-Neural2-A'
+        const defaultVoice = language.startsWith('zh') ? 'cmn-CN-Neural2-A'
           : language.startsWith('es') ? 'es-US-Neural2-A'
           : 'en-US-Neural2-D';
-        const languageCode = language.startsWith('zh') ? 'cmn-CN'
-          : language.startsWith('es') ? 'es-US'
-          : 'en-US';
+        const voiceName = voiceNameParam || defaultVoice;
+        const languageCode = voiceName.slice(0, voiceName.lastIndexOf('-Neural2'));
 
         for (const chapterDoc of chaptersSnap.docs) {
           const chData = chapterDoc.data();
+
+          // Skip chapters that already have audio (from previous partial run)
+          if (chData.audioUrl) {
+            completedChapters++;
+            const progress = Math.round((completedChapters / totalChapters) * 100);
+            await bookRef.update({ audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
+            continue;
+          }
 
           // Extract chapter text
           let chapterText = '';
@@ -2445,7 +2491,7 @@ export const digitalLibrary = onRequest(
 
           completedChapters++;
           const progress = Math.round((completedChapters / totalChapters) * 100);
-          await bookRef.update({ audioProgress: progress });
+          await bookRef.update({ audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
         }
 
         // Record actual TTS usage for the month
