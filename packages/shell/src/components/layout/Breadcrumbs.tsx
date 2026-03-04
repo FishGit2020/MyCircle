@@ -83,14 +83,18 @@ export default function Breadcrumbs() {
             <li>
               <Link
                 to={`/${firstSegment}`}
+                onClick={() => {
+                  window.dispatchEvent(new Event('breadcrumb-navigate-parent'));
+                  setMfeDetail(null);
+                }}
                 className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
               >
                 {t(labelKey)}
               </Link>
             </li>
             <li aria-hidden="true" className="select-none">/</li>
-            <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200">
-              {resolveDetailLabel(firstSegment, segments, searchParams, t)}
+            <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200 truncate max-w-[200px]">
+              {mfeDetail || resolveDetailLabel(firstSegment, segments, searchParams, t)}
             </li>
           </>
         ) : tabParam ? (
