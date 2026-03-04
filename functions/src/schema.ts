@@ -93,6 +93,24 @@ export const typeDefs = `#graphql
     lon: Float!
   }
 
+  # ─── USCIS Case Status Types ─────────────────────────────────
+
+  type CaseStatusHistory {
+    date: String!
+    status: String!
+  }
+
+  type CaseStatus {
+    receiptNumber: String!
+    formType: String!
+    status: String!
+    statusDescription: String!
+    checkedAt: String!
+    submittedDate: String
+    modifiedDate: String
+    history: [CaseStatusHistory!]
+  }
+
   # ─── Stock Types ──────────────────────────────────────────────
 
   type StockSearchResult {
@@ -227,6 +245,9 @@ export const typeDefs = `#graphql
     historicalWeather(lat: Float!, lon: Float!, date: String!): HistoricalWeatherDay
     searchCities(query: String!, limit: Int = 5): [City!]!
     reverseGeocode(lat: Float!, lon: Float!): City
+
+    # USCIS case status
+    checkCaseStatus(receiptNumber: String!): CaseStatus!
 
     # Stock & Crypto queries
     cryptoPrices(ids: [String!]!, vsCurrency: String = "usd"): [CryptoPrice!]!

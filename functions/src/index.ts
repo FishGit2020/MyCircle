@@ -18,7 +18,6 @@ import type OpenAI from 'openai';
 import { verifyRecaptchaToken } from './recaptcha.js';
 import { logAiChatInteraction } from './aiChatLogger.js';
 import type { AiToolCallTiming } from './aiChatLogger.js';
-import { fetchUscisStatus } from './uscisApi.js';
 import {
   validateAiChatRequest,
   buildSystemInstruction,
@@ -2043,78 +2042,6 @@ export const babyPhotos = onRequest(
 
     } else {
       res.status(404).json({ error: 'Not found' });
-    }
-  }
-);
-
-// ─── USCIS Case Status Proxy ─────────────────────────────────────────
-const uscisCache = new NodeCache({ stdTTL: 14400 }); // 4 hour default TTL
-
-export const uscisStatus = onRequest(
-  {
-    cors: ALLOWED_ORIGINS,
-    invoker: 'public',
-    maxInstances: 5,
-    memory: '256MiB',
-    timeoutSeconds: 30,
-    secrets: ['USCIS_CREDS'],
-  },
-  async (req: Request, res: Response) => {
-    const uid = await verifyAuthToken(req);
-    if (!uid) {
-      res.status(401).json({ error: 'Authentication required' });
-      return;
-    }
-
-    const clientIp = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
-    if (checkRateLimit(clientIp, 10, 60)) {
-      res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
-      return;
-    }
-
-    const path = req.path.replace(/^\/api\/uscis\/?/, '').replace(/^\/+/, '');
-
-    if (path !== 'status' || req.method !== 'GET') {
-      res.status(404).json({ error: 'Not found' });
-      return;
-    }
-
-    const receiptNumber = (req.query.receiptNumber as string || '').trim().toUpperCase();
-    if (!receiptNumber) {
-      res.status(400).json({ error: 'receiptNumber parameter required' });
-      return;
-    }
-    if (!/^[A-Z]{3}\d{10}$/.test(receiptNumber)) {
-      res.status(400).json({ error: 'Invalid receipt number format. Expected 3 letters followed by 10 digits (e.g., MSC2190012345).' });
-      return;
-    }
-
-    // Check cache
-    const cacheKey = `uscis:${receiptNumber}`;
-    const cached = uscisCache.get<any>(cacheKey);
-    if (cached) {
-      res.status(200).json(cached);
-      return;
-    }
-
-    try {
-      const result = await fetchUscisStatus(receiptNumber);
-      uscisCache.set(cacheKey, result);
-      logger.info('USCIS status fetched', { uid, receiptNumber, status: result.status });
-      res.status(200).json(result);
-    } catch (err: any) {
-      logger.error('USCIS API error', { receiptNumber, error: err.message });
-
-      if (err.response?.status === 429) {
-        res.status(429).json({ error: 'USCIS API rate limit exceeded. Please try again later.' });
-        return;
-      }
-      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-        res.status(504).json({ error: 'USCIS service timed out' });
-        return;
-      }
-
-      res.status(500).json({ error: 'Failed to fetch USCIS case status' });
     }
   }
 );

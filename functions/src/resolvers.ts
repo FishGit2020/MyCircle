@@ -1728,6 +1728,12 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
         return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       },
 
+      checkCaseStatus: async (_: any, { receiptNumber }: { receiptNumber: string }) => {
+        const rn = (receiptNumber || '').trim().toUpperCase();
+        if (!/^[A-Z]{3}\d{10}$/.test(rn)) throw new Error('Invalid receipt number format');
+        return fetchUscisStatus(rn);
+      },
+
       benchmarkSummary: async (_: any, __: any, ctx: any) => {
         const uid = ctx?.uid;
         if (!uid) throw new Error('Authentication required');

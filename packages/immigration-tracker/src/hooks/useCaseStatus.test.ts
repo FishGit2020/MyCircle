@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { useLazyQuery } from '@mycircle/shared';
 import { useCaseStatus } from './useCaseStatus';
 
-// @mycircle/shared is already mocked in test/setup.ts
+const mockUseLazyQuery = vi.mocked(useLazyQuery);
 
 const mockStatusResponse = {
   receiptNumber: 'IOE0912345678',
@@ -13,17 +14,12 @@ const mockStatusResponse = {
 };
 
 describe('useCaseStatus', () => {
-  const mockFetch = vi.fn();
+  let mockExecute: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal('fetch', mockFetch);
-    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    delete window.__getFirebaseIdToken;
+    mockExecute = vi.fn();
+    mockUseLazyQuery.mockReturnValue([mockExecute, { loading: false, data: null } as any]);
   });
 
   it('initializes with empty statuses and no error', () => {
@@ -33,10 +29,9 @@ describe('useCaseStatus', () => {
     expect(result.current.error).toBeNull();
   });
 
-  it('fetches status successfully', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockStatusResponse),
+  it('fetches status successfully via GraphQL', async () => {
+    mockExecute.mockResolvedValue({
+      data: { checkCaseStatus: mockStatusResponse },
     });
 
     const { result } = renderHook(() => useCaseStatus());
@@ -50,15 +45,17 @@ describe('useCaseStatus', () => {
     expect(result.current.statuses.get('IOE0912345678')).toEqual(mockStatusResponse);
     expect(result.current.loadingReceipt).toBeNull();
     expect(result.current.error).toBeNull();
+    expect(mockExecute).toHaveBeenCalledWith({
+      variables: { receiptNumber: 'IOE0912345678' },
+    });
   });
 
   it('sets loadingReceipt during fetch', async () => {
     let resolvePromise!: (value: any) => void;
-    mockFetch.mockReturnValue(new Promise(r => { resolvePromise = r; }));
+    mockExecute.mockReturnValue(new Promise(r => { resolvePromise = r; }));
 
     const { result } = renderHook(() => useCaseStatus());
 
-    // Start fetch but don't await
     let fetchPromise: Promise<any>;
     act(() => {
       fetchPromise = result.current.fetchStatus('IOE0912345678');
@@ -66,23 +63,17 @@ describe('useCaseStatus', () => {
 
     expect(result.current.loadingReceipt).toBe('IOE0912345678');
 
-    // Resolve the fetch
     await act(async () => {
-      resolvePromise({
-        ok: true,
-        json: () => Promise.resolve(mockStatusResponse),
-      });
+      resolvePromise({ data: { checkCaseStatus: mockStatusResponse } });
       await fetchPromise!;
     });
 
     expect(result.current.loadingReceipt).toBeNull();
   });
 
-  it('handles HTTP error response', async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 500,
-      text: () => Promise.resolve('Internal Server Error'),
+  it('handles GraphQL error', async () => {
+    mockExecute.mockResolvedValue({
+      error: { message: 'Invalid receipt number format' },
     });
 
     const { result } = renderHook(() => useCaseStatus());
@@ -93,28 +84,12 @@ describe('useCaseStatus', () => {
     });
 
     expect(data).toBeNull();
-    expect(result.current.error).toBe('Internal Server Error');
+    expect(result.current.error).toBe('Invalid receipt number format');
     expect(result.current.loadingReceipt).toBeNull();
   });
 
-  it('handles HTTP error with empty body', async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 404,
-      text: () => Promise.resolve(''),
-    });
-
-    const { result } = renderHook(() => useCaseStatus());
-
-    await act(async () => {
-      await result.current.fetchStatus('IOE0912345678');
-    });
-
-    expect(result.current.error).toBe('HTTP 404');
-  });
-
-  it('handles authentication failure', async () => {
-    window.__getFirebaseIdToken = vi.fn().mockResolvedValue(null);
+  it('handles missing data response', async () => {
+    mockExecute.mockResolvedValue({ data: null });
 
     const { result } = renderHook(() => useCaseStatus());
 
@@ -124,12 +99,11 @@ describe('useCaseStatus', () => {
     });
 
     expect(data).toBeNull();
-    expect(result.current.error).toBe('Not authenticated');
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(result.current.error).toBe('No data returned');
   });
 
   it('handles network error', async () => {
-    mockFetch.mockRejectedValue(new Error('Network failure'));
+    mockExecute.mockRejectedValue(new Error('Network failure'));
 
     const { result } = renderHook(() => useCaseStatus());
 
@@ -146,9 +120,9 @@ describe('useCaseStatus', () => {
     const status1 = { ...mockStatusResponse, receiptNumber: 'IOE1111111111' };
     const status2 = { ...mockStatusResponse, receiptNumber: 'IOE2222222222', status: 'Case Was Approved' };
 
-    mockFetch
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(status1) })
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(status2) });
+    mockExecute
+      .mockResolvedValueOnce({ data: { checkCaseStatus: status1 } })
+      .mockResolvedValueOnce({ data: { checkCaseStatus: status2 } });
 
     const { result } = renderHook(() => useCaseStatus());
 
@@ -166,10 +140,8 @@ describe('useCaseStatus', () => {
   });
 
   it('clears previous error on new fetch', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      text: () => Promise.resolve('Server Error'),
+    mockExecute.mockResolvedValueOnce({
+      error: { message: 'Server Error' },
     });
 
     const { result } = renderHook(() => useCaseStatus());
@@ -180,9 +152,8 @@ describe('useCaseStatus', () => {
 
     expect(result.current.error).toBe('Server Error');
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockStatusResponse),
+    mockExecute.mockResolvedValueOnce({
+      data: { checkCaseStatus: mockStatusResponse },
     });
 
     await act(async () => {
@@ -190,44 +161,5 @@ describe('useCaseStatus', () => {
     });
 
     expect(result.current.error).toBeNull();
-  });
-
-  it('uses localhost URL when on localhost', async () => {
-    // jsdom defaults to localhost
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockStatusResponse),
-    });
-
-    const { result } = renderHook(() => useCaseStatus());
-
-    await act(async () => {
-      await result.current.fetchStatus('IOE0912345678');
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('http://localhost:5001/mycircle-app/us-central1/api/uscis/status'),
-      expect.objectContaining({
-        headers: { Authorization: 'Bearer mock-token' },
-      })
-    );
-  });
-
-  it('includes receipt number in URL query param', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockStatusResponse),
-    });
-
-    const { result } = renderHook(() => useCaseStatus());
-
-    await act(async () => {
-      await result.current.fetchStatus('IOE0912345678');
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('receiptNumber=IOE0912345678'),
-      expect.any(Object)
-    );
   });
 });

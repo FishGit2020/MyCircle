@@ -195,6 +195,24 @@ export type BibleVersion = {
   title: Scalars['String']['output'];
 };
 
+export type CaseStatus = {
+  __typename?: 'CaseStatus';
+  checkedAt: Scalars['String']['output'];
+  formType: Scalars['String']['output'];
+  history?: Maybe<Array<CaseStatusHistory>>;
+  modifiedDate?: Maybe<Scalars['String']['output']>;
+  receiptNumber: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  statusDescription: Scalars['String']['output'];
+  submittedDate?: Maybe<Scalars['String']['output']>;
+};
+
+export type CaseStatusHistory = {
+  __typename?: 'CaseStatusHistory';
+  date: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
 export type City = {
   __typename?: 'City';
   country: Scalars['String']['output'];
@@ -412,6 +430,7 @@ export type Query = {
   bibleVersions: Array<BibleVersion>;
   bibleVotd: BibleVerse;
   bibleVotdApi: BibleVerse;
+  checkCaseStatus: CaseStatus;
   companyNews: Array<CompanyNews>;
   cryptoPrices: Array<CryptoPrice>;
   currentWeather: CurrentWeather;
@@ -472,6 +491,11 @@ export type QueryBibleVotdArgs = {
 
 export type QueryBibleVotdApiArgs = {
   day: Scalars['Int']['input'];
+};
+
+
+export type QueryCheckCaseStatusArgs = {
+  receiptNumber: Scalars['String']['input'];
 };
 
 
@@ -716,6 +740,13 @@ export type ReverseGeocodeQueryVariables = Exact<{
 
 
 export type ReverseGeocodeQuery = { __typename?: 'Query', reverseGeocode?: { __typename?: 'City', id: string, name: string, country: string, state?: string | null, lat: number, lon: number } | null };
+
+export type CheckCaseStatusQueryVariables = Exact<{
+  receiptNumber: Scalars['String']['input'];
+}>;
+
+
+export type CheckCaseStatusQuery = { __typename?: 'Query', checkCaseStatus: { __typename?: 'CaseStatus', receiptNumber: string, formType: string, status: string, statusDescription: string, checkedAt: string, submittedDate?: string | null, modifiedDate?: string | null, history?: Array<{ __typename?: 'CaseStatusHistory', date: string, status: string }> | null } };
 
 export type SearchStocksQueryVariables = Exact<{
   query: Scalars['String']['input'];

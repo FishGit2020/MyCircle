@@ -186,6 +186,26 @@ export const REVERSE_GEOCODE = gql`
   }
 `;
 
+// ─── USCIS Case Status Queries ──────────────────────────────
+
+export const CHECK_CASE_STATUS = gql`
+  query CheckCaseStatus($receiptNumber: String!) {
+    checkCaseStatus(receiptNumber: $receiptNumber) {
+      receiptNumber
+      formType
+      status
+      statusDescription
+      checkedAt
+      submittedDate
+      modifiedDate
+      history {
+        date
+        status
+      }
+    }
+  }
+`;
+
 // ─── Stock Queries ──────────────────────────────────────────
 
 export const SEARCH_STOCKS = gql`
