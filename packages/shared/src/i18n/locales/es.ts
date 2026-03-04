@@ -330,6 +330,8 @@ const es: Record<TranslationKey, string> = {
   // Footer
   'footer.dataProvider': 'Desarrollado con',
   'footer.builtWith': 'Construido con React, Vite y arquitectura Micro Frontend',
+  'footer.privacyPolicy': 'Pol\u00edtica de Privacidad',
+  'footer.termsOfService': 'T\u00e9rminos de Servicio',
 
   // Language
   'language.label': 'Idioma',
@@ -1728,6 +1730,40 @@ const es: Record<TranslationKey, string> = {
   'games.round': 'Ronda',
   'games.ready': '\u00bfListo?',
   'games.holdUp': '\u00a1Sostiene el tel\u00e9fono en tu frente!',
+
+  // Privacy Policy
+  'privacy.title': 'Pol\u00edtica de Privacidad',
+  'privacy.lastUpdated': '\u00daltima actualizaci\u00f3n: marzo de 2026',
+  'privacy.introTitle': 'Introducci\u00f3n',
+  'privacy.introText': 'MyCircle ("nosotros") respeta su privacidad. Esta Pol\u00edtica de Privacidad explica c\u00f3mo recopilamos, usamos y protegemos su informaci\u00f3n cuando utiliza nuestra aplicaci\u00f3n.',
+  'privacy.collectTitle': 'Informaci\u00f3n que Recopilamos',
+  'privacy.collectText': 'Recopilamos informaci\u00f3n que usted proporciona directamente, como detalles de cuenta y preferencias. Tambi\u00e9n recopilamos datos de uso para mejorar nuestros servicios.',
+  'privacy.useTitle': 'C\u00f3mo Usamos su Informaci\u00f3n',
+  'privacy.useText': 'Usamos su informaci\u00f3n para proporcionar y mejorar nuestros servicios, personalizar su experiencia y comunicarnos con usted sobre actualizaciones.',
+  'privacy.sharingTitle': 'Compartir Informaci\u00f3n',
+  'privacy.sharingText': 'No vendemos su informaci\u00f3n personal. Podemos compartir datos con proveedores de servicios que nos ayudan a operar nuestra aplicaci\u00f3n.',
+  'privacy.securityTitle': 'Seguridad de Datos',
+  'privacy.securityText': 'Implementamos medidas de seguridad est\u00e1ndar de la industria para proteger sus datos. Sin embargo, ning\u00fan m\u00e9todo es completamente seguro.',
+  'privacy.contactTitle': 'Cont\u00e1ctenos',
+  'privacy.contactText': 'Si tiene preguntas sobre esta Pol\u00edtica de Privacidad, cont\u00e1ctenos a trav\u00e9s de nuestro repositorio de GitHub.',
+
+  // Terms of Service
+  'terms.title': 'T\u00e9rminos de Servicio',
+  'terms.lastUpdated': '\u00daltima actualizaci\u00f3n: marzo de 2026',
+  'terms.introTitle': 'Aceptaci\u00f3n de T\u00e9rminos',
+  'terms.introText': 'Al acceder o usar MyCircle, usted acepta estos T\u00e9rminos de Servicio. Si no est\u00e1 de acuerdo, no utilice la aplicaci\u00f3n.',
+  'terms.useTitle': 'Uso del Servicio',
+  'terms.useText': 'Puede usar MyCircle solo para fines legales. Acepta no hacer mal uso de nuestros servicios ni ayudar a otros a hacerlo.',
+  'terms.accountsTitle': 'Cuentas',
+  'terms.accountsText': 'Usted es responsable de mantener la seguridad de sus credenciales. Debe notificarnos inmediatamente sobre cualquier uso no autorizado.',
+  'terms.contentTitle': 'Contenido del Usuario',
+  'terms.contentText': 'Usted conserva la propiedad del contenido que crea. Al usar nuestros servicios, nos otorga una licencia limitada para almacenar y mostrar su contenido.',
+  'terms.disclaimerTitle': 'Descargo de Responsabilidad',
+  'terms.disclaimerText': 'MyCircle se proporciona "tal cual" sin garant\u00edas de ning\u00fan tipo. No garantizamos la exactitud o confiabilidad de ning\u00fan contenido.',
+  'terms.limitationTitle': 'Limitaci\u00f3n de Responsabilidad',
+  'terms.limitationText': 'En la m\u00e1xima medida permitida por la ley, MyCircle no ser\u00e1 responsable de da\u00f1os indirectos, incidentales o consecuentes.',
+  'terms.contactTitle': 'Cont\u00e1ctenos',
+  'terms.contactText': 'Si tiene preguntas sobre estos T\u00e9rminos de Servicio, cont\u00e1ctenos a trav\u00e9s de nuestro repositorio de GitHub.',
 };
 
 export default es;

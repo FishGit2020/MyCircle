@@ -129,13 +129,113 @@ describe('fetchUscisStatus (uscisApi module)', () => {
     await expect(fetchUscisStatus('MSC0000000099')).rejects.toThrow('missing case_status');
   });
 
-  it('propagates API errors', async () => {
+  it('propagates API errors with RFC-9457 message extraction', async () => {
     process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
     mockOAuthToken();
-    vi.mocked(axios.get).mockRejectedValueOnce({ response: { status: 404 }, message: 'Not Found' });
+    vi.mocked(axios.get).mockRejectedValueOnce({
+      response: {
+        status: 400,
+        data: { errors: [{ message: 'Invalid receipt number format' }] },
+      },
+      message: 'Request failed with status code 400',
+    });
 
-    await expect(fetchUscisStatus('MSC0000000099')).rejects.toEqual(
-      expect.objectContaining({ message: 'Not Found' }),
+    await expect(fetchUscisStatus('BADRECEIPT')).rejects.toThrow('Invalid receipt number format');
+  });
+
+  it('extracts simple message format from error response', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+    mockOAuthToken();
+    vi.mocked(axios.get).mockRejectedValueOnce({
+      response: {
+        status: 404,
+        data: { message: 'Receipt number not recognized' },
+      },
+      message: 'Not Found',
+    });
+
+    await expect(fetchUscisStatus('MSC0000000099')).rejects.toThrow('Receipt number not recognized');
+  });
+
+  it('falls back to raw error message when no structured error', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+    mockOAuthToken();
+    vi.mocked(axios.get).mockRejectedValueOnce({
+      response: { status: 500, data: {} },
+      message: 'Internal Server Error',
+    });
+
+    await expect(fetchUscisStatus('MSC0000000099')).rejects.toThrow('Internal Server Error');
+  });
+
+  it('uses configurable apiBase and oauthUrl from secret', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({
+      clientId: 'test-id',
+      clientSecret: 'test-secret',
+      apiBase: 'https://api-int.uscis.gov',
+      oauthUrl: 'https://api-int.uscis.gov/oauth/accesstoken',
+    });
+    mockOAuthToken();
+    vi.mocked(axios.get).mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any);
+
+    await fetchUscisStatus('MSC0000000099');
+
+    expect(axios.post).toHaveBeenCalledWith(
+      'https://api-int.uscis.gov/oauth/accesstoken',
+      expect.any(String),
+      expect.any(Object),
     );
+    expect(axios.get).toHaveBeenCalledWith(
+      'https://api-int.uscis.gov/case-status/MSC0000000099',
+      expect.any(Object),
+    );
+  });
+
+  it('falls back to default URLs when apiBase/oauthUrl not provided', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+    mockOAuthToken();
+    vi.mocked(axios.get).mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any);
+
+    await fetchUscisStatus('MSC0000000099');
+
+    expect(axios.post).toHaveBeenCalledWith(
+      'https://api.uscis.gov/oauth/accesstoken',
+      expect.any(String),
+      expect.any(Object),
+    );
+    expect(axios.get).toHaveBeenCalledWith(
+      'https://api.uscis.gov/case-status/MSC0000000099',
+      expect.any(Object),
+    );
+  });
+
+  it('sends demo_id header when demoId is present', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({
+      clientId: 'test-id',
+      clientSecret: 'test-secret',
+      demoId: '1234',
+    });
+    mockOAuthToken();
+    vi.mocked(axios.get).mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any);
+
+    await fetchUscisStatus('MSC0000000099');
+
+    expect(axios.get).toHaveBeenCalledWith(
+      expect.stringContaining('/case-status/MSC0000000099'),
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'demo_id': '1234' }),
+      }),
+    );
+  });
+
+  it('does not send demo_id header when demoId is absent', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+    mockOAuthToken();
+    vi.mocked(axios.get).mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any);
+
+    await fetchUscisStatus('MSC0000000099');
+
+    const callHeaders = vi.mocked(axios.get).mock.calls[0][1]?.headers;
+    expect(callHeaders).not.toHaveProperty('demo_id');
   });
 });
