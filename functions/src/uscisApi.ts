@@ -5,8 +5,7 @@ import { logger } from 'firebase-functions';
 let oauthToken: string | null = null;
 let tokenExpiresAt = 0;
 
-// Sandbox base URL — change to https://api.uscis.gov for production
-const USCIS_API_BASE = 'https://api-int.uscis.gov';
+const USCIS_API_BASE = 'https://api.uscis.gov';
 
 interface UscisHistoryEntry {
   date: string;
