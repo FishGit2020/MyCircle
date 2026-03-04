@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation, WindowEvents, createLogger } from '@mycircle/shared';
 import BookReader from './BookReader';
+import { useParams, useNavigate } from 'react-router';
 
 const logger = createLogger('DigitalLibrary');
 
@@ -215,11 +216,14 @@ interface Chapter {
 
 export default function DigitalLibrary() {
   const { t } = useTranslation();
+  const { bookId: urlBookId } = useParams<{ bookId: string }>();
+  const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUid, setCurrentUid] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const pendingBookIdRef = useRef<string | undefined>(urlBookId);
 
   const fetchBooks = useCallback(async () => {
     try {
@@ -299,22 +303,39 @@ export default function DigitalLibrary() {
       logger.error('Failed to fetch chapters', err);
     }
     setSelectedBook(book);
-  }, []);
+    // Update URL to /library/:bookId
+    navigate(`/library/${book.id}`, { replace: true });
+    // Broadcast book title for breadcrumb
+    window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: book.title }));
+  }, [navigate]);
 
   const handleBack = useCallback(() => {
     setSelectedBook(null);
     setChapters([]);
-  }, []);
+    navigate('/library', { replace: true });
+  }, [navigate]);
+
+  // Auto-select book from URL param after books load
+  useEffect(() => {
+    const targetId = pendingBookIdRef.current;
+    if (!targetId || books.length === 0 || selectedBook) return;
+    const book = books.find(b => b.id === targetId);
+    if (book) {
+      pendingBookIdRef.current = undefined;
+      handleSelect(book);
+    }
+  }, [books, selectedBook, handleSelect]);
 
   // Listen for breadcrumb "Library" click to navigate back to book list
   useEffect(() => {
     const handler = () => {
       setSelectedBook(null);
       setChapters([]);
+      navigate('/library', { replace: true });
     };
     window.addEventListener('breadcrumb-navigate-parent', handler);
     return () => window.removeEventListener('breadcrumb-navigate-parent', handler);
-  }, []);
+  }, [navigate]);
 
   if (selectedBook) {
     return (

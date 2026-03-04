@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -14,19 +15,26 @@ vi.mock('./BookReader', () => ({
 
 import DigitalLibrary from './DigitalLibrary';
 
+const renderWithRouter = () =>
+  render(
+    <MemoryRouter>
+      <DigitalLibrary />
+    </MemoryRouter>
+  );
+
 describe('DigitalLibrary', () => {
   it('renders the library title', () => {
-    render(<DigitalLibrary />);
+    renderWithRouter();
     expect(screen.getByText('library.title')).toBeInTheDocument();
   });
 
   it('renders upload area', () => {
-    render(<DigitalLibrary />);
+    renderWithRouter();
     expect(screen.getByText('library.dropEpub')).toBeInTheDocument();
   });
 
   it('shows empty state when no books loaded', async () => {
-    render(<DigitalLibrary />);
+    renderWithRouter();
     // After loading completes, should show empty state
     const emptyMsg = await screen.findByText('library.emptyLibrary');
     expect(emptyMsg).toBeInTheDocument();
