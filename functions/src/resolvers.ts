@@ -851,6 +851,9 @@ function buildEndpointHeaders(endpoint: OllamaEndpoint): Record<string, string> 
   return headers;
 }
 
+// USCIS case status cache (4 hour TTL, same as the old REST endpoint)
+const uscisCache = new NodeCache({ stdTTL: 14400 });
+
 // Resolver factory
 export function createResolvers(getApiKey: () => string, getFinnhubKey?: () => string, getPodcastKeys?: () => { apiKey: string; apiSecret: string }, getYouVersionKey?: () => string) {
   return {
@@ -1731,7 +1734,11 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
       checkCaseStatus: async (_: any, { receiptNumber }: { receiptNumber: string }) => {
         const rn = (receiptNumber || '').trim().toUpperCase();
         if (!/^[A-Z]{3}\d{10}$/.test(rn)) throw new Error('Invalid receipt number format');
-        return fetchUscisStatus(rn);
+        const cached = uscisCache.get<any>(rn);
+        if (cached) return cached;
+        const result = await fetchUscisStatus(rn);
+        uscisCache.set(rn, result);
+        return result;
       },
 
       benchmarkSummary: async (_: any, __: any, ctx: any) => {
