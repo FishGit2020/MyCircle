@@ -264,7 +264,8 @@ Exposes `AiAssistant` component via Module Federation.
 **Key Behavior:**
 - Conversational AI chat powered by **Ollama** (per-user endpoints) or **Google Gemini** (cloud fallback)
 - **Provider priority**: If user has Ollama endpoints → Ollama (using selected endpoint); otherwise → Gemini
-- **Context-aware responses**: `useAiChat` hook calls `gatherUserContext()` on every message, collecting stock watchlist symbols, favorite/recent city names, podcast subscription count, locale, temperature unit, theme, and current page from localStorage. This context is sent in the request body and injected into the system instruction for personalized answers.
+- **Streaming responses (SSE)**: `useAiChatWithStreaming` tries the SSE streaming endpoint (`POST /ai/chat/stream`) first, showing tokens incrementally as they arrive (~200ms to first token). Falls back to the GraphQL mutation path on failure, with `localStorage` caching of streaming availability to skip repeated failures. Streaming supports tool call events (`tool_start`/`tool_result`) displayed with live spinners. The `aiChatStream` Cloud Function uses `generateContentStream()` for Gemini and `stream: true` for Ollama.
+- **Context-aware responses**: `useAiChatWithStreaming` hook calls `gatherUserContext()` on every message, collecting stock watchlist symbols, favorite/recent city names, podcast subscription count, locale, temperature unit, theme, and current page from localStorage. This context is sent in the request body and injected into the system instruction for personalized answers.
 - **Tool calling**: 16 tools available — `getWeather`, `searchCities`, `getStockQuote`, `getCryptoPrices`, `navigateTo`, `getBibleVerse`, `searchPodcasts`, `addFlashcard`, `listFlashcards`, `addBookmark`, `checkCaseStatus`, `addNote`, `addWorkEntry`, `setBabyDueDate`, `addChildMilestone`, `addImmigrationCase`. With Ollama, native tool calling is tried first; for models without support (e.g., `gemma2:2b`), a prompt-based fallback parses `<tool_call>` tags. Tool calls are displayed as labeled badges (e.g., "Weather lookup", "Crypto prices") via `ToolCallDisplay`.
 - **MCP tool execution mode**: Users can toggle between "Native" and "MCP" tool execution via the UI. In MCP mode, tool discovery and execution are routed through an in-memory MCP server (`functions/src/mcpToolServer.ts`) using `InMemoryTransport` — no network, no persistent connections, fully compatible with serverless (Cloud Functions). The `toolMode` GraphQL parameter controls which path is used. Both modes call the same underlying `executeTool()` function.
 - **Voice input**: `ChatInput` component includes a microphone button that uses the Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`). Lazy detection via `getSpeechRecognition()` ensures the button only renders when the browser supports it. Pulsing red animation indicates listening state. Transcribed speech is appended to the textarea.
@@ -1181,6 +1182,8 @@ Tools available:
 | `navigateTo` | Navigate user to an app page | — (client-side) |
 
 Context injection: The system instruction is enriched with user context (favorite cities, stock watchlist, podcast subscriptions, temperature unit, locale, current page) for personalized responses.
+
+**Streaming**: The `aiChatStream` Cloud Function (`POST /ai/chat/stream`) sends SSE events for incremental token delivery. Shared logic (validation, system prompt, tool definitions, tool execution) lives in `functions/src/aiChatHelpers.ts` to avoid duplication between the REST and streaming endpoints. Firebase Hosting rewrite: `/ai/chat/stream → aiChatStream` (before the catch-all `/ai/** → aiChat`).
 
 ### Configurable Base URLs
 

@@ -2,8 +2,12 @@ import { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { ToolCall } from '../hooks/useAiChat';
 
+export interface ToolCallWithPending extends ToolCall {
+  pending?: boolean;
+}
+
 interface ToolCallDisplayProps {
-  toolCalls: ToolCall[];
+  toolCalls: (ToolCall | ToolCallWithPending)[];
   debugMode?: boolean;
 }
 
@@ -82,7 +86,14 @@ export default function ToolCallDisplay({ toolCalls, debugMode = false }: ToolCa
               className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors w-fit"
               aria-expanded={isExpanded}
             >
-              <span aria-hidden="true">{TOOL_ICONS[tc.name] || '\uD83D\uDD27'}</span>
+              {'pending' in tc && tc.pending ? (
+                <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              ) : (
+                <span aria-hidden="true">{TOOL_ICONS[tc.name] || '\uD83D\uDD27'}</span>
+              )}
               {t(TOOL_LABEL_KEYS[tc.name] || 'ai.toolGeneric')}
               {tc.args && Object.keys(tc.args).length > 0 && (
                 <span className="text-blue-500 dark:text-blue-400">

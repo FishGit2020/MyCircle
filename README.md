@@ -119,7 +119,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Dark mode, full i18n (English, Spanish, Chinese)
 
 ### AI Assistant
-- Conversational AI chat powered by Google Gemini via **GraphQL mutation** (`Mutation.aiChat`)
+- Conversational AI chat powered by Google Gemini via **GraphQL mutation** (`Mutation.aiChat`) with **SSE streaming** (`POST /ai/chat/stream`) for incremental token delivery (~200ms to first token, automatic GraphQL fallback)
 - **Context-aware responses** — automatically gathers user data (stock watchlist, favorite cities, podcast subscriptions, preferences) and injects into Gemini system instruction for personalized answers
 - **10 AI tools**: weather lookup, city search, stock quotes, crypto prices, page navigation, flashcard creation, Bible verse lookup, podcast search, Bible bookmarks, flashcard listing
 - **Shared tool registry** — tool definitions in Zod (`scripts/mcp-tools/mfe-tools.ts`), auto-converted to Gemini format via bridge, eliminating duplicated declarations

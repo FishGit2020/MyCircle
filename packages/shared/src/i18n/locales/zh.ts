@@ -524,6 +524,10 @@ const zh: Record<TranslationKey, string> = {
   'ai.monitor.endpoint': '\u7aef\u70b9',
   'ai.monitor.showRaw': '\u663e\u793a\u5b8c\u6574',
   'ai.monitor.showPreview': '\u663e\u793a\u6458\u8981',
+  'ai.streaming': '\u6d41\u5f0f\u4f20\u8f93\u4e2d...',
+  'ai.connecting': '\u8fde\u63a5\u4e2d...',
+  'ai.toolExecuting': '\u6b63\u5728\u8fd0\u884c\u5de5\u5177...',
+  'ai.streamError': '\u6d41\u5f0f\u4f20\u8f93\u4e0d\u53ef\u7528\uff0c\u4f7f\u7528\u5907\u7528\u65b9\u6848',
 
   // Feedback
   'feedback.button': '\u53cd\u9988',
