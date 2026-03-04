@@ -26,6 +26,7 @@ COPY packages/cloud-files/package.json packages/cloud-files/
 COPY packages/model-benchmark/package.json packages/model-benchmark/
 COPY packages/immigration-tracker/package.json packages/immigration-tracker/
 COPY packages/digital-library/package.json packages/digital-library/
+COPY packages/family-games/package.json packages/family-games/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -79,6 +80,7 @@ COPY --from=builder /app/packages/cloud-files/package.json packages/cloud-files/
 COPY --from=builder /app/packages/model-benchmark/package.json packages/model-benchmark/
 COPY --from=builder /app/packages/immigration-tracker/package.json packages/immigration-tracker/
 COPY --from=builder /app/packages/digital-library/package.json packages/digital-library/
+COPY --from=builder /app/packages/family-games/package.json packages/family-games/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune

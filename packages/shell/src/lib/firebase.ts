@@ -1459,4 +1459,41 @@ window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) =
   logEvent(eventName, params);
 };
 
+// ── Family Games bridge API ──────────────────────────────────────────
+if (db && auth) {
+  const gamesDb = db;
+  const gamesAuth = auth;
+
+  (window as any).__familyGames = {
+    async getScores(gameType: string) {
+      const scoresRef = collection(gamesDb, 'games', 'scores', gameType);
+      const q = query(scoresRef, orderBy('score', 'desc'), limit(20));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    },
+
+    subscribe(gameType: string, cb: (scores: any[]) => void) {
+      const scoresRef = collection(gamesDb, 'games', 'scores', gameType);
+      const q = query(scoresRef, orderBy('score', 'desc'), limit(20));
+      return onSnapshot(q, (snap) => {
+        cb(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      });
+    },
+
+    async saveScore(data: { gameType: string; score: number; timeMs: number; difficulty: string }) {
+      const user = gamesAuth.currentUser;
+      if (!user) throw new Error('Not authenticated');
+      const scoresRef = collection(gamesDb, 'games', 'scores', data.gameType);
+      await addDoc(scoresRef, {
+        gameType: data.gameType,
+        score: data.score,
+        timeMs: data.timeMs,
+        difficulty: data.difficulty,
+        playedBy: { uid: user.uid, displayName: user.displayName || 'Anonymous' },
+        playedAt: serverTimestamp(),
+      });
+    },
+  };
+}
+
 export { app, auth, db, perf, analytics, firebaseEnabled };

@@ -39,6 +39,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/work-tracker': () => import('workTracker/WorkTracker'),
   '/files': () => import('cloudFiles/CloudFiles'),
   '/library': () => import('digitalLibrary/DigitalLibrary'),
+  '/family-games': () => import('familyGames/FamilyGames'),
 };
 
 function prefetchRoute(path: string) {
@@ -84,6 +85,8 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>;
     case 'digital-library':
       return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>;
+    case 'family-games':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
     default:
       return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg>;
   }
@@ -107,6 +110,7 @@ const NAV_GROUPS: NavGroup[] = [
     { path: '/baby',      labelKey: 'nav.baby',     icon: 'baby' },
     { path: '/child-dev', labelKey: 'nav.childDev', icon: 'child-dev' },
     { path: '/immigration', labelKey: 'nav.immigration', icon: 'immigration' },
+    { path: '/family-games', labelKey: 'nav.familyGames', icon: 'family-games' },
   ]},
   { labelKey: 'nav.group.learning', items: [
     { path: '/flashcards', labelKey: 'nav.flashcards', icon: 'flashcards' },

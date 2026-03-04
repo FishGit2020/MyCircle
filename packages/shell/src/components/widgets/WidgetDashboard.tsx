@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames';
 
 export type WidgetSize = 'small' | 'medium' | 'large';
 
@@ -33,6 +33,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'benchmark', visible: true },
   { id: 'immigration', visible: true },
   { id: 'digitalLibrary', visible: true },
+  { id: 'familyGames', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -244,7 +245,10 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
         const data = JSON.parse(nowPlaying);
         if (data.episode) setEpisode(data.episode);
         if (data.podcast) setPodcast(data.podcast);
-        setIsActivelyPlaying(true);
+        // Don't set isActivelyPlaying here — the PODCAST_NOW_PLAYING key
+        // persists across page refreshes but GlobalAudioPlayer doesn't
+        // auto-resume. Only the PODCAST_PLAY_EPISODE event (real playback)
+        // should flip isActivelyPlaying to true.
       } else {
         // Fall back to last-played (cross-device restore)
         const lastPlayed = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
@@ -903,6 +907,25 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
   );
 });
 
+const FamilyGamesWidget = React.memo(function FamilyGamesWidget() {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-fuchsia-50 dark:bg-fuchsia-900/30 flex items-center justify-center text-fuchsia-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.familyGames')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.familyGamesDesc')}</p>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   weather: WeatherWidget,
   stocks: StockWidget,
@@ -918,6 +941,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   benchmark: BenchmarkWidget,
   immigration: ImmigrationWidget,
   digitalLibrary: DigitalLibraryWidget,
+  familyGames: FamilyGamesWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -935,6 +959,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   benchmark: '/benchmark',
   immigration: '/immigration',
   digitalLibrary: '/library',
+  familyGames: '/family-games',
 };
 
 // ─── Dashboard Reducer ──────────────────────────────────────────────────────
