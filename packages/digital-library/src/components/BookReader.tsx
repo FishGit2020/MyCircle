@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation, createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
+import { useTranslation, createLogger, StorageKeys, WindowEvents, Breadcrumb } from '@mycircle/shared';
 import TableOfContents from './TableOfContents';
 import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
@@ -257,19 +257,14 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
 
   return (
     <div ref={containerRef} className={`flex flex-col pb-20 md:pb-8 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-gray-800 p-4 overflow-auto' : showAudioPlayer ? '' : 'h-[calc(100vh-8rem)]'}`}>
-      {/* Header */}
+      {/* Breadcrumb + actions */}
       <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-        <button
-          type="button"
-          onClick={isFullscreen ? toggleFullscreen : onBack}
-          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
-          aria-label={isFullscreen ? t('library.exitFullscreen') : t('library.backToLibrary')}
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate flex-1">{title}</h2>
+        <div className="flex-1 min-w-0">
+          <Breadcrumb items={[
+            { label: t('library.title'), onClick: onBack },
+            { label: title },
+          ]} />
+        </div>
 
         {/* Bookmark button */}
         <div className="relative">
