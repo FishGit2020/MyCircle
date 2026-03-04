@@ -671,8 +671,8 @@ const FlashcardsWidget = React.memo(function FlashcardsWidget() {
       } catch { /* ignore */ }
     }
     load();
-    window.addEventListener('flashcard-progress-changed', load);
-    return () => window.removeEventListener('flashcard-progress-changed', load);
+    window.addEventListener(WindowEvents.FLASHCARD_PROGRESS_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.FLASHCARD_PROGRESS_CHANGED, load);
   }, []);
 
   return (
