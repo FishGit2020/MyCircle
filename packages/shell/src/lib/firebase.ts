@@ -117,8 +117,6 @@ export interface UserProfile {
   lastSeenAnnouncementId?: string;
   babyDueDate?: string;
   bottomNavOrder?: string[];
-  weatherAlertsEnabled?: boolean;
-  announcementAlertsEnabled?: boolean;
   bibleBookmarks?: Array<{ book: string; chapter: number; label: string; timestamp: number }>;
   worshipFavorites?: string[];
   lastPlayed?: LastPlayedData;
@@ -502,14 +500,6 @@ export async function updateWorshipFavorites(uid: string, favorites: string[]) {
   });
 }
 
-export async function updateUserNotificationAlerts(uid: string, alerts: {
-  weatherAlertsEnabled: boolean;
-  announcementAlertsEnabled: boolean;
-}) {
-  if (!db) return;
-  const userRef = doc(db, 'users', uid);
-  await updateDoc(userRef, { ...alerts, updatedAt: serverTimestamp() });
-}
 
 export async function updateWidgetLayout(uid: string, layout: Array<{ id: string; visible: boolean; size?: string }> | null) {
   if (!db) return;

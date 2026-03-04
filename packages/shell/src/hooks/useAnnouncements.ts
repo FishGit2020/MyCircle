@@ -28,8 +28,6 @@ export function useAnnouncements() {
         const items = await getAnnouncements();
         if (!cancelled) {
           setAnnouncements(items);
-          // Check for unread: if there are announcements and the first (newest) one
-          // is not the last-seen one, there are unread announcements
           const seenId = getLastSeenId();
           setLastSeenId(seenId);
           const hasNew = items.length > 0 && items[0].id !== seenId;

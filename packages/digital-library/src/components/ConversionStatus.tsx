@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation, createLogger } from '@mycircle/shared';
 
 const logger = createLogger('ConversionStatus');
@@ -17,6 +17,8 @@ function getDefaultVoice(language: string): string {
   return `${langCode}-Neural2-${suffix}`;
 }
 
+const POLL_INTERVAL = 15_000;
+
 interface ConversionStatusProps {
   bookId: string;
   language: string;
@@ -29,13 +31,69 @@ interface ConversionStatusProps {
 export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert }: ConversionStatusProps) {
   const { t } = useTranslation();
   const [status, setStatus] = useState(initialStatus);
-  const [progress] = useState(initialProgress);
+  const [progress, setProgress] = useState(initialProgress);
   const [error, setError] = useState<string | null>(null);
   const [converting, setConverting] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState(getDefaultVoice(language));
+  const [checking, setChecking] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const langCode = getLangCode(language);
   const voiceOptions = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
+
+  const checkStatus = useCallback(async () => {
+    try {
+      const token = await window.__getFirebaseIdToken?.();
+      if (!token) return;
+      const apiBase = window.__digitalLibraryApiBase?.() || '';
+      const res = await fetch(`${apiBase}/digital-library-api/list`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const book = (data.books || []).find((b: any) => b.id === bookId);
+      if (!book) return;
+
+      if (book.audioStatus === 'complete') {
+        setStatus('complete');
+        setProgress(100);
+        onComplete();
+      } else if (book.audioStatus === 'error') {
+        setStatus('error');
+        setError(book.audioError || t('library.conversionFailed'));
+      } else if (book.audioStatus === 'processing') {
+        setProgress(book.audioProgress || 0);
+      }
+    } catch (err) {
+      logger.error('Failed to check conversion status', err);
+    }
+  }, [bookId, onComplete, t]);
+
+  // Auto-poll when processing
+  useEffect(() => {
+    if (status === 'processing') {
+      const timeout = setTimeout(checkStatus, 5000);
+      pollRef.current = setInterval(checkStatus, POLL_INTERVAL);
+      return () => {
+        clearTimeout(timeout);
+        if (pollRef.current) clearInterval(pollRef.current);
+      };
+    }
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  }, [status, checkStatus]);
+
+  useEffect(() => {
+    if (initialStatus === 'complete') onComplete();
+  }, [initialStatus, onComplete]);
+
+  const handleCheckStatus = useCallback(async () => {
+    setChecking(true);
+    await checkStatus();
+    setChecking(false);
+  }, [checkStatus]);
 
   const handleConvert = useCallback(async () => {
     setConverting(true);
@@ -55,6 +113,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         }
       } else if (res && res.ok) {
         setStatus('processing');
+        setProgress(0);
       }
     } catch (err) {
       logger.error('Failed to start conversion', err);
@@ -102,8 +161,27 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
 
   if (status === 'processing') {
     return (
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-gray-600 dark:text-gray-400">{t('library.convertingRefresh')}</span>
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">{t('library.converting')}</span>
+          {progress > 0 && (
+            <span className="text-sm font-medium text-purple-600 dark:text-purple-400">{progress}%</span>
+          )}
+        </div>
+        {progress > 0 && (
+          <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-full bg-purple-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={handleCheckStatus}
+          disabled={checking}
+          className="text-xs text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] disabled:opacity-50"
+        >
+          {checking ? t('library.converting') : t('library.convertingRefresh')}
+        </button>
       </div>
     );
   }

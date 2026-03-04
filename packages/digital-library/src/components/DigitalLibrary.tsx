@@ -306,6 +306,16 @@ export default function DigitalLibrary() {
     setChapters([]);
   }, []);
 
+  // Listen for breadcrumb "Library" click to navigate back to book list
+  useEffect(() => {
+    const handler = () => {
+      setSelectedBook(null);
+      setChapters([]);
+    };
+    window.addEventListener('breadcrumb-navigate-parent', handler);
+    return () => window.removeEventListener('breadcrumb-navigate-parent', handler);
+  }, []);
+
   if (selectedBook) {
     return (
       <BookReader
