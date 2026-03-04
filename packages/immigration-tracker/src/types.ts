@@ -12,6 +12,10 @@ export interface CaseStatus {
   status: string;
   statusDescription: string;
   checkedAt: string;
+  submittedDate?: string;
+  modifiedDate?: string;
+  history?: Array<{ date: string; status: string }>;
+  source?: 'api' | 'scraper';
 }
 
 export interface CaseStatusHistory {

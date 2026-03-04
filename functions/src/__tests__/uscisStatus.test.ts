@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock firebase-admin modules
 vi.mock('firebase-admin/app', () => ({
@@ -86,12 +86,29 @@ const MOCK_USCIS_HTML = `
 </html>
 `;
 
-describe('uscisStatus', () => {
+const MOCK_API_RESPONSE = {
+  case_status: {
+    receiptNumber: 'MSC0000000099',
+    formType: 'I-765',
+    current_case_status_text_en: 'Case Was Approved',
+    current_case_status_desc_en: 'On October 19, 2023, we approved your Form I-765.',
+    submittedDate: '2023-06-15',
+    modifiedDate: '2023-10-19',
+    hist_case_status: [
+      { date: '2023-10-19', case_status_text_en: 'Case Was Approved' },
+      { date: '2023-06-15', case_status_text_en: 'Case Was Received' },
+    ],
+  },
+};
+
+describe('uscisStatus endpoint', () => {
   let uscisStatus: any;
 
   beforeEach(async () => {
     vi.mocked(axios.post).mockReset();
     vi.mocked(axios.get).mockReset();
+    // No USCIS_CREDS by default — falls back to scraper
+    delete process.env.USCIS_CREDS;
     const mod = await import('../index.js');
     uscisStatus = mod.uscisStatus;
   });
@@ -129,7 +146,7 @@ describe('uscisStatus', () => {
     expect(res.status).toHaveBeenCalledWith(404);
   });
 
-  it('parses USCIS HTML response correctly', async () => {
+  it('parses USCIS HTML response correctly (scraper fallback)', async () => {
     const receipt = uniqueReceipt();
     vi.mocked(axios.post).mockResolvedValueOnce({ data: MOCK_USCIS_HTML } as any);
 
@@ -152,6 +169,7 @@ describe('uscisStatus', () => {
         formType: 'Form I-765',
         statusDescription: expect.stringContaining('Application for Employment Authorization'),
         checkedAt: expect.any(String),
+        source: 'scraper',
       }),
     );
   });
@@ -223,5 +241,164 @@ describe('uscisStatus', () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ status: 'Unknown Status', formType: '' }),
     );
+  });
+});
+
+describe('fetchUscisStatus (uscisApi module)', () => {
+  let fetchUscisStatus: any;
+  let _resetTokenCache: any;
+
+  beforeEach(async () => {
+    vi.mocked(axios.post).mockReset();
+    vi.mocked(axios.get).mockReset();
+    const mod = await import('../uscisApi.js');
+    fetchUscisStatus = mod.fetchUscisStatus;
+    _resetTokenCache = mod._resetTokenCache;
+    _resetTokenCache();
+  });
+
+  afterEach(() => {
+    delete process.env.USCIS_CREDS;
+  });
+
+  it('uses official API when USCIS_CREDS are configured', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+
+    // Mock OAuth token response
+    vi.mocked(axios.post).mockResolvedValueOnce({
+      data: { access_token: 'mock-token', expires_in: 3600 },
+    } as any);
+
+    // Mock case status API response
+    vi.mocked(axios.get).mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any);
+
+    const result = await fetchUscisStatus('MSC0000000099');
+
+    expect(axios.post).toHaveBeenCalledWith(
+      expect.stringContaining('/oauth/accesstoken'),
+      'grant_type=client_credentials',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'Authorization': expect.stringContaining('Basic '),
+        }),
+      }),
+    );
+    expect(axios.get).toHaveBeenCalledWith(
+      expect.stringContaining('/case-status/MSC0000000099'),
+      expect.objectContaining({
+        headers: { 'Authorization': 'Bearer mock-token' },
+      }),
+    );
+    expect(result).toEqual(expect.objectContaining({
+      receiptNumber: 'MSC0000000099',
+      formType: 'I-765',
+      status: 'Case Was Approved',
+      submittedDate: '2023-06-15',
+      modifiedDate: '2023-10-19',
+      source: 'api',
+      history: [
+        { date: '2023-10-19', status: 'Case Was Approved' },
+        { date: '2023-06-15', status: 'Case Was Received' },
+      ],
+    }));
+  });
+
+  it('falls back to scraper when API returns 404', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+
+    // Mock OAuth token response
+    vi.mocked(axios.post)
+      .mockResolvedValueOnce({ data: { access_token: 'mock-token', expires_in: 3600 } } as any)
+      // Mock scraper response (second axios.post call)
+      .mockResolvedValueOnce({ data: MOCK_USCIS_HTML } as any);
+
+    // Mock API 404
+    vi.mocked(axios.get).mockRejectedValueOnce({ response: { status: 404 }, message: 'Not Found' });
+
+    const receipt = uniqueReceipt();
+    const result = await fetchUscisStatus(receipt);
+
+    expect(result.source).toBe('scraper');
+    expect(result.status).toBe('Case Was Approved');
+  });
+
+  it('refreshes token on 401 and retries', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+
+    // First OAuth token
+    vi.mocked(axios.post)
+      .mockResolvedValueOnce({ data: { access_token: 'token-1', expires_in: 3600 } } as any)
+      // Second OAuth token (after refresh)
+      .mockResolvedValueOnce({ data: { access_token: 'token-2', expires_in: 3600 } } as any);
+
+    // First API call fails with 401, second succeeds
+    vi.mocked(axios.get)
+      .mockRejectedValueOnce({ response: { status: 401 }, message: 'Unauthorized' })
+      .mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any);
+
+    const result = await fetchUscisStatus('MSC0000000099');
+
+    // Should have made 2 token requests and 2 API calls
+    expect(axios.post).toHaveBeenCalledTimes(2);
+    expect(axios.get).toHaveBeenCalledTimes(2);
+    expect(result.source).toBe('api');
+    expect(result.status).toBe('Case Was Approved');
+  });
+
+  it('falls back to scraper when no USCIS_CREDS configured', async () => {
+    delete process.env.USCIS_CREDS;
+
+    vi.mocked(axios.post).mockResolvedValueOnce({ data: MOCK_USCIS_HTML } as any);
+
+    const receipt = uniqueReceipt();
+    const result = await fetchUscisStatus(receipt);
+
+    // Should not have called the official API
+    expect(axios.get).not.toHaveBeenCalled();
+    // Should have called the scraper
+    expect(axios.post).toHaveBeenCalledWith(
+      'https://egov.uscis.gov/casestatus/mycasestatus.do',
+      expect.any(String),
+      expect.any(Object),
+    );
+    expect(result.source).toBe('scraper');
+    expect(result.status).toBe('Case Was Approved');
+  });
+
+  it('caches OAuth token across calls', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+
+    // Single OAuth token response
+    vi.mocked(axios.post).mockResolvedValueOnce({
+      data: { access_token: 'cached-token', expires_in: 3600 },
+    } as any);
+
+    // Two API responses
+    vi.mocked(axios.get)
+      .mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any)
+      .mockResolvedValueOnce({ data: MOCK_API_RESPONSE } as any);
+
+    await fetchUscisStatus('MSC0000000099');
+    await fetchUscisStatus('MSC0000000098');
+
+    // OAuth token should only be fetched once
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    expect(axios.get).toHaveBeenCalledTimes(2);
+  });
+
+  it('handles missing case_status in API response by falling back to scraper', async () => {
+    process.env.USCIS_CREDS = JSON.stringify({ clientId: 'test-id', clientSecret: 'test-secret' });
+
+    vi.mocked(axios.post)
+      .mockResolvedValueOnce({ data: { access_token: 'mock-token', expires_in: 3600 } } as any)
+      .mockResolvedValueOnce({ data: MOCK_USCIS_HTML } as any);
+
+    // API returns unexpected shape
+    vi.mocked(axios.get).mockResolvedValueOnce({ data: {} } as any);
+
+    const receipt = uniqueReceipt();
+    const result = await fetchUscisStatus(receipt);
+
+    expect(result.source).toBe('scraper');
   });
 });

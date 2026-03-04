@@ -18,6 +18,7 @@ import type OpenAI from 'openai';
 import { verifyRecaptchaToken } from './recaptcha.js';
 import { logAiChatInteraction } from './aiChatLogger.js';
 import type { AiToolCallTiming } from './aiChatLogger.js';
+import { fetchUscisStatus } from './uscisApi.js';
 
 // Initialize Firebase Admin (idempotent)
 if (getApps().length === 0) {
@@ -123,7 +124,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 300,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_CREDS', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY']
+    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_CREDS', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'USCIS_CREDS']
   },
   async (req: Request, res: Response) => {
     const server = await getServer();
@@ -1678,6 +1679,7 @@ export const uscisStatus = onRequest(
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 30,
+    secrets: ['USCIS_CREDS'],
   },
   async (req: Request, res: Response) => {
     const uid = await verifyAuthToken(req);
@@ -1718,54 +1720,19 @@ export const uscisStatus = onRequest(
     }
 
     try {
-      const response = await axios.post(
-        'https://egov.uscis.gov/casestatus/mycasestatus.do',
-        `appReceiptNum=${encodeURIComponent(receiptNumber)}`,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Cache-Control': 'no-cache',
-            'Origin': 'https://egov.uscis.gov',
-            'Referer': 'https://egov.uscis.gov/casestatus/landing.do',
-          },
-          timeout: 15000,
-        },
-      );
-
-      const html = response.data as string;
-
-      // Extract status title from <h1>
-      const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-      const status = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : 'Unknown Status';
-
-      // Extract description from first <p> after h1
-      const pMatch = html.match(/<h1[^>]*>[\s\S]*?<\/h1>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
-      const statusDescription = pMatch ? pMatch[1].replace(/<[^>]+>/g, '').trim() : '';
-
-      // Extract form type from description
-      const formMatch = statusDescription.match(/Form I-\d+/i);
-      const formType = formMatch ? formMatch[0] : '';
-
-      const result = {
-        receiptNumber,
-        formType,
-        status,
-        statusDescription,
-        checkedAt: new Date().toISOString(),
-      };
-
+      const result = await fetchUscisStatus(receiptNumber);
       uscisCache.set(cacheKey, result);
-      logger.info('USCIS status fetched', { uid, receiptNumber, status });
+      logger.info('USCIS status fetched', { uid, receiptNumber, status: result.status, source: result.source });
       res.status(200).json(result);
     } catch (err: any) {
       logger.error('USCIS proxy error', { receiptNumber, error: err.message });
 
       if (err.response?.status === 403) {
         res.status(503).json({ error: 'USCIS service temporarily unavailable' });
+        return;
+      }
+      if (err.response?.status === 429) {
+        res.status(429).json({ error: 'USCIS API rate limit exceeded. Please try again later.' });
         return;
       }
       if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
