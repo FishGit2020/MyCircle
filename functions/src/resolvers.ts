@@ -1107,7 +1107,7 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
           if (name === 'checkCaseStatus') {
             const rn = (args.receiptNumber as string || '').trim().toUpperCase();
             if (!/^[A-Z]{3}\d{10}$/.test(rn)) return JSON.stringify({ error: 'Invalid receipt number format. Expected 3 letters + 10 digits (e.g., MSC2190012345).' });
-            const resp = await axios.post('https://egov.uscis.gov/casestatus/mycasestatus.do', `appReceiptNum=${encodeURIComponent(rn)}`, { headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'Mozilla/5.0 (compatible; MyCircle/1.0)' }, timeout: 15000 });
+            const resp = await axios.post('https://egov.uscis.gov/casestatus/mycasestatus.do', `appReceiptNum=${encodeURIComponent(rn)}`, { headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'Accept-Language': 'en-US,en;q=0.9', 'Origin': 'https://egov.uscis.gov', 'Referer': 'https://egov.uscis.gov/casestatus/landing.do' }, timeout: 15000 });
             const html = resp.data as string;
             const h1m = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
             const status = h1m ? h1m[1].replace(/<[^>]+>/g, '').trim() : 'Unknown Status';
