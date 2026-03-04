@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import CitySearch from './CitySearch';
@@ -106,13 +105,12 @@ describe('CitySearch', () => {
     expect(screen.getByText('City Search Micro Frontend')).toBeInTheDocument();
   });
 
-  it('does not search with less than 2 characters', async () => {
+  it('does not search with less than 2 characters', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderWithProviders(<CitySearch />);
 
     const input = screen.getByPlaceholderText('Search for a city...');
-    await user.type(input, 'L');
+    fireEvent.change(input, { target: { value: 'L' } });
     vi.advanceTimersByTime(500);
 
     expect(document.querySelector('.animate-pulse')).not.toBeInTheDocument();
