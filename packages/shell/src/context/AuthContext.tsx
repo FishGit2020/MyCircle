@@ -27,6 +27,9 @@ import {
   updateBibleBookmarks,
   updateWorshipFavorites,
   updateChildData,
+  updateWidgetLayout,
+  updateBookBookmarks,
+  updateBookAudioProgress,
   getWorkEntries,
   getUserFiles,
   getWorshipSongs,
@@ -251,6 +254,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           if (userProfile.childName || userProfile.childBirthDate) {
             window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
+          }
+
+          // Restore widget layout
+          if (userProfile.widgetLayout && userProfile.widgetLayout.length > 0) {
+            localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(userProfile.widgetLayout));
+            window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
+          }
+
+          // Restore book bookmarks
+          if (userProfile.bookBookmarks && userProfile.bookBookmarks.length > 0) {
+            localStorage.setItem(StorageKeys.BOOK_BOOKMARKS, JSON.stringify(userProfile.bookBookmarks));
+            window.dispatchEvent(new Event(WindowEvents.BOOK_BOOKMARKS_CHANGED));
+          }
+
+          // Restore book audio progress
+          if (userProfile.bookAudioProgress) {
+            localStorage.setItem(StorageKeys.BOOK_AUDIO_PROGRESS, JSON.stringify(userProfile.bookAudioProgress));
           }
 
           window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
@@ -531,6 +551,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     window.addEventListener(WindowEvents.CHILD_DATA_CHANGED, handleChildDataChanged);
     return () => window.removeEventListener(WindowEvents.CHILD_DATA_CHANGED, handleChildDataChanged);
+  }, [user]);
+
+  // Auto-sync widget layout from localStorage to Firestore
+  useEffect(() => {
+    function handleWidgetLayoutChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
+          const layout = stored ? JSON.parse(stored) : null;
+          updateWidgetLayout(user.uid, layout);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
+    return () => window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
+  }, [user]);
+
+  // Auto-sync book bookmarks from localStorage to Firestore
+  useEffect(() => {
+    function handleBookBookmarksChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.BOOK_BOOKMARKS);
+          const bookmarks = stored ? JSON.parse(stored) : [];
+          updateBookBookmarks(user.uid, bookmarks);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, handleBookBookmarksChanged);
+    return () => window.removeEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, handleBookBookmarksChanged);
+  }, [user]);
+
+  // Auto-sync book audio progress from localStorage to Firestore
+  useEffect(() => {
+    function handleBookAudioProgressChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
+          const progress = stored ? JSON.parse(stored) : null;
+          updateBookAudioProgress(user.uid, progress);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    // Listen for storage changes from the audio player (custom event)
+    window.addEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
+    return () => window.removeEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
   }, [user]);
 
   return (

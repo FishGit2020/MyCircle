@@ -230,10 +230,10 @@ export default function UserMenu() {
           <img
             src={user.photoURL}
             alt={user.displayName || 'User'}
-            className="w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-600"
+            className="w-8 h-8 rounded-full border-2 border-gray-200 dark:border-gray-600 flex-shrink-0 object-cover"
           />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium flex-shrink-0">
             {user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
           </div>
         )}

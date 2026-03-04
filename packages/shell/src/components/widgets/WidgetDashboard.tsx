@@ -61,6 +61,7 @@ function loadLayout(): WidgetConfig[] {
 function saveLayout(layout: WidgetConfig[]) {
   try {
     localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(layout));
+    window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
   } catch { /* ignore */ }
 }
 
@@ -320,8 +321,16 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
           )}
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.nowPlaying')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.nowPlayingDesc')}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">
+            {isActivelyPlaying ? t('widgets.nowPlaying') : t('widgets.podcastsTitle')}
+          </h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {isActivelyPlaying
+              ? t('widgets.nowPlayingDesc')
+              : hasEpisode
+                ? t('widgets.continueWhereLeft')
+                : t('widgets.discoverAndListen')}
+          </p>
         </div>
       </div>
       {hasEpisode ? (

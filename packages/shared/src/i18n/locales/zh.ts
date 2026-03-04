@@ -1622,6 +1622,9 @@ const zh: Record<TranslationKey, string> = {
 
   // Digital Library
   'nav.digitalLibrary': '\u56fe\u4e66\u9986',
+  'widgets.podcastsTitle': '\u64ad\u5ba2',
+  'widgets.continueWhereLeft': '\u4ece\u4e0a\u6b21\u505c\u4e0b\u7684\u5730\u65b9\u7ee7\u7eed',
+  'widgets.discoverAndListen': '\u53d1\u73b0\u5e76\u6536\u542c',
   'widgets.digitalLibrary': '\u6570\u5b57\u56fe\u4e66\u9986',
   'widgets.digitalLibraryDesc': '\u9605\u8bfbEPUB\u4e66\u7c4d\u548c\u6709\u58f0\u4e66',
   'library.title': '\u6570\u5b57\u56fe\u4e66\u9986',
@@ -1665,6 +1668,12 @@ const zh: Record<TranslationKey, string> = {
   'library.conversionTimedOut': '\u8f6c\u6362\u8d85\u65f6\u3002\u91cd\u8bd5\u4ee5\u7ee7\u7eed \u2014 \u5df2\u5b8c\u6210\u7684\u7ae0\u8282\u5c06\u88ab\u8df3\u8fc7\u3002',
   'library.tooManyConversions': '\u592a\u591a\u8f6c\u6362\u6b63\u5728\u8fdb\u884c\u4e2d\u3002\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002',
   'library.convertingRefresh': '\u97f3\u9891\u8f6c\u6362\u8fdb\u884c\u4e2d\u3002\u5237\u65b0\u4ee5\u67e5\u770b\u72b6\u6001\u3002',
+  'library.addBookmark': '\u6dfb\u52a0\u4e66\u7b7e',
+  'library.bookmarks': '\u4e66\u7b7e',
+  'library.removeBookmark': '\u5220\u9664',
+  'library.noBookmarks': '\u8fd8\u6ca1\u6709\u4e66\u7b7e',
+  'library.fullscreen': '\u5168\u5c4f',
+  'library.exitFullscreen': '\u9000\u51fa\u5168\u5c4f',
 };
 
 export default zh;
