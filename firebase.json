@@ -23,6 +23,10 @@
         "function": "podcastProxy"
       },
       {
+        "source": "/ai/chat/stream",
+        "function": "aiChatStream"
+      },
+      {
         "source": "/ai/**",
         "function": "aiChat"
       },

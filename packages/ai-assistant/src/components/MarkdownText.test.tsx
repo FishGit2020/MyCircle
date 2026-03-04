@@ -100,4 +100,23 @@ describe('MarkdownText', () => {
     const { container } = render(<MarkdownText content="" />);
     expect(container).toBeInTheDocument();
   });
+
+  it('handles unclosed code block when streaming', () => {
+    const content = 'Here is code:\n```javascript\nconst x = 1;';
+    const { container } = render(<MarkdownText content={content} streaming />);
+    // Should auto-close the code block and render it
+    const pre = container.querySelector('pre');
+    expect(pre).toBeInTheDocument();
+    const code = pre!.querySelector('code');
+    expect(code!.textContent).toContain('const x = 1;');
+  });
+
+  it('does not auto-close code block when not streaming', () => {
+    // Without streaming, unclosed ``` is treated as text
+    const content = 'Here is code:\n```javascript\nconst x = 1;';
+    const { container } = render(<MarkdownText content={content} />);
+    const pre = container.querySelector('pre');
+    // Without streaming fix, the regex won't match so no <pre> rendered
+    expect(pre).toBeNull();
+  });
 });

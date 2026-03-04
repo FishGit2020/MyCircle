@@ -2,15 +2,26 @@ import React from 'react';
 
 interface MarkdownTextProps {
   content: string;
+  /** When true, handles unclosed code blocks (streaming partial content) */
+  streaming?: boolean;
 }
 
 /**
  * Lightweight markdown renderer for AI assistant responses.
  * Handles: code blocks, inline code, bold, italic, bullet lists, numbered lists.
  */
-export default function MarkdownText({ content }: MarkdownTextProps) {
+export default function MarkdownText({ content, streaming }: MarkdownTextProps) {
   // Split into code blocks and text segments
-  const segments = content.split(/(```[\s\S]*?```)/g);
+  // When streaming, handle unclosed code blocks (opening ``` without closing)
+  let processedContent = content;
+  if (streaming) {
+    const backtickCount = (content.match(/```/g) || []).length;
+    if (backtickCount % 2 !== 0) {
+      // Unclosed code block — append closing ``` so it renders as code
+      processedContent = content + '\n```';
+    }
+  }
+  const segments = processedContent.split(/(```[\s\S]*?```)/g);
 
   return (
     <>

@@ -7,9 +7,11 @@ import type { ChatMessage as ChatMessageType } from '../hooks/useAiChat';
 interface ChatMessageProps {
   message: ChatMessageType;
   debugMode?: boolean;
+  /** When true, shows blinking cursor and disables copy */
+  streaming?: boolean;
 }
 
-export default function ChatMessage({ message, debugMode }: ChatMessageProps) {
+export default function ChatMessage({ message, debugMode, streaming }: ChatMessageProps) {
   const { t } = useTranslation();
   const isUser = message.role === 'user';
   const [copied, setCopied] = useState(false);
@@ -38,7 +40,7 @@ export default function ChatMessage({ message, debugMode }: ChatMessageProps) {
           <div className="text-xs font-medium opacity-70">
             {isUser ? t('ai.you') : t('ai.assistant')}
           </div>
-          {!isUser && (
+          {!isUser && !streaming && (
             <button
               onClick={handleCopy}
               className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
@@ -61,7 +63,12 @@ export default function ChatMessage({ message, debugMode }: ChatMessageProps) {
           {isUser ? (
             <span className="whitespace-pre-wrap">{message.content}</span>
           ) : (
-            <MarkdownText content={message.content} />
+            <>
+              <MarkdownText content={message.content} streaming={streaming} />
+              {streaming && (
+                <span className="inline-block w-2 h-4 ml-0.5 bg-gray-500 dark:bg-gray-300 animate-pulse rounded-sm align-text-bottom" aria-hidden="true" />
+              )}
+            </>
           )}
         </div>
         {message.toolCalls && message.toolCalls.length > 0 && (

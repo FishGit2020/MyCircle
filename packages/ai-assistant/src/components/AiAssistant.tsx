@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS, EndpointManager } from '@mycircle/shared';
-import { useAiChat } from '../hooks/useAiChat';
+import { useAiChatWithStreaming } from '../hooks/useAiChatWithStreaming';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
+import type { ChatMessage as ChatMessageType } from '../hooks/useAiChat';
+import ToolCallDisplay from './ToolCallDisplay';
 
 const AiMonitor = lazy(() => import('./AiMonitor'));
 
@@ -30,7 +32,7 @@ const TOOL_MODE_STORAGE_KEY = 'mycircle-ai-tool-mode';
 
 export default function AiAssistant() {
   const { t } = useTranslation();
-  const { messages, loading, error, canRetry, sendMessage, clearChat, retry } = useAiChat();
+  const { messages, loading, streaming, streamingContent, activeToolCalls, error, canRetry, sendMessage, clearChat, retry } = useAiChatWithStreaming();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's Ollama endpoints
@@ -128,7 +130,7 @@ export default function AiAssistant() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, loading, streaming, streamingContent]);
 
   return (
     <div className="ai-assistant max-w-3xl mx-auto px-4 py-6 flex flex-col h-[calc(100vh-16rem)]">
@@ -282,7 +284,7 @@ export default function AiAssistant() {
         <>
           {/* Messages area */}
           <div
-            className={`flex-1 space-y-4 mb-4 min-h-0 ${messages.length > 0 || loading ? 'overflow-y-auto' : 'overflow-hidden'}`}
+            className={`flex-1 space-y-4 mb-4 min-h-0 ${messages.length > 0 || loading || streaming ? 'overflow-y-auto' : 'overflow-hidden'}`}
             role="list"
             aria-label={t('ai.chatMessages')}
             aria-live="polite"
@@ -319,7 +321,26 @@ export default function AiAssistant() {
               <ChatMessage key={msg.id} message={msg} debugMode={debugMode} />
             ))}
 
-            {loading && (
+            {/* Streaming message — shows incremental content as it arrives */}
+            {streaming && streamingContent && (
+              <ChatMessage
+                message={{ id: 'streaming', role: 'assistant', content: streamingContent, timestamp: Date.now() } as ChatMessageType}
+                debugMode={debugMode}
+                streaming
+              />
+            )}
+
+            {/* Active tool calls during streaming */}
+            {streaming && activeToolCalls.length > 0 && (
+              <div className="flex justify-start">
+                <div className="max-w-[85%] sm:max-w-[75%] bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
+                  <ToolCallDisplay toolCalls={activeToolCalls} debugMode={debugMode} />
+                </div>
+              </div>
+            )}
+
+            {/* Loading indicator — only when waiting for first response (not streaming) */}
+            {loading && !streaming && (
               <div className="flex justify-start" role="status" aria-label={t('ai.thinking')}>
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -329,6 +350,22 @@ export default function AiAssistant() {
                       <span className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </span>
                     {t('ai.thinking')}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Streaming with no content yet — show "Connecting..." */}
+            {streaming && !streamingContent && activeToolCalls.length === 0 && (
+              <div className="flex justify-start" role="status" aria-label={t('ai.connecting')}>
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="flex gap-1">
+                      <span className="w-2 h-2 bg-blue-400 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-blue-400 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-blue-400 dark:bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </span>
+                    {t('ai.connecting')}
                   </div>
                 </div>
               </div>
@@ -354,7 +391,7 @@ export default function AiAssistant() {
           )}
 
           {/* Input */}
-          <ChatInput onSend={sendMessage} disabled={loading} />
+          <ChatInput onSend={sendMessage} disabled={loading || streaming} />
         </>
       )}
     </div>

@@ -524,6 +524,10 @@ const es: Record<TranslationKey, string> = {
   'ai.monitor.endpoint': 'Endpoint',
   'ai.monitor.showRaw': 'Ver completo',
   'ai.monitor.showPreview': 'Ver resumen',
+  'ai.streaming': 'Transmitiendo...',
+  'ai.connecting': 'Conectando...',
+  'ai.toolExecuting': 'Ejecutando herramienta...',
+  'ai.streamError': 'Transmisi\u00f3n no disponible, usando alternativa',
 
   // Feedback
   'feedback.button': 'Comentarios',

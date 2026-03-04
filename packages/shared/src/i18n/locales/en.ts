@@ -522,6 +522,10 @@ const en = {
   'ai.monitor.endpoint': 'Endpoint',
   'ai.monitor.showRaw': 'Show full',
   'ai.monitor.showPreview': 'Show preview',
+  'ai.streaming': 'Streaming...',
+  'ai.connecting': 'Connecting...',
+  'ai.toolExecuting': 'Running tool...',
+  'ai.streamError': 'Streaming unavailable, using fallback',
 
   // Feedback
   'feedback.button': 'Feedback',

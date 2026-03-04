@@ -10,25 +10,30 @@ import AiAssistant from './AiAssistant';
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
-// Mock useAiChat at module level to avoid import issues
-vi.mock('../hooks/useAiChat', () => {
+// Mock useAiChatWithStreaming at module level to avoid import issues
+vi.mock('../hooks/useAiChatWithStreaming', () => {
   const mockSendMessage = vi.fn();
   const mockClearChat = vi.fn();
   return {
-    useAiChat: vi.fn(() => ({
+    useAiChatWithStreaming: vi.fn(() => ({
       messages: [],
       loading: false,
+      streaming: false,
+      streamingContent: '',
+      activeToolCalls: [],
       error: null,
+      canRetry: false,
       sendMessage: mockSendMessage,
       clearChat: mockClearChat,
+      retry: vi.fn(),
     })),
     __mockSendMessage: mockSendMessage,
     __mockClearChat: mockClearChat,
   };
 });
 
-import { useAiChat } from '../hooks/useAiChat';
-const mockUseAiChat = vi.mocked(useAiChat);
+import { useAiChatWithStreaming } from '../hooks/useAiChatWithStreaming';
+const mockUseAiChat = vi.mocked(useAiChatWithStreaming);
 
 const ollamaModelsMock = {
   request: { query: GET_OLLAMA_MODELS },
@@ -54,9 +59,14 @@ describe('AiAssistant', () => {
     mockUseAiChat.mockReturnValue({
       messages: [],
       loading: false,
+      streaming: false,
+      streamingContent: '',
+      activeToolCalls: [],
       error: null,
+      canRetry: false,
       sendMessage: vi.fn(),
       clearChat: vi.fn(),
+      retry: vi.fn(),
     });
   });
 
