@@ -102,6 +102,10 @@ export default function Breadcrumbs() {
             <li>
               <Link
                 to={`/${firstSegment}`}
+                onClick={() => {
+                  window.dispatchEvent(new Event('breadcrumb-navigate-parent'));
+                  setMfeDetail(null);
+                }}
                 className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
               >
                 {t(labelKey)}

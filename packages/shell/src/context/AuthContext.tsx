@@ -23,7 +23,6 @@ import {
   updatePodcastSubscriptions,
   updateUserBabyDueDate,
   updateUserBottomNavOrder,
-  updateUserNotificationAlerts,
   updateBibleBookmarks,
   updateWorshipFavorites,
   updateChildData,
@@ -181,14 +180,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             window.dispatchEvent(new Event(WindowEvents.BOTTOM_NAV_ORDER_CHANGED));
           }
 
-          // Restore notification alert preferences
-          if (userProfile.weatherAlertsEnabled !== undefined) {
-            localStorage.setItem(StorageKeys.WEATHER_ALERTS, String(userProfile.weatherAlertsEnabled));
-          }
-          if (userProfile.announcementAlertsEnabled !== undefined) {
-            localStorage.setItem(StorageKeys.ANNOUNCEMENT_ALERTS, String(userProfile.announcementAlertsEnabled));
-          }
-          window.dispatchEvent(new Event(WindowEvents.NOTIFICATION_ALERTS_CHANGED));
 
           // Restore Bible bookmarks
           if (userProfile.bibleBookmarks && userProfile.bibleBookmarks.length > 0) {
@@ -488,20 +479,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     window.addEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
     return () => window.removeEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
-  }, [user]);
-
-  // Auto-sync notification alert preferences from localStorage to Firestore
-  useEffect(() => {
-    function handleNotificationAlertsChanged() {
-      if (user) {
-        updateUserNotificationAlerts(user.uid, {
-          weatherAlertsEnabled: localStorage.getItem(StorageKeys.WEATHER_ALERTS) === 'true',
-          announcementAlertsEnabled: localStorage.getItem(StorageKeys.ANNOUNCEMENT_ALERTS) === 'true',
-        });
-      }
-    }
-    window.addEventListener(WindowEvents.NOTIFICATION_ALERTS_CHANGED, handleNotificationAlertsChanged);
-    return () => window.removeEventListener(WindowEvents.NOTIFICATION_ALERTS_CHANGED, handleNotificationAlertsChanged);
   }, [user]);
 
   // Auto-sync Bible bookmarks from localStorage to Firestore
