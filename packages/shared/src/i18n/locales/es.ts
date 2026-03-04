@@ -1656,6 +1656,7 @@ const es: Record<TranslationKey, string> = {
   'library.nextChapter': 'Siguiente Cap\u00edtulo',
   'library.prevChapter': 'Cap\u00edtulo Anterior',
   'library.download': 'Descargar',
+  'library.quotaReached': 'Cuota mensual de TTS alcanzada ({used}M / {limit}M caracteres). Se renueva el pr\u00f3ximo mes.',
 };
 
 export default es;

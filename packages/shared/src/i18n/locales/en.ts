@@ -1654,6 +1654,7 @@ const en = {
   'library.nextChapter': 'Next Chapter',
   'library.prevChapter': 'Previous Chapter',
   'library.download': 'Download',
+  'library.quotaReached': 'Monthly TTS quota reached ({used}M / {limit}M chars). Resets next month.',
 } as const;
 
 export default en;

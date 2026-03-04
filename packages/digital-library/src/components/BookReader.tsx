@@ -223,18 +223,14 @@ export default function BookReader({ bookId, epubUrl, title, chapters, audioStat
           initialProgress={audioProgress}
           onComplete={() => setShowAudioPlayer(true)}
           onConvert={async () => {
-            try {
-              const token = await window.__getFirebaseIdToken?.();
-              if (!token) return;
-              const apiBase = window.__digitalLibraryApiBase?.() || '';
-              await fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ bookId }),
-              });
-            } catch (err) {
-              logger.error('Failed to start conversion', err);
-            }
+            const token = await window.__getFirebaseIdToken?.();
+            if (!token) return undefined;
+            const apiBase = window.__digitalLibraryApiBase?.() || '';
+            return fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ bookId }),
+            });
           }}
         />
         {showAudioPlayer && (
