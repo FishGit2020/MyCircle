@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EntryForm from './EntryForm';
 
@@ -28,24 +28,22 @@ describe('EntryForm', () => {
     expect(screen.getByRole('button', { name: 'workTracker.save' })).toBeDisabled();
   });
 
-  it('submit button is disabled when input is only whitespace', async () => {
-    const user = userEvent.setup();
+  it('submit button is disabled when input is only whitespace', () => {
     render(<EntryForm onSubmit={onSubmit} />);
-    await user.type(screen.getByPlaceholderText('workTracker.placeholder'), '   ');
+    fireEvent.change(screen.getByPlaceholderText('workTracker.placeholder'), { target: { value: '   ' } });
     expect(screen.getByRole('button', { name: 'workTracker.save' })).toBeDisabled();
   });
 
-  it('enables submit button when content is entered', async () => {
-    const user = userEvent.setup();
+  it('enables submit button when content is entered', () => {
     render(<EntryForm onSubmit={onSubmit} />);
-    await user.type(screen.getByPlaceholderText('workTracker.placeholder'), 'New task');
+    fireEvent.change(screen.getByPlaceholderText('workTracker.placeholder'), { target: { value: 'New task' } });
     expect(screen.getByRole('button', { name: 'workTracker.save' })).toBeEnabled();
   });
 
   it('calls onSubmit with trimmed content on form submission', async () => {
     const user = userEvent.setup();
     render(<EntryForm onSubmit={onSubmit} />);
-    await user.type(screen.getByPlaceholderText('workTracker.placeholder'), '  Fix bug  ');
+    fireEvent.change(screen.getByPlaceholderText('workTracker.placeholder'), { target: { value: '  Fix bug  ' } });
     await user.click(screen.getByRole('button', { name: 'workTracker.save' }));
     expect(onSubmit).toHaveBeenCalledWith('Fix bug');
   });
@@ -54,7 +52,7 @@ describe('EntryForm', () => {
     const user = userEvent.setup();
     render(<EntryForm onSubmit={onSubmit} />);
     const input = screen.getByPlaceholderText('workTracker.placeholder');
-    await user.type(input, 'New task');
+    fireEvent.change(input, { target: { value: 'New task' } });
     await user.click(screen.getByRole('button', { name: 'workTracker.save' }));
     await waitFor(() => {
       expect(input).toHaveValue('');
@@ -105,7 +103,7 @@ describe('EntryForm', () => {
     );
     const user = userEvent.setup();
     render(<EntryForm onSubmit={slowSubmit} />);
-    await user.type(screen.getByPlaceholderText('workTracker.placeholder'), 'Task');
+    fireEvent.change(screen.getByPlaceholderText('workTracker.placeholder'), { target: { value: 'Task' } });
     await user.click(screen.getByRole('button', { name: 'workTracker.save' }));
     // While submitting, button should be disabled
     expect(screen.getByRole('button', { name: 'workTracker.save' })).toBeDisabled();
@@ -120,7 +118,7 @@ describe('EntryForm', () => {
     const failSubmit = vi.fn().mockRejectedValue(new Error('fail'));
     const user = userEvent.setup();
     render(<EntryForm onSubmit={failSubmit} />);
-    await user.type(screen.getByPlaceholderText('workTracker.placeholder'), 'Task');
+    fireEvent.change(screen.getByPlaceholderText('workTracker.placeholder'), { target: { value: 'Task' } });
     await user.click(screen.getByRole('button', { name: 'workTracker.save' }));
     await waitFor(() => {
       // After error, submitting state should be reset

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SongList from './SongList';
 import type { WorshipSong } from '../types';
@@ -79,53 +79,45 @@ describe('SongList', () => {
     expect(screen.getByText('worship.noSongs')).toBeInTheDocument();
   });
 
-  it('shows no-results state when search finds nothing', async () => {
-    const user = userEvent.setup();
+  it('shows no-results state when search finds nothing', () => {
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
 
-    const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'zzzznonexistent');
+    fireEvent.change(screen.getByPlaceholderText('worship.searchPlaceholder'), { target: { value: 'zzzznonexistent' } });
 
     expect(screen.getByText('worship.noResults')).toBeInTheDocument();
   });
 
-  it('filters songs by search query on title', async () => {
-    const user = userEvent.setup();
+  it('filters songs by search query on title', () => {
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
 
-    const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'Amazing');
+    fireEvent.change(screen.getByPlaceholderText('worship.searchPlaceholder'), { target: { value: 'Amazing' } });
 
     expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
     expect(screen.queryByText('How Great Thou Art')).not.toBeInTheDocument();
     expect(screen.queryByText('10000 Reasons')).not.toBeInTheDocument();
   });
 
-  it('filters songs by search query on artist', async () => {
-    const user = userEvent.setup();
+  it('filters songs by search query on artist', () => {
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
 
-    const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'Matt');
+    fireEvent.change(screen.getByPlaceholderText('worship.searchPlaceholder'), { target: { value: 'Matt' } });
 
     expect(screen.getByText('10000 Reasons')).toBeInTheDocument();
     expect(screen.queryByText('Amazing Grace')).not.toBeInTheDocument();
   });
 
-  it('filters songs by search query on tags', async () => {
-    const user = userEvent.setup();
+  it('filters songs by search query on tags', () => {
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
 
-    const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'classic');
+    fireEvent.change(screen.getByPlaceholderText('worship.searchPlaceholder'), { target: { value: 'classic' } });
 
     expect(screen.getByText('How Great Thou Art')).toBeInTheDocument();
     expect(screen.queryByText('Amazing Grace')).not.toBeInTheDocument();
