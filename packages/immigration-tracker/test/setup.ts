@@ -17,4 +17,6 @@ vi.mock('@mycircle/shared', () => ({
     error: vi.fn(),
     debug: vi.fn(),
   }),
+  useLazyQuery: vi.fn().mockReturnValue([vi.fn(), { loading: false, data: null }]),
+  CHECK_CASE_STATUS: 'CHECK_CASE_STATUS',
 }));

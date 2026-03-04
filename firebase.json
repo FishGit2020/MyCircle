@@ -39,10 +39,6 @@
         "function": "babyPhotos"
       },
       {
-        "source": "/api/uscis/**",
-        "function": "uscisStatus"
-      },
-      {
         "source": "/digital-library-api/**",
         "function": "digitalLibrary"
       },

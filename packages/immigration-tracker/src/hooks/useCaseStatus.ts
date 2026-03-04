@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useLazyQuery, CHECK_CASE_STATUS } from '@mycircle/shared';
 import type { CaseStatus } from '../types';
 
 export function useCaseStatus() {
@@ -6,39 +7,35 @@ export function useCaseStatus() {
   const [loadingReceipt, setLoadingReceipt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [executeQuery] = useLazyQuery(CHECK_CASE_STATUS, {
+    fetchPolicy: 'network-only',
+  });
+
   const fetchStatus = useCallback(async (receiptNumber: string) => {
     setLoadingReceipt(receiptNumber);
     setError(null);
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) throw new Error('Not authenticated');
-
-      const baseUrl = window.location.hostname === 'localhost'
-        ? 'http://localhost:5001/mycircle-app/us-central1'
-        : '';
-      const res = await fetch(`${baseUrl}/api/uscis/status?receiptNumber=${encodeURIComponent(receiptNumber)}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const { data, error: gqlError } = await executeQuery({
+        variables: { receiptNumber },
       });
 
-      if (!res.ok) {
-        const body = await res.text();
-        throw new Error(body || `HTTP ${res.status}`);
-      }
+      if (gqlError) throw new Error(gqlError.message);
+      if (!data?.checkCaseStatus) throw new Error('No data returned');
 
-      const data: CaseStatus = await res.json();
+      const result = data.checkCaseStatus as CaseStatus;
       setStatuses(prev => {
         const next = new Map(prev);
-        next.set(receiptNumber, data);
+        next.set(receiptNumber, result);
         return next;
       });
-      return data;
+      return result;
     } catch (err: any) {
       setError(err.message || 'Failed to fetch status');
       return null;
     } finally {
       setLoadingReceipt(null);
     }
-  }, []);
+  }, [executeQuery]);
 
   return {
     statuses,

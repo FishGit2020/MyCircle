@@ -4,6 +4,8 @@ export * from './queries';
 // with entity types in ./types that share names like City, CurrentWeather, etc.)
 export type {
   // Query operation types
+  CheckCaseStatusQuery,
+  CheckCaseStatusQueryVariables,
   SearchStocksQuery,
   GetStockQuoteQuery,
   GetStockCandlesQuery,
@@ -42,6 +44,8 @@ export type {
   // Subscription operation types
   WeatherUpdatesSubscription,
   // Schema entity types (only those that don't conflict with ./types)
+  CaseStatus as GqlCaseStatus,
+  CaseStatusHistory as GqlCaseStatusHistory,
   StockSearchResult,
   StockQuote,
   StockCandle,
