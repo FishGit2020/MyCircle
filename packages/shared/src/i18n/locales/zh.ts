@@ -1677,6 +1677,7 @@ const zh: Record<TranslationKey, string> = {
 
   // Family Games
   'commandPalette.goToFamilyGames': '\u53bb\u5bb6\u5ead\u6e38\u620f',
+  'shortcuts.goFamilyGames': '\u53bb\u5bb6\u5ead\u6e38\u620f',
   'nav.familyGames': '\u5bb6\u5ead\u6e38\u620f',
   'widgets.familyGames': '\u5bb6\u5ead\u6e38\u620f',
   'widgets.familyGamesDesc': '\u4e0e\u5bb6\u4eba\u4e00\u8d77\u73a9\u5c0f\u6e38\u620f',
@@ -1700,6 +1701,7 @@ const zh: Record<TranslationKey, string> = {
   'games.submitScore': '\u63d0\u4ea4\u5206\u6570',
   'games.submitting': '\u63d0\u4ea4\u4e2d...',
   'games.scoreSubmitted': '\u5206\u6570\u5df2\u63d0\u4ea4\uff01',
+  'games.submitFailed': '\u63d0\u4ea4\u5206\u6570\u5931\u8d25\u3002\u8bf7\u91cd\u8bd5\u3002',
   'games.playAgain': '\u518d\u73a9\u4e00\u6b21',
   'games.backToGames': '\u8fd4\u56de\u6e38\u620f',
   'games.comingSoon': '\u5373\u5c06\u63a8\u51fa\uff01',

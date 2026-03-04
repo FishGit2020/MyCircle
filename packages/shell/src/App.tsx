@@ -513,6 +513,7 @@ export default function App() {
         <Route path="library" element={<RequireAuth><LibraryPage /></RequireAuth>} />
         <Route path="library/:bookId" element={<RequireAuth><LibraryPage /></RequireAuth>} />
         <Route path="family-games" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
+        <Route path="family-games/:gameType" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />
