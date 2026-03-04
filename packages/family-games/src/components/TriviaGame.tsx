@@ -188,7 +188,7 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
 
           return (
             <button
-              key={i}
+              key={`${questionIndex}-${i}`}
               type="button"
               onClick={() => handleAnswer(i)}
               disabled={selected !== null}

@@ -388,17 +388,28 @@ const NotebookWidget = React.memo(function NotebookWidget() {
     }
     load();
     window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
-    return () => window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
+    // On auth change, the notebook subscription needs time to populate the cache
+    const handleAuth = () => { setTimeout(load, 2000); };
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
+    return () => {
+      window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
+      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
+    };
   }, []);
 
   // Fetch public notes count (lightweight — cached by Firestore persistence)
   useEffect(() => {
-    const api = (window as any).__notebook;
-    if (api?.getAllPublic) {
-      api.getAllPublic().then((notes: any[]) => {
-        setPublicCount(notes.length);
-      }).catch(() => { /* ignore */ });
+    function loadPublic() {
+      const api = (window as any).__notebook;
+      if (api?.getAllPublic) {
+        api.getAllPublic().then((notes: any[]) => {
+          setPublicCount(notes.length);
+        }).catch(() => { /* ignore */ });
+      }
     }
+    loadPublic();
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, loadPublic);
+    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, loadPublic);
   }, []);
 
   return (

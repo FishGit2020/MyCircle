@@ -1707,6 +1707,8 @@ const es: Record<TranslationKey, string> = {
   'games.submitScore': 'Enviar Puntuaci\u00f3n',
   'games.submitting': 'Enviando...',
   'games.scoreSubmitted': '\u00a1Puntuaci\u00f3n enviada!',
+  'games.shareScore': 'Compartir Puntuaci\u00f3n',
+  'games.shareText': '\u00a1Obtuve {score} puntos en {game} en MyCircle! \u00bfPuedes superarlo?',
   'games.submitFailed': 'Error al enviar puntuaci\u00f3n. Int\u00e9ntalo de nuevo.',
   'games.playAgain': 'Jugar de Nuevo',
   'games.backToGames': 'Volver a Juegos',
