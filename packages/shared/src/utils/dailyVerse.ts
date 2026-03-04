@@ -196,3 +196,14 @@ export function getDailyDevotional(date: Date = new Date()): DailyDevotional {
 export function getAllDailyVerses(): DailyVerse[] {
   return DAILY_VERSES;
 }
+
+/**
+ * Parse a human-readable verse reference into book + chapter.
+ * Handles ranges like "Philippians 4:6–7" by stripping after the dash.
+ */
+export function parseVerseReference(ref: string): { book: string; chapter: number } | null {
+  const cleaned = ref.replace(/[\u2013\u2014].*/g, '').trim();
+  const match = cleaned.match(/^(.+?)\s+(\d+)(?::.*)?$/);
+  if (!match) return null;
+  return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
+}

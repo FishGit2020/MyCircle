@@ -24,6 +24,12 @@ vi.mock('@mycircle/shared', () => ({
     BIBLE_TRANSLATION: 'bible-translation',
   },
   getDailyDevotional: () => ({ book: 'Psalms', chapter: 23, theme: 'The Lord is my shepherd' }),
+  parseVerseReference: (ref: string) => {
+    const cleaned = ref.replace(/[\u2013\u2014].*/g, '').trim();
+    const match = cleaned.match(/^(.+?)\s+(\d+)(?::.*)?$/);
+    if (!match) return null;
+    return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
+  },
 }));
 
 // Mock versions data

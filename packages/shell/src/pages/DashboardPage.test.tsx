@@ -3,11 +3,17 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import DashboardPage from './DashboardPage';
 
-// Mock @mycircle/shared — only useTranslation needed by DashboardPage now
+// Mock @mycircle/shared
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+  parseVerseReference: (ref: string) => {
+    const cleaned = ref.replace(/[\u2013\u2014].*/g, '').trim();
+    const match = cleaned.match(/^(.+?)\s+(\d+)(?::.*)?$/);
+    if (!match) return null;
+    return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
+  },
 }));
 
 // Mock useCuratedVerse hook — returns API verse with text by default
