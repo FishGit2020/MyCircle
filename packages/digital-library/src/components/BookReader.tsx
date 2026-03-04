@@ -256,7 +256,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
   }, []);
 
   return (
-    <div ref={containerRef} className={`flex flex-col pb-20 md:pb-8 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-gray-800 p-4 overflow-auto' : 'h-[calc(100vh-8rem)]'}`}>
+    <div ref={containerRef} className={`flex flex-col pb-20 md:pb-8 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-gray-800 p-4 overflow-auto' : showAudioPlayer ? '' : 'h-[calc(100vh-8rem)]'}`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-4 flex-shrink-0">
         <button
@@ -378,7 +378,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
 
       {readerExpanded && (
         <>
-          <div className="flex flex-1 gap-4 overflow-hidden relative">
+          <div className="flex min-h-[400px] gap-4 overflow-hidden relative">
             {/* TOC Sidebar */}
             {tocOpen && (
               <TableOfContents
