@@ -7,6 +7,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { z } from 'zod';
 import { logAiChatInteraction } from './aiChatLogger.js';
 import type { AiToolCallTiming } from './aiChatLogger.js';
+import { fetchUscisStatus } from './uscisApi.js';
 
 // ─── Zod validation schemas for GraphQL mutations ────────────────────
 const runBenchmarkSchema = z.object({
@@ -1107,14 +1108,8 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
           if (name === 'checkCaseStatus') {
             const rn = (args.receiptNumber as string || '').trim().toUpperCase();
             if (!/^[A-Z]{3}\d{10}$/.test(rn)) return JSON.stringify({ error: 'Invalid receipt number format. Expected 3 letters + 10 digits (e.g., MSC2190012345).' });
-            const resp = await axios.post('https://egov.uscis.gov/casestatus/mycasestatus.do', `appReceiptNum=${encodeURIComponent(rn)}`, { headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'Accept-Language': 'en-US,en;q=0.9', 'Origin': 'https://egov.uscis.gov', 'Referer': 'https://egov.uscis.gov/casestatus/landing.do' }, timeout: 15000 });
-            const html = resp.data as string;
-            const h1m = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-            const status = h1m ? h1m[1].replace(/<[^>]+>/g, '').trim() : 'Unknown Status';
-            const pm = html.match(/<h1[^>]*>[\s\S]*?<\/h1>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
-            const desc = pm ? pm[1].replace(/<[^>]+>/g, '').trim() : '';
-            const fm = desc.match(/Form I-\d+/i);
-            return JSON.stringify({ receiptNumber: rn, formType: fm ? fm[0] : '', status, statusDescription: desc, checkedAt: new Date().toISOString() });
+            const result = await fetchUscisStatus(rn);
+            return JSON.stringify(result);
           }
           if (name === 'addNote') return JSON.stringify({ action: 'addNote', title: args.title, content: args.content });
           if (name === 'addWorkEntry') return JSON.stringify({ action: 'addWorkEntry', date: args.date, content: args.content });
