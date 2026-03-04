@@ -55,9 +55,9 @@ export const getCryptoPricesTool: ToolDef = {
 
 export const navigateToTool: ToolDef = {
   name: 'navigateTo',
-  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai, library, family-games.',
+  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, weather/compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai, library, family-games.',
   parameters: z.object({
-    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "compare", "bible", "worship", "notebook", "flashcards", "baby", "child-dev", "work-tracker", "files", "benchmark", "immigration", "ai", "library", "family-games"'),
+    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "weather/compare", "bible", "worship", "notebook", "flashcards", "baby", "child-dev", "work-tracker", "files", "benchmark", "immigration", "ai", "library", "family-games"'),
   }),
   category: 'navigation',
   isFrontendAction: true,

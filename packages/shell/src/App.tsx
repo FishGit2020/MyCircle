@@ -8,6 +8,8 @@ import { WeatherCompare } from './components/widgets';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
 import WhatsNewPage from './pages/WhatsNewPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
 import { useAuth } from './context/AuthContext';
 import { tracedLazy } from './lib/tracedLazy';
 import { perf } from './lib/firebase';
@@ -515,7 +517,9 @@ export default function App() {
         <Route path="family-games" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
         <Route path="family-games/:gameType" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
-        <Route path="compare" element={<WeatherCompare />} />
+        <Route path="privacy" element={<PrivacyPolicyPage />} />
+        <Route path="terms" element={<TermsOfServicePage />} />
+        <Route path="weather/compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

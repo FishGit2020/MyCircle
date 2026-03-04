@@ -204,10 +204,10 @@ export function buildGeminiToolDeclarations(Type: any): { functionDeclarations: 
   };
   const navigateToDecl: FunctionDeclaration = {
     name: 'navigateTo',
-    description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, compare.',
+    description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, weather/compare.',
     parameters: {
       type: Type.OBJECT,
-      properties: { page: { type: Type.STRING, description: 'Page to navigate to: "weather", "stocks", "podcasts", "compare"' } },
+      properties: { page: { type: Type.STRING, description: 'Page to navigate to: "weather", "stocks", "podcasts", "weather/compare"' } },
       required: ['page'],
     },
   };

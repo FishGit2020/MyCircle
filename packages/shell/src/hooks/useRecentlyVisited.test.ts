@@ -30,7 +30,7 @@ describe('useRecentlyVisited', () => {
     expect(result.current.recent[0].path).toBe('/weather');
   });
 
-  it('does not track excluded routes (/ and /compare)', () => {
+  it('does not track excluded routes (/ and /weather/compare)', () => {
     mockPathname.value = '/';
     const { result } = renderHook(() => useRecentlyVisited());
     expect(result.current.recent).toHaveLength(0);

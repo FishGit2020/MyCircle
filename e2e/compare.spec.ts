@@ -1,14 +1,14 @@
 import { test, expect } from './fixtures';
 
 test.describe('Weather Compare', () => {
-  test('legacy /compare route still works', async ({ page }) => {
-    await page.goto('/compare');
+  test('/weather/compare route works', async ({ page }) => {
+    await page.goto('/weather/compare');
 
     await expect(page.getByRole('heading', { name: 'Compare Weather' })).toBeVisible();
   });
 
-  test('/compare shows instruction for adding favorites', async ({ page }) => {
-    await page.goto('/compare');
+  test('/weather/compare shows instruction for adding favorites', async ({ page }) => {
+    await page.goto('/weather/compare');
 
     // Since user is not logged in, it should show a message about needing favorites/recent cities
     await expect(page.getByText(/favorites|recent/i).first()).toBeVisible();
