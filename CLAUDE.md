@@ -45,12 +45,13 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 
 When adding a new micro frontend, update ALL of these integration points:
 
-1. **Shell**: `App.tsx` (lazy import + route), `vite.config.ts` (federation remote URL), `remotes.d.ts` (type declaration), `tailwind.config.js` (content path), `WidgetDashboard.tsx` (WidgetType + DEFAULT_LAYOUT + WIDGET_COMPONENTS + WIDGET_ROUTES), `BottomNav.tsx` (nav item + icon)
-2. **Testing**: Mock file in `packages/shell/test/mocks/`, alias in **both** root `vitest.config.ts` AND `packages/shell/vitest.config.ts`, update hardcoded widget/nav counts in existing tests
+1. **Shell**: `App.tsx` (lazy import + route), `vite.config.ts` (federation remote URL), `remotes.d.ts` (type declaration), `tailwind.config.js` (content path), `WidgetDashboard.tsx` (WidgetType + DEFAULT_LAYOUT + WIDGET_COMPONENTS + WIDGET_ROUTES), `BottomNav.tsx` (nav item + icon), `Layout.tsx` (NAV_GROUPS item + NavIcon case + ROUTE_MODULE_MAP prefetch), `CommandPalette.tsx` (nav item), `routeConfig.ts` (ROUTE_LABEL_KEYS for breadcrumbs)
+2. **Testing**: Mock file in `packages/shell/test/mocks/`, alias in **both** root `vitest.config.ts` AND `packages/shell/vitest.config.ts`, update hardcoded widget/nav counts in existing tests, add e2e test in `e2e/`
 3. **Deployment**: `deploy/docker/Dockerfile` (COPY in build + runtime stages), `scripts/assemble-firebase.mjs` (copy block + mfeDirs array), `server/production.ts` (`MFE_PREFIXES` array)
-4. **Other**: `firestore.rules` (if new subcollections), root `package.json` (`dev:*` and `preview:*` scripts **AND** the `"dev"` + `"dev:mf"` concurrently commands — missing this means the MFE won't start in local dev and the route silently fails), i18n keys in all 3 locales, `docs/architecture.md`, `README.md`
-5. **Cloud Function endpoints**: If the MFE has its own Cloud Function (REST API), add a `firebase.json` hosting rewrite **before** the catch-all `** → /index.html` rule: `{ "source": "/your-api-path/**", "function": "yourFunction" }`. Missing this causes the API to return HTML (index.html) instead of JSON in production.
-6. **functions/ has separate strict tsconfig**: `noUnusedLocals: true` — root `pnpm typecheck` doesn't catch it. Always verify with `cd functions && npx tsc --noEmit` before pushing backend changes.
+4. **Other**: `firestore.rules` (if new subcollections), root `package.json` (`dev:*` and `preview:*` scripts **AND** the `"dev"` + `"dev:mf"` concurrently commands — missing this means the MFE won't start in local dev and the route silently fails), i18n keys in all 3 locales (including `commandPalette.goTo*` and `nav.*` keys), `docs/architecture.md`, `README.md`
+5. **AI Tools**: Update `navigateTo` page list in `scripts/mcp-tools/mfe-tools.ts` to include the new route. If the MFE has AI-callable actions, add new tool definitions to `ALL_TOOLS` array.
+6. **Cloud Function endpoints**: If the MFE has its own Cloud Function (REST API), add a `firebase.json` hosting rewrite **before** the catch-all `** → /index.html` rule: `{ "source": "/your-api-path/**", "function": "yourFunction" }`. Missing this causes the API to return HTML (index.html) instead of JSON in production.
+7. **functions/ has separate strict tsconfig**: `noUnusedLocals: true` — root `pnpm typecheck` doesn't catch it. Always verify with `cd functions && npx tsc --noEmit` before pushing backend changes.
 
 ## Removing Features
 
