@@ -656,7 +656,7 @@ export const aiChat = onRequest(
     invoker: 'public',
     maxInstances: 5,
     memory: '256MiB',
-    timeoutSeconds: 60,
+    timeoutSeconds: 300,
     secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY'],
   },
   async (req: Request, res: Response) => {
