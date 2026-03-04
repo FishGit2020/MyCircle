@@ -46,7 +46,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
   const [ttsText, setTtsText] = useState('');
   const [loading, setLoading] = useState(true);
   const [showAudioPlayer, setShowAudioPlayer] = useState(audioStatus === 'complete');
-  const [readerExpanded, setReaderExpanded] = useState(audioStatus !== 'complete');
+  const [readerExpanded, setReaderExpanded] = useState(true);
   const [bookmarks, setBookmarks] = useState<BookBookmark[]>([]);
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -148,7 +148,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
         try { bookRef.current.destroy(); } catch { /* ignore */ }
       }
     };
-  }, [epubUrl, chapters]);
+  }, [epubUrl, chapters, readerExpanded]);
 
   // Update font size
   useEffect(() => {

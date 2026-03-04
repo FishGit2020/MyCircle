@@ -1147,6 +1147,15 @@ All Cloud Functions are defined in `functions/src/index.ts` and deployed via `fi
 | `subscribeToAlerts` | `onCall` | Callable | Default | Default | — |
 | `checkWeatherAlerts` | `onSchedule` | Every 24 hours | 256 MiB | 120s | OPENWEATHER_API_KEY |
 
+### Storage Upload Helpers
+
+Two shared helper functions in `functions/src/index.ts` consolidate Firebase Storage uploads across `cloudFiles`, `babyPhotos`, and `digitalLibrary`:
+
+- `uploadToStorage(bucket, path, data, contentType, options?)` — saves a buffer with a download token, returns `{ downloadUrl, downloadToken }`. Options: `cacheControl`, `customMetadata`.
+- `getStorageDownloadUrl(bucket, path)` — sets a download token on an existing file (used after `file.copy()`), returns `{ downloadUrl, downloadToken }`.
+
+All six upload sites (cloud files upload, cloud files share, baby photos, EPUB upload, cover extraction, TTS audio) use these helpers.
+
 ### Rate Limiting
 
 IP-based rate limiting via `node-cache` (in-memory, per-instance):

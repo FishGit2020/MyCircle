@@ -82,6 +82,41 @@ async function verifyAuthToken(req: Request): Promise<string | null> {
   }
 }
 
+// ─── Storage Upload Helpers ─────────────────────────────────────────
+/** Upload a buffer to Firebase Storage with a download token, return the public URL. */
+export async function uploadToStorage(
+  bucket: ReturnType<ReturnType<typeof getStorage>['bucket']>,
+  storagePath: string,
+  data: Buffer,
+  contentType: string,
+  options?: { cacheControl?: string; customMetadata?: Record<string, string> },
+): Promise<{ downloadUrl: string; downloadToken: string }> {
+  const file = bucket.file(storagePath);
+  const downloadToken = crypto.randomUUID();
+  await file.save(data, {
+    contentType,
+    metadata: {
+      ...(options?.cacheControl ? { cacheControl: options.cacheControl } : {}),
+      metadata: { firebaseStorageDownloadTokens: downloadToken, ...options?.customMetadata },
+    },
+  });
+  const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(storagePath)}?alt=media&token=${downloadToken}`;
+  return { downloadUrl, downloadToken };
+}
+
+/** Set a download token on an existing file (e.g. after copy) and return the public URL. */
+export async function getStorageDownloadUrl(
+  bucket: ReturnType<ReturnType<typeof getStorage>['bucket']>,
+  storagePath: string,
+): Promise<{ downloadUrl: string; downloadToken: string }> {
+  const downloadToken = crypto.randomUUID();
+  await bucket.file(storagePath).setMetadata({
+    metadata: { firebaseStorageDownloadTokens: downloadToken },
+  });
+  const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(storagePath)}?alt=media&token=${downloadToken}`;
+  return { downloadUrl, downloadToken };
+}
+
 // Cache the Apollo Server instance to avoid re-initialization on every request
 let serverPromise: Promise<any> | null = null;
 
@@ -1773,20 +1808,9 @@ export const cloudFiles = onRequest(
         const bucket = getStorage().bucket();
         const fileId = crypto.randomUUID();
         const filePath = `users/${uid}/files/${fileId}/${fileName}`;
-        const file = bucket.file(filePath);
-
-        const downloadToken = crypto.randomUUID();
-        await file.save(buffer, {
-          contentType,
-          metadata: {
-            cacheControl: 'public, max-age=31536000',
-            metadata: { firebaseStorageDownloadTokens: downloadToken },
-          },
+        const { downloadUrl } = await uploadToStorage(bucket, filePath, buffer, contentType, {
+          cacheControl: 'public, max-age=31536000',
         });
-
-        const bucketName = bucket.name;
-        const encodedPath = encodeURIComponent(filePath);
-        const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`;
 
         const dbAdmin = getFirestore();
         await dbAdmin.doc(`users/${uid}/files/${fileId}`).set({
@@ -1826,18 +1850,8 @@ export const cloudFiles = onRequest(
         const bucket = getStorage().bucket();
         const srcFile = bucket.file(fileData.storagePath);
         const destPath = `shared-files/${fileId}/${fileData.fileName}`;
-        const downloadToken = crypto.randomUUID();
-
         await srcFile.copy(bucket.file(destPath));
-        // Set download token on the copied file
-        const destFile = bucket.file(destPath);
-        await destFile.setMetadata({
-          metadata: { firebaseStorageDownloadTokens: downloadToken },
-        });
-
-        const bucketName = bucket.name;
-        const encodedPath = encodeURIComponent(destPath);
-        const sharedDownloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`;
+        const { downloadUrl: sharedDownloadUrl } = await getStorageDownloadUrl(bucket, destPath);
 
         // Get user display name
         const userRecord = await getAuth().getUser(uid);
@@ -1982,21 +1996,9 @@ export const babyPhotos = onRequest(
       try {
         const bucket = getStorage().bucket();
         const filePath = `users/${uid}/baby-photos/${stageId}.jpg`;
-        const file = bucket.file(filePath);
-
-        const downloadToken = crypto.randomUUID();
-        await file.save(buffer, {
-          contentType: 'image/jpeg',
-          metadata: {
-            cacheControl: 'public, max-age=31536000',
-            metadata: { firebaseStorageDownloadTokens: downloadToken },
-          },
+        const { downloadUrl: photoUrl } = await uploadToStorage(bucket, filePath, buffer, 'image/jpeg', {
+          cacheControl: 'public, max-age=31536000',
         });
-
-        // Build Firebase Storage download URL (no IAM signBlob permission needed)
-        const bucketName = bucket.name;
-        const encodedPath = encodeURIComponent(filePath);
-        const photoUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${downloadToken}`;
 
         // Write metadata to Firestore
         const db = getFirestore();
@@ -2081,15 +2083,10 @@ export const digitalLibrary = onRequest(
 
       const bookId = crypto.randomUUID();
       const storagePath = `books/${bookId}/original.epub`;
-      const file = bucket.file(storagePath);
 
       // Write EPUB to Storage
-      const downloadToken = crypto.randomUUID();
-      await file.save(buffer, {
-        metadata: {
-          contentType: 'application/epub+zip',
-          metadata: { firebaseStorageDownloadTokens: downloadToken, uploadedBy: uid },
-        },
+      const { downloadUrl: epubUrl } = await uploadToStorage(bucket, storagePath, buffer, 'application/epub+zip', {
+        customMetadata: { uploadedBy: uid },
       });
 
       try {
@@ -2123,20 +2120,11 @@ export const digitalLibrary = onRequest(
               });
             });
             coverStoragePath = `books/${bookId}/cover.jpg`;
-            const coverFile = bucket.file(coverStoragePath);
-            await coverFile.save(coverData, { metadata: { contentType: coverItem.mediaType || 'image/jpeg' } });
-            const downloadToken = crypto.randomUUID();
-            await coverFile.setMetadata({ metadata: { firebaseStorageDownloadTokens: downloadToken } });
-            const bucketName = bucket.name;
-            coverUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(coverStoragePath)}?alt=media&token=${downloadToken}`;
+            ({ downloadUrl: coverUrl } = await uploadToStorage(bucket, coverStoragePath, coverData, coverItem.mediaType || 'image/jpeg'));
           }
         } catch (coverErr) {
           logger.warn('Failed to extract cover image', { bookId, error: String(coverErr) });
         }
-
-        // Build EPUB download URL (token already set during upload)
-        const bucketName = bucket.name;
-        const epubUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(storagePath)}?alt=media&token=${downloadToken}`;
 
         // Get chapters from flow/toc
         const chapters: Array<{ index: number; title: string; href: string; characterCount: number }> = [];
@@ -2470,13 +2458,7 @@ export const digitalLibrary = onRequest(
           if (audioBuffers.length > 0) {
             const combinedAudio = Buffer.concat(audioBuffers);
             const audioPath = `books/${bookId}/audio/chapter-${String(chData.index).padStart(4, '0')}.mp3`;
-            const audioFile = bucket.file(audioPath);
-            await audioFile.save(combinedAudio, { metadata: { contentType: 'audio/mpeg' } });
-
-            const audioToken = crypto.randomUUID();
-            await audioFile.setMetadata({ metadata: { firebaseStorageDownloadTokens: audioToken } });
-            const bucketName = bucket.name;
-            const audioUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(audioPath)}?alt=media&token=${audioToken}`;
+            const { downloadUrl: audioUrl } = await uploadToStorage(bucket, audioPath, combinedAudio, 'audio/mpeg');
 
             // Estimate duration (rough: 150 words/min at normal speed)
             const wordCount = chapterText.split(/\s+/).length;
