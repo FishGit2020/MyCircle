@@ -31,6 +31,7 @@ const WorkTrackerMF = tracedLazy('mfe_work_tracker_load', () => import('workTrac
 const CloudFilesMF = tracedLazy('mfe_cloud_files_load', () => import('cloudFiles/CloudFiles'), getPerf);
 const ModelBenchmarkMF = tracedLazy('mfe_benchmark_load', () => import('modelBenchmark/ModelBenchmark'), getPerf);
 const ImmigrationTrackerMF = tracedLazy('mfe_immigration_load', () => import('immigrationTracker/ImmigrationTracker'), getPerf);
+const DigitalLibraryMF = tracedLazy('mfe_digital_library_load', () => import('digitalLibrary/DigitalLibrary'), getPerf);
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -417,6 +418,23 @@ function ImmigrationPage() {
   );
 }
 
+// Fallback for Digital Library MFE
+const DigitalLibraryFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Digital Library module is loading...</p>
+  </div>
+);
+
+function LibraryPage() {
+  return (
+    <ErrorBoundary fallback={<DigitalLibraryFallback />}>
+      <Suspense fallback={<Loading />}>
+        <DigitalLibraryMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -474,6 +492,8 @@ export default function App() {
         <Route path="files" element={<RequireAuth><CloudFilesPage /></RequireAuth>} />
         <Route path="benchmark" element={<RequireAuth><BenchmarkPage /></RequireAuth>} />
         <Route path="immigration" element={<RequireAuth><ImmigrationPage /></RequireAuth>} />
+        <Route path="library" element={<RequireAuth><LibraryPage /></RequireAuth>} />
+        <Route path="library/:bookId" element={<RequireAuth><LibraryPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="compare" element={<WeatherCompare />} />
         <Route path="*" element={<NotFound />} />

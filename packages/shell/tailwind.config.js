@@ -18,6 +18,7 @@ export default {
     "../cloud-files/src/**/*.{js,ts,jsx,tsx}",
     "../model-benchmark/src/**/*.{js,ts,jsx,tsx}",
     "../immigration-tracker/src/**/*.{js,ts,jsx,tsx}",
+    "../digital-library/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',
   theme: {

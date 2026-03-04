@@ -156,6 +156,10 @@ const immigrationTrackerRemote = isProduction
   ? '/immigration-tracker/assets/remoteEntry.js'
   : 'http://localhost:3018/assets/remoteEntry.js';
 
+const digitalLibraryRemote = isProduction
+  ? '/digital-library/assets/remoteEntry.js'
+  : 'http://localhost:3019/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -178,7 +182,8 @@ export default defineConfig({
         workTracker: workTrackerRemote,
         cloudFiles: cloudFilesRemote,
         modelBenchmark: modelBenchmarkRemote,
-        immigrationTracker: immigrationTrackerRemote
+        immigrationTracker: immigrationTrackerRemote,
+        digitalLibrary: digitalLibraryRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
@@ -248,6 +253,7 @@ export default defineConfig({
           /^\/podcast\//,
           /^\/ai\//,
           /^\/cloud-files\//,
+          /^\/digital-library-api\//,
           /^\/api\//,
           /^\/__\//,
         ],

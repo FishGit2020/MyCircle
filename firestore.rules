@@ -97,5 +97,17 @@ service cloud.firestore {
     match /announcements/{announcementId} {
       allow read: if true;
     }
+
+    // Books - shared library, authenticated read, uploader can write/delete
+    match /books/{bookId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.uploadedBy.uid == request.auth.uid;
+
+      // Chapters subcollection - authenticated read only (written by cloud function)
+      match /chapters/{chapterId} {
+        allow read: if request.auth != null;
+      }
+    }
   }
 }
