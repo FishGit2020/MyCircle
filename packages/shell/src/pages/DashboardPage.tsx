@@ -1,5 +1,6 @@
 import React from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { Link } from 'react-router';
+import { useTranslation, parseVerseReference } from '@mycircle/shared';
 import { WidgetDashboard } from '../components/widgets';
 import QuickAccessTiles from '../components/layout/QuickAccessTiles';
 import { useCuratedVerse } from '../hooks/useCuratedVerse';
@@ -29,7 +30,7 @@ export default function DashboardPage() {
             ) : (
               <>
                 {verseFragments ? (
-                  <p className="text-sm italic text-blue-600 dark:text-blue-400 text-left leading-relaxed">
+                  <p className="text-base md:text-lg italic text-blue-600 dark:text-blue-400 text-left leading-relaxed">
                     &ldquo;{verseFragments.map((v) => (
                       <span key={v.number}>
                         <sup className="text-[10px] font-bold text-blue-400 dark:text-blue-500 mr-0.5 not-italic select-none">
@@ -40,7 +41,7 @@ export default function DashboardPage() {
                     ))}&rdquo;
                   </p>
                 ) : verse.text ? (
-                  <p className="text-sm italic text-blue-600 dark:text-blue-400">
+                  <p className="text-base md:text-lg italic text-blue-600 dark:text-blue-400">
                     &ldquo;{verse.text}&rdquo;
                   </p>
                 ) : null}
@@ -52,6 +53,18 @@ export default function DashboardPage() {
                     {verse.copyright}
                   </p>
                 )}
+                {(() => {
+                  const parsed = parseVerseReference(verse.reference);
+                  if (!parsed) return null;
+                  return (
+                    <Link
+                      to={`/bible?book=${encodeURIComponent(parsed.book)}&chapter=${parsed.chapter}`}
+                      className="inline-block mt-2 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
+                    >
+                      {t('bible.readChapter')} &rarr;
+                    </Link>
+                  );
+                })()}
               </>
             )}
           </div>

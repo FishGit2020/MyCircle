@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import ToolCallDisplay from './ToolCallDisplay';
 import MarkdownText from './MarkdownText';
+import { useTypewriter } from '../hooks/useTypewriter';
 import type { ChatMessage as ChatMessageType } from '../hooks/useAiChat';
 
 interface ChatMessageProps {
@@ -9,12 +10,20 @@ interface ChatMessageProps {
   debugMode?: boolean;
   /** When true, shows blinking cursor and disables copy */
   streaming?: boolean;
+  /** When true, applies typewriter effect for non-streamed responses */
+  isLatest?: boolean;
 }
 
-export default function ChatMessage({ message, debugMode, streaming }: ChatMessageProps) {
+export default function ChatMessage({ message, debugMode, streaming, isLatest }: ChatMessageProps) {
   const { t } = useTranslation();
   const isUser = message.role === 'user';
   const [copied, setCopied] = useState(false);
+
+  const useTypewriterEffect = !isUser && !streaming && !!isLatest;
+  const { displayedText, isTyping } = useTypewriter({
+    text: message.content,
+    enabled: useTypewriterEffect,
+  });
 
   const handleCopy = useCallback(async () => {
     try {
@@ -23,6 +32,9 @@ export default function ChatMessage({ message, debugMode, streaming }: ChatMessa
       setTimeout(() => setCopied(false), 2000);
     } catch { /* clipboard not available */ }
   }, [message.content]);
+
+  const showCursor = streaming || isTyping;
+  const renderedContent = useTypewriterEffect ? displayedText : message.content;
 
   return (
     <div
@@ -40,7 +52,7 @@ export default function ChatMessage({ message, debugMode, streaming }: ChatMessa
           <div className="text-xs font-medium opacity-70">
             {isUser ? t('ai.you') : t('ai.assistant')}
           </div>
-          {!isUser && !streaming && (
+          {!isUser && !streaming && !isTyping && (
             <button
               onClick={handleCopy}
               className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
@@ -64,9 +76,9 @@ export default function ChatMessage({ message, debugMode, streaming }: ChatMessa
             <span className="whitespace-pre-wrap">{message.content}</span>
           ) : (
             <>
-              <MarkdownText content={message.content} streaming={streaming} />
-              {streaming && (
-                <span className="inline-block w-2 h-4 ml-0.5 bg-gray-500 dark:bg-gray-300 animate-pulse rounded-sm align-text-bottom" aria-hidden="true" />
+              <MarkdownText content={renderedContent} streaming={streaming} />
+              {showCursor && (
+                <span className="inline-block w-0.5 h-4 ml-0.5 bg-blue-500 shadow-[0_0_4px_rgba(59,130,246,0.5)] animate-pulse rounded-sm align-text-bottom" aria-hidden="true" />
               )}
             </>
           )}

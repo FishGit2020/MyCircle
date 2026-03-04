@@ -317,9 +317,28 @@ export default function AiAssistant() {
               </div>
             )}
 
-            {messages.map(msg => (
-              <ChatMessage key={msg.id} message={msg} debugMode={debugMode} />
+            {messages.map((msg, i) => (
+              <ChatMessage
+                key={msg.id}
+                message={msg}
+                debugMode={debugMode}
+                isLatest={i === messages.length - 1 && msg.role === 'assistant' && !streaming}
+              />
             ))}
+
+            {/* Streaming/generating badge */}
+            {(streaming || (loading && !streaming)) && (
+              <div className="flex justify-start">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                  streaming
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                }`}>
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse bg-current" />
+                  {streaming ? t('ai.streamingBadge') : t('ai.generatingBadge')}
+                </span>
+              </div>
+            )}
 
             {/* Streaming message — shows incremental content as it arrives */}
             {streaming && streamingContent && (

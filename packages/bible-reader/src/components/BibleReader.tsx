@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-import { useTranslation, StorageKeys, WindowEvents, getDailyDevotional } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, getDailyDevotional, parseVerseReference } from '@mycircle/shared';
 import { useVotd, useBiblePassage, useBibleVersions, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
 
@@ -109,7 +109,7 @@ function markDevotionalCompleted() {
 
 // --- Sub-components ---
 
-function VotdSection() {
+function VotdSection({ onReadChapter }: { onReadChapter?: (book: string, chapter: number) => void }) {
   const { t } = useTranslation();
   const { verse, loading, error } = useVotd();
 
@@ -145,6 +145,19 @@ function VotdSection() {
       {verse.copyright && (
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{verse.copyright}</p>
       )}
+      {onReadChapter && (() => {
+        const parsed = parseVerseReference(verse.reference);
+        if (!parsed) return null;
+        return (
+          <button
+            type="button"
+            onClick={() => onReadChapter(parsed.book, parsed.chapter)}
+            className="mt-2 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
+          >
+            {t('bible.readChapter')} &rarr;
+          </button>
+        );
+      })()}
     </div>
   );
 }
@@ -703,7 +716,7 @@ export default function BibleReader() {
 
   return (
     <div className="space-y-6">
-      <VotdSection />
+      <VotdSection onReadChapter={handleDevotionalRead} />
       <DailyDevotional onRead={handleDevotionalRead} />
 
       {/* Continue reading & bookmarks bar */}

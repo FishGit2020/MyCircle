@@ -10,6 +10,11 @@ import AiAssistant from './AiAssistant';
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
+// Mock useTypewriter to skip animation in tests
+vi.mock('../hooks/useTypewriter', () => ({
+  useTypewriter: ({ text }: { text: string }) => ({ displayedText: text, isTyping: false }),
+}));
+
 // Mock useAiChatWithStreaming at module level to avoid import issues
 vi.mock('../hooks/useAiChatWithStreaming', () => {
   const mockSendMessage = vi.fn();
