@@ -113,7 +113,7 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
       setError(t('library.epubOnly'));
       return;
     }
-    if (file.size > 50 * 1024 * 1024) {
+    if (file.size > 20 * 1024 * 1024) {
       setError(t('library.fileTooLarge'));
       return;
     }
@@ -130,29 +130,21 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
 
       const apiBase = window.__digitalLibraryApiBase?.() || '';
 
-      // Step 1: Get signed upload URL
-      const urlRes = await fetch(`${apiBase}/digital-library-api/upload-url`, {
+      // Convert file to base64 and upload in one step (same pattern as cloudFiles)
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const fileBase64 = btoa(binary);
+
+      const res = await fetch(`${apiBase}/digital-library-api/upload`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ fileName: file.name, contentType: 'application/epub+zip', fileSize: file.size }),
+        body: JSON.stringify({ fileBase64 }),
       });
-      if (!urlRes.ok) throw new Error(await urlRes.text());
-      const { uploadUrl, bookId } = await urlRes.json();
-
-      // Step 2: Upload EPUB to signed URL
-      await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/epub+zip' },
-        body: file,
-      });
-
-      // Step 3: Register book (extract metadata server-side)
-      const regRes = await fetch(`${apiBase}/digital-library-api/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ bookId }),
-      });
-      if (!regRes.ok) throw new Error(await regRes.text());
+      if (!res.ok) throw new Error(await res.text());
 
       logger.info('Book uploaded successfully', { bookId });
       window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
