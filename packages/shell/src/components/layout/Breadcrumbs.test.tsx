@@ -12,6 +12,7 @@ vi.mock('react-router', () => ({
 }));
 
 vi.mock('@mycircle/shared', () => ({
+  WindowEvents: { BREADCRUMB_DETAIL: 'breadcrumb-detail' },
   useTranslation: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {

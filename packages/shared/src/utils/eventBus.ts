@@ -58,6 +58,7 @@ export const WindowEvents = {
   BOOKS_CHANGED: 'books-changed',
   WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
   BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
+  BREADCRUMB_DETAIL: 'breadcrumb-detail',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals

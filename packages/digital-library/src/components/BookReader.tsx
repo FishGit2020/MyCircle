@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation, createLogger, StorageKeys, WindowEvents, Breadcrumb } from '@mycircle/shared';
+import { useTranslation, createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
 import TableOfContents from './TableOfContents';
 import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
@@ -148,7 +148,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
         try { bookRef.current.destroy(); } catch { /* ignore */ }
       }
     };
-  }, [epubUrl, chapters, readerExpanded]);
+  }, [epubUrl, chapters]);
 
   // Update font size
   useEffect(() => {
@@ -255,16 +255,19 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // Broadcast breadcrumb detail to shell
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: title }));
+    return () => {
+      window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: null }));
+    };
+  }, [title]);
+
   return (
     <div ref={containerRef} className={`flex flex-col pb-20 md:pb-8 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-gray-800 p-4 overflow-auto' : 'h-[calc(100vh-8rem)]'}`}>
-      {/* Breadcrumb + actions */}
+      {/* Header actions */}
       <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-        <div className="flex-1 min-w-0">
-          <Breadcrumb items={[
-            { label: t('library.title'), onClick: onBack },
-            { label: title },
-          ]} />
-        </div>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate flex-1">{title}</h2>
 
         {/* Bookmark button */}
         <div className="relative">
