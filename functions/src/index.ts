@@ -19,6 +19,15 @@ import { verifyRecaptchaToken } from './recaptcha.js';
 import { logAiChatInteraction } from './aiChatLogger.js';
 import type { AiToolCallTiming } from './aiChatLogger.js';
 import { fetchUscisStatus } from './uscisApi.js';
+import {
+  validateAiChatRequest,
+  buildSystemInstruction,
+  buildOllamaClient,
+  buildGeminiToolDeclarations,
+  ollamaTools,
+  executeTool as executeToolHelper,
+  getUserOllamaEndpoint as getUserOllamaEndpointHelper,
+} from './aiChatHelpers.js';
 
 // Initialize Firebase Admin (idempotent)
 if (getApps().length === 0) {
@@ -1095,6 +1104,375 @@ export const aiChat = onRequest(
 );
 
 /**
+ * AI Chat SSE streaming endpoint.
+ * POST /ai/chat/stream — same body as /ai/chat but returns Server-Sent Events.
+ *
+ * Event types:
+ *   { type: 'text', content: '...' }         — incremental token
+ *   { type: 'tool_start', name, args }       — tool execution begins
+ *   { type: 'tool_result', name, result }    — tool execution done
+ *   { type: 'done', metadata: {...} }        — stream complete
+ *   { type: 'error', message: '...' }        — error
+ */
+export const aiChatStream = onRequest(
+  {
+    cors: ALLOWED_ORIGINS,
+    invoker: 'public',
+    maxInstances: 5,
+    memory: '256MiB',
+    timeoutSeconds: 300,
+    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY'],
+  },
+  async (req: Request, res: Response) => {
+    // Validate request (auth, rate limit, recaptcha, zod)
+    const validated = await validateAiChatRequest(req, res);
+    if (!validated) return; // response already sent
+
+    const { uid, message, history, context, model: reqModel, endpointId: reqEndpointId } = validated;
+
+    // SSE headers
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+
+    let aborted = false;
+    req.on('close', () => { aborted = true; });
+
+    function sendEvent(type: string, data: Record<string, unknown>) {
+      if (aborted) return;
+      res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`);
+    }
+
+    const endpoint = await getUserOllamaEndpointHelper(uid, reqEndpointId || undefined);
+    const ollamaBaseUrl = endpoint?.url || '';
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (!ollamaBaseUrl && !geminiKey) {
+      sendEvent('error', { message: 'No AI provider configured' });
+      res.end();
+      return;
+    }
+    const ollamaModel = reqModel || '';
+    if (ollamaBaseUrl && !ollamaModel) {
+      sendEvent('error', { message: 'Model is required — select a model before chatting' });
+      res.end();
+      return;
+    }
+
+    const systemInstruction = buildSystemInstruction(context);
+
+    // Metrics
+    const startTime = Date.now();
+    let inputTokens = 0;
+    let outputTokens = 0;
+    const toolCallTimings: AiToolCallTiming[] = [];
+    let trackedProvider = '';
+    let trackedModel = '';
+    let fullText = '';
+
+    try {
+      // ─── Ollama streaming path ────────────────────────────────
+      if (ollamaBaseUrl && endpoint) {
+        trackedProvider = 'ollama';
+        trackedModel = ollamaModel;
+        const client = await buildOllamaClient(endpoint);
+
+        const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+          { role: 'system', content: systemInstruction },
+        ];
+        if (history && Array.isArray(history)) {
+          for (const msg of history) {
+            messages.push({ role: msg.role === 'assistant' ? 'assistant' : 'user', content: msg.content });
+          }
+        }
+        messages.push({ role: 'user', content: message });
+
+        // Try streaming with native tool calling
+        let usedFallback = false;
+        try {
+          const stream = await client.chat.completions.create({
+            model: ollamaModel,
+            messages,
+            tools: ollamaTools,
+            stream: true,
+          });
+
+          // Buffer tool calls from deltas
+          const toolCallBuffers: Map<number, { id: string; name: string; arguments: string }> = new Map();
+          let streamText = '';
+
+          for await (const chunk of stream) {
+            if (aborted) break;
+            const delta = chunk.choices[0]?.delta;
+            if (!delta) continue;
+
+            if (delta.content) {
+              streamText += delta.content;
+              fullText += delta.content;
+              sendEvent('text', { content: delta.content });
+            }
+
+            // Buffer incremental tool call deltas
+            if (delta.tool_calls) {
+              for (const tc of delta.tool_calls) {
+                const idx = tc.index ?? 0;
+                if (!toolCallBuffers.has(idx)) {
+                  toolCallBuffers.set(idx, { id: tc.id || '', name: tc.function?.name || '', arguments: '' });
+                }
+                const buf = toolCallBuffers.get(idx)!;
+                if (tc.function?.name) buf.name = tc.function.name;
+                if (tc.function?.arguments) buf.arguments += tc.function.arguments;
+              }
+            }
+
+            if (chunk.usage) {
+              inputTokens += chunk.usage.prompt_tokens || 0;
+              outputTokens += chunk.usage.completion_tokens || 0;
+            }
+          }
+
+          // Execute buffered tool calls
+          if (toolCallBuffers.size > 0 && !aborted) {
+            const toolCalls: Array<{ name: string; args: Record<string, unknown>; result: string }> = [];
+            const toolMessages: Array<{ role: 'tool'; tool_call_id: string; content: string }> = [];
+
+            for (const [, buf] of toolCallBuffers) {
+              const args = JSON.parse(buf.arguments || '{}') as Record<string, unknown>;
+              sendEvent('tool_start', { name: buf.name, args });
+
+              const toolStart = Date.now();
+              let result = '';
+              try { result = await executeToolHelper(buf.name, args); }
+              catch (err: any) { result = JSON.stringify({ error: err.message }); }
+              toolCallTimings.push({ name: buf.name, durationMs: Date.now() - toolStart });
+
+              sendEvent('tool_result', { name: buf.name, result });
+              toolCalls.push({ name: buf.name, args, result });
+              toolMessages.push({ role: 'tool', tool_call_id: buf.id, content: result });
+            }
+
+            // Follow-up streaming call with tool results
+            const followupMessages: any[] = [
+              ...messages,
+              { role: 'assistant', content: streamText || null, tool_calls: Array.from(toolCallBuffers.values()).map(b => ({ id: b.id, type: 'function' as const, function: { name: b.name, arguments: b.arguments } })) },
+              ...toolMessages,
+            ];
+
+            const followupStream = await client.chat.completions.create({
+              model: ollamaModel,
+              messages: followupMessages,
+              stream: true,
+            });
+
+            for await (const chunk of followupStream) {
+              if (aborted) break;
+              const delta = chunk.choices[0]?.delta;
+              if (delta?.content) {
+                fullText += delta.content;
+                sendEvent('text', { content: delta.content });
+              }
+              if (chunk.usage) {
+                inputTokens += chunk.usage.prompt_tokens || 0;
+                outputTokens += chunk.usage.completion_tokens || 0;
+              }
+            }
+          }
+        } catch {
+          // Model doesn't support native tools — prompt-based fallback (non-streaming for simplicity)
+          usedFallback = true;
+          const toolPrompt = ollamaTools.map(t => {
+            const params = (t.function.parameters as Record<string, any>)?.properties || {};
+            return `- ${t.function.name}(${Object.keys(params).join(', ')}): ${t.function.description}`;
+          }).join('\n');
+          const fallbackSystemPrompt = systemInstruction + '\n\n' +
+            'You have access to these tools:\n' + toolPrompt + '\n\n' +
+            'If the user\'s request needs a tool, respond with ONLY a JSON object in this exact format (no other text):\n' +
+            '{"name":"toolName","args":{"param":"value"}}\n\n' +
+            'Otherwise, respond normally to the user.';
+
+          const fallbackMessages: any[] = [
+            { role: 'system', content: fallbackSystemPrompt },
+            ...messages.slice(1),
+          ];
+
+          const completion = await client.chat.completions.create({
+            model: ollamaModel,
+            messages: fallbackMessages,
+          });
+          inputTokens += completion.usage?.prompt_tokens || 0;
+          outputTokens += completion.usage?.completion_tokens || 0;
+
+          const text = completion.choices[0].message.content || '';
+
+          // Check for tool call in response
+          const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/)
+            || text.match(/```(?:tool_call|json)?\s*(\{[\s\S]*?\})\s*```/)
+            || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo)"[\s\S]*?\})/);
+
+          if (match) {
+            try {
+              const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
+              sendEvent('tool_start', { name: parsed.name, args: parsed.args });
+
+              const toolStart = Date.now();
+              let result = '';
+              try { result = await executeToolHelper(parsed.name, parsed.args); }
+              catch (err: any) { result = JSON.stringify({ error: err.message }); }
+              toolCallTimings.push({ name: parsed.name, durationMs: Date.now() - toolStart });
+              sendEvent('tool_result', { name: parsed.name, result });
+
+              // Follow-up for final answer
+              const followup = await client.chat.completions.create({
+                model: ollamaModel,
+                messages: [
+                  ...messages,
+                  { role: 'assistant', content: text },
+                  { role: 'user', content: `Tool result for ${parsed.name}: ${result}\n\nPlease provide a helpful response based on this data.` },
+                ],
+              });
+              inputTokens += followup.usage?.prompt_tokens || 0;
+              outputTokens += followup.usage?.completion_tokens || 0;
+
+              fullText = followup.choices[0].message.content || '';
+              // Stream the full text word by word for typewriter effect
+              const words = fullText.split(' ');
+              for (const word of words) {
+                if (aborted) break;
+                sendEvent('text', { content: word + ' ' });
+              }
+            } catch {
+              // JSON parse failed — send as plain text
+              fullText = text;
+              sendEvent('text', { content: text });
+            }
+          } else {
+            fullText = text || 'Sorry, I could not generate a response.';
+            sendEvent('text', { content: fullText });
+          }
+        }
+
+        if (!aborted) {
+          logAiChatInteraction({ userId: uid, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: fullText.slice(0, 200), status: 'success', usedFallback });
+          sendEvent('done', { metadata: { provider: trackedProvider, model: trackedModel, tokens: { input: inputTokens, output: outputTokens }, latencyMs: Date.now() - startTime } });
+        }
+        res.end();
+        return;
+      }
+
+      // ─── Gemini streaming path ────────────────────────────────
+      trackedProvider = 'gemini';
+      trackedModel = 'gemini-2.5-flash';
+      const { GoogleGenAI, Type } = await import('@google/genai');
+      const ai = new GoogleGenAI({ apiKey: geminiKey! });
+
+      const tools = buildGeminiToolDeclarations(Type);
+
+      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+      if (history && Array.isArray(history)) {
+        for (const msg of history) {
+          contents.push({ role: msg.role === 'assistant' ? 'model' : 'user', parts: [{ text: msg.content }] });
+        }
+      }
+      contents.push({ role: 'user', parts: [{ text: message }] });
+
+      // Use generateContentStream for real streaming
+      const stream = await ai.models.generateContentStream({
+        model: 'gemini-2.5-flash',
+        contents,
+        config: { tools, systemInstruction },
+      });
+
+      let hasToolCalls = false;
+      const geminiToolCalls: Array<{ name: string; args: Record<string, unknown>; result?: string }> = [];
+      const geminiParts: any[] = [];
+
+      for await (const chunk of stream) {
+        if (aborted) break;
+
+        // Track usage from chunks
+        if ((chunk as any).usageMetadata) {
+          inputTokens = (chunk as any).usageMetadata.promptTokenCount || inputTokens;
+          outputTokens = (chunk as any).usageMetadata.candidatesTokenCount || outputTokens;
+        }
+
+        // Check for text content
+        if (chunk.text) {
+          fullText += chunk.text;
+          sendEvent('text', { content: chunk.text });
+        }
+
+        // Check for function calls in parts
+        const parts = chunk.candidates?.[0]?.content?.parts || [];
+        for (const part of parts) {
+          geminiParts.push(part);
+          if (part.functionCall) {
+            hasToolCalls = true;
+            const fc = part.functionCall;
+            const args = (fc.args || {}) as Record<string, unknown>;
+            sendEvent('tool_start', { name: fc.name!, args });
+
+            const toolStart = Date.now();
+            let result = '';
+            try { result = await executeToolHelper(fc.name!, args); }
+            catch (err: any) { result = JSON.stringify({ error: err.message }); }
+            toolCallTimings.push({ name: fc.name!, durationMs: Date.now() - toolStart });
+
+            sendEvent('tool_result', { name: fc.name!, result });
+            geminiToolCalls.push({ name: fc.name!, args, result });
+          }
+        }
+      }
+
+      // If we had tool calls, send results back to Gemini for a follow-up streamed response
+      if (hasToolCalls && geminiToolCalls.length > 0 && !aborted) {
+        const toolResponseParts = geminiToolCalls.map(tc => ({
+          functionResponse: { name: tc.name, response: { result: tc.result } },
+        }));
+
+        const followupContents = [
+          ...contents,
+          { role: 'model', parts: geminiParts },
+          { role: 'user', parts: toolResponseParts },
+        ];
+
+        const followupStream = await ai.models.generateContentStream({
+          model: 'gemini-2.5-flash',
+          contents: followupContents,
+          config: {
+            systemInstruction: 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. Summarize the tool results in a natural, helpful way. Be concise.',
+          },
+        });
+
+        for await (const chunk of followupStream) {
+          if (aborted) break;
+          if ((chunk as any).usageMetadata) {
+            inputTokens = (chunk as any).usageMetadata.promptTokenCount || inputTokens;
+            outputTokens = (chunk as any).usageMetadata.candidatesTokenCount || outputTokens;
+          }
+          if (chunk.text) {
+            fullText += chunk.text;
+            sendEvent('text', { content: chunk.text });
+          }
+        }
+      }
+
+      if (!aborted) {
+        logAiChatInteraction({ userId: uid, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: fullText.slice(0, 200), status: 'success', usedFallback: false });
+        sendEvent('done', { metadata: { provider: trackedProvider, model: trackedModel, tokens: { input: inputTokens, output: outputTokens }, latencyMs: Date.now() - startTime } });
+      }
+      res.end();
+    } catch (err: any) {
+      logger.error('AI Chat Stream error', { error: err.message || String(err) });
+      logAiChatInteraction({ userId: uid, provider: trackedProvider || 'unknown', model: trackedModel || 'unknown', inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: '', status: 'error', error: err.message || String(err), usedFallback: false });
+      sendEvent('error', { message: err.message || 'Failed to generate response' });
+      res.end();
+    }
+  }
+);
+
+/**
  * Execute getWeather tool: fetch current weather from OpenWeather API
  */
 async function executeGetWeather(city: string): Promise<string> {
@@ -1758,50 +2136,37 @@ export const digitalLibrary = onRequest(
     const db = getFirestore();
     const bucket = getStorage().bucket();
 
-    // POST /digital-library-api/upload-url
-    // Returns a resumable upload URI (no signBlob permission needed)
-    if (req.method === 'POST' && route === 'upload-url') {
-      const { fileName, contentType, fileSize } = req.body;
-      if (!fileName || !contentType) { res.status(400).json({ error: 'fileName and contentType required' }); return; }
-      if (fileSize && fileSize > 50 * 1024 * 1024) { res.status(400).json({ error: 'File too large (max 50MB)' }); return; }
-
-      const bookId = crypto.randomUUID();
-      const storagePath = `books/${bookId}/original.epub`;
-      const file = bucket.file(storagePath);
-
-      const [uploadUrl] = await file.createResumableUpload({
-        metadata: {
-          contentType: 'application/epub+zip',
-          metadata: { uploadedBy: uid },
-        },
-      });
-
-      res.json({ uploadUrl, bookId });
-      return;
-    }
-
-    // Validate bookId is a safe UUID (generated by upload-url endpoint)
+    // Validate bookId is a safe UUID
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     function validateBookId(id: unknown): string | null {
       if (typeof id !== 'string' || !UUID_RE.test(id)) return null;
       return id;
     }
 
-    // POST /digital-library-api/register
-    if (req.method === 'POST' && route === 'register') {
-      const bookId = validateBookId(req.body.bookId);
-      if (!bookId) { res.status(400).json({ error: 'Invalid or missing bookId' }); return; }
+    // POST /digital-library-api/upload
+    // Accepts base64 EPUB, writes to Storage, extracts metadata — single step (same pattern as cloudFiles)
+    if (req.method === 'POST' && route === 'upload') {
+      const { fileBase64 } = req.body;
+      if (!fileBase64) { res.status(400).json({ error: 'fileBase64 required' }); return; }
 
+      const buffer = Buffer.from(fileBase64, 'base64');
+      if (buffer.length > 20 * 1024 * 1024) { res.status(400).json({ error: 'File too large (max 20MB)' }); return; }
+
+      const bookId = crypto.randomUUID();
       const storagePath = `books/${bookId}/original.epub`;
       const file = bucket.file(storagePath);
-      const [exists] = await file.exists();
-      if (!exists) { res.status(404).json({ error: 'EPUB file not found in storage' }); return; }
+
+      // Write EPUB to Storage
+      const downloadToken = crypto.randomUUID();
+      await file.save(buffer, {
+        metadata: {
+          contentType: 'application/epub+zip',
+          metadata: { firebaseStorageDownloadTokens: downloadToken, uploadedBy: uid },
+        },
+      });
 
       try {
-        // Download EPUB to temp
-        const [buffer] = await file.download();
-        const [metadata] = await file.getMetadata();
-        const fileSize = Number(metadata.size) || buffer.length;
+        const fileSize = buffer.length;
 
         // Extract metadata using epub2
         const epub2Module = await import('epub2');
@@ -1842,11 +2207,9 @@ export const digitalLibrary = onRequest(
           logger.warn('Failed to extract cover image', { bookId, error: String(coverErr) });
         }
 
-        // Build EPUB download URL
-        const epubToken = crypto.randomUUID();
-        await file.setMetadata({ metadata: { firebaseStorageDownloadTokens: epubToken } });
+        // Build EPUB download URL (token already set during upload)
         const bucketName = bucket.name;
-        const epubUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(storagePath)}?alt=media&token=${epubToken}`;
+        const epubUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(storagePath)}?alt=media&token=${downloadToken}`;
 
         // Get chapters from flow/toc
         const chapters: Array<{ index: number; title: string; href: string; characterCount: number }> = [];
