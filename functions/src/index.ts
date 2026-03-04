@@ -2279,6 +2279,32 @@ export const digitalLibrary = onRequest(
       return;
     }
 
+    // POST /digital-library-api/admin/reset-conversion/:bookId
+    if (req.method === 'POST' && route.startsWith('admin/reset-conversion/')) {
+      const bookId = validateBookId(route.replace('admin/reset-conversion/', ''));
+      if (!bookId) { res.status(400).json({ error: 'Invalid bookId' }); return; }
+
+      // Verify caller is admin
+      const userDoc = await db.collection('users').doc(uid).get();
+      if (!userDoc.exists || !userDoc.data()?.isAdmin) {
+        res.status(403).json({ error: 'Admin access required' });
+        return;
+      }
+
+      const bookDoc = await db.collection('books').doc(bookId).get();
+      if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
+
+      await bookDoc.ref.update({
+        audioStatus: 'none',
+        audioProgress: 0,
+        audioError: FieldValue.delete(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+
+      res.json({ ok: true, message: 'Conversion reset successfully' });
+      return;
+    }
+
     // ── TTS Monthly Quota ─────────────────────────────────────────────
     // 3.5M chars/month (~87% of the 4M free tier) — prevents surprise bills
     const TTS_MONTHLY_CHAR_LIMIT = 3_500_000;

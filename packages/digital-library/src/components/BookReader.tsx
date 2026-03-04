@@ -33,9 +33,10 @@ interface BookReaderProps {
   audioStatus: 'none' | 'processing' | 'complete' | 'error';
   audioProgress: number;
   onBack: () => void;
+  isAdmin?: boolean;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, language, audioStatus, audioProgress, onBack }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, language, audioStatus, audioProgress, onBack, isAdmin }: BookReaderProps) {
   const { t } = useTranslation();
   const viewerRef = useRef<HTMLDivElement>(null);
   const renditionRef = useRef<any>(null);
@@ -432,6 +433,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
               body: JSON.stringify({ bookId, voiceName }),
             });
           }}
+          isAdmin={isAdmin}
         />
         {showAudioPlayer && (
           <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} />
