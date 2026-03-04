@@ -116,7 +116,7 @@ export default function HeadsUpGame({ onBack }: HeadsUpGameProps) {
   if (state === 'over') {
     return (
       <GameOver
-        gameType="trivia"
+        gameType="headsup"
         score={score}
         timeMs={elapsed}
         difficulty="party"

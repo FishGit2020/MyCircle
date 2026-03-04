@@ -1705,6 +1705,8 @@ const en = {
   'games.submitScore': 'Submit Score',
   'games.submitting': 'Submitting...',
   'games.scoreSubmitted': 'Score submitted!',
+  'games.shareScore': 'Share Score',
+  'games.shareText': 'I scored {score} points in {game} on MyCircle! Can you beat it?',
   'games.submitFailed': 'Failed to submit score. Try again.',
   'games.playAgain': 'Play Again',
   'games.backToGames': 'Back to Games',

@@ -1707,6 +1707,8 @@ const zh: Record<TranslationKey, string> = {
   'games.submitScore': '\u63d0\u4ea4\u5206\u6570',
   'games.submitting': '\u63d0\u4ea4\u4e2d...',
   'games.scoreSubmitted': '\u5206\u6570\u5df2\u63d0\u4ea4\uff01',
+  'games.shareScore': '\u5206\u4eab\u5206\u6570',
+  'games.shareText': '\u6211\u5728MyCircle\u7684{game}\u4e2d\u83b7\u5f97\u4e86{score}\u5206\uff01\u4f60\u80fd\u8d85\u8d8a\u5417\uff1f',
   'games.submitFailed': '\u63d0\u4ea4\u5206\u6570\u5931\u8d25\u3002\u8bf7\u91cd\u8bd5\u3002',
   'games.playAgain': '\u518d\u73a9\u4e00\u6b21',
   'games.backToGames': '\u8fd4\u56de\u6e38\u620f',

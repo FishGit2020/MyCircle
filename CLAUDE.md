@@ -20,6 +20,28 @@ git checkout main && git pull origin main
 Branch prefixes: `feat/` `fix/` `docs/` `refactor/` `test/`
 Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperative, under 72 chars.
 
+**Git Safety**: Always create a feature branch BEFORE implementing changes. Never commit directly to main. After implementation, create PR and merge via the standard git workflow (branch → commit → push → PR → merge).
+
+## Testing
+
+- After implementing changes, always run the full test suite (`pnpm test:run` / `pnpm typecheck`) and fix any failures before creating a PR. Do not assume tests pass without running them.
+
+## General Guidelines
+
+- When user asks to remove a feature or dependency, remove it completely — do not keep it as a fallback unless explicitly asked.
+- When user asks to implement something, proceed with implementation rather than extended planning unless told otherwise.
+
+## Repository Context
+
+- This is a TypeScript monorepo with multiple MFEs. Always verify import paths after moving files.
+- When switching branches, stash or commit work first to avoid losing changes.
+- After git operations (rebase, stash pop), verify key files weren't reverted.
+
+## Debugging
+
+- When fixing bugs, verify the fix in the correct location (correct React component, correct API path, correct environment URL).
+- Double-check sandbox vs production URLs, Firestore rules paths, and which component actually renders the UI being fixed.
+
 ## Must-Follow Rules
 
 - **Apollo imports in MFEs**: Never import `useQuery`/`useMutation`/etc. directly from `@apollo/client` in MFE packages. Always import from `@mycircle/shared` which re-exports them. Direct `@apollo/client` imports break Module Federation at runtime (`R is not a function`).
