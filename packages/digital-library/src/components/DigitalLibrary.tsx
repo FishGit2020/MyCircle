@@ -145,6 +145,7 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
         body: JSON.stringify({ fileBase64 }),
       });
       if (!res.ok) throw new Error(await res.text());
+      const { bookId } = await res.json();
 
       logger.info('Book uploaded successfully', { bookId });
       window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
