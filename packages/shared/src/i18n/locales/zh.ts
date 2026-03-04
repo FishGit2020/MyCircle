@@ -1661,6 +1661,10 @@ const zh: Record<TranslationKey, string> = {
   'library.prevChapter': '\u4e0a\u4e00\u7ae0',
   'library.download': '\u4e0b\u8f7d',
   'library.quotaReached': '\u6708\u5ea6TTS\u914d\u989d\u5df2\u7528\u5c3d ({used}M / {limit}M \u5b57\u7b26)\u3002\u4e0b\u6708\u91cd\u7f6e\u3002',
+  'library.selectVoice': '\u9009\u62e9\u8bed\u97f3',
+  'library.conversionTimedOut': '\u8f6c\u6362\u8d85\u65f6\u3002\u91cd\u8bd5\u4ee5\u7ee7\u7eed \u2014 \u5df2\u5b8c\u6210\u7684\u7ae0\u8282\u5c06\u88ab\u8df3\u8fc7\u3002',
+  'library.tooManyConversions': '\u592a\u591a\u8f6c\u6362\u6b63\u5728\u8fdb\u884c\u4e2d\u3002\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002',
+  'library.convertingRefresh': '\u97f3\u9891\u8f6c\u6362\u8fdb\u884c\u4e2d\u3002\u5237\u65b0\u4ee5\u67e5\u770b\u72b6\u6001\u3002',
 };
 
 export default zh;

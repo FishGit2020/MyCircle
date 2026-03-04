@@ -1659,6 +1659,10 @@ const en = {
   'library.prevChapter': 'Previous Chapter',
   'library.download': 'Download',
   'library.quotaReached': 'Monthly TTS quota reached ({used}M / {limit}M chars). Resets next month.',
+  'library.selectVoice': 'Select Voice',
+  'library.conversionTimedOut': 'Conversion timed out. Retry to continue — completed chapters will be skipped.',
+  'library.tooManyConversions': 'Too many conversions in progress. Try again later.',
+  'library.convertingRefresh': 'Audio conversion in progress. Refresh to check status.',
 } as const;
 
 export default en;

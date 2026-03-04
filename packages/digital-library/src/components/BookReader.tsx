@@ -21,12 +21,13 @@ interface BookReaderProps {
   epubUrl: string;
   title: string;
   chapters: Chapter[];
+  language: string;
   audioStatus: 'none' | 'processing' | 'complete' | 'error';
   audioProgress: number;
   onBack: () => void;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, audioStatus, audioProgress, onBack }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, language, audioStatus, audioProgress, onBack }: BookReaderProps) {
   const { t } = useTranslation();
   const viewerRef = useRef<HTMLDivElement>(null);
   const renditionRef = useRef<any>(null);
@@ -219,17 +220,18 @@ export default function BookReader({ bookId, epubUrl, title, chapters, audioStat
         <BrowserTTS text={ttsText} />
         <ConversionStatus
           bookId={bookId}
+          language={language}
           initialStatus={audioStatus}
           initialProgress={audioProgress}
           onComplete={() => setShowAudioPlayer(true)}
-          onConvert={async () => {
+          onConvert={async (voiceName: string) => {
             const token = await window.__getFirebaseIdToken?.();
             if (!token) return undefined;
             const apiBase = window.__digitalLibraryApiBase?.() || '';
             return fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ bookId }),
+              body: JSON.stringify({ bookId, voiceName }),
             });
           }}
         />
