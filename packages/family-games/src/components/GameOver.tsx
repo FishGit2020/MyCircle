@@ -15,17 +15,19 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleSubmitScore = async () => {
     const api = (window as any).__familyGames;
     if (!api?.saveScore) return;
 
     setSubmitting(true);
+    setError(false);
     try {
       await api.saveScore({ gameType, score, timeMs, difficulty });
       setSubmitted(true);
     } catch {
-      // Silently fail — user can still play again
+      setError(true);
     } finally {
       setSubmitting(false);
     }
@@ -59,6 +61,11 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
         {submitted && (
           <p className="text-sm text-green-600 dark:text-green-400 text-center font-medium">
             {t('games.scoreSubmitted')}
+          </p>
+        )}
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400 text-center font-medium">
+            {t('games.submitFailed')}
           </p>
         )}
         <button

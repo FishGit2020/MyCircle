@@ -104,7 +104,8 @@ service cloud.firestore {
     }
 
     // Game scores - shared scoreboard, any authenticated user can read/write
-    match /games/scores/{scoreId} {
+    // Scores stored as games/scores/{gameType}/{scoreId} (subcollection per game type)
+    match /games/scores/{gameType}/{scoreId} {
       allow read, write: if request.auth != null;
     }
 

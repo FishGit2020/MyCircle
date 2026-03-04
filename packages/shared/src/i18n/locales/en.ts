@@ -1675,6 +1675,7 @@ const en = {
 
   // Family Games
   'commandPalette.goToFamilyGames': 'Go to Family Games',
+  'shortcuts.goFamilyGames': 'Go to Family Games',
   'nav.familyGames': 'Family Games',
   'widgets.familyGames': 'Family Games',
   'widgets.familyGamesDesc': 'Play mini-games with family',
@@ -1698,6 +1699,7 @@ const en = {
   'games.submitScore': 'Submit Score',
   'games.submitting': 'Submitting...',
   'games.scoreSubmitted': 'Score submitted!',
+  'games.submitFailed': 'Failed to submit score. Try again.',
   'games.playAgain': 'Play Again',
   'games.backToGames': 'Back to Games',
   'games.comingSoon': 'Coming soon!',

@@ -1677,6 +1677,7 @@ const es: Record<TranslationKey, string> = {
 
   // Family Games
   'commandPalette.goToFamilyGames': 'Ir a Juegos Familiares',
+  'shortcuts.goFamilyGames': 'Ir a Juegos Familiares',
   'nav.familyGames': 'Juegos Familiares',
   'widgets.familyGames': 'Juegos Familiares',
   'widgets.familyGamesDesc': 'Juega minijuegos en familia',
@@ -1700,6 +1701,7 @@ const es: Record<TranslationKey, string> = {
   'games.submitScore': 'Enviar Puntuaci\u00f3n',
   'games.submitting': 'Enviando...',
   'games.scoreSubmitted': '\u00a1Puntuaci\u00f3n enviada!',
+  'games.submitFailed': 'Error al enviar puntuaci\u00f3n. Int\u00e9ntalo de nuevo.',
   'games.playAgain': 'Jugar de Nuevo',
   'games.backToGames': 'Volver a Juegos',
   'games.comingSoon': '\u00a1Pr\u00f3ximamente!',

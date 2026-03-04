@@ -21,6 +21,16 @@ function resolveDetailLabel(
     case 'notebook':
       if (segments[1] === 'new') return t('notebook.newNote');
       return t('notebook.editNote');
+    case 'family-games': {
+      const gameMap: Record<string, string> = {
+        trivia: 'games.trivia',
+        math: 'games.mathChallenge',
+        word: 'games.wordGame',
+        memory: 'games.memoryMatch',
+        headsup: 'games.headsUp',
+      };
+      return t(gameMap[segments[1]] || 'nav.detail');
+    }
     default:
       return t('nav.detail');
   }

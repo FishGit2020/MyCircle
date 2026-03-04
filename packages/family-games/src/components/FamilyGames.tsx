@@ -1,47 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import GameCard from './GameCard';
 import Scoreboard from './Scoreboard';
 import type { GameType } from './GameCard';
 
+const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup']);
+
 export default function FamilyGames() {
   const { t } = useTranslation();
-  const [activeGame, setActiveGame] = useState<GameType | null>(null);
+  const { gameType } = useParams<{ gameType?: string }>();
+  const navigate = useNavigate();
   const [GameComponent, setGameComponent] = useState<React.ComponentType<{ onBack: () => void }> | null>(null);
 
-  const handleSelectGame = async (type: GameType) => {
-    try {
-      let mod: { default: React.ComponentType<{ onBack: () => void }> };
-      switch (type) {
-        case 'trivia':
-          mod = await import('./TriviaGame');
-          break;
-        case 'math':
-          mod = await import('./MathGame');
-          break;
-        case 'word':
-          mod = await import('./WordGame');
-          break;
-        case 'memory':
-          mod = await import('./MemoryGame');
-          break;
-        case 'headsup':
-          mod = await import('./HeadsUpGame');
-          break;
-      }
-      setActiveGame(type);
-      setGameComponent(() => mod.default);
-    } catch {
-      // Game module not yet available — will be added in PR2/PR3
+  // Load game component when URL param changes
+  useEffect(() => {
+    if (!gameType || !VALID_GAMES.has(gameType)) {
+      setGameComponent(null);
+      return;
     }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        let mod: { default: React.ComponentType<{ onBack: () => void }> };
+        switch (gameType as GameType) {
+          case 'trivia':
+            mod = await import('./TriviaGame');
+            break;
+          case 'math':
+            mod = await import('./MathGame');
+            break;
+          case 'word':
+            mod = await import('./WordGame');
+            break;
+          case 'memory':
+            mod = await import('./MemoryGame');
+            break;
+          case 'headsup':
+            mod = await import('./HeadsUpGame');
+            break;
+          default:
+            return;
+        }
+        if (!cancelled) setGameComponent(() => mod.default);
+      } catch {
+        // Module load failed
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [gameType]);
+
+  const handleSelectGame = (type: GameType) => {
+    navigate(`/family-games/${type}`);
   };
 
   const handleBack = () => {
-    setActiveGame(null);
-    setGameComponent(null);
+    navigate('/family-games');
   };
 
-  if (activeGame && GameComponent) {
+  // Show active game if URL has a valid game type
+  if (gameType && VALID_GAMES.has(gameType) && GameComponent) {
     return (
       <div className="pb-20 md:pb-8">
         <GameComponent onBack={handleBack} />
