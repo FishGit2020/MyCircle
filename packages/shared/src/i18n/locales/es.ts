@@ -1622,6 +1622,9 @@ const es: Record<TranslationKey, string> = {
 
   // Digital Library
   'nav.digitalLibrary': 'Biblioteca',
+  'widgets.podcastsTitle': 'Podcasts',
+  'widgets.continueWhereLeft': 'Contin\u00faa donde lo dejaste',
+  'widgets.discoverAndListen': 'Descubre y escucha',
   'widgets.digitalLibrary': 'Biblioteca Digital',
   'widgets.digitalLibraryDesc': 'Lee libros EPUB y audiolibros',
   'library.title': 'Biblioteca Digital',
@@ -1665,6 +1668,12 @@ const es: Record<TranslationKey, string> = {
   'library.conversionTimedOut': 'La conversi\u00f3n expir\u00f3. Reintenta para continuar \u2014 los cap\u00edtulos completados se omitir\u00e1n.',
   'library.tooManyConversions': 'Demasiadas conversiones en progreso. Int\u00e9ntalo m\u00e1s tarde.',
   'library.convertingRefresh': 'Conversi\u00f3n de audio en progreso. Actualiza para ver el estado.',
+  'library.addBookmark': 'Agregar marcador',
+  'library.bookmarks': 'Marcadores',
+  'library.removeBookmark': 'Eliminar',
+  'library.noBookmarks': 'A\u00fan no hay marcadores',
+  'library.fullscreen': 'Pantalla completa',
+  'library.exitFullscreen': 'Salir de pantalla completa',
 };
 
 export default es;

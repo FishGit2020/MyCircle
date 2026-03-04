@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useTranslation, createLogger } from '@mycircle/shared';
+import { useTranslation, createLogger, StorageKeys } from '@mycircle/shared';
 
 const logger = createLogger('AudioPlayer');
 
@@ -13,11 +13,31 @@ interface Chapter {
 interface AudioPlayerProps {
   chapters: Chapter[];
   bookTitle: string;
+  bookId?: string;
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
-export default function AudioPlayer({ chapters, bookTitle }: AudioPlayerProps) {
+function saveAudioProgress(bookId: string, chapter: number, position: number, duration: number) {
+  try {
+    const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
+    const progress: Record<string, { position: number; duration: number; chapter: number }> = raw ? JSON.parse(raw) : {};
+    progress[bookId] = { position, duration, chapter };
+    localStorage.setItem(StorageKeys.BOOK_AUDIO_PROGRESS, JSON.stringify(progress));
+    window.dispatchEvent(new Event('book-audio-progress-changed'));
+  } catch { /* ignore */ }
+}
+
+function loadAudioProgress(bookId: string): { position: number; duration: number; chapter: number } | null {
+  try {
+    const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
+    if (!raw) return null;
+    const progress = JSON.parse(raw);
+    return progress[bookId] || null;
+  } catch { return null; }
+}
+
+export default function AudioPlayer({ chapters, bookTitle, bookId }: AudioPlayerProps) {
   const { t } = useTranslation();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentChapter, setCurrentChapter] = useState(0);
@@ -26,6 +46,8 @@ export default function AudioPlayer({ chapters, bookTitle }: AudioPlayerProps) {
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
 
+  const lastSaveRef = useRef(0);
+
   const audioChapters = chapters.filter(ch => ch.audioUrl);
   const current = audioChapters[currentChapter];
 
@@ -33,7 +55,14 @@ export default function AudioPlayer({ chapters, bookTitle }: AudioPlayerProps) {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+      // Throttled save every 5 seconds
+      if (bookId && Date.now() - lastSaveRef.current > 5000) {
+        lastSaveRef.current = Date.now();
+        saveAudioProgress(bookId, currentChapter, audio.currentTime, audio.duration || 0);
+      }
+    };
     const handleDurationChange = () => setDuration(audio.duration || 0);
     const handleEnded = () => {
       // Auto-advance to next chapter
@@ -45,7 +74,13 @@ export default function AudioPlayer({ chapters, bookTitle }: AudioPlayerProps) {
       }
     };
     const handlePlay = () => setPlaying(true);
-    const handlePause = () => setPlaying(false);
+    const handlePause = () => {
+      setPlaying(false);
+      // Save position immediately on pause
+      if (bookId) {
+        saveAudioProgress(bookId, currentChapter, audio.currentTime, audio.duration || 0);
+      }
+    };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('durationchange', handleDurationChange);
@@ -62,12 +97,30 @@ export default function AudioPlayer({ chapters, bookTitle }: AudioPlayerProps) {
     };
   }, [currentChapter, audioChapters.length]);
 
+  // Restore saved position on mount
+  useEffect(() => {
+    if (!bookId) return;
+    const saved = loadAudioProgress(bookId);
+    if (saved && saved.chapter >= 0 && saved.chapter < audioChapters.length) {
+      setCurrentChapter(saved.chapter);
+    }
+  }, [bookId, audioChapters.length]);
+
   // Load new chapter audio when changed
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !current?.audioUrl) return;
     audio.src = current.audioUrl;
     audio.playbackRate = speed;
+
+    // Restore saved position for this book
+    if (bookId) {
+      const saved = loadAudioProgress(bookId);
+      if (saved && saved.chapter === currentChapter && saved.position > 0) {
+        audio.currentTime = saved.position;
+      }
+    }
+
     if (playing) {
       audio.play().catch(err => logger.error('Play failed', err));
     }

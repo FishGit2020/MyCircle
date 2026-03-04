@@ -125,6 +125,9 @@ export interface UserProfile {
   podcastPlayedEpisodes?: string[];
   childName?: string;
   childBirthDate?: string;
+  widgetLayout?: Array<{ id: string; visible: boolean; size?: string }>;
+  bookBookmarks?: Array<{ bookId: string; bookTitle: string; cfi: string; label: string; createdAt: number }>;
+  bookAudioProgress?: Record<string, { position: number; duration: number; chapter: number }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -506,6 +509,33 @@ export async function updateUserNotificationAlerts(uid: string, alerts: {
   if (!db) return;
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, { ...alerts, updatedAt: serverTimestamp() });
+}
+
+export async function updateWidgetLayout(uid: string, layout: Array<{ id: string; visible: boolean; size?: string }> | null) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    widgetLayout: layout || null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateBookBookmarks(uid: string, bookmarks: Array<{ bookId: string; bookTitle: string; cfi: string; label: string; createdAt: number }>) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    bookBookmarks: bookmarks,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateBookAudioProgress(uid: string, progress: Record<string, { position: number; duration: number; chapter: number }> | null) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    bookAudioProgress: progress || null,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export async function getRecentCities(uid: string): Promise<RecentCity[]> {

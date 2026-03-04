@@ -1620,6 +1620,9 @@ const en = {
 
   // Digital Library
   'nav.digitalLibrary': 'Library',
+  'widgets.podcastsTitle': 'Podcasts',
+  'widgets.continueWhereLeft': 'Continue where you left off',
+  'widgets.discoverAndListen': 'Discover and listen',
   'widgets.digitalLibrary': 'Digital Library',
   'widgets.digitalLibraryDesc': 'Read EPUB books and audiobooks',
   'library.title': 'Digital Library',
@@ -1663,6 +1666,12 @@ const en = {
   'library.conversionTimedOut': 'Conversion timed out. Retry to continue — completed chapters will be skipped.',
   'library.tooManyConversions': 'Too many conversions in progress. Try again later.',
   'library.convertingRefresh': 'Audio conversion in progress. Refresh to check status.',
+  'library.addBookmark': 'Add Bookmark',
+  'library.bookmarks': 'Bookmarks',
+  'library.removeBookmark': 'Remove',
+  'library.noBookmarks': 'No bookmarks yet',
+  'library.fullscreen': 'Fullscreen',
+  'library.exitFullscreen': 'Exit fullscreen',
 } as const;
 
 export default en;
