@@ -22,7 +22,6 @@ interface UscisResult {
   submittedDate?: string;
   modifiedDate?: string;
   history?: UscisHistoryEntry[];
-  source?: 'api' | 'scraper';
 }
 
 // ─── OAuth Access Token ──────────────────────────────────────────────
@@ -60,7 +59,7 @@ async function fetchFromUscisApi(
   clientSecret: string,
   retried = false,
 ): Promise<UscisResult> {
-  let token = await getAccessToken(clientId, clientSecret);
+  const token = await getAccessToken(clientId, clientSecret);
 
   try {
     const resp = await axios.get(
@@ -82,7 +81,6 @@ async function fetchFromUscisApi(
       status: cs.current_case_status_text_en || 'Unknown Status',
       statusDescription: cs.current_case_status_desc_en || '',
       checkedAt: new Date().toISOString(),
-      source: 'api',
     };
 
     if (cs.submittedDate) result.submittedDate = cs.submittedDate;
@@ -107,78 +105,20 @@ async function fetchFromUscisApi(
   }
 }
 
-// ─── HTML Scraper (fallback) ─────────────────────────────────────────
-async function fetchFromHtmlScraper(receiptNumber: string): Promise<UscisResult> {
-  const response = await axios.post(
-    'https://egov.uscis.gov/casestatus/mycasestatus.do',
-    `appReceiptNum=${encodeURIComponent(receiptNumber)}`,
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Cache-Control': 'no-cache',
-        'Origin': 'https://egov.uscis.gov',
-        'Referer': 'https://egov.uscis.gov/casestatus/landing.do',
-      },
-      timeout: 15000,
-    },
-  );
-
-  const html = response.data as string;
-
-  const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-  const status = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : 'Unknown Status';
-
-  const pMatch = html.match(/<h1[^>]*>[\s\S]*?<\/h1>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/i);
-  const statusDescription = pMatch ? pMatch[1].replace(/<[^>]+>/g, '').trim() : '';
-
-  const formMatch = statusDescription.match(/Form I-\d+/i);
-  const formType = formMatch ? formMatch[0] : '';
-
-  return {
-    receiptNumber,
-    formType,
-    status,
-    statusDescription,
-    checkedAt: new Date().toISOString(),
-    source: 'scraper',
-  };
-}
-
-// ─── Unified Entry Point ─────────────────────────────────────────────
+// ─── Entry Point ─────────────────────────────────────────────────────
 export async function fetchUscisStatus(receiptNumber: string): Promise<UscisResult> {
   const creds = JSON.parse(process.env.USCIS_CREDS || '{}');
   const { clientId, clientSecret } = creds;
 
-  // Try official API first if credentials are configured
-  if (clientId && clientSecret) {
-    try {
-      const result = await fetchFromUscisApi(receiptNumber, clientId, clientSecret);
-      logger.info('USCIS status via official API', { receiptNumber, status: result.status });
-      return result;
-    } catch (err: any) {
-      const status = err.response?.status;
-      // 404/422 = receipt not found in API (e.g. sandbox limitations) — fall back to scraper
-      // Network errors also fall back
-      logger.warn('USCIS API failed, falling back to scraper', {
-        receiptNumber,
-        error: err.message,
-        status,
-      });
-    }
+  if (!clientId || !clientSecret) {
+    throw new Error('USCIS_CREDS secret not configured');
   }
 
-  // Fallback to HTML scraper
-  const result = await fetchFromHtmlScraper(receiptNumber);
-  logger.info('USCIS status via scraper', { receiptNumber, status: result.status });
+  const result = await fetchFromUscisApi(receiptNumber, clientId, clientSecret);
+  logger.info('USCIS status fetched', { receiptNumber, status: result.status });
   return result;
 }
 
-// Export for testing
-export { getAccessToken as _getAccessToken, fetchFromUscisApi as _fetchFromApi, fetchFromHtmlScraper as _fetchFromScraper };
 // Export to allow tests to reset token state
 export function _resetTokenCache(): void {
   oauthToken = null;

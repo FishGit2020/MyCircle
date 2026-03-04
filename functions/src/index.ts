@@ -1722,15 +1722,11 @@ export const uscisStatus = onRequest(
     try {
       const result = await fetchUscisStatus(receiptNumber);
       uscisCache.set(cacheKey, result);
-      logger.info('USCIS status fetched', { uid, receiptNumber, status: result.status, source: result.source });
+      logger.info('USCIS status fetched', { uid, receiptNumber, status: result.status });
       res.status(200).json(result);
     } catch (err: any) {
-      logger.error('USCIS proxy error', { receiptNumber, error: err.message });
+      logger.error('USCIS API error', { receiptNumber, error: err.message });
 
-      if (err.response?.status === 403) {
-        res.status(503).json({ error: 'USCIS service temporarily unavailable' });
-        return;
-      }
       if (err.response?.status === 429) {
         res.status(429).json({ error: 'USCIS API rate limit exceeded. Please try again later.' });
         return;
