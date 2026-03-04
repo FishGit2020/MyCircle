@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation, createLogger } from '@mycircle/shared';
 
 const logger = createLogger('ConversionStatus');
@@ -17,8 +17,6 @@ function getDefaultVoice(language: string): string {
   return `${langCode}-Neural2-${suffix}`;
 }
 
-const POLL_INTERVAL = 15_000;
-
 interface ConversionStatusProps {
   bookId: string;
   language: string;
@@ -36,7 +34,6 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const [converting, setConverting] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState(getDefaultVoice(language));
   const [checking, setChecking] = useState(false);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const langCode = getLangCode(language);
   const voiceOptions = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
@@ -68,22 +65,6 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
       logger.error('Failed to check conversion status', err);
     }
   }, [bookId, onComplete, t]);
-
-  // Auto-poll when processing
-  useEffect(() => {
-    if (status === 'processing') {
-      const timeout = setTimeout(checkStatus, 5000);
-      pollRef.current = setInterval(checkStatus, POLL_INTERVAL);
-      return () => {
-        clearTimeout(timeout);
-        if (pollRef.current) clearInterval(pollRef.current);
-      };
-    }
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
-  }, [status, checkStatus]);
 
   useEffect(() => {
     if (initialStatus === 'complete') onComplete();
