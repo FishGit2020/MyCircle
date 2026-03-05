@@ -48,13 +48,17 @@ describe('SongEditor', () => {
     expect(input.value).toBe('https://youtube.com/watch?v=abc123');
   });
 
-  it('includes YouTube URL in saved data', { timeout: 15000 }, async () => {
+  it('includes YouTube URL in saved data', async () => {
     const user = userEvent.setup();
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
     fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+    });
     await user.click(screen.getByText('worship.save'));
 
     expect(onSave).toHaveBeenCalledWith(
@@ -71,6 +75,10 @@ describe('SongEditor', () => {
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
     // Leave YouTube URL empty
+
+    await waitFor(() => {
+      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+    });
     await user.click(screen.getByText('worship.save'));
 
     expect(onSave).toHaveBeenCalledWith(
@@ -117,6 +125,10 @@ describe('SongEditor', () => {
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
     fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+    });
     await user.click(screen.getByText('worship.save'));
 
     expect(onSave).toHaveBeenCalledWith(
