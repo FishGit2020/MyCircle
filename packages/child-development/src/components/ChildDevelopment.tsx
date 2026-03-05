@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference, PageContent } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getAgeRangeForMonths } from '../data/milestones';
 import { parentingVerses } from '../data/parentingVerses';
@@ -135,7 +135,7 @@ export default function ChildDevelopment() {
 
   if (!birthDate || isEditing) {
     return (
-      <div className="max-w-md mx-auto">
+      <PageContent maxWidth="md">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
             {t('childDev.title' as any)}
@@ -184,14 +184,14 @@ export default function ChildDevelopment() {
             </button>
           </div>
         </div>
-      </div>
+      </PageContent>
     );
   }
 
   // ─── Main View (Timeline Only) ─────────────────────────────────────────
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <PageContent maxWidth="4xl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <div>
@@ -217,6 +217,6 @@ export default function ChildDevelopment() {
         ageInMonths={ageInMonths}
         currentAgeRange={currentAgeRange}
       />
-    </div>
+    </PageContent>
   );
 }

@@ -275,7 +275,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   }, [title]);
 
   return (
-    <div ref={containerRef} className={`flex flex-col pb-20 md:pb-8 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-gray-800 p-4 overflow-auto' : ''}`} style={isFullscreen ? undefined : { height: 'calc(100vh - 8rem - var(--player-h, 0px))' }}>
+    <div ref={containerRef} className={`flex flex-col flex-grow ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-gray-800 p-4 overflow-auto' : ''}`} style={isFullscreen ? undefined : { height: 'calc(100vh - 8rem - var(--player-h, 0px))' }}>
       {/* Header actions */}
       <div className="flex items-center gap-2 mb-3 flex-shrink-0">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate flex-1">{title}</h2>

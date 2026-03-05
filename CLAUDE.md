@@ -48,7 +48,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **i18n**: Every visible string uses `t('key')`. Add keys to all 3 locales (`en`, `es`, `zh`). Rebuild shared after: `pnpm build:shared`
 - **Dark mode**: Every color class needs a `dark:` variant. Check existing patterns in codebase.
 - **a11y**: Semantic HTML, `aria-label` where needed, `type="button"` on non-submit buttons, touch targets ≥ 44px
-- **Responsive**: Mobile-first (`md:` = main breakpoint). Content needs `pb-20 md:pb-8` for BottomNav.
+- **Responsive**: Mobile-first (`md:` = main breakpoint). Wrap MFE page content in `<PageContent>` from `@mycircle/shared` — Layout.tsx handles BottomNav padding.
 - **Spanish i18n**: File uses Unicode escapes (`\u00f3`). Always read the exact line before editing.
 - **PR merge**: Always run `gh pr checks <PR#> --watch` and confirm **all** checks (ci, e2e, e2e-emulator) pass before merging. Never merge with failing or pending checks.
 - **Firebase secrets**: Use `printf` not `echo` when piping values — `echo` appends a trailing newline (`\n`) that corrupts URLs and tokens. Always: `printf "value" | npx firebase functions:secrets:set SECRET_NAME`. PodcastIndex uses a combined JSON secret (`PODCASTINDEX_CREDS`). After creating a new secret, grant the compute SA access: `gcloud secrets add-iam-policy-binding SECRET_NAME --project=mycircle-dash --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"`. Without this, deploy fails with `secretmanager.secrets.setIamPolicy` denied.

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
-import { useTranslation, WindowEvents, StorageKeys } from '@mycircle/shared';
+import { useTranslation, WindowEvents, StorageKeys, PageContent } from '@mycircle/shared';
 import StockSearch from './StockSearch';
 import CryptoTracker from './CryptoTracker';
 import Watchlist from './Watchlist';
@@ -80,7 +80,7 @@ export default function StockTracker() {
   const changeColor = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
 
   return (
-    <div className="stock-tracker-container max-w-4xl mx-auto px-4 py-6">
+    <PageContent maxWidth="4xl" className="stock-tracker-container">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -224,6 +224,6 @@ export default function StockTracker() {
         </div>
       )}
 
-    </div>
+    </PageContent>
   );
 }

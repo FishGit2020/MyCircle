@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PageContent } from '@mycircle/shared';
 import { useCases } from '../hooks/useCases';
 import { useCaseStatus } from '../hooks/useCaseStatus';
 import AddCaseForm from './AddCaseForm';
@@ -24,7 +24,7 @@ export default function ImmigrationTracker() {
 
   if (!authChecked || loading) {
     return (
-      <div className="pb-20 md:pb-8">
+      <PageContent>
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('immigration.title')}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('immigration.subtitle')}</p>
@@ -32,21 +32,21 @@ export default function ImmigrationTracker() {
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
         </div>
-      </div>
+      </PageContent>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="pb-20 md:pb-8">
+      <PageContent>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('immigration.title')}</h1>
         <p className="text-gray-500 dark:text-gray-400">{t('immigration.signInRequired')}</p>
-      </div>
+      </PageContent>
     );
   }
 
   return (
-    <div className="pb-20 md:pb-8">
+    <PageContent>
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
@@ -110,6 +110,6 @@ export default function ImmigrationTracker() {
           ))}
         </div>
       )}
-    </div>
+    </PageContent>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, PageContent } from '@mycircle/shared';
 import type { FlashCard, CardType, VisibilityFilter } from '../types';
 import { useFlashCards } from '../hooks/useFlashCards';
 import type { ChineseCharacter, CharacterCategory } from '../data/characters';
@@ -136,7 +136,7 @@ export default function FlashCards() {
 
   if (loading) {
     return (
-      <div className="pb-20 md:pb-8">
+      <PageContent>
         <div className="mb-6">
           <div className="h-7 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-2" />
@@ -150,12 +150,12 @@ export default function FlashCards() {
             <div key={i} className="h-40 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
           ))}
         </div>
-      </div>
+      </PageContent>
     );
   }
 
   return (
-    <div className="pb-20 md:pb-8">
+    <PageContent>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('flashcards.title')}</h1>
@@ -414,6 +414,6 @@ export default function FlashCards() {
 
       {/* PWA safe area bottom spacer for notched devices */}
       <div className="md:hidden" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} aria-hidden="true" />
-    </div>
+    </PageContent>
   );
 }

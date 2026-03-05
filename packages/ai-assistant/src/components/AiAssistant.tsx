@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router';
-import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS, EndpointManager } from '@mycircle/shared';
+import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS, EndpointManager, PageContent } from '@mycircle/shared';
 import { useAiChatWithStreaming } from '../hooks/useAiChatWithStreaming';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -133,7 +133,7 @@ export default function AiAssistant() {
   }, [messages, loading, streaming, streamingContent]);
 
   return (
-    <div className="ai-assistant max-w-3xl mx-auto px-4 py-6 flex flex-col h-[calc(100vh-16rem)]">
+    <PageContent maxWidth="3xl" fill className="ai-assistant">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -413,6 +413,6 @@ export default function AiAssistant() {
           <ChatInput onSend={sendMessage} disabled={loading || streaming} />
         </>
       )}
-    </div>
+    </PageContent>
   );
 }

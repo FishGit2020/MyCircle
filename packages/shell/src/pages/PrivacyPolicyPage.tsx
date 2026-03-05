@@ -1,4 +1,4 @@
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PageContent } from '@mycircle/shared';
 import type { TranslationKey } from '@mycircle/shared';
 
 const SECTIONS: { titleKey: TranslationKey; textKey: TranslationKey }[] = [
@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-3xl mx-auto pb-20 md:pb-8">
+    <PageContent maxWidth="3xl">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
         {t('privacy.title')}
       </h1>
@@ -34,6 +34,6 @@ export default function PrivacyPolicyPage() {
           </section>
         ))}
       </div>
-    </div>
+    </PageContent>
   );
 }

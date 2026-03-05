@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PageContent } from '@mycircle/shared';
 import { useWorshipSongs } from '../hooks/useWorshipSongs';
 import type { WorshipSong } from '../types';
 import SongList from './SongList';
@@ -125,7 +125,7 @@ export default function WorshipSongs() {
 
     default:
       return (
-        <>
+        <PageContent>
           <div className="flex justify-end mb-2">
             <button
               type="button"
@@ -153,7 +153,7 @@ export default function WorshipSongs() {
             onSelectSong={handleSelectSong}
             onNewSong={handleNewSong}
           />
-        </>
+        </PageContent>
       );
   }
 }

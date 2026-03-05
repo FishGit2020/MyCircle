@@ -327,6 +327,10 @@ When adding a new micro-frontend, update **all** of the following. Items marked 
 - [ ] Add alias to root `vitest.config.ts` (different relative path — see note above)
 - [ ] Verify with `pnpm test:run` (root) — not just `pnpm --filter @mycircle/shell test:run`
 
+#### Page Layout
+
+- [ ] **PageContent wrapper**: Wrap the MFE's top-level return in `<PageContent>` from `@mycircle/shared`. Use `maxWidth` prop to constrain width, `fill` prop for chat-style UIs, and `className` for additional classes. Do **not** add `pb-20 md:pb-8` — Layout.tsx handles BottomNav padding.
+
 #### Shell Integration (all in `packages/shell/src/`)
 
 - [ ] **Route**: Add `<Route>` and lazy import in `App.tsx`

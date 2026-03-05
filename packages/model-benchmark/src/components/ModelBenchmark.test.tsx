@@ -6,6 +6,7 @@ import ModelBenchmark from './ModelBenchmark';
 
 // Mock @mycircle/shared (includes Apollo hooks)
 vi.mock('@mycircle/shared', () => ({
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
   useTranslation: () => ({
     t: (key: string) => key,
   }),

@@ -4,4 +4,5 @@ export { SkeletonLine, SkeletonCircle, SkeletonCard, SkeletonList, SkeletonChart
 export { Breadcrumb } from './Breadcrumb';
 export type { BreadcrumbItem } from './Breadcrumb';
 export { default as EndpointManager } from './EndpointManager';
+export { PageContent } from './PageContent';
 

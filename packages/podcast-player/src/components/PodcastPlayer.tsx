@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router';
-import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents, subscribeToMFEvent, useQuery, GET_PODCAST_FEED } from '@mycircle/shared';
+import { useTranslation, WindowEvents, StorageKeys, eventBus, MFEvents, subscribeToMFEvent, useQuery, GET_PODCAST_FEED, PageContent } from '@mycircle/shared';
 import type { PodcastPlayEpisodeEvent } from '@mycircle/shared';
 import { usePodcastEpisodes } from '../hooks/usePodcastData';
 import type { Podcast, Episode } from '../hooks/usePodcastData';
@@ -193,7 +193,7 @@ export default function PodcastPlayer() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <PageContent maxWidth="6xl">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -342,6 +342,6 @@ export default function PodcastPlayer() {
         />
       )}
 
-    </div>
+    </PageContent>
   );
 }
