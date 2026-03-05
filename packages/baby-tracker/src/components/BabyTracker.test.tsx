@@ -20,6 +20,15 @@ vi.mock('@mycircle/shared', () => ({
     shuffle: vi.fn(),
   }),
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
+  parseVerseReference: (ref: string) => {
+    const match = ref.replace(/[\u2013\u2014].*/g, '').trim().match(/^(.+?)\s+(\d+)(?::.*)?$/);
+    if (!match) return null;
+    return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
+  },
+}));
+
+vi.mock('react-router', () => ({
+  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>,
 }));
 
 describe('BabyTracker', () => {

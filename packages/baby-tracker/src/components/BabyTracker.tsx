@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference } from '@mycircle/shared';
+import { Link } from 'react-router';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
 import { useBabyPhotos } from '../hooks/useBabyPhotos';
@@ -132,6 +133,18 @@ export default function BabyTracker() {
             <p className={`text-pink-600 dark:text-pink-400 text-sm font-semibold ${verseText || verseLoading ? 'mt-2' : ''}`}>
               — {verseRef}
             </p>
+            {(() => {
+              const parsed = parseVerseReference(verseRef);
+              if (!parsed) return null;
+              return (
+                <Link
+                  to={`/bible?book=${encodeURIComponent(parsed.book)}&chapter=${parsed.chapter}`}
+                  className="inline-block mt-2 text-xs font-medium text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-200 transition-colors"
+                >
+                  {t('bible.readChapter')} &rarr;
+                </Link>
+              );
+            })()}
           </div>
           <button
             onClick={shuffleVerse}

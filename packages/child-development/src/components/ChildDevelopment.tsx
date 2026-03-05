@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference } from '@mycircle/shared';
+import { Link } from 'react-router';
 import { getAgeRangeForMonths } from '../data/milestones';
 import { parentingVerses } from '../data/parentingVerses';
 import TimelineView from './TimelineView';
@@ -35,6 +36,18 @@ function VerseSection() {
           <p className={`text-xs text-amber-600 dark:text-amber-400 font-medium ${text || loading ? 'mt-1' : ''}`}>
             — {reference}
           </p>
+          {(() => {
+            const parsed = parseVerseReference(reference);
+            if (!parsed) return null;
+            return (
+              <Link
+                to={`/bible?book=${encodeURIComponent(parsed.book)}&chapter=${parsed.chapter}`}
+                className="inline-block mt-2 text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 transition-colors"
+              >
+                {t('bible.readChapter')} &rarr;
+              </Link>
+            );
+          })()}
         </div>
         <button
           type="button"
