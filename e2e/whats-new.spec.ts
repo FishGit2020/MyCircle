@@ -3,8 +3,8 @@ import { test, expect } from './fixtures';
 test.describe('What\'s New — Announcements', () => {
   test('header sparkle button navigates to /whats-new', async ({ page }) => {
     await page.goto('/');
-    // There are 2 WhatsNewButtons (desktop + mobile) — click the first visible one
-    const btn = page.getByTestId('whats-new-button').first();
+    // Mobile + desktop headers each have a WhatsNewButton — target the visible one
+    const btn = page.getByTestId('whats-new-button').and(page.locator(':visible')).first();
     await expect(btn).toBeVisible();
     await btn.click();
     await expect(page).toHaveURL(/\/whats-new/);
@@ -23,7 +23,7 @@ test.describe('What\'s New — Announcements', () => {
 
   test('sparkle button is visible in header', async ({ page }) => {
     await page.goto('/');
-    // At least one sparkle button should be visible
-    await expect(page.getByTestId('whats-new-button').first()).toBeVisible();
+    // Mobile + desktop headers each have a WhatsNewButton — target the visible one
+    await expect(page.getByTestId('whats-new-button').and(page.locator(':visible')).first()).toBeVisible();
   });
 });

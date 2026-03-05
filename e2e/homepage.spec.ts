@@ -4,8 +4,8 @@ test.describe('Homepage / Dashboard', () => {
   test('renders header with app title and navigation', async ({ page }) => {
     await page.goto('/');
 
-    // App title
-    await expect(page.locator('h1')).toContainText('MyCircle');
+    // App title (mobile + desktop h1 exist; target the visible one)
+    await expect(page.locator('h1:visible').first()).toContainText('MyCircle');
 
     // Navigation dropdown groups visible in desktop header
     await expect(page.getByRole('button', { name: 'Daily' }).first()).toBeVisible();

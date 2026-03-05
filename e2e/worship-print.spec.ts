@@ -5,8 +5,8 @@ test.describe('Worship Songs — Print', () => {
     // Navigate to worship songs page
     await page.goto('/worship');
 
-    // Wait for the page to fully render
-    await page.waitForSelector('h1', { timeout: 15_000 });
+    // Wait for the page to fully render (target visible h1 — mobile/desktop headers have separate h1s)
+    await page.locator('h1:visible').first().waitFor({ timeout: 15_000 });
 
     // Check if there are any songs displayed; if a song viewer is available, test print
     const printCalled = await page.evaluate(() => {

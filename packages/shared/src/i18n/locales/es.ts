@@ -17,6 +17,7 @@ const es: Record<TranslationKey, string> = {
   'nav.group.family': 'Familia',
   'nav.group.learning': 'Aprendizaje',
   'nav.group.workspace': 'Espacio de trabajo',
+  'nav.more': 'M\u00e1s',
 
   // Home page
   'home.title': 'Bienvenido a MyCircle',
