@@ -1695,6 +1695,11 @@ const es: Record<TranslationKey, string> = {
   'library.noBookmarks': 'A\u00fan no hay marcadores',
   'library.fullscreen': 'Pantalla completa',
   'library.exitFullscreen': 'Salir de pantalla completa',
+  'library.retryConversion': 'Reintentar Conversi\u00f3n',
+  'library.continuingConversion': 'Continuando conversi\u00f3n...',
+  'library.autoContinueHint': 'Continuar\u00e1 autom\u00e1ticamente en un momento',
+
+  'widgets.noAudiobook': 'No hay audiolibro en progreso',
 
   // Family Games
   'commandPalette.goToFamilyGames': 'Ir a Juegos Familiares',

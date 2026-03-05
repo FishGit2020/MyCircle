@@ -1695,6 +1695,11 @@ const zh: Record<TranslationKey, string> = {
   'library.noBookmarks': '\u8fd8\u6ca1\u6709\u4e66\u7b7e',
   'library.fullscreen': '\u5168\u5c4f',
   'library.exitFullscreen': '\u9000\u51fa\u5168\u5c4f',
+  'library.retryConversion': '\u91cd\u8bd5\u8f6c\u6362',
+  'library.continuingConversion': '\u6b63\u5728\u7ee7\u7eed\u8f6c\u6362...',
+  'library.autoContinueHint': '\u5c06\u5728\u7a0d\u540e\u81ea\u52a8\u7ee7\u7eed',
+
+  'widgets.noAudiobook': '\u6ca1\u6709\u6b63\u5728\u8fdb\u884c\u7684\u6709\u58f0\u4e66',
 
   // Family Games
   'commandPalette.goToFamilyGames': '\u53bb\u5bb6\u5ead\u6e38\u620f',

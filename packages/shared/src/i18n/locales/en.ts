@@ -1693,6 +1693,11 @@ const en = {
   'library.noBookmarks': 'No bookmarks yet',
   'library.fullscreen': 'Fullscreen',
   'library.exitFullscreen': 'Exit fullscreen',
+  'library.retryConversion': 'Retry Conversion',
+  'library.continuingConversion': 'Continuing conversion...',
+  'library.autoContinueHint': 'Will auto-continue in a moment',
+
+  'widgets.noAudiobook': 'No audiobook in progress',
 
   // Family Games
   'commandPalette.goToFamilyGames': 'Go to Family Games',
