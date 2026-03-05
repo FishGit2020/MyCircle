@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { GameType } from './GameCard';
 
@@ -30,24 +30,18 @@ interface GameOverProps {
 export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAgain, onBack }: GameOverProps) {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
 
-  const handleSubmitScore = async () => {
+  // Auto-save score on mount
+  useEffect(() => {
     const api = window.__familyGames;
     if (!api?.saveScore) return;
-
-    setSubmitting(true);
-    setError(false);
-    try {
-      await api.saveScore({ gameType, score, timeMs, difficulty });
-      setSubmitted(true);
-    } catch {
-      setError(true);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    let cancelled = false;
+    api.saveScore({ gameType, score, timeMs, difficulty })
+      .then(() => { if (!cancelled) setSubmitted(true); })
+      .catch(() => { if (!cancelled) setError(true); });
+    return () => { cancelled = true; };
+  }, [gameType, score, timeMs, difficulty]);
 
   const handleShare = useCallback(async () => {
     const gameName = t(GAME_NAME_KEYS[gameType] || 'games.trivia');
@@ -81,16 +75,6 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
       </div>
 
       <div className="flex flex-col gap-3 w-full max-w-xs">
-        {!submitted && (
-          <button
-            type="button"
-            onClick={handleSubmitScore}
-            disabled={submitting}
-            className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition disabled:opacity-50"
-          >
-            {submitting ? t('games.submitting') : t('games.submitScore')}
-          </button>
-        )}
         {submitted && (
           <p className="text-sm text-green-600 dark:text-green-400 text-center font-medium">
             {t('games.scoreSubmitted')}

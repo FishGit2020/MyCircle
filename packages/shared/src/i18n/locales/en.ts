@@ -1748,6 +1748,12 @@ const en = {
   'games.round': 'Round',
   'games.ready': 'Ready?',
   'games.holdUp': 'Hold the phone up to your forehead!',
+  'games.scoringRules': 'Scoring',
+  'games.triviaRules': 'Answer faster for up to 2x points. 100\u2013200 pts per correct answer.',
+  'games.mathRules': 'Base points per answer: Easy 10, Medium 20, Hard 30. Streak bonus: +5 per consecutive correct.',
+  'games.wordRules': 'Fewer guesses = higher score. 1 guess = 600 pts, 6 guesses = 100 pts.',
+  'games.memoryRules': 'Finish fast with fewer flips for the highest score. Time and flip penalties apply.',
+  'games.headsUpRules': '1 point per word guessed. Skip words freely \u2014 no penalty.',
 
   // Privacy Policy
   'privacy.title': 'Privacy Policy',

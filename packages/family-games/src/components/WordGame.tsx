@@ -191,6 +191,9 @@ export default function WordGame({ onBack }: WordGameProps) {
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('games.wordGame')}</h2>
         <span className="w-16" />
       </div>
+      <div className="bg-green-50 dark:bg-green-900/20 rounded-lg px-3 py-1.5 w-full">
+        <p className="text-[10px] text-green-600 dark:text-green-400">{t('games.scoringRules' as any)}: {t('games.wordRules' as any)}</p>
+      </div>
 
       {/* Grid */}
       <div className={`grid gap-1.5 ${shake ? 'animate-[shake_0.5s_ease-in-out]' : ''}`}>

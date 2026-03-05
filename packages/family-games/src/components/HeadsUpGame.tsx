@@ -204,6 +204,10 @@ export default function HeadsUpGame({ onBack }: HeadsUpGameProps) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.headsUp')}</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">{t('games.headsUpDesc')}</p>
       </div>
+      <div className="bg-fuchsia-50 dark:bg-fuchsia-900/20 rounded-lg px-4 py-2.5 max-w-xs">
+        <p className="text-xs font-medium text-fuchsia-700 dark:text-fuchsia-300">{t('games.scoringRules' as any)}</p>
+        <p className="text-xs text-fuchsia-600 dark:text-fuchsia-400 mt-0.5">{t('games.headsUpRules' as any)}</p>
+      </div>
       <button
         type="button"
         onClick={startRound}

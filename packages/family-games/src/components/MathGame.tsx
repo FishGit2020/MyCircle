@@ -173,6 +173,10 @@ export default function MathGame({ onBack }: MathGameProps) {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.mathChallenge')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">60s &middot; {t('games.difficulty')}</p>
         </div>
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-2.5 max-w-xs">
+          <p className="text-xs font-medium text-blue-700 dark:text-blue-300">{t('games.scoringRules' as any)}</p>
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">{t('games.mathRules' as any)}</p>
+        </div>
         <div className="flex gap-3">
           {(['easy', 'medium', 'hard'] as const).map(d => (
             <button

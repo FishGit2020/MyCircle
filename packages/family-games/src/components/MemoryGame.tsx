@@ -172,6 +172,10 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.memoryMatch')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.difficulty')}</p>
         </div>
+        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg px-4 py-2.5 max-w-xs">
+          <p className="text-xs font-medium text-orange-700 dark:text-orange-300">{t('games.scoringRules' as any)}</p>
+          <p className="text-xs text-orange-600 dark:text-orange-400 mt-0.5">{t('games.memoryRules' as any)}</p>
+        </div>
         <div className="flex gap-3">
           {(['easy', 'medium', 'hard'] as const).map(d => (
             <button
