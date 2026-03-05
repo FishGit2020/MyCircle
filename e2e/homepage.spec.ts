@@ -7,10 +7,10 @@ test.describe('Homepage / Dashboard', () => {
     // App title
     await expect(page.locator('h1')).toContainText('MyCircle');
 
-    // Navigation links — Home replaces Weather, Compare is removed from nav
-    await expect(page.getByRole('link', { name: 'Home' }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Stocks' }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Podcasts' }).first()).toBeVisible();
+    // Navigation dropdown groups visible in desktop header
+    await expect(page.getByRole('button', { name: 'Daily' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Faith' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Family' }).first()).toBeVisible();
   });
 
   test('shows hero section with welcome message', async ({ page }) => {
