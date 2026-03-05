@@ -73,6 +73,7 @@ export const WindowEvents = {
   WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
   BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
   BOOK_LAST_PLAYED_CHANGED: 'book-last-played-changed',
+  BOOK_LISTEN_TAB_ACTIVE: 'book-listen-tab-active',
   BREADCRUMB_DETAIL: 'breadcrumb-detail',
   FAMILY_GAMES_CHANGED: 'family-games-changed',
 } as const;
