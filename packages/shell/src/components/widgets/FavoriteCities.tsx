@@ -74,7 +74,7 @@ export default function FavoriteCities() {
         </h3>
         {favoriteCities.length >= 2 && (
           <Link
-            to="/weather/compare"
+            to={`/weather/compare?a=${encodeURIComponent(favoriteCities[0].name)}&b=${encodeURIComponent(favoriteCities[1].name)}`}
             className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition flex items-center gap-1"
           >
             {t('compare.compareLink')}
