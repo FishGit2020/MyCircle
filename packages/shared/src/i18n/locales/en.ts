@@ -1697,6 +1697,13 @@ const en = {
   'library.retryConversion': 'Retry Conversion',
   'library.continuingConversion': 'Continuing conversion...',
   'library.autoContinueHint': 'Will auto-continue in a moment',
+  'library.sleepTimer': 'Sleep timer',
+  'library.sleepOff': 'Off',
+  'library.sleepMinutes': '{mins} min',
+  'library.shareChapter': 'Share chapter',
+  'library.skipForward': 'Skip forward 10 seconds',
+  'library.skipBack': 'Skip back 10 seconds',
+  'library.chapterComplete': 'Complete',
 
   'widgets.noAudiobook': 'No audiobook in progress',
 

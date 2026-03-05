@@ -1699,6 +1699,13 @@ const es: Record<TranslationKey, string> = {
   'library.retryConversion': 'Reintentar Conversi\u00f3n',
   'library.continuingConversion': 'Continuando conversi\u00f3n...',
   'library.autoContinueHint': 'Continuar\u00e1 autom\u00e1ticamente en un momento',
+  'library.sleepTimer': 'Temporizador de sue\u00f1o',
+  'library.sleepOff': 'Apagado',
+  'library.sleepMinutes': '{mins} min',
+  'library.shareChapter': 'Compartir cap\u00edtulo',
+  'library.skipForward': 'Avanzar 10 segundos',
+  'library.skipBack': 'Retroceder 10 segundos',
+  'library.chapterComplete': 'Completo',
 
   'widgets.noAudiobook': 'No hay audiolibro en progreso',
 
