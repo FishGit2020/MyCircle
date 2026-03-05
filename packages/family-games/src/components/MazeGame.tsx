@@ -80,15 +80,15 @@ export default function MazeGame({ onBack }: { onBack: () => void }) {
     }
   }, [maze, pos]);
 
-  // Keyboard controls
+  // Keyboard controls (arrow keys + WASD)
   useEffect(() => {
     if (phase !== 'playing') return;
     const handler = (e: KeyboardEvent) => {
       switch (e.key) {
-        case 'ArrowUp': case 'w': move(-1, 0); break;
-        case 'ArrowDown': case 's': move(1, 0); break;
-        case 'ArrowLeft': case 'a': move(0, -1); break;
-        case 'ArrowRight': case 'd': move(0, 1); break;
+        case 'ArrowUp': case 'w': case 'W': e.preventDefault(); move(-1, 0); break;
+        case 'ArrowDown': case 's': case 'S': e.preventDefault(); move(1, 0); break;
+        case 'ArrowLeft': case 'a': case 'A': e.preventDefault(); move(0, -1); break;
+        case 'ArrowRight': case 'd': case 'D': e.preventDefault(); move(0, 1); break;
       }
     };
     window.addEventListener('keydown', handler);
@@ -151,17 +151,19 @@ export default function MazeGame({ onBack }: { onBack: () => void }) {
 
       {/* Maze grid */}
       <div className="border-2 border-gray-800 dark:border-gray-200" style={{ display: 'grid', gridTemplateColumns: `repeat(${size}, ${cellPx}px)` }}>
-        {maze?.map((row, r) => row.map((cell, c) => (
+        {maze?.map((row, r) => row.map((cell, c) => {
+          const isDark = document.documentElement.classList.contains('dark');
+          const wallColor = isDark ? '#6b7280' : '#9ca3af';
+          return (
           <div
             key={`${r}-${c}`}
             style={{ width: cellPx, height: cellPx,
-              borderTop: cell.top ? '2px solid' : '2px solid transparent',
-              borderRight: cell.right ? '2px solid' : '2px solid transparent',
-              borderBottom: cell.bottom ? '2px solid' : '2px solid transparent',
-              borderLeft: cell.left ? '2px solid' : '2px solid transparent',
-              borderColor: undefined,
+              borderTop: cell.top ? `2px solid ${wallColor}` : '2px solid transparent',
+              borderRight: cell.right ? `2px solid ${wallColor}` : '2px solid transparent',
+              borderBottom: cell.bottom ? `2px solid ${wallColor}` : '2px solid transparent',
+              borderLeft: cell.left ? `2px solid ${wallColor}` : '2px solid transparent',
             }}
-            className={`relative border-gray-400 dark:border-gray-500 ${
+            className={`relative ${
               r === 0 && c === 0 ? 'bg-green-100 dark:bg-green-900/30' :
               r === size - 1 && c === size - 1 ? 'bg-red-100 dark:bg-red-900/30' : ''
             }`}
@@ -173,7 +175,8 @@ export default function MazeGame({ onBack }: { onBack: () => void }) {
               <div className="absolute inset-1 flex items-center justify-center text-xs">🏁</div>
             )}
           </div>
-        )))}
+          );
+        }))}
       </div>
 
       {/* D-pad controls for touch */}
