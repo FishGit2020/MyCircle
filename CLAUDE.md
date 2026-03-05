@@ -62,7 +62,6 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - Missing `type="button"` creates extra submit buttons that break `getByRole('button')` queries
 - Rebuild shared before MFE tests: `pnpm --filter @mycircle/shared build`
 - e2e tests live in top-level `e2e/` — search entire repo when removing features
-- **fireEvent vs userEvent**: `@testing-library/react` v16 does NOT wrap `fireEvent` in `act()` — it's a direct passthrough to `@testing-library/dom`. React 18 batched state updates from `fireEvent.change` may not flush before the next synchronous call. Use `fireEvent.change` for fast text input (avoids `user.type` per-keystroke overhead), but use `user.click` for submit/save buttons (userEvent properly flushes React state). Never do `fireEvent.change` → `fireEvent.submit` without an `await waitFor` gate in between — `handleSubmit` will read stale closure state.
 
 ## Adding New MFE Packages
 

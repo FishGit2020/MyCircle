@@ -69,8 +69,8 @@ describe('AuthModal', () => {
     mockSignInWithEmail.mockResolvedValue(undefined);
     render(<AuthModal open={true} onClose={onClose} />);
 
-    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'password123' } });
+    await user.type(screen.getByLabelText('auth.email'), 'test@example.com');
+    await user.type(screen.getByLabelText('auth.password'), 'password123');
     await user.click(getSubmitButton());
 
     await waitFor(() => {
@@ -83,14 +83,14 @@ describe('AuthModal', () => {
     mockSignInWithEmail.mockRejectedValue({ code: 'auth/wrong-password' });
     render(<AuthModal open={true} onClose={onClose} />);
 
-    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'wrong' } });
+    await user.type(screen.getByLabelText('auth.email'), 'test@example.com');
+    await user.type(screen.getByLabelText('auth.password'), 'wrong');
     await user.click(getSubmitButton());
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument();
       expect(screen.getByText('auth.errorWrongPassword')).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 
   it('switches to sign up tab and shows additional fields', async () => {
@@ -113,9 +113,9 @@ describe('AuthModal', () => {
     const signUpElements = screen.getAllByText('auth.signUp');
     await user.click(signUpElements[0]);
 
-    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'new@example.com' } });
-    fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByLabelText('auth.confirmPassword'), { target: { value: 'different' } });
+    await user.type(screen.getByLabelText('auth.email'), 'new@example.com');
+    await user.type(screen.getByLabelText('auth.password'), 'password123');
+    await user.type(screen.getByLabelText('auth.confirmPassword'), 'different');
 
     await user.click(getSubmitButton());
 
@@ -134,10 +134,10 @@ describe('AuthModal', () => {
     const signUpElements = screen.getAllByText('auth.signUp');
     await user.click(signUpElements[0]);
 
-    fireEvent.change(screen.getByLabelText('auth.displayName'), { target: { value: 'New User' } });
-    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'new@example.com' } });
-    fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByLabelText('auth.confirmPassword'), { target: { value: 'password123' } });
+    await user.type(screen.getByLabelText('auth.displayName'), 'New User');
+    await user.type(screen.getByLabelText('auth.email'), 'new@example.com');
+    await user.type(screen.getByLabelText('auth.password'), 'password123');
+    await user.type(screen.getByLabelText('auth.confirmPassword'), 'password123');
 
     await user.click(getSubmitButton());
 
@@ -163,7 +163,7 @@ describe('AuthModal', () => {
     mockResetPassword.mockResolvedValue(undefined);
     render(<AuthModal open={true} onClose={onClose} />);
 
-    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@example.com' } });
+    await user.type(screen.getByLabelText('auth.email'), 'test@example.com');
     await user.click(screen.getByText('auth.forgotPassword'));
 
     await waitFor(() => {

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import DayNode from './DayNode';
 import type { WorkEntry } from '../types';
 
@@ -98,21 +99,23 @@ describe('DayNode', () => {
     expect(screen.getByText('Task two')).toBeInTheDocument();
   });
 
-  it('shows edit form when edit button is clicked', () => {
+  it('shows edit form when edit button is clicked', async () => {
+    const user = userEvent.setup();
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
+    await user.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
     expect(screen.getByTestId('entry-form')).toBeInTheDocument();
     expect(screen.getByTestId('form-initial-value')).toHaveTextContent('Fixed a bug');
   });
 
   it('calls onUpdate and exits edit mode on save', async () => {
+    const user = userEvent.setup();
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
-    fireEvent.click(screen.getByText('mock-save'));
+    await user.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
+    await user.click(screen.getByText('mock-save'));
     await waitFor(() => {
       expect(onUpdate).toHaveBeenCalledWith('1', 'updated content');
     });
@@ -122,30 +125,33 @@ describe('DayNode', () => {
     });
   });
 
-  it('exits edit mode on cancel', () => {
+  it('exits edit mode on cancel', async () => {
+    const user = userEvent.setup();
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
+    await user.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
     expect(screen.getByTestId('entry-form')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('mock-cancel'));
+    await user.click(screen.getByText('mock-cancel'));
     expect(screen.queryByTestId('entry-form')).not.toBeInTheDocument();
   });
 
-  it('shows delete confirmation on delete button click', () => {
+  it('shows delete confirmation on delete button click', async () => {
+    const user = userEvent.setup();
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.delete' }));
+    await user.click(screen.getByRole('button', { name: 'dailyLog.delete' }));
     expect(screen.getByText('Confirm')).toBeInTheDocument();
   });
 
   it('calls onDelete on confirm', async () => {
+    const user = userEvent.setup();
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.delete' }));
-    fireEvent.click(screen.getByText('Confirm'));
+    await user.click(screen.getByRole('button', { name: 'dailyLog.delete' }));
+    await user.click(screen.getByText('Confirm'));
     await waitFor(() => {
       expect(onDelete).toHaveBeenCalledWith('1');
     });
@@ -171,7 +177,8 @@ describe('DayNode', () => {
     expect(screen.getByRole('button', { name: 'dailyLog.moveDate' })).toBeInTheDocument();
   });
 
-  it('shows date picker when move button is clicked', () => {
+  it('shows date picker when move button is clicked', async () => {
+    const user = userEvent.setup();
     render(
       <DayNode
         date="2026-03-01"
@@ -181,11 +188,12 @@ describe('DayNode', () => {
         onMoveEntry={onMoveEntry}
       />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.moveDate' }));
+    await user.click(screen.getByRole('button', { name: 'dailyLog.moveDate' }));
     expect(screen.getByLabelText('dailyLog.moveDatePicker')).toBeInTheDocument();
   });
 
-  it('toggles move date picker off on second click', () => {
+  it('toggles move date picker off on second click', async () => {
+    const user = userEvent.setup();
     render(
       <DayNode
         date="2026-03-01"
@@ -196,9 +204,9 @@ describe('DayNode', () => {
       />
     );
     const moveBtn = screen.getByRole('button', { name: 'dailyLog.moveDate' });
-    fireEvent.click(moveBtn);
+    await user.click(moveBtn);
     expect(screen.getByLabelText('dailyLog.moveDatePicker')).toBeInTheDocument();
-    fireEvent.click(moveBtn);
+    await user.click(moveBtn);
     expect(screen.queryByLabelText('dailyLog.moveDatePicker')).not.toBeInTheDocument();
   });
 });

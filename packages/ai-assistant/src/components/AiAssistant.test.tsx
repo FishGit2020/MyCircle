@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
@@ -154,7 +155,7 @@ describe('AiAssistant', () => {
     expect(screen.queryByText('Clear chat')).not.toBeInTheDocument();
   });
 
-  it('calls sendMessage when form is submitted', () => {
+  it('calls sendMessage when form is submitted', async () => {
     const mockSend = vi.fn();
     mockUseAiChat.mockReturnValue({
       messages: [],
@@ -164,11 +165,11 @@ describe('AiAssistant', () => {
       clearChat: vi.fn(),
     });
 
+    const user = userEvent.setup();
     renderWithProviders(<AiAssistant />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...');
-    fireEvent.change(input, { target: { value: 'Hello' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    await user.type(input, 'Hello{Enter}');
 
     expect(mockSend).toHaveBeenCalledWith('Hello');
   });
