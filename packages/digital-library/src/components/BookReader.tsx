@@ -361,23 +361,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
         </button>
       </div>
 
-      {/* Collapsible reader section */}
-      {showAudioPlayer && (
-        <button
-          type="button"
-          onClick={() => setReaderExpanded(!readerExpanded)}
-          className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition mb-2 min-h-[44px]"
-        >
-          <svg className={`w-4 h-4 transition-transform ${readerExpanded ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-          {readerExpanded ? t('library.tableOfContents') : t('library.readNow')}
-        </button>
-      )}
-
-      {readerExpanded && (
-        <>
-          <div className="flex flex-1 min-h-0 gap-4 overflow-hidden relative">
+      <div className="flex flex-1 min-h-0 gap-4 overflow-hidden relative">
             {/* TOC Sidebar */}
             {tocOpen && (
               <TableOfContents
@@ -412,8 +396,6 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
             />
             <BrowserTTS text={ttsText} />
           </div>
-        </>
-      )}
 
       {/* Audio controls (always visible) */}
       <div className="flex-shrink-0 mt-4 space-y-3">
