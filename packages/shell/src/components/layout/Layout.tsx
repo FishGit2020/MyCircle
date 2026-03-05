@@ -314,6 +314,7 @@ export default function Layout() {
               </button>
               <LanguageSelector />
               <WhatsNewButton />
+              <FeedbackButton />
               <NotificationBell />
               <UserMenu />
             </nav>
@@ -322,6 +323,7 @@ export default function Layout() {
             <div className="flex md:!hidden items-center gap-1 flex-shrink-0">
               <LanguageSelector />
               <WhatsNewButton />
+              <FeedbackButton />
               <button
                 onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
                 className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -356,7 +358,6 @@ export default function Layout() {
       <CommandPalette recentPages={recent} />
       <KeyboardShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
 
-      <FeedbackButton hasActivePlayer={isPlayerVisible} />
       <PwaInstallPrompt />
       <SyncIndicator />
 
