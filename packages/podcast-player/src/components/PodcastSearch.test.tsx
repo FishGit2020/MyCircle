@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { MemoryRouter } from 'react-router';
 import PodcastSearch from './PodcastSearch';
@@ -54,13 +55,16 @@ describe('PodcastSearch', () => {
     expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
-  it('passes query to search hook on input change', () => {
+  it('passes query to search hook on input change', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderWithProviders(<PodcastSearch onSelectPodcast={vi.fn()} />);
 
     const input = screen.getByPlaceholderText('Search podcasts...');
-    fireEvent.change(input, { target: { value: 'tech' } });
+    await user.type(input, 'tech');
 
     expect(mockUsePodcastSearch).toHaveBeenCalledWith('tech');
+    vi.useRealTimers();
   });
 
   it('shows search results when data is returned', () => {

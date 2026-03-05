@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act, fireEvent } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import ChatInput from './ChatInput';
@@ -21,34 +21,35 @@ describe('ChatInput', () => {
     expect(screen.getByRole('button', { name: 'Send message' })).toBeInTheDocument();
   });
 
-  it('calls onSend when Enter is pressed', () => {
+  it('calls onSend when Enter is pressed', async () => {
     const onSend = vi.fn();
+    const user = userEvent.setup();
     renderWithProviders(<ChatInput onSend={onSend} />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...');
-    fireEvent.change(input, { target: { value: 'Hello' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    await user.type(input, 'Hello{Enter}');
 
     expect(onSend).toHaveBeenCalledWith('Hello');
   });
 
-  it('does not send empty messages', () => {
+  it('does not send empty messages', async () => {
     const onSend = vi.fn();
+    const user = userEvent.setup();
     renderWithProviders(<ChatInput onSend={onSend} />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...');
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    await user.type(input, '{Enter}');
 
     expect(onSend).not.toHaveBeenCalled();
   });
 
-  it('clears input after sending', () => {
+  it('clears input after sending', async () => {
     const onSend = vi.fn();
+    const user = userEvent.setup();
     renderWithProviders(<ChatInput onSend={onSend} />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...') as HTMLTextAreaElement;
-    fireEvent.change(input, { target: { value: 'Hello' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+    await user.type(input, 'Hello{Enter}');
 
     expect(input.value).toBe('');
   });
