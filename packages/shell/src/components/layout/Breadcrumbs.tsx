@@ -43,6 +43,9 @@ export default function Breadcrumbs() {
   const [searchParams] = useSearchParams();
   const [mfeDetail, setMfeDetail] = useState<string | null>(null);
 
+  // Compute root section early so we can use it as effect dependency
+  const firstSegmentForEffect = location.pathname.split('/').filter(Boolean)[0] || '';
+
   // Listen for MFE-provided breadcrumb detail (e.g. book title from digital library)
   useEffect(() => {
     const handler = (e: Event) => setMfeDetail((e as CustomEvent).detail || null);
@@ -50,8 +53,9 @@ export default function Breadcrumbs() {
     return () => window.removeEventListener(WindowEvents.BREADCRUMB_DETAIL, handler);
   }, []);
 
-  // Clear MFE detail on route change
-  useEffect(() => { setMfeDetail(null); }, [location.pathname]);
+  // Clear MFE detail only when navigating to a different top-level section,
+  // not when going deeper within the same section (e.g. /library → /library/:id)
+  useEffect(() => { setMfeDetail(null); }, [firstSegmentForEffect]);
 
   // Don't show breadcrumbs on the home page
   if (location.pathname === '/') return null;

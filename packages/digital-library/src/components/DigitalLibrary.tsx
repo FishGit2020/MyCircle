@@ -28,9 +28,10 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function BookCard({ book, onSelect, onDelete, currentUid }: {
+function BookCard({ book, onSelect, onSelectListen, onDelete, currentUid }: {
   book: Book;
   onSelect: (book: Book) => void;
+  onSelectListen: (book: Book) => void;
   onDelete: (bookId: string) => void;
   currentUid: string | null;
 }) {
@@ -68,12 +69,17 @@ function BookCard({ book, onSelect, onDelete, currentUid }: {
             <span>{formatFileSize(book.fileSize)}</span>
           </div>
           {book.audioStatus === 'complete' && (
-            <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onSelectListen(book); }}
+              className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-medium bg-green-500 dark:bg-green-600 text-white hover:bg-green-600 dark:hover:bg-green-500 transition-colors active:scale-95 min-h-[36px]"
+              aria-label={`${t('library.listenNow')}: ${book.title}`}
+            >
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
               </svg>
               {t('library.audioAvailable')}
-            </span>
+            </button>
           )}
           {(book.audioStatus === 'processing' || book.audioStatus === 'paused') && (
             <div className="mt-2">
@@ -287,7 +293,7 @@ export default function DigitalLibrary() {
     }
   }, [t]);
 
-  const handleSelect = useCallback(async (book: Book) => {
+  const handleSelect = useCallback(async (book: Book, tab?: 'read' | 'listen') => {
     try {
       const token = await window.__getFirebaseIdToken?.();
       if (!token) return;
@@ -303,11 +309,16 @@ export default function DigitalLibrary() {
       logger.error('Failed to fetch chapters', err);
     }
     setSelectedBook(book);
-    // Update URL to /library/:bookId
-    navigate(`/library/${book.id}`, { replace: true });
-    // Broadcast book title for breadcrumb
+    // Broadcast book title for breadcrumb before navigation so it isn't cleared
     window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: book.title }));
+    // Update URL to /library/:bookId with optional tab param
+    const url = tab ? `/library/${book.id}?tab=${tab}${tab === 'listen' ? '&autoPlay=1' : ''}` : `/library/${book.id}`;
+    navigate(url, { replace: true });
   }, [navigate]);
+
+  const handleSelectListen = useCallback((book: Book) => {
+    handleSelect(book, 'listen');
+  }, [handleSelect]);
 
   const handleBack = useCallback(() => {
     setSelectedBook(null);
@@ -381,6 +392,7 @@ export default function DigitalLibrary() {
               key={book.id}
               book={book}
               onSelect={handleSelect}
+              onSelectListen={handleSelectListen}
               onDelete={handleDelete}
               currentUid={currentUid}
             />

@@ -14,6 +14,7 @@ interface AudioPlayerProps {
   bookTitle: string;
   bookId?: string;
   coverUrl?: string;
+  autoPlay?: boolean;
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -31,7 +32,7 @@ interface BookProgress {
   chapter: number;
 }
 
-export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl }: AudioPlayerProps) {
+export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, autoPlay }: AudioPlayerProps) {
   const { t } = useTranslation();
   const [currentChapter, setCurrentChapter] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -86,6 +87,21 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl }: A
     window.addEventListener('book-audio-progress-changed', handler);
     return () => window.removeEventListener('book-audio-progress-changed', handler);
   }, [loadBookProgress]);
+
+  // Auto-play on mount when requested (e.g. from widget "Continue" button)
+  const shouldAutoPlayRef = React.useRef(autoPlay);
+  const currentChapterRef = React.useRef(currentChapter);
+  currentChapterRef.current = currentChapter;
+  useEffect(() => {
+    if (!shouldAutoPlayRef.current) return;
+    shouldAutoPlayRef.current = false;
+    // Defer so restored chapter index from localStorage is applied first
+    const id = setTimeout(() => {
+      eventBus.publish(MFEvents.AUDIO_PLAY, buildAudioSource(currentChapterRef.current));
+    }, 150);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // mount only
 
   // Subscribe to playback state from GlobalAudioPlayer
   useEffect(() => {
