@@ -352,9 +352,6 @@ export default function Layout() {
               <h1 className="text-lg font-bold text-gray-800 dark:text-white truncate">MyCircle</h1>
             </Link>
             <div className="flex items-center gap-1 flex-shrink-0">
-              <LanguageSelector />
-              <WhatsNewButton />
-              <FeedbackButton />
               <button
                 type="button"
                 onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
@@ -365,6 +362,9 @@ export default function Layout() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
+              <LanguageSelector />
+              <WhatsNewButton />
+              <FeedbackButton />
               <NotificationBell />
               <UserMenu />
             </div>
