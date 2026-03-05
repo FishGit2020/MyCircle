@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import WeatherCompare from './WeatherCompare';
+
+const renderWithRouter = (initialEntries = ['/weather/compare']) =>
+  render(
+    <MemoryRouter initialEntries={initialEntries}>
+      <WeatherCompare />
+    </MemoryRouter>
+  );
 
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
@@ -31,29 +39,33 @@ vi.mock('@apollo/client/react', () => ({
 
 describe('WeatherCompare', () => {
   it('renders title', () => {
-    render(<WeatherCompare />);
+    renderWithRouter();
     expect(screen.getByText('compare.title')).toBeInTheDocument();
   });
 
   it('shows city selectors when enough cities available', () => {
-    render(<WeatherCompare />);
+    renderWithRouter();
     const selects = screen.getAllByRole('combobox');
     expect(selects.length).toBe(2);
   });
 
-  it('shows placeholder text when no city selected', () => {
-    render(<WeatherCompare />);
-    expect(screen.getAllByText(/compare.selectCity/).length).toBe(2);
+  it('auto-selects first two favorite cities', () => {
+    renderWithRouter();
+    // With 2 favorites, both should be auto-selected
+    const selects = screen.getAllByRole('combobox') as HTMLSelectElement[];
+    expect(selects[0].value).toBe('c1');
+    expect(selects[1].value).toBe('c2');
   });
 
   it('shows choose city option in dropdowns', () => {
-    render(<WeatherCompare />);
+    renderWithRouter();
     const options = screen.getAllByText('compare.chooseCity');
-    expect(options.length).toBe(2);
+    // "Choose city" is still an option in each dropdown (unselected default)
+    expect(options.length).toBeGreaterThanOrEqual(1);
   });
 
   it('lists available cities in dropdown', () => {
-    render(<WeatherCompare />);
+    renderWithRouter();
     // Both cities should appear as options
     expect(screen.getAllByText('New York, US').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('London, UK').length).toBeGreaterThanOrEqual(1);
@@ -69,7 +81,7 @@ describe('WeatherCompare - insufficient cities', () => {
       }),
     }));
     // This behavior is tested via the component rendering
-    render(<WeatherCompare />);
+    renderWithRouter();
     // When cities < 2 it shows needCities message
     // But the mock above won't be applied due to vi.doMock timing
     // At least verify the component renders without crashing

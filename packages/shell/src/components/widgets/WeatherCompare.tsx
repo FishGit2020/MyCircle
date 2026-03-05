@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router';
 import { useQuery } from '@apollo/client/react';
 import { GET_CURRENT_WEATHER, GET_FORECAST, getWeatherIconUrl, getWindDirection, useTranslation, useUnits, formatTemperature, formatWindSpeed, convertTemp, tempUnitSymbol } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
@@ -214,6 +215,7 @@ function ComparisonChart({ cityA, cityB }: { cityA: SelectableCity | null; cityB
 export default function WeatherCompare() {
   const { favoriteCities, recentCities } = useAuth();
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [cityA, setCityA] = useState<SelectableCity | null>(null);
   const [cityB, setCityB] = useState<SelectableCity | null>(null);
 
@@ -221,6 +223,25 @@ export default function WeatherCompare() {
     ...favoriteCities,
     ...recentCities.filter(rc => !favoriteCities.some(fc => fc.id === rc.id)),
   ];
+
+  // Auto-select cities from URL params or first two favorites
+  useEffect(() => {
+    if (allCities.length < 2) return;
+    const aName = searchParams.get('a');
+    const bName = searchParams.get('b');
+    if (aName && !cityA) {
+      const found = allCities.find(c => c.name === aName);
+      if (found) setCityA(found);
+    }
+    if (bName && !cityB) {
+      const found = allCities.find(c => c.name === bName);
+      if (found) setCityB(found);
+    }
+    if (!aName && !bName && !cityA && !cityB && favoriteCities.length >= 2) {
+      setCityA(favoriteCities[0]);
+      setCityB(favoriteCities[1]);
+    }
+  }, [allCities.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const CitySelector = ({ value, onChange, excludeId }: { value: SelectableCity | null; onChange: (c: SelectableCity) => void; excludeId?: string }) => (
     <select

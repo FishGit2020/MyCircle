@@ -145,7 +145,7 @@ export default function FeedbackButton() {
 
       {/* Modal backdrop + dialog */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 dark:bg-black/60"
@@ -159,7 +159,7 @@ export default function FeedbackButton() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="feedback-dialog-title"
-            className="relative w-full max-w-md mx-4 mb-[calc(1rem_+_env(safe-area-inset-bottom,0px))] sm:mb-0 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-black/40 overflow-hidden"
+            className="relative w-full max-w-md mx-4 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-black/40 overflow-hidden max-h-[90vh] overflow-y-auto"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">

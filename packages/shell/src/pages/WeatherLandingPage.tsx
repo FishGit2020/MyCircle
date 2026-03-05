@@ -35,7 +35,7 @@ export default function WeatherLandingPage() {
       {user && favoriteCities.length >= 2 && (
         <section>
           <Link
-            to="/weather/compare"
+            to={`/weather/compare?a=${encodeURIComponent(favoriteCities[0].name)}&b=${encodeURIComponent(favoriteCities[1].name)}`}
             className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition group"
           >
             <div className="flex items-center gap-3 min-w-0">
