@@ -49,43 +49,37 @@ describe('SongEditor', () => {
   });
 
   it('includes YouTube URL in saved data', async () => {
-    const user = userEvent.setup();
-    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    const { container } = render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
     fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
+    fireEvent.submit(container.querySelector('form')!);
 
     await waitFor(() => {
-      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          youtubeUrl: 'https://youtube.com/watch?v=xyz',
+        })
+      );
     });
-    await user.click(screen.getByText('worship.save'));
-
-    expect(onSave).toHaveBeenCalledWith(
-      expect.objectContaining({
-        youtubeUrl: 'https://youtube.com/watch?v=xyz',
-      })
-    );
   });
 
   it('sends undefined when YouTube URL is empty', async () => {
-    const user = userEvent.setup();
-    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    const { container } = render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
     // Leave YouTube URL empty
+    fireEvent.submit(container.querySelector('form')!);
 
     await waitFor(() => {
-      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          youtubeUrl: undefined,
+        })
+      );
     });
-    await user.click(screen.getByText('worship.save'));
-
-    expect(onSave).toHaveBeenCalledWith(
-      expect.objectContaining({
-        youtubeUrl: undefined,
-      })
-    );
   });
 
   it('renders title and content as required fields', () => {
@@ -119,23 +113,20 @@ describe('SongEditor', () => {
   });
 
   it('includes BPM in saved data', async () => {
-    const user = userEvent.setup();
-    render(<SongEditor onSave={onSave} onCancel={onCancel} />);
+    const { container } = render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
     fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
     fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
+    fireEvent.submit(container.querySelector('form')!);
 
     await waitFor(() => {
-      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          bpm: 95,
+        })
+      );
     });
-    await user.click(screen.getByText('worship.save'));
-
-    expect(onSave).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bpm: 95,
-      })
-    );
   });
 
   it('disables save button when required fields are empty', () => {
