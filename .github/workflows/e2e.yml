@@ -111,3 +111,17 @@ jobs:
           name: playwright-report-emulator
           path: playwright-report/
           retention-days: 14
+
+  # ── Gate job for branch protection (single "e2e-gate" check) ─────────
+  e2e-gate:
+    if: always()
+    needs: [e2e, e2e-emulator]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required jobs
+        run: |
+          if [ "${{ needs.e2e.result }}" != "success" ] || [ "${{ needs.e2e-emulator.result }}" != "success" ]; then
+            echo "Required jobs failed: e2e=${{ needs.e2e.result }}, e2e-emulator=${{ needs.e2e-emulator.result }}"
+            exit 1
+          fi
+          echo "All e2e jobs passed"
