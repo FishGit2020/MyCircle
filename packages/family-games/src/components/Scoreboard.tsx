@@ -84,7 +84,7 @@ function GameScoreCard({ gameType, t }: { gameType: GameType; t: (key: string) =
           <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-3">{t('games.noScores')}</p>
         ) : (
           <>
-            <div className="space-y-1.5">
+            <div className={`space-y-1.5 ${expanded ? 'max-h-[300px] overflow-y-auto' : ''}`}>
               {shown.map((entry, i) => (
                 <div
                   key={entry.id}
