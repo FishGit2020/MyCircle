@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation, createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
+import { useSearchParams } from 'react-router';
 import TableOfContents from './TableOfContents';
 import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
@@ -39,6 +40,9 @@ interface BookReaderProps {
 
 export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack, isAdmin }: BookReaderProps) {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'listen' ? 'listen' : 'read';
+  const autoPlayOnMount = searchParams.get('autoPlay') === '1';
   const viewerRef = useRef<HTMLDivElement>(null);
   const renditionRef = useRef<any>(null);
   const bookRef = useRef<any>(null);
@@ -52,8 +56,19 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [bookmarks, setBookmarks] = useState<BookBookmark[]>([]);
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'read' | 'listen'>('read');
+  const [activeTab, setActiveTab] = useState<'read' | 'listen'>(initialTab);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sync activeTab to URL search param
+  const handleTabChange = useCallback((tab: 'read' | 'listen') => {
+    setActiveTab(tab);
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.set('tab', tab);
+      next.delete('autoPlay');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   // Broadcast listen-tab state so GlobalAudioPlayer can hide itself
   useEffect(() => {
@@ -377,7 +392,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
           type="button"
           role="tab"
           aria-selected={activeTab === 'read'}
-          onClick={() => setActiveTab('read')}
+          onClick={() => handleTabChange('read')}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
             activeTab === 'read'
               ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -390,7 +405,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
           type="button"
           role="tab"
           aria-selected={activeTab === 'listen'}
-          onClick={() => setActiveTab('listen')}
+          onClick={() => handleTabChange('listen')}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
             activeTab === 'listen'
               ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -462,7 +477,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             isAdmin={isAdmin}
           />
           {showAudioPlayer && (
-            <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} />
+            <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} autoPlay={autoPlayOnMount} />
           )}
         </div>
       )}
