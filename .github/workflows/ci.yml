@@ -18,7 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
+  # ── Shared setup: install, check versions, build shared ────────────────
+  setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,23 +39,91 @@ jobs:
       - name: Build shared package
         run: pnpm build:shared
 
-      - name: Typecheck
+      - name: Cache workspace for downstream jobs
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/shared/dist
+          key: workspace-${{ github.sha }}
+
+  # ── Typecheck (parallel with test) ─────────────────────────────────────
+  typecheck:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore workspace
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/shared/dist
+          key: workspace-${{ github.sha }}
+
+      - name: Typecheck all packages
         run: pnpm typecheck:all
 
-      - name: Unit tests with coverage
-        run: pnpm test:coverage && pnpm test:mf
+  # ── Unit tests (parallel with typecheck) ───────────────────────────────
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore workspace
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/shared/dist
+          key: workspace-${{ github.sha }}
+
+      - name: Unit tests
+        run: pnpm test:run --reporter=dot && pnpm test:mf
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
 
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-          retention-days: 14
+  # ── Bundle size report (parallel, non-blocking) ────────────────────────
+  bundle-report:
+    needs: setup
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Build all packages (bundle size analysis)
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore workspace
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/shared/dist
+          key: workspace-${{ github.sha }}
+
+      - name: Build all packages
         run: pnpm build
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
@@ -82,3 +151,17 @@ jobs:
           name: bundle-size-report
           path: bundle-report.md
           retention-days: 30
+
+  # ── Gate job for branch protection (preserves "ci" check name) ─────────
+  ci:
+    if: always()
+    needs: [typecheck, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required jobs
+        run: |
+          if [ "${{ needs.typecheck.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ]; then
+            echo "Required jobs failed: typecheck=${{ needs.typecheck.result }}, test=${{ needs.test.result }}"
+            exit 1
+          fi
+          echo "All required jobs passed"
