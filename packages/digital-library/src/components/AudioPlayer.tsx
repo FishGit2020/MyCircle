@@ -145,7 +145,7 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
       tracks: audioTracks,
     },
     trackIndex: chapterIdx,
-    navigateTo: '/library',
+    navigateTo: bookId ? `/library/${bookId}?tab=listen&autoPlay=1` : '/library',
     progressKey: StorageKeys.BOOK_AUDIO_PROGRESS,
     nowPlayingKey: StorageKeys.BOOK_NOW_PLAYING,
     lastPlayedKey: StorageKeys.BOOK_LAST_PLAYED,
