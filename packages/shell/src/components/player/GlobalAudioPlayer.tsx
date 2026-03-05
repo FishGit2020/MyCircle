@@ -184,6 +184,16 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
     location.pathname === `/podcasts/${source.collection.id}`
   );
 
+  // Hide when BookReader Listen tab is active (keep player alive, just CSS hidden)
+  const [bookListenActive, setBookListenActive] = useState(false);
+  useEffect(() => {
+    function handleBookListenTab(e: Event) {
+      setBookListenActive((e as CustomEvent).detail === true);
+    }
+    window.addEventListener(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, handleBookListenTab);
+    return () => window.removeEventListener(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, handleBookListenTab);
+  }, []);
+
   // Notify Layout when player is active but visually hidden
   useEffect(() => {
     if (source) {
@@ -695,7 +705,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
       <audio ref={audioRef} preload="metadata" className="hidden" />
       {isOnMatchingPage ? null : (
     <div
-      className="podcast-player-slide-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg"
+      className={`podcast-player-slide-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg${bookListenActive ? ' hidden' : ''}`}
       role="region"
       aria-label={t('podcasts.nowPlaying')}
     >

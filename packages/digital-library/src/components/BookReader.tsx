@@ -54,6 +54,14 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState<'read' | 'listen'>('read');
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Broadcast listen-tab state so GlobalAudioPlayer can hide itself
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, { detail: activeTab === 'listen' }));
+    return () => {
+      window.dispatchEvent(new CustomEvent(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, { detail: false }));
+    };
+  }, [activeTab]);
   const spineItemsRef = useRef<Array<{ href: string; index: number }>>([]);
 
   // Initialize EPUB renderer
