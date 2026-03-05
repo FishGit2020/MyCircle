@@ -8,6 +8,10 @@ const GAME_NAME_KEYS: Record<GameType, string> = {
   word: 'games.wordGame',
   memory: 'games.memoryMatch',
   headsup: 'games.headsUp',
+  reaction: 'games.reactionTime',
+  simon: 'games.simonSays',
+  sequence: 'games.numberSequence',
+  colormatch: 'games.colorMatch',
 };
 
 const GAME_ROUTES: Record<GameType, string> = {
@@ -16,6 +20,10 @@ const GAME_ROUTES: Record<GameType, string> = {
   word: '/family-games/word',
   memory: '/family-games/memory',
   headsup: '/family-games/headsup',
+  reaction: '/family-games/reaction',
+  simon: '/family-games/simon',
+  sequence: '/family-games/sequence',
+  colormatch: '/family-games/colormatch',
 };
 
 interface GameOverProps {

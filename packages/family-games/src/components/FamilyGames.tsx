@@ -5,7 +5,7 @@ import GameCard from './GameCard';
 import Scoreboard from './Scoreboard';
 import type { GameType } from './GameCard';
 
-const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup']);
+const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch']);
 
 export default function FamilyGames() {
   const { t } = useTranslation();
@@ -39,6 +39,18 @@ export default function FamilyGames() {
             break;
           case 'headsup':
             mod = await import('./HeadsUpGame');
+            break;
+          case 'reaction':
+            mod = await import('./ReactionGame');
+            break;
+          case 'simon':
+            mod = await import('./SimonGame');
+            break;
+          case 'sequence':
+            mod = await import('./SequenceGame');
+            break;
+          case 'colormatch':
+            mod = await import('./ColorMatchGame');
             break;
           default:
             return;
@@ -141,6 +153,18 @@ export default function FamilyGames() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           }
+        />
+        <GameCard type="reaction" titleKey={'games.reactionTime' as any} descKey={'games.reactionDesc' as any} color="red" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+        />
+        <GameCard type="simon" titleKey={'games.simonSays' as any} descKey={'games.simonDesc' as any} color="yellow" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>}
+        />
+        <GameCard type="sequence" titleKey={'games.numberSequence' as any} descKey={'games.sequenceDesc' as any} color="teal" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>}
+        />
+        <GameCard type="colormatch" titleKey={'games.colorMatch' as any} descKey={'games.colorMatchDesc' as any} color="rose" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>}
         />
       </div>
 
