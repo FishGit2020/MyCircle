@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useTranslation, parseVerseReference } from '@mycircle/shared';
+import { useTranslation, parseVerseReference, PageContent } from '@mycircle/shared';
 import { WidgetDashboard } from '../components/widgets';
 import QuickAccessTiles from '../components/layout/QuickAccessTiles';
 import { useCuratedVerse } from '../hooks/useCuratedVerse';
@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { verse, verseFragments, loading } = useCuratedVerse();
 
   return (
-    <div className="space-y-6">
+    <PageContent className="space-y-6">
       {/* Hero section */}
       <section className="text-center mb-2">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
@@ -77,6 +77,6 @@ export default function DashboardPage() {
 
       {/* Desktop Quick Access Tiles */}
       <QuickAccessTiles />
-    </div>
+    </PageContent>
   );
 }

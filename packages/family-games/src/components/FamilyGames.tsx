@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useTranslation, WindowEvents } from '@mycircle/shared';
+import { useTranslation, WindowEvents, PageContent } from '@mycircle/shared';
 import GameCard from './GameCard';
 import Scoreboard from './Scoreboard';
 import type { GameType } from './GameCard';
@@ -101,14 +101,14 @@ export default function FamilyGames() {
   // Show active game if URL has a valid game type
   if (gameType && VALID_GAMES.has(gameType) && GameComponent) {
     return (
-      <div className="pb-20 md:pb-8">
+      <PageContent>
         <GameComponent onBack={handleBack} />
-      </div>
+      </PageContent>
     );
   }
 
   return (
-    <div className="pb-20 md:pb-8 space-y-6">
+    <PageContent className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
           {t('games.title')}
@@ -202,6 +202,6 @@ export default function FamilyGames() {
 
       {/* Scoreboard */}
       <Scoreboard />
-    </div>
+    </PageContent>
   );
 }

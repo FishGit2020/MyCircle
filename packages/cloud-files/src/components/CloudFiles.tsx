@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation, WindowEvents } from '@mycircle/shared';
+import { useTranslation, WindowEvents, PageContent } from '@mycircle/shared';
 import { useFiles } from '../hooks/useFiles';
 import { useSharedFiles } from '../hooks/useSharedFiles';
 import FileUpload from './FileUpload';
@@ -64,7 +64,7 @@ export default function CloudFiles() {
   const currentError = tab === 'my' ? error : sharedError;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 pb-20 md:pb-8">
+    <PageContent maxWidth="5xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('cloudFiles.title')}</h1>
@@ -146,6 +146,6 @@ export default function CloudFiles() {
           )}
         </>
       )}
-    </div>
+    </PageContent>
   );
 }

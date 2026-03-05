@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+
+vi.mock('@mycircle/shared', () => ({
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
+
 import ImmigrationTracker from './ImmigrationTracker';
 
 // Mock hooks

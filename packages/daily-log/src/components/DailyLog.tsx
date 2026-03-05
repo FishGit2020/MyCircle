@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, PageContent } from '@mycircle/shared';
 import { useDailyLogEntries } from '../hooks/useDailyLogEntries';
 import { getLocalDateString } from '../utils/localDate';
 import EntryForm from './EntryForm';
@@ -64,7 +64,7 @@ export default function DailyLog() {
 
   if (!authChecked || loading) {
     return (
-      <div className="pb-20 md:pb-8">
+      <PageContent>
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('dailyLog.title')}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('dailyLog.subtitle')}</p>
@@ -72,21 +72,21 @@ export default function DailyLog() {
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
         </div>
-      </div>
+      </PageContent>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="pb-20 md:pb-8">
+      <PageContent>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('dailyLog.title')}</h1>
         <p className="text-gray-500 dark:text-gray-400">{t('dailyLog.signInRequired')}</p>
-      </div>
+      </PageContent>
     );
   }
 
   return (
-    <div className="pb-20 md:pb-8">
+    <PageContent>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('dailyLog.title')}</h1>
@@ -157,6 +157,6 @@ export default function DailyLog() {
         onDelete={deleteEntry}
         onMoveEntry={moveEntry}
       />
-    </div>
+    </PageContent>
   );
 }

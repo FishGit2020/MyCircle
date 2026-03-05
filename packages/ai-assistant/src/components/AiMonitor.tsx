@@ -1,4 +1,4 @@
-import { useTranslation, useQuery, GET_AI_USAGE_SUMMARY, GET_OLLAMA_STATUS, GET_AI_RECENT_LOGS } from '@mycircle/shared';
+import { useTranslation, useQuery, GET_AI_USAGE_SUMMARY, GET_OLLAMA_STATUS, GET_AI_RECENT_LOGS, PageContent } from '@mycircle/shared';
 import MonitorUsageStats from './MonitorUsageStats';
 import MonitorCharts from './MonitorCharts';
 import MonitorOllamaStatus from './MonitorOllamaStatus';
@@ -26,13 +26,13 @@ export default function AiMonitor() {
   const logs = logsData?.aiRecentLogs;
 
   return (
-    <div className="flex-1 overflow-y-auto space-y-6 pb-20 md:pb-8">
+    <PageContent className="space-y-6">
       <p className="text-xs text-gray-400 dark:text-gray-500">{t('ai.monitor.last7days')}</p>
 
       <MonitorUsageStats usage={usage} loading={usageLoading} />
       <MonitorCharts dailyBreakdown={usage?.dailyBreakdown} />
       <MonitorOllamaStatus status={status} />
       <MonitorRecentLogs logs={logs} loading={logsLoading} />
-    </div>
+    </PageContent>
   );
 }

@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+vi.mock('@mycircle/shared', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
+
 import AddCaseForm from './AddCaseForm';
 
 describe('AddCaseForm', () => {

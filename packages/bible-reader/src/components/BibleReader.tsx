@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-import { useTranslation, StorageKeys, WindowEvents, getDailyDevotional, parseVerseReference } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, getDailyDevotional, parseVerseReference, PageContent } from '@mycircle/shared';
 import { useVotd, useBiblePassage, useBibleVersions, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
 
@@ -715,7 +715,7 @@ export default function BibleReader() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageContent className="space-y-6">
       <VotdSection onReadChapter={handleDevotionalRead} />
       <DailyDevotional onRead={handleDevotionalRead} />
 
@@ -810,6 +810,6 @@ export default function BibleReader() {
       <p className="text-xs text-center text-gray-400 dark:text-gray-500">
         {t('bible.attributionYouVersion')}
       </p>
-    </div>
+    </PageContent>
   );
 }

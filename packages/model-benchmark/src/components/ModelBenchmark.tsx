@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, PageContent } from '@mycircle/shared';
 import BenchmarkRunner from './BenchmarkRunner';
 import EndpointManager from './EndpointManager';
 import ResultsDashboard from './ResultsDashboard';
@@ -62,7 +62,7 @@ export default function ModelBenchmark() {
   const busy = running || scoring;
 
   return (
-    <div className="max-w-4xl mx-auto pb-20 md:pb-8">
+    <PageContent maxWidth="4xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('benchmark.title')}</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('benchmark.subtitle')}</p>
@@ -108,6 +108,6 @@ export default function ModelBenchmark() {
         {activeTab === 'results' && <ResultsDashboard results={latestResults} saved={saved} saveError={saveError} onClear={handleClearResults} />}
         {activeTab === 'history' && <BenchmarkHistory />}
       </div>
-    </div>
+    </PageContent>
   );
 }

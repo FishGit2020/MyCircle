@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+
+vi.mock('@mycircle/shared', () => ({
+  useLazyQuery: vi.fn().mockReturnValue([vi.fn(), { loading: false, data: null }]),
+  CHECK_CASE_STATUS: 'CHECK_CASE_STATUS',
+}));
+
 import { useLazyQuery } from '@mycircle/shared';
 import { useCaseStatus } from './useCaseStatus';
 

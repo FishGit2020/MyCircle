@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PageContent } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { UseMyLocation, CitySearchWrapper, FavoriteCities } from '../components/widgets';
 import { UnitToggle, SpeedToggle } from '../components/settings';
@@ -9,7 +9,7 @@ export default function WeatherLandingPage() {
   const { user, recentCities, favoriteCities } = useAuth();
 
   return (
-    <div className="space-y-8">
+    <PageContent className="space-y-8">
       {/* Hero section with search */}
       <section className="text-center mb-4">
         <div className="flex justify-end gap-2 mb-2">
@@ -78,6 +78,6 @@ export default function WeatherLandingPage() {
           </div>
         </section>
       )}
-    </div>
+    </PageContent>
   );
 }

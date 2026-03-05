@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+
+vi.mock('@mycircle/shared', () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
+
 import CaseCard from './CaseCard';
 import type { ImmigrationCase, CaseStatus } from '../types';
 

@@ -5,6 +5,7 @@ import FlashCards from './FlashCards';
 
 // Mock @mycircle/shared
 vi.mock('@mycircle/shared', () => ({
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: { language: 'en' },

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router';
-import { useTranslation, WindowEvents } from '@mycircle/shared';
+import { useTranslation, WindowEvents, PageContent } from '@mycircle/shared';
 import { useNotes } from '../hooks/useNotes';
 import { usePublicNotes } from '../hooks/usePublicNotes';
 import NoteList from './NoteList';
@@ -135,7 +135,7 @@ export default function Notebook() {
   ];
 
   return (
-    <div className="space-y-4">
+    <PageContent className="space-y-4">
       {/* Tab bar */}
       <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700" role="tablist" aria-label={t('notebook.title')}>
         {tabItems.map(({ key, label }) => (
@@ -172,6 +172,6 @@ export default function Notebook() {
         onDelete={handleDelete}
         isPublicView={tab === 'public'}
       />
-    </div>
+    </PageContent>
   );
 }

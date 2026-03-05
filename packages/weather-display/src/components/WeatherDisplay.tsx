@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
-import { useWeatherData, useHistoricalWeather, useAirQuality, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys, REVERSE_GEOCODE, useLazyQuery } from '@mycircle/shared';
+import { useWeatherData, useHistoricalWeather, useAirQuality, subscribeToMFEvent, MFEvents, CitySelectedEvent, useTranslation, StorageKeys, REVERSE_GEOCODE, useLazyQuery, PageContent } from '@mycircle/shared';
 import CurrentWeather from './CurrentWeatherV1';
 import Forecast from './Forecast';
 import HourlyForecast from './HourlyForecast';
@@ -173,7 +173,7 @@ export default function WeatherDisplay() {
   }
 
   return (
-    <div className="weather-display-container space-y-6 animate-fadeIn" aria-live="polite">
+    <PageContent className="weather-display-container space-y-6 animate-fadeIn" aria-live="polite">
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{cityName}</h2>
@@ -277,6 +277,6 @@ export default function WeatherDisplay() {
           {t('mfe.weatherDisplay')}
         </span>
       </div>
-    </div>
+    </PageContent>
   );
 }

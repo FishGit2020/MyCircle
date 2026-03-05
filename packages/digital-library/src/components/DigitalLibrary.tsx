@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation, WindowEvents, createLogger } from '@mycircle/shared';
+import { useTranslation, WindowEvents, createLogger, PageContent } from '@mycircle/shared';
 import BookReader from './BookReader';
 import { useParams, useNavigate } from 'react-router';
 
@@ -355,7 +355,7 @@ export default function DigitalLibrary() {
   }
 
   return (
-    <div className="pb-20 md:pb-8">
+    <PageContent>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('library.title')}</h2>
       </div>
@@ -387,6 +387,6 @@ export default function DigitalLibrary() {
           ))}
         </div>
       )}
-    </div>
+    </PageContent>
   );
 }

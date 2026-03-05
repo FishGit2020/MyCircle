@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference, PageContent } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
@@ -109,7 +109,7 @@ export default function BabyTracker() {
   const isValidPregnancy = currentWeek !== null && currentWeek >= 1 && currentWeek <= 40;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <PageContent maxWidth="2xl" className="space-y-6">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2">
@@ -469,6 +469,6 @@ export default function BabyTracker() {
           </div>
         </section>
       )}
-    </div>
+    </PageContent>
   );
 }
