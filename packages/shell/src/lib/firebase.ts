@@ -86,7 +86,7 @@ if (firebaseEnabled) {
         log.warn('Auth emulator already connected:', e);
       }
       // Expose test helper for emulator e2e auth tests
-      (window as any).__signInForTest = (email: string, password: string) =>
+      window.__signInForTest = (email: string, password: string) =>
         signInWithEmailAndPassword(auth!, email, password);
     }
   }
@@ -1469,13 +1469,13 @@ window.__digitalLibraryApiBase = () => {
 };
 
 // Expose admin status for MFEs (set via AuthContext when profile loads)
-(window as Record<string, unknown>).__isAdmin = false;
+window.__isAdmin = false;
 
 // Expose current user uid for MFEs
 window.__currentUid = auth?.currentUser?.uid ?? null;
 if (auth) {
   onAuthStateChanged(auth, (user) => {
-    (window as Record<string, unknown>).__currentUid = user?.uid ?? null;
+    window.__currentUid = user?.uid ?? null;
   });
 }
 
@@ -1489,7 +1489,7 @@ if (db && auth) {
   const gamesDb = db;
   const gamesAuth = auth;
 
-  (window as any).__familyGames = {
+  window.__familyGames = {
     async getScores(gameType: string) {
       const scoresRef = collection(gamesDb, 'games', 'scores', gameType);
       const q = query(scoresRef, orderBy('score', 'desc'), limit(20));

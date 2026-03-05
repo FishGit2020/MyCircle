@@ -7,7 +7,7 @@ describe('platform utilities', () => {
   afterEach(() => {
     // Restore original state
     if (originalCapacitor === undefined) {
-      delete (window as any).Capacitor;
+      delete window.Capacitor;
     } else {
       window.Capacitor = originalCapacitor;
     }
@@ -15,7 +15,7 @@ describe('platform utilities', () => {
 
   describe('isNativePlatform', () => {
     it('returns false when window.Capacitor is absent', () => {
-      delete (window as any).Capacitor;
+      delete window.Capacitor;
       expect(isNativePlatform()).toBe(false);
     });
 
@@ -40,7 +40,7 @@ describe('platform utilities', () => {
 
   describe('getPlatform', () => {
     it('returns "web" when window.Capacitor is absent', () => {
-      delete (window as any).Capacitor;
+      delete window.Capacitor;
       expect(getPlatform()).toBe('web');
     });
 
@@ -74,7 +74,7 @@ describe('platform utilities', () => {
 
   describe('isPluginAvailable', () => {
     it('returns false when window.Capacitor is absent', () => {
-      delete (window as any).Capacitor;
+      delete window.Capacitor;
       expect(isPluginAvailable('StatusBar')).toBe(false);
     });
 

@@ -23,7 +23,7 @@ describe('RequireAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthState = { user: null, loading: false, signIn: mockSignIn };
-    delete (window as any).__getFirebaseIdToken;
+    delete window.__getFirebaseIdToken;
   });
 
   it('shows loading when auth is loading', () => {
@@ -45,7 +45,7 @@ describe('RequireAuth', () => {
   });
 
   it('renders children when token bridge returns token', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
     render(<RequireAuth><div>Protected</div></RequireAuth>);
     await waitFor(() => {
       expect(screen.getByText('Protected')).toBeInTheDocument();

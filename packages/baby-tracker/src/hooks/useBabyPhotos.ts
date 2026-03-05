@@ -4,16 +4,6 @@ import { compressImage } from '../utils/compressImage';
 
 const logger = createLogger('useBabyPhotos');
 
-declare global {
-  interface Window {
-    __babyPhotos?: {
-      upload: (stageId: number, file: Blob, caption?: string) => Promise<string>;
-      getAll: () => Promise<Array<{ id: string; photoUrl: string; caption?: string; uploadedAt?: any }>>;
-      delete: (stageId: number) => Promise<void>;
-    };
-    __getFirebaseIdToken?: () => Promise<string | null>;
-  }
-}
 
 export interface MilestonePhotoData {
   photoUrl: string;

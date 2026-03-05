@@ -5,33 +5,6 @@ import { phrases } from '../data/phrases';
 
 const log = createLogger('flashcards');
 
-declare global {
-  interface Window {
-    __chineseCharacters?: {
-      getAll: () => Promise<Array<{ id: string; character: string; pinyin: string; meaning: string; category: string }>>;
-      add: (char: Record<string, any>) => Promise<string>;
-      update: (id: string, updates: Record<string, any>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-      subscribe: (callback: (chars: any[]) => void) => () => void;
-    };
-    __flashcards?: {
-      getAll: () => Promise<any[]>;
-      add: (card: Record<string, any>) => Promise<string>;
-      addBatch: (cards: Array<Record<string, any>>) => Promise<void>;
-      update: (id: string, updates: Record<string, any>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-      subscribe: (callback: (cards: any[]) => void) => () => void;
-      getProgress: () => Promise<any>;
-      updateProgress: (progress: Record<string, any>) => Promise<void>;
-      getAllPublic: () => Promise<any[]>;
-      subscribePublic: (callback: (cards: any[]) => void) => () => void;
-      publish: (card: Record<string, any>) => Promise<string>;
-      deletePublic: (id: string) => Promise<void>;
-      migrateChineseToPublic: () => Promise<void>;
-    };
-    __getFirebaseIdToken?: () => Promise<string | null>;
-  }
-}
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   try {

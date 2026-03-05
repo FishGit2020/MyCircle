@@ -3,14 +3,6 @@
 const RECAPTCHA_SITE_KEY = (typeof process !== 'undefined' && process.env?.VITE_RECAPTCHA_SITE_KEY) || '6Lcvm2ksAAAAAPQ63bPl94XAfS2gTn2Fu4zMmT4f';
 const LOAD_TIMEOUT_MS = 5000;
 
-declare global {
-  interface Window {
-    grecaptcha?: {
-      ready(callback: () => void): void;
-      execute(siteKey: string, options: { action: string }): Promise<string>;
-    };
-  }
-}
 
 /**
  * Waits for the reCAPTCHA script to load (polls for window.grecaptcha).

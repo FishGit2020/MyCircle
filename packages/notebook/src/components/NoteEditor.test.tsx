@@ -22,7 +22,7 @@ describe('NoteEditor', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (window as any).__logAnalyticsEvent = vi.fn();
+    window.__logAnalyticsEvent = vi.fn();
   });
 
   it('renders empty form for new note', () => {
@@ -123,7 +123,7 @@ describe('NoteEditor', () => {
     fireEvent.change(screen.getByLabelText('notebook.noteTitle'), { target: { value: 'Title' } });
     fireEvent.submit(screen.getByRole('button', { name: 'notebook.save' }));
     await waitFor(() => {
-      expect((window as any).__logAnalyticsEvent).toHaveBeenCalledWith('note_save', { is_new: true });
+      expect(window.__logAnalyticsEvent).toHaveBeenCalledWith('note_save', { is_new: true });
     });
   });
 });

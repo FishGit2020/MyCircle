@@ -13,7 +13,7 @@ interface CloudFilesApi {
 }
 
 function getApi(): CloudFilesApi | null {
-  return (window as any).__cloudFiles ?? null;
+  return window.__cloudFiles ?? null;
 }
 
 export function useFiles() {

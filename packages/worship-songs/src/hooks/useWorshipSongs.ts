@@ -4,20 +4,6 @@ import type { WorshipSong } from '../types';
 
 const logger = createLogger('useWorshipSongs');
 
-// The shell exposes these on the window object
-declare global {
-  interface Window {
-    __getFirebaseIdToken?: () => Promise<string | null>;
-    __worshipSongs?: {
-      getAll: () => Promise<WorshipSong[]>;
-      get: (id: string) => Promise<WorshipSong | null>;
-      add: (song: Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
-      update: (id: string, updates: Partial<WorshipSong>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-      subscribe?: (callback: (songs: WorshipSong[]) => void) => () => void;
-    };
-  }
-}
 
 function getCachedSongs(): WorshipSong[] {
   try {

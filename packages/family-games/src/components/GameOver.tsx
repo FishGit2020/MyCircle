@@ -34,7 +34,7 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
   const [error, setError] = useState(false);
 
   const handleSubmitScore = async () => {
-    const api = (window as any).__familyGames;
+    const api = window.__familyGames;
     if (!api?.saveScore) return;
 
     setSubmitting(true);

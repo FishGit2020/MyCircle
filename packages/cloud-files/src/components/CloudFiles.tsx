@@ -18,7 +18,7 @@ export default function CloudFiles() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = await (window as any).__getFirebaseIdToken?.();
+        const token = await window.__getFirebaseIdToken?.();
         setIsAuthenticated(!!token);
       } catch { setIsAuthenticated(false); }
     };
@@ -26,7 +26,7 @@ export default function CloudFiles() {
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
     return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
   }, []);
-  const hasApi = typeof (window as any).__cloudFiles !== 'undefined';
+  const hasApi = typeof window.__cloudFiles !== 'undefined';
 
   const handleUpload = useCallback(async (file: File) => {
     window.__logAnalyticsEvent?.('file_upload', { file_type: file.type, file_size: file.size });

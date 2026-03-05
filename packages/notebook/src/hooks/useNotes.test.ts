@@ -24,11 +24,11 @@ describe('useNotes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    delete (window as any).__notebook;
+    delete window.__notebook;
   });
 
   afterEach(() => {
-    delete (window as any).__notebook;
+    delete window.__notebook;
   });
 
   it('returns empty notes and stops loading when no API', async () => {
@@ -39,7 +39,7 @@ describe('useNotes', () => {
   });
 
   it('loads notes via getAll when no subscribe', async () => {
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: vi.fn().mockResolvedValue(mockNotes),
       add: vi.fn(),
       update: vi.fn(),
@@ -53,7 +53,7 @@ describe('useNotes', () => {
 
   it('uses subscribe when available', async () => {
     const unsubscribe = vi.fn();
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: vi.fn(),
       add: vi.fn(),
       update: vi.fn(),
@@ -73,7 +73,7 @@ describe('useNotes', () => {
 
   it('saves new note via add', async () => {
     const addFn = vi.fn().mockResolvedValue('new-id');
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: vi.fn().mockResolvedValue([]),
       add: addFn,
       update: vi.fn(),
@@ -90,7 +90,7 @@ describe('useNotes', () => {
 
   it('updates existing note via update', async () => {
     const updateFn = vi.fn().mockResolvedValue(undefined);
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: updateFn,
@@ -107,7 +107,7 @@ describe('useNotes', () => {
 
   it('deletes note', async () => {
     const deleteFn = vi.fn().mockResolvedValue(undefined);
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: vi.fn(),
@@ -123,7 +123,7 @@ describe('useNotes', () => {
   });
 
   it('handles error during load', async () => {
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: vi.fn().mockRejectedValue(new Error('Load failed')),
       add: vi.fn(),
       update: vi.fn(),
@@ -143,7 +143,7 @@ describe('useNotes', () => {
   });
 
   it('caches note count in localStorage', async () => {
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: vi.fn().mockResolvedValue(mockNotes),
       add: vi.fn(),
       update: vi.fn(),
@@ -158,7 +158,7 @@ describe('useNotes', () => {
 
   it('reloads notes on NOTEBOOK_CHANGED event when no subscribe', async () => {
     const getAllFn = vi.fn().mockResolvedValue(mockNotes);
-    (window as any).__notebook = {
+    window.__notebook = {
       getAll: getAllFn,
       add: vi.fn(),
       update: vi.fn(),

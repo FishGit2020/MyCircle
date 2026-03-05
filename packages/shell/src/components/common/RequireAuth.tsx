@@ -17,7 +17,7 @@ export default function RequireAuth({ children }: Props) {
     let mounted = true;
     const check = async () => {
       try {
-        const token = await (window as any).__getFirebaseIdToken?.();
+        const token = await window.__getFirebaseIdToken?.();
         if (mounted) setHasToken(!!token);
       } catch {
         if (mounted) setHasToken(false);

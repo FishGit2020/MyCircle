@@ -2,11 +2,6 @@ import React, { useState } from 'react';
 import { useTranslation } from '../i18n';
 import { useEndpoints } from '../hooks/useEndpoints';
 
-declare global {
-  interface Window {
-    __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
-  }
-}
 
 interface EndpointManagerProps {
   source: 'chat' | 'benchmark';

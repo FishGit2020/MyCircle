@@ -6,15 +6,6 @@
  * for web users where Capacitor is absent.
  */
 
-declare global {
-  interface Window {
-    Capacitor?: {
-      isNativePlatform: () => boolean;
-      getPlatform: () => string;
-      isPluginAvailable: (name: string) => boolean;
-    };
-  }
-}
 
 /** Returns `true` when running inside a Capacitor native shell (iOS/Android). */
 export function isNativePlatform(): boolean {

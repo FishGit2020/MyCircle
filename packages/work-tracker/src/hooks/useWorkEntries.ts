@@ -3,18 +3,6 @@ import { WindowEvents } from '@mycircle/shared';
 import type { WorkEntry } from '../types';
 import { getLocalDateString } from '../utils/localDate';
 
-declare global {
-  interface Window {
-    __workTracker?: {
-      getAll: () => Promise<WorkEntry[]>;
-      add: (entry: { date: string; content: string }) => Promise<string>;
-      update: (id: string, updates: Partial<{ content: string; date: string }>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-      subscribe?: (callback: (entries: WorkEntry[]) => void) => () => void;
-    };
-    __getFirebaseIdToken?: () => Promise<string | null>;
-  }
-}
 
 export function useWorkEntries() {
   const [entries, setEntries] = useState<WorkEntry[]>([]);

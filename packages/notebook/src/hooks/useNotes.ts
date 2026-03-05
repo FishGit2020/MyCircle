@@ -25,7 +25,7 @@ export function useNotes() {
     return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
   }, []);
 
-  const api = (window as any).__notebook as NotebookAPI | undefined;
+  const api = window.__notebook as NotebookAPI | undefined;
 
   const loadNotes = useCallback(async () => {
     if (!api) {

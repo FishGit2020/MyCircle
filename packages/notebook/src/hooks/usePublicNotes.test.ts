@@ -18,11 +18,11 @@ const mockPublicNotes = [
 describe('usePublicNotes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    delete (window as any).__notebook;
+    delete window.__notebook;
   });
 
   afterEach(() => {
-    delete (window as any).__notebook;
+    delete window.__notebook;
   });
 
   it('returns empty when no API', async () => {
@@ -32,7 +32,7 @@ describe('usePublicNotes', () => {
   });
 
   it('loads public notes via getAllPublic', async () => {
-    (window as any).__notebook = {
+    window.__notebook = {
       getAllPublic: vi.fn().mockResolvedValue(mockPublicNotes),
     };
     const { result } = renderHook(() => usePublicNotes());
@@ -41,7 +41,7 @@ describe('usePublicNotes', () => {
 
   it('uses subscribePublic when available', async () => {
     const unsub = vi.fn();
-    (window as any).__notebook = {
+    window.__notebook = {
       getAllPublic: vi.fn(),
       subscribePublic: vi.fn((cb: any) => {
         setTimeout(() => cb(mockPublicNotes), 10);
@@ -56,7 +56,7 @@ describe('usePublicNotes', () => {
 
   it('publishes a note', async () => {
     const publishFn = vi.fn().mockResolvedValue('pub-id');
-    (window as any).__notebook = {
+    window.__notebook = {
       getAllPublic: vi.fn().mockResolvedValue([]),
       publish: publishFn,
     };
@@ -70,7 +70,7 @@ describe('usePublicNotes', () => {
 
   it('updates a public note', async () => {
     const updateFn = vi.fn().mockResolvedValue(undefined);
-    (window as any).__notebook = {
+    window.__notebook = {
       getAllPublic: vi.fn().mockResolvedValue([]),
       updatePublic: updateFn,
     };
@@ -84,7 +84,7 @@ describe('usePublicNotes', () => {
 
   it('deletes a public note', async () => {
     const deleteFn = vi.fn().mockResolvedValue(undefined);
-    (window as any).__notebook = {
+    window.__notebook = {
       getAllPublic: vi.fn().mockResolvedValue([]),
       deletePublic: deleteFn,
     };
@@ -97,7 +97,7 @@ describe('usePublicNotes', () => {
   });
 
   it('handles error during load', async () => {
-    (window as any).__notebook = {
+    window.__notebook = {
       getAllPublic: vi.fn().mockRejectedValue(new Error('Network error')),
     };
     const { result } = renderHook(() => usePublicNotes());
@@ -114,7 +114,7 @@ describe('usePublicNotes', () => {
 
   it('reloads on PUBLIC_NOTES_CHANGED event when no subscribe', async () => {
     const getAllFn = vi.fn().mockResolvedValue(mockPublicNotes);
-    (window as any).__notebook = { getAllPublic: getAllFn };
+    window.__notebook = { getAllPublic: getAllFn };
     renderHook(() => usePublicNotes());
     await waitFor(() => expect(getAllFn).toHaveBeenCalledTimes(1));
     act(() => { window.dispatchEvent(new Event('public-notes-changed')); });

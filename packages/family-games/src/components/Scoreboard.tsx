@@ -48,7 +48,7 @@ function GameScoreCard({ gameType, t }: { gameType: GameType; t: (key: string) =
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    const api = (window as any).__familyGames;
+    const api = window.__familyGames;
     if (api?.getScores) {
       api.getScores(gameType).then((data: ScoreEntry[]) => {
         setScores(data);

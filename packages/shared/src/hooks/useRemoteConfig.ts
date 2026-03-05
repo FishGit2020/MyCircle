@@ -1,10 +1,5 @@
 import { useState, useEffect } from 'react';
 
-declare global {
-  interface Window {
-    __REMOTE_CONFIG__?: Record<string, string>;
-  }
-}
 
 /**
  * Reads Firebase Remote Config values from window.__REMOTE_CONFIG__.
