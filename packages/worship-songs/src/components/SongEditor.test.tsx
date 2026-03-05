@@ -27,6 +27,16 @@ const baseSong: WorshipSong = {
   updatedAt: { seconds: 1700000000, nanoseconds: 0 },
 };
 
+/** Fill required fields via fireEvent.change, then wait for React to flush state */
+async function fillRequiredFields() {
+  fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
+  fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+  // Wait for React 18 batched state to flush — button becomes enabled
+  await waitFor(() => {
+    expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+  });
+}
+
 describe('SongEditor', () => {
   const onSave = vi.fn().mockResolvedValue(undefined);
   const onCancel = vi.fn();
@@ -51,8 +61,7 @@ describe('SongEditor', () => {
   it('includes YouTube URL in saved data', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    await fillRequiredFields();
     fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
@@ -68,8 +77,7 @@ describe('SongEditor', () => {
   it('sends undefined when YouTube URL is empty', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    await fillRequiredFields();
     // Leave YouTube URL empty
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
@@ -115,8 +123,7 @@ describe('SongEditor', () => {
   it('includes BPM in saved data', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    await fillRequiredFields();
     fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
@@ -150,11 +157,10 @@ describe('SongEditor', () => {
     expect(titleInput).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('hides helper text when all required fields are filled', () => {
+  it('hides helper text when all required fields are filled', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
-    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    await fillRequiredFields();
 
     expect(screen.queryByText('worship.fillRequiredFields')).not.toBeInTheDocument();
     expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
