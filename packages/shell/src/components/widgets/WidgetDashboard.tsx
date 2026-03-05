@@ -1001,6 +1001,35 @@ const ImmigrationWidget = React.memo(function ImmigrationWidget() {
 
 const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
   const { t } = useTranslation();
+  const [bookmarkCount, setBookmarkCount] = React.useState(0);
+  const [lastRead, setLastRead] = React.useState('');
+
+  useEffect(() => {
+    function load() {
+      try {
+        const raw = localStorage.getItem(StorageKeys.BOOK_BOOKMARKS);
+        if (raw) {
+          const all = JSON.parse(raw);
+          setBookmarkCount(Array.isArray(all) ? all.length : 0);
+        }
+      } catch { /* ignore */ }
+      try {
+        const raw = localStorage.getItem(StorageKeys.BOOK_LAST_PLAYED);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (data.bookTitle) setLastRead(data.bookTitle);
+        }
+      } catch { /* ignore */ }
+    }
+    load();
+    window.addEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, load);
+    window.addEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, load);
+    return () => {
+      window.removeEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, load);
+      window.removeEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, load);
+    };
+  }, []);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -1014,12 +1043,42 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.digitalLibraryDesc')}</p>
         </div>
       </div>
+      {lastRead && (
+        <p className="text-xs text-indigo-600 dark:text-indigo-400/70 truncate">
+          {t('widgets.lastRead' as any).replace('{title}', lastRead)}
+        </p>
+      )}
+      {bookmarkCount > 0 && (
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          {t('widgets.bookBookmarks' as any).replace('{count}', String(bookmarkCount))}
+        </p>
+      )}
     </div>
   );
 });
 
 const FamilyGamesWidget = React.memo(function FamilyGamesWidget() {
   const { t } = useTranslation();
+  const [totalGames, setTotalGames] = React.useState(0);
+
+  useEffect(() => {
+    const api = window.__familyGames;
+    if (!api?.getScores) return;
+    const gameTypes = ['trivia', 'math', 'word', 'memory', 'headsup'];
+    let total = 0;
+    let done = 0;
+    gameTypes.forEach(gt => {
+      api.getScores(gt).then((scores: any[]) => {
+        total += scores.length;
+        done++;
+        if (done === gameTypes.length) setTotalGames(total);
+      }).catch(() => {
+        done++;
+        if (done === gameTypes.length) setTotalGames(total);
+      });
+    });
+  }, []);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -1033,6 +1092,11 @@ const FamilyGamesWidget = React.memo(function FamilyGamesWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.familyGamesDesc')}</p>
         </div>
       </div>
+      {totalGames > 0 && (
+        <p className="text-xs text-fuchsia-600 dark:text-fuchsia-400/70">
+          {t('widgets.gamesPlayed' as any).replace('{count}', String(totalGames))}
+        </p>
+      )}
     </div>
   );
 });
