@@ -11,12 +11,12 @@ export default defineConfig({
   testDir: './e2e/integration',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: 1,
+  retries: 0,
   workers: 1, // serial to avoid rate-limiting external APIs
   reporter: [['html', { outputFolder: 'playwright-report-integration' }]],
-  timeout: 30_000,
+  timeout: 15_000,
   use: {
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
   },
   projects: [
     {
