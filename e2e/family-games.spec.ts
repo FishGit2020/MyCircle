@@ -15,10 +15,9 @@ test.describe('Family Games', () => {
   });
 
   test('shows page title or loading state', async ({ page }) => {
-    // MFE loads asynchronously — either the title appears or loading state is visible
+    // MFE loads asynchronously — check that the heading eventually appears
     const title = page.getByRole('heading', { name: /family games|juegos|游戏/i }).first();
-    const loading = page.getByText(/loading/i).first();
-    await expect(title.or(loading)).toBeVisible({ timeout: 20_000 });
+    await expect(title).toBeVisible({ timeout: 20_000 });
   });
 
   test('shows game selector grid', async ({ page }) => {

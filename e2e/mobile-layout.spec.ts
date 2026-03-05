@@ -5,9 +5,9 @@ test.describe('Mobile layout', () => {
 
   test('header does not overflow viewport width', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
     const header = page.locator('header');
+    await expect(header).toBeVisible();
+
     const headerBox = await header.boundingBox();
     expect(headerBox).not.toBeNull();
     // Header should not extend beyond viewport width
@@ -17,9 +17,9 @@ test.describe('Mobile layout', () => {
 
   test('bottom nav does not overflow viewport width', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
     const nav = page.locator('nav[aria-label="Bottom navigation"]');
+    await expect(nav).toBeVisible();
+
     const navBox = await nav.boundingBox();
     expect(navBox).not.toBeNull();
     expect(navBox!.x).toBeGreaterThanOrEqual(0);
@@ -28,7 +28,8 @@ test.describe('Mobile layout', () => {
 
   test('page has no horizontal scrollbar', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    const header = page.locator('header');
+    await expect(header).toBeVisible();
 
     const hasHorizontalScroll = await page.evaluate(() => {
       return document.documentElement.scrollWidth > document.documentElement.clientWidth;
@@ -38,10 +39,9 @@ test.describe('Mobile layout', () => {
 
   test('header is fully visible without scrolling', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
     const header = page.locator('header');
     await expect(header).toBeVisible();
+
     const headerBox = await header.boundingBox();
     expect(headerBox).not.toBeNull();
     // Header top should be at or near 0 (visible)
@@ -50,10 +50,9 @@ test.describe('Mobile layout', () => {
 
   test('bottom nav is visible at bottom of viewport', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
     const nav = page.locator('nav[aria-label="Bottom navigation"]');
     await expect(nav).toBeVisible();
+
     const navBox = await nav.boundingBox();
     expect(navBox).not.toBeNull();
     // Bottom nav should be within viewport

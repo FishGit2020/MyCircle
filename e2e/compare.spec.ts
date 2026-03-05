@@ -32,8 +32,8 @@ test.describe('Weather Compare', () => {
 
     await page.goto('/weather/51.5074,-0.1278?name=London');
 
-    // Wait for weather to load
-    await expect(page.getByText('London')).toBeVisible({ timeout: 15_000 });
+    // Wait for weather to load (use heading to avoid strict mode with breadcrumb)
+    await expect(page.getByRole('heading', { name: 'London' })).toBeVisible({ timeout: 15_000 });
 
     // Should have a "Compare Weather" expandable button
     await expect(page.getByRole('button', { name: /Compare Weather/i })).toBeVisible({ timeout: 5_000 });
