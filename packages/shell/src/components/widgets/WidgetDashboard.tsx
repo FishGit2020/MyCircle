@@ -571,7 +571,7 @@ const BabyTrackerWidget = React.memo(function BabyTrackerWidget() {
               <button
                 key={cat}
                 type="button"
-                onClick={(e) => { e.stopPropagation(); setCategory(cat); }}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCategory(cat); }}
                 className={`px-2 py-0.5 rounded-full text-xs min-h-[28px] transition ${
                   category === cat
                     ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 font-medium'

@@ -53,7 +53,8 @@ describe('Layout', () => {
   it('renders header with app title', () => {
     renderWithRouter(<Layout />);
 
-    expect(screen.getByText('MyCircle')).toBeInTheDocument();
+    // Mobile + desktop headers both render the title
+    expect(screen.getAllByText('MyCircle').length).toBeGreaterThan(0);
   });
 
   it('renders Home link and nav group labels', () => {
@@ -152,8 +153,9 @@ describe('Layout', () => {
   it('header logo links to home', () => {
     renderWithRouter(<Layout />);
 
-    const logoLink = screen.getByRole('link', { name: /MyCircle/i });
-    expect(logoLink).toHaveAttribute('href', '/');
+    // Mobile + desktop headers both have logo links
+    const logoLinks = screen.getAllByRole('link', { name: /MyCircle|Home/i });
+    expect(logoLinks.some(link => link.getAttribute('href') === '/')).toBe(true);
   });
 
   it('OpenWeatherMap link opens in new tab', () => {

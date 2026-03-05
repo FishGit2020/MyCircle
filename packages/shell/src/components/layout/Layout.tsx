@@ -21,6 +21,7 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useFocusOnRouteChange } from '../../hooks/useFocusOnRouteChange';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useRecentlyVisited } from '../../hooks/useRecentlyVisited';
+import { useOverflowNav } from '../../hooks/useOverflowNav';
 import { logEvent } from '../../lib/firebase';
 
 // Prefetch MFE remote modules on hover/focus to reduce perceived load time
@@ -195,6 +196,82 @@ function NavDropdown({
   );
 }
 
+// --- OverflowMenu: collects groups that don't fit into a "..." dropdown ---
+function OverflowMenu({
+  groups,
+  isOpen,
+  onToggle,
+  pathname,
+  t: translate,
+}: {
+  groups: NavGroup[];
+  isOpen: boolean;
+  onToggle: () => void;
+  pathname: string;
+  t: (key: TranslationKey) => string;
+}) {
+  if (groups.length === 0) return null;
+
+  const isAnyActive = groups.some(g =>
+    g.items.some(item => pathname.startsWith(item.path)),
+  );
+
+  return (
+    <div className="relative flex-shrink-0">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`text-sm font-medium transition flex items-center gap-1 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded px-1 min-w-[44px] min-h-[44px] justify-center ${
+          isAnyActive
+            ? 'text-blue-600 dark:text-blue-400'
+            : 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
+        }`}
+        aria-label={translate('nav.more')}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div
+          role="menu"
+          className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 max-h-[70vh] overflow-y-auto"
+        >
+          {groups.map((group) => (
+            <div key={group.labelKey}>
+              <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                {translate(group.labelKey)}
+              </div>
+              {group.items.map(item => {
+                const active = pathname.startsWith(item.path);
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    role="menuitem"
+                    onMouseEnter={() => prefetchRoute(item.path)}
+                    onFocus={() => prefetchRoute(item.path)}
+                    className={`flex items-center gap-2 px-3 py-2 text-sm transition ${
+                      active
+                        ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <NavIcon icon={item.icon} />
+                    {translate(item.labelKey)}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Layout() {
   const { t } = useTranslation();
   const { config, loading: configLoading } = useRemoteConfigContext();
@@ -204,7 +281,9 @@ export default function Layout() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const navRef = useRef<HTMLElement>(null);
+  const navContainerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const visibleCount = useOverflowNav(navContainerRef, NAV_GROUPS.length, 44);
 
   useKeyboardShortcuts({
     onToggleTheme: toggleTheme,
@@ -222,15 +301,6 @@ export default function Layout() {
   const handlePlayerVisibilityChange = useCallback((visible: boolean) => {
     setIsPlayerVisible(visible);
   }, []);
-
-  const navLinkClass = (path: string) => {
-    const isActive = path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
-    return `text-sm font-medium transition ${
-      isActive
-        ? 'text-blue-600 dark:text-blue-400'
-        : 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
-    }`;
-  };
 
   // Close dropdown and scroll to top on route change
   useEffect(() => {
@@ -271,20 +341,59 @@ export default function Layout() {
       <OfflineIndicator />
       <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-[1920px] mx-auto px-4 py-2 sm:py-3">
-          <div className="flex items-center justify-between gap-2">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 min-w-0 flex-shrink md:flex-shrink-0">
-              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          {/* Mobile header */}
+          <div className="flex md:hidden items-center justify-between gap-2">
+            <Link to="/" className="flex items-center space-x-2 min-w-0 flex-shrink">
+              <svg className="w-6 h-6 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
                 <circle cx="12" cy="12" r="4" />
                 <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              <h1 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white truncate">MyCircle</h1>
+              <h1 className="text-lg font-bold text-gray-800 dark:text-white truncate">MyCircle</h1>
+            </Link>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <LanguageSelector />
+              <WhatsNewButton />
+              <FeedbackButton />
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+                className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label={t('search.search')}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              <NotificationBell />
+              <UserMenu />
+            </div>
+          </div>
+
+          {/* Desktop header — CSS Grid: icon | MyCircle | nav (1fr) | right icons */}
+          <nav
+            ref={navRef}
+            aria-label="Main navigation"
+            className="hidden md:grid items-center gap-2"
+            style={{ gridTemplateColumns: 'auto auto 1fr auto' }}
+          >
+            {/* Col 1: Icon */}
+            <Link to="/" className="flex items-center flex-shrink-0" aria-label="Home">
+              <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
             </Link>
 
-            {/* Desktop nav (hidden on mobile) */}
-            <nav ref={navRef} aria-label="Main navigation" className="hidden md:flex items-center space-x-2 lg:space-x-4 min-w-0">
-              {NAV_GROUPS.map(group => (
+            {/* Col 2: Brand */}
+            <Link to="/" className="flex-shrink-0">
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white whitespace-nowrap">MyCircle</h1>
+            </Link>
+
+            {/* Col 3: Nav dropdowns (shrinkable 1fr) */}
+            <div ref={navContainerRef} className="flex items-center gap-1 lg:gap-2 min-w-0">
+              {NAV_GROUPS.slice(0, visibleCount).map(group => (
                 <NavDropdown
                   key={group.labelKey}
                   group={group}
@@ -300,6 +409,21 @@ export default function Layout() {
                   t={t}
                 />
               ))}
+              {visibleCount < NAV_GROUPS.length && (
+                <OverflowMenu
+                  groups={NAV_GROUPS.slice(visibleCount)}
+                  isOpen={openGroup === '__overflow__'}
+                  onToggle={() => {
+                    setOpenGroup(prev => prev === '__overflow__' ? null : '__overflow__');
+                  }}
+                  pathname={location.pathname}
+                  t={t}
+                />
+              )}
+            </div>
+
+            {/* Col 4: Right-side icons (never collapse) */}
+            <div className="flex items-center gap-1 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
@@ -317,26 +441,8 @@ export default function Layout() {
               <FeedbackButton />
               <NotificationBell />
               <UserMenu />
-            </nav>
-
-            {/* Mobile controls (bottom nav replaces hamburger) */}
-            <div className="flex md:!hidden items-center gap-1 flex-shrink-0">
-              <LanguageSelector />
-              <WhatsNewButton />
-              <FeedbackButton />
-              <button
-                onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
-                className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                aria-label={t('search.search')}
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-              <NotificationBell />
-              <UserMenu />
             </div>
-          </div>
+          </nav>
         </div>
       </header>
 

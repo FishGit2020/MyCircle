@@ -79,13 +79,13 @@ describe('AuthModal', () => {
   });
 
   it('shows error on failed sign in', async () => {
-    const user = userEvent.setup();
     mockSignInWithEmail.mockRejectedValue({ code: 'auth/wrong-password' });
     render(<AuthModal open={true} onClose={onClose} />);
 
-    await user.type(screen.getByLabelText('auth.email'), 'test@example.com');
-    await user.type(screen.getByLabelText('auth.password'), 'wrong');
-    await user.click(getSubmitButton());
+    // Use fireEvent.change for reliability — userEvent.type can mis-focus in jsdom
+    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'wrong' } });
+    fireEvent.click(getSubmitButton());
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument();
