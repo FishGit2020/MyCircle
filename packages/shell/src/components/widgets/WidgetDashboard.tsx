@@ -989,6 +989,7 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [bookmarkCount, setBookmarkCount] = React.useState(0);
+  const [isNavigating, setIsNavigating] = React.useState(false);
   const [lastPlayed, setLastPlayed] = React.useState<{
     bookId: string;
     bookTitle: string;
@@ -1085,10 +1086,22 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
             </div>
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate('/library'); }}
-              className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-indigo-500 dark:bg-indigo-600 rounded-full hover:bg-indigo-600 dark:hover:bg-indigo-500 transition active:scale-95"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsNavigating(true);
+                navigate(`/library/${lastPlayed!.bookId}?tab=listen&autoPlay=1`);
+              }}
+              className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-indigo-500 dark:bg-indigo-600 rounded-full hover:bg-indigo-600 dark:hover:bg-indigo-500 transition active:scale-95 flex items-center gap-1.5"
               aria-label={t('widgets.continueListening')}
+              disabled={isNavigating}
             >
+              {isNavigating ? (
+                <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              ) : null}
               {t('widgets.continueListening')}
             </button>
           </div>
