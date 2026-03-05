@@ -18,7 +18,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  e2e:
+  # ── Shared setup: install + build once, cache for both test jobs ──────
+  setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +32,55 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Build app
+        run: pnpm firebase:build
+        env:
+          # Fallback values for Dependabot PRs which cannot access secrets.
+          # The emulator tests only talk to localhost, so the actual keys don't matter —
+          # they just need to be non-empty so Firebase initializes.
+          VITE_APPCHECK_DEBUG_TOKEN: ${{ secrets.APPCHECK_DEBUG_TOKEN || 'emulator-debug-token' }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY || 'fake-api-key-for-emulator' }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN || 'localhost' }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID || 'mycircle-dash' }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET || 'mycircle-dash.appspot.com' }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID || '000000000000' }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID || '1:000000000000:web:0000000000000000' }}
+
+      - name: Cache build output for test jobs
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/*/dist
+            functions/lib
+            dist
+          key: e2e-build-${{ github.sha }}
+
+  # ── E2E tests against live Firebase ──────────────────────────────────
+  e2e:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore build
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/*/dist
+            functions/lib
+            dist
+          key: e2e-build-${{ github.sha }}
 
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -47,11 +97,6 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps
 
-      - name: Build app
-        run: pnpm firebase:build
-        env:
-          VITE_APPCHECK_DEBUG_TOKEN: ${{ secrets.APPCHECK_DEBUG_TOKEN }}
-
       - name: Run E2E tests
         run: pnpm test:e2e
 
@@ -65,7 +110,9 @@ jobs:
             test-results/
           retention-days: 14
 
+  # ── E2E tests against Firebase emulator ──────────────────────────────
   e2e-emulator:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -75,31 +122,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - run: pnpm install --frozen-lockfile
+      - name: Restore build
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/*/dist
+            functions/lib
+            dist
+          key: e2e-build-${{ github.sha }}
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
-
-      - name: Build app
-        run: pnpm firebase:build
-        env:
-          # Fallback values for Dependabot PRs which cannot access secrets.
-          # The emulator tests only talk to localhost, so the actual keys don't matter —
-          # they just need to be non-empty so Firebase initializes and connects to emulators.
-          VITE_APPCHECK_DEBUG_TOKEN: ${{ secrets.APPCHECK_DEBUG_TOKEN || 'emulator-debug-token' }}
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY || 'fake-api-key-for-emulator' }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN || 'localhost' }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID || 'mycircle-dash' }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET || 'mycircle-dash.appspot.com' }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID || '000000000000' }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID || '1:000000000000:web:0000000000000000' }}
 
       - name: Run emulator E2E tests
         run: pnpm emulator:test
@@ -111,3 +152,17 @@ jobs:
           name: playwright-report-emulator
           path: playwright-report/
           retention-days: 14
+
+  # ── Gate job for branch protection (single "e2e-gate" check) ─────────
+  e2e-gate:
+    if: always()
+    needs: [e2e, e2e-emulator]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required jobs
+        run: |
+          if [ "${{ needs.e2e.result }}" != "success" ] || [ "${{ needs.e2e-emulator.result }}" != "success" ]; then
+            echo "Required jobs failed: e2e=${{ needs.e2e.result }}, e2e-emulator=${{ needs.e2e-emulator.result }}"
+            exit 1
+          fi
+          echo "All e2e jobs passed"
