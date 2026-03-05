@@ -25,10 +25,10 @@ vi.mock('../hooks/useCuratedVerse', () => ({
   useCuratedVerse: () => mockUseCuratedVerse(),
 }));
 
-// Mock useAuth — unauthenticated user with no cities
+// Mock useAuth — authenticated user with no cities
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
-    user: null,
+    user: { uid: 'test-user' },
     favoriteCities: [],
     recentCities: [],
   }),

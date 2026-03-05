@@ -232,8 +232,11 @@ export default function Layout() {
     }`;
   };
 
-  // Close dropdown on route change
-  useEffect(() => { setOpenGroup(null); }, [location.pathname]);
+  // Close dropdown and scroll to top on route change
+  useEffect(() => {
+    setOpenGroup(null);
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   // Close dropdown on outside click
   useEffect(() => {

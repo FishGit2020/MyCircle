@@ -72,9 +72,8 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Widget Dashboard — key on uid forces full remount on sign-in/out,
-           so all widget state resets cleanly (no stale data from previous user) */}
-      <WidgetDashboard key={user?.uid ?? 'anon'} />
+      {/* Widget Dashboard — only shown when signed in */}
+      {user && <WidgetDashboard key={user.uid} />}
 
       {/* Desktop Quick Access Tiles */}
       <QuickAccessTiles />
