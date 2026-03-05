@@ -256,21 +256,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
           }
 
-          // Restore widget layout — preserve local sizes that may not be in Firestore
+          // Restore widget layout (ensure each widget has a size default)
           if (userProfile.widgetLayout && userProfile.widgetLayout.length > 0) {
-            const localRaw = localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
-            const localSizes: Record<string, string> = {};
-            if (localRaw) {
-              try {
-                const local = JSON.parse(localRaw) as Array<{ id: string; size?: string }>;
-                for (const w of local) { if (w.size) localSizes[w.id] = w.size; }
-              } catch { /* ignore */ }
-            }
-            const merged = userProfile.widgetLayout.map((w: any) => ({
+            const withSizes = userProfile.widgetLayout.map((w: any) => ({
               ...w,
-              size: w.size || localSizes[w.id] || 'medium',
+              size: w.size || 'medium',
             }));
-            localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(merged));
+            localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(withSizes));
             window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
           }
 
