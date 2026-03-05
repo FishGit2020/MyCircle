@@ -27,10 +27,16 @@ const baseSong: WorshipSong = {
   updatedAt: { seconds: 1700000000, nanoseconds: 0 },
 };
 
-/** Fill required fields via fireEvent.change, then wait for React to flush state */
-async function fillRequiredFields() {
+/**
+ * Fill fields via fireEvent.change, then wait for React 18 to flush batched state.
+ * ALL changes must happen BEFORE the waitFor gate — any fireEvent.change after
+ * the gate races the submit because @testing-library/react v16 does NOT wrap
+ * fireEvent in act().
+ */
+async function fillAndFlush(extraChanges?: () => void) {
   fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
   fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+  extraChanges?.();
   // Wait for React 18 batched state to flush — button becomes enabled
   await waitFor(() => {
     expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
@@ -61,8 +67,9 @@ describe('SongEditor', () => {
   it('includes YouTube URL in saved data', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await fillRequiredFields();
-    fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
+    await fillAndFlush(() => {
+      fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
+    });
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
     await waitFor(() => {
@@ -77,7 +84,7 @@ describe('SongEditor', () => {
   it('sends undefined when YouTube URL is empty', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await fillRequiredFields();
+    await fillAndFlush();
     // Leave YouTube URL empty
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
@@ -123,8 +130,9 @@ describe('SongEditor', () => {
   it('includes BPM in saved data', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await fillRequiredFields();
-    fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
+    await fillAndFlush(() => {
+      fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
+    });
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
     await waitFor(() => {
@@ -160,7 +168,7 @@ describe('SongEditor', () => {
   it('hides helper text when all required fields are filled', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await fillRequiredFields();
+    await fillAndFlush();
 
     expect(screen.queryByText('worship.fillRequiredFields')).not.toBeInTheDocument();
     expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
