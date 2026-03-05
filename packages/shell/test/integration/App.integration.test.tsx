@@ -63,7 +63,7 @@ describe('App Integration', () => {
     it('renders the home page by default', async () => {
       renderApp('/');
 
-      expect(screen.getByText('MyCircle')).toBeInTheDocument();
+      expect(screen.getAllByText('MyCircle').length).toBeGreaterThan(0);
       expect(screen.getByText('Welcome to MyCircle')).toBeInTheDocument();
     });
 
@@ -112,7 +112,7 @@ describe('App Integration', () => {
   describe('Layout', () => {
     it('renders header and footer on all pages', () => {
       renderApp('/');
-      expect(screen.getByText('MyCircle')).toBeInTheDocument();
+      expect(screen.getAllByText('MyCircle').length).toBeGreaterThan(0);
       expect(screen.getByText('OpenWeatherMap')).toBeInTheDocument();
     });
   });

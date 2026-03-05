@@ -15,6 +15,7 @@ const en = {
   'nav.group.family': 'Family',
   'nav.group.learning': 'Learning',
   'nav.group.workspace': 'Workspace',
+  'nav.more': 'More',
 
   // Home page
   'home.title': 'Welcome to MyCircle',
