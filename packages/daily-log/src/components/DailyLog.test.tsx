@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import WorkTracker from './WorkTracker';
+import DailyLog from './DailyLog';
 
 // Mock @mycircle/shared
 vi.mock('@mycircle/shared', () => ({
@@ -10,12 +10,12 @@ vi.mock('@mycircle/shared', () => ({
     i18n: { language: 'en' },
   }),
   WindowEvents: {
-    WORK_TRACKER_CHANGED: 'work-tracker-changed',
+    DAILY_LOG_CHANGED: 'daily-log-changed',
   },
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
 }));
 
-describe('WorkTracker', () => {
+describe('DailyLog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Not authenticated by default
@@ -24,12 +24,12 @@ describe('WorkTracker', () => {
   });
 
   it('shows sign-in required when not authenticated', async () => {
-    render(<WorkTracker />);
+    render(<DailyLog />);
     // Initially shows loading spinner while auth check runs
-    expect(screen.getByText('workTracker.title')).toBeInTheDocument();
+    expect(screen.getByText('dailyLog.title')).toBeInTheDocument();
     // After auth check resolves (no token), shows sign-in message
     await vi.waitFor(() => {
-      expect(screen.getByText('workTracker.signInRequired')).toBeInTheDocument();
+      expect(screen.getByText('dailyLog.signInRequired')).toBeInTheDocument();
     }, { timeout: 3000 });
   });
 
@@ -42,7 +42,7 @@ describe('WorkTracker', () => {
       delete: vi.fn(),
     };
 
-    render(<WorkTracker />);
+    render(<DailyLog />);
     // Should show loading initially, then resolve
     // The component checks auth asynchronously
   });
@@ -56,11 +56,11 @@ describe('WorkTracker', () => {
       delete: vi.fn(),
     };
 
-    render(<WorkTracker />);
+    render(<DailyLog />);
 
     // Wait for auth check and data load
     await vi.waitFor(() => {
-      expect(screen.getByText('workTracker.noEntries')).toBeInTheDocument();
+      expect(screen.getByText('dailyLog.noEntries')).toBeInTheDocument();
     }, { timeout: 6000 });
   });
 
@@ -78,7 +78,7 @@ describe('WorkTracker', () => {
       delete: vi.fn(),
     };
 
-    render(<WorkTracker />);
+    render(<DailyLog />);
 
     await vi.waitFor(() => {
       expect(screen.getByText('Fixed a bug')).toBeInTheDocument();
@@ -95,12 +95,12 @@ describe('WorkTracker', () => {
       delete: vi.fn(),
     };
 
-    render(<WorkTracker />);
+    render(<DailyLog />);
 
     await vi.waitFor(() => {
-      expect(screen.getByText('workTracker.today')).toBeInTheDocument();
-      expect(screen.getByText('workTracker.thisMonth')).toBeInTheDocument();
-      expect(screen.getByText('workTracker.allTime')).toBeInTheDocument();
+      expect(screen.getByText('dailyLog.today')).toBeInTheDocument();
+      expect(screen.getByText('dailyLog.thisMonth')).toBeInTheDocument();
+      expect(screen.getByText('dailyLog.allTime')).toBeInTheDocument();
     }, { timeout: 6000 });
   });
 });

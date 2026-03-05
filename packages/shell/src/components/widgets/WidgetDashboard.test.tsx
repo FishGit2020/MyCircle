@@ -32,7 +32,7 @@ vi.mock('@mycircle/shared', () => ({
     CHILD_BIRTH_DATE: 'child-birth-date',
     BIBLE_BOOKMARKS: 'bible-bookmarks',
     FLASHCARD_PROGRESS: 'flashcard-progress',
-    WORK_TRACKER_CACHE: 'work-tracker-cache',
+    DAILY_LOG_CACHE: 'daily-log-cache',
   },
   MFEvents: {
     PODCAST_PLAY_EPISODE: 'mf:podcast-play-episode',

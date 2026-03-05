@@ -45,14 +45,14 @@ describe('TimelineView', () => {
     render(
       <TimelineView entries={[]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    expect(screen.getByText('workTracker.noEntries')).toBeInTheDocument();
+    expect(screen.getByText('dailyLog.noEntries')).toBeInTheDocument();
   });
 
   it('does not show "no entries" message when entries exist', () => {
     render(
       <TimelineView entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    expect(screen.queryByText('workTracker.noEntries')).not.toBeInTheDocument();
+    expect(screen.queryByText('dailyLog.noEntries')).not.toBeInTheDocument();
   });
 
   it('renders a DayNode for each unique date', () => {

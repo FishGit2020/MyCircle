@@ -140,8 +140,8 @@ const flashcardsRemote = isProduction
   ? '/flashcards/assets/remoteEntry.js'
   : 'http://localhost:3015/assets/remoteEntry.js';
 
-const workTrackerRemote = isProduction
-  ? '/work-tracker/assets/remoteEntry.js'
+const dailyLogRemote = isProduction
+  ? '/daily-log/assets/remoteEntry.js'
   : 'http://localhost:3016/assets/remoteEntry.js';
 
 const cloudFilesRemote = isProduction
@@ -183,7 +183,7 @@ export default defineConfig({
         babyTracker: babyTrackerRemote,
         childDevelopment: childDevelopmentRemote,
         flashcards: flashcardsRemote,
-        workTracker: workTrackerRemote,
+        dailyLog: dailyLogRemote,
         cloudFiles: cloudFilesRemote,
         modelBenchmark: modelBenchmarkRemote,
         immigrationTracker: immigrationTrackerRemote,

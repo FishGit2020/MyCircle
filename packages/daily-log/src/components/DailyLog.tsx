@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation, StorageKeys } from '@mycircle/shared';
-import { useWorkEntries } from '../hooks/useWorkEntries';
+import { useDailyLogEntries } from '../hooks/useDailyLogEntries';
 import { getLocalDateString } from '../utils/localDate';
 import EntryForm from './EntryForm';
 import TimelineView from './TimelineView';
@@ -25,9 +25,9 @@ function isWeekend(dateStr: string): boolean {
   return day === 0 || day === 6;
 }
 
-export default function WorkTracker() {
+export default function DailyLog() {
   const { t } = useTranslation();
-  const { entries, loading, isAuthenticated, authChecked, addEntry, updateEntry, deleteEntry, moveEntry } = useWorkEntries();
+  const { entries, loading, isAuthenticated, authChecked, addEntry, updateEntry, deleteEntry, moveEntry } = useDailyLogEntries();
   const [filter, setFilter] = useState<TimeFilter>('all');
   const [dayFilter, setDayFilter] = useState<DayFilter>(loadDayFilter);
 
@@ -66,8 +66,8 @@ export default function WorkTracker() {
     return (
       <div className="pb-20 md:pb-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('workTracker.title')}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('workTracker.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('dailyLog.title')}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('dailyLog.subtitle')}</p>
         </div>
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
@@ -79,8 +79,8 @@ export default function WorkTracker() {
   if (!isAuthenticated) {
     return (
       <div className="pb-20 md:pb-8">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('workTracker.title')}</h1>
-        <p className="text-gray-500 dark:text-gray-400">{t('workTracker.signInRequired')}</p>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('dailyLog.title')}</h1>
+        <p className="text-gray-500 dark:text-gray-400">{t('dailyLog.signInRequired')}</p>
       </div>
     );
   }
@@ -89,8 +89,8 @@ export default function WorkTracker() {
     <div className="pb-20 md:pb-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('workTracker.title')}</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('workTracker.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('dailyLog.title')}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('dailyLog.subtitle')}</p>
       </div>
 
       {/* Entry form */}
@@ -101,9 +101,9 @@ export default function WorkTracker() {
       {/* Filter chips */}
       <div className="flex flex-wrap gap-2 mb-4">
         {([
-          { key: 'today' as const, label: t('workTracker.today') },
-          { key: 'thisMonth' as const, label: t('workTracker.thisMonth') },
-          { key: 'all' as const, label: t('workTracker.allTime') },
+          { key: 'today' as const, label: t('dailyLog.today') },
+          { key: 'thisMonth' as const, label: t('dailyLog.thisMonth') },
+          { key: 'all' as const, label: t('dailyLog.allTime') },
         ]).map(f => (
           <button
             key={f.key}
@@ -130,7 +130,7 @@ export default function WorkTracker() {
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 line-through'
             }`}
           >
-            {t('workTracker.weekdays')}
+            {t('dailyLog.weekdays')}
           </button>
           <button
             type="button"
@@ -141,12 +141,12 @@ export default function WorkTracker() {
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 line-through'
             }`}
           >
-            {t('workTracker.weekends')}
+            {t('dailyLog.weekends')}
           </button>
         </div>
 
         <span className="flex items-center text-xs text-gray-400 dark:text-gray-500 w-full sm:w-auto sm:ml-2">
-          {t('workTracker.entriesCount').replace('{count}', String(filteredEntries.length))}
+          {t('dailyLog.entriesCount').replace('{count}', String(filteredEntries.length))}
         </span>
       </div>
 

@@ -47,8 +47,8 @@ function gatherUserContext(): Record<string, unknown> {
     if (cloudFiles) { try { const parsed = JSON.parse(cloudFiles); if (Array.isArray(parsed)) ctx.cloudFilesCount = parsed.length; } catch { /* */ } }
     const immCases = localStorage.getItem('immigration-cases-cache');
     if (immCases) { try { const parsed = JSON.parse(immCases); if (Array.isArray(parsed)) ctx.immigrationCasesCount = parsed.length; } catch { /* */ } }
-    const workEntries = localStorage.getItem('work-tracker-cache');
-    if (workEntries) { try { const parsed = JSON.parse(workEntries); if (Array.isArray(parsed)) ctx.workEntriesCount = parsed.length; } catch { /* */ } }
+    const dailyLogEntries = localStorage.getItem('daily-log-cache');
+    if (dailyLogEntries) { try { const parsed = JSON.parse(dailyLogEntries); if (Array.isArray(parsed)) ctx.dailyLogEntriesCount = parsed.length; } catch { /* */ } }
     const locale = localStorage.getItem('mycircle-locale');
     if (locale) ctx.locale = locale;
     const tempUnit = localStorage.getItem('mycircle-temp-unit');
@@ -101,7 +101,7 @@ function handleActions(actions: AiAction[]) {
       case 'addNote':
         window.__notebook?.add(action.payload);
         break;
-      case 'addWorkEntry':
+      case 'addDailyLogEntry':
         window.__workTracker?.add(action.payload);
         break;
       case 'setBabyDueDate':

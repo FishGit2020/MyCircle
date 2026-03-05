@@ -66,9 +66,9 @@ declare module 'flashcards/FlashCards' {
   export default FlashCards;
 }
 
-declare module 'workTracker/WorkTracker' {
-  const WorkTracker: React.ComponentType;
-  export default WorkTracker;
+declare module 'dailyLog/DailyLog' {
+  const DailyLog: React.ComponentType;
+  export default DailyLog;
 }
 
 declare module 'cloudFiles/CloudFiles' {

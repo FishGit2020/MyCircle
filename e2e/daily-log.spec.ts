@@ -1,8 +1,8 @@
 import { test, expect } from './fixtures';
 
-test.describe('Work Tracker', () => {
+test.describe('Daily Log', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/work-tracker');
+    await page.goto('/daily-log');
   });
 
   test('renders page without crash', async ({ page }) => {

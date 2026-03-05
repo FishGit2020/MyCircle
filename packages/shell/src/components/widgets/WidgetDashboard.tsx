@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'workTracker' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames';
 
 export type WidgetSize = 'small' | 'medium' | 'large';
 
@@ -28,7 +28,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'childDev', visible: true },
   { id: 'worship', visible: true },
   { id: 'flashcards', visible: true },
-  { id: 'workTracker', visible: true },
+  { id: 'dailyLog', visible: true },
   { id: 'cloudFiles', visible: true },
   { id: 'benchmark', visible: true },
   { id: 'immigration', visible: true },
@@ -798,14 +798,14 @@ const FlashcardsWidget = React.memo(function FlashcardsWidget() {
   );
 });
 
-const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
+const DailyLogWidget = React.memo(function DailyLogWidget() {
   const { t } = useTranslation();
   const [entryCount, setEntryCount] = React.useState(0);
 
   useEffect(() => {
     function load() {
       try {
-        const raw = localStorage.getItem(StorageKeys.WORK_TRACKER_CACHE);
+        const raw = localStorage.getItem(StorageKeys.DAILY_LOG_CACHE);
         if (raw) {
           const entries = JSON.parse(raw);
           setEntryCount(Array.isArray(entries) ? entries.length : 0);
@@ -820,11 +820,11 @@ const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
     if (api?.getAll) {
       api.getAll().then((entries: any[]) => {
         setEntryCount(entries.length);
-        try { localStorage.setItem(StorageKeys.WORK_TRACKER_CACHE, JSON.stringify(entries)); } catch { /* ignore */ }
+        try { localStorage.setItem(StorageKeys.DAILY_LOG_CACHE, JSON.stringify(entries)); } catch { /* ignore */ }
       }).catch(() => { /* ignore */ });
     }
-    window.addEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
-    return () => window.removeEventListener(WindowEvents.WORK_TRACKER_CHANGED, load);
+    window.addEventListener(WindowEvents.DAILY_LOG_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.DAILY_LOG_CHANGED, load);
   }, []);
 
   return (
@@ -836,16 +836,16 @@ const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
           </svg>
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.workTracker')}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.workTrackerDesc')}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.dailyLog')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.dailyLogDesc')}</p>
         </div>
       </div>
       {entryCount > 0 ? (
         <p className="text-xs text-amber-600 dark:text-amber-400/70">
-          {t('widgets.workTrackerEntries').replace('{count}', String(entryCount))}
+          {t('widgets.dailyLogEntries').replace('{count}', String(entryCount))}
         </p>
       ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noWorkEntries')}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noDailyLogEntries')}</p>
       )}
     </div>
   );
@@ -1036,7 +1036,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   childDev: ChildDevWidget,
   worship: WorshipWidget,
   flashcards: FlashcardsWidget,
-  workTracker: WorkTrackerWidget,
+  dailyLog: DailyLogWidget,
   cloudFiles: CloudFilesWidget,
   benchmark: BenchmarkWidget,
   immigration: ImmigrationWidget,
@@ -1054,7 +1054,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   childDev: '/child-dev',
   worship: '/worship',
   flashcards: '/flashcards',
-  workTracker: '/work-tracker',
+  dailyLog: '/daily-log',
   cloudFiles: '/files',
   benchmark: '/benchmark',
   immigration: '/immigration',

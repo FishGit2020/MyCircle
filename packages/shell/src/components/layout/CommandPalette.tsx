@@ -30,7 +30,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/child-dev': 'commandPalette.goToChildDev',
   '/ai': 'commandPalette.goToAi',
   '/flashcards': 'commandPalette.goToFlashcards',
-  '/work-tracker': 'commandPalette.goToWorkTracker',
+  '/daily-log': 'commandPalette.goToDailyLog',
   '/files': 'commandPalette.goToCloudFiles',
   '/benchmark': 'commandPalette.goToBenchmark',
   '/immigration': 'commandPalette.goToImmigration',
@@ -175,9 +175,9 @@ export default function CommandPalette({ recentPages = [] }: Props) {
       action: () => { navigate('/flashcards'); setOpen(false); }, category: 'navigation',
     },
     {
-      id: 'nav-work-tracker', label: t('commandPalette.goToWorkTracker'), description: '/work-tracker',
+      id: 'nav-daily-log', label: t('commandPalette.goToDailyLog'), description: '/daily-log',
       icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>,
-      action: () => { navigate('/work-tracker'); setOpen(false); }, category: 'navigation',
+      action: () => { navigate('/daily-log'); setOpen(false); }, category: 'navigation',
     },
     {
       id: 'nav-benchmark', label: t('commandPalette.goToBenchmark'), description: '/benchmark',

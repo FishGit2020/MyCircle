@@ -35,7 +35,7 @@ test.describe('Authenticated MFE routes', () => {
     '/bible',
     '/worship',
     '/flashcards',
-    '/work-tracker',
+    '/daily-log',
     '/files',
     '/baby',
     '/child-dev',

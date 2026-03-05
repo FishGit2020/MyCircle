@@ -4,7 +4,7 @@ import type { WorkEntry } from '../types';
 import { getLocalDateString } from '../utils/localDate';
 
 
-export function useWorkEntries() {
+export function useDailyLogEntries() {
   const [entries, setEntries] = useState<WorkEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,34 +62,34 @@ export function useWorkEntries() {
 
     loadEntries();
     const handler = () => { loadEntries(); };
-    window.addEventListener(WindowEvents.WORK_TRACKER_CHANGED, handler);
-    return () => window.removeEventListener(WindowEvents.WORK_TRACKER_CHANGED, handler);
+    window.addEventListener(WindowEvents.DAILY_LOG_CHANGED, handler);
+    return () => window.removeEventListener(WindowEvents.DAILY_LOG_CHANGED, handler);
   }, [loadEntries, isAuthenticated]);
 
   const addEntry = useCallback(async (content: string) => {
-    if (!window.__workTracker) throw new Error('Work tracker API not available');
+    if (!window.__workTracker) throw new Error('Daily log API not available');
     const date = getLocalDateString();
     const id = await window.__workTracker.add({ date, content });
-    window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+    window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
     return id;
   }, []);
 
   const updateEntry = useCallback(async (id: string, content: string) => {
-    if (!window.__workTracker) throw new Error('Work tracker API not available');
+    if (!window.__workTracker) throw new Error('Daily log API not available');
     await window.__workTracker.update(id, { content });
-    window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+    window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
   }, []);
 
   const deleteEntry = useCallback(async (id: string) => {
-    if (!window.__workTracker) throw new Error('Work tracker API not available');
+    if (!window.__workTracker) throw new Error('Daily log API not available');
     await window.__workTracker.delete(id);
-    window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+    window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
   }, []);
 
   const moveEntry = useCallback(async (id: string, newDate: string) => {
-    if (!window.__workTracker) throw new Error('Work tracker API not available');
+    if (!window.__workTracker) throw new Error('Daily log API not available');
     await window.__workTracker.update(id, { date: newDate });
-    window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+    window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
   }, []);
 
   return {

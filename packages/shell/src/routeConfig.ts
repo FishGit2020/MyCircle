@@ -12,7 +12,7 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   english: 'nav.english',
   chinese: 'nav.chinese',
   flashcards: 'nav.flashcards',
-  'work-tracker': 'nav.workTracker',
+  'daily-log': 'nav.dailyLog',
   files: 'nav.cloudFiles',
   'whats-new': 'whatsNew.title',
   immigration: 'nav.immigration',
