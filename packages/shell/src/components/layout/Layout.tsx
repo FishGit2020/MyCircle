@@ -267,7 +267,7 @@ export default function Layout() {
       </a>
       <OfflineIndicator />
       <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="container mx-auto px-4 py-2 sm:py-3">
+        <div className="max-w-[1920px] mx-auto px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between gap-2">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 min-w-0 flex-shrink md:flex-shrink-0">
@@ -280,7 +280,7 @@ export default function Layout() {
             </Link>
 
             {/* Desktop nav (hidden on mobile) */}
-            <nav ref={navRef} aria-label="Main navigation" className="hidden md:flex items-center space-x-4">
+            <nav ref={navRef} aria-label="Main navigation" className="hidden md:flex items-center space-x-2 lg:space-x-4 min-w-0">
               {NAV_GROUPS.map(group => (
                 <NavDropdown
                   key={group.labelKey}
