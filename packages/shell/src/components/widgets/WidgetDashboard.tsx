@@ -232,11 +232,18 @@ interface NowPlayingDisplay {
 
 function loadPodcastDisplay(): NowPlayingDisplay | null {
   try {
+    // Load played episodes to filter them out
+    let playedIds: Set<string> = new Set();
+    try {
+      const raw = localStorage.getItem(StorageKeys.PODCAST_PLAYED_EPISODES);
+      if (raw) playedIds = new Set(JSON.parse(raw));
+    } catch { /* ignore */ }
+
     // Try now-playing first, then last-played
     const nowPlaying = localStorage.getItem(StorageKeys.PODCAST_NOW_PLAYING);
     if (nowPlaying) {
       const data = JSON.parse(nowPlaying);
-      if (data.episode) {
+      if (data.episode && !playedIds.has(data.episode.id)) {
         return {
           type: 'podcast',
           title: data.episode.title,
@@ -252,7 +259,7 @@ function loadPodcastDisplay(): NowPlayingDisplay | null {
     const lastPlayed = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
     if (lastPlayed) {
       const data = JSON.parse(lastPlayed);
-      if (data.episode) {
+      if (data.episode && !playedIds.has(data.episode.id)) {
         return {
           type: 'podcast',
           title: data.episode.title,
@@ -803,12 +810,16 @@ const DailyLogWidget = React.memo(function DailyLogWidget() {
   const [entryCount, setEntryCount] = React.useState(0);
 
   useEffect(() => {
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    function countThisMonth(entries: any[]): number {
+      if (!Array.isArray(entries)) return 0;
+      return entries.filter((e: any) => e.date && e.date.startsWith(currentMonth)).length;
+    }
     function load() {
       try {
         const raw = localStorage.getItem(StorageKeys.DAILY_LOG_CACHE);
         if (raw) {
-          const entries = JSON.parse(raw);
-          setEntryCount(Array.isArray(entries) ? entries.length : 0);
+          setEntryCount(countThisMonth(JSON.parse(raw)));
         } else {
           setEntryCount(0);
         }
@@ -819,7 +830,7 @@ const DailyLogWidget = React.memo(function DailyLogWidget() {
     const api = window.__workTracker;
     if (api?.getAll) {
       api.getAll().then((entries: any[]) => {
-        setEntryCount(entries.length);
+        setEntryCount(countThisMonth(entries));
         try { localStorage.setItem(StorageKeys.DAILY_LOG_CACHE, JSON.stringify(entries)); } catch { /* ignore */ }
       }).catch(() => { /* ignore */ });
     }
@@ -1341,11 +1352,12 @@ export default function WidgetDashboard() {
             const to = typeof routeDef === 'function' ? routeDef({ favoriteCities }) : routeDef;
             const size = widget.size || 'medium';
             const spanClass = size === 'large' ? 'col-span-2' : size === 'small' ? 'col-span-1' : 'col-span-2 lg:col-span-1';
+            const sizeClass = size === 'small' ? 'p-3 min-h-[80px]' : 'p-5 min-h-[120px]';
             return (
               <Link
                 key={widget.id}
                 to={to}
-                className={`block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all min-h-[120px] ${spanClass}`}
+                className={`block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all ${sizeClass} ${spanClass}`}
               >
                 <ErrorBoundary>
                   <WidgetComponent />
