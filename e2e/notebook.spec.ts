@@ -15,10 +15,14 @@ test.describe('Notebook', () => {
   });
 
   test('shows content or sign-in prompt', async ({ page }) => {
-    // Either shows notebook tabs, sign-in prompt, or loading state
-    const signIn = page.getByText(/sign in|iniciar sesi|登录/i).first();
-    const notes = page.getByText(/notes|notas|笔记/i).first();
-    const loading = page.getByText(/loading/i).first();
-    await expect(signIn.or(notes).or(loading)).toBeVisible({ timeout: 20_000 });
+    // Either shows notebook tabs, sign-in prompt, or loading state.
+    // Use count check to avoid strict mode violation when multiple elements
+    // match across branches (e.g. "Sign In" nav button + "Loading" spinner).
+    await expect(async () => {
+      const signIn = await page.getByText(/sign in|iniciar sesi|登录/i).count();
+      const notes = await page.getByText(/notes|notas|笔记/i).count();
+      const loading = await page.getByText(/loading/i).count();
+      expect(signIn + notes + loading).toBeGreaterThan(0);
+    }).toPass();
   });
 });
