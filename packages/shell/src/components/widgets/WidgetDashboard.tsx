@@ -114,6 +114,7 @@ const StockWidget = React.memo(function StockWidget() {
       try {
         const stored = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
         if (stored) setWatchlist(JSON.parse(stored));
+        else setWatchlist([]);
       } catch { /* ignore */ }
     }
     load();
@@ -302,6 +303,8 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
         if (stored) {
           const subs = JSON.parse(stored);
           setHasSubscriptions(Array.isArray(subs) && subs.length > 0);
+        } else {
+          setHasSubscriptions(false);
         }
       } catch { /* ignore */ }
     }
@@ -466,6 +469,7 @@ const NotebookWidget = React.memo(function NotebookWidget() {
       try {
         const stored = localStorage.getItem(StorageKeys.NOTEBOOK_CACHE);
         if (stored) setNoteCount(JSON.parse(stored));
+        else setNoteCount(null);
       } catch { /* ignore */ }
     }
     load();
@@ -760,6 +764,8 @@ const FlashcardsWidget = React.memo(function FlashcardsWidget() {
         if (raw) {
           const progress = JSON.parse(raw);
           setMasteredCount(Array.isArray(progress.masteredIds) ? progress.masteredIds.length : 0);
+        } else {
+          setMasteredCount(0);
         }
       } catch { /* ignore */ }
     }
@@ -922,6 +928,7 @@ const BenchmarkWidget = React.memo(function BenchmarkWidget() {
       try {
         const raw = localStorage.getItem(StorageKeys.BENCHMARK_CACHE);
         if (raw) setSummary(JSON.parse(raw));
+        else setSummary(null);
       } catch { /* ignore */ }
     }
     load();
