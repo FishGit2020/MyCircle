@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SongEditor from './SongEditor';
 import type { WorshipSong } from '../types';
@@ -52,12 +52,9 @@ describe('SongEditor', () => {
     const user = userEvent.setup();
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
-    await user.type(screen.getByRole('textbox', { name: /worship\.content/ }), 'Some lyrics');
-    // Use paste instead of type for the long URL to avoid keystroke timeout in CI
-    const urlInput = screen.getByLabelText('worship.youtubeUrl');
-    await user.click(urlInput);
-    await user.paste('https://youtube.com/watch?v=xyz');
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
     await user.click(screen.getByText('worship.save'));
 
     expect(onSave).toHaveBeenCalledWith(
@@ -71,8 +68,8 @@ describe('SongEditor', () => {
     const user = userEvent.setup();
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
-    await user.type(screen.getByRole('textbox', { name: /worship\.content/ }), 'Some lyrics');
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
     // Leave YouTube URL empty
     await user.click(screen.getByText('worship.save'));
 
@@ -117,9 +114,9 @@ describe('SongEditor', () => {
     const user = userEvent.setup();
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
-    await user.type(screen.getByRole('textbox', { name: /worship\.content/ }), 'Some lyrics');
-    await user.type(screen.getByLabelText('worship.bpm'), '95');
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
     await user.click(screen.getByText('worship.save'));
 
     expect(onSave).toHaveBeenCalledWith(
@@ -154,10 +151,12 @@ describe('SongEditor', () => {
     const user = userEvent.setup();
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
-    await user.type(screen.getByRole('textbox', { name: /worship\.content/ }), 'Some lyrics');
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
 
-    expect(screen.queryByText('worship.fillRequiredFields')).not.toBeInTheDocument();
-    expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+    await waitFor(() => {
+      expect(screen.queryByText('worship.fillRequiredFields')).not.toBeInTheDocument();
+      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+    });
   });
 });

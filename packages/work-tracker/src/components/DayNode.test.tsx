@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DayNode from './DayNode';
 import type { WorkEntry } from '../types';
 
@@ -99,23 +98,21 @@ describe('DayNode', () => {
     expect(screen.getByText('Task two')).toBeInTheDocument();
   });
 
-  it('shows edit form when edit button is clicked', async () => {
-    const user = userEvent.setup();
+  it('shows edit form when edit button is clicked', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    await user.click(screen.getByRole('button', { name: 'workTracker.edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'workTracker.edit' }));
     expect(screen.getByTestId('entry-form')).toBeInTheDocument();
     expect(screen.getByTestId('form-initial-value')).toHaveTextContent('Fixed a bug');
   });
 
   it('calls onUpdate and exits edit mode on save', async () => {
-    const user = userEvent.setup();
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    await user.click(screen.getByRole('button', { name: 'workTracker.edit' }));
-    await user.click(screen.getByText('mock-save'));
+    fireEvent.click(screen.getByRole('button', { name: 'workTracker.edit' }));
+    fireEvent.click(screen.getByText('mock-save'));
     await waitFor(() => {
       expect(onUpdate).toHaveBeenCalledWith('1', 'updated content');
     });
@@ -125,33 +122,30 @@ describe('DayNode', () => {
     });
   });
 
-  it('exits edit mode on cancel', async () => {
-    const user = userEvent.setup();
+  it('exits edit mode on cancel', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    await user.click(screen.getByRole('button', { name: 'workTracker.edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'workTracker.edit' }));
     expect(screen.getByTestId('entry-form')).toBeInTheDocument();
-    await user.click(screen.getByText('mock-cancel'));
+    fireEvent.click(screen.getByText('mock-cancel'));
     expect(screen.queryByTestId('entry-form')).not.toBeInTheDocument();
   });
 
-  it('shows delete confirmation on delete button click', async () => {
-    const user = userEvent.setup();
+  it('shows delete confirmation on delete button click', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    await user.click(screen.getByRole('button', { name: 'workTracker.delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'workTracker.delete' }));
     expect(screen.getByText('Confirm')).toBeInTheDocument();
   });
 
   it('calls onDelete on confirm', async () => {
-    const user = userEvent.setup();
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    await user.click(screen.getByRole('button', { name: 'workTracker.delete' }));
-    await user.click(screen.getByText('Confirm'));
+    fireEvent.click(screen.getByRole('button', { name: 'workTracker.delete' }));
+    fireEvent.click(screen.getByText('Confirm'));
     await waitFor(() => {
       expect(onDelete).toHaveBeenCalledWith('1');
     });
@@ -177,8 +171,7 @@ describe('DayNode', () => {
     expect(screen.getByRole('button', { name: 'workTracker.moveDate' })).toBeInTheDocument();
   });
 
-  it('shows date picker when move button is clicked', async () => {
-    const user = userEvent.setup();
+  it('shows date picker when move button is clicked', () => {
     render(
       <DayNode
         date="2026-03-01"
@@ -188,12 +181,11 @@ describe('DayNode', () => {
         onMoveEntry={onMoveEntry}
       />
     );
-    await user.click(screen.getByRole('button', { name: 'workTracker.moveDate' }));
+    fireEvent.click(screen.getByRole('button', { name: 'workTracker.moveDate' }));
     expect(screen.getByLabelText('workTracker.moveDatePicker')).toBeInTheDocument();
   });
 
-  it('toggles move date picker off on second click', async () => {
-    const user = userEvent.setup();
+  it('toggles move date picker off on second click', () => {
     render(
       <DayNode
         date="2026-03-01"
@@ -204,9 +196,9 @@ describe('DayNode', () => {
       />
     );
     const moveBtn = screen.getByRole('button', { name: 'workTracker.moveDate' });
-    await user.click(moveBtn);
+    fireEvent.click(moveBtn);
     expect(screen.getByLabelText('workTracker.moveDatePicker')).toBeInTheDocument();
-    await user.click(moveBtn);
+    fireEvent.click(moveBtn);
     expect(screen.queryByLabelText('workTracker.moveDatePicker')).not.toBeInTheDocument();
   });
 });

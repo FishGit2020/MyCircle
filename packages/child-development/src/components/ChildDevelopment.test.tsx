@@ -56,13 +56,13 @@ describe('ChildDevelopment', () => {
     expect(screen.getByText('childDev.getStarted')).toBeInTheDocument();
   });
 
-  it('saves child data to localStorage and dispatches event', { timeout: 15_000 }, async () => {
+  it('saves child data to localStorage and dispatches event', async () => {
     const user = userEvent.setup();
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
     render(<ChildDevelopment />);
 
-    await user.type(screen.getByLabelText('childDev.childName'), 'Emma');
+    fireEvent.change(screen.getByLabelText('childDev.childName'), { target: { value: 'Emma' } });
     fireEvent.change(screen.getByLabelText('childDev.birthDate'), { target: { value: '2024-06-15' } });
     await user.click(screen.getByText('childDev.getStarted'));
 

@@ -23,7 +23,7 @@ describe('AddCaseForm', () => {
     const input = screen.getByLabelText('immigration.receiptNumber');
     const submit = screen.getByText('immigration.addCase');
 
-    await userEvent.type(input, 'INVALID');
+    fireEvent.change(input, { target: { value: 'INVALID' } });
     fireEvent.click(submit);
 
     expect(screen.getByText('immigration.invalidReceipt')).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('AddCaseForm', () => {
     const input = screen.getByLabelText('immigration.receiptNumber');
     const submit = screen.getByText('immigration.addCase');
 
-    await userEvent.type(input, 'IOE0912345678');
+    fireEvent.change(input, { target: { value: 'IOE0912345678' } });
     fireEvent.click(submit);
 
     await waitFor(() => {
@@ -59,7 +59,7 @@ describe('AddCaseForm', () => {
     render(<AddCaseForm onAdd={onAdd} onCancel={onCancel} />);
     const input = screen.getByLabelText('immigration.receiptNumber');
 
-    await userEvent.type(input, 'ioe0912345678');
+    fireEvent.change(input, { target: { value: 'ioe0912345678' } });
     fireEvent.click(screen.getByText('immigration.addCase'));
 
     await waitFor(() => {

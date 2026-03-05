@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BabyTracker from './BabyTracker';
 
@@ -67,21 +66,19 @@ describe('BabyTracker', () => {
     expect(screen.getByText('baby.noDueDate')).toBeInTheDocument();
   });
 
-  it('saves due date to localStorage and dispatches event', async () => {
+  it('saves due date to localStorage and dispatches event', () => {
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    const user = userEvent.setup();
 
     render(<BabyTracker />);
 
     const dateInput = screen.getByLabelText('baby.dueDate');
-    await user.clear(dateInput);
     // Set a date 20 weeks from now
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 140);
     const dateStr = futureDate.toISOString().split('T')[0];
     fireEvent.change(dateInput, { target: { value: dateStr } });
 
-    await user.click(screen.getByText('baby.save'));
+    fireEvent.click(screen.getByText('baby.save'));
 
     expect(Storage.prototype.setItem).toHaveBeenCalledWith('baby-due-date', dateStr);
     expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'baby-due-date-changed' }));
@@ -131,18 +128,17 @@ describe('BabyTracker', () => {
     expect(screen.getByText('baby.clear')).toBeInTheDocument();
   });
 
-  it('clears due date when clear button is clicked', async () => {
+  it('clears due date when clear button is clicked', () => {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 140);
     const dateStr = futureDate.toISOString().split('T')[0];
 
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(dateStr);
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    const user = userEvent.setup();
 
     render(<BabyTracker />);
 
-    await user.click(screen.getByText('baby.clear'));
+    fireEvent.click(screen.getByText('baby.clear'));
 
     expect(Storage.prototype.removeItem).toHaveBeenCalledWith('baby-due-date');
     expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'baby-due-date-changed' }));
@@ -174,14 +170,13 @@ describe('BabyTracker', () => {
     expect(screen.getByText('baby.notPregnantYet')).toBeInTheDocument();
   });
 
-  it('shuffles verse when shuffle button is clicked', async () => {
-    const user = userEvent.setup();
+  it('shuffles verse when shuffle button is clicked', () => {
     render(<BabyTracker />);
 
     const shuffleBtn = screen.getByRole('button', { name: 'baby.shuffleVerse' });
     // Click multiple times - since it's random, just ensure it doesn't error
-    await user.click(shuffleBtn);
-    await user.click(shuffleBtn);
+    fireEvent.click(shuffleBtn);
+    fireEvent.click(shuffleBtn);
 
     expect(shuffleBtn).toBeInTheDocument();
   });
