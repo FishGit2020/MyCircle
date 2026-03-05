@@ -281,9 +281,6 @@ export default function Layout() {
 
             {/* Desktop nav (hidden on mobile) */}
             <nav ref={navRef} aria-label="Main navigation" className="hidden md:flex items-center space-x-4">
-              <Link to="/" className={navLinkClass('/')}>
-                {t('nav.home')}
-              </Link>
               {NAV_GROUPS.map(group => (
                 <NavDropdown
                   key={group.labelKey}

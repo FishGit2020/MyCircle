@@ -16,27 +16,47 @@ export default function EndpointManager({ source }: EndpointManagerProps) {
   const { t } = useTranslation();
   const { endpoints, loading, saving, saveEndpoint, deleteEndpoint } = useEndpoints();
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [cfEnabled, setCfEnabled] = useState(false);
   const [cfClientId, setCfClientId] = useState('');
   const [cfClientSecret, setCfClientSecret] = useState('');
 
+  const resetForm = () => {
+    setName('');
+    setUrl('');
+    setCfEnabled(false);
+    setCfClientId('');
+    setCfClientSecret('');
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const handleEdit = (ep: { id: string; name: string; url: string; hasCfAccess?: boolean; source: string }) => {
+    setEditingId(ep.id);
+    setName(ep.name);
+    setUrl(ep.url);
+    setCfEnabled(!!ep.hasCfAccess);
+    setCfClientId('');
+    setCfClientSecret('');
+    setShowForm(true);
+  };
+
   const handleSave = async () => {
     if (!name.trim() || !url.trim()) return;
+    // If editing, delete old endpoint first
+    if (editingId) {
+      await deleteEndpoint(editingId);
+    }
     await saveEndpoint({
       name: name.trim(),
       url: url.trim().replace(/\/+$/, ''),
       source,
       ...(cfEnabled && cfClientId ? { cfAccessClientId: cfClientId, cfAccessClientSecret: cfClientSecret } : {}),
     });
-    window.__logAnalyticsEvent?.('endpoint_saved', { source, has_cf_access: cfEnabled });
-    setName('');
-    setUrl('');
-    setCfEnabled(false);
-    setCfClientId('');
-    setCfClientSecret('');
-    setShowForm(false);
+    window.__logAnalyticsEvent?.('endpoint_saved', { source, has_cf_access: cfEnabled, edited: !!editingId });
+    resetForm();
   };
 
   const handleDelete = async (id: string) => {
@@ -54,7 +74,7 @@ export default function EndpointManager({ source }: EndpointManagerProps) {
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{t('benchmark.endpoints.title')}</h3>
         <button
           type="button"
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => { resetForm(); setShowForm(!showForm); }}
           className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
         >
           {t('benchmark.endpoints.add')}
@@ -63,6 +83,9 @@ export default function EndpointManager({ source }: EndpointManagerProps) {
 
       {showForm && (
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3 border border-gray-200 dark:border-gray-700">
+          <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {editingId ? t('benchmark.endpoints.edit') : t('benchmark.endpoints.add')}
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('benchmark.endpoints.name')}</label>
             <input
@@ -108,7 +131,7 @@ export default function EndpointManager({ source }: EndpointManagerProps) {
             </div>
           )}
           <div className="flex gap-2 justify-end">
-            <button type="button" onClick={() => setShowForm(false)} className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
+            <button type="button" onClick={resetForm} className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
               {t('benchmark.endpoints.cancel')}
             </button>
             <button type="button" onClick={handleSave} disabled={saving || !name.trim() || !url.trim()} className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg transition">
@@ -138,16 +161,28 @@ export default function EndpointManager({ source }: EndpointManagerProps) {
                   <span className="inline-block mt-1 text-xs px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded">CF Access</span>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => handleDelete(ep.id)}
-                className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
-                aria-label={t('benchmark.endpoints.delete')}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => handleEdit(ep)}
+                  className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                  aria-label={t('benchmark.endpoints.edit')}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(ep.id)}
+                  className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                  aria-label={t('benchmark.endpoints.delete')}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
         </div>
