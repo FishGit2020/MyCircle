@@ -1777,6 +1777,13 @@ const en = {
   'games.colorGreen': 'Green',
   'games.colorBlue': 'Blue',
   'games.colorYellow': 'Yellow',
+  'games.mazeRunner': 'Maze Runner',
+  'games.mazeDesc': 'Navigate the maze to the finish',
+  'games.mazeRules': 'Fewer moves + faster time = higher score. Difficulty changes maze size.',
+  'games.anagram': 'Anagram',
+  'games.anagramDesc': 'Unscramble the letters',
+  'games.anagramRules': 'Speed + fewer hints = more points. Each hint costs 30 pts.',
+  'games.anagramHint': 'Reveal a letter',
 
   // Privacy Policy
   'privacy.title': 'Privacy Policy',

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { TranslationKey } from '@mycircle/shared';
 
-export type GameType = 'trivia' | 'word' | 'memory' | 'math' | 'headsup' | 'reaction' | 'simon' | 'sequence' | 'colormatch';
+export type GameType = 'trivia' | 'word' | 'memory' | 'math' | 'headsup' | 'reaction' | 'simon' | 'sequence' | 'colormatch' | 'maze' | 'anagram';
 
 interface GameCardProps {
   type: GameType;

@@ -1779,6 +1779,13 @@ const zh: Record<TranslationKey, string> = {
   'games.colorGreen': '\u7eff\u8272',
   'games.colorBlue': '\u84dd\u8272',
   'games.colorYellow': '\u9ec4\u8272',
+  'games.mazeRunner': '\u8ff7\u5bab',
+  'games.mazeDesc': '\u5bfc\u822a\u8ff7\u5bab\u5230\u8fbe\u7ec8\u70b9',
+  'games.mazeRules': '\u66f4\u5c11\u6b65\u6570+\u66f4\u5feb\u901f\u5ea6=\u66f4\u9ad8\u5206\u6570\u3002',
+  'games.anagram': '\u5b57\u6bcd\u91cd\u7ec4',
+  'games.anagramDesc': '\u91cd\u65b0\u6392\u5217\u5b57\u6bcd',
+  'games.anagramRules': '\u901f\u5ea6\u8d8a\u5feb+\u63d0\u793a\u8d8a\u5c11=\u5206\u6570\u8d8a\u9ad8\u3002\u6bcf\u6b21\u63d0\u793a\u626330\u5206\u3002',
+  'games.anagramHint': '\u63ed\u793a\u4e00\u4e2a\u5b57\u6bcd',
 
   // Privacy Policy
   'privacy.title': '\u9690\u79c1\u653f\u7b56',

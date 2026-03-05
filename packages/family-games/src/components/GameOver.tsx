@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { GameType } from './GameCard';
 
@@ -12,6 +12,8 @@ const GAME_NAME_KEYS: Record<GameType, string> = {
   simon: 'games.simonSays',
   sequence: 'games.numberSequence',
   colormatch: 'games.colorMatch',
+  maze: 'games.mazeRunner',
+  anagram: 'games.anagram',
 };
 
 const GAME_ROUTES: Record<GameType, string> = {
@@ -24,6 +26,8 @@ const GAME_ROUTES: Record<GameType, string> = {
   simon: '/family-games/simon',
   sequence: '/family-games/sequence',
   colormatch: '/family-games/colormatch',
+  maze: '/family-games/maze',
+  anagram: '/family-games/anagram',
 };
 
 interface GameOverProps {
@@ -39,16 +43,17 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
+  const savedRef = useRef(false);
 
-  // Auto-save score on mount
+  // Auto-save score on mount (once only)
   useEffect(() => {
+    if (savedRef.current) return;
     const api = window.__familyGames;
     if (!api?.saveScore) return;
-    let cancelled = false;
+    savedRef.current = true;
     api.saveScore({ gameType, score, timeMs, difficulty })
-      .then(() => { if (!cancelled) setSubmitted(true); })
-      .catch(() => { if (!cancelled) setError(true); });
-    return () => { cancelled = true; };
+      .then(() => setSubmitted(true))
+      .catch(() => setError(true));
   }, [gameType, score, timeMs, difficulty]);
 
   const handleShare = useCallback(async () => {
