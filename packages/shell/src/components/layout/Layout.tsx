@@ -343,6 +343,7 @@ export default function Layout() {
       <main
         id="main-content"
         className={`flex-grow container mx-auto px-4 py-6 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
+        style={{ '--player-h': isPlayerVisible ? '5rem' : '0px' } as React.CSSProperties}
       >
         <Outlet />
         {/* PWA safe area bottom spacer for notched devices */}
