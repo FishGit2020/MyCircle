@@ -267,7 +267,7 @@ export default function Layout() {
       </a>
       <OfflineIndicator />
       <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="container mx-auto px-4 py-3 sm:py-4">
+        <div className="container mx-auto px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between gap-2">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 min-w-0 flex-shrink md:flex-shrink-0">
@@ -342,7 +342,7 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-grow container mx-auto px-4 py-8 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
+        className={`flex-grow container mx-auto px-4 py-6 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
       >
         <Outlet />
         {/* PWA safe area bottom spacer for notched devices */}

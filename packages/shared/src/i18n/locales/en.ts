@@ -1657,6 +1657,8 @@ const en = {
   'library.confirmDelete': 'Are you sure you want to delete this book?',
   'library.readNow': 'Read Now',
   'library.listenNow': 'Listen Now',
+  'library.tabRead': 'Read',
+  'library.tabListen': 'Listen',
   'library.convertToAudio': 'Convert to Audio',
   'library.converting': 'Converting...',
   'library.conversionProgress': 'Audio conversion progress',

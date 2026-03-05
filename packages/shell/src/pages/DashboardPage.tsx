@@ -12,13 +12,13 @@ export default function DashboardPage() {
   const { verse, verseFragments, loading } = useCuratedVerse();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Hero section */}
-      <section className="text-center mb-4">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+      <section className="text-center mb-2">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
           {t('home.title')}
         </h2>
-        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-4">
           {t('home.subtitle')}
         </p>
         {/* Daily Bible verse */}

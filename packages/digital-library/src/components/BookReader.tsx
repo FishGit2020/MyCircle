@@ -52,6 +52,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [bookmarks, setBookmarks] = useState<BookBookmark[]>([]);
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'read' | 'listen'>('read');
   const containerRef = useRef<HTMLDivElement>(null);
   const spineItemsRef = useRef<Array<{ href: string; index: number }>>([]);
 
@@ -268,7 +269,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   return (
     <div ref={containerRef} className={`flex flex-col pb-20 md:pb-8 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white dark:bg-gray-800 p-4 overflow-auto' : 'h-[calc(100vh-8rem)]'}`}>
       {/* Header actions */}
-      <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+      <div className="flex items-center gap-2 mb-3 flex-shrink-0">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate flex-1">{title}</h2>
 
         {/* Bookmark button */}
@@ -362,66 +363,101 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         </button>
       </div>
 
-      <div className="flex flex-1 min-h-0 gap-4 overflow-hidden relative">
-            {/* TOC Sidebar */}
-            {tocOpen && (
-              <TableOfContents
-                chapters={chapters}
-                currentChapter={currentChapter}
-                onSelect={goToChapter}
-                onClose={() => setTocOpen(false)}
-              />
-            )}
-
-            {/* Reader */}
-            <div className="flex-1 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 relative">
-              {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 z-10">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-                </div>
-              )}
-              <div ref={viewerRef} className="w-full h-full overflow-auto" />
-            </div>
-          </div>
-
-          {/* Reader Controls */}
-          <div className="flex-shrink-0 mt-4 space-y-3">
-            <ReaderControls
-              onPrev={goPrev}
-              onNext={goNext}
-              onFontIncrease={increaseFontSize}
-              onFontDecrease={decreaseFontSize}
-              fontSize={fontSize}
-              currentChapter={currentChapter}
-              totalChapters={chapters.length}
-            />
-            <BrowserTTS text={ttsText} />
-          </div>
-
-      {/* Audio controls (always visible) */}
-      <div className="flex-shrink-0 mt-4 space-y-3">
-        <ConversionStatus
-          bookId={bookId}
-          language={language}
-          initialStatus={audioStatus}
-          initialProgress={audioProgress}
-          onComplete={() => setShowAudioPlayer(true)}
-          onConvert={async (voiceName: string) => {
-            const token = await window.__getFirebaseIdToken?.();
-            if (!token) return undefined;
-            const apiBase = window.__digitalLibraryApiBase?.() || '';
-            return fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ bookId, voiceName }),
-            });
-          }}
-          isAdmin={isAdmin}
-        />
-        {showAudioPlayer && (
-          <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} />
-        )}
+      {/* Tabs */}
+      <div className="flex gap-1 mb-3 flex-shrink-0 border-b border-gray-200 dark:border-gray-700" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'read'}
+          onClick={() => setActiveTab('read')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
+            activeTab === 'read'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          {t('library.tabRead' as any)}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'listen'}
+          onClick={() => setActiveTab('listen')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
+            activeTab === 'listen'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          {t('library.tabListen' as any)}
+        </button>
       </div>
+
+      {/* Read tab — kept mounted so epubjs state persists */}
+      <div className={activeTab === 'read' ? 'flex flex-col flex-1 min-h-0' : 'hidden'} role="tabpanel">
+        <div className="flex flex-1 min-h-0 gap-4 overflow-hidden relative">
+          {/* TOC Sidebar */}
+          {tocOpen && (
+            <TableOfContents
+              chapters={chapters}
+              currentChapter={currentChapter}
+              onSelect={goToChapter}
+              onClose={() => setTocOpen(false)}
+            />
+          )}
+
+          {/* Reader */}
+          <div className="flex-1 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 relative">
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-gray-800 z-10">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+              </div>
+            )}
+            <div ref={viewerRef} className="w-full h-full overflow-auto" />
+          </div>
+        </div>
+
+        {/* Reader Controls */}
+        <div className="flex-shrink-0 mt-3 space-y-3">
+          <ReaderControls
+            onPrev={goPrev}
+            onNext={goNext}
+            onFontIncrease={increaseFontSize}
+            onFontDecrease={decreaseFontSize}
+            fontSize={fontSize}
+            currentChapter={currentChapter}
+            totalChapters={chapters.length}
+          />
+          <BrowserTTS text={ttsText} />
+        </div>
+      </div>
+
+      {/* Listen tab */}
+      {activeTab === 'listen' && (
+        <div className="flex-1 overflow-auto space-y-4" role="tabpanel">
+          <ConversionStatus
+            bookId={bookId}
+            language={language}
+            initialStatus={audioStatus}
+            initialProgress={audioProgress}
+            onComplete={() => setShowAudioPlayer(true)}
+            onConvert={async (voiceName: string) => {
+              const token = await window.__getFirebaseIdToken?.();
+              if (!token) return undefined;
+              const apiBase = window.__digitalLibraryApiBase?.() || '';
+              return fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ bookId, voiceName }),
+              });
+            }}
+            isAdmin={isAdmin}
+          />
+          {showAudioPlayer && (
+            <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} />
+          )}
+        </div>
+      )}
     </div>
   );
 }
