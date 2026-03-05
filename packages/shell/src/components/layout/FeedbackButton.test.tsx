@@ -24,21 +24,21 @@ beforeEach(() => {
 });
 
 describe('FeedbackButton', () => {
-  it('renders floating trigger button', () => {
+  it('renders header trigger button', () => {
     render(<FeedbackButton />);
-    expect(screen.getByText('feedback.button')).toBeInTheDocument();
+    expect(screen.getByLabelText('feedback.button')).toBeInTheDocument();
   });
 
   it('opens modal on click', () => {
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('feedback.title')).toBeInTheDocument();
   });
 
   it('shows category select, star rating, and message textarea', () => {
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
 
     expect(screen.getByLabelText('feedback.category')).toBeInTheDocument();
     expect(screen.getByLabelText('feedback.message')).toBeInTheDocument();
@@ -49,7 +49,7 @@ describe('FeedbackButton', () => {
 
   it('disables submit when message is empty', () => {
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
 
     const submit = screen.getByText('feedback.submit');
     expect(submit).toBeDisabled();
@@ -57,7 +57,7 @@ describe('FeedbackButton', () => {
 
   it('enables submit when message is entered', () => {
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
 
     fireEvent.change(screen.getByLabelText('feedback.message'), {
       target: { value: 'Great app!' },
@@ -68,7 +68,7 @@ describe('FeedbackButton', () => {
 
   it('submits feedback and shows success', async () => {
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
 
     fireEvent.change(screen.getByLabelText('feedback.message'), {
       target: { value: 'Great app!' },
@@ -89,7 +89,7 @@ describe('FeedbackButton', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
 
     fireEvent.change(screen.getByLabelText('feedback.message'), {
       target: { value: 'Feedback' },
@@ -104,7 +104,7 @@ describe('FeedbackButton', () => {
 
   it('closes on Escape key', () => {
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
 
     act(() => {
@@ -115,14 +115,14 @@ describe('FeedbackButton', () => {
 
   it('closes on close button click', () => {
     render(<FeedbackButton />);
-    fireEvent.click(screen.getByText('feedback.button'));
+    fireEvent.click(screen.getByLabelText('feedback.button'));
     fireEvent.click(screen.getByLabelText('feedback.close'));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('has aria-haspopup on trigger', () => {
     render(<FeedbackButton />);
-    const trigger = screen.getByText('feedback.button').closest('button')!;
+    const trigger = screen.getByLabelText('feedback.button');
     expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
   });
 });
