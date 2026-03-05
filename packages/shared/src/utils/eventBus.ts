@@ -28,6 +28,20 @@ export const MFEvents = {
   PODCAST_CHANGE_SPEED: 'mf:podcast-change-speed',
   PODCAST_SET_SLEEP_TIMER: 'mf:podcast-set-sleep-timer',
   PODCAST_REMOVE_FROM_QUEUE: 'mf:podcast-remove-from-queue',
+  // Generic audio events (source-agnostic)
+  AUDIO_PLAY: 'mf:audio-play',
+  AUDIO_CLOSE: 'mf:audio-close',
+  AUDIO_PLAYBACK_STATE: 'mf:audio-playback-state',
+  AUDIO_TOGGLE_PLAY: 'mf:audio-toggle-play',
+  AUDIO_SEEK: 'mf:audio-seek',
+  AUDIO_SKIP_FORWARD: 'mf:audio-skip-forward',
+  AUDIO_SKIP_BACK: 'mf:audio-skip-back',
+  AUDIO_NEXT_TRACK: 'mf:audio-next-track',
+  AUDIO_PREV_TRACK: 'mf:audio-prev-track',
+  AUDIO_CHANGE_SPEED: 'mf:audio-change-speed',
+  AUDIO_SET_SLEEP_TIMER: 'mf:audio-set-sleep-timer',
+  AUDIO_QUEUE: 'mf:audio-queue',
+  AUDIO_REMOVE_FROM_QUEUE: 'mf:audio-remove-from-queue',
 } as const;
 
 // Window-level data-sync events (plain Event, no payload — used as invalidation signals)
@@ -58,6 +72,7 @@ export const WindowEvents = {
   BOOKS_CHANGED: 'books-changed',
   WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
   BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
+  BOOK_LAST_PLAYED_CHANGED: 'book-last-played-changed',
   BREADCRUMB_DETAIL: 'breadcrumb-detail',
   FAMILY_GAMES_CHANGED: 'family-games-changed',
 } as const;
@@ -117,6 +132,8 @@ export const StorageKeys = {
   BOOKS_CACHE: 'books-cache',
   BOOK_BOOKMARKS: 'book-bookmarks',
   BOOK_AUDIO_PROGRESS: 'book-audio-progress',
+  BOOK_NOW_PLAYING: 'book-now-playing',
+  BOOK_LAST_PLAYED: 'book-last-played',
   FAMILY_GAMES_CACHE: 'family-games-cache',
 } as const;
 
@@ -150,6 +167,53 @@ export interface PodcastPlaybackStateEvent {
   sleepRemaining: number;
   queueLength: number;
   queue?: Array<{ id: string | number; title: string }>;
+}
+
+/** A single playable audio track */
+export interface AudioTrack {
+  id: string;
+  url: string;
+  title: string;
+}
+
+/** A collection of tracks (podcast, book, album) */
+export interface AudioCollection {
+  id: string;
+  title: string;
+  artwork?: string;
+  tracks: AudioTrack[];
+}
+
+/** Generic audio source — everything the player needs */
+export interface AudioSource {
+  type: string;
+  track: AudioTrack;
+  collection: AudioCollection;
+  trackIndex: number;
+  navigateTo: string;
+  progressKey: string;
+  nowPlayingKey: string;
+  lastPlayedKey: string;
+  lastPlayedEvent: string;
+  canQueue?: boolean;
+  canShare?: boolean;
+  skipSeconds?: number;
+}
+
+/** Generic playback state broadcast */
+export interface AudioPlaybackStateEvent {
+  type: string;
+  isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  playbackSpeed: number;
+  sleepMinutes: number;
+  sleepRemaining: number;
+  trackIndex: number;
+  totalTracks: number;
+  trackTitle: string;
+  queueLength: number;
+  queue?: Array<{ id: string; title: string }>;
 }
 
 class EventBusImpl implements EventBus {

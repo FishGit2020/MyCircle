@@ -423,6 +423,14 @@ const en = {
   'podcasts.markPlayed': 'Mark as played',
   'podcasts.markUnplayed': 'Mark as unplayed',
 
+  // Generic audio player
+  'player.chapterOf': 'Chapter {current} of {total}',
+  'player.nextTrack': 'Next track',
+  'player.prevTrack': 'Previous track',
+  'player.listeningToBook': 'Listening to audiobook',
+  'player.resumeBook': 'Resume audiobook',
+  'player.closePlayer': 'Close player',
+
   // AI Assistant
   'ai.title': 'AI Assistant',
   'ai.subtitle': 'Ask about weather, stocks, or navigate the app',

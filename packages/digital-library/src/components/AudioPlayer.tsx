@@ -1,7 +1,6 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { useTranslation, createLogger, StorageKeys } from '@mycircle/shared';
-
-const logger = createLogger('AudioPlayer');
+import React, { useState, useCallback, useEffect } from 'react';
+import { useTranslation, StorageKeys, WindowEvents, eventBus, MFEvents, subscribeToMFEvent } from '@mycircle/shared';
+import type { AudioSource, AudioPlaybackStateEvent, AudioTrack } from '@mycircle/shared';
 
 interface Chapter {
   index: number;
@@ -14,154 +13,117 @@ interface AudioPlayerProps {
   chapters: Chapter[];
   bookTitle: string;
   bookId?: string;
+  coverUrl?: string;
 }
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
-function saveAudioProgress(bookId: string, chapter: number, position: number, duration: number) {
-  try {
-    const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
-    const progress: Record<string, { position: number; duration: number; chapter: number }> = raw ? JSON.parse(raw) : {};
-    progress[bookId] = { position, duration, chapter };
-    localStorage.setItem(StorageKeys.BOOK_AUDIO_PROGRESS, JSON.stringify(progress));
-    window.dispatchEvent(new Event('book-audio-progress-changed'));
-  } catch { /* ignore */ }
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function loadAudioProgress(bookId: string): { position: number; duration: number; chapter: number } | null {
-  try {
-    const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
-    if (!raw) return null;
-    const progress = JSON.parse(raw);
-    return progress[bookId] || null;
-  } catch { return null; }
-}
-
-export default function AudioPlayer({ chapters, bookTitle, bookId }: AudioPlayerProps) {
+export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl }: AudioPlayerProps) {
   const { t } = useTranslation();
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
 
-  const lastSaveRef = useRef(0);
-
   const audioChapters = chapters.filter(ch => ch.audioUrl);
+
+  // Build AudioTrack[] for the collection
+  const audioTracks: AudioTrack[] = audioChapters.map(ch => ({
+    id: `${bookId || 'book'}-${ch.index}`,
+    url: ch.audioUrl!,
+    title: ch.title,
+  }));
+
   const current = audioChapters[currentChapter];
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-      // Throttled save every 5 seconds
-      if (bookId && Date.now() - lastSaveRef.current > 5000) {
-        lastSaveRef.current = Date.now();
-        saveAudioProgress(bookId, currentChapter, audio.currentTime, audio.duration || 0);
-      }
-    };
-    const handleDurationChange = () => setDuration(audio.duration || 0);
-    const handleEnded = () => {
-      // Auto-advance to next chapter
-      if (currentChapter < audioChapters.length - 1) {
-        setCurrentChapter(prev => prev + 1);
-        setPlaying(true);
-      } else {
-        setPlaying(false);
-      }
-    };
-    const handlePlay = () => setPlaying(true);
-    const handlePause = () => {
-      setPlaying(false);
-      // Save position immediately on pause
-      if (bookId) {
-        saveAudioProgress(bookId, currentChapter, audio.currentTime, audio.duration || 0);
-      }
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('durationchange', handleDurationChange);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('durationchange', handleDurationChange);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-    };
-  }, [currentChapter, audioChapters.length]);
-
-  // Restore saved position on mount
+  // Restore saved chapter on mount
   useEffect(() => {
     if (!bookId) return;
-    const saved = loadAudioProgress(bookId);
-    if (saved && saved.chapter >= 0 && saved.chapter < audioChapters.length) {
-      setCurrentChapter(saved.chapter);
-    }
+    try {
+      const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
+      if (!raw) return;
+      const progress = JSON.parse(raw);
+      const saved = progress[bookId];
+      if (saved && saved.chapter >= 0 && saved.chapter < audioChapters.length) {
+        setCurrentChapter(saved.chapter);
+      }
+    } catch { /* ignore */ }
   }, [bookId, audioChapters.length]);
 
-  // Load new chapter audio when changed
+  // Subscribe to playback state from GlobalAudioPlayer
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !current?.audioUrl) return;
-    audio.src = current.audioUrl;
-    audio.playbackRate = speed;
+    const unsub = subscribeToMFEvent<AudioPlaybackStateEvent>(
+      MFEvents.AUDIO_PLAYBACK_STATE,
+      (data) => {
+        if (data.type !== 'book') return;
+        setPlaying(data.isPlaying);
+        setCurrentTime(data.currentTime);
+        setDuration(data.duration);
+        setSpeed(data.playbackSpeed);
+        if (data.trackIndex !== currentChapter) {
+          setCurrentChapter(data.trackIndex);
+        }
+      },
+    );
+    return unsub;
+  }, [currentChapter]);
 
-    // Restore saved position for this book
-    if (bookId) {
-      const saved = loadAudioProgress(bookId);
-      if (saved && saved.chapter === currentChapter && saved.position > 0) {
-        audio.currentTime = saved.position;
-      }
-    }
-
-    if (playing) {
-      audio.play().catch(err => logger.error('Play failed', err));
-    }
-  }, [currentChapter, current?.audioUrl]);
-
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.playbackRate = speed;
-  }, [speed]);
+  const buildAudioSource = useCallback((chapterIdx: number): AudioSource => ({
+    type: 'book',
+    track: audioTracks[chapterIdx],
+    collection: {
+      id: bookId || 'book',
+      title: bookTitle,
+      artwork: coverUrl,
+      tracks: audioTracks,
+    },
+    trackIndex: chapterIdx,
+    navigateTo: '/library',
+    progressKey: StorageKeys.BOOK_AUDIO_PROGRESS,
+    nowPlayingKey: StorageKeys.BOOK_NOW_PLAYING,
+    lastPlayedKey: StorageKeys.BOOK_LAST_PLAYED,
+    lastPlayedEvent: WindowEvents.BOOK_LAST_PLAYED_CHANGED,
+    canQueue: false,
+    canShare: false,
+    skipSeconds: 10,
+  }), [audioTracks, bookId, bookTitle, coverUrl]);
 
   const togglePlay = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio || !current?.audioUrl) return;
     if (playing) {
-      audio.pause();
+      eventBus.publish(MFEvents.AUDIO_TOGGLE_PLAY);
     } else {
-      audio.play().catch(err => logger.error('Play failed', err));
+      // Publish AUDIO_PLAY to start playback via GlobalAudioPlayer
+      eventBus.publish(MFEvents.AUDIO_PLAY, buildAudioSource(currentChapter));
+      setPlaying(true); // optimistic
     }
-  }, [playing, current?.audioUrl]);
-
-  const seekTo = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const audio = audioRef.current;
-    if (audio) audio.currentTime = Number(e.target.value);
-  }, []);
+  }, [playing, currentChapter, buildAudioSource]);
 
   const goToChapter = useCallback((index: number) => {
     setCurrentChapter(index);
-    setPlaying(true);
+    eventBus.publish(MFEvents.AUDIO_PLAY, buildAudioSource(index));
+    setPlaying(true); // optimistic
+  }, [buildAudioSource]);
+
+  const handleSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    eventBus.publish(MFEvents.AUDIO_SEEK, { time: Number(e.target.value) });
   }, []);
 
-  const formatTime = (seconds: number): string => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
+  const handleSpeedChange = useCallback((newSpeed: number) => {
+    setSpeed(newSpeed);
+    eventBus.publish(MFEvents.AUDIO_CHANGE_SPEED, { speed: newSpeed });
+  }, []);
 
   if (audioChapters.length === 0) return null;
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3">
-      <audio ref={audioRef} preload="metadata" />
-
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate flex-1">
           {current?.title || bookTitle}
@@ -179,7 +141,7 @@ export default function AudioPlayer({ chapters, bookTitle, bookId }: AudioPlayer
           min={0}
           max={duration || 0}
           value={currentTime}
-          onChange={seekTo}
+          onChange={handleSeek}
           className="flex-1 h-1.5 rounded-full appearance-none bg-gray-200 dark:bg-gray-700 cursor-pointer"
           aria-label="Audio progress"
         />
@@ -236,7 +198,7 @@ export default function AudioPlayer({ chapters, bookTitle, bookId }: AudioPlayer
           <span className="text-xs text-gray-500 dark:text-gray-400">{t('library.speed')}:</span>
           <select
             value={speed}
-            onChange={(e) => setSpeed(Number(e.target.value))}
+            onChange={(e) => handleSpeedChange(Number(e.target.value))}
             className="text-xs bg-gray-100 dark:bg-gray-700 border-0 rounded px-2 py-1 text-gray-700 dark:text-gray-300 min-h-[44px]"
             aria-label={t('library.speed')}
           >
