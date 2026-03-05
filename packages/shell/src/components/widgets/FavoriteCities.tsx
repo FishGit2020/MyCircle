@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate, Link } from 'react-router';
 import { useQuery, GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature, useTranslation } from '@mycircle/shared';
 import type { GetCurrentWeatherQuery } from '@mycircle/shared';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation, useUnits, formatTemperature, formatTemperatureDiff, formatWindSpeed, getWeatherIconUrl } from '@mycircle/shared';
 import type { CurrentWeather, HistoricalWeatherDay } from '@mycircle/shared';
 

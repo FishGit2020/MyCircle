@@ -1,4 +1,3 @@
-import React from 'react';
 import { CurrentWeather, useTranslation } from '@mycircle/shared';
 
 interface Props {

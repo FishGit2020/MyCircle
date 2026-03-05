@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';

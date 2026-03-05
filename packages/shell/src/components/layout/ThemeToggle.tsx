@@ -1,4 +1,3 @@
-import React from 'react';
 import { createLogger } from '@mycircle/shared';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';

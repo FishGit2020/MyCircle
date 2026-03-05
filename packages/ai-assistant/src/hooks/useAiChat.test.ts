@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import React from 'react';
 
 // Track the mutate function so tests can inspect calls
 const mockMutate = vi.fn();

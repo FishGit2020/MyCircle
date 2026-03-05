@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQuery, GET_CURRENT_WEATHER, getWeatherIconUrl, useUnits, formatTemperature } from '@mycircle/shared';
 import type { GetCurrentWeatherQuery } from '@mycircle/shared';
 

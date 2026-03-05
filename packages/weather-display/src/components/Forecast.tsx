@@ -1,4 +1,3 @@
-import React from 'react';
 import { ForecastDay, getWeatherIconUrl, useUnits, convertTemp, tempUnitSymbol, useTranslation } from '@mycircle/shared';
 
 interface Props {

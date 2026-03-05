@@ -1,4 +1,3 @@
-import React from 'react';
 import { CurrentWeather as CurrentWeatherType, getWeatherIconUrl, getWindDirection, getWeatherDescription, useUnits, formatTemperature, formatWindSpeed, useTranslation } from '@mycircle/shared';
 
 interface Props {
