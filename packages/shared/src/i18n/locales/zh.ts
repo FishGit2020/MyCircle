@@ -1699,6 +1699,13 @@ const zh: Record<TranslationKey, string> = {
   'library.retryConversion': '\u91cd\u8bd5\u8f6c\u6362',
   'library.continuingConversion': '\u6b63\u5728\u7ee7\u7eed\u8f6c\u6362...',
   'library.autoContinueHint': '\u5c06\u5728\u7a0d\u540e\u81ea\u52a8\u7ee7\u7eed',
+  'library.sleepTimer': '\u7761\u7720\u5b9a\u65f6\u5668',
+  'library.sleepOff': '\u5173\u95ed',
+  'library.sleepMinutes': '{mins} \u5206\u949f',
+  'library.shareChapter': '\u5206\u4eab\u7ae0\u8282',
+  'library.skipForward': '\u5feb\u8fdb10\u79d2',
+  'library.skipBack': '\u5feb\u900010\u79d2',
+  'library.chapterComplete': '\u5df2\u5b8c\u6210',
 
   'widgets.noAudiobook': '\u6ca1\u6709\u6b63\u5728\u8fdb\u884c\u7684\u6709\u58f0\u4e66',
 
