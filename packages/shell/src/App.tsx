@@ -29,7 +29,7 @@ const NotebookMF = tracedLazy('mfe_notebook_load', () => import('notebook/Notebo
 const BabyTrackerMF = tracedLazy('mfe_baby_load', () => import('babyTracker/BabyTracker'), getPerf);
 const ChildDevelopmentMF = tracedLazy('mfe_childdev_load', () => import('childDevelopment/ChildDevelopment'), getPerf);
 const FlashCardsMF = tracedLazy('mfe_flashcards_load', () => import('flashcards/FlashCards'), getPerf);
-const WorkTrackerMF = tracedLazy('mfe_work_tracker_load', () => import('workTracker/WorkTracker'), getPerf);
+const DailyLogMF = tracedLazy('mfe_daily_log_load', () => import('dailyLog/DailyLog'), getPerf);
 const CloudFilesMF = tracedLazy('mfe_cloud_files_load', () => import('cloudFiles/CloudFiles'), getPerf);
 const ModelBenchmarkMF = tracedLazy('mfe_benchmark_load', () => import('modelBenchmark/ModelBenchmark'), getPerf);
 const ImmigrationTrackerMF = tracedLazy('mfe_immigration_load', () => import('immigrationTracker/ImmigrationTracker'), getPerf);
@@ -353,18 +353,18 @@ function FlashCardsPage() {
   );
 }
 
-// Fallback for Work Tracker MFE
-const WorkTrackerFallback = () => (
+// Fallback for Daily Log MFE
+const DailyLogFallback = () => (
   <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Work Tracker module is loading...</p>
+    <p className="text-yellow-700 dark:text-yellow-300">Daily Log module is loading...</p>
   </div>
 );
 
-function WorkTrackerPage() {
+function DailyLogPage() {
   return (
-    <ErrorBoundary fallback={<WorkTrackerFallback />}>
+    <ErrorBoundary fallback={<DailyLogFallback />}>
       <Suspense fallback={<Loading />}>
-        <WorkTrackerMF />
+        <DailyLogMF />
       </Suspense>
     </ErrorBoundary>
   );
@@ -508,7 +508,7 @@ export default function App() {
         <Route path="baby" element={<RequireAuth><BabyPage /></RequireAuth>} />
         <Route path="child-dev" element={<RequireAuth><ChildDevPage /></RequireAuth>} />
         <Route path="flashcards" element={<RequireAuth><FlashCardsPage /></RequireAuth>} />
-        <Route path="work-tracker" element={<RequireAuth><WorkTrackerPage /></RequireAuth>} />
+        <Route path="daily-log" element={<RequireAuth><DailyLogPage /></RequireAuth>} />
         <Route path="files" element={<RequireAuth><CloudFilesPage /></RequireAuth>} />
         <Route path="benchmark" element={<RequireAuth><BenchmarkPage /></RequireAuth>} />
         <Route path="immigration" element={<RequireAuth><ImmigrationPage /></RequireAuth>} />

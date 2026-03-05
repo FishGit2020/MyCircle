@@ -21,7 +21,7 @@ COPY packages/notebook/package.json packages/notebook/
 COPY packages/baby-tracker/package.json packages/baby-tracker/
 COPY packages/child-development/package.json packages/child-development/
 COPY packages/flashcards/package.json packages/flashcards/
-COPY packages/work-tracker/package.json packages/work-tracker/
+COPY packages/daily-log/package.json packages/daily-log/
 COPY packages/cloud-files/package.json packages/cloud-files/
 COPY packages/model-benchmark/package.json packages/model-benchmark/
 COPY packages/immigration-tracker/package.json packages/immigration-tracker/
@@ -75,7 +75,7 @@ COPY --from=builder /app/packages/notebook/package.json packages/notebook/
 COPY --from=builder /app/packages/baby-tracker/package.json packages/baby-tracker/
 COPY --from=builder /app/packages/child-development/package.json packages/child-development/
 COPY --from=builder /app/packages/flashcards/package.json packages/flashcards/
-COPY --from=builder /app/packages/work-tracker/package.json packages/work-tracker/
+COPY --from=builder /app/packages/daily-log/package.json packages/daily-log/
 COPY --from=builder /app/packages/cloud-files/package.json packages/cloud-files/
 COPY --from=builder /app/packages/model-benchmark/package.json packages/model-benchmark/
 COPY --from=builder /app/packages/immigration-tracker/package.json packages/immigration-tracker/

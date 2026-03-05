@@ -55,9 +55,9 @@ export const getCryptoPricesTool: ToolDef = {
 
 export const navigateToTool: ToolDef = {
   name: 'navigateTo',
-  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, weather/compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai, library, family-games.',
+  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, weather/compare, bible, worship, notebook, flashcards, baby, child-dev, daily-log, files, benchmark, immigration, ai, library, family-games.',
   parameters: z.object({
-    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "weather/compare", "bible", "worship", "notebook", "flashcards", "baby", "child-dev", "work-tracker", "files", "benchmark", "immigration", "ai", "library", "family-games"'),
+    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "weather/compare", "bible", "worship", "notebook", "flashcards", "baby", "child-dev", "daily-log", "files", "benchmark", "immigration", "ai", "library", "family-games"'),
   }),
   category: 'navigation',
   isFrontendAction: true,
@@ -137,14 +137,14 @@ export const addNoteTool: ToolDef = {
   isFrontendAction: true,
 };
 
-export const addWorkEntryTool: ToolDef = {
-  name: 'addWorkEntry',
-  description: 'Add a work time entry for the user. Returns an action for the frontend to execute.',
+export const addDailyLogEntryTool: ToolDef = {
+  name: 'addDailyLogEntry',
+  description: 'Add a daily log entry for the user. Returns an action for the frontend to execute.',
   parameters: z.object({
     date: z.string().describe('Date for the entry (YYYY-MM-DD format)'),
-    content: z.string().describe('Description of work done'),
+    content: z.string().describe('Description of activity'),
   }),
-  category: 'work-tracker',
+  category: 'daily-log',
   isFrontendAction: true,
 };
 
@@ -196,7 +196,7 @@ export const ALL_TOOLS: ToolDef[] = [
   listFlashcardsTool,
   checkCaseStatusTool,
   addNoteTool,
-  addWorkEntryTool,
+  addDailyLogEntryTool,
   setBabyDueDateTool,
   addChildMilestoneTool,
   addImmigrationCaseTool,

@@ -70,22 +70,22 @@ describe('DayNode', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    expect(screen.getByText('workTracker.today')).toBeInTheDocument();
+    expect(screen.getByText('dailyLog.today')).toBeInTheDocument();
   });
 
   it('shows "yesterday" label for yesterday\'s date', () => {
     render(
       <DayNode date="2026-02-28" entries={[makeEntry({ date: '2026-02-28' })]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    expect(screen.getByText('workTracker.yesterday')).toBeInTheDocument();
+    expect(screen.getByText('dailyLog.yesterday')).toBeInTheDocument();
   });
 
   it('does not show day label for other dates', () => {
     render(
       <DayNode date="2026-02-20" entries={[makeEntry({ date: '2026-02-20' })]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    expect(screen.queryByText('workTracker.today')).not.toBeInTheDocument();
-    expect(screen.queryByText('workTracker.yesterday')).not.toBeInTheDocument();
+    expect(screen.queryByText('dailyLog.today')).not.toBeInTheDocument();
+    expect(screen.queryByText('dailyLog.yesterday')).not.toBeInTheDocument();
   });
 
   it('renders multiple entries', () => {
@@ -102,7 +102,7 @@ describe('DayNode', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'workTracker.edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
     expect(screen.getByTestId('entry-form')).toBeInTheDocument();
     expect(screen.getByTestId('form-initial-value')).toHaveTextContent('Fixed a bug');
   });
@@ -111,7 +111,7 @@ describe('DayNode', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'workTracker.edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
     fireEvent.click(screen.getByText('mock-save'));
     await waitFor(() => {
       expect(onUpdate).toHaveBeenCalledWith('1', 'updated content');
@@ -126,7 +126,7 @@ describe('DayNode', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'workTracker.edit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
     expect(screen.getByTestId('entry-form')).toBeInTheDocument();
     fireEvent.click(screen.getByText('mock-cancel'));
     expect(screen.queryByTestId('entry-form')).not.toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('DayNode', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'workTracker.delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.delete' }));
     expect(screen.getByText('Confirm')).toBeInTheDocument();
   });
 
@@ -144,7 +144,7 @@ describe('DayNode', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'workTracker.delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.delete' }));
     fireEvent.click(screen.getByText('Confirm'));
     await waitFor(() => {
       expect(onDelete).toHaveBeenCalledWith('1');
@@ -155,7 +155,7 @@ describe('DayNode', () => {
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
-    expect(screen.queryByRole('button', { name: 'workTracker.moveDate' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'dailyLog.moveDate' })).not.toBeInTheDocument();
   });
 
   it('shows move button when onMoveEntry is provided', () => {
@@ -168,7 +168,7 @@ describe('DayNode', () => {
         onMoveEntry={onMoveEntry}
       />
     );
-    expect(screen.getByRole('button', { name: 'workTracker.moveDate' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'dailyLog.moveDate' })).toBeInTheDocument();
   });
 
   it('shows date picker when move button is clicked', () => {
@@ -181,8 +181,8 @@ describe('DayNode', () => {
         onMoveEntry={onMoveEntry}
       />
     );
-    fireEvent.click(screen.getByRole('button', { name: 'workTracker.moveDate' }));
-    expect(screen.getByLabelText('workTracker.moveDatePicker')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'dailyLog.moveDate' }));
+    expect(screen.getByLabelText('dailyLog.moveDatePicker')).toBeInTheDocument();
   });
 
   it('toggles move date picker off on second click', () => {
@@ -195,10 +195,10 @@ describe('DayNode', () => {
         onMoveEntry={onMoveEntry}
       />
     );
-    const moveBtn = screen.getByRole('button', { name: 'workTracker.moveDate' });
+    const moveBtn = screen.getByRole('button', { name: 'dailyLog.moveDate' });
     fireEvent.click(moveBtn);
-    expect(screen.getByLabelText('workTracker.moveDatePicker')).toBeInTheDocument();
+    expect(screen.getByLabelText('dailyLog.moveDatePicker')).toBeInTheDocument();
     fireEvent.click(moveBtn);
-    expect(screen.queryByLabelText('workTracker.moveDatePicker')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('dailyLog.moveDatePicker')).not.toBeInTheDocument();
   });
 });

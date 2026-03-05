@@ -104,10 +104,10 @@ function gatherUserContext(): Record<string, unknown> {
       try { const parsed = JSON.parse(immCases); if (Array.isArray(parsed)) ctx.immigrationCasesCount = parsed.length; } catch { /* */ }
     }
 
-    // Work entries
-    const workEntries = localStorage.getItem('work-tracker-cache');
-    if (workEntries) {
-      try { const parsed = JSON.parse(workEntries); if (Array.isArray(parsed)) ctx.workEntriesCount = parsed.length; } catch { /* */ }
+    // Daily log entries
+    const dailyLogEntries = localStorage.getItem('daily-log-cache');
+    if (dailyLogEntries) {
+      try { const parsed = JSON.parse(dailyLogEntries); if (Array.isArray(parsed)) ctx.dailyLogEntriesCount = parsed.length; } catch { /* */ }
     }
 
     // User preferences
@@ -166,7 +166,7 @@ function handleActions(actions: AiAction[]) {
       case 'addNote':
         window.__notebook?.add(action.payload);
         break;
-      case 'addWorkEntry':
+      case 'addDailyLogEntry':
         window.__workTracker?.add(action.payload);
         break;
       case 'setBabyDueDate':

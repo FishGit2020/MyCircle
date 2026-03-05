@@ -1075,7 +1075,7 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
         /** Frontend action tools — their args become actions dispatched to the client */
         const FRONTEND_ACTIONS = new Set([
           'navigateTo', 'addFlashcard', 'addBookmark', 'listFlashcards',
-          'addNote', 'addWorkEntry', 'setBabyDueDate', 'addChildMilestone', 'addImmigrationCase',
+          'addNote', 'addDailyLogEntry', 'setBabyDueDate', 'addChildMilestone', 'addImmigrationCase',
         ]);
 
         function extractActions(toolCalls: Array<{ name: string; args: Record<string, unknown> }>) {
@@ -1115,7 +1115,7 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
             return JSON.stringify(result);
           }
           if (name === 'addNote') return JSON.stringify({ action: 'addNote', title: args.title, content: args.content });
-          if (name === 'addWorkEntry') return JSON.stringify({ action: 'addWorkEntry', date: args.date, content: args.content });
+          if (name === 'addDailyLogEntry') return JSON.stringify({ action: 'addDailyLogEntry', date: args.date, content: args.content });
           if (name === 'setBabyDueDate') return JSON.stringify({ action: 'setBabyDueDate', dueDate: args.dueDate });
           if (name === 'addChildMilestone') return JSON.stringify({ action: 'addChildMilestone', milestone: args.milestone, date: args.date });
           if (name === 'addImmigrationCase') return JSON.stringify({ action: 'addImmigrationCase', receiptNumber: args.receiptNumber, formType: args.formType, nickname: args.nickname });
@@ -1169,10 +1169,10 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
             { type: 'function', function: { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: 'object', properties: { query: { type: 'string', description: 'Search query' } }, required: ['query'] } } },
             { type: 'function', function: { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: 'object', properties: { symbol: { type: 'string', description: 'Stock ticker' } }, required: ['symbol'] } } },
             { type: 'function', function: { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: 'object', properties: {} } } },
-            { type: 'function', function: { name: 'navigateTo', description: 'Navigate to a page. Pages: weather, stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai.', parameters: { type: 'object', properties: { page: { type: 'string', description: 'Page name' } }, required: ['page'] } } },
+            { type: 'function', function: { name: 'navigateTo', description: 'Navigate to a page. Pages: weather, stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, daily-log, files, benchmark, immigration, ai.', parameters: { type: 'object', properties: { page: { type: 'string', description: 'Page name' } }, required: ['page'] } } },
             { type: 'function', function: { name: 'checkCaseStatus', description: 'Check USCIS immigration case status by receipt number.', parameters: { type: 'object', properties: { receiptNumber: { type: 'string', description: 'USCIS receipt number (e.g., MSC2190012345)' } }, required: ['receiptNumber'] } } },
             { type: 'function', function: { name: 'addNote', description: 'Create a note in the notebook.', parameters: { type: 'object', properties: { title: { type: 'string', description: 'Note title' }, content: { type: 'string', description: 'Note content' } }, required: ['title', 'content'] } } },
-            { type: 'function', function: { name: 'addWorkEntry', description: 'Add a work time entry.', parameters: { type: 'object', properties: { date: { type: 'string', description: 'Date (YYYY-MM-DD)' }, content: { type: 'string', description: 'Work description' } }, required: ['date', 'content'] } } },
+            { type: 'function', function: { name: 'addDailyLogEntry', description: 'Add a daily log entry.', parameters: { type: 'object', properties: { date: { type: 'string', description: 'Date (YYYY-MM-DD)' }, content: { type: 'string', description: 'Work description' } }, required: ['date', 'content'] } } },
             { type: 'function', function: { name: 'setBabyDueDate', description: 'Set the baby due date.', parameters: { type: 'object', properties: { dueDate: { type: 'string', description: 'Due date (YYYY-MM-DD)' } }, required: ['dueDate'] } } },
             { type: 'function', function: { name: 'addChildMilestone', description: 'Record a child development milestone.', parameters: { type: 'object', properties: { milestone: { type: 'string', description: 'Milestone description' }, date: { type: 'string', description: 'Date achieved (YYYY-MM-DD)' } }, required: ['milestone'] } } },
             { type: 'function', function: { name: 'addImmigrationCase', description: 'Add a USCIS case to track.', parameters: { type: 'object', properties: { receiptNumber: { type: 'string', description: 'Receipt number' }, formType: { type: 'string', description: 'Form type (e.g., I-485)' }, nickname: { type: 'string', description: 'Friendly name' } }, required: ['receiptNumber'] } } },
@@ -1235,7 +1235,7 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
             const text = choice.message.content || '';
             const match = text.match(/<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/)
               || text.match(/```(?:tool_call|json)?\s*(\{[\s\S]*?\})\s*```/)
-              || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo|checkCaseStatus|addNote|addWorkEntry|setBabyDueDate|addChildMilestone|addImmigrationCase|addFlashcard|getBibleVerse|searchPodcasts|addBookmark|listFlashcards)"[\s\S]*?\})/);
+              || text.match(/(\{"name"\s*:\s*"(?:getWeather|searchCities|getStockQuote|getCryptoPrices|navigateTo|checkCaseStatus|addNote|addDailyLogEntry|setBabyDueDate|addChildMilestone|addImmigrationCase|addFlashcard|getBibleVerse|searchPodcasts|addBookmark|listFlashcards)"[\s\S]*?\})/);
             if (match) {
               try {
                 const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
@@ -1298,10 +1298,10 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
           { name: 'searchCities', description: 'Search for cities by name.', parameters: { type: Type.OBJECT, properties: { query: { type: Type.STRING, description: 'Search query' } }, required: ['query'] } },
           { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: Type.OBJECT, properties: { symbol: { type: Type.STRING, description: 'Stock ticker' } }, required: ['symbol'] } },
           { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: Type.OBJECT, properties: {} } },
-          { name: 'navigateTo', description: 'Navigate to a page. Pages: weather, stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, work-tracker, files, benchmark, immigration, ai.', parameters: { type: Type.OBJECT, properties: { page: { type: Type.STRING, description: 'Page name' } }, required: ['page'] } },
+          { name: 'navigateTo', description: 'Navigate to a page. Pages: weather, stocks, podcasts, compare, bible, worship, notebook, flashcards, baby, child-dev, daily-log, files, benchmark, immigration, ai.', parameters: { type: Type.OBJECT, properties: { page: { type: Type.STRING, description: 'Page name' } }, required: ['page'] } },
           { name: 'checkCaseStatus', description: 'Check USCIS immigration case status by receipt number.', parameters: { type: Type.OBJECT, properties: { receiptNumber: { type: Type.STRING, description: 'USCIS receipt number (e.g., MSC2190012345)' } }, required: ['receiptNumber'] } },
           { name: 'addNote', description: 'Create a note in the notebook.', parameters: { type: Type.OBJECT, properties: { title: { type: Type.STRING, description: 'Note title' }, content: { type: Type.STRING, description: 'Note content' } }, required: ['title', 'content'] } },
-          { name: 'addWorkEntry', description: 'Add a work time entry.', parameters: { type: Type.OBJECT, properties: { date: { type: Type.STRING, description: 'Date (YYYY-MM-DD)' }, content: { type: Type.STRING, description: 'Work description' } }, required: ['date', 'content'] } },
+          { name: 'addDailyLogEntry', description: 'Add a daily log entry.', parameters: { type: Type.OBJECT, properties: { date: { type: Type.STRING, description: 'Date (YYYY-MM-DD)' }, content: { type: Type.STRING, description: 'Work description' } }, required: ['date', 'content'] } },
           { name: 'setBabyDueDate', description: 'Set the baby due date.', parameters: { type: Type.OBJECT, properties: { dueDate: { type: Type.STRING, description: 'Due date (YYYY-MM-DD)' } }, required: ['dueDate'] } },
           { name: 'addChildMilestone', description: 'Record a child development milestone.', parameters: { type: Type.OBJECT, properties: { milestone: { type: Type.STRING, description: 'Milestone description' }, date: { type: Type.STRING, description: 'Date achieved (YYYY-MM-DD)' } }, required: ['milestone'] } },
           { name: 'addImmigrationCase', description: 'Add a USCIS case to track.', parameters: { type: Type.OBJECT, properties: { receiptNumber: { type: Type.STRING, description: 'Receipt number' }, formType: { type: Type.STRING, description: 'Form type (e.g., I-485)' }, nickname: { type: Type.STRING, description: 'Friendly name' } }, required: ['receiptNumber'] } },

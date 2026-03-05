@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useWorkEntries } from './useWorkEntries';
+import { useDailyLogEntries } from './useDailyLogEntries';
 
 // Stable t reference prevents infinite re-renders from useCallback([..., t])
 vi.mock('@mycircle/shared', () => {
@@ -9,9 +9,9 @@ vi.mock('@mycircle/shared', () => {
     useTranslation: () => ({ t }),
     WindowEvents: {
       AUTH_STATE_CHANGED: 'auth-state-changed',
-      WORK_TRACKER_CHANGED: 'work-tracker-changed',
+      DAILY_LOG_CHANGED: 'daily-log-changed',
     },
-    StorageKeys: { WORK_TRACKER_CACHE: 'work-tracker-cache' },
+    StorageKeys: { DAILY_LOG_CACHE: 'daily-log-cache' },
   };
 });
 
@@ -24,7 +24,7 @@ const mockEntries = [
   { id: '2', date: '2026-02-28', content: 'Task B', createdAt: { seconds: 200, nanoseconds: 0 } },
 ];
 
-describe('useWorkEntries', () => {
+describe('useDailyLogEntries', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -38,14 +38,14 @@ describe('useWorkEntries', () => {
   });
 
   it('starts with empty entries', async () => {
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     expect(result.current.entries).toEqual([]);
     // Loading resolves quickly when not authenticated
     await waitFor(() => expect(result.current.loading).toBe(false));
   });
 
   it('sets loading to false when not authenticated', async () => {
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.authChecked).toBe(true));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.isAuthenticated).toBe(false);
@@ -59,7 +59,7 @@ describe('useWorkEntries', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
   });
 
@@ -71,7 +71,7 @@ describe('useWorkEntries', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.entries).toEqual(mockEntries));
     expect(result.current.loading).toBe(false);
   });
@@ -89,7 +89,7 @@ describe('useWorkEntries', () => {
         return unsubscribe;
       }),
     };
-    const { result, unmount } = renderHook(() => useWorkEntries());
+    const { result, unmount } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.entries).toEqual(mockEntries));
     expect(result.current.loading).toBe(false);
     unmount();
@@ -109,7 +109,7 @@ describe('useWorkEntries', () => {
       }),
     };
     vi.useFakeTimers();
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
 
     // Wait for auth to be checked
     await act(async () => {
@@ -135,7 +135,7 @@ describe('useWorkEntries', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     let id: string | undefined;
@@ -146,7 +146,7 @@ describe('useWorkEntries', () => {
     expect(addFn).toHaveBeenCalledWith({ date: '2026-03-01', content: 'New task' });
     expect(id).toBe('new-id');
     expect(dispatchSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'work-tracker-changed' })
+      expect.objectContaining({ type: 'daily-log-changed' })
     );
     dispatchSpy.mockRestore();
   });
@@ -161,7 +161,7 @@ describe('useWorkEntries', () => {
       update: updateFn,
       delete: vi.fn(),
     };
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
@@ -170,7 +170,7 @@ describe('useWorkEntries', () => {
 
     expect(updateFn).toHaveBeenCalledWith('1', { content: 'Updated content' });
     expect(dispatchSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'work-tracker-changed' })
+      expect.objectContaining({ type: 'daily-log-changed' })
     );
     dispatchSpy.mockRestore();
   });
@@ -185,7 +185,7 @@ describe('useWorkEntries', () => {
       update: vi.fn(),
       delete: deleteFn,
     };
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
@@ -194,7 +194,7 @@ describe('useWorkEntries', () => {
 
     expect(deleteFn).toHaveBeenCalledWith('1');
     expect(dispatchSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'work-tracker-changed' })
+      expect.objectContaining({ type: 'daily-log-changed' })
     );
     dispatchSpy.mockRestore();
   });
@@ -208,7 +208,7 @@ describe('useWorkEntries', () => {
       update: updateFn,
       delete: vi.fn(),
     };
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
@@ -219,42 +219,42 @@ describe('useWorkEntries', () => {
   });
 
   it('throws when addEntry is called without bridge API', async () => {
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.authChecked).toBe(true));
 
     await expect(
       act(async () => { await result.current.addEntry('test'); })
-    ).rejects.toThrow('Work tracker API not available');
+    ).rejects.toThrow('Daily log API not available');
   });
 
   it('throws when updateEntry is called without bridge API', async () => {
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.authChecked).toBe(true));
 
     await expect(
       act(async () => { await result.current.updateEntry('1', 'x'); })
-    ).rejects.toThrow('Work tracker API not available');
+    ).rejects.toThrow('Daily log API not available');
   });
 
   it('throws when deleteEntry is called without bridge API', async () => {
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.authChecked).toBe(true));
 
     await expect(
       act(async () => { await result.current.deleteEntry('1'); })
-    ).rejects.toThrow('Work tracker API not available');
+    ).rejects.toThrow('Daily log API not available');
   });
 
   it('throws when moveEntry is called without bridge API', async () => {
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.authChecked).toBe(true));
 
     await expect(
       act(async () => { await result.current.moveEntry('1', '2026-02-20'); })
-    ).rejects.toThrow('Work tracker API not available');
+    ).rejects.toThrow('Daily log API not available');
   });
 
-  it('reloads on WORK_TRACKER_CHANGED event when no subscribe', async () => {
+  it('reloads on DAILY_LOG_CHANGED event when no subscribe', async () => {
     const getAllFn = vi.fn().mockResolvedValue(mockEntries);
     window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
     window.__workTracker = {
@@ -263,11 +263,11 @@ describe('useWorkEntries', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    renderHook(() => useWorkEntries());
+    renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(getAllFn).toHaveBeenCalledTimes(1));
 
     act(() => {
-      window.dispatchEvent(new Event('work-tracker-changed'));
+      window.dispatchEvent(new Event('daily-log-changed'));
     });
     await waitFor(() => expect(getAllFn).toHaveBeenCalledTimes(2));
   });
@@ -284,7 +284,7 @@ describe('useWorkEntries', () => {
       delete: vi.fn(),
     };
 
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.isAuthenticated).toBe(false));
 
     await act(async () => {
@@ -302,7 +302,7 @@ describe('useWorkEntries', () => {
       update: vi.fn(),
       delete: vi.fn(),
     };
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.loading).toBe(false));
     const initialCallCount = getAllFn.mock.calls.length;
 
@@ -314,7 +314,7 @@ describe('useWorkEntries', () => {
 
   it('handles auth check failure gracefully', async () => {
     window.__getFirebaseIdToken = vi.fn().mockRejectedValue(new Error('auth error'));
-    const { result } = renderHook(() => useWorkEntries());
+    const { result } = renderHook(() => useDailyLogEntries());
     await waitFor(() => expect(result.current.authChecked).toBe(true));
     expect(result.current.isAuthenticated).toBe(false);
   });

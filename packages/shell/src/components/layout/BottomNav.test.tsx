@@ -59,7 +59,7 @@ describe('BottomNav', () => {
   });
 
   it('loads persisted order from localStorage', () => {
-    const customOrder = ['/ai', '/weather', '/stocks', '/podcasts', '/', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/flashcards', '/work-tracker'];
+    const customOrder = ['/ai', '/weather', '/stocks', '/podcasts', '/', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/flashcards', '/daily-log'];
     getItemSpy.mockImplementation((key: string) => {
       if (key === 'bottom-nav-order') return JSON.stringify(customOrder);
       return null;
@@ -107,7 +107,7 @@ describe('BottomNav', () => {
     fireEvent.click(screen.getByText('bottomNav.more'));
     fireEvent.click(screen.getByText('bottomNav.editOrder'));
     fireEvent.click(screen.getByText('bottomNav.reset'));
-    const defaultOrder = ['/', '/weather', '/stocks', '/podcasts', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/flashcards', '/work-tracker', '/files', '/ai', '/benchmark', '/immigration', '/library', '/family-games'];
+    const defaultOrder = ['/', '/weather', '/stocks', '/podcasts', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/flashcards', '/daily-log', '/files', '/ai', '/benchmark', '/immigration', '/library', '/family-games'];
     expect(setItemSpy).toHaveBeenCalledWith('bottom-nav-order', JSON.stringify(defaultOrder));
   });
 

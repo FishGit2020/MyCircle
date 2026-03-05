@@ -125,11 +125,11 @@ const flashcardsDest = path.join(firebaseDir, 'flashcards');
 console.log(`Copying flashcards to ${flashcardsDest}`);
 copyDir(flashcardsDist, flashcardsDest);
 
-// 15. Copy work-tracker MF to /work-tracker
-const workTrackerDist = path.join(rootDir, 'packages', 'work-tracker', 'dist');
-const workTrackerDest = path.join(firebaseDir, 'work-tracker');
-console.log(`Copying work-tracker to ${workTrackerDest}`);
-copyDir(workTrackerDist, workTrackerDest);
+// 15. Copy daily-log MF to /daily-log
+const dailyLogDist = path.join(rootDir, 'packages', 'daily-log', 'dist');
+const dailyLogDest = path.join(firebaseDir, 'daily-log');
+console.log(`Copying daily-log to ${dailyLogDest}`);
+copyDir(dailyLogDist, dailyLogDest);
 
 // 16. Copy cloud-files MF to /cloud-files
 const cloudFilesDist = path.join(rootDir, 'packages', 'cloud-files', 'dist');
@@ -168,7 +168,7 @@ const mfeDirs = [
   'city-search', 'weather-display', 'stock-tracker', 'podcast-player',
   'ai-assistant', 'bible-reader', 'worship-songs', 'notebook',
   'baby-tracker', 'child-development', 'chinese-learning', 'english-learning',
-  'flashcards', 'work-tracker', 'cloud-files', 'model-benchmark', 'immigration-tracker',
+  'flashcards', 'daily-log', 'cloud-files', 'model-benchmark', 'immigration-tracker',
   'digital-library', 'family-games',
 ];
 for (const mfe of mfeDirs) {

@@ -69,8 +69,8 @@ test.describe('Emulator Smoke Tests', () => {
     await expect(page.locator('body')).not.toBeEmpty();
   });
 
-  test('work tracker page loads', async ({ page }) => {
-    await page.goto('/work-tracker');
+  test('daily log page loads', async ({ page }) => {
+    await page.goto('/daily-log');
     await page.waitForLoadState('domcontentloaded');
     await expect(page.locator('body')).not.toBeEmpty();
   });

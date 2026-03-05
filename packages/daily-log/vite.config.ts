@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: 'workTracker',
+      name: 'dailyLog',
       filename: 'remoteEntry.js',
       exposes: {
-        './WorkTracker': './src/components/WorkTracker.tsx'
+        './DailyLog': './src/components/DailyLog.tsx'
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

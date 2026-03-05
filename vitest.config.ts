@@ -19,7 +19,7 @@ export default defineConfig({
       'chineseLearning/ChineseLearning': resolve(__dirname, './packages/shell/test/mocks/ChineseLearningMock.tsx'),
       'englishLearning/EnglishLearning': resolve(__dirname, './packages/shell/test/mocks/EnglishLearningMock.tsx'),
       'flashcards/FlashCards': resolve(__dirname, './packages/shell/test/mocks/FlashCardsMock.tsx'),
-      'workTracker/WorkTracker': resolve(__dirname, './packages/shell/test/mocks/WorkTrackerMock.tsx'),
+      'dailyLog/DailyLog': resolve(__dirname, './packages/shell/test/mocks/DailyLogMock.tsx'),
       'cloudFiles/CloudFiles': resolve(__dirname, './packages/shell/test/mocks/CloudFilesMock.tsx'),
       'modelBenchmark/ModelBenchmark': resolve(__dirname, './packages/shell/test/mocks/ModelBenchmarkMock.tsx'),
       'immigrationTracker/ImmigrationTracker': resolve(__dirname, './packages/shell/test/mocks/ImmigrationTrackerMock.tsx'),

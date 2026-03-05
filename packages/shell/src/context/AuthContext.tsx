@@ -30,7 +30,7 @@ import {
   updateBookBookmarks,
   updateBookAudioProgress,
   updateBookLastPlayed,
-  getWorkEntries,
+  getDailyLogEntries,
   getUserFiles,
   getWorshipSongs,
   getBenchmarkSummary,
@@ -70,7 +70,7 @@ function clearUserSpecificStorage() {
   window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
-  window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
@@ -283,11 +283,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           // Restore subcollection data for dashboard widgets (non-blocking)
           const uid = firebaseUser.uid;
-          getWorkEntries(uid).then(entries => {
+          getDailyLogEntries(uid).then(entries => {
             if (entries.length > 0) {
-              localStorage.setItem(StorageKeys.WORK_TRACKER_CACHE, JSON.stringify(entries));
+              localStorage.setItem(StorageKeys.DAILY_LOG_CACHE, JSON.stringify(entries));
             }
-            window.dispatchEvent(new Event(WindowEvents.WORK_TRACKER_CHANGED));
+            window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
           }).catch(() => {});
           getUserFiles(uid).then(files => {
             if (files.length > 0) {
