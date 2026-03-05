@@ -66,6 +66,7 @@ function clearUserSpecificStorage() {
   window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.WORSHIP_FAVORITES_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.FLASHCARD_PROGRESS_CHANGED));
@@ -73,6 +74,11 @@ function clearUserSpecificStorage() {
   window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.LAST_PLAYED_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.BOOK_LAST_PLAYED_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.BENCHMARK_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
 }
 
 interface AuthContextType {

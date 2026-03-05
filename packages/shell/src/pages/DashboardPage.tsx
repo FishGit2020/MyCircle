@@ -4,9 +4,11 @@ import { useTranslation, parseVerseReference } from '@mycircle/shared';
 import { WidgetDashboard } from '../components/widgets';
 import QuickAccessTiles from '../components/layout/QuickAccessTiles';
 import { useCuratedVerse } from '../hooks/useCuratedVerse';
+import { useAuth } from '../context/AuthContext';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { verse, verseFragments, loading } = useCuratedVerse();
 
   return (
@@ -71,8 +73,9 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* Widget Dashboard */}
-      <WidgetDashboard />
+      {/* Widget Dashboard — key on uid forces full remount on sign-in/out,
+           so all widget state resets cleanly (no stale data from previous user) */}
+      <WidgetDashboard key={user?.uid ?? 'anon'} />
 
       {/* Desktop Quick Access Tiles */}
       <QuickAccessTiles />
