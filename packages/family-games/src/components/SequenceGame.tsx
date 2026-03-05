@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import GameOver from './GameOver';
 
@@ -41,6 +41,13 @@ function generatePuzzle(level: number): Puzzle {
 const TOTAL_PUZZLES = 10;
 const TIME_LIMIT = 90_000;
 
+const NUMPAD_KEYS = [
+  ['1', '2', '3'],
+  ['4', '5', '6'],
+  ['7', '8', '9'],
+  ['C', '0', '='],
+];
+
 export default function SequenceGame({ onBack }: { onBack: () => void }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<'menu' | 'playing' | 'over'>('menu');
@@ -50,6 +57,7 @@ export default function SequenceGame({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(0);
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const startRef = useRef(Date.now());
+  const submitRef = useRef<(() => void) | null>(null);
 
   const nextPuzzle = useCallback((lvl: number) => {
     setPuzzle(generatePuzzle(lvl));
@@ -65,8 +73,23 @@ export default function SequenceGame({ onBack }: { onBack: () => void }) {
     nextPuzzle(0);
   }, [nextPuzzle]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const handleKey = useCallback((key: string) => {
+    if (phase !== 'playing') return;
+    if (key >= '0' && key <= '9') setInput(prev => prev + key);
+    else if (key === 'C') setInput('');
+    else if (key === 'Backspace') setInput(prev => prev.slice(0, -1));
+    else if (key === '=' || key === 'Enter') submitRef.current?.();
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const handler = (e: KeyboardEvent) => { if (/^[0-9]$/.test(e.key) || e.key === 'Enter' || e.key === 'Backspace') handleKey(e.key); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [phase, handleKey]);
+
+  const handleSubmit = useCallback((e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!puzzle || !input.trim()) return;
     const userAnswer = parseInt(input, 10);
     if (userAnswer === puzzle.answer) {
@@ -85,6 +108,8 @@ export default function SequenceGame({ onBack }: { onBack: () => void }) {
       setTimeout(() => { setFeedback(null); setInput(''); }, 800);
     }
   }, [puzzle, input, score, level, nextPuzzle]);
+
+  submitRef.current = () => handleSubmit();
 
   if (phase === 'over') {
     return (
@@ -136,23 +161,25 @@ export default function SequenceGame({ onBack }: { onBack: () => void }) {
             ))}
             <span className="text-teal-500">, ?</span>
           </div>
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              type="number"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              className={`w-24 px-3 py-2 rounded-lg border text-center text-lg font-bold outline-none transition ${
-                feedback === 'correct' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' :
-                feedback === 'incorrect' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
-                'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-teal-500'
-              }`}
-              autoFocus
-              aria-label="Answer"
-            />
-            <button type="submit" className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition active:scale-95">
-              OK
-            </button>
-          </form>
+          <div className={`w-32 px-3 py-2 rounded-lg border text-center text-2xl font-bold min-h-[44px] ${
+            feedback === 'correct' ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300' :
+            feedback === 'incorrect' ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300' :
+            'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white'
+          }`}>
+            {input || '\u00a0'}
+          </div>
+          <div className="grid grid-cols-3 gap-2 w-48">
+            {NUMPAD_KEYS.flat().map(key => (
+              <button key={key} type="button" onClick={() => handleKey(key)}
+                className={`h-12 rounded-xl font-bold text-lg transition active:scale-95 ${
+                  key === '=' ? 'bg-teal-600 hover:bg-teal-700 text-white' :
+                  key === 'C' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                  'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}>
+                {key}
+              </button>
+            ))}
+          </div>
         </>
       )}
     </div>

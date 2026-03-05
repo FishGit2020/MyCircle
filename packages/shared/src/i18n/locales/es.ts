@@ -1779,6 +1779,13 @@ const es: Record<TranslationKey, string> = {
   'games.colorGreen': 'Verde',
   'games.colorBlue': 'Azul',
   'games.colorYellow': 'Amarillo',
+  'games.mazeRunner': 'Laberinto',
+  'games.mazeDesc': 'Navega el laberinto hasta el final',
+  'games.mazeRules': 'Menos movimientos + m\u00e1s r\u00e1pido = m\u00e1s puntos.',
+  'games.anagram': 'Anagrama',
+  'games.anagramDesc': 'Descifra las letras',
+  'games.anagramRules': 'Rapidez + menos pistas = m\u00e1s puntos. Cada pista cuesta 30 pts.',
+  'games.anagramHint': 'Revelar una letra',
 
   // Privacy Policy
   'privacy.title': 'Pol\u00edtica de Privacidad',

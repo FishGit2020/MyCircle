@@ -1,17 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 import GameCard from './GameCard';
 import Scoreboard from './Scoreboard';
 import type { GameType } from './GameCard';
 
-const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch']);
+const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram']);
+
+const GAME_TITLE_KEYS: Record<string, string> = {
+  trivia: 'games.trivia', math: 'games.mathChallenge', word: 'games.wordGame',
+  memory: 'games.memoryMatch', headsup: 'games.headsUp', reaction: 'games.reactionTime',
+  simon: 'games.simonSays', sequence: 'games.numberSequence', colormatch: 'games.colorMatch',
+  maze: 'games.mazeRunner', anagram: 'games.anagram',
+};
 
 export default function FamilyGames() {
   const { t } = useTranslation();
   const { gameType } = useParams<{ gameType?: string }>();
   const navigate = useNavigate();
   const [GameComponent, setGameComponent] = useState<React.ComponentType<{ onBack: () => void }> | null>(null);
+
+  // Broadcast game name as breadcrumb detail
+  useEffect(() => {
+    if (gameType && VALID_GAMES.has(gameType)) {
+      const label = t(GAME_TITLE_KEYS[gameType] as any) || gameType;
+      window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: label }));
+    } else {
+      window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: null }));
+    }
+    return () => {
+      window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: null }));
+    };
+  }, [gameType, t]);
 
   // Load game component when URL param changes
   useEffect(() => {
@@ -51,6 +71,12 @@ export default function FamilyGames() {
             break;
           case 'colormatch':
             mod = await import('./ColorMatchGame');
+            break;
+          case 'maze':
+            mod = await import('./MazeGame');
+            break;
+          case 'anagram':
+            mod = await import('./AnagramGame');
             break;
           default:
             return;
@@ -165,6 +191,12 @@ export default function FamilyGames() {
         />
         <GameCard type="colormatch" titleKey={'games.colorMatch' as any} descKey={'games.colorMatchDesc' as any} color="rose" onSelect={handleSelectGame}
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>}
+        />
+        <GameCard type="maze" titleKey={'games.mazeRunner' as any} descKey={'games.mazeDesc' as any} color="emerald" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>}
+        />
+        <GameCard type="anagram" titleKey={'games.anagram' as any} descKey={'games.anagramDesc' as any} color="sky" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>}
         />
       </div>
 
