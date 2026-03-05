@@ -392,7 +392,7 @@ export default function Layout() {
             </Link>
 
             {/* Col 3: Nav dropdowns (shrinkable 1fr) */}
-            <div ref={navContainerRef} className="flex items-center gap-1 lg:gap-2 min-w-0 overflow-hidden">
+            <div ref={navContainerRef} className="flex items-center gap-1 lg:gap-2 min-w-0">
               {NAV_GROUPS.slice(0, visibleCount).map(group => (
                 <NavDropdown
                   key={group.labelKey}
