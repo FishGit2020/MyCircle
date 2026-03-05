@@ -8,13 +8,13 @@ export default defineConfig({
   testDir: './e2e/smoke',
   fullyParallel: false,
   workers: 1,
-  retries: 1,
+  retries: 0,
   forbidOnly: !!process.env.CI,
-  timeout: 45_000,
+  timeout: 15_000,
   reporter: process.env.CI ? 'html' : 'list',
   use: {
     baseURL: 'https://mycircle-dash.web.app',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
   projects: [
