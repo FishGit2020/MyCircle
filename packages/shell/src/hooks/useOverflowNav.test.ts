@@ -18,11 +18,19 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+/** Create a fake container with nav items marked by data-nav-item */
 function makeContainer(containerWidth: number, childWidths: number[]) {
-  const children = childWidths.map((w) => ({ offsetWidth: w }) as HTMLElement);
+  const navItems = childWidths.map((w) => {
+    const el = { offsetWidth: w, hasAttribute: (attr: string) => attr === 'data-nav-item' } as unknown as HTMLElement;
+    return el;
+  });
   return {
     clientWidth: containerWidth,
-    children,
+    children: navItems,
+    querySelectorAll: (selector: string) => {
+      if (selector === '[data-nav-item]') return navItems;
+      return [];
+    },
   } as unknown as HTMLElement;
 }
 
