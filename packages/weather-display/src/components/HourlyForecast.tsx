@@ -1,4 +1,3 @@
-import React from 'react';
 import { HourlyForecast as HourlyForecastType, getWeatherIconUrl, useUnits, formatTemperature, useTranslation } from '@mycircle/shared';
 
 interface Props {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router';
 import { useTranslation, parseVerseReference } from '@mycircle/shared';
 import { WidgetDashboard } from '../components/widgets';

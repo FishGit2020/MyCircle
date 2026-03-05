@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { useStockQuote, useStockCandles } from '../hooks/useStockData';
 import StockCard from './StockCard';

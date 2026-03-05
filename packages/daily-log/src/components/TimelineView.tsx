@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { WorkEntry } from '../types';
 import DayNode from './DayNode';
