@@ -12,7 +12,7 @@ interface ScoreEntry {
   playedAt: string;
 }
 
-const GAME_ORDER: GameType[] = ['trivia', 'math', 'word', 'memory', 'headsup'];
+const GAME_ORDER: GameType[] = ['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch'];
 
 const GAME_COLORS: Record<GameType, string> = {
   trivia: 'purple',
@@ -20,6 +20,10 @@ const GAME_COLORS: Record<GameType, string> = {
   word: 'green',
   memory: 'orange',
   headsup: 'fuchsia',
+  reaction: 'red',
+  simon: 'yellow',
+  sequence: 'teal',
+  colormatch: 'rose',
 };
 
 const GAME_LABEL_KEYS: Record<GameType, string> = {
@@ -28,6 +32,10 @@ const GAME_LABEL_KEYS: Record<GameType, string> = {
   word: 'games.wordGame',
   memory: 'games.memoryMatch',
   headsup: 'games.headsUp',
+  reaction: 'games.reactionTime',
+  simon: 'games.simonSays',
+  sequence: 'games.numberSequence',
+  colormatch: 'games.colorMatch',
 };
 
 const TOP_N = 5;
