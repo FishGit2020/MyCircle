@@ -26,7 +26,7 @@ vi.mock('@mycircle/shared', () => {
       'podcasts.shareEpisode': 'Share episode',
       'podcasts.shareCopied': 'Copied!',
       'podcasts.shareText': 'Listening to {episode} from {podcast} at {time}',
-      'podcasts.closePlayer': 'Close player',
+      'player.closePlayer': 'Close player',
     };
     return map[key] ?? key;
   };
@@ -38,15 +38,15 @@ vi.mock('@mycircle/shared', () => {
     }),
     eventBus: { publish: (...args: any[]) => mockEventBusPublish(...args) },
     MFEvents: {
-      PODCAST_PLAYBACK_STATE: 'podcast:playback-state',
-      PODCAST_TOGGLE_PLAY: 'podcast:toggle-play',
-      PODCAST_SKIP_FORWARD: 'podcast:skip-forward',
-      PODCAST_SKIP_BACK: 'podcast:skip-back',
-      PODCAST_SEEK: 'podcast:seek',
-      PODCAST_CHANGE_SPEED: 'podcast:change-speed',
-      PODCAST_SET_SLEEP_TIMER: 'podcast:set-sleep-timer',
-      PODCAST_CLOSE_PLAYER: 'podcast:close-player',
-      PODCAST_REMOVE_FROM_QUEUE: 'podcast:remove-from-queue',
+      AUDIO_PLAYBACK_STATE: 'mf:audio-playback-state',
+      AUDIO_TOGGLE_PLAY: 'mf:audio-toggle-play',
+      AUDIO_SKIP_FORWARD: 'mf:audio-skip-forward',
+      AUDIO_SKIP_BACK: 'mf:audio-skip-back',
+      AUDIO_SEEK: 'mf:audio-seek',
+      AUDIO_CHANGE_SPEED: 'mf:audio-change-speed',
+      AUDIO_SET_SLEEP_TIMER: 'mf:audio-set-sleep-timer',
+      AUDIO_CLOSE: 'mf:audio-close',
+      AUDIO_REMOVE_FROM_QUEUE: 'mf:audio-remove-from-queue',
     },
   };
 });
@@ -126,7 +126,7 @@ describe('InlinePlaybackControls', () => {
 
     fireEvent.click(screen.getByLabelText('Play'));
 
-    expect(mockEventBusPublish).toHaveBeenCalledWith('podcast:toggle-play');
+    expect(mockEventBusPublish).toHaveBeenCalledWith('mf:audio-toggle-play');
   });
 
   it('shows pause button when playback state is playing', () => {
@@ -134,12 +134,16 @@ describe('InlinePlaybackControls', () => {
 
     act(() => {
       playbackStateCallback?.({
+        type: 'podcast',
         isPlaying: true,
         currentTime: 60,
         duration: 1800,
         playbackSpeed: 1,
         sleepMinutes: 0,
         sleepRemaining: 0,
+        trackIndex: 0,
+        totalTracks: 1,
+        trackTitle: 'Test Episode Title',
         queueLength: 0,
         queue: [],
       });
@@ -159,10 +163,10 @@ describe('InlinePlaybackControls', () => {
     render(<InlinePlaybackControls episode={mockEpisode} podcast={mockPodcast} />);
 
     fireEvent.click(screen.getByLabelText('Skip back'));
-    expect(mockEventBusPublish).toHaveBeenCalledWith('podcast:skip-back');
+    expect(mockEventBusPublish).toHaveBeenCalledWith('mf:audio-skip-back');
 
     fireEvent.click(screen.getByLabelText('Skip forward'));
-    expect(mockEventBusPublish).toHaveBeenCalledWith('podcast:skip-forward');
+    expect(mockEventBusPublish).toHaveBeenCalledWith('mf:audio-skip-forward');
   });
 
   it('renders seek slider', () => {
@@ -176,12 +180,16 @@ describe('InlinePlaybackControls', () => {
 
     act(() => {
       playbackStateCallback?.({
+        type: 'podcast',
         isPlaying: true,
         currentTime: 125,  // 2:05
         duration: 1800,    // 30:00
         playbackSpeed: 1,
         sleepMinutes: 0,
         sleepRemaining: 0,
+        trackIndex: 0,
+        totalTracks: 1,
+        trackTitle: 'Test Episode Title',
         queueLength: 0,
         queue: [],
       });
@@ -216,7 +224,7 @@ describe('InlinePlaybackControls', () => {
     fireEvent.click(screen.getByLabelText('Speed'));
     fireEvent.click(screen.getByText('1.5x'));
 
-    expect(mockEventBusPublish).toHaveBeenCalledWith('podcast:change-speed', { speed: 1.5 });
+    expect(mockEventBusPublish).toHaveBeenCalledWith('mf:audio-change-speed', { speed: 1.5 });
   });
 
   it('renders sleep timer button', () => {
@@ -236,7 +244,7 @@ describe('InlinePlaybackControls', () => {
 
     fireEvent.click(screen.getByLabelText('Close player'));
 
-    expect(mockEventBusPublish).toHaveBeenCalledWith('podcast:close-player');
+    expect(mockEventBusPublish).toHaveBeenCalledWith('mf:audio-close');
   });
 
   it('renders share button', () => {

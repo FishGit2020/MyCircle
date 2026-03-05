@@ -29,6 +29,7 @@ import {
   updateWidgetLayout,
   updateBookBookmarks,
   updateBookAudioProgress,
+  updateBookLastPlayed,
   getWorkEntries,
   getUserFiles,
   getWorshipSongs,
@@ -264,6 +265,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Restore book audio progress
           if (userProfile.bookAudioProgress) {
             localStorage.setItem(StorageKeys.BOOK_AUDIO_PROGRESS, JSON.stringify(userProfile.bookAudioProgress));
+          }
+
+          // Restore last-played book for cross-device resume
+          if (userProfile.bookLastPlayed?.bookId) {
+            localStorage.setItem(StorageKeys.BOOK_LAST_PLAYED, JSON.stringify(userProfile.bookLastPlayed));
+            window.dispatchEvent(new Event(WindowEvents.BOOK_LAST_PLAYED_CHANGED));
           }
 
           window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
@@ -576,6 +583,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for storage changes from the audio player (custom event)
     window.addEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
     return () => window.removeEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
+  }, [user]);
+
+  // Auto-sync book last-played from localStorage to Firestore
+  useEffect(() => {
+    function handleBookLastPlayedChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.BOOK_LAST_PLAYED);
+          const data = stored ? JSON.parse(stored) : null;
+          updateBookLastPlayed(user.uid, data);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleBookLastPlayedChanged);
+    return () => window.removeEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleBookLastPlayedChanged);
   }, [user]);
 
   return (

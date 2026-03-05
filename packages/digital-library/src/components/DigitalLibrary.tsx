@@ -344,6 +344,7 @@ export default function DigitalLibrary() {
         epubUrl={selectedBook.epubUrl}
         title={selectedBook.title}
         chapters={chapters}
+        coverUrl={selectedBook.coverUrl}
         language={selectedBook.language || 'en'}
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}

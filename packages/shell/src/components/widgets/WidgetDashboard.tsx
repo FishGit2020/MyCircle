@@ -214,11 +214,84 @@ const VerseWidget = React.memo(function VerseWidget() {
   );
 });
 
+// Generic display state for NowPlayingWidget (source-agnostic)
+interface NowPlayingDisplay {
+  type: 'podcast' | 'book';
+  title: string;       // track/episode title
+  subtitle: string;    // collection/podcast title
+  artwork?: string;
+  navigateTo: string;
+  savedAt: number;
+  // For podcast — needed to replay
+  episode?: Episode;
+  podcast?: Podcast | null;
+  // For book — needed to replay
+  audioSource?: import('@mycircle/shared').AudioSource;
+}
+
+function loadPodcastDisplay(): NowPlayingDisplay | null {
+  try {
+    // Try now-playing first, then last-played
+    const nowPlaying = localStorage.getItem(StorageKeys.PODCAST_NOW_PLAYING);
+    if (nowPlaying) {
+      const data = JSON.parse(nowPlaying);
+      if (data.episode) {
+        return {
+          type: 'podcast',
+          title: data.episode.title,
+          subtitle: data.podcast?.title || '',
+          artwork: data.episode.image || data.podcast?.artwork,
+          navigateTo: data.podcast ? `/podcasts/${data.podcast.id}` : '/podcasts',
+          savedAt: 0, // now-playing has no savedAt; treat as older than last-played
+          episode: data.episode,
+          podcast: data.podcast,
+        };
+      }
+    }
+    const lastPlayed = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
+    if (lastPlayed) {
+      const data = JSON.parse(lastPlayed);
+      if (data.episode) {
+        return {
+          type: 'podcast',
+          title: data.episode.title,
+          subtitle: data.podcast?.title || '',
+          artwork: data.episode.image || data.podcast?.artwork,
+          navigateTo: data.podcast ? `/podcasts/${data.podcast.id}` : '/podcasts',
+          savedAt: data.savedAt || 0,
+          episode: data.episode as Episode,
+          podcast: data.podcast as Podcast,
+        };
+      }
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+function loadBookDisplay(): NowPlayingDisplay | null {
+  try {
+    const lastPlayed = localStorage.getItem(StorageKeys.BOOK_LAST_PLAYED);
+    if (lastPlayed) {
+      const data = JSON.parse(lastPlayed);
+      if (data.bookId) {
+        return {
+          type: 'book',
+          title: data.chapterTitle || data.bookTitle,
+          subtitle: data.bookTitle,
+          artwork: data.artwork,
+          navigateTo: '/library',
+          savedAt: data.savedAt || 0,
+        };
+      }
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
 const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [episode, setEpisode] = React.useState<Episode | null>(null);
-  const [podcast, setPodcast] = React.useState<Podcast | null>(null);
+  const [display, setDisplay] = React.useState<NowPlayingDisplay | null>(null);
   const [isActivelyPlaying, setIsActivelyPlaying] = React.useState(false);
   const [hasSubscriptions, setHasSubscriptions] = React.useState(false);
 
@@ -237,71 +310,85 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
     return () => window.removeEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, loadSubs);
   }, []);
 
-  useEffect(() => {
-    // Hydrate from persisted "now playing" or "last played" state
-    try {
-      const nowPlaying = localStorage.getItem(StorageKeys.PODCAST_NOW_PLAYING);
-      if (nowPlaying) {
-        const data = JSON.parse(nowPlaying);
-        if (data.episode) setEpisode(data.episode);
-        if (data.podcast) setPodcast(data.podcast);
-        // Don't set isActivelyPlaying here — the PODCAST_NOW_PLAYING key
-        // persists across page refreshes but GlobalAudioPlayer doesn't
-        // auto-resume. Only the PODCAST_PLAY_EPISODE event (real playback)
-        // should flip isActivelyPlaying to true.
-      } else {
-        // Fall back to last-played (cross-device restore)
-        const lastPlayed = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
-        if (lastPlayed) {
-          const data = JSON.parse(lastPlayed);
-          if (data.episode) setEpisode(data.episode as Episode);
-          if (data.podcast) setPodcast(data.podcast as Podcast);
-        }
-      }
-    } catch { /* ignore */ }
+  // Hydrate display from persisted data (podcast + book), pick most recent
+  const hydrateDisplay = React.useCallback(() => {
+    const podcastD = loadPodcastDisplay();
+    const bookD = loadBookDisplay();
+    if (podcastD && bookD) {
+      setDisplay(podcastD.savedAt >= bookD.savedAt ? podcastD : bookD);
+    } else {
+      setDisplay(podcastD || bookD);
+    }
+  }, []);
 
+  useEffect(() => {
+    hydrateDisplay();
+
+    // Live updates from play/close events
     const unsubPlay = subscribeToMFEvent<{ episode: Episode; podcast: Podcast | null }>(
       MFEvents.PODCAST_PLAY_EPISODE,
       (data) => {
-        setEpisode(data.episode);
-        setPodcast(data.podcast);
+        setDisplay({
+          type: 'podcast',
+          title: data.episode.title,
+          subtitle: data.podcast?.title || '',
+          artwork: data.episode.image || data.podcast?.artwork,
+          navigateTo: data.podcast ? `/podcasts/${data.podcast.id}` : '/podcasts',
+          savedAt: Date.now(),
+          episode: data.episode,
+          podcast: data.podcast,
+        });
         setIsActivelyPlaying(true);
       }
     );
-    const unsubClose = subscribeToMFEvent(MFEvents.PODCAST_CLOSE_PLAYER, () => {
-      // Don't clear episode/podcast — keep them for "Continue Listening"
-      setIsActivelyPlaying(false);
-    });
 
-    // Hydrate when last-played data is restored from Firestore (on login)
-    function handleLastPlayedChanged() {
-      try {
-        const raw = localStorage.getItem(StorageKeys.PODCAST_LAST_PLAYED);
-        if (raw) {
-          const data = JSON.parse(raw);
-          if (data.episode) setEpisode(data.episode as Episode);
-          if (data.podcast) setPodcast(data.podcast as Podcast);
-        }
-      } catch { /* ignore */ }
-    }
+    const unsubAudioPlay = subscribeToMFEvent<import('@mycircle/shared').AudioSource>(
+      MFEvents.AUDIO_PLAY,
+      (audioSource) => {
+        setDisplay({
+          type: audioSource.type as 'podcast' | 'book',
+          title: audioSource.track.title,
+          subtitle: audioSource.collection.title,
+          artwork: audioSource.collection.artwork,
+          navigateTo: audioSource.navigateTo,
+          savedAt: Date.now(),
+          audioSource,
+        });
+        setIsActivelyPlaying(true);
+      }
+    );
+
+    const unsubClose = subscribeToMFEvent(MFEvents.PODCAST_CLOSE_PLAYER, () => setIsActivelyPlaying(false));
+    const unsubAudioClose = subscribeToMFEvent(MFEvents.AUDIO_CLOSE, () => setIsActivelyPlaying(false));
+
+    // Re-hydrate when last-played data changes (e.g. on login)
+    function handleLastPlayedChanged() { hydrateDisplay(); }
     window.addEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
+    window.addEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleLastPlayedChanged);
 
     return () => {
       unsubPlay();
+      unsubAudioPlay();
       unsubClose();
+      unsubAudioClose();
       window.removeEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
+      window.removeEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleLastPlayedChanged);
     };
-  }, []);
+  }, [hydrateDisplay]);
 
   const handleContinue = React.useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!podcast || !episode) return;
-    navigate(`/podcasts/${podcast.id}`, { state: { podcast } });
-    eventBus.publish(MFEvents.PODCAST_PLAY_EPISODE, { episode, podcast });
-  }, [navigate, episode, podcast]);
+    if (!display) return;
 
-  const hasEpisode = !!episode;
+    navigate(display.navigateTo);
+
+    if (display.type === 'podcast' && display.episode && display.podcast) {
+      eventBus.publish(MFEvents.PODCAST_PLAY_EPISODE, { episode: display.episode, podcast: display.podcast });
+    } else if (display.audioSource) {
+      eventBus.publish(MFEvents.AUDIO_PLAY, display.audioSource);
+    }
+  }, [navigate, display]);
 
   return (
     <div>
@@ -312,7 +399,6 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
             : 'bg-purple-50 dark:bg-purple-900/30 text-purple-500'
         }`}>
           {isActivelyPlaying ? (
-            /* Animated equalizer bars when playing */
             <div className="flex items-end gap-0.5 h-4" aria-hidden="true">
               <span className="w-1 bg-white rounded-full animate-bounce" style={{ height: '60%', animationDelay: '0ms', animationDuration: '600ms' }} />
               <span className="w-1 bg-white rounded-full animate-bounce" style={{ height: '100%', animationDelay: '150ms', animationDuration: '600ms' }} />
@@ -331,38 +417,34 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {isActivelyPlaying
               ? t('widgets.nowPlayingDesc')
-              : hasEpisode
+              : display
                 ? t('widgets.continueWhereLeft')
                 : t('widgets.discoverAndListen')}
           </p>
         </div>
       </div>
-      {hasEpisode ? (
+      {display ? (
         <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/20 rounded-lg p-2.5">
           <div className="flex items-center gap-2">
-            {episode.image && (
+            {display.artwork && (
               <img
-                src={episode.image}
+                src={display.artwork}
                 alt=""
                 className="w-10 h-10 rounded object-cover flex-shrink-0 ring-2 ring-purple-300 dark:ring-purple-600"
               />
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{episode.title}</p>
-              {podcast && (
-                <p className="text-xs text-purple-600 dark:text-purple-400 truncate">{podcast.title}</p>
-              )}
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{display.title}</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400 truncate">{display.subtitle}</p>
             </div>
-            {podcast && (
-              <button
-                type="button"
-                onClick={handleContinue}
-                className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-purple-500 dark:bg-purple-600 rounded-full hover:bg-purple-600 dark:hover:bg-purple-500 transition active:scale-95"
-                aria-label={t('widgets.continueListening')}
-              >
-                {t('widgets.continueListening')}
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleContinue}
+              className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-purple-500 dark:bg-purple-600 rounded-full hover:bg-purple-600 dark:hover:bg-purple-500 transition active:scale-95"
+              aria-label={t('widgets.continueListening')}
+            >
+              {t('widgets.continueListening')}
+            </button>
           </div>
         </div>
       ) : hasSubscriptions ? (

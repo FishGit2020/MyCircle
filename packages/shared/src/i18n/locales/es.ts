@@ -425,6 +425,14 @@ const es: Record<TranslationKey, string> = {
   'podcasts.markPlayed': 'Marcar como reproducido',
   'podcasts.markUnplayed': 'Marcar como no reproducido',
 
+  // Generic audio player
+  'player.chapterOf': 'Cap\u00edtulo {current} de {total}',
+  'player.nextTrack': 'Siguiente pista',
+  'player.prevTrack': 'Pista anterior',
+  'player.listeningToBook': 'Escuchando audiolibro',
+  'player.resumeBook': 'Reanudar audiolibro',
+  'player.closePlayer': 'Cerrar reproductor',
+
   // AI Assistant
   'ai.title': 'Asistente IA',
   'ai.subtitle': 'Pregunta sobre clima, acciones o navega la app',

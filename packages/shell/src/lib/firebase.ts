@@ -100,6 +100,17 @@ export interface LastPlayedData {
   savedAt: number;
 }
 
+// Last-played book data (synced to Firestore for cross-device resume)
+export interface BookLastPlayedData {
+  bookId: string;
+  bookTitle: string;
+  artwork?: string;
+  chapterTitle: string;
+  chapterIndex: number;
+  position: number;
+  savedAt: number;
+}
+
 // User profile type
 export interface UserProfile {
   uid: string;
@@ -126,6 +137,7 @@ export interface UserProfile {
   widgetLayout?: Array<{ id: string; visible: boolean; size?: string }>;
   bookBookmarks?: Array<{ bookId: string; bookTitle: string; cfi: string; label: string; createdAt: number }>;
   bookAudioProgress?: Record<string, { position: number; duration: number; chapter: number }>;
+  bookLastPlayed?: BookLastPlayedData;
   isAdmin?: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -442,6 +454,15 @@ export async function updateLastPlayed(uid: string, data: LastPlayedData | null)
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     lastPlayed: data || null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateBookLastPlayed(uid: string, data: BookLastPlayedData | null) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    bookLastPlayed: data || null,
     updatedAt: serverTimestamp(),
   });
 }
