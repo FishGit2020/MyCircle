@@ -143,6 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const userProfile = await getUserProfile(firebaseUser.uid);
         setProfile(userProfile);
+        (window as Record<string, unknown>).__isAdmin = userProfile?.isAdmin ?? false;
         if (userProfile) {
           setRecentCities(userProfile.recentCities || []);
           setFavoriteCities(userProfile.favoriteCities || []);

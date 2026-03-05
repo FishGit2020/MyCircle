@@ -7,6 +7,18 @@ import GameOver from './GameOver';
 const QUESTIONS_PER_ROUND = 10;
 const TIME_PER_QUESTION_MS = 15_000;
 
+type Category = 'all' | 'science' | 'history' | 'geography' | 'popculture';
+
+const CATEGORIES: Category[] = ['all', 'science', 'history', 'geography', 'popculture'];
+
+const CATEGORY_LABEL_KEYS: Record<Category, string> = {
+  all: 'games.allCategories',
+  science: 'games.science',
+  history: 'games.history',
+  geography: 'games.geography',
+  popculture: 'games.popculture',
+};
+
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -25,6 +37,7 @@ type Phase = 'menu' | 'playing' | 'feedback' | 'over';
 export default function TriviaGame({ onBack }: TriviaGameProps) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<Phase>('menu');
+  const [category, setCategory] = useState<Category>('all');
   const [questions, setQuestions] = useState(triviaQuestions.slice(0, QUESTIONS_PER_ROUND));
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -35,7 +48,9 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
   const questionStartRef = useRef(Date.now());
 
   const startGame = useCallback(() => {
-    const shuffled = shuffle(triviaQuestions).slice(0, QUESTIONS_PER_ROUND);
+    const pool = category === 'all' ? triviaQuestions : triviaQuestions.filter(q => q.category === category);
+    const count = Math.min(QUESTIONS_PER_ROUND, pool.length);
+    const shuffled = shuffle(pool).slice(0, count);
     setQuestions(shuffled);
     setQuestionIndex(0);
     setScore(0);
@@ -45,7 +60,7 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
     setTimerKey(k => k + 1);
     startTimeRef.current = Date.now();
     questionStartRef.current = Date.now();
-  }, []);
+  }, [category]);
 
   const handleAnswer = useCallback((optionIndex: number) => {
     if (selected !== null) return;
@@ -103,7 +118,7 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
         gameType="trivia"
         score={score}
         timeMs={elapsed}
-        difficulty="mixed"
+        difficulty={category === 'all' ? 'mixed' : category}
         onPlayAgain={startGame}
         onBack={onBack}
       />
@@ -122,6 +137,25 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.trivia')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">{QUESTIONS_PER_ROUND} questions &middot; 15s each</p>
         </div>
+
+        {/* Category picker */}
+        <div className="flex flex-wrap justify-center gap-2">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setCategory(cat)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${
+                category === cat
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900/30'
+              }`}
+            >
+              {t(CATEGORY_LABEL_KEYS[cat] as any)}
+            </button>
+          ))}
+        </div>
+
         <button
           type="button"
           onClick={startGame}

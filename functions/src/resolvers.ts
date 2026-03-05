@@ -653,7 +653,7 @@ function parseVersesFromHtml(html: string): Array<{ number: number; text: string
         verses.push({ number: num, text });
       }
     }
-    if (verses.length > 1) {
+    if (verses.length > 0) {
       verses.sort((a, b) => a.number - b.number);
       return verses;
     }
@@ -670,7 +670,7 @@ function parseVersesFromHtml(html: string): Array<{ number: number; text: string
         verses.push({ number: num, text: rawText });
       }
     }
-    if (verses.length > 1) {
+    if (verses.length > 0) {
       verses.sort((a, b) => a.number - b.number);
       return verses;
     }
