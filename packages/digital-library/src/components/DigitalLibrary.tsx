@@ -254,7 +254,7 @@ export default function DigitalLibrary() {
   useEffect(() => {
     const handleAuth = () => {
       window.__getFirebaseIdToken?.().then(token => {
-        setCurrentUid(token ? (window as Record<string, unknown>).__currentUid as string || null : null);
+        setCurrentUid(token ? window.__currentUid || null : null);
       });
     };
     const handleBooksChanged = () => fetchBooks();
@@ -349,7 +349,7 @@ export default function DigitalLibrary() {
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}
         onBack={handleBack}
-        isAdmin={!!(window as Record<string, unknown>).__isAdmin}
+        isAdmin={!!window.__isAdmin}
       />
     );
   }

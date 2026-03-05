@@ -2,17 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { WindowEvents } from '@mycircle/shared';
 import type { ImmigrationCase } from '../types';
 
-declare global {
-  interface Window {
-    __immigrationTracker?: {
-      getAll: () => Promise<ImmigrationCase[]>;
-      add: (data: { receiptNumber: string; formType: string; nickname: string }) => Promise<string>;
-      delete: (id: string) => Promise<void>;
-      subscribe?: (callback: (cases: ImmigrationCase[]) => void) => () => void;
-    };
-    __getFirebaseIdToken?: () => Promise<string | null>;
-  }
-}
 
 export function useCases() {
   const [cases, setCases] = useState<ImmigrationCase[]>([]);

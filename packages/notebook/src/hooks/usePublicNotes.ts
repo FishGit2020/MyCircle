@@ -16,7 +16,7 @@ export function usePublicNotes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const api = (window as any).__notebook as (PublicNotebookAPI & Record<string, unknown>) | undefined;
+  const api = window.__notebook as (PublicNotebookAPI & Record<string, unknown>) | undefined;
 
   const loadNotes = useCallback(async () => {
     if (!api?.getAllPublic) {

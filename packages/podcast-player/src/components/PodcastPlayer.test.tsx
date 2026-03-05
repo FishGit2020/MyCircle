@@ -65,7 +65,7 @@ describe('PodcastPlayer', () => {
     vi.clearAllMocks();
     localStorage.clear();
     // Mock Firebase auth so the Subscriptions tab is visible
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
   });
 
   afterEach(() => {

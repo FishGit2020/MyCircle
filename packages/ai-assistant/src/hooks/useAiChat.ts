@@ -155,7 +155,7 @@ function handleActions(actions: AiAction[]) {
         window.dispatchEvent(new CustomEvent('navigate', { detail: action.payload }));
         break;
       case 'addFlashcard':
-        (window as any).__flashcards?.add(action.payload);
+        window.__flashcards?.add(action.payload);
         break;
       case 'addBookmark':
         window.dispatchEvent(new CustomEvent('bible-bookmark', { detail: action.payload }));
@@ -164,10 +164,10 @@ function handleActions(actions: AiAction[]) {
         window.dispatchEvent(new CustomEvent('flashcards-list', { detail: action.payload }));
         break;
       case 'addNote':
-        (window as any).__notebook?.add(action.payload);
+        window.__notebook?.add(action.payload);
         break;
       case 'addWorkEntry':
-        (window as any).__workTracker?.add(action.payload);
+        window.__workTracker?.add(action.payload);
         break;
       case 'setBabyDueDate':
         try {
@@ -184,7 +184,7 @@ function handleActions(actions: AiAction[]) {
         } catch { /* */ }
         break;
       case 'addImmigrationCase':
-        (window as any).__immigrationTracker?.add(action.payload);
+        window.__immigrationTracker?.add(action.payload);
         break;
     }
   }

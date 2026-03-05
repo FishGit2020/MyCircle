@@ -17,7 +17,7 @@ function createMockSSEStream(events: Array<Record<string, unknown>>): ReadableSt
 describe('useAiChatStream', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
   });
 
   it('returns initial state', () => {
@@ -112,7 +112,7 @@ describe('useAiChatStream', () => {
   });
 
   it('throws when no auth token', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue(null);
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue(null);
 
     const { result } = renderHook(() => useAiChatStream());
 

@@ -10,7 +10,7 @@ interface SharedFilesApi {
 }
 
 function getApi(): SharedFilesApi | null {
-  return (window as any).__cloudFiles ?? null;
+  return window.__cloudFiles ?? null;
 }
 
 export function useSharedFiles() {

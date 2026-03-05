@@ -31,15 +31,15 @@ describe('useBabyPhotos', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    delete (window as any).__babyPhotos;
-    delete (window as any).__getFirebaseIdToken;
-    delete (window as any).__logAnalyticsEvent;
+    delete window.__babyPhotos;
+    delete window.__getFirebaseIdToken;
+    delete window.__logAnalyticsEvent;
   });
 
   afterEach(() => {
-    delete (window as any).__babyPhotos;
-    delete (window as any).__getFirebaseIdToken;
-    delete (window as any).__logAnalyticsEvent;
+    delete window.__babyPhotos;
+    delete window.__getFirebaseIdToken;
+    delete window.__logAnalyticsEvent;
   });
 
   it('starts with empty photos map', async () => {
@@ -55,8 +55,8 @@ describe('useBabyPhotos', () => {
   });
 
   it('detects authenticated state from __getFirebaseIdToken', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__babyPhotos = {
       upload: vi.fn(),
       getAll: vi.fn().mockResolvedValue([]),
       delete: vi.fn(),
@@ -66,8 +66,8 @@ describe('useBabyPhotos', () => {
   });
 
   it('loads photos from Firestore when authenticated', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn(),
       getAll: vi.fn().mockResolvedValue(mockDocs),
       delete: vi.fn(),
@@ -80,8 +80,8 @@ describe('useBabyPhotos', () => {
   });
 
   it('caches photos to localStorage', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn(),
       getAll: vi.fn().mockResolvedValue(mockDocs),
       delete: vi.fn(),
@@ -109,13 +109,13 @@ describe('useBabyPhotos', () => {
     const getAllFn = vi.fn()
       .mockResolvedValueOnce([]) // Initial load
       .mockResolvedValue([{ id: '5', photoUrl: 'https://example.com/new.jpg', caption: 'My caption' }]); // After event
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: uploadFn,
       getAll: getAllFn,
       delete: vi.fn(),
     };
-    (window as any).__logAnalyticsEvent = vi.fn();
+    window.__logAnalyticsEvent = vi.fn();
     const { result } = renderHook(() => useBabyPhotos());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -140,8 +140,8 @@ describe('useBabyPhotos', () => {
     const uploadFn = vi.fn().mockImplementation(
       () => new Promise<string>((resolve) => { resolveUpload = resolve; })
     );
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: uploadFn,
       getAll: vi.fn().mockResolvedValue([]),
       delete: vi.fn(),
@@ -166,8 +166,8 @@ describe('useBabyPhotos', () => {
   });
 
   it('sets error on upload failure', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn().mockRejectedValue(new Error('Upload failed')),
       getAll: vi.fn().mockResolvedValue([]),
       delete: vi.fn(),
@@ -188,8 +188,8 @@ describe('useBabyPhotos', () => {
   });
 
   it('clearError resets error and errorStageId', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn().mockRejectedValue(new Error('fail')),
       getAll: vi.fn().mockResolvedValue([]),
       delete: vi.fn(),
@@ -218,13 +218,13 @@ describe('useBabyPhotos', () => {
     const getAllFn = vi.fn()
       .mockResolvedValueOnce(mockDocs) // Initial load
       .mockResolvedValue([{ id: '10', photoUrl: 'https://example.com/10.jpg' }]); // After delete event
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn(),
       getAll: getAllFn,
       delete: deleteFn,
     };
-    (window as any).__logAnalyticsEvent = vi.fn();
+    window.__logAnalyticsEvent = vi.fn();
     const { result } = renderHook(() => useBabyPhotos());
     await waitFor(() => expect(result.current.photos.size).toBe(2));
 
@@ -260,8 +260,8 @@ describe('useBabyPhotos', () => {
 
   it('dispatches BABY_MILESTONES_CHANGED event after upload', async () => {
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn().mockResolvedValue('https://example.com/new.jpg'),
       getAll: vi.fn().mockResolvedValue([]),
       delete: vi.fn(),
@@ -282,8 +282,8 @@ describe('useBabyPhotos', () => {
 
   it('dispatches BABY_MILESTONES_CHANGED event after delete', async () => {
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn(),
       getAll: vi.fn().mockResolvedValue(mockDocs),
       delete: vi.fn().mockResolvedValue(undefined),
@@ -303,7 +303,7 @@ describe('useBabyPhotos', () => {
 
   it('reloads data on BABY_MILESTONES_CHANGED event', async () => {
     const getAllFn = vi.fn().mockResolvedValue([]);
-    (window as any).__babyPhotos = {
+    window.__babyPhotos = {
       upload: vi.fn(),
       getAll: getAllFn,
       delete: vi.fn(),
@@ -322,7 +322,7 @@ describe('useBabyPhotos', () => {
   });
 
   it('handles auth check failure gracefully', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockRejectedValue(new Error('auth error'));
+    window.__getFirebaseIdToken = vi.fn().mockRejectedValue(new Error('auth error'));
     const { result } = renderHook(() => useBabyPhotos());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.isAuthenticated).toBe(false);
@@ -330,8 +330,8 @@ describe('useBabyPhotos', () => {
 
   it('handles Firestore getAll failure gracefully (uses cache)', async () => {
     localStorage.setItem('baby-milestones-cache', JSON.stringify([[1, { photoUrl: 'cached.jpg' }]]));
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__babyPhotos = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__babyPhotos = {
       upload: vi.fn(),
       getAll: vi.fn().mockRejectedValue(new Error('Firestore error')),
       delete: vi.fn(),

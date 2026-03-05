@@ -67,10 +67,10 @@ export function useAiChatStream() {
 
     setStreamState({ streaming: true, activeToolCalls: [], streamingContent: '' });
 
-    const token = await (window as any).__getFirebaseIdToken?.();
+    const token = await window.__getFirebaseIdToken?.();
     if (!token) throw new Error('Authentication required');
 
-    const recaptchaToken = await (window as any).__getRecaptchaToken?.('ai_chat');
+    const recaptchaToken = await window.__getRecaptchaToken?.('ai_chat');
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
 
   // Auth link: attaches Firebase ID token for authenticated endpoints (stock, podcast, AI)
   const authLink = new SetContextLink(async (prevContext) => {
-    const idToken = await (window as any).__getFirebaseIdToken?.();
+    const idToken = await window.__getFirebaseIdToken?.();
     return {
       headers: {
         ...prevContext.headers,
@@ -47,7 +47,7 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
 
   // App Check link: attaches Firebase App Check token for bot protection
   const appCheckLink = new SetContextLink(async (prevContext) => {
-    const appCheckToken = await (window as any).__getAppCheckToken?.();
+    const appCheckToken = await window.__getAppCheckToken?.();
     return {
       headers: {
         ...prevContext.headers,
@@ -122,7 +122,7 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
 
   // Expose client for Apollo DevTools browser extension
   if (isBrowser) {
-    (window as any).__APOLLO_CLIENT__ = client;
+    window.__APOLLO_CLIENT__ = client;
   }
 
   return client;

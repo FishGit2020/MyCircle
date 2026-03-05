@@ -28,13 +28,13 @@ describe('useWorkEntries', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    delete (window as any).__workTracker;
-    delete (window as any).__getFirebaseIdToken;
+    delete window.__workTracker;
+    delete window.__getFirebaseIdToken;
   });
 
   afterEach(() => {
-    delete (window as any).__workTracker;
-    delete (window as any).__getFirebaseIdToken;
+    delete window.__workTracker;
+    delete window.__getFirebaseIdToken;
   });
 
   it('starts with empty entries', async () => {
@@ -52,8 +52,8 @@ describe('useWorkEntries', () => {
   });
 
   it('detects authenticated state from __getFirebaseIdToken', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: vi.fn(),
@@ -64,8 +64,8 @@ describe('useWorkEntries', () => {
   });
 
   it('loads entries via getAll when authenticated (no subscribe)', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue(mockEntries),
       add: vi.fn(),
       update: vi.fn(),
@@ -78,8 +78,8 @@ describe('useWorkEntries', () => {
 
   it('uses subscribe when available', async () => {
     const unsubscribe = vi.fn();
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: vi.fn(),
       add: vi.fn(),
       update: vi.fn(),
@@ -97,8 +97,8 @@ describe('useWorkEntries', () => {
   });
 
   it('falls back to loading:false after subscribe timeout if callback never fires', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: vi.fn(),
       add: vi.fn(),
       update: vi.fn(),
@@ -128,8 +128,8 @@ describe('useWorkEntries', () => {
   it('addEntry calls bridge add and dispatches event', async () => {
     const addFn = vi.fn().mockResolvedValue('new-id');
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: addFn,
       update: vi.fn(),
@@ -154,8 +154,8 @@ describe('useWorkEntries', () => {
   it('updateEntry calls bridge update and dispatches event', async () => {
     const updateFn = vi.fn().mockResolvedValue(undefined);
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: updateFn,
@@ -178,8 +178,8 @@ describe('useWorkEntries', () => {
   it('deleteEntry calls bridge delete and dispatches event', async () => {
     const deleteFn = vi.fn().mockResolvedValue(undefined);
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: vi.fn(),
@@ -201,8 +201,8 @@ describe('useWorkEntries', () => {
 
   it('moveEntry calls bridge update with new date', async () => {
     const updateFn = vi.fn().mockResolvedValue(undefined);
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: updateFn,
@@ -256,8 +256,8 @@ describe('useWorkEntries', () => {
 
   it('reloads on WORK_TRACKER_CHANGED event when no subscribe', async () => {
     const getAllFn = vi.fn().mockResolvedValue(mockEntries);
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: getAllFn,
       add: vi.fn(),
       update: vi.fn(),
@@ -276,8 +276,8 @@ describe('useWorkEntries', () => {
     const tokenFn = vi.fn()
       .mockResolvedValueOnce(null)    // First check: not authenticated
       .mockResolvedValueOnce('token'); // Second check after event
-    (window as any).__getFirebaseIdToken = tokenFn;
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = tokenFn;
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: vi.fn(),
@@ -295,8 +295,8 @@ describe('useWorkEntries', () => {
 
   it('refresh function re-loads entries', async () => {
     const getAllFn = vi.fn().mockResolvedValue(mockEntries);
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('token');
+    window.__workTracker = {
       getAll: getAllFn,
       add: vi.fn(),
       update: vi.fn(),
@@ -313,7 +313,7 @@ describe('useWorkEntries', () => {
   });
 
   it('handles auth check failure gracefully', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockRejectedValue(new Error('auth error'));
+    window.__getFirebaseIdToken = vi.fn().mockRejectedValue(new Error('auth error'));
     const { result } = renderHook(() => useWorkEntries());
     await waitFor(() => expect(result.current.authChecked).toBe(true));
     expect(result.current.isAuthenticated).toBe(false);

@@ -19,8 +19,8 @@ describe('WorkTracker', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Not authenticated by default
-    delete (window as any).__getFirebaseIdToken;
-    delete (window as any).__workTracker;
+    delete window.__getFirebaseIdToken;
+    delete window.__workTracker;
   });
 
   it('shows sign-in required when not authenticated', async () => {
@@ -34,8 +34,8 @@ describe('WorkTracker', () => {
   });
 
   it('shows loading state when authenticated', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: vi.fn(),
@@ -48,8 +48,8 @@ describe('WorkTracker', () => {
   });
 
   it('shows no entries message when authenticated with empty data', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: vi.fn(),
@@ -70,8 +70,8 @@ describe('WorkTracker', () => {
       { id: '2', date: '2026-02-18', content: 'Code review', createdAt: { seconds: 2, nanoseconds: 0 } },
     ];
 
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue(mockEntries),
       add: vi.fn(),
       update: vi.fn(),
@@ -87,8 +87,8 @@ describe('WorkTracker', () => {
   });
 
   it('shows filter chips', async () => {
-    (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
-    (window as any).__workTracker = {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    window.__workTracker = {
       getAll: vi.fn().mockResolvedValue([]),
       add: vi.fn(),
       update: vi.fn(),

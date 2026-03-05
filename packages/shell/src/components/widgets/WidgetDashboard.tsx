@@ -482,7 +482,7 @@ const NotebookWidget = React.memo(function NotebookWidget() {
   // Fetch public notes count (lightweight — cached by Firestore persistence)
   useEffect(() => {
     function loadPublic() {
-      const api = (window as any).__notebook;
+      const api = window.__notebook;
       if (api?.getAllPublic) {
         api.getAllPublic().then((notes: any[]) => {
           setPublicCount(notes.length);
@@ -810,7 +810,7 @@ const WorkTrackerWidget = React.memo(function WorkTrackerWidget() {
     }
     load();
     // Also try the bridge API for fresh data
-    const api = (window as any).__workTracker;
+    const api = window.__workTracker;
     if (api?.getAll) {
       api.getAll().then((entries: any[]) => {
         setEntryCount(entries.length);
@@ -864,7 +864,7 @@ const CloudFilesWidget = React.memo(function CloudFilesWidget() {
     }
     load();
     // Also try the bridge API for fresh data
-    const api = (window as any).__cloudFiles;
+    const api = window.__cloudFiles;
     if (api?.getAll) {
       api.getAll().then((files: any[]) => {
         setFileCount(files.length);

@@ -59,8 +59,8 @@ describe('FlashCards', () => {
   beforeEach(() => {
     localStorageMock.clear();
     vi.clearAllMocks();
-    delete (window as any).__getFirebaseIdToken;
-    delete (window as any).__flashcards;
+    delete window.__getFirebaseIdToken;
+    delete window.__flashcards;
   });
 
   it('renders the title and subtitle', () => {
@@ -145,7 +145,7 @@ describe('FlashCards', () => {
 
   describe('when authenticated', () => {
     beforeEach(() => {
-      (window as any).__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+      window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
     });
 
     it('shows add buttons when authenticated', async () => {

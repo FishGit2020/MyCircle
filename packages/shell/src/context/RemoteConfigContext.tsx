@@ -16,54 +16,6 @@ export function useRemoteConfigContext() {
 }
 
 // Augment window type for cross-MFE access
-declare global {
-  interface Window {
-    __REMOTE_CONFIG__?: Record<string, string>;
-    __getFirebaseIdToken?: () => Promise<string | null>;
-    __getAppCheckToken?: () => Promise<string | null>;
-    __worshipSongs?: {
-      getAll: () => Promise<any[]>;
-      get: (id: string) => Promise<any>;
-      add: (song: Record<string, any>) => Promise<string>;
-      update: (id: string, updates: Record<string, any>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-    };
-    __notebook?: {
-      getAll: () => Promise<any[]>;
-      get: (id: string) => Promise<any>;
-      add: (note: { title: string; content: string }) => Promise<string>;
-      update: (id: string, updates: Partial<{ title: string; content: string }>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-    };
-    __flashcards?: {
-      getAll: () => Promise<any[]>;
-      add: (card: Record<string, any>) => Promise<string>;
-      addBatch: (cards: Array<Record<string, any>>) => Promise<void>;
-      update: (id: string, updates: Record<string, any>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-      subscribe: (callback: (cards: any[]) => void) => () => void;
-      getProgress: () => Promise<any>;
-      updateProgress: (progress: Record<string, any>) => Promise<void>;
-    };
-    __cloudFiles?: {
-      getAll: () => Promise<any[]>;
-      subscribe: (callback: (files: any[]) => void) => () => void;
-      upload: (fileName: string, fileBase64: string, contentType: string) => Promise<{ fileId: string; downloadUrl: string }>;
-      share: (fileId: string) => Promise<{ ok: boolean; downloadUrl: string }>;
-      delete: (fileId: string) => Promise<{ ok: boolean }>;
-      getAllShared: () => Promise<any[]>;
-      subscribeShared: (callback: (files: any[]) => void) => () => void;
-      deleteShared: (fileId: string) => Promise<{ ok: boolean }>;
-    };
-    __immigrationTracker?: {
-      getAll: () => Promise<any[]>;
-      add: (data: { receiptNumber: string; formType: string; nickname: string }) => Promise<string>;
-      delete: (id: string) => Promise<void>;
-      subscribe?: (callback: (cases: any[]) => void) => () => void;
-    };
-    __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
-  }
-}
 
 export function RemoteConfigProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<RemoteConfigState>({ config: {}, loading: true });

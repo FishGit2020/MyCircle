@@ -47,7 +47,7 @@ export default function Notebook() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = await (window as any).__getFirebaseIdToken?.();
+        const token = await window.__getFirebaseIdToken?.();
         setIsAuthenticated(!!token);
       } catch { setIsAuthenticated(false); }
     };
@@ -55,7 +55,7 @@ export default function Notebook() {
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
     return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
   }, []);
-  const hasApi = typeof (window as any).__notebook !== 'undefined';
+  const hasApi = typeof window.__notebook !== 'undefined';
 
   // All hooks MUST be above early returns (React rules of hooks)
   const handleSave = useCallback(async (id: string | null, data: { title: string; content: string }) => {
