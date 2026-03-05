@@ -22,6 +22,15 @@ vi.mock('@mycircle/shared', () => ({
     loading: false,
     shuffle: vi.fn(),
   }),
+  parseVerseReference: (ref: string) => {
+    const match = ref.replace(/[\u2013\u2014].*/g, '').trim().match(/^(.+?)\s+(\d+)(?::.*)?$/);
+    if (!match) return null;
+    return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
+  },
+}));
+
+vi.mock('react-router', () => ({
+  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>,
 }));
 
 describe('ChildDevelopment', () => {

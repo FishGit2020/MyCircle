@@ -32,7 +32,7 @@ export default function DashboardPage() {
             ) : (
               <>
                 {verseFragments ? (
-                  <p className="text-base md:text-lg italic text-blue-600 dark:text-blue-400 text-left leading-relaxed">
+                  <p className="text-sm md:text-base italic text-blue-600 dark:text-blue-400 text-left leading-relaxed">
                     &ldquo;{verseFragments.map((v) => (
                       <span key={v.number}>
                         <sup className="text-[10px] font-bold text-blue-400 dark:text-blue-500 mr-0.5 not-italic select-none">
@@ -43,7 +43,7 @@ export default function DashboardPage() {
                     ))}&rdquo;
                   </p>
                 ) : verse.text ? (
-                  <p className="text-base md:text-lg italic text-blue-600 dark:text-blue-400">
+                  <p className="text-sm md:text-base italic text-blue-600 dark:text-blue-400">
                     &ldquo;{verse.text}&rdquo;
                   </p>
                 ) : null}
