@@ -71,7 +71,7 @@ function AccountAvatar({ account, size = 'sm' }: { account: { displayName: strin
       <img
         src={account.photoURL}
         alt={account.displayName || 'User'}
-        className={`${px} rounded-full flex-shrink-0`}
+        className={`${px} rounded-full flex-shrink-0 object-cover`}
       />
     );
   }

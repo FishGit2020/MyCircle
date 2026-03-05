@@ -1659,6 +1659,8 @@ const es: Record<TranslationKey, string> = {
   'library.confirmDelete': '\u00bfEst\u00e1s seguro de que quieres eliminar este libro?',
   'library.readNow': 'Leer Ahora',
   'library.listenNow': 'Escuchar Ahora',
+  'library.tabRead': 'Leer',
+  'library.tabListen': 'Escuchar',
   'library.convertToAudio': 'Convertir a Audio',
   'library.converting': 'Convirtiendo...',
   'library.conversionProgress': 'Progreso de conversi\u00f3n de audio',
