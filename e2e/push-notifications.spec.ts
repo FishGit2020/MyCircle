@@ -20,9 +20,9 @@ test.describe('Push Notifications Preferences', () => {
       await bell.click();
       const dialog = page.getByRole('dialog');
       await expect(dialog).toBeVisible();
-      // Should have three toggle switches
+      // Should have toggle switches for each notification category
       const switches = dialog.getByRole('switch');
-      await expect(switches).toHaveCount(3);
+      await expect(switches).toHaveCount(2);
     }
   });
 

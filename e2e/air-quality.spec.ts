@@ -3,7 +3,8 @@ import { test, expect } from './fixtures';
 test.describe('Air Quality Index Widget', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/weather/40.7128,-74.006?name=New+York');
-    await page.waitForSelector('[aria-live="polite"]', { timeout: 15000 });
+    // Wait for the weather page heading to confirm data loaded
+    await expect(page.getByText('New York').first()).toBeVisible({ timeout: 15_000 });
   });
 
   test('renders the air quality section', async ({ page }) => {
