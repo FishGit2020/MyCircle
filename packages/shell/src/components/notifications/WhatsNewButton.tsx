@@ -92,7 +92,9 @@ export default function WhatsNewButton() {
 
     const latestId = announcements[0].id;
     const key = getPopupShownKey(latestId);
-    if (localStorage.getItem(key)) return; // already shown for this batch
+    // Skip only if the popup was already shown AND the user has a valid read state.
+    // If lastSeenId is null (cleared/new user), always allow the popup.
+    if (localStorage.getItem(key) && lastSeenId) return;
 
     popupTimerRef.current = setTimeout(() => {
       setShowPopup(true);
@@ -102,7 +104,7 @@ export default function WhatsNewButton() {
     return () => {
       if (popupTimerRef.current) clearTimeout(popupTimerRef.current);
     };
-  }, [hasUnread, announcements]);
+  }, [hasUnread, announcements, lastSeenId]);
 
   const handleDismiss = useCallback(() => {
     setShowPopup(false);

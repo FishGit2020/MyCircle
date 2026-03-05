@@ -75,7 +75,8 @@ describe('WhatsNewButton', () => {
     vi.useRealTimers();
   });
 
-  it('does not re-popup after localStorage flag is set', () => {
+  it('re-shows popup when lastSeenId is null even if localStorage flag exists', () => {
+    // lastSeenId is null in the mock (simulates cleared read state)
     localStorage.setItem('announcement-popup-shown-ann-1', '1');
     vi.useFakeTimers();
     renderButton();
@@ -84,7 +85,8 @@ describe('WhatsNewButton', () => {
       vi.advanceTimersByTime(2000);
     });
 
-    expect(screen.queryByTestId('announcement-popup')).not.toBeInTheDocument();
+    // Popup should re-appear because lastSeenId is null
+    expect(screen.getByTestId('announcement-popup')).toBeInTheDocument();
     vi.useRealTimers();
   });
 
