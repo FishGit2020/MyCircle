@@ -31,7 +31,7 @@ interface BookReaderProps {
   chapters: Chapter[];
   coverUrl?: string;
   language: string;
-  audioStatus: 'none' | 'processing' | 'complete' | 'error';
+  audioStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   audioProgress: number;
   onBack: () => void;
   isAdmin?: boolean;

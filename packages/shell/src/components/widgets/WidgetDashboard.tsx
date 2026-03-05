@@ -215,19 +215,16 @@ const VerseWidget = React.memo(function VerseWidget() {
   );
 });
 
-// Generic display state for NowPlayingWidget (source-agnostic)
+// Display state for NowPlayingWidget (podcast-only)
 interface NowPlayingDisplay {
-  type: 'podcast' | 'book';
-  title: string;       // track/episode title
-  subtitle: string;    // collection/podcast title
+  type: 'podcast';
+  title: string;       // episode title
+  subtitle: string;    // podcast title
   artwork?: string;
   navigateTo: string;
   savedAt: number;
-  // For podcast — needed to replay
   episode?: Episode;
   podcast?: Podcast | null;
-  // For book — needed to replay
-  audioSource?: import('@mycircle/shared').AudioSource;
 }
 
 function loadPodcastDisplay(): NowPlayingDisplay | null {
@@ -276,25 +273,6 @@ function loadPodcastDisplay(): NowPlayingDisplay | null {
   return null;
 }
 
-function loadBookDisplay(): NowPlayingDisplay | null {
-  try {
-    const lastPlayed = localStorage.getItem(StorageKeys.BOOK_LAST_PLAYED);
-    if (lastPlayed) {
-      const data = JSON.parse(lastPlayed);
-      if (data.bookId) {
-        return {
-          type: 'book',
-          title: data.chapterTitle || data.bookTitle,
-          subtitle: data.bookTitle,
-          artwork: data.artwork,
-          navigateTo: '/library',
-          savedAt: data.savedAt || 0,
-        };
-      }
-    }
-  } catch { /* ignore */ }
-  return null;
-}
 
 const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   const { t } = useTranslation();
@@ -320,21 +298,15 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
     return () => window.removeEventListener(WindowEvents.SUBSCRIPTIONS_CHANGED, loadSubs);
   }, []);
 
-  // Hydrate display from persisted data (podcast + book), pick most recent
+  // Hydrate display from persisted podcast data only
   const hydrateDisplay = React.useCallback(() => {
-    const podcastD = loadPodcastDisplay();
-    const bookD = loadBookDisplay();
-    if (podcastD && bookD) {
-      setDisplay(podcastD.savedAt >= bookD.savedAt ? podcastD : bookD);
-    } else {
-      setDisplay(podcastD || bookD);
-    }
+    setDisplay(loadPodcastDisplay());
   }, []);
 
   useEffect(() => {
     hydrateDisplay();
 
-    // Live updates from play/close events
+    // Live updates from podcast play/close events
     const unsubPlay = subscribeToMFEvent<{ episode: Episode; podcast: Podcast | null }>(
       MFEvents.PODCAST_PLAY_EPISODE,
       (data) => {
@@ -352,37 +324,16 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
       }
     );
 
-    const unsubAudioPlay = subscribeToMFEvent<import('@mycircle/shared').AudioSource>(
-      MFEvents.AUDIO_PLAY,
-      (audioSource) => {
-        setDisplay({
-          type: audioSource.type as 'podcast' | 'book',
-          title: audioSource.track.title,
-          subtitle: audioSource.collection.title,
-          artwork: audioSource.collection.artwork,
-          navigateTo: audioSource.navigateTo,
-          savedAt: Date.now(),
-          audioSource,
-        });
-        setIsActivelyPlaying(true);
-      }
-    );
-
     const unsubClose = subscribeToMFEvent(MFEvents.PODCAST_CLOSE_PLAYER, () => setIsActivelyPlaying(false));
-    const unsubAudioClose = subscribeToMFEvent(MFEvents.AUDIO_CLOSE, () => setIsActivelyPlaying(false));
 
     // Re-hydrate when last-played data changes (e.g. on login)
     function handleLastPlayedChanged() { hydrateDisplay(); }
     window.addEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
-    window.addEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleLastPlayedChanged);
 
     return () => {
       unsubPlay();
-      unsubAudioPlay();
       unsubClose();
-      unsubAudioClose();
       window.removeEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
-      window.removeEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleLastPlayedChanged);
     };
   }, [hydrateDisplay]);
 
@@ -393,10 +344,8 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
 
     navigate(display.navigateTo);
 
-    if (display.type === 'podcast' && display.episode && display.podcast) {
+    if (display.episode && display.podcast) {
       eventBus.publish(MFEvents.PODCAST_PLAY_EPISODE, { episode: display.episode, podcast: display.podcast });
-    } else if (display.audioSource) {
-      eventBus.publish(MFEvents.AUDIO_PLAY, display.audioSource);
     }
   }, [navigate, display]);
 
@@ -1038,8 +987,18 @@ const ImmigrationWidget = React.memo(function ImmigrationWidget() {
 
 const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [bookmarkCount, setBookmarkCount] = React.useState(0);
-  const [lastRead, setLastRead] = React.useState('');
+  const [lastPlayed, setLastPlayed] = React.useState<{
+    bookId: string;
+    bookTitle: string;
+    chapterTitle?: string;
+    artwork?: string;
+  } | null>(null);
+  const [audioProgress, setAudioProgress] = React.useState<{
+    position: number;
+    duration: number;
+  } | null>(null);
 
   useEffect(() => {
     function load() {
@@ -1054,18 +1013,46 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
         const raw = localStorage.getItem(StorageKeys.BOOK_LAST_PLAYED);
         if (raw) {
           const data = JSON.parse(raw);
-          if (data.bookTitle) setLastRead(data.bookTitle);
+          if (data.bookId) setLastPlayed(data);
+          else setLastPlayed(null);
+        } else {
+          setLastPlayed(null);
         }
+      } catch { /* ignore */ }
+      try {
+        const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
+        if (raw) setAudioProgress(JSON.parse(raw));
+        else setAudioProgress(null);
       } catch { /* ignore */ }
     }
     load();
     window.addEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, load);
     window.addEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, load);
+    window.addEventListener('book-audio-progress-changed', load);
+    const unsubAudioPlay = subscribeToMFEvent<import('@mycircle/shared').AudioSource>(
+      MFEvents.AUDIO_PLAY,
+      (audioSource) => {
+        if (audioSource.type === 'book') {
+          setLastPlayed({
+            bookId: audioSource.collection.id || '',
+            bookTitle: audioSource.collection.title,
+            chapterTitle: audioSource.track.title,
+            artwork: audioSource.collection.artwork,
+          });
+        }
+      }
+    );
     return () => {
       window.removeEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, load);
       window.removeEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, load);
+      window.removeEventListener('book-audio-progress-changed', load);
+      unsubAudioPlay();
     };
   }, []);
+
+  const progressPct = audioProgress && audioProgress.duration > 0
+    ? Math.round((audioProgress.position / audioProgress.duration) * 100)
+    : 0;
 
   return (
     <div>
@@ -1080,13 +1067,42 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.digitalLibraryDesc')}</p>
         </div>
       </div>
-      {lastRead && (
-        <p className="text-xs text-indigo-600 dark:text-indigo-400/70 truncate">
-          {t('widgets.lastRead' as any).replace('{title}', lastRead)}
-        </p>
+      {lastPlayed ? (
+        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg p-2.5">
+          <div className="flex items-center gap-2">
+            {lastPlayed.artwork && (
+              <img
+                src={lastPlayed.artwork}
+                alt=""
+                className="w-10 h-10 rounded object-cover flex-shrink-0 ring-2 ring-indigo-300 dark:ring-indigo-600"
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{lastPlayed.bookTitle}</p>
+              {lastPlayed.chapterTitle && (
+                <p className="text-xs text-indigo-600 dark:text-indigo-400 truncate">{lastPlayed.chapterTitle}</p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate('/library'); }}
+              className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-indigo-500 dark:bg-indigo-600 rounded-full hover:bg-indigo-600 dark:hover:bg-indigo-500 transition active:scale-95"
+              aria-label={t('widgets.continueListening')}
+            >
+              {t('widgets.continueListening')}
+            </button>
+          </div>
+          {progressPct > 0 && (
+            <div className="mt-2 h-1.5 bg-indigo-100 dark:bg-indigo-900/40 rounded-full overflow-hidden">
+              <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
+            </div>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noAudiobook')}</p>
       )}
       {bookmarkCount > 0 && (
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {t('widgets.bookBookmarks' as any).replace('{count}', String(bookmarkCount))}
         </p>
       )}

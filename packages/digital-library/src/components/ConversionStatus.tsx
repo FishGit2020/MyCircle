@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation, createLogger } from '@mycircle/shared';
+import { useTranslation, createLogger, WindowEvents } from '@mycircle/shared';
 
 const logger = createLogger('ConversionStatus');
 
@@ -20,7 +20,7 @@ function getDefaultVoice(language: string): string {
 interface ConversionStatusProps {
   bookId: string;
   language: string;
-  initialStatus: 'none' | 'processing' | 'complete' | 'error';
+  initialStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   initialProgress: number;
   onComplete: () => void;
   onConvert: (voiceName: string) => Promise<Response | undefined>;
@@ -60,6 +60,9 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
       } else if (book.audioStatus === 'error') {
         setStatus('error');
         setError(book.audioError || t('library.conversionFailed'));
+      } else if (book.audioStatus === 'paused') {
+        setStatus('paused');
+        setProgress(book.audioProgress || 0);
       } else if (book.audioStatus === 'processing') {
         setProgress(book.audioProgress || 0);
       }
@@ -120,6 +123,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         setProgress(0);
         setError(null);
         logger.info('Admin reset conversion', { bookId });
+        window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
       }
     } catch (err) {
       logger.error('Admin reset failed', err);
@@ -128,7 +132,15 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [bookId]);
 
-  const adminResetButton = isAdmin && (status === 'processing' || status === 'error') ? (
+  // Auto-continue when paused (time-budget exhausted, server waiting for client to re-trigger)
+  useEffect(() => {
+    if (status === 'paused' && !converting) {
+      const timer = setTimeout(() => handleConvert(), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, converting, handleConvert]);
+
+  const adminResetButton = isAdmin && (status === 'processing' || status === 'paused' || status === 'error') ? (
     <button
       type="button"
       onClick={handleAdminReset}
@@ -206,6 +218,27 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     );
   }
 
+  if (status === 'paused') {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">{t('library.continuingConversion')}</span>
+          {progress > 0 && (
+            <span className="text-sm font-medium text-purple-600 dark:text-purple-400">{progress}%</span>
+          )}
+        </div>
+        {progress > 0 && (
+          <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-full bg-purple-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+          </div>
+        )}
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('library.autoContinueHint')}</p>
+        {adminResetButton}
+      </div>
+    );
+  }
+
   if (status === 'error') {
     return (
       <div className="flex flex-col gap-2">
@@ -220,7 +253,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
             disabled={converting}
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] text-left disabled:opacity-50"
           >
-            {converting ? t('library.converting') : t('library.convertToAudio')}
+            {converting ? t('library.converting') : progress > 0 ? t('library.retryConversion') : t('library.convertToAudio')}
           </button>
           {adminResetButton}
         </div>

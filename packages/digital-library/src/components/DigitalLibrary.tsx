@@ -18,7 +18,7 @@ interface Book {
   totalCharacters: number;
   uploadedBy: { uid: string; displayName: string };
   uploadedAt: string;
-  audioStatus: 'none' | 'processing' | 'complete' | 'error';
+  audioStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   audioProgress: number;
 }
 
@@ -75,7 +75,7 @@ function BookCard({ book, onSelect, onDelete, currentUid }: {
               {t('library.audioAvailable')}
             </span>
           )}
-          {book.audioStatus === 'processing' && (
+          {(book.audioStatus === 'processing' || book.audioStatus === 'paused') && (
             <div className="mt-2">
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">

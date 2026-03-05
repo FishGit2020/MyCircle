@@ -2271,10 +2271,23 @@ export const digitalLibrary = onRequest(
         }
       }
 
+      // Detect stale paused: if paused for >30 min, client likely abandoned
+      if (audioStatus === 'paused' && data.updatedAt) {
+        const updatedMs = data.updatedAt.toMillis ? data.updatedAt.toMillis() : Date.now();
+        if (Date.now() - updatedMs > 30 * 60 * 1000) {
+          audioStatus = 'error';
+          await bookDoc.ref.update({
+            audioStatus: 'error',
+            audioError: 'Conversion paused too long. Retry to continue.',
+          });
+        }
+      }
+
       res.json({
         audioStatus,
         audioProgress: data.audioProgress || 0,
         audioError: audioStatus === 'error' && data.audioError ? data.audioError : audioError,
+        canContinue: audioStatus === 'paused',
       });
       return;
     }
@@ -2345,10 +2358,11 @@ export const digitalLibrary = onRequest(
           return;
         }
       }
+      // 'paused' status: allow immediately — it's waiting for continuation
 
-      // Global concurrency limit: max 2 concurrent conversions
-      const processingSnap = await db.collection('books').where('audioStatus', '==', 'processing').get();
-      // Exclude current book from count (it might be a stale retry)
+      // Global concurrency limit: max 2 concurrent conversions (processing + paused)
+      const processingSnap = await db.collection('books').where('audioStatus', 'in', ['processing', 'paused']).get();
+      // Exclude current book from count (it might be a paused continuation or stale retry)
       const activeCount = processingSnap.docs.filter(d => d.id !== bookId).length;
       if (activeCount >= 2) {
         res.status(429).json({ error: 'Too many conversions in progress. Try again later.' });
@@ -2386,6 +2400,9 @@ export const digitalLibrary = onRequest(
 
       // Process in background
       try {
+        const startTime = Date.now();
+        const TIME_BUDGET_MS = 4 * 60 * 1000; // 4 min, leave 1 min margin for 5-min CF timeout
+
         const ttsClient = new (await import('@google-cloud/text-to-speech')).TextToSpeechClient();
 
         const chaptersSnap = await bookRef.collection('chapters').orderBy('index').get();
@@ -2420,6 +2437,17 @@ export const digitalLibrary = onRequest(
             const progress = Math.round((completedChapters / totalChapters) * 100);
             await bookRef.update({ audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
             continue;
+          }
+
+          // Check time budget before processing a new chapter
+          if (Date.now() - startTime > TIME_BUDGET_MS) {
+            const progress = Math.round((completedChapters / totalChapters) * 100);
+            await bookRef.update({ audioStatus: 'paused', audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
+            // Record partial TTS usage
+            if (totalCharsUsed > 0) await incrementTtsUsage(quota.ref, totalCharsUsed);
+            try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
+            logger.info('Audio conversion paused (time budget)', { bookId, completedChapters, totalChapters });
+            return;
           }
 
           // Extract chapter text
