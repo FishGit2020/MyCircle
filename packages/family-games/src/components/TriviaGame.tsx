@@ -137,6 +137,10 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.trivia')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">{QUESTIONS_PER_ROUND} questions &middot; 15s each</p>
         </div>
+        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg px-4 py-2.5 max-w-xs">
+          <p className="text-xs font-medium text-purple-700 dark:text-purple-300">{t('games.scoringRules' as any)}</p>
+          <p className="text-xs text-purple-600 dark:text-purple-400 mt-0.5">{t('games.triviaRules' as any)}</p>
+        </div>
 
         {/* Category picker */}
         <div className="flex flex-wrap justify-center gap-2">

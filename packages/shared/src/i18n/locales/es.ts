@@ -1750,6 +1750,12 @@ const es: Record<TranslationKey, string> = {
   'games.round': 'Ronda',
   'games.ready': '\u00bfListo?',
   'games.holdUp': '\u00a1Sostiene el tel\u00e9fono en tu frente!',
+  'games.scoringRules': 'Puntuaci\u00f3n',
+  'games.triviaRules': 'Responde m\u00e1s r\u00e1pido para hasta 2x puntos. 100\u2013200 pts por respuesta correcta.',
+  'games.mathRules': 'Puntos base: F\u00e1cil 10, Medio 20, Dif\u00edcil 30. Racha: +5 por respuesta consecutiva.',
+  'games.wordRules': 'Menos intentos = m\u00e1s puntos. 1 intento = 600 pts, 6 intentos = 100 pts.',
+  'games.memoryRules': 'Termina r\u00e1pido con menos volteos para m\u00e1s puntos.',
+  'games.headsUpRules': '1 punto por palabra adivinada. Saltar no tiene penalizaci\u00f3n.',
 
   // Privacy Policy
   'privacy.title': 'Pol\u00edtica de Privacidad',
