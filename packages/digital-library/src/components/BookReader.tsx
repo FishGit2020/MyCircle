@@ -29,6 +29,7 @@ interface BookReaderProps {
   epubUrl: string;
   title: string;
   chapters: Chapter[];
+  coverUrl?: string;
   language: string;
   audioStatus: 'none' | 'processing' | 'complete' | 'error';
   audioProgress: number;
@@ -36,7 +37,7 @@ interface BookReaderProps {
   isAdmin?: boolean;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, language, audioStatus, audioProgress, onBack, isAdmin }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack, isAdmin }: BookReaderProps) {
   const { t } = useTranslation();
   const viewerRef = useRef<HTMLDivElement>(null);
   const renditionRef = useRef<any>(null);
@@ -418,7 +419,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, language,
           isAdmin={isAdmin}
         />
         {showAudioPlayer && (
-          <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} />
+          <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} />
         )}
       </div>
     </div>

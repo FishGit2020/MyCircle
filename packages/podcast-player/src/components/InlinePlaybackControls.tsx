@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation, subscribeToMFEvent, eventBus, MFEvents } from '@mycircle/shared';
-import type { PodcastPlaybackStateEvent, Episode, Podcast } from '@mycircle/shared';
+import type { AudioPlaybackStateEvent, Episode, Podcast } from '@mycircle/shared';
 
 const PLAYBACK_SPEEDS = [0.5, 1, 1.25, 1.5, 2];
 const SLEEP_TIMER_OPTIONS = [0, 5, 15, 30, 45, 60];
@@ -23,13 +23,17 @@ interface InlinePlaybackControlsProps {
 
 export default function InlinePlaybackControls({ episode, podcast }: InlinePlaybackControlsProps) {
   const { t } = useTranslation();
-  const [state, setState] = useState<PodcastPlaybackStateEvent>({
+  const [state, setState] = useState<AudioPlaybackStateEvent>({
+    type: 'podcast',
     isPlaying: false,
     currentTime: 0,
     duration: 0,
     playbackSpeed: 1,
     sleepMinutes: 0,
     sleepRemaining: 0,
+    trackIndex: 0,
+    totalTracks: 1,
+    trackTitle: '',
     queueLength: 0,
     queue: [],
   });
@@ -40,55 +44,55 @@ export default function InlinePlaybackControls({ episode, podcast }: InlinePlayb
 
   // Subscribe to playback state broadcasts from GlobalAudioPlayer
   useEffect(() => {
-    const unsub = subscribeToMFEvent<PodcastPlaybackStateEvent>(
-      MFEvents.PODCAST_PLAYBACK_STATE,
+    const unsub = subscribeToMFEvent<AudioPlaybackStateEvent>(
+      MFEvents.AUDIO_PLAYBACK_STATE,
       (data) => setState(data),
     );
     return unsub;
   }, []);
 
   const togglePlay = useCallback(() => {
-    eventBus.publish(MFEvents.PODCAST_TOGGLE_PLAY);
+    eventBus.publish(MFEvents.AUDIO_TOGGLE_PLAY);
   }, []);
 
   const skipForward = useCallback(() => {
-    eventBus.publish(MFEvents.PODCAST_SKIP_FORWARD);
+    eventBus.publish(MFEvents.AUDIO_SKIP_FORWARD);
   }, []);
 
   const skipBack = useCallback(() => {
-    eventBus.publish(MFEvents.PODCAST_SKIP_BACK);
+    eventBus.publish(MFEvents.AUDIO_SKIP_BACK);
   }, []);
 
   const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!state.duration) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    eventBus.publish(MFEvents.PODCAST_SEEK, { time: fraction * state.duration });
+    eventBus.publish(MFEvents.AUDIO_SEEK, { time: fraction * state.duration });
   }, [state.duration]);
 
   const handleSeekKeyboard = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!state.duration) return;
     if (e.key === 'ArrowRight') {
       e.preventDefault();
-      eventBus.publish(MFEvents.PODCAST_SEEK, { time: Math.min(state.currentTime + 5, state.duration) });
+      eventBus.publish(MFEvents.AUDIO_SEEK, { time: Math.min(state.currentTime + 5, state.duration) });
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      eventBus.publish(MFEvents.PODCAST_SEEK, { time: Math.max(state.currentTime - 5, 0) });
+      eventBus.publish(MFEvents.AUDIO_SEEK, { time: Math.max(state.currentTime - 5, 0) });
     }
   }, [state.currentTime, state.duration]);
 
   const changeSpeed = useCallback((speed: number) => {
-    eventBus.publish(MFEvents.PODCAST_CHANGE_SPEED, { speed });
+    eventBus.publish(MFEvents.AUDIO_CHANGE_SPEED, { speed });
     setShowSpeedMenu(false);
   }, []);
 
   const startSleepTimer = useCallback((minutes: number) => {
-    eventBus.publish(MFEvents.PODCAST_SET_SLEEP_TIMER, { minutes });
+    eventBus.publish(MFEvents.AUDIO_SET_SLEEP_TIMER, { minutes });
     setShowSleepMenu(false);
   }, []);
 
   const handleClose = useCallback(() => {
-    eventBus.publish(MFEvents.PODCAST_CLOSE_PLAYER);
+    eventBus.publish(MFEvents.AUDIO_CLOSE);
   }, []);
 
   const handleShare = useCallback(async () => {
@@ -329,7 +333,7 @@ export default function InlinePlaybackControls({ episode, podcast }: InlinePlayb
                     <p className="text-xs text-gray-800 dark:text-gray-200 truncate flex-1">{item.title}</p>
                     <button
                       type="button"
-                      onClick={() => eventBus.publish(MFEvents.PODCAST_REMOVE_FROM_QUEUE, { index: i })}
+                      onClick={() => eventBus.publish(MFEvents.AUDIO_REMOVE_FROM_QUEUE, { index: i })}
                       className="p-0.5 text-gray-400 hover:text-red-500 transition flex-shrink-0"
                       aria-label={t('podcasts.removeFromQueue')}
                     >
@@ -371,7 +375,7 @@ export default function InlinePlaybackControls({ episode, podcast }: InlinePlayb
           type="button"
           onClick={handleClose}
           className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-          aria-label={t('podcasts.closePlayer')}
+          aria-label={t('player.closePlayer')}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

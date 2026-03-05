@@ -425,6 +425,14 @@ const zh: Record<TranslationKey, string> = {
   'podcasts.markPlayed': '\u6807\u8bb0\u4e3a\u5df2\u64ad\u653e',
   'podcasts.markUnplayed': '\u6807\u8bb0\u4e3a\u672a\u64ad\u653e',
 
+  // Generic audio player
+  'player.chapterOf': '\u7b2c {current} \u7ae0\uff0c\u5171 {total} \u7ae0',
+  'player.nextTrack': '\u4e0b\u4e00\u66f2',
+  'player.prevTrack': '\u4e0a\u4e00\u66f2',
+  'player.listeningToBook': '\u6b63\u5728\u6536\u542c\u6709\u58f0\u4e66',
+  'player.resumeBook': '\u7ee7\u7eed\u6536\u542c',
+  'player.closePlayer': '\u5173\u95ed\u64ad\u653e\u5668',
+
   // AI Assistant
   'ai.title': 'AI \u52a9\u624b',
   'ai.subtitle': '\u8be2\u95ee\u5929\u6c14\u3001\u80a1\u7968\u6216\u5bfc\u822a\u5e94\u7528',
