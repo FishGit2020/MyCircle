@@ -145,11 +145,11 @@ function NavDropdown({
   );
 
   return (
-    <div className="relative">
+    <div className="relative" data-nav-item>
       <button
         type="button"
         onClick={onToggle}
-        className={`text-sm font-medium transition flex items-center gap-1 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded px-1 ${
+        className={`text-sm font-medium transition flex items-center gap-1 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded px-1 whitespace-nowrap ${
           isGroupActive
             ? 'text-blue-600 dark:text-blue-400'
             : 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'

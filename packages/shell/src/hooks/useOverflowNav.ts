@@ -1,9 +1,12 @@
-import { useState, useEffect, useCallback, type RefObject } from 'react';
+import { useState, useEffect, useCallback, useRef, type RefObject } from 'react';
 
 /**
  * Observes a flex container and returns how many direct children fit
  * before overflowing. Reserves space for an overflow button when not
  * all items fit.
+ *
+ * Nav items must have `data-nav-item` attribute so the hook can
+ * distinguish them from the overflow button and cache their widths.
  */
 export function useOverflowNav(
   containerRef: RefObject<HTMLElement | null>,
@@ -11,15 +14,12 @@ export function useOverflowNav(
   overflowButtonWidth = 44,
 ): number {
   const [visibleCount, setVisibleCount] = useState(itemCount);
+  // Cache widths so we can calculate even when items are removed from DOM
+  const widthsRef = useRef<number[]>([]);
 
   const measure = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
-
-    const children = Array.from(el.children) as HTMLElement[];
-    // Last child may be the overflow button itself — only measure nav items
-    const navChildren = children.slice(0, itemCount);
-    if (navChildren.length === 0) return;
 
     const containerWidth = el.clientWidth;
     // In SSR / jsdom the container has no layout — show all items
@@ -27,14 +27,26 @@ export function useOverflowNav(
       setVisibleCount(itemCount);
       return;
     }
+
+    // Measure only actual nav items (not the overflow button) and cache widths
+    const navItems = el.querySelectorAll('[data-nav-item]');
+    navItems.forEach((item, i) => {
+      widthsRef.current[i] = (item as HTMLElement).offsetWidth;
+    });
+
+    // Wait until we've measured all items at least once
+    if (widthsRef.current.length < itemCount) {
+      return;
+    }
+
     let usedWidth = 0;
     let fits = 0;
 
-    for (let i = 0; i < navChildren.length; i++) {
-      const childWidth = navChildren[i].offsetWidth;
-      // If not all items have been counted yet, reserve overflow button space
-      const remaining = i < navChildren.length - 1 ? overflowButtonWidth : 0;
-      if (usedWidth + childWidth + remaining <= containerWidth) {
+    for (let i = 0; i < itemCount; i++) {
+      const childWidth = widthsRef.current[i];
+      // Reserve overflow button space unless this is the last item
+      const reserve = i < itemCount - 1 ? overflowButtonWidth : 0;
+      if (usedWidth + childWidth + reserve <= containerWidth) {
         usedWidth += childWidth;
         fits++;
       } else {
