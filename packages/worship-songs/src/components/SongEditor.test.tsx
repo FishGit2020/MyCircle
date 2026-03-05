@@ -67,9 +67,16 @@ describe('SongEditor', () => {
   it('includes YouTube URL in saved data', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await fillAndFlush(() => {
-      fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    fireEvent.change(screen.getByLabelText('worship.youtubeUrl'), { target: { value: 'https://youtube.com/watch?v=xyz' } });
+
+    // Wait for ALL state to flush — verify both button enabled AND youtube value
+    await waitFor(() => {
+      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+      expect(screen.getByLabelText('worship.youtubeUrl')).toHaveValue('https://youtube.com/watch?v=xyz');
     });
+
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
     await waitFor(() => {
@@ -130,9 +137,15 @@ describe('SongEditor', () => {
   it('includes BPM in saved data', async () => {
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
-    await fillAndFlush(() => {
-      fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.songTitle/ }), { target: { value: 'Test Song' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /worship\.content/ }), { target: { value: 'Some lyrics' } });
+    fireEvent.change(screen.getByLabelText('worship.bpm'), { target: { value: '95' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('worship.save').closest('button')).toBeEnabled();
+      expect(screen.getByLabelText('worship.bpm')).toHaveValue(95);
     });
+
     fireEvent.submit(screen.getByText('worship.save').closest('form')!);
 
     await waitFor(() => {
