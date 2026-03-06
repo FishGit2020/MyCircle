@@ -20,18 +20,19 @@
     "react-router": "catalog:"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "catalog:",
-    "@testing-library/react": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
-    "autoprefixer": "catalog:",
-    "jsdom": "catalog:",
-    "postcss": "catalog:",
-    "tailwindcss": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:"
+    "@originjs/vite-plugin-federation": "^1.3.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@types/testing-library__jest-dom": "^6.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.17",
+    "jsdom": "^27.4.0",
+    "postcss": "^8.4.33",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vitest": "^4.0.17"
   }
 }
