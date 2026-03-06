@@ -41,6 +41,17 @@ const PODCASTINDEX_BASE = process.env.PODCASTINDEX_BASE_URL || 'https://api.podc
 
 // Ollama endpoints are now per-user (stored in Firestore), not env vars
 
+// ─── Expand API_KEYS JSON secret into individual env vars ───────────
+function expandApiKeys() {
+  if (process.env.API_KEYS) {
+    const ak = JSON.parse(process.env.API_KEYS);
+    process.env.OPENWEATHER_API_KEY = ak.openweather || '';
+    process.env.FINNHUB_API_KEY = ak.finnhub || '';
+    process.env.GEMINI_API_KEY = ak.gemini || '';
+    process.env.YOUVERSION_APP_KEY = ak.youversion || '';
+  }
+}
+
 // ─── CORS origins whitelist ─────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://mycircle-dash.web.app',
@@ -167,9 +178,10 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 300,
-    secrets: ['OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'PODCASTINDEX_CREDS', 'YOUVERSION_APP_KEY', 'GEMINI_API_KEY', 'USCIS_CREDS']
+    secrets: ['API_KEYS', 'PODCASTINDEX_CREDS', 'USCIS_CREDS']
   },
   async (req: Request, res: Response) => {
+    expandApiKeys();
     const server = await getServer();
 
     // App Check: verify request comes from our app (bot protection)
@@ -419,9 +431,10 @@ export const checkWeatherAlerts = onSchedule(
     schedule: 'every 30 minutes',
     memory: '256MiB',
     timeoutSeconds: 120,
-    secrets: ['OPENWEATHER_API_KEY'],
+    secrets: ['API_KEYS'],
   },
   async () => {
+    expandApiKeys();
     const db = getFirestore();
     const messaging = getMessaging();
     const apiKey = process.env.OPENWEATHER_API_KEY || '';
@@ -545,9 +558,10 @@ export const stockProxy = onRequest(
     maxInstances: 10,
     memory: '256MiB',
     timeoutSeconds: 30,
-    secrets: ['FINNHUB_API_KEY'],
+    secrets: ['API_KEYS'],
   },
   async (req: Request, res: Response) => {
+    expandApiKeys();
     const apiKey = process.env.FINNHUB_API_KEY;
     if (!apiKey) {
       res.status(500).json({ error: 'FINNHUB_API_KEY not configured' });
@@ -705,9 +719,10 @@ export const aiChat = onRequest(
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 300,
-    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY'],
+    secrets: ['API_KEYS', 'RECAPTCHA_SECRET_KEY'],
   },
   async (req: Request, res: Response) => {
+    expandApiKeys();
     if (req.method !== 'POST') {
       res.status(405).json({ error: 'Method not allowed' });
       return;
@@ -1159,9 +1174,10 @@ export const aiChatStream = onRequest(
     maxInstances: 5,
     memory: '256MiB',
     timeoutSeconds: 300,
-    secrets: ['GEMINI_API_KEY', 'OPENWEATHER_API_KEY', 'FINNHUB_API_KEY', 'RECAPTCHA_SECRET_KEY'],
+    secrets: ['API_KEYS', 'RECAPTCHA_SECRET_KEY'],
   },
   async (req: Request, res: Response) => {
+    expandApiKeys();
     // Validate request (auth, rate limit, recaptcha, zod)
     const validated = await validateAiChatRequest(req, res);
     if (!validated) return; // response already sent
