@@ -46,6 +46,11 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
+      // Hiking routes subcollection - private per-user saved routes
+      match /hikingRoutes/{routeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // Immigration cases subcollection - private per-user case tracking
       match /immigrationCases/{caseId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -55,6 +60,13 @@ service cloud.firestore {
       match /gameProgress/{docId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+    }
+
+    // Public hiking routes - authenticated read/create, creator-only delete
+    match /publicHikingRoutes/{routeId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.sharedBy.uid == request.auth.uid;
     }
 
     // Feedback collection - anyone can submit feedback (write-only inbox)

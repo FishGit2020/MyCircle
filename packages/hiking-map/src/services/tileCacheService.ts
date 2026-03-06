@@ -57,6 +57,13 @@ export async function clearAllTiles(): Promise<void> {
   await db.clear(STORE);
 }
 
+/** Return all cached tile keys as a Set for fast lookup. */
+export async function getAllCachedKeys(): Promise<Set<string>> {
+  const db = await getDb();
+  const keys = await db.getAllKeys(STORE);
+  return new Set(keys as string[]);
+}
+
 /** Generate all tile coordinates for a bounding box at a given zoom level. */
 function tilesForBbox(
   bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number },

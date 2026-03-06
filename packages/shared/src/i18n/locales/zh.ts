@@ -1918,6 +1918,20 @@ const zh: Record<TranslationKey, string> = {
   'hiking.downloadComplete': '\u4e0b\u8f7d\u5b8c\u6210',
   'hiking.downloadError': '\u4e0b\u8f7d\u5931\u8d25',
   'hiking.clearCache': '\u6e05\u9664\u7f13\u5b58',
+  'hiking.myRoutes': '\u6211\u7684\u8def\u7ebf',
+  'hiking.communityRoutes': '\u793e\u533a\u8def\u7ebf',
+  'hiking.noCommunityRoutes': '\u6682\u65e0\u5206\u4eab\u8def\u7ebf',
+  'hiking.shareRoute': '\u516c\u5f00\u5206\u4eab\u8def\u7ebf',
+  'hiking.unshareRoute': '\u53d6\u6d88\u5206\u4eab',
+  'hiking.shared': '\u5df2\u5206\u4eab',
+  'hiking.sharedBy': '\u5206\u4eab\u8005',
+  'hiking.signInToRoutes': '\u767b\u5f55\u4ee5\u4fdd\u5b58\u548c\u5206\u4eab\u8def\u7ebf',
+  'hiking.signInToRoutesHint': '\u8def\u7ebf\u8de8\u8bbe\u5907\u540c\u6b65\uff0c\u53ef\u4e0e\u793e\u533a\u5171\u4eab',
+  'hiking.showCacheOverlay': '\u663e\u793a\u5df2\u7f13\u5b58\u74e6\u7247',
+  'hiking.hideCacheOverlay': '\u9690\u85cf\u5df2\u7f13\u5b58\u74e6\u7247',
+  'hiking.renameRoute': '\u91cd\u547d\u540d\u8def\u7ebf',
+  'hiking.routeNamePlaceholder': '\u8def\u7ebf\u540d\u79f0...',
+  'hiking.save': '\u4fdd\u5b58',
 };
 
 export default zh;

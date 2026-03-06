@@ -55,6 +55,14 @@ vi.mock('./OfflineTileManager', () => ({
   default: () => <div data-testid="offline-tile-manager" />,
 }));
 
+vi.mock('./TileCacheOverlay', () => ({
+  default: () => null,
+}));
+
+vi.mock('./RouteDisplay', () => ({
+  default: () => null,
+}));
+
 vi.mock('./RoutePlanner', () => ({
   default: () => (
     <>

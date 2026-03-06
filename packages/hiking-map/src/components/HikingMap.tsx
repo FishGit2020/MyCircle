@@ -9,8 +9,9 @@ import ZoomControls from './ZoomControls';
 import SavedRoutes from './SavedRoutes';
 import OfflineTileManager from './OfflineTileManager';
 import RouteDisplay from './RouteDisplay';
+import TileCacheOverlay from './TileCacheOverlay';
 import type { RouteResult } from '../providers/RoutingProvider';
-import type { SavedRoute } from '../services/routeStorageService';
+import type { SavedRoute, PublicRoute } from '../services/routeStorageService';
 import { MAP_CONFIG } from '../config/mapConfig';
 
 /** Format [lng, lat] as "lat, lng" string for route planner inputs. */
@@ -67,6 +68,10 @@ export default function HikingMap() {
   const [currentEndLabel, setCurrentEndLabel] = useState('');
   // Route loaded from saved routes (bypasses RoutePlanner line)
   const [loadedRouteGeometry, setLoadedRouteGeometry] = useState<GeoJSON.Geometry | null>(null);
+
+  // Tile cache overlay toggle + version (bumped after download to refresh overlay)
+  const [showCacheOverlay, setShowCacheOverlay] = useState(false);
+  const [cacheVersion, setCacheVersion] = useState(0);
 
   // Auto-locate user when map first loads
   useEffect(() => {
@@ -137,7 +142,7 @@ export default function HikingMap() {
     setLoadedRouteGeometry(null);
   }, []);
 
-  const handleLoadSavedRoute = useCallback((saved: SavedRoute) => {
+  const handleLoadSavedRoute = useCallback((saved: SavedRoute | PublicRoute) => {
     setLoadedRouteGeometry(saved.geometry);
     setCurrentRoute({ geometry: saved.geometry, distance: saved.distance, duration: saved.duration });
     // Fit the map viewport to the loaded route
@@ -235,6 +240,9 @@ export default function HikingMap() {
           )}
         </div>
 
+        {/* Tile cache overlay */}
+        <TileCacheOverlay map={map} visible={showCacheOverlay} cacheVersion={cacheVersion} />
+
         {/* Sidebar */}
         <div className="md:w-72 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
           {/* Loaded saved route overlay */}
@@ -250,14 +258,18 @@ export default function HikingMap() {
           />
 
           <SavedRoutes
-            map={map}
             currentRoute={currentRoute}
             currentStart={currentStartLabel}
             currentEnd={currentEndLabel}
             onLoadRoute={handleLoadSavedRoute}
           />
 
-          <OfflineTileManager map={map} />
+          <OfflineTileManager
+            map={map}
+            showCacheOverlay={showCacheOverlay}
+            onToggleCacheOverlay={() => setShowCacheOverlay(v => !v)}
+            onCacheChanged={() => setCacheVersion(v => v + 1)}
+          />
         </div>
       </div>
     </PageContent>

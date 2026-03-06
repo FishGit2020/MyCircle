@@ -1916,6 +1916,20 @@ const en = {
   'hiking.downloadComplete': 'Download complete',
   'hiking.downloadError': 'Download failed',
   'hiking.clearCache': 'Clear Cache',
+  'hiking.myRoutes': 'My Routes',
+  'hiking.communityRoutes': 'Community Routes',
+  'hiking.noCommunityRoutes': 'No routes shared yet',
+  'hiking.shareRoute': 'Share route publicly',
+  'hiking.unshareRoute': 'Unshare route',
+  'hiking.shared': 'shared',
+  'hiking.sharedBy': 'Shared by',
+  'hiking.signInToRoutes': 'Sign in to save & share routes',
+  'hiking.signInToRoutesHint': 'Your routes sync across devices and can be shared with the community',
+  'hiking.showCacheOverlay': 'Show cached tiles',
+  'hiking.hideCacheOverlay': 'Hide cached tiles',
+  'hiking.renameRoute': 'Rename route',
+  'hiking.routeNamePlaceholder': 'Route name...',
+  'hiking.save': 'Save',
 } as const;
 
 export default en;
