@@ -32,10 +32,6 @@ export function useCamera(): UseCameraReturn {
         audio: false,
       });
       setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play();
-      }
       setIsActive(true);
     } catch (err) {
       if (err instanceof DOMException) {
@@ -51,6 +47,16 @@ export function useCamera(): UseCameraReturn {
       }
     }
   }, []);
+
+  // Attach stream to video element once both are available
+  // (isActive triggers render of <video>, then this effect connects the stream)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && stream) {
+      video.srcObject = stream;
+      video.play().catch(() => {});
+    }
+  }, [stream, isActive]);
 
   const captureFrame = useCallback((): ImageData | null => {
     const video = videoRef.current;

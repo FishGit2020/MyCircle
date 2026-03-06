@@ -55,10 +55,10 @@ export default function CameraCapture({ onCapture }: CameraCaptureProps) {
           <button
             type="button"
             onClick={handleCapture}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-white dark:bg-gray-200 border-4 border-blue-500 shadow-lg hover:scale-105 transition-transform"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-16 h-16 rounded-full bg-white dark:bg-gray-200 border-4 border-blue-500 shadow-lg hover:scale-105 active:scale-95 transition-transform touch-manipulation"
             aria-label={t('docScanner.capture')}
           >
-            <div className="w-12 h-12 mx-auto rounded-full bg-blue-500" />
+            <div className="w-12 h-12 mx-auto rounded-full bg-blue-500 pointer-events-none" />
           </button>
         </div>
       ) : (
