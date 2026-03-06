@@ -54,6 +54,7 @@ const keysToPreserve = new Set([
   StorageKeys.WEATHER_ALERTS,
   StorageKeys.ANNOUNCEMENT_ALERTS,
   StorageKeys.KNOWN_ACCOUNTS,
+  StorageKeys.WIDGET_LAYOUT,
 ]);
 
 /** Clear user-specific localStorage and dispatch change events */
@@ -256,8 +257,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
           }
 
-          // Restore widget layout (ensure each widget has a size default)
-          if (userProfile.widgetLayout && userProfile.widgetLayout.length > 0) {
+          // Restore widget layout from Firestore only if local is empty
+          const hasLocalLayout = !!localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
+          if (!hasLocalLayout && userProfile.widgetLayout && userProfile.widgetLayout.length > 0) {
             const withSizes = userProfile.widgetLayout.map((w: any) => ({
               ...w,
               size: w.size || 'medium',
