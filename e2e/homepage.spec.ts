@@ -32,12 +32,11 @@ test.describe('Homepage / Dashboard', () => {
     await expect(page.getByRole('button', { name: /use my.*location/i })).toBeVisible();
   });
 
-  test('footer credits OpenWeatherMap, Finnhub, and PodcastIndex', async ({ page }) => {
+  test('footer shows privacy and terms links', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.locator('footer')).toContainText('OpenWeatherMap');
-    await expect(page.locator('footer')).toContainText('Finnhub');
-    await expect(page.locator('footer')).toContainText('PodcastIndex');
+    await expect(page.locator('footer')).toContainText('Privacy Policy');
+    await expect(page.locator('footer')).toContainText('Terms of Service');
   });
 
 });
