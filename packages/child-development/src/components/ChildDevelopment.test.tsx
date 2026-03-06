@@ -149,7 +149,7 @@ describe('ChildDevelopment', () => {
   });
 
   it('shuffles Bible verse', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<ChildDevelopment />);
 
     const shuffleBtn = screen.getByRole('button', { name: 'childDev.shuffleVerse' });
@@ -177,7 +177,7 @@ describe('ChildDevelopment', () => {
   });
 
   it('shows edit button and edit form works', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     storage['child-name'] = 'Emma';
     storage['child-birth-date'] = btoa('2024-06-01');
 

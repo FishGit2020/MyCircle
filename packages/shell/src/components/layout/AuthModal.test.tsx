@@ -65,7 +65,7 @@ describe('AuthModal', () => {
   });
 
   it('calls signInWithEmail on form submit', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     mockSignInWithEmail.mockResolvedValue(undefined);
     render(<AuthModal open={true} onClose={onClose} />);
 
@@ -94,7 +94,7 @@ describe('AuthModal', () => {
   });
 
   it('switches to sign up tab and shows additional fields', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<AuthModal open={true} onClose={onClose} />);
 
     // Click Sign Up tab (first element with that text is the tab)
@@ -106,7 +106,7 @@ describe('AuthModal', () => {
   });
 
   it('shows error when passwords do not match on sign up', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<AuthModal open={true} onClose={onClose} />);
 
     // Switch to sign up tab
@@ -126,7 +126,7 @@ describe('AuthModal', () => {
   });
 
   it('calls signUpWithEmail on valid sign up', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     mockSignUpWithEmail.mockResolvedValue(undefined);
     render(<AuthModal open={true} onClose={onClose} />);
 
@@ -147,7 +147,7 @@ describe('AuthModal', () => {
   });
 
   it('calls Google sign in when Google button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     mockSignIn.mockResolvedValue(undefined);
     render(<AuthModal open={true} onClose={onClose} />);
 
@@ -159,7 +159,7 @@ describe('AuthModal', () => {
   });
 
   it('calls resetPassword when forgot password is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     mockResetPassword.mockResolvedValue(undefined);
     render(<AuthModal open={true} onClose={onClose} />);
 
@@ -173,7 +173,7 @@ describe('AuthModal', () => {
   });
 
   it('shows error when forgot password clicked without email', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<AuthModal open={true} onClose={onClose} />);
 
     await user.click(screen.getByText('auth.forgotPassword'));
@@ -185,7 +185,7 @@ describe('AuthModal', () => {
   });
 
   it('closes on close button click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<AuthModal open={true} onClose={onClose} />);
 
     await user.click(screen.getByLabelText('auth.close'));

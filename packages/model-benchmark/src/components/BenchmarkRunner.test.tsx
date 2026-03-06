@@ -71,7 +71,7 @@ describe('BenchmarkRunner', () => {
   });
 
   it('shows per-endpoint model dropdown when endpoint is checked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
 
     // Only judge dropdown before selecting endpoints
@@ -87,7 +87,7 @@ describe('BenchmarkRunner', () => {
   });
 
   it('shows model dropdowns for each selected endpoint', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
 
     const checkboxes = screen.getAllByRole('checkbox');
@@ -100,7 +100,7 @@ describe('BenchmarkRunner', () => {
   });
 
   it('discovers models when endpoint is checked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<BenchmarkRunner onResults={onResults} benchmark={mockBenchmark} />);
 
     const checkboxes = screen.getAllByRole('checkbox');

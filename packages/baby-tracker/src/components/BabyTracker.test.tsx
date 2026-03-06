@@ -79,7 +79,7 @@ describe('BabyTracker', () => {
 
   it('saves due date to localStorage and dispatches event', async () => {
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
 
     render(<BabyTracker />);
 
@@ -148,7 +148,7 @@ describe('BabyTracker', () => {
 
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(dateStr);
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
 
     render(<BabyTracker />);
 
@@ -185,7 +185,7 @@ describe('BabyTracker', () => {
   });
 
   it('shuffles verse when shuffle button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<BabyTracker />);
 
     const shuffleBtn = screen.getByRole('button', { name: 'baby.shuffleVerse' });

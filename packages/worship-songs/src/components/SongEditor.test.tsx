@@ -68,7 +68,7 @@ describe('SongEditor', () => {
   });
 
   it('sends undefined when YouTube URL is empty', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
@@ -114,7 +114,7 @@ describe('SongEditor', () => {
   });
 
   it('includes BPM in saved data', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');
@@ -140,7 +140,7 @@ describe('SongEditor', () => {
   });
 
   it('shows inline validation on title after blur when empty', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     const titleInput = screen.getByRole('textbox', { name: /worship\.songTitle/ });
@@ -151,7 +151,7 @@ describe('SongEditor', () => {
   });
 
   it('hides helper text when all required fields are filled', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');

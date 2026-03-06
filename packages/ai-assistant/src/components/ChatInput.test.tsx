@@ -23,7 +23,7 @@ describe('ChatInput', () => {
 
   it('calls onSend when Enter is pressed', async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<ChatInput onSend={onSend} />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...');
@@ -34,7 +34,7 @@ describe('ChatInput', () => {
 
   it('does not send empty messages', async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<ChatInput onSend={onSend} />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...');
@@ -45,7 +45,7 @@ describe('ChatInput', () => {
 
   it('clears input after sending', async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<ChatInput onSend={onSend} />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...') as HTMLTextAreaElement;
@@ -61,7 +61,7 @@ describe('ChatInput', () => {
 
   it('allows Shift+Enter for newlines without sending', async () => {
     const onSend = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<ChatInput onSend={onSend} />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...');
@@ -119,7 +119,7 @@ describe('ChatInput - Voice Input', () => {
   });
 
   it('starts listening when voice button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<ChatInput onSend={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: 'Voice input' }));
@@ -128,7 +128,7 @@ describe('ChatInput - Voice Input', () => {
   });
 
   it('populates textarea with transcript on recognition result', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<ChatInput onSend={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: 'Voice input' }));
@@ -147,7 +147,7 @@ describe('ChatInput - Voice Input', () => {
   });
 
   it('shows listening state with aria-label change', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<ChatInput onSend={vi.fn()} />);
 
     await user.click(screen.getByRole('button', { name: 'Voice input' }));

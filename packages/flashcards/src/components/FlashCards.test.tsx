@@ -107,7 +107,7 @@ describe('FlashCards', () => {
   });
 
   it('enters practice mode when a card is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<FlashCards />);
 
     // Click on a card thumbnail
@@ -125,7 +125,7 @@ describe('FlashCards', () => {
   });
 
   it('collapses and expands category sections', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<FlashCards />);
 
     // Find the greetings section header button
@@ -191,7 +191,7 @@ describe('FlashCards', () => {
 
     it('shows delete confirmation modal and deletes card', async () => {
       seedCustomCard();
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(<FlashCards />);
       await screen.findByText('flashcards.addCustomCard');
 
@@ -211,7 +211,7 @@ describe('FlashCards', () => {
     });
 
     it('opens add card modal when button is clicked', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(<FlashCards />);
       await screen.findByText('flashcards.addCustomCard');
 
@@ -223,7 +223,7 @@ describe('FlashCards', () => {
 
     it('opens edit modal with pre-filled values when edit is clicked', async () => {
       seedCustomCard();
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(<FlashCards />);
       await screen.findByText('flashcards.addCustomCard');
 
@@ -240,7 +240,7 @@ describe('FlashCards', () => {
 
     it('can edit a bible card via the edit modal', async () => {
       seedBibleCard();
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(<FlashCards />);
       await screen.findByText('flashcards.addCustomCard');
 
@@ -256,7 +256,7 @@ describe('FlashCards', () => {
   });
 
   it('toggles type filter chips to hide/show card types', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<FlashCards />);
 
     // English chip should be active by default
@@ -277,7 +277,7 @@ describe('FlashCards', () => {
   });
 
   it('persists type filter to localStorage', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<FlashCards />);
 
     const englishChip = screen.getByText(/flashcards\.english/);

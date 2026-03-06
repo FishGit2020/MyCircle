@@ -71,7 +71,7 @@ describe('WorshipSongs', () => {
   });
 
   it('navigates to song viewer when a song is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithRouter();
 
     await waitFor(() => {
