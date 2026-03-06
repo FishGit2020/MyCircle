@@ -375,14 +375,17 @@ export const onAnnouncementCreated = onDocumentCreated(
 
     const title = (data.title as string) || 'New Announcement';
     const body = (data.description as string) || '';
-    const icon = (data.icon as string) || undefined;
+    // icon field stores category tags ('feature','fix','improvement'), not URLs.
+    // Only use imageUrl if the field looks like a URL.
+    const rawIcon = (data.icon as string) || '';
+    const imageUrl = rawIcon.startsWith('http') ? rawIcon : undefined;
 
     const messaging = getMessaging();
 
     try {
       await messaging.send({
         topic: 'announcements',
-        notification: { title, body, ...(icon ? { imageUrl: icon } : {}) },
+        notification: { title, body, ...(imageUrl ? { imageUrl } : {}) },
         webpush: {
           fcmOptions: {
             link: '/',
