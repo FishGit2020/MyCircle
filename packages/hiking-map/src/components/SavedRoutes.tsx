@@ -235,7 +235,7 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
   if (!isLoggedIn) return <SignInPrompt />;
 
   return (
-    <div className="mt-3 space-y-0">
+    <div className="mt-3 space-y-3">
       {/* ── My Routes ── */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <div className="flex items-center gap-2">
@@ -305,7 +305,7 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
       </div>
 
       {/* ── Community Routes ── */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <button type="button" onClick={() => setCommunityExpanded(v => !v)}
           className="flex items-center justify-between w-full text-sm font-semibold text-gray-900 dark:text-white">
           <span className="flex items-center gap-1.5">

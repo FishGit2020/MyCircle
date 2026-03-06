@@ -1027,8 +1027,11 @@ export async function addHikingRoute(uid: string, route: {
   startLabel?: string; endLabel?: string;
 }) {
   if (!db) throw new Error('Firebase not initialized');
+  // Firestore doesn't support nested arrays (GeoJSON coordinates); serialize geometry as JSON string
   const docRef = await addDoc(collection(db, 'users', uid, 'hikingRoutes'), {
-    ...route, createdAt: serverTimestamp(),
+    ...route,
+    geometry: JSON.stringify(route.geometry),
+    createdAt: serverTimestamp(),
   });
   return docRef.id;
 }
@@ -1064,8 +1067,10 @@ export async function shareHikingRoute(uid: string, displayName: string, routeId
 }) {
   if (!db) throw new Error('Firebase not initialized');
   // Use same id in public collection so we can match them
+  // Serialize geometry (GeoJSON nested arrays not supported by Firestore)
   await setDoc(doc(db, 'publicHikingRoutes', routeId), {
     ...route,
+    geometry: JSON.stringify(route.geometry),
     sharedBy: { uid, displayName },
     sharedAt: serverTimestamp(),
   });
