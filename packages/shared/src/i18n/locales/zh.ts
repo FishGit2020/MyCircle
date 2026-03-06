@@ -1922,6 +1922,21 @@ const zh: Record<TranslationKey, string> = {
   'hiking.save': '\u4fdd\u5b58',
   'hiking.renameRoute': '\u91cd\u547d\u540d\u8def\u7ebf',
   'hiking.routeNamePlaceholder': '\u8def\u7ebf\u540d\u79f0...',
+
+  // ─── Children (multi-child) ──────────────────────────────────
+  'children.addChild': '\u6dfb\u52a0\u5b69\u5b50',
+  'children.add': '\u6dfb\u52a0',
+  'children.editChild': '\u7f16\u8f91\u5b69\u5b50',
+  'children.deleteChild': '\u5220\u9664\u5b69\u5b50',
+  'children.deleteConfirm': '\u786e\u5b9a\u8981\u5220\u9664{name}\u5417\uff1f\u6b64\u64cd\u4f5c\u65e0\u6cd5\u64a4\u6d88\u3002',
+  'children.name': '\u59d3\u540d',
+  'children.namePlaceholder': '\u5b69\u5b50\u7684\u540d\u5b57',
+  'children.birthDate': '\u51fa\u751f\u65e5\u671f',
+  'children.dueDate': '\u9884\u4ea7\u671f\uff08\u53ef\u9009\uff09',
+  'children.save': '\u4fdd\u5b58',
+  'children.cancel': '\u53d6\u6d88',
+  'children.noChildren': '\u8fd8\u6ca1\u6709\u6dfb\u52a0\u5b69\u5b50\u3002',
+  'children.switchChild': '\u5207\u6362\u5b69\u5b50',
 };
 
 export default zh;

@@ -27,6 +27,18 @@ vi.mock('@mycircle/shared', () => ({
     if (!match) return null;
     return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
   },
+  useChildren: vi.fn(() => ({
+    children: [],
+    allChildren: [],
+    selectedChild: null,
+    selectedId: null,
+    setSelectedId: vi.fn(),
+    addChild: vi.fn(),
+    updateChild: vi.fn(),
+    deleteChild: vi.fn(),
+    loading: false,
+  })),
+  ChildSelector: ({ children: _c }: any) => <div data-testid="child-selector" />,
 }));
 
 vi.mock('react-router', () => ({

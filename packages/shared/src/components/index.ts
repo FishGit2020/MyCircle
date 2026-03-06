@@ -5,4 +5,5 @@ export { Breadcrumb } from './Breadcrumb';
 export type { BreadcrumbItem } from './Breadcrumb';
 export { default as EndpointManager } from './EndpointManager';
 export { PageContent } from './PageContent';
+export { ChildSelector } from './ChildSelector';
 

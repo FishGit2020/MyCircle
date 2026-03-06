@@ -8,3 +8,4 @@ export { useVerseOfDay } from './useVerseOfDay';
 export type { VerseRef } from './useVerseOfDay';
 export { useEndpoints } from './useEndpoints';
 export type { Endpoint } from './useEndpoints';
+export { useChildren, getAgeInMonths, getAgeRemainingDays } from './useChildren';

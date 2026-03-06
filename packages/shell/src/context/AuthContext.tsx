@@ -63,6 +63,7 @@ function clearUserSpecificStorage() {
   window.dispatchEvent(new Event(WindowEvents.BENCHMARK_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
   window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
+  window.dispatchEvent(new Event(WindowEvents.CHILDREN_CHANGED));
 }
 
 interface AuthContextType {

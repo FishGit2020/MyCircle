@@ -1,20 +1,10 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference, PageContent } from '@mycircle/shared';
+import { useState, useCallback, useMemo } from 'react';
+import { useTranslation, useChildren, getAgeInMonths, getAgeRemainingDays, useVerseOfDay, parseVerseReference, PageContent, ChildSelector } from '@mycircle/shared';
+import type { Child } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getAgeRangeForMonths } from '../data/milestones';
 import { parentingVerses } from '../data/parentingVerses';
 import TimelineView from './TimelineView';
-
-/**
- * Encode/decode sensitive values to avoid clear-text storage in localStorage.
- * Uses btoa/atob — minimal obfuscation suitable for client-side storage.
- */
-function encodeSensitive(value: string): string {
-  try { return btoa(value); } catch { return value; }
-}
-function decodeSensitive(value: string): string {
-  try { return atob(value); } catch { return value; }
-}
 
 // ─── Verse Section ───────────────────────────────────────────────────────────
 
@@ -68,53 +58,21 @@ function VerseSection() {
 
 export default function ChildDevelopment() {
   const { t } = useTranslation();
+  const { children, selectedChild, selectedId, setSelectedId, addChild } = useChildren([0, 60]);
+  const [isAdding, setIsAdding] = useState(false);
+  const [inputName, setInputName] = useState('');
+  const [inputBirthDate, setInputBirthDate] = useState('');
 
-  // State — initialize from localStorage synchronously to prevent CLS
-  // (avoids a flash from setup form → milestone view on mount)
-  const [childName, setChildName] = useState(() => localStorage.getItem(StorageKeys.CHILD_NAME) || '');
-  const [birthDate, setBirthDate] = useState(() => {
-    const raw = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
-    return raw ? decodeSensitive(raw) : '';
-  });
-  const [inputName, setInputName] = useState(childName);
-  const [inputBirthDate, setInputBirthDate] = useState(birthDate);
-  const [isEditing, setIsEditing] = useState(false);
-
-  // Listen for external changes (Firestore sync)
-  useEffect(() => {
-    function handleDataChanged() {
-      const storedName = localStorage.getItem(StorageKeys.CHILD_NAME);
-      const storedDate = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
-      if (storedName) { setChildName(storedName); setInputName(storedName); }
-      else { setChildName(''); setInputName(''); }
-      if (storedDate) { const d = decodeSensitive(storedDate); setBirthDate(d); setInputBirthDate(d); }
-      else { setBirthDate(''); setInputBirthDate(''); }
-    }
-    window.addEventListener(WindowEvents.CHILD_DATA_CHANGED, handleDataChanged);
-    return () => window.removeEventListener(WindowEvents.CHILD_DATA_CHANGED, handleDataChanged);
-  }, []);
-
-  // Computed
+  // Computed from selected child
   const ageInMonths = useMemo(() => {
-    if (!birthDate) return null;
-    const birth = new Date(birthDate + 'T00:00:00');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const months = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
-    return Math.max(0, months);
-  }, [birthDate]);
+    if (!selectedChild) return null;
+    return getAgeInMonths(selectedChild.birthDate);
+  }, [selectedChild]);
 
   const ageInDays = useMemo(() => {
-    if (!birthDate || ageInMonths === null) return 0;
-    const birth = new Date(birthDate + 'T00:00:00');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    // Calculate the start of the current month-age to find remaining days
-    const monthStart = new Date(birth);
-    monthStart.setMonth(monthStart.getMonth() + ageInMonths);
-    const diffMs = today.getTime() - monthStart.getTime();
-    return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
-  }, [birthDate, ageInMonths]);
+    if (!selectedChild) return 0;
+    return getAgeRemainingDays(selectedChild.birthDate);
+  }, [selectedChild]);
 
   const currentAgeRange = useMemo(() => {
     if (ageInMonths === null) return null;
@@ -139,21 +97,19 @@ export default function ChildDevelopment() {
     return base;
   }, [ageInMonths, ageInDays, t]);
 
-  // Actions
-  const saveChild = useCallback(() => {
+  const saveChild = useCallback(async () => {
     if (!inputName.trim() || !inputBirthDate) return;
-    localStorage.setItem(StorageKeys.CHILD_NAME, inputName.trim());
-    localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, encodeSensitive(inputBirthDate));
-    setChildName(inputName.trim());
-    setBirthDate(inputBirthDate);
-    setIsEditing(false);
-    window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
+    const child: Omit<Child, 'id'> = { name: inputName.trim(), birthDate: inputBirthDate };
+    await addChild(child);
+    setInputName('');
+    setInputBirthDate('');
+    setIsAdding(false);
     window.__logAnalyticsEvent?.('child_info_save');
-  }, [inputName, inputBirthDate]);
+  }, [inputName, inputBirthDate, addChild]);
 
-  // ─── Setup View ──────────────────────────────────────────────────────────
+  // ─── Add Child View ─────────────────────────────────────────────────────
 
-  if (!birthDate || isEditing) {
+  if (children.length === 0 || isAdding) {
     return (
       <PageContent maxWidth="md">
         <div className="text-center mb-8">
@@ -194,14 +150,25 @@ export default function ChildDevelopment() {
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
-            <button
-              type="button"
-              onClick={saveChild}
-              disabled={!inputName.trim() || !inputBirthDate}
-              className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
-            >
-              {isEditing ? t('childDev.saveChild' as any) : t('childDev.getStarted' as any)}
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={saveChild}
+                disabled={!inputName.trim() || !inputBirthDate}
+                className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
+              >
+                {t('children.addChild' as any)}
+              </button>
+              {isAdding && (
+                <button
+                  type="button"
+                  onClick={() => setIsAdding(false)}
+                  className="py-2.5 px-4 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-gray-500"
+                >
+                  {t('children.cancel' as any)}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </PageContent>
@@ -212,31 +179,40 @@ export default function ChildDevelopment() {
 
   return (
     <PageContent maxWidth="4xl">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-            {childName}
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">{ageDisplay}</p>
+      {/* Child Selector */}
+      {children.length > 0 && (
+        <div className="mb-4">
+          <ChildSelector
+            children={children}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onAdd={() => setIsAdding(true)}
+          />
         </div>
-        <button
-          type="button"
-          onClick={() => setIsEditing(true)}
-          className="self-start sm:self-auto text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-        >
-          {t('childDev.editChild' as any)}
-        </button>
-      </div>
+      )}
 
-      {/* Verse */}
-      <VerseSection />
+      {/* Header */}
+      {selectedChild && (
+        <>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                {selectedChild.name}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">{ageDisplay}</p>
+            </div>
+          </div>
 
-      {/* Timeline (the primary and only view) */}
-      <TimelineView
-        ageInMonths={ageInMonths}
-        currentAgeRange={currentAgeRange}
-      />
+          {/* Verse */}
+          <VerseSection />
+
+          {/* Timeline (the primary and only view) */}
+          <TimelineView
+            ageInMonths={ageInMonths}
+            currentAgeRange={currentAgeRange}
+          />
+        </>
+      )}
     </PageContent>
   );
 }
