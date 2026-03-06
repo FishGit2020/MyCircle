@@ -224,6 +224,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Work Tracker** | Firestore-backed daily work log with timeline view and real-time sync | `WorkTracker` |
 | **Cloud Files** | Upload, share, and download files (images, PDFs, docs) via Cloud Function | `CloudFiles` |
 | **Model Benchmark** | Compare AI model performance across Ollama endpoints (CPU vs GPU), nanosecond-precision timing | `ModelBenchmark` |
+| **Hiking Map** | Interactive trail map with GPS auto-locate, tap-to-place waypoints, foot-routing via OSRM, offline tile cache (IndexedDB), saved routes, and topo/street style switcher | `HikingMap` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
@@ -261,6 +262,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/baby` | Baby growth tracker with weekly development |
 | `/child-dev` | Child development milestone tracker (birth–5 years) |
 | `/flashcards` | Flashcards — quiz mode, handwriting practice, character editor, English phrases |
+| `/hiking` | Hiking Map — GPS locate, tap-to-set waypoints, route planning, offline tiles |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack

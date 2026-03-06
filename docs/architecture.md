@@ -471,6 +471,26 @@ Exposes `DocScanner` component via Module Federation. Port **3021**.
 
 ---
 
+### Hiking Map - `packages/hiking-map/`
+
+Exposes `HikingMap` component via Module Federation. Port **3022**.
+
+**Key Behavior:**
+- Interactive map powered by **MapLibre GL JS**; no API key required (public free tiles)
+- **GPS auto-locate**: flies to user position on first load via `navigator.geolocation`
+- **Tap-to-place waypoints**: first tap = green start marker, second tap = red end marker, third tap resets
+- **Route planning**: OSRM demo API (`router.project-osrm.org`) for foot routing; provider abstraction allows config-only switch to self-hosted Valhalla
+- **Tile styles**: OpenFreeMap liberty (street) + OpenTopoMap raster (real topographic)
+- **Zoom controls**: custom +/- overlay buttons (mid-right); save map as PNG
+- **Offline tile cache**: IndexedDB via `idb`; download current viewport tiles at zoom 10–16 with progress bar
+- **Saved routes**: GeoJSON + metadata persisted to IndexedDB; load restores route and fits map bounds
+- **Provider abstraction**: `RoutingProvider.ts` factory, `GpsProvider.ts` — NAS swap (Protomaps + Valhalla) is config-only in `mapConfig.ts`
+- **AI tool**: `planHikingRoute` — AI assistant can set start/end coordinates
+- Fully client-side (no Firestore, no API keys); dark mode + responsive
+- Route: `/hiking`
+
+---
+
 ## Navigation & Discovery
 
 ### Breadcrumbs
