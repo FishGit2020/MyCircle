@@ -47,6 +47,14 @@ vi.mock('./MapStyleSwitcher', () => ({
   ),
 }));
 
+vi.mock('./SavedRoutes', () => ({
+  default: () => <div data-testid="saved-routes" />,
+}));
+
+vi.mock('./OfflineTileManager', () => ({
+  default: () => <div data-testid="offline-tile-manager" />,
+}));
+
 vi.mock('./RoutePlanner', () => ({
   default: () => (
     <>
