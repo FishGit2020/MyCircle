@@ -36,6 +36,7 @@ const DigitalLibraryMF = tracedLazy('mfe_digital_library_load', () => import('di
 const FamilyGamesMF = tracedLazy('mfe_family_games_load', () => import('familyGames/FamilyGames'), getPerf);
 const DocScannerMF = tracedLazy('mfe_doc_scanner_load', () => import('docScanner/DocScanner'), getPerf);
 const HikingMapMF = tracedLazy('mfe_hiking_map_load', () => import('hikingMap/HikingMap'), getPerf);
+const YouthTrackerMF = tracedLazy('mfe_youth_tracker_load', () => import('youthTracker/YouthTracker'), getPerf);
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -335,6 +336,23 @@ function ChildDevPage() {
   );
 }
 
+// Youth Tracker MFE
+const YouthTrackerFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Youth Tracker module is loading...</p>
+  </div>
+);
+
+function YouthTrackerPage() {
+  return (
+    <ErrorBoundary fallback={<YouthTrackerFallback />}>
+      <Suspense fallback={<Loading />}>
+        <YouthTrackerMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // Fallback for Flash Cards MFE
 const FlashCardsFallback = () => (
   <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
@@ -540,6 +558,7 @@ export default function App() {
         <Route path="notebook/:noteId" element={<RequireAuth><NotebookPage /></RequireAuth>} />
         <Route path="baby" element={<RequireAuth><BabyPage /></RequireAuth>} />
         <Route path="child-dev" element={<RequireAuth><ChildDevPage /></RequireAuth>} />
+        <Route path="youth-tracker" element={<RequireAuth><YouthTrackerPage /></RequireAuth>} />
         <Route path="flashcards" element={<RequireAuth><FlashCardsPage /></RequireAuth>} />
         <Route path="daily-log" element={<RequireAuth><DailyLogPage /></RequireAuth>} />
         <Route path="files" element={<RequireAuth><CloudFilesPage /></RequireAuth>} />

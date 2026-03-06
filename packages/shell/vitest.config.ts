@@ -43,6 +43,7 @@ export default defineConfig({
       'familyGames/FamilyGames': resolve(__dirname, './test/mocks/FamilyGamesMock.tsx'),
       'docScanner/DocScanner': resolve(__dirname, './test/mocks/DocScannerMock.tsx'),
       'hikingMap/HikingMap': resolve(__dirname, './test/mocks/HikingMapMock.tsx'),
+      'youthTracker/YouthTracker': resolve(__dirname, './test/mocks/YouthTrackerMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

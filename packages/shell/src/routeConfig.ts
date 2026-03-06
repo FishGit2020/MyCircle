@@ -9,6 +9,7 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   notebook: 'nav.notebook',
   baby: 'nav.baby',
   'child-dev': 'nav.childDev',
+  'youth-tracker': 'nav.youthTracker',
   english: 'nav.english',
   chinese: 'nav.chinese',
   flashcards: 'nav.flashcards',
