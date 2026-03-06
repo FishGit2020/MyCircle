@@ -12,15 +12,15 @@ vi.mock('../config/mapConfig', () => ({
     defaultCenter: [-122.4194, 37.7749],
     defaultZoom: 10,
     tileProviders: [
-      { id: 'street', labelKey: 'hiking.styleStreet', styleUrl: 'https://example.com/street.json' },
-      { id: 'topo', labelKey: 'hiking.styleTopo', styleUrl: 'https://example.com/topo.json' },
+      { id: 'street', labelKey: 'hiking.styleStreet', style: 'https://example.com/street.json' },
+      { id: 'topo', labelKey: 'hiking.styleTopo', style: 'https://example.com/topo.json' },
     ],
     routing: { baseUrl: 'https://router.example.com', profile: 'foot' },
   },
 }));
 
 vi.mock('./MapView', () => ({
-  default: ({ onMapReady }: { onMapReady: (map: unknown) => void }) => {
+  default: ({ onMapReady }: { onMapReady: (map: unknown) => void; onMapClick?: (lngLat: [number, number]) => void }) => {
     onMapReady(null);
     return <div role="application" aria-label="Map" />;
   },
@@ -30,12 +30,16 @@ vi.mock('./GpsLocateButton', () => ({
   default: () => <button type="button" aria-label="hiking.locateMe">GPS</button>,
 }));
 
+vi.mock('./ZoomControls', () => ({
+  default: () => <div data-testid="zoom-controls" />,
+}));
+
 vi.mock('./MapStyleSwitcher', () => ({
-  default: ({ providers, onChange }: { providers: Array<{ id: string; labelKey: string; styleUrl: string }>; activeId: string; onChange: (id: string, url: string) => void }) => (
+  default: ({ providers, onChange }: { providers: Array<{ id: string; labelKey: string; style: string | Record<string, unknown> }>; activeId: string; onChange: (id: string, style: string | Record<string, unknown>) => void }) => (
     <div>
       <span>hiking.mapStyle</span>
       {providers.map(p => (
-        <button key={p.id} type="button" onClick={() => onChange(p.id, p.styleUrl)}>
+        <button key={p.id} type="button" onClick={() => onChange(p.id, p.style)}>
           {p.labelKey}
         </button>
       ))}
@@ -45,12 +49,14 @@ vi.mock('./MapStyleSwitcher', () => ({
 
 vi.mock('./RoutePlanner', () => ({
   default: () => (
-    <div>
-      <span>hiking.routePlanner</span>
-      <input placeholder="hiking.startPoint" />
-      <input placeholder="hiking.endPoint" />
-      <button type="button">hiking.planRoute</button>
-    </div>
+    <>
+      <div>
+        <span>hiking.routePlanner</span>
+        <input placeholder="hiking.startPoint" />
+        <input placeholder="hiking.endPoint" />
+        <button type="button">hiking.planRoute</button>
+      </div>
+    </>
   ),
 }));
 

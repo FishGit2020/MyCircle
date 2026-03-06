@@ -1894,7 +1894,14 @@ const zh: Record<TranslationKey, string> = {
   'hiking.styleTopo': '\u5730\u5f62',
   'hiking.distance': '\u8ddd\u79bb',
   'hiking.duration': '\u65f6\u957f',
-  'hiking.coordsHint': '输入小数度坐标（例如 37.7749，-122.4194）',
+  'hiking.coordsHint': '格式：纬度, 经度，例如 37.7749, -122.4194（括号可选）',
+  'hiking.coordsError': '坐标格式错误，请使用：纬度, 经度（例如 47.67, -122.12）',
+  'hiking.tapToSetRoute': '点击地图设置起点和终点',
+  'hiking.tapForEnd': '点击地图设置终点',
+  'hiking.useMyLocation': '使用我的位置',
+  'hiking.zoomIn': '放大',
+  'hiking.zoomOut': '缩小',
+  'hiking.saveMap': '保存地图',
 };
 
 export default zh;

@@ -1892,7 +1892,14 @@ const en = {
   'hiking.styleTopo': 'Topo',
   'hiking.distance': 'Distance',
   'hiking.duration': 'Duration',
-  'hiking.coordsHint': 'Enter coordinates as decimal degrees (e.g. 37.7749, -122.4194)',
+  'hiking.coordsHint': 'Format: lat, lng  e.g. 37.7749, -122.4194  (parens ok)',
+  'hiking.coordsError': 'Invalid coordinates — use: lat, lng (e.g. 47.67, -122.12)',
+  'hiking.tapToSetRoute': 'Tap the map to place start & end points',
+  'hiking.tapForEnd': 'tap map for end',
+  'hiking.useMyLocation': 'Use my location',
+  'hiking.zoomIn': 'Zoom in',
+  'hiking.zoomOut': 'Zoom out',
+  'hiking.saveMap': 'Save Map',
 } as const;
 
 export default en;
