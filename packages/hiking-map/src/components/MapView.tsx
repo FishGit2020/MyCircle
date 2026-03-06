@@ -28,6 +28,7 @@ export default function MapView({ style, onMapReady, onMapClick, onStyleLoad }: 
     if (!containerRef.current) return;
 
     let map: maplibregl.Map;
+    let ro: ResizeObserver | undefined;
     import('maplibre-gl').then(({ default: maplibregl }) => {
       import('maplibre-gl/dist/maplibre-gl.css').catch(() => {});
       map = new maplibregl.Map({
@@ -51,7 +52,13 @@ export default function MapView({ style, onMapReady, onMapClick, onStyleLoad }: 
       map.on('load', () => {
         mapRef.current = map;
         onMapReady(map);
+        // Trigger resize after load so the canvas fills its container on mobile
+        map.resize();
       });
+
+      // Keep canvas sized to container on orientation/layout changes
+      ro = new ResizeObserver(() => { mapRef.current?.resize(); });
+      if (containerRef.current) ro.observe(containerRef.current);
 
       map.on('style.load', () => {
         onStyleLoadRef.current?.();
@@ -63,6 +70,7 @@ export default function MapView({ style, onMapReady, onMapClick, onStyleLoad }: 
     });
 
     return () => {
+      ro?.disconnect();
       map?.remove();
       mapRef.current = null;
     };

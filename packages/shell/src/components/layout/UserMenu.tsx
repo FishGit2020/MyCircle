@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, useUnits } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { logEvent } from '../../lib/firebase';
@@ -84,8 +84,9 @@ function AccountAvatar({ account, size = 'sm' }: { account: { displayName: strin
 
 export default function UserMenu() {
   const { t } = useTranslation();
-  const { user, loading, signOut, updateDarkMode, knownAccounts, switchToAccount, removeKnownAccount } = useAuth();
+  const { user, loading, signOut, updateDarkMode, updateTempUnit, updateSpeedUnit, updateDistanceUnit, knownAccounts, switchToAccount, removeKnownAccount } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { tempUnit, speedUnit, distanceUnit, setTempUnit, setSpeedUnit, setDistanceUnit } = useUnits();
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [switchingUid, setSwitchingUid] = useState<string | null>(null);
@@ -346,6 +347,52 @@ export default function UserMenu() {
             </svg>
             {knownAccounts.length >= 5 ? t('auth.maxAccountsReached') : t('auth.addAnotherAccount')}
           </button>
+
+          {/* Units preferences */}
+          <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{t('settings.units')}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {/* Temperature */}
+              <div className="flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden text-xs">
+                {(['C', 'F'] as const).map(u => (
+                  <button
+                    key={u}
+                    type="button"
+                    onClick={() => { setTempUnit(u); if (user) updateTempUnit(u); }}
+                    className={`px-2 py-1 font-medium transition-colors ${tempUnit === u ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                  >
+                    °{u}
+                  </button>
+                ))}
+              </div>
+              {/* Wind speed */}
+              <div className="flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden text-xs">
+                {(['ms', 'kmh', 'mph'] as const).map(u => (
+                  <button
+                    key={u}
+                    type="button"
+                    onClick={() => { setSpeedUnit(u); if (user) updateSpeedUnit(u); }}
+                    className={`px-2 py-1 font-medium transition-colors ${speedUnit === u ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                  >
+                    {u === 'ms' ? 'm/s' : u}
+                  </button>
+                ))}
+              </div>
+              {/* Distance */}
+              <div className="flex rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden text-xs">
+                {(['km', 'mi'] as const).map(u => (
+                  <button
+                    key={u}
+                    type="button"
+                    onClick={() => { setDistanceUnit(u); if (user) updateDistanceUnit(u); }}
+                    className={`px-2 py-1 font-medium transition-colors ${distanceUnit === u ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                  >
+                    {u}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* Theme toggle */}
           <button

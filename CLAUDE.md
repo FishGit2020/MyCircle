@@ -53,6 +53,8 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **PR merge**: Always run `gh pr checks <PR#> --watch` and confirm **all** checks (ci, e2e, e2e-emulator) pass before merging. Never merge with failing or pending checks.
 - **Firebase secrets**: Use `printf` not `echo` when piping values — `echo` appends a trailing newline (`\n`) that corrupts URLs and tokens. Always: `printf "value" | npx firebase functions:secrets:set SECRET_NAME`. PodcastIndex uses a combined JSON secret (`PODCASTINDEX_CREDS`). After creating a new secret, grant the compute SA access: `gcloud secrets add-iam-policy-binding SECRET_NAME --project=mycircle-dash --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"`. Without this, deploy fails with `secretmanager.secrets.setIamPolicy` denied.
 - **GraphQL codegen**: When the schema changes (`functions/src/schema.ts`) or queries change (`packages/shared/src/apollo/queries.ts`), run `pnpm codegen` to regenerate `packages/shared/src/apollo/generated.ts`. Always commit the regenerated file. Auto-runs on `pnpm install` via `postinstall` hook.
+- **Unit system**: Distance/temperature/speed preferences live in `@mycircle/shared` (`useUnits()`, `formatDistance()`, `StorageKeys.DISTANCE_UNIT`). All MFEs must use these shared utilities — never define local `formatDistance` helpers. Preferences are persisted to Firestore `UserProfile` and restored via `restoreUserData` on sign-in. The central toggle is in `UserMenu` (profile avatar dropdown), not in individual MFE headers.
+- **Cross-MFE window globals**: Shell exposes Firebase APIs to MFEs via `window.__hikingRoutes`, `window.__currentUid`, etc. MFEs must read these at call-time (not cache at import-time) since they're set asynchronously after Firebase initializes. Fire `WindowEvents.*_CHANGED` events from the wrapper callbacks (not inside raw Firestore listeners) so the shell widget can react.
 
 ## Test Performance
 
@@ -60,6 +62,22 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **Global testTimeout** — can be set higher in vitest config (e.g. 15000ms) for packages with heavy component rendering where the jsdom env startup itself takes time. This is different from per-test overrides.
 - Unit tests must complete in milliseconds — mock all network calls, timers, and async side effects.
 - **userEvent**: always use `userEvent.setup({ delay: null })` — the default typing delay makes tests slow in CI. For tests that only verify state (not interaction fidelity), prefer `fireEvent.change()` over `userEvent.type()`.
+
+## Firestore Gotchas
+
+- **Nested arrays are not supported**: GeoJSON `LineString.coordinates` is `[[lng,lat],...]` — a nested array. Firestore rejects it with `Function addDoc() called with invalid data. Nested arrays are not supported`. Always serialize GeoJSON geometry to a JSON string before writing: `geometry: JSON.stringify(route.geometry)`, and parse it back on read: `typeof raw.geometry === 'string' ? JSON.parse(raw.geometry) : raw.geometry`.
+- **Timestamps from onSnapshot**: Firestore `Timestamp` objects come back from `onSnapshot` with a `.toMillis()` method. Convert them explicitly — they are NOT plain numbers.
+
+## MapLibre GL Gotchas
+
+- **`setStyle()` wipes all custom sources/layers**: Every `map.setStyle()` call fires `style.load` and destroys all custom GL sources/layers added after init. Re-draw them by listening to the `style.load` event (expose via an `onStyleLoad` prop from MapView) and re-running the relevant effects.
+- **`map.getCanvas().toDataURL()` returns blank**: WebGL buffer isn't populated synchronously. Use `preserveDrawingBuffer: true` in the map constructor, then `map.once('idle', () => canvas.toDataURL()); map.triggerRepaint()`.
+- **`map.getLayer()` crashes after navigation**: When the user navigates away, the map is destroyed (`map.remove()`) but React effects with the stale `map` reference may still fire. `map.getLayer()` internally accesses `this.style` which is null after removal → `TypeError: undefined is not an object`. Always wrap GL layer operations in try/catch.
+- **Map canvas not filling container on mobile**: MapLibre doesn't auto-resize when the container dimensions change. Call `map.resize()` once after `load`, and attach a `ResizeObserver` to the container div that calls `map.resize()` on every size change.
+
+## CI/CD Gotchas
+
+- **`cancel-in-progress: true` at workflow level kills gate jobs**: If you set concurrency at the workflow level with `cancel-in-progress: true`, a new push cancels the entire in-progress workflow including the gate job — GitHub then shows "Waiting for status to be reported" indefinitely. Fix: set concurrency at the **job level** on expensive jobs only (setup, test, build), and give gate jobs **no concurrency group** so they always run and always post a status.
 
 ## Test Gotchas
 

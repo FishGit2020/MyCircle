@@ -6,6 +6,7 @@ import {
   updateUserLocale,
   updateUserTempUnit,
   updateUserSpeedUnit,
+  updateUserDistanceUnit,
 } from '../lib/firebase';
 
 export interface PreferencesResult {
@@ -13,6 +14,7 @@ export interface PreferencesResult {
   updateLocale: (locale: string) => Promise<void>;
   updateTempUnit: (unit: 'C' | 'F') => Promise<void>;
   updateSpeedUnit: (unit: 'ms' | 'mph' | 'kmh') => Promise<void>;
+  updateDistanceUnit: (unit: 'km' | 'mi') => Promise<void>;
 }
 
 export function usePreferences(
@@ -47,5 +49,12 @@ export function usePreferences(
     }
   }, [user, setProfile]);
 
-  return { updateDarkMode, updateLocale, updateTempUnit, updateSpeedUnit };
+  const updateDistanceUnit = useCallback(async (distanceUnit: 'km' | 'mi') => {
+    if (user) {
+      await updateUserDistanceUnit(user.uid, distanceUnit);
+      setProfile((prev) => (prev ? { ...prev, distanceUnit } : null));
+    }
+  }, [user, setProfile]);
+
+  return { updateDarkMode, updateLocale, updateTempUnit, updateSpeedUnit, updateDistanceUnit };
 }

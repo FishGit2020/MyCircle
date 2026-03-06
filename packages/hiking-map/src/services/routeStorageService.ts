@@ -50,6 +50,13 @@ function getDb(): Promise<RouteDb> {
   return dbPromise;
 }
 
+function parseGeometry(raw: any): GeoJSON.LineString {
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw) as GeoJSON.LineString; } catch { /* fall through */ }
+  }
+  return raw as GeoJSON.LineString;
+}
+
 function normalizeRoute(raw: Record<string, any>): SavedRoute {
   return {
     id: raw.id,
@@ -57,7 +64,7 @@ function normalizeRoute(raw: Record<string, any>): SavedRoute {
     createdAt: raw.createdAt?.toMillis?.() ?? raw.createdAt ?? Date.now(),
     distance: raw.distance ?? 0,
     duration: raw.duration ?? 0,
-    geometry: raw.geometry as GeoJSON.LineString,
+    geometry: parseGeometry(raw.geometry),
     startLabel: raw.startLabel,
     endLabel: raw.endLabel,
     sharedId: raw.sharedId ?? null,
@@ -70,7 +77,7 @@ function normalizePublicRoute(raw: Record<string, any>): PublicRoute {
     name: raw.name ?? 'Route',
     distance: raw.distance ?? 0,
     duration: raw.duration ?? 0,
-    geometry: raw.geometry as GeoJSON.LineString,
+    geometry: parseGeometry(raw.geometry),
     startLabel: raw.startLabel,
     endLabel: raw.endLabel,
     sharedBy: raw.sharedBy ?? { uid: '', displayName: 'Unknown' },

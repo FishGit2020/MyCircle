@@ -2,7 +2,6 @@ import { Link } from 'react-router';
 import { useTranslation, PageContent } from '@mycircle/shared';
 import { useAuth } from '../context/AuthContext';
 import { UseMyLocation, CitySearchWrapper, FavoriteCities } from '../components/widgets';
-import { UnitToggle, SpeedToggle } from '../components/settings';
 
 export default function WeatherLandingPage() {
   const { t } = useTranslation();
@@ -12,10 +11,6 @@ export default function WeatherLandingPage() {
     <PageContent className="space-y-8">
       {/* Hero section with search */}
       <section className="text-center mb-4">
-        <div className="flex justify-end gap-2 mb-2">
-          <UnitToggle />
-          <SpeedToggle />
-        </div>
         <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
           {t('dashboard.weather')}
         </h2>
