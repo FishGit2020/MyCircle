@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { TemperatureUnit, SpeedUnit, getStoredUnits } from '../utils/weatherHelpers';
+import { TemperatureUnit, SpeedUnit, DistanceUnit, getStoredUnits } from '../utils/weatherHelpers';
 import { WindowEvents, StorageKeys } from '../utils/eventBus';
 
 export function useUnits() {
@@ -23,5 +23,11 @@ export function useUnits() {
     window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
   }, []);
 
-  return { ...units, setTempUnit, setSpeedUnit };
+  const setDistanceUnit = useCallback((unit: DistanceUnit) => {
+    localStorage.setItem(StorageKeys.DISTANCE_UNIT, unit);
+    setUnits(prev => ({ ...prev, distanceUnit: unit }));
+    window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
+  }, []);
+
+  return { ...units, setTempUnit, setSpeedUnit, setDistanceUnit };
 }

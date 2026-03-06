@@ -78,6 +78,7 @@ interface AuthContextType {
   updateLocale: (locale: string) => Promise<void>;
   updateTempUnit: (unit: 'C' | 'F') => Promise<void>;
   updateSpeedUnit: (unit: 'ms' | 'mph' | 'kmh') => Promise<void>;
+  updateDistanceUnit: (unit: 'km' | 'mi') => Promise<void>;
   addCity: (city: Omit<RecentCity, 'searchedAt'>) => Promise<void>;
   removeCity: (cityId: string) => Promise<void>;
   clearCities: () => Promise<void>;
@@ -246,6 +247,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updateLocale: preferences.updateLocale,
         updateTempUnit: preferences.updateTempUnit,
         updateSpeedUnit: preferences.updateSpeedUnit,
+        updateDistanceUnit: preferences.updateDistanceUnit,
         addCity: cityManager.addCity,
         removeCity: cityManager.removeCity,
         clearCities: cityManager.clearCities,

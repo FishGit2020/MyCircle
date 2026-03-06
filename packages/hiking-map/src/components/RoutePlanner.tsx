@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, useUnits, formatDistance } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 import { createRoutingProvider } from '../providers/RoutingProvider';
 import type { RouteResult } from '../providers/RoutingProvider';
@@ -20,11 +20,6 @@ function parseCoords(input: string): [number, number] | null {
   return [lng, lat]; // [lng, lat] for MapLibre
 }
 
-function formatDistance(meters: number) {
-  return meters >= 1000
-    ? `${(meters / 1000).toFixed(1)} km`
-    : `${Math.round(meters)} m`;
-}
 
 function formatDuration(seconds: number) {
   const h = Math.floor(seconds / 3600);
@@ -47,6 +42,7 @@ interface Props {
 
 export default function RoutePlanner({ map, routingConfig, externalStart, externalEnd, onClearWaypoints, onRouteChange }: Props) {
   const { t } = useTranslation();
+  const { distanceUnit } = useUnits();
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [loading, setLoading] = useState(false);
@@ -197,7 +193,7 @@ export default function RoutePlanner({ map, routingConfig, externalStart, extern
           <div className="flex gap-3">
             <div className="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('hiking.distance')}</p>
-              <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">{formatDistance(route.distance)}</p>
+              <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">{formatDistance(route.distance, distanceUnit)}</p>
             </div>
             <div className="flex-1 bg-green-50 dark:bg-green-900/20 rounded-lg p-2 text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('hiking.duration')}</p>

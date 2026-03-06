@@ -76,12 +76,14 @@ export const WindowEvents = {
   BOOK_LISTEN_TAB_ACTIVE: 'book-listen-tab-active',
   BREADCRUMB_DETAIL: 'breadcrumb-detail',
   FAMILY_GAMES_CHANGED: 'family-games-changed',
+  HIKING_ROUTES_CHANGED: 'hiking-routes-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
 export const StorageKeys = {
   TEMP_UNIT: 'tempUnit',
   SPEED_UNIT: 'speedUnit',
+  DISTANCE_UNIT: 'distanceUnit',
   THEME: 'theme',
   LOCALE: 'weather-app-locale',
   STOCK_WATCHLIST: 'stock-tracker-watchlist',
