@@ -54,6 +54,11 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **Firebase secrets**: Use `printf` not `echo` when piping values — `echo` appends a trailing newline (`\n`) that corrupts URLs and tokens. Always: `printf "value" | npx firebase functions:secrets:set SECRET_NAME`. PodcastIndex uses a combined JSON secret (`PODCASTINDEX_CREDS`). After creating a new secret, grant the compute SA access: `gcloud secrets add-iam-policy-binding SECRET_NAME --project=mycircle-dash --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"`. Without this, deploy fails with `secretmanager.secrets.setIamPolicy` denied.
 - **GraphQL codegen**: When the schema changes (`functions/src/schema.ts`) or queries change (`packages/shared/src/apollo/queries.ts`), run `pnpm codegen` to regenerate `packages/shared/src/apollo/generated.ts`. Always commit the regenerated file. Auto-runs on `pnpm install` via `postinstall` hook.
 
+## Test Performance
+
+- **Max timeout: 5000ms** — never set `{ timeout: X }` above 5000 in any test file (unit or e2e). Tests that need more time indicate a design problem: mock the slow dependency instead.
+- Unit tests must complete in milliseconds — mock all network calls, timers, and async side effects.
+
 ## Test Gotchas
 
 - `vi.fn(() => obj)` is NOT a constructor — use real `class` mocks for SpeechRecognition, AudioContext, etc.

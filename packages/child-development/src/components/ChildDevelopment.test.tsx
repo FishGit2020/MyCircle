@@ -66,7 +66,7 @@ describe('ChildDevelopment', () => {
     expect(screen.getByText('childDev.getStarted')).toBeInTheDocument();
   });
 
-  it('saves child data to localStorage and dispatches event', { timeout: 15_000 }, async () => {
+  it('saves child data to localStorage and dispatches event', { timeout: 5_000 }, async () => {
     const user = userEvent.setup();
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
