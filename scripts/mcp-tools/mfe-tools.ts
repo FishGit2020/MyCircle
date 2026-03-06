@@ -181,6 +181,19 @@ export const addImmigrationCaseTool: ToolDef = {
   isFrontendAction: true,
 };
 
+export const planHikingRouteTool: ToolDef = {
+  name: 'planHikingRoute',
+  description: 'Plan a hiking route between two coordinates on the hiking map. Returns an action for the frontend to execute.',
+  parameters: z.object({
+    startLat: z.number().describe('Start latitude'),
+    startLng: z.number().describe('Start longitude'),
+    endLat: z.number().describe('End latitude'),
+    endLng: z.number().describe('End longitude'),
+  }),
+  category: 'hiking-map',
+  isFrontendAction: true,
+};
+
 // ─── All tools registry ───────────────────────────────────────
 
 export const ALL_TOOLS: ToolDef[] = [
@@ -200,6 +213,7 @@ export const ALL_TOOLS: ToolDef[] = [
   setBabyDueDateTool,
   addChildMilestoneTool,
   addImmigrationCaseTool,
+  planHikingRouteTool,
 ];
 
 /** Tools that execute on the backend (return data) */
