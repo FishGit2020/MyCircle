@@ -56,9 +56,10 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 
 ## Test Performance
 
-- **Max timeout: 5000ms** — never set `{ timeout: X }` above 5000 in any test file (unit or e2e). Tests that need more time indicate a design problem: mock the slow dependency instead.
+- **Explicit assertion timeouts ≤ 5000ms** — never pass `{ timeout: X }` > 5000 to `it()`/`test()` or to assertions like `.toBeVisible({ timeout: X })`. Tests that need more time indicate a design problem: mock the slow dependency or use `fireEvent` instead of `userEvent`.
+- **Global testTimeout** — can be set higher in vitest config (e.g. 15000ms) for packages with heavy component rendering where the jsdom env startup itself takes time. This is different from per-test overrides.
 - Unit tests must complete in milliseconds — mock all network calls, timers, and async side effects.
-- **userEvent**: always use `userEvent.setup({ delay: null })` — the default typing delay makes tests slow in CI.
+- **userEvent**: always use `userEvent.setup({ delay: null })` — the default typing delay makes tests slow in CI. For tests that only verify state (not interaction fidelity), prefer `fireEvent.change()` over `userEvent.type()`.
 
 ## Test Gotchas
 
