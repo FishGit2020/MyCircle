@@ -331,7 +331,7 @@ export default function Layout() {
   }, [openGroup]);
 
   return (
-    <div className="min-h-screen md:h-dvh flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:outline-none"
@@ -450,7 +450,7 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-grow md:overflow-y-auto flex flex-col container mx-auto px-4 py-6 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
+        className={`flex-grow flex flex-col container mx-auto px-4 py-6 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
         style={{ '--player-h': isPlayerVisible ? '5rem' : '0px' } as React.CSSProperties}
       >
         <Outlet />
