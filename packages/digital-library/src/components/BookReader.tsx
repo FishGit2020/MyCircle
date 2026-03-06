@@ -136,10 +136,12 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         if (cancelled) return;
         setLoading(false);
 
-        // Build spine mapping for TOC navigation
+        // Build spine mapping for TOC navigation using epubjs loaded spine
         try {
-          if (book.spine && book.spine.spineItems) {
-            spineItemsRef.current = book.spine.spineItems.map((item: any, idx: number) => ({
+          const spine = await book.loaded.spine;
+          const items = spine?.spineItems || spine?.items || (Array.isArray(spine) ? spine : []);
+          if (items.length > 0) {
+            spineItemsRef.current = items.map((item: any, idx: number) => ({
               href: item.href,
               index: idx,
             }));
@@ -236,11 +238,16 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const goToChapter = useCallback((index: number) => {
     if (!renditionRef.current || !chapters[index]) return;
     const chapterHref = chapters[index].href;
-    // Match spine item by href (spine ordering may differ from flow/chapter index)
+    const hrefBase = chapterHref.split('#')[0];
+    // Try spine item match by href, then partial match, then use chapter href directly
     const spineItem = spineItemsRef.current.find(
-      (item: any) => item.href === chapterHref || item.href === chapterHref.split('#')[0]
+      (item: any) => item.href === chapterHref || item.href === hrefBase
+        || item.href.endsWith('/' + hrefBase) || hrefBase.endsWith('/' + item.href)
     );
-    const href = spineItem ? spineItem.href : chapterHref;
+    // Also try epubjs section lookup by index as fallback
+    const book = bookRef.current;
+    const section = book?.spine?.get?.(index);
+    const href = spineItem?.href || section?.href || chapterHref;
     renditionRef.current.display(href).catch((err: any) => {
       logger.error('Failed to navigate to chapter', err);
     });
