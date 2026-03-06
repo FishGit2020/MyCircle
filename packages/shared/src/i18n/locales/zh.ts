@@ -1706,6 +1706,7 @@ const zh: Record<TranslationKey, string> = {
   'library.skipForward': '\u5feb\u8fdb10\u79d2',
   'library.skipBack': '\u5feb\u900010\u79d2',
   'library.chapterComplete': '\u5df2\u5b8c\u6210',
+  'library.pageInfo': '\u7b2c {page} \u9875\uff0c\u5171 {total} \u9875',
 
   'widgets.noAudiobook': '\u6ca1\u6709\u6b63\u5728\u8fdb\u884c\u7684\u6709\u58f0\u4e66',
 

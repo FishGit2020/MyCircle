@@ -1706,6 +1706,7 @@ const es: Record<TranslationKey, string> = {
   'library.skipForward': 'Avanzar 10 segundos',
   'library.skipBack': 'Retroceder 10 segundos',
   'library.chapterComplete': 'Completo',
+  'library.pageInfo': 'P\u00e1gina {page} de {total}',
 
   'widgets.noAudiobook': 'No hay audiolibro en progreso',
 
