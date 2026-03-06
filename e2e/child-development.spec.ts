@@ -17,8 +17,6 @@ test.describe('Child Development', () => {
   });
 
   test('shows Get Started button in setup view', async ({ page }) => {
-    // Wait for MFE chunk to finish loading before asserting
-    await page.waitForLoadState('networkidle');
     await expect(
       page.getByRole('button', { name: /get started|comenzar|开始/i })
     ).toBeVisible({ timeout: 5_000 });
