@@ -1,7 +1,8 @@
 export interface TileProviderConfig {
   id: string;
   labelKey: string;
-  styleUrl: string;
+  /** Either a URL string (vector style) or a MapLibre StyleSpecification object (raster). */
+  style: string | Record<string, unknown>;
 }
 
 export interface RoutingProviderConfig {
@@ -16,20 +17,37 @@ export interface MapConfig {
   routing: RoutingProviderConfig;
 }
 
-// Public free-tier config using OSM/OpenFreeMap tiles and OSRM demo routing
+// OpenTopoMap raster style — shows contour lines, elevation shading, hiking paths
+const TOPO_RASTER_STYLE: Record<string, unknown> = {
+  version: 8,
+  sources: {
+    'open-topo': {
+      type: 'raster',
+      tiles: ['https://tile.opentopomap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution:
+        'Map data: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+        '<a href="http://viewfinderpanoramas.org">SRTM</a> | Map display: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+      maxzoom: 17,
+    },
+  },
+  layers: [{ id: 'topo-tiles', type: 'raster', source: 'open-topo' }],
+};
+
+// Public free-tier config using OpenFreeMap (street) and OpenTopoMap (topo)
 const PUBLIC_CONFIG: MapConfig = {
-  defaultCenter: [-122.4194, 37.7749], // San Francisco
+  defaultCenter: [-122.4194, 37.7749], // San Francisco — replaced by GPS auto-locate
   defaultZoom: 10,
   tileProviders: [
     {
       id: 'street',
       labelKey: 'hiking.styleStreet',
-      styleUrl: 'https://tiles.openfreemap.org/styles/liberty',
+      style: 'https://tiles.openfreemap.org/styles/liberty',
     },
     {
       id: 'topo',
       labelKey: 'hiking.styleTopo',
-      styleUrl: 'https://demotiles.maplibre.org/style.json',
+      style: TOPO_RASTER_STYLE,
     },
   ],
   routing: {
@@ -45,8 +63,8 @@ const PUBLIC_CONFIG: MapConfig = {
 //   defaultCenter: [-122.4194, 37.7749],
 //   defaultZoom: 10,
 //   tileProviders: [
-//     { id: 'street', labelKey: 'hiking.styleStreet', styleUrl: 'https://YOUR_NAS/tiles/street.json' },
-//     { id: 'topo',   labelKey: 'hiking.styleTopo',   styleUrl: 'https://YOUR_NAS/tiles/topo.json'   },
+//     { id: 'street', labelKey: 'hiking.styleStreet', style: 'https://YOUR_NAS/tiles/street.json' },
+//     { id: 'topo',   labelKey: 'hiking.styleTopo',   style: 'https://YOUR_NAS/tiles/topo.json'   },
 //   ],
 //   routing: { baseUrl: 'https://YOUR_NAS/valhalla', profile: 'pedestrian' },
 // };
