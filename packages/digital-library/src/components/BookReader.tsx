@@ -235,9 +235,12 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
   const goToChapter = useCallback((index: number) => {
     if (!renditionRef.current || !chapters[index]) return;
-    // Try epubjs spine item first (more reliable than Firestore chapter href)
-    const spineItem = spineItemsRef.current[index];
-    const href = spineItem ? spineItem.href : chapters[index].href;
+    const chapterHref = chapters[index].href;
+    // Match spine item by href (spine ordering may differ from flow/chapter index)
+    const spineItem = spineItemsRef.current.find(
+      (item: any) => item.href === chapterHref || item.href === chapterHref.split('#')[0]
+    );
+    const href = spineItem ? spineItem.href : chapterHref;
     renditionRef.current.display(href).catch((err: any) => {
       logger.error('Failed to navigate to chapter', err);
     });
