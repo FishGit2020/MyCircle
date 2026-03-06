@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import AudioPlayer from './AudioPlayer';
 
 // Capture the AudioSource passed to the global player
@@ -32,17 +32,30 @@ const chapters = [
 ];
 
 describe('AudioPlayer', () => {
-  it('builds navigateTo with bookId and query params', () => {
-    render(
-      <AudioPlayer
-        chapters={chapters}
-        bookTitle="Test Book"
-        bookId="abc-123"
-        coverUrl="https://example.com/cover.jpg"
-      />,
-    );
+  beforeEach(() => {
+    vi.useFakeTimers();
+    capturedSource = null;
+  });
 
-    // Click play to trigger buildAudioSource → eventBus.publish
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('builds navigateTo with bookId and query params', () => {
+    act(() => {
+      render(
+        <AudioPlayer
+          chapters={chapters}
+          bookTitle="Test Book"
+          bookId="abc-123"
+          coverUrl="https://example.com/cover.jpg"
+        />,
+      );
+    });
+
+    // Flush any pending timers (e.g. auto-play setTimeout)
+    act(() => { vi.runAllTimers(); });
+
     fireEvent.click(screen.getByRole('button', { name: 'library.play' }));
 
     expect(capturedSource).toBeTruthy();
@@ -50,13 +63,16 @@ describe('AudioPlayer', () => {
   });
 
   it('falls back to /library when bookId is missing', () => {
-    capturedSource = null;
-    render(
-      <AudioPlayer
-        chapters={chapters}
-        bookTitle="No ID Book"
-      />,
-    );
+    act(() => {
+      render(
+        <AudioPlayer
+          chapters={chapters}
+          bookTitle="No ID Book"
+        />,
+      );
+    });
+
+    act(() => { vi.runAllTimers(); });
 
     fireEvent.click(screen.getByRole('button', { name: 'library.play' }));
 
