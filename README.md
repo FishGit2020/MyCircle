@@ -128,6 +128,17 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Voice input** — microphone button using Web Speech API (`SpeechRecognition`) with pulsing visual feedback, graceful fallback (hidden when unsupported)
 - Suggested prompt chips with crypto, weather, stock, navigation, flashcard, Bible, and podcast prompts
 
+### Doc Scanner
+- Pure Canvas/TypeScript document scanning — zero external image processing dependencies
+- Camera capture (rear camera) + file upload fallback
+- Automatic document edge detection via Canny edge detection + contour tracing + quad detection
+- Manual corner adjustment with draggable handles
+- Perspective correction via 4-point homography with bilinear interpolation
+- B&W enhancement using adaptive threshold for scanned document look
+- Auto-save to Cloud Files, scan history with thumbnails
+- Download as JPEG + Web Share API support
+- All image processing runs in a Web Worker for non-blocking UI
+
 ### General
 - Dark / light theme with system preference detection
 - Multi-language support (i18n: English, Spanish, Chinese)

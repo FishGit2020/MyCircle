@@ -161,6 +161,12 @@ const familyGamesDest = path.join(firebaseDir, 'family-games');
 console.log(`Copying family-games to ${familyGamesDest}`);
 copyDir(familyGamesDist, familyGamesDest);
 
+// 21. Copy doc-scanner MF to /doc-scanner
+const docScannerDist = path.join(rootDir, 'packages', 'doc-scanner', 'dist');
+const docScannerDest = path.join(firebaseDir, 'doc-scanner');
+console.log(`Copying doc-scanner to ${docScannerDest}`);
+copyDir(docScannerDist, docScannerDest);
+
 // Remove MFE index.html files — they conflict with Firebase Hosting's SPA rewrite.
 // When /notebook/ has an index.html, Firebase serves it instead of the shell's root
 // index.html, causing a blank page with "SyntaxError: Unexpected token '<'".
@@ -169,7 +175,7 @@ const mfeDirs = [
   'ai-assistant', 'bible-reader', 'worship-songs', 'notebook',
   'baby-tracker', 'child-development', 'chinese-learning', 'english-learning',
   'flashcards', 'daily-log', 'cloud-files', 'model-benchmark', 'immigration-tracker',
-  'digital-library', 'family-games',
+  'digital-library', 'family-games', 'doc-scanner',
 ];
 for (const mfe of mfeDirs) {
   const mfeIndex = path.join(firebaseDir, mfe, 'index.html');

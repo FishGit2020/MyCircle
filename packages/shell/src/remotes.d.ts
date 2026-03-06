@@ -95,3 +95,8 @@ declare module 'familyGames/FamilyGames' {
   const FamilyGames: React.ComponentType;
   export default FamilyGames;
 }
+
+declare module 'docScanner/DocScanner' {
+  const DocScanner: React.ComponentType;
+  export default DocScanner;
+}

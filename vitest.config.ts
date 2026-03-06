@@ -25,6 +25,7 @@ export default defineConfig({
       'immigrationTracker/ImmigrationTracker': resolve(__dirname, './packages/shell/test/mocks/ImmigrationTrackerMock.tsx'),
       'digitalLibrary/DigitalLibrary': resolve(__dirname, './packages/shell/test/mocks/DigitalLibraryMock.tsx'),
       'familyGames/FamilyGames': resolve(__dirname, './packages/shell/test/mocks/FamilyGamesMock.tsx'),
+      'docScanner/DocScanner': resolve(__dirname, './packages/shell/test/mocks/DocScannerMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/test/mocks/pwaRegisterReactMock.ts'),
       'epubjs': resolve(__dirname, './test/mocks/epubjsMock.ts'),
       '@mycircle/shared': resolve(__dirname, './packages/shared/src'),
