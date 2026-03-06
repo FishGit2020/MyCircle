@@ -46,6 +46,11 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
+      // Hiking routes subcollection - private per-user saved routes
+      match /hikingRoutes/{routeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // Immigration cases subcollection - private per-user case tracking
       match /immigrationCases/{caseId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;

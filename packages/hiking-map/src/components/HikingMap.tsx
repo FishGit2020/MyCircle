@@ -250,7 +250,6 @@ export default function HikingMap() {
           />
 
           <SavedRoutes
-            map={map}
             currentRoute={currentRoute}
             currentStart={currentStartLabel}
             currentEnd={currentEndLabel}

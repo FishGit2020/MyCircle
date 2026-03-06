@@ -1916,6 +1916,10 @@ const en = {
   'hiking.downloadComplete': 'Download complete',
   'hiking.downloadError': 'Download failed',
   'hiking.clearCache': 'Clear Cache',
+  'hiking.synced': 'synced',
+  'hiking.save': 'Save',
+  'hiking.renameRoute': 'Rename route',
+  'hiking.routeNamePlaceholder': 'Route name...',
 } as const;
 
 export default en;
