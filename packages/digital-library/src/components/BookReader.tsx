@@ -194,7 +194,9 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
     // Re-display current location to apply the new size
     const loc = r.location;
     if (loc?.start?.cfi) {
-      r.display(loc.start.cfi);
+      r.display(loc.start.cfi).catch((err: any) => {
+        logger.error('Failed to re-display after font change', err);
+      });
     }
   }, [fontSize]);
 
@@ -202,22 +204,20 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
     if (!renditionRef.current || !chapters[index]) return;
     // Try epubjs spine item first (more reliable than Firestore chapter href)
     const spineItem = spineItemsRef.current[index];
-    if (spineItem) {
-      renditionRef.current.display(spineItem.href);
-    } else {
-      // Fallback to Firestore chapter href
-      renditionRef.current.display(chapters[index].href);
-    }
+    const href = spineItem ? spineItem.href : chapters[index].href;
+    renditionRef.current.display(href).catch((err: any) => {
+      logger.error('Failed to navigate to chapter', err);
+    });
     setCurrentChapter(index);
     setTocOpen(false);
   }, [chapters]);
 
   const goNext = useCallback(() => {
-    if (renditionRef.current) renditionRef.current.next();
+    if (renditionRef.current) renditionRef.current.next()?.catch?.(() => {});
   }, []);
 
   const goPrev = useCallback(() => {
-    if (renditionRef.current) renditionRef.current.prev();
+    if (renditionRef.current) renditionRef.current.prev()?.catch?.(() => {});
   }, []);
 
   const increaseFontSize = useCallback(() => {
@@ -273,27 +273,37 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
   const goToBookmark = useCallback((cfi: string) => {
     if (renditionRef.current) {
-      renditionRef.current.display(cfi);
+      renditionRef.current.display(cfi).catch((err: any) => {
+        logger.error('Failed to navigate to bookmark', err);
+      });
       setBookmarksOpen(false);
     }
   }, []);
 
-  // Fullscreen
+  // Fullscreen (with Safari webkit prefix fallback)
   const toggleFullscreen = useCallback(() => {
-    if (!containerRef.current) return;
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch(() => {});
+    const el = containerRef.current as any;
+    if (!el) return;
+    const fsElement = document.fullscreenElement ?? (document as any).webkitFullscreenElement;
+    if (!fsElement) {
+      const request = el.requestFullscreen ?? el.webkitRequestFullscreen;
+      request?.call(el)?.catch?.(() => {});
     } else {
-      document.exitFullscreen().catch(() => {});
+      const exit = document.exitFullscreen ?? (document as any).webkitExitFullscreen;
+      exit?.call(document)?.catch?.(() => {});
     }
   }, []);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      setIsFullscreen(!!(document.fullscreenElement ?? (document as any).webkitFullscreenElement));
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
   }, []);
 
   // Broadcast breadcrumb detail to shell
