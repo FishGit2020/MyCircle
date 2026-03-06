@@ -1535,7 +1535,7 @@ export default function WidgetDashboard() {
                     {widget.visible ? t('widgets.visible') : t('widgets.hidden')}
                   </button>
                 </div>
-                <div className={!widget.visible ? 'pointer-events-none' : ''}>
+                <div className="pointer-events-none">
                   <ErrorBoundary>
                     <WidgetComponent />
                   </ErrorBoundary>
