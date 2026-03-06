@@ -8,7 +8,7 @@ export default function ThemeSync() {
 
   useEffect(() => {
     if (!loading && profile) {
-      setThemeFromProfile(profile.darkMode);
+      setThemeFromProfile(profile.darkMode, (profile as any).theme);
     }
   }, [profile, loading, setThemeFromProfile]);
 

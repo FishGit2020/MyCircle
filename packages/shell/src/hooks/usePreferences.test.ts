@@ -13,9 +13,11 @@ vi.mock('@mycircle/shared', () => ({
 
 vi.mock('../lib/firebase', () => ({
   updateUserDarkMode: (...args: unknown[]) => mockUpdateUserDarkMode(...args),
+  updateUserTheme: vi.fn(),
   updateUserLocale: (...args: unknown[]) => mockUpdateUserLocale(...args),
   updateUserTempUnit: (...args: unknown[]) => mockUpdateUserTempUnit(...args),
   updateUserSpeedUnit: (...args: unknown[]) => mockUpdateUserSpeedUnit(...args),
+  updateUserDistanceUnit: vi.fn(),
 }));
 
 const makeUser = (uid = 'user1') => ({ uid } as any);

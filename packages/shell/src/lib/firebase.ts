@@ -118,6 +118,7 @@ export interface UserProfile {
   displayName: string | null;
   photoURL: string | null;
   darkMode: boolean;
+  theme?: 'light' | 'dark' | 'auto';
   locale?: string;
   tempUnit?: 'C' | 'F';
   speedUnit?: 'ms' | 'mph' | 'kmh';
@@ -324,6 +325,15 @@ export async function updateUserDarkMode(uid: string, darkMode: boolean) {
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     darkMode,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateUserTheme(uid: string, theme: 'light' | 'dark' | 'auto') {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    theme,
     updatedAt: serverTimestamp(),
   });
 }
