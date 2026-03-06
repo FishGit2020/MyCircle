@@ -1893,6 +1893,7 @@ const es: Record<TranslationKey, string> = {
   'hiking.styleTopo': 'Topogr\u00e1fico',
   'hiking.distance': 'Distancia',
   'hiking.duration': 'Duraci\u00f3n',
+  'hiking.coordsHint': 'Ingresa coordenadas en grados decimales (p. ej. 37.7749, -122.4194)',
 };
 
 export default es;

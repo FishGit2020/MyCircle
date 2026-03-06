@@ -112,7 +112,7 @@ describe('WeatherComparison', () => {
   });
 
   it('collapses comparison when toggle button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
 
     renderWithProviders(
       <WeatherComparison

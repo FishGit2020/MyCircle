@@ -29,21 +29,21 @@ describe('EntryForm', () => {
   });
 
   it('submit button is disabled when input is only whitespace', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={onSubmit} />);
     await user.type(screen.getByPlaceholderText('dailyLog.placeholder'), '   ');
     expect(screen.getByRole('button', { name: 'dailyLog.save' })).toBeDisabled();
   });
 
   it('enables submit button when content is entered', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={onSubmit} />);
     await user.type(screen.getByPlaceholderText('dailyLog.placeholder'), 'New task');
     expect(screen.getByRole('button', { name: 'dailyLog.save' })).toBeEnabled();
   });
 
   it('calls onSubmit with trimmed content on form submission', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={onSubmit} />);
     await user.type(screen.getByPlaceholderText('dailyLog.placeholder'), '  Fix bug  ');
     await user.click(screen.getByRole('button', { name: 'dailyLog.save' }));
@@ -51,7 +51,7 @@ describe('EntryForm', () => {
   });
 
   it('clears input after successful submit (no initialValue)', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={onSubmit} />);
     const input = screen.getByPlaceholderText('dailyLog.placeholder');
     await user.type(input, 'New task');
@@ -62,7 +62,7 @@ describe('EntryForm', () => {
   });
 
   it('does not clear input after submit when initialValue is provided (edit mode)', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={onSubmit} initialValue="Existing work" />);
     const input = screen.getByPlaceholderText('dailyLog.placeholder');
     expect(input).toHaveValue('Existing work');
@@ -81,7 +81,7 @@ describe('EntryForm', () => {
 
   it('shows cancel button and calls onCancel when clicked', async () => {
     const onCancel = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={onSubmit} onCancel={onCancel} />);
     const cancelBtn = screen.getByRole('button', { name: 'dailyLog.cancel' });
     expect(cancelBtn).toBeInTheDocument();
@@ -90,7 +90,7 @@ describe('EntryForm', () => {
   });
 
   it('does not submit when empty', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={onSubmit} />);
     // Try submitting via Enter key on empty input
     const input = screen.getByPlaceholderText('dailyLog.placeholder');
@@ -103,7 +103,7 @@ describe('EntryForm', () => {
     const slowSubmit = vi.fn().mockImplementation(
       () => new Promise<void>((resolve) => { resolveSubmit = resolve; })
     );
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={slowSubmit} />);
     await user.type(screen.getByPlaceholderText('dailyLog.placeholder'), 'Task');
     await user.click(screen.getByRole('button', { name: 'dailyLog.save' }));
@@ -118,7 +118,7 @@ describe('EntryForm', () => {
 
   it('handles onSubmit error gracefully', async () => {
     const failSubmit = vi.fn().mockRejectedValue(new Error('fail'));
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<EntryForm onSubmit={failSubmit} />);
     await user.type(screen.getByPlaceholderText('dailyLog.placeholder'), 'Task');
     await user.click(screen.getByRole('button', { name: 'dailyLog.save' }));

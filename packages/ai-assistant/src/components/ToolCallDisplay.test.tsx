@@ -28,7 +28,7 @@ describe('ToolCallDisplay', () => {
   });
 
   it('expands tool call details on click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<ToolCallDisplay toolCalls={basicToolCalls} />);
 
     // Initially collapsed
@@ -43,7 +43,7 @@ describe('ToolCallDisplay', () => {
   });
 
   it('collapses tool call details on second click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<ToolCallDisplay toolCalls={basicToolCalls} />);
 
     await user.click(screen.getByText('Weather lookup'));
@@ -87,7 +87,7 @@ describe('ToolCallDisplay', () => {
   });
 
   it('sets aria-expanded correctly', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<ToolCallDisplay toolCalls={basicToolCalls} />);
 
     const buttons = screen.getAllByRole('button');

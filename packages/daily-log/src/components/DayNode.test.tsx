@@ -100,7 +100,7 @@ describe('DayNode', () => {
   });
 
   it('shows edit form when edit button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
@@ -110,7 +110,7 @@ describe('DayNode', () => {
   });
 
   it('calls onUpdate and exits edit mode on save', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
@@ -126,7 +126,7 @@ describe('DayNode', () => {
   });
 
   it('exits edit mode on cancel', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
@@ -137,7 +137,7 @@ describe('DayNode', () => {
   });
 
   it('shows delete confirmation on delete button click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
@@ -146,7 +146,7 @@ describe('DayNode', () => {
   });
 
   it('calls onDelete on confirm', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <DayNode date="2026-03-01" entries={[makeEntry()]} onUpdate={onUpdate} onDelete={onDelete} />
     );
@@ -178,7 +178,7 @@ describe('DayNode', () => {
   });
 
   it('shows date picker when move button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <DayNode
         date="2026-03-01"
@@ -193,7 +193,7 @@ describe('DayNode', () => {
   });
 
   it('toggles move date picker off on second click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <DayNode
         date="2026-03-01"

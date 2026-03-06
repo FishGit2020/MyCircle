@@ -118,7 +118,7 @@ describe('BibleReader', () => {
   });
 
   it('filters books when searching', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>
@@ -134,7 +134,7 @@ describe('BibleReader', () => {
   });
 
   it('shows chapter selector when a book is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>
@@ -152,7 +152,7 @@ describe('BibleReader', () => {
   });
 
   it('has back navigation from chapter selector', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>
@@ -221,7 +221,7 @@ describe('Daily Devotional', () => {
   });
 
   it('shows completed state after clicking Read Passage', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>
@@ -236,7 +236,7 @@ describe('Daily Devotional', () => {
   });
 
   it('saves completion to localStorage', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>
@@ -317,7 +317,7 @@ describe('Bible Version Selector', () => {
   });
 
   it('persists version selection to localStorage', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>
@@ -414,7 +414,7 @@ describe('Bible Version Selector', () => {
       error: null,
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>
@@ -464,7 +464,7 @@ describe('Bible Version Selector', () => {
       error: null,
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MemoryRouter>
         <MockedProvider mocks={[]} addTypename={false}>

@@ -1891,6 +1891,7 @@ const en = {
   'hiking.styleTopo': 'Topo',
   'hiking.distance': 'Distance',
   'hiking.duration': 'Duration',
+  'hiking.coordsHint': 'Enter coordinates as decimal degrees (e.g. 37.7749, -122.4194)',
 } as const;
 
 export default en;

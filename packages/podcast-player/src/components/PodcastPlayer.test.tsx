@@ -115,7 +115,7 @@ describe('PodcastPlayer', () => {
   });
 
   it('switches to subscribed tab and shows empty state', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders();
 
     // Auth check is async — wait for the tab to appear
@@ -126,7 +126,7 @@ describe('PodcastPlayer', () => {
   });
 
   it('uses string IDs for subscription management', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders();
 
     // Subscribe to a podcast

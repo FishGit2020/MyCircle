@@ -132,7 +132,7 @@ describe('SubscribedPodcasts', () => {
   });
 
   it('calls onUnsubscribe when Unsubscribe button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onUnsubscribe = vi.fn();
     const mocks = [buildMock('101', mockFeed)];
 
@@ -164,7 +164,7 @@ describe('SubscribedPodcasts', () => {
   });
 
   it('calls onSelectPodcast when a podcast card is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const onSelectPodcast = vi.fn();
     const mocks = [buildMock('101', mockFeed)];
 

@@ -66,15 +66,14 @@ describe('ChildDevelopment', () => {
     expect(screen.getByText('childDev.getStarted')).toBeInTheDocument();
   });
 
-  it('saves child data to localStorage and dispatches event', { timeout: 15_000 }, async () => {
-    const user = userEvent.setup();
+  it('saves child data to localStorage and dispatches event', () => {
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
     render(<ChildDevelopment />);
 
-    await user.type(screen.getByLabelText('childDev.childName'), 'Emma');
+    fireEvent.change(screen.getByLabelText('childDev.childName'), { target: { value: 'Emma' } });
     fireEvent.change(screen.getByLabelText('childDev.birthDate'), { target: { value: '2024-06-15' } });
-    await user.click(screen.getByText('childDev.getStarted'));
+    fireEvent.click(screen.getByText('childDev.getStarted'));
 
     expect(storage['child-name']).toBe('Emma');
     expect(storage['child-birth-date']).toBe(btoa('2024-06-15'));
@@ -150,7 +149,7 @@ describe('ChildDevelopment', () => {
   });
 
   it('shuffles Bible verse', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<ChildDevelopment />);
 
     const shuffleBtn = screen.getByRole('button', { name: 'childDev.shuffleVerse' });
@@ -178,7 +177,7 @@ describe('ChildDevelopment', () => {
   });
 
   it('shows edit button and edit form works', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     storage['child-name'] = 'Emma';
     storage['child-birth-date'] = btoa('2024-06-01');
 

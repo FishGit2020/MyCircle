@@ -113,7 +113,7 @@ describe('TimelineView', () => {
   });
 
   it('expands upcoming stage on click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<TimelineView {...DEFAULT_PROPS} />);
 
     // Click the upcoming stage header
@@ -126,7 +126,7 @@ describe('TimelineView', () => {
   });
 
   it('toggles domain visibility when clicking a filter chip', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<TimelineView {...DEFAULT_PROPS} />);
 
     // All 5 chips start pressed (active)
@@ -142,7 +142,7 @@ describe('TimelineView', () => {
   });
 
   it('keeps at least one domain visible', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<TimelineView {...DEFAULT_PROPS} />);
 
     // Deactivate 4 of 5 domains
@@ -207,7 +207,7 @@ describe('TimelineView', () => {
   });
 
   it('allows toggling past stages open and closed', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<TimelineView {...DEFAULT_PROPS} />);
 
     // Past stage starts collapsed
@@ -225,7 +225,7 @@ describe('TimelineView', () => {
   });
 
   it('allows collapsing the current stage', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<TimelineView {...DEFAULT_PROPS} />);
 
     // Current stage starts expanded

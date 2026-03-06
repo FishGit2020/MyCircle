@@ -136,7 +136,7 @@ describe('TrendingPodcasts', () => {
   });
 
   it('filters podcasts when a category chip is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderComponent();
 
     // Click "History" chip inside the chip list
@@ -149,7 +149,7 @@ describe('TrendingPodcasts', () => {
   });
 
   it('shows heading with selected category name', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderComponent();
 
     await clickChip(user, 'Technology');
@@ -157,7 +157,7 @@ describe('TrendingPodcasts', () => {
   });
 
   it('clears filter when "All" chip is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderComponent();
 
     // Filter to Technology
@@ -172,7 +172,7 @@ describe('TrendingPodcasts', () => {
   });
 
   it('toggles category off when clicking the same chip again', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderComponent();
 
     await clickChip(user, 'History');

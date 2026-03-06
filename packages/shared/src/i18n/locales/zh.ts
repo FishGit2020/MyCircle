@@ -1893,6 +1893,7 @@ const zh: Record<TranslationKey, string> = {
   'hiking.styleTopo': '\u5730\u5f62',
   'hiking.distance': '\u8ddd\u79bb',
   'hiking.duration': '\u65f6\u957f',
+  'hiking.coordsHint': '输入小数度坐标（例如 37.7749，-122.4194）',
 };
 
 export default zh;

@@ -94,7 +94,7 @@ describe('MonitorRecentLogs', () => {
   });
 
   it('expands and collapses log details on click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<MonitorRecentLogs logs={mockLogs} loading={false} />);
 
     // Initially not expanded
@@ -129,7 +129,7 @@ describe('MonitorRecentLogs', () => {
   });
 
   it('sets aria-expanded on expandable buttons', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<MonitorRecentLogs logs={mockLogs} loading={false} />);
 
     const buttons = screen.getAllByRole('button');

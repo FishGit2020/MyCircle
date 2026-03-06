@@ -54,6 +54,13 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **Firebase secrets**: Use `printf` not `echo` when piping values — `echo` appends a trailing newline (`\n`) that corrupts URLs and tokens. Always: `printf "value" | npx firebase functions:secrets:set SECRET_NAME`. PodcastIndex uses a combined JSON secret (`PODCASTINDEX_CREDS`). After creating a new secret, grant the compute SA access: `gcloud secrets add-iam-policy-binding SECRET_NAME --project=mycircle-dash --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"`. Without this, deploy fails with `secretmanager.secrets.setIamPolicy` denied.
 - **GraphQL codegen**: When the schema changes (`functions/src/schema.ts`) or queries change (`packages/shared/src/apollo/queries.ts`), run `pnpm codegen` to regenerate `packages/shared/src/apollo/generated.ts`. Always commit the regenerated file. Auto-runs on `pnpm install` via `postinstall` hook.
 
+## Test Performance
+
+- **Explicit assertion timeouts ≤ 5000ms** — never pass `{ timeout: X }` > 5000 to `it()`/`test()` or to assertions like `.toBeVisible({ timeout: X })`. Tests that need more time indicate a design problem: mock the slow dependency or use `fireEvent` instead of `userEvent`.
+- **Global testTimeout** — can be set higher in vitest config (e.g. 15000ms) for packages with heavy component rendering where the jsdom env startup itself takes time. This is different from per-test overrides.
+- Unit tests must complete in milliseconds — mock all network calls, timers, and async side effects.
+- **userEvent**: always use `userEvent.setup({ delay: null })` — the default typing delay makes tests slow in CI. For tests that only verify state (not interaction fidelity), prefer `fireEvent.change()` over `userEvent.type()`.
+
 ## Test Gotchas
 
 - `vi.fn(() => obj)` is NOT a constructor — use real `class` mocks for SpeechRecognition, AudioContext, etc.

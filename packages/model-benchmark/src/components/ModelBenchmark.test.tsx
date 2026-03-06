@@ -67,7 +67,7 @@ describe('ModelBenchmark', () => {
   });
 
   it('keeps runner mounted when switching to endpoints tab', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<MemoryRouter><ModelBenchmark /></MemoryRouter>);
     await user.click(screen.getByText('benchmark.tabs.endpoints'));
     expect(screen.getByTestId('endpoint-manager')).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('ModelBenchmark', () => {
   });
 
   it('switches to history tab when clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<MemoryRouter><ModelBenchmark /></MemoryRouter>);
     await user.click(screen.getByText('benchmark.tabs.history'));
     expect(screen.getByTestId('benchmark-history')).toBeInTheDocument();

@@ -80,7 +80,7 @@ describe('SongList', () => {
   });
 
   it('shows no-results state when search finds nothing', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
@@ -92,7 +92,7 @@ describe('SongList', () => {
   });
 
   it('filters songs by search query on title', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
@@ -106,7 +106,7 @@ describe('SongList', () => {
   });
 
   it('filters songs by search query on artist', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
@@ -119,7 +119,7 @@ describe('SongList', () => {
   });
 
   it('filters songs by search query on tags', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
@@ -132,7 +132,7 @@ describe('SongList', () => {
   });
 
   it('calls onSelectSong when a song is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
@@ -156,7 +156,7 @@ describe('SongList', () => {
   });
 
   it('calls onNewSong when add song button is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );

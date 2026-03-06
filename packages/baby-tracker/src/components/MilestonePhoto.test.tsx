@@ -71,7 +71,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('calls onClearError when try again is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
@@ -95,7 +95,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('shows caption input when "Add Photo" is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} />
     );
@@ -104,7 +104,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('hides caption input when cancel is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} />
     );
@@ -162,7 +162,7 @@ describe('MilestonePhoto', () => {
   // --- Delete confirmation ---
 
   it('shows delete confirmation dialog on delete click', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
@@ -176,7 +176,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('calls onDelete with stageId on confirm', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
@@ -197,7 +197,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('hides confirmation dialog when cancel is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
@@ -215,7 +215,7 @@ describe('MilestonePhoto', () => {
   // --- Lightbox ---
 
   it('opens lightbox when photo thumbnail is clicked', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
@@ -229,7 +229,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('shows full image in lightbox', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
@@ -245,7 +245,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('shows caption in lightbox when provided', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
@@ -262,7 +262,7 @@ describe('MilestonePhoto', () => {
   });
 
   it('closes lightbox via close button', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}

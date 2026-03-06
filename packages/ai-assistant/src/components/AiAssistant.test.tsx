@@ -165,7 +165,7 @@ describe('AiAssistant', () => {
       clearChat: vi.fn(),
     });
 
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     renderWithProviders(<AiAssistant />);
 
     const input = screen.getByPlaceholderText('Ask me about weather, stocks, or anything...');
