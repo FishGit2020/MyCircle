@@ -7,6 +7,8 @@ export interface TileProviderConfig {
 
 export interface RoutingProviderConfig {
   baseUrl: string;
+  /** 'osrm' (default) or 'valhalla' for self-hosted NAS routing. */
+  type?: 'osrm' | 'valhalla';
   profile: string;
 }
 
@@ -52,6 +54,7 @@ const PUBLIC_CONFIG: MapConfig = {
   ],
   routing: {
     baseUrl: 'https://router.project-osrm.org',
+    type: 'osrm' as const,
     profile: 'foot',
   },
 };

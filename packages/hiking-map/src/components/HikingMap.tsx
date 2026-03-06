@@ -166,7 +166,7 @@ export default function HikingMap() {
         <div className="md:w-72 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
           <RoutePlanner
             map={map}
-            routingBaseUrl={MAP_CONFIG.routing.baseUrl}
+            routingConfig={MAP_CONFIG.routing}
             externalStart={startCoords ? lngLatToString(startCoords) : undefined}
             externalEnd={endCoords ? lngLatToString(endCoords) : undefined}
             onClearWaypoints={handleClearWaypoints}

@@ -49,12 +49,14 @@ vi.mock('./MapStyleSwitcher', () => ({
 
 vi.mock('./RoutePlanner', () => ({
   default: () => (
-    <div>
-      <span>hiking.routePlanner</span>
-      <input placeholder="hiking.startPoint" />
-      <input placeholder="hiking.endPoint" />
-      <button type="button">hiking.planRoute</button>
-    </div>
+    <>
+      <div>
+        <span>hiking.routePlanner</span>
+        <input placeholder="hiking.startPoint" />
+        <input placeholder="hiking.endPoint" />
+        <button type="button">hiking.planRoute</button>
+      </div>
+    </>
   ),
 }));
 
