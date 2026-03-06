@@ -79,6 +79,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -95,10 +97,24 @@ jobs:
             packages/shared/dist
           key: workspace-${{ github.sha }}
 
-      - name: Unit tests
-        run: pnpm test:run --reporter=dot && pnpm test:mf
+      - name: Unit tests (root — shell + shared)
+        run: pnpm test:run --reporter=dot
         env:
-          NODE_OPTIONS: '--max-old-space-size=4096'
+          NODE_OPTIONS: '--max-old-space-size=6144'
+
+      - name: Unit tests (changed MFE packages)
+        run: |
+          # Run tests only for packages with changes relative to main
+          CHANGED=$(pnpm --filter '!mycircle' --filter '...[origin/main]' -r exec -- echo '$PNPM_PACKAGE_NAME' 2>/dev/null | grep '@mycircle/' || true)
+          if [ -z "$CHANGED" ]; then
+            echo "No changed MFE packages — running all to be safe"
+            pnpm --filter '!mycircle' -r --parallel test:run
+          else
+            echo "Changed packages: $CHANGED"
+            pnpm --filter '!mycircle' --filter '...[origin/main]' -r --parallel test:run
+          fi
+        env:
+          NODE_OPTIONS: '--max-old-space-size=6144'
 
   # ── Bundle size report (parallel, non-blocking) ────────────────────────
   bundle-report:

@@ -58,10 +58,14 @@ jobs:
             dist
           key: e2e-build-${{ github.sha }}
 
-  # ── E2E tests against live Firebase ──────────────────────────────────
+  # ── E2E tests against live Firebase (sharded) ─────────────────────────
   e2e:
     needs: setup
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/3, 2/3, 3/3]
     steps:
       - uses: actions/checkout@v4
 
@@ -97,14 +101,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps
 
-      - name: Run E2E tests
-        run: pnpm test:e2e
+      - name: Run E2E tests (shard ${{ matrix.shard }})
+        run: pnpm test:e2e --shard=${{ matrix.shard }}
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-shard-${{ strategy.job-index }}
           path: |
             playwright-report/
             test-results/
@@ -139,8 +143,26 @@ jobs:
             dist
           key: e2e-build-${{ github.sha }}
 
+      - name: Cache Firebase emulator binaries
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase-emulators-${{ runner.os }}-${{ hashFiles('firebase.json') }}
+
+      - name: Cache Playwright browsers
+        id: pw-cache-emulator
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright browsers
+        if: steps.pw-cache-emulator.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps (cache hit)
+        if: steps.pw-cache-emulator.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       - name: Run emulator E2E tests
         run: pnpm emulator:test

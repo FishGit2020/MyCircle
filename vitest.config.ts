@@ -34,6 +34,13 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        minThreads: 1,
+        maxThreads: process.env.CI ? 4 : undefined,
+      },
+    },
     setupFiles: ['./test/setup.ts'],
     exclude: [
       '**/node_modules/**',
