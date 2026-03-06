@@ -75,10 +75,12 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateDarkMode: (darkMode: boolean) => Promise<void>;
+  updateTheme: (theme: 'light' | 'dark' | 'auto') => Promise<void>;
   updateLocale: (locale: string) => Promise<void>;
   updateTempUnit: (unit: 'C' | 'F') => Promise<void>;
   updateSpeedUnit: (unit: 'ms' | 'mph' | 'kmh') => Promise<void>;
   updateDistanceUnit: (unit: 'km' | 'mi') => Promise<void>;
+  updateUnitSystem: (system: 'us' | 'metric') => Promise<void>;
   addCity: (city: Omit<RecentCity, 'searchedAt'>) => Promise<void>;
   removeCity: (cityId: string) => Promise<void>;
   clearCities: () => Promise<void>;
@@ -244,10 +246,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         resetPassword: resetPasswordFn,
         signOut: signOutUser,
         updateDarkMode: preferences.updateDarkMode,
+        updateTheme: preferences.updateTheme,
         updateLocale: preferences.updateLocale,
         updateTempUnit: preferences.updateTempUnit,
         updateSpeedUnit: preferences.updateSpeedUnit,
         updateDistanceUnit: preferences.updateDistanceUnit,
+        updateUnitSystem: preferences.updateUnitSystem,
         addCity: cityManager.addCity,
         removeCity: cityManager.removeCity,
         clearCities: cityManager.clearCities,

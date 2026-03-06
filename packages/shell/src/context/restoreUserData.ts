@@ -24,6 +24,10 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
   const favoriteCities = profile.favoriteCities || [];
 
   // Restore saved preferences to localStorage so shared hooks pick them up
+  if (profile.theme) {
+    localStorage.setItem(StorageKeys.THEME, profile.theme);
+    window.dispatchEvent(new Event(WindowEvents.THEME_CHANGED));
+  }
   if (profile.tempUnit) {
     localStorage.setItem(StorageKeys.TEMP_UNIT, profile.tempUnit);
     window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));

@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { StorageKeys } from '@mycircle/shared';
 
-type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark' | 'auto';
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
-  setThemeFromProfile: (darkMode: boolean) => void;
+  setThemeMode: (theme: Theme) => void;
+  setThemeFromProfile: (darkMode: boolean, profileTheme?: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -14,33 +15,47 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(StorageKeys.THEME) as Theme;
-      if (stored) return stored;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const stored = localStorage.getItem(StorageKeys.THEME);
+      if (stored === 'light' || stored === 'dark' || stored === 'auto') return stored;
     }
-    return 'light';
+    return 'auto';
   });
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
+    function applyDark(dark: boolean) {
+      if (dark) root.classList.add('dark');
+      else root.classList.remove('dark');
     }
     localStorage.setItem(StorageKeys.THEME, theme);
+    if (theme === 'auto') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      applyDark(mq.matches);
+      const listener = (e: MediaQueryListEvent) => applyDark(e.matches);
+      mq.addEventListener('change', listener);
+      return () => mq.removeEventListener('change', listener);
+    } else {
+      applyDark(theme === 'dark');
+    }
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
+  // Cycles light → dark → auto → light (for keyboard shortcut)
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => prev === 'light' ? 'dark' : prev === 'dark' ? 'auto' : 'light');
+  }, []);
 
-  const setThemeFromProfile = useCallback((darkMode: boolean) => {
-    setTheme(darkMode ? 'dark' : 'light');
+  const setThemeMode = useCallback((t: Theme) => setTheme(t), []);
+
+  const setThemeFromProfile = useCallback((darkMode: boolean, profileTheme?: Theme) => {
+    if (profileTheme === 'light' || profileTheme === 'dark' || profileTheme === 'auto') {
+      setTheme(profileTheme);
+    } else {
+      setTheme(darkMode ? 'dark' : 'light');
+    }
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setThemeFromProfile }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setThemeMode, setThemeFromProfile }}>
       {children}
     </ThemeContext.Provider>
   );
