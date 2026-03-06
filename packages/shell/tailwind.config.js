@@ -20,6 +20,7 @@ export default {
     "../immigration-tracker/src/**/*.{js,ts,jsx,tsx}",
     "../digital-library/src/**/*.{js,ts,jsx,tsx}",
     "../family-games/src/**/*.{js,ts,jsx,tsx}",
+    "../doc-scanner/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

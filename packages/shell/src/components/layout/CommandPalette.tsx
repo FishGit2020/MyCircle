@@ -35,6 +35,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/benchmark': 'commandPalette.goToBenchmark',
   '/immigration': 'commandPalette.goToImmigration',
   '/family-games': 'commandPalette.goToFamilyGames',
+  '/doc-scanner': 'commandPalette.goToDocScanner',
 };
 
 const clockIcon = (

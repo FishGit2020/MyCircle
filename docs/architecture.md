@@ -451,6 +451,24 @@ Exposes `FamilyGames` component via Module Federation. Port **3020**.
 - Auth-gated: requires Firebase sign-in
 - Route: `/family-games`
 
+### Doc Scanner - `packages/doc-scanner/`
+
+Exposes `DocScanner` component via Module Federation. Port **3021**.
+
+**Key Behavior:**
+- Pure Canvas/TypeScript document scanning — no external image processing dependencies
+- Camera capture (rear camera) + file upload fallback
+- Edge detection pipeline: grayscale → Gaussian blur → Sobel → Canny threshold → contour trace → quad detection
+- Manual corner adjustment with draggable handles
+- Perspective correction via 4-point homography with bilinear interpolation
+- B&W enhancement using adaptive threshold (integral image, O(1) per pixel)
+- Auto-save to Cloud Files via `window.__cloudFiles` bridge API
+- Scan history with thumbnails (filtered by `scan-` prefix)
+- Download as JPEG + Web Share API support
+- All image processing runs in a Web Worker for non-blocking UI
+- Auth-gated: requires Firebase sign-in
+- Route: `/doc-scanner`
+
 ---
 
 ## Navigation & Discovery

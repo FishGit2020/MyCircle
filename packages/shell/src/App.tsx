@@ -35,6 +35,7 @@ const ModelBenchmarkMF = tracedLazy('mfe_benchmark_load', () => import('modelBen
 const ImmigrationTrackerMF = tracedLazy('mfe_immigration_load', () => import('immigrationTracker/ImmigrationTracker'), getPerf);
 const DigitalLibraryMF = tracedLazy('mfe_digital_library_load', () => import('digitalLibrary/DigitalLibrary'), getPerf);
 const FamilyGamesMF = tracedLazy('mfe_family_games_load', () => import('familyGames/FamilyGames'), getPerf);
+const DocScannerMF = tracedLazy('mfe_doc_scanner_load', () => import('docScanner/DocScanner'), getPerf);
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -455,6 +456,23 @@ function FamilyGamesPage() {
   );
 }
 
+// Fallback for Doc Scanner MFE
+const DocScannerFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Doc Scanner module is loading...</p>
+  </div>
+);
+
+function DocScannerPage() {
+  return (
+    <ErrorBoundary fallback={<DocScannerFallback />}>
+      <Suspense fallback={<Loading />}>
+        <DocScannerMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -516,6 +534,7 @@ export default function App() {
         <Route path="library/:bookId" element={<RequireAuth><LibraryPage /></RequireAuth>} />
         <Route path="family-games" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
         <Route path="family-games/:gameType" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
+        <Route path="doc-scanner" element={<RequireAuth><DocScannerPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />
         <Route path="terms" element={<TermsOfServicePage />} />

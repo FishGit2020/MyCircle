@@ -39,6 +39,7 @@ export default defineConfig({
       'immigrationTracker/ImmigrationTracker': resolve(__dirname, './test/mocks/ImmigrationTrackerMock.tsx'),
       'digitalLibrary/DigitalLibrary': resolve(__dirname, './test/mocks/DigitalLibraryMock.tsx'),
       'familyGames/FamilyGames': resolve(__dirname, './test/mocks/FamilyGamesMock.tsx'),
+      'docScanner/DocScanner': resolve(__dirname, './test/mocks/DocScannerMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }
