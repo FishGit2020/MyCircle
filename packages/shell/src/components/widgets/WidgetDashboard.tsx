@@ -664,8 +664,8 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
 
   const ageDisplay = ageMonths !== null
     ? ageMonths >= 24
-      ? `${Math.floor(ageMonths / 12)}y ${ageMonths % 12}m` + (ageDays > 0 ? ` ${ageDays}d` : '')
-      : `${ageMonths}m` + (ageDays > 0 ? ` ${ageDays}d` : '')
+      ? t('childDev.yearsMonthsOld' as any).replace('{years}', String(Math.floor(ageMonths / 12))).replace('{months}', String(ageMonths % 12)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '')
+      : t('childDev.monthsOld' as any).replace('{months}', String(ageMonths)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '')
     : null;
 
   const stageLabel = ageMonths !== null ? getStageLabel(ageMonths) : null;
