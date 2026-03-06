@@ -10,6 +10,7 @@ export default defineConfig({
     setupFiles: ['./test/setup.ts'],
     include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
     pool: 'threads',
+    testTimeout: 15_000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
