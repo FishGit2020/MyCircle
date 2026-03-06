@@ -28,6 +28,7 @@ COPY packages/immigration-tracker/package.json packages/immigration-tracker/
 COPY packages/digital-library/package.json packages/digital-library/
 COPY packages/family-games/package.json packages/family-games/
 COPY packages/doc-scanner/package.json packages/doc-scanner/
+COPY packages/hiking-map/package.json packages/hiking-map/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -83,6 +84,7 @@ COPY --from=builder /app/packages/immigration-tracker/package.json packages/immi
 COPY --from=builder /app/packages/digital-library/package.json packages/digital-library/
 COPY --from=builder /app/packages/family-games/package.json packages/family-games/
 COPY --from=builder /app/packages/doc-scanner/package.json packages/doc-scanner/
+COPY --from=builder /app/packages/hiking-map/package.json packages/hiking-map/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune

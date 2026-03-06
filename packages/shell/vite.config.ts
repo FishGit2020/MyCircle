@@ -168,6 +168,10 @@ const docScannerRemote = isProduction
   ? '/doc-scanner/assets/remoteEntry.js'
   : 'http://localhost:3021/assets/remoteEntry.js';
 
+const hikingMapRemote = isProduction
+  ? '/hiking-map/assets/remoteEntry.js'
+  : 'http://localhost:3022/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -193,7 +197,8 @@ export default defineConfig({
         immigrationTracker: immigrationTrackerRemote,
         digitalLibrary: digitalLibraryRemote,
         familyGames: familyGamesRemote,
-        docScanner: docScannerRemote
+        docScanner: docScannerRemote,
+        hikingMap: hikingMapRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

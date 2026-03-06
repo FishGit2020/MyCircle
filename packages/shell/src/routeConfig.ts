@@ -20,4 +20,5 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   library: 'nav.digitalLibrary',
   'family-games': 'nav.familyGames',
   'doc-scanner': 'nav.docScanner',
+  hiking: 'nav.hikingMap',
 };

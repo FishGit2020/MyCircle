@@ -41,6 +41,7 @@ export default defineConfig({
       'digitalLibrary/DigitalLibrary': resolve(__dirname, './test/mocks/DigitalLibraryMock.tsx'),
       'familyGames/FamilyGames': resolve(__dirname, './test/mocks/FamilyGamesMock.tsx'),
       'docScanner/DocScanner': resolve(__dirname, './test/mocks/DocScannerMock.tsx'),
+      'hikingMap/HikingMap': resolve(__dirname, './test/mocks/HikingMapMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

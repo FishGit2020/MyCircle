@@ -100,3 +100,8 @@ declare module 'docScanner/DocScanner' {
   const DocScanner: React.ComponentType;
   export default DocScanner;
 }
+
+declare module 'hikingMap/HikingMap' {
+  const HikingMap: React.ComponentType;
+  export default HikingMap;
+}
