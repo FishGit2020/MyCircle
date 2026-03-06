@@ -6,6 +6,7 @@ import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
 import ConversionStatus from './ConversionStatus';
 import AudioPlayer from './AudioPlayer';
+import useSwipe from '../hooks/useSwipe';
 
 interface BookBookmark {
   bookId: string;
@@ -57,6 +58,8 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState<'read' | 'listen'>(initialTab);
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [pageInfo, setPageInfo] = useState<{ page: number; total: number } | undefined>();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Sync activeTab when URL search params change (e.g. audio pill navigation)
@@ -85,6 +88,24 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   }, [activeTab]);
   const spineItemsRef = useRef<Array<{ href: string; index: number }>>([]);
 
+  const getThemeStyles = useCallback((isDark: boolean) => {
+    const base: Record<string, Record<string, string>> = {
+      body: {
+        'font-family': 'Georgia, serif',
+        'line-height': '1.8',
+        padding: '1rem',
+        'text-align': 'justify',
+      },
+    };
+    if (isDark) {
+      base.body.color = '#e5e7eb';
+      base.body.background = '#1f2937';
+      base.a = base.a || {};
+      (base as any).a = { color: '#60a5fa' };
+    }
+    return base;
+  }, []);
+
   // Initialize EPUB renderer
   useEffect(() => {
     let cancelled = false;
@@ -100,38 +121,16 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         const rendition = book.renderTo(viewerRef.current, {
           width: '100%',
           height: '100%',
-          spread: 'none',
-          flow: 'scrolled-doc',
+          spread: 'auto',
+          flow: 'paginated',
+          minSpreadWidth: 900,
         });
 
         renditionRef.current = rendition;
 
         rendition.themes.fontSize(`${fontSize}px`);
-        rendition.themes.default({
-          body: {
-            'font-family': 'Georgia, serif',
-            'line-height': '1.8',
-            'max-width': '800px',
-            margin: '0 auto',
-            padding: '1rem',
-          },
-        });
-
-        // Apply dark mode if active
-        if (document.documentElement.classList.contains('dark')) {
-          rendition.themes.default({
-            body: {
-              color: '#e5e7eb',
-              background: '#1f2937',
-              'font-family': 'Georgia, serif',
-              'line-height': '1.8',
-              'max-width': '800px',
-              margin: '0 auto',
-              padding: '1rem',
-            },
-            a: { color: '#60a5fa' },
-          });
-        }
+        const isDark = document.documentElement.classList.contains('dark');
+        rendition.themes.default(getThemeStyles(isDark));
 
         await rendition.display();
         if (cancelled) return;
@@ -147,7 +146,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
           }
         } catch { /* ignore */ }
 
-        // Extract text for TTS
+        // Extract text for TTS + page info
         rendition.on('relocated', async (location: any) => {
           if (cancelled) return;
           try {
@@ -160,6 +159,14 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
           } catch (err) {
             logger.error('Failed to extract text for TTS', err);
           }
+
+          // Page info from epubjs
+          try {
+            const displayed = location?.start?.displayed;
+            if (displayed) {
+              setPageInfo({ page: displayed.page, total: displayed.total });
+            }
+          } catch { /* ignore */ }
 
           // Find current chapter index
           if (location?.start?.href) {
@@ -181,6 +188,32 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
       }
     };
   }, [epubUrl, chapters]);
+
+  // ResizeObserver — re-fit rendition on container resize (fullscreen, window resize)
+  useEffect(() => {
+    const el = viewerRef.current;
+    const rendition = renditionRef.current;
+    if (!el || !rendition) return;
+
+    const ro = new ResizeObserver(() => {
+      try { rendition.resize(); } catch { /* ignore */ }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [loading]); // re-run after loading completes (rendition exists)
+
+  // MutationObserver — watch <html> class for dark mode toggle
+  useEffect(() => {
+    const rendition = renditionRef.current;
+    if (!rendition) return;
+
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark');
+      try { rendition.themes.default(getThemeStyles(isDark)); } catch { /* ignore */ }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, [loading, getThemeStyles]);
 
   // Update font size — inject !important CSS to override EPUB inline styles
   useEffect(() => {
@@ -227,6 +260,35 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const decreaseFontSize = useCallback(() => {
     setFontSize(prev => Math.max(prev - 2, 10));
   }, []);
+
+  // Tap zones: left 25% = prev, right 25% = next, center = toggle controls
+  const handleReaderClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const ratio = x / rect.width;
+
+    if (ratio < 0.25) {
+      goPrev();
+    } else if (ratio > 0.75) {
+      goNext();
+    } else {
+      setControlsVisible(v => !v);
+    }
+  }, [goPrev, goNext]);
+
+  // Swipe gestures for mobile
+  useSwipe(viewerRef, { onSwipeLeft: goNext, onSwipeRight: goPrev });
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeTab !== 'read') return;
+      if (e.key === 'ArrowLeft') { goPrev(); e.preventDefault(); }
+      else if (e.key === 'ArrowRight') { goNext(); e.preventDefault(); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, goPrev, goNext]);
 
   // Load bookmarks from localStorage
   useEffect(() => {
@@ -463,21 +525,31 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
               </div>
             )}
-            <div ref={viewerRef} className="w-full h-full overflow-auto" />
+            {/* Tap zone overlay */}
+            <div
+              className="absolute inset-0 z-10 cursor-pointer"
+              onClick={handleReaderClick}
+              aria-hidden="true"
+            />
+            <div ref={viewerRef} className="w-full h-full overflow-hidden" />
+
+            {/* Controls overlay inside reader pane */}
+            <ReaderControls
+              onPrev={goPrev}
+              onNext={goNext}
+              onFontIncrease={increaseFontSize}
+              onFontDecrease={decreaseFontSize}
+              fontSize={fontSize}
+              currentChapter={currentChapter}
+              totalChapters={chapters.length}
+              pageInfo={pageInfo}
+              visible={controlsVisible}
+            />
           </div>
         </div>
 
-        {/* Reader Controls */}
-        <div className="flex-shrink-0 mt-3 space-y-3">
-          <ReaderControls
-            onPrev={goPrev}
-            onNext={goNext}
-            onFontIncrease={increaseFontSize}
-            onFontDecrease={decreaseFontSize}
-            fontSize={fontSize}
-            currentChapter={currentChapter}
-            totalChapters={chapters.length}
-          />
+        {/* BrowserTTS below reader */}
+        <div className="flex-shrink-0 mt-3">
           <BrowserTTS text={ttsText} />
         </div>
       </div>

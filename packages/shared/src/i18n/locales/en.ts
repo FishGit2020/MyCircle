@@ -1704,6 +1704,7 @@ const en = {
   'library.skipForward': 'Skip forward 10 seconds',
   'library.skipBack': 'Skip back 10 seconds',
   'library.chapterComplete': 'Complete',
+  'library.pageInfo': 'Page {page} of {total}',
 
   'widgets.noAudiobook': 'No audiobook in progress',
 
