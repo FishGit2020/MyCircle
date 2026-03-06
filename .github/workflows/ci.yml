@@ -13,14 +13,13 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   # ── Shared setup: install, check versions, build shared ────────────────
   setup:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ci-setup-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
@@ -52,6 +51,9 @@ jobs:
   typecheck:
     needs: setup
     runs-on: ubuntu-latest
+    concurrency:
+      group: ci-typecheck-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
@@ -77,6 +79,9 @@ jobs:
   test-root:
     needs: setup
     runs-on: ubuntu-latest
+    concurrency:
+      group: ci-test-root-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
@@ -104,6 +109,9 @@ jobs:
   test-mfe:
     needs: setup
     runs-on: ubuntu-latest
+    concurrency:
+      group: ci-test-mfe-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
         with:
