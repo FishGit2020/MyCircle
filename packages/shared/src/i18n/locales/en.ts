@@ -186,6 +186,7 @@ const en = {
   'auth.signOut': 'Sign Out',
   'settings.exportData': 'Export Data',
   'settings.importData': 'Import Data',
+  'settings.units': 'Units',
   'theme.dark': 'Dark Mode',
   'theme.light': 'Light Mode',
   'auth.signUp': 'Sign Up',

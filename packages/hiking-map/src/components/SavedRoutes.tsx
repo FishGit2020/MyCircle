@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, useUnits, formatDistance } from '@mycircle/shared';
 import {
   listRoutes, deleteRoute, saveRoute, renameRoute, subscribeRoutes,
   shareRoute, unshareRoute, listPublicRoutes, subscribePublicRoutes,
@@ -14,9 +14,6 @@ interface Props {
   onLoadRoute: (route: SavedRoute | PublicRoute) => void;
 }
 
-function formatDistance(m: number) {
-  return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
-}
 function formatDuration(s: number) {
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
@@ -85,7 +82,7 @@ function PersonalRouteCard({
           <div className="flex items-start gap-1.5 mb-1">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{route.name}</p>
-              <p className="text-xs text-gray-400">{formatDistance(route.distance)} · {formatDuration(route.duration)}</p>
+              <p className="text-xs text-gray-400">{formatDistance(route.distance, distanceUnit)} · {formatDuration(route.duration)}</p>
             </div>
             {isShared && (
               <span className="shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
@@ -145,6 +142,7 @@ function PersonalRouteCard({
 
 export default function SavedRoutes({ currentRoute, currentStart, currentEnd, onLoadRoute }: Props) {
   const { t } = useTranslation();
+  const { distanceUnit } = useUnits();
   const isLoggedIn = !!window.__currentUid;
 
   const [myRoutes, setMyRoutes] = useState<SavedRoute[]>([]);
@@ -237,7 +235,7 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
   if (!isLoggedIn) return <SignInPrompt />;
 
   return (
-    <div className="mt-3 space-y-0">
+    <div className="mt-3 space-y-3">
       {/* ── My Routes ── */}
       <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <div className="flex items-center gap-2">
@@ -307,7 +305,7 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
       </div>
 
       {/* ── Community Routes ── */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
         <button type="button" onClick={() => setCommunityExpanded(v => !v)}
           className="flex items-center justify-between w-full text-sm font-semibold text-gray-900 dark:text-white">
           <span className="flex items-center gap-1.5">
@@ -330,7 +328,7 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
                 <div className="flex items-start gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{route.name}</p>
-                    <p className="text-xs text-gray-400">{formatDistance(route.distance)} · {formatDuration(route.duration)}</p>
+                    <p className="text-xs text-gray-400">{formatDistance(route.distance, distanceUnit)} · {formatDuration(route.duration)}</p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">
                       {t('hiking.sharedBy')} {route.sharedBy.displayName}
                     </p>

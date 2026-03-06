@@ -3,7 +3,6 @@ import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-ro
 import { useTranslation, createLogger } from '@mycircle/shared';
 import { Layout } from './components/layout';
 import { Loading, ErrorBoundary, RequireAuth } from './components/common';
-import { UnitToggle, SpeedToggle } from './components/settings';
 import { WeatherCompare } from './components/widgets';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
@@ -187,8 +186,6 @@ function WeatherPage() {
   return (
     <div>
       <div className="flex justify-end gap-2 mb-4">
-        <UnitToggle />
-        <SpeedToggle />
         <ShareButton weatherRef={weatherRef} />
         <FavoriteButton />
       </div>

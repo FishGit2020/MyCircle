@@ -127,6 +127,7 @@ describe('StorageKeys constants', () => {
   it('has expected storage keys', () => {
     expect(StorageKeys.TEMP_UNIT).toBe('tempUnit');
     expect(StorageKeys.SPEED_UNIT).toBe('speedUnit');
+    expect(StorageKeys.DISTANCE_UNIT).toBe('distanceUnit');
     expect(StorageKeys.THEME).toBe('theme');
     expect(StorageKeys.STOCK_WATCHLIST).toBe('stock-tracker-watchlist');
     expect(StorageKeys.BABY_DUE_DATE).toBe('baby-due-date');

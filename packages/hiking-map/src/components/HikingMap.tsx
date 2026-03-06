@@ -27,24 +27,28 @@ function setPointLayer(
   coords: [number, number] | null,
   color: string
 ) {
-  if (map.getLayer(layerId)) map.removeLayer(layerId);
-  if (map.getSource(sourceId)) map.removeSource(sourceId);
-  if (!coords) return;
-  map.addSource(sourceId, {
-    type: 'geojson',
-    data: { type: 'Feature', geometry: { type: 'Point', coordinates: coords }, properties: {} },
-  });
-  map.addLayer({
-    id: layerId,
-    type: 'circle',
-    source: sourceId,
-    paint: {
-      'circle-radius': 9,
-      'circle-color': color,
-      'circle-stroke-width': 2.5,
-      'circle-stroke-color': '#ffffff',
-    },
-  });
+  try {
+    if (map.getLayer(layerId)) map.removeLayer(layerId);
+    if (map.getSource(sourceId)) map.removeSource(sourceId);
+    if (!coords) return;
+    map.addSource(sourceId, {
+      type: 'geojson',
+      data: { type: 'Feature', geometry: { type: 'Point', coordinates: coords }, properties: {} },
+    });
+    map.addLayer({
+      id: layerId,
+      type: 'circle',
+      source: sourceId,
+      paint: {
+        'circle-radius': 9,
+        'circle-color': color,
+        'circle-stroke-width': 2.5,
+        'circle-stroke-color': '#ffffff',
+      },
+    });
+  } catch {
+    // Map may have been destroyed during navigation — ignore
+  }
 }
 
 export default function HikingMap() {

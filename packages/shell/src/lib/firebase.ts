@@ -1,4 +1,4 @@
-import { createLogger } from '@mycircle/shared';
+import { createLogger, WindowEvents } from '@mycircle/shared';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
@@ -121,6 +121,7 @@ export interface UserProfile {
   locale?: string;
   tempUnit?: 'C' | 'F';
   speedUnit?: 'ms' | 'mph' | 'kmh';
+  distanceUnit?: 'km' | 'mi';
   recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
   stockWatchlist?: WatchlistItem[];
@@ -350,6 +351,15 @@ export async function updateUserSpeedUnit(uid: string, speedUnit: 'ms' | 'mph' |
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     speedUnit,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateUserDistanceUnit(uid: string, distanceUnit: 'km' | 'mi') {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    distanceUnit,
     updatedAt: serverTimestamp(),
   });
 }
@@ -1017,8 +1027,11 @@ export async function addHikingRoute(uid: string, route: {
   startLabel?: string; endLabel?: string;
 }) {
   if (!db) throw new Error('Firebase not initialized');
+  // Firestore doesn't support nested arrays (GeoJSON coordinates); serialize geometry as JSON string
   const docRef = await addDoc(collection(db, 'users', uid, 'hikingRoutes'), {
-    ...route, createdAt: serverTimestamp(),
+    ...route,
+    geometry: JSON.stringify(route.geometry),
+    createdAt: serverTimestamp(),
   });
   return docRef.id;
 }
@@ -1054,8 +1067,10 @@ export async function shareHikingRoute(uid: string, displayName: string, routeId
 }) {
   if (!db) throw new Error('Firebase not initialized');
   // Use same id in public collection so we can match them
+  // Serialize geometry (GeoJSON nested arrays not supported by Firestore)
   await setDoc(doc(db, 'publicHikingRoutes', routeId), {
     ...route,
+    geometry: JSON.stringify(route.geometry),
     sharedBy: { uid, displayName },
     sharedAt: serverTimestamp(),
   });
@@ -1094,7 +1109,10 @@ if (firebaseEnabled) {
     },
     subscribe: (callback) => {
       if (!auth?.currentUser) return () => {};
-      return subscribeToHikingRoutes(auth.currentUser.uid, callback);
+      return subscribeToHikingRoutes(auth.currentUser.uid, (routes) => {
+        callback(routes);
+        window.dispatchEvent(new Event(WindowEvents.HIKING_ROUTES_CHANGED));
+      });
     },
     share: (routeId, route) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
@@ -1106,7 +1124,10 @@ if (firebaseEnabled) {
       return unshareHikingRoute(auth.currentUser.uid, routeId);
     },
     getAllPublic: () => getPublicHikingRoutes(),
-    subscribePublic: subscribeToPublicHikingRoutes,
+    subscribePublic: (callback) => subscribeToPublicHikingRoutes((routes) => {
+      callback(routes);
+      window.dispatchEvent(new Event(WindowEvents.HIKING_ROUTES_CHANGED));
+    }),
   };
 }
 

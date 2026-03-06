@@ -188,6 +188,7 @@ const zh: Record<TranslationKey, string> = {
   'auth.signOut': '\u9000\u51fa',
   'settings.exportData': '\u5bfc\u51fa\u6570\u636e',
   'settings.importData': '\u5bfc\u5165\u6570\u636e',
+  'settings.units': '\u5355\u4f4d',
   'theme.dark': '\u6df1\u8272\u6a21\u5f0f',
   'theme.light': '\u6d45\u8272\u6a21\u5f0f',
   'auth.signUp': '\u6ce8\u518c',
