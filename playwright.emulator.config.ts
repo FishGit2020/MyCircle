@@ -7,10 +7,10 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e/emulator',
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
-  workers: 1, // Serial — emulator state is shared
+  workers: process.env.CI ? 2 : 1,
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:5000',

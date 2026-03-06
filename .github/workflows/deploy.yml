@@ -98,11 +98,23 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Cache Playwright browsers
+        id: pw-cache-smoke
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright Chromium
+        if: steps.pw-cache-smoke.outputs.cache-hit != 'true'
         run: npx playwright install chromium --with-deps
 
+      - name: Install Playwright system deps (cache hit)
+        if: steps.pw-cache-smoke.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
       - name: Wait for CDN propagation
-        run: sleep 30
+        run: sleep 15
 
       - name: Health check
         run: |

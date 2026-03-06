@@ -1,9 +1,5 @@
-import { test, expect } from './fixtures';
+import { test, expect, FIRESTORE_URL, PROJECT_ID, ADMIN_HEADERS } from './fixtures';
 import { APIRequestContext } from '@playwright/test';
-
-const FIRESTORE_URL = 'http://localhost:8080';
-const PROJECT_ID = 'mycircle-dash';
-const ADMIN_HEADERS = { Authorization: 'Bearer owner' };
 
 async function seedAnnouncement(request: APIRequestContext, data: Record<string, any>) {
   await request.post(
@@ -22,16 +18,8 @@ async function seedAnnouncement(request: APIRequestContext, data: Record<string,
   );
 }
 
-async function clearFirestoreData(request: APIRequestContext) {
-  await request.delete(
-    `${FIRESTORE_URL}/emulator/v1/projects/${PROJECT_ID}/databases/(default)/documents`,
-  );
-}
-
 test.describe('Announcements — Firestore Emulator', () => {
-  test.beforeEach(async ({ request }) => {
-    await clearFirestoreData(request);
-  });
+  test.use({ clearFirestore: undefined as any });
 
   test('/whats-new page loads', async ({ page }) => {
     await page.goto('/whats-new');

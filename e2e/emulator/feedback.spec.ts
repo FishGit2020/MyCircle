@@ -1,17 +1,8 @@
-import { test, expect } from './fixtures';
+import { test, expect, FIRESTORE_URL, PROJECT_ID, ADMIN_HEADERS } from './fixtures';
 import { APIRequestContext } from '@playwright/test';
 
-const FIRESTORE_URL = 'http://localhost:8080';
 const AUTH_URL = 'http://localhost:9099';
-const PROJECT_ID = 'mycircle-dash';
 
-// "Bearer owner" is a magic token recognised by the Firestore emulator that
-// bypasses security rules — needed because our feedback rules only allow create.
-const ADMIN_HEADERS = { Authorization: 'Bearer owner' };
-
-/**
- * Read all feedback documents from the Firestore emulator REST API.
- */
 async function getFirestoreFeedback(request: APIRequestContext) {
   const res = await request.get(
     `${FIRESTORE_URL}/v1/projects/${PROJECT_ID}/databases/(default)/documents/feedback`,
@@ -21,17 +12,16 @@ async function getFirestoreFeedback(request: APIRequestContext) {
   return body.documents ?? [];
 }
 
-/**
- * Delete all feedback documents for test isolation.
- */
 async function clearFirestoreFeedback(request: APIRequestContext) {
-  // Use the emulator's bulk-clear endpoint (skips rules entirely)
   await request.delete(
     `${FIRESTORE_URL}/emulator/v1/projects/${PROJECT_ID}/databases/(default)/documents`,
   );
 }
 
 test.describe('Feedback → Firestore Emulator', () => {
+  // Feedback tests mutate shared Firestore state — run serially within this file
+  test.describe.configure({ mode: 'serial' });
+
   test('anonymous feedback reaches Firestore', async ({ page, request }) => {
     await clearFirestoreFeedback(request);
 
