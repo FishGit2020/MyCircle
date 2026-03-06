@@ -68,7 +68,7 @@ export default function EdgeOverlay({ imageData, initialCorners, onConfirm, onRe
     // Draw corner handles
     corners.forEach((corner, i) => {
       ctx.beginPath();
-      ctx.arc(corner.x, corner.y, 12, 0, Math.PI * 2);
+      ctx.arc(corner.x, corner.y, 18, 0, Math.PI * 2);
       ctx.fillStyle = i === activeCorner ? '#2563eb' : '#3b82f6';
       ctx.fill();
       ctx.strokeStyle = '#fff';
@@ -77,7 +77,8 @@ export default function EdgeOverlay({ imageData, initialCorners, onConfirm, onRe
     });
   }, [imageData, corners, activeCorner]);
 
-  // Track canvas rect for pointer calculations
+  // Track canvas rect for pointer calculations — refresh on every render
+  // so it stays accurate after scroll/resize/layout shifts
   const updateCanvasRect = useCallback(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -89,19 +90,31 @@ export default function EdgeOverlay({ imageData, initialCorners, onConfirm, onRe
   useEffect(() => {
     updateCanvasRect();
     window.addEventListener('resize', updateCanvasRect);
-    return () => window.removeEventListener('resize', updateCanvasRect);
+    window.addEventListener('scroll', updateCanvasRect, true);
+    return () => {
+      window.removeEventListener('resize', updateCanvasRect);
+      window.removeEventListener('scroll', updateCanvasRect, true);
+    };
   }, [updateCanvasRect]);
+
+  // Refresh rect when image loads (canvas resizes)
+  useEffect(() => {
+    updateCanvasRect();
+  }, [imageData, updateCanvasRect]);
 
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-gray-600 dark:text-gray-400">{t('docScanner.adjustCorners')}</p>
 
-      <div ref={containerRef} className="relative w-full max-w-lg touch-none">
+      <div
+        ref={containerRef}
+        className="relative w-full max-w-lg touch-none"
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      >
         <canvas
           ref={canvasRef}
           className="w-full rounded-lg"
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
           data-testid="edge-overlay-canvas"
         />
 
@@ -113,12 +126,14 @@ export default function EdgeOverlay({ imageData, initialCorners, onConfirm, onRe
           return (
             <div
               key={i}
-              className="absolute w-11 h-11 -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing"
+              className="absolute w-14 h-14 -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing"
               style={{
                 left: `${corner.x * scaleX}px`,
                 top: `${corner.y * scaleY}px`,
               }}
               onPointerDown={(e) => handlePointerDown(e, i)}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
               data-testid={`corner-handle-${i}`}
             />
           );
