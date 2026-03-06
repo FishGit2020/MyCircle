@@ -1,0 +1,34 @@
+import { JSONScalar } from './shared.js';
+import { createWeatherQueryResolvers } from './weather.js';
+import { createStockQueryResolvers } from './stocks.js';
+import { createCryptoQueryResolvers } from './crypto.js';
+import { createPodcastQueryResolvers } from './podcasts.js';
+import { createBibleQueryResolvers } from './bible.js';
+import { createImmigrationQueryResolvers } from './immigration.js';
+import { createAiMutationResolvers, createAiQueryResolvers } from './ai.js';
+
+// Resolver factory — identical signature and shape to the original resolvers.ts
+export function createResolvers(
+  getApiKey: () => string,
+  getFinnhubKey?: () => string,
+  getPodcastKeys?: () => { apiKey: string; apiSecret: string },
+  getYouVersionKey?: () => string,
+) {
+  return {
+    JSON: JSONScalar,
+
+    Mutation: {
+      ...createAiMutationResolvers(getApiKey, getFinnhubKey, getPodcastKeys, getYouVersionKey),
+    },
+
+    Query: {
+      ...createAiQueryResolvers(),
+      ...createWeatherQueryResolvers(getApiKey),
+      ...createCryptoQueryResolvers(),
+      ...createStockQueryResolvers(getFinnhubKey),
+      ...createPodcastQueryResolvers(getPodcastKeys),
+      ...createBibleQueryResolvers(getYouVersionKey),
+      ...createImmigrationQueryResolvers(),
+    },
+  };
+}
