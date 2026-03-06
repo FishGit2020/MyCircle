@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation, PageContent } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 import MapView from './MapView';
@@ -18,23 +18,54 @@ function lngLatToString([lng, lat]: [number, number]) {
   return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 }
 
+/** Draw or update a circle source+layer on the map. Replaces HTML Marker for reliability. */
+function setPointLayer(
+  map: maplibregl.Map,
+  sourceId: string,
+  layerId: string,
+  coords: [number, number] | null,
+  color: string
+) {
+  if (map.getLayer(layerId)) map.removeLayer(layerId);
+  if (map.getSource(sourceId)) map.removeSource(sourceId);
+  if (!coords) return;
+  map.addSource(sourceId, {
+    type: 'geojson',
+    data: { type: 'Feature', geometry: { type: 'Point', coordinates: coords }, properties: {} },
+  });
+  map.addLayer({
+    id: layerId,
+    type: 'circle',
+    source: sourceId,
+    paint: {
+      'circle-radius': 9,
+      'circle-color': color,
+      'circle-stroke-width': 2.5,
+      'circle-stroke-color': '#ffffff',
+    },
+  });
+}
+
 export default function HikingMap() {
   const { t } = useTranslation();
   const [map, setMap] = useState<maplibregl.Map | null>(null);
   const [styleId, setStyleId] = useState(MAP_CONFIG.tileProviders[0].id);
   const [mapStyle, setMapStyle] = useState<string | Record<string, unknown>>(MAP_CONFIG.tileProviders[0].style);
+  // Incremented on every style.load so circle-layer effects re-run after style switch
+  const [styleVersion, setStyleVersion] = useState(0);
 
   // Waypoints set by clicking the map
   const [startCoords, setStartCoords] = useState<[number, number] | null>(null);
   const [endCoords, setEndCoords] = useState<[number, number] | null>(null);
-  const startMarkerRef = useRef<maplibregl.Marker | null>(null);
-  const endMarkerRef = useRef<maplibregl.Marker | null>(null);
+
+  // My location dot (shown after GPS locate)
+  const [myLocation, setMyLocation] = useState<[number, number] | null>(null);
 
   // Current planned route (shared between RoutePlanner, SavedRoutes)
   const [currentRoute, setCurrentRoute] = useState<RouteResult | null>(null);
   const [currentStartLabel, setCurrentStartLabel] = useState('');
   const [currentEndLabel, setCurrentEndLabel] = useState('');
-  // Route loaded from saved routes (bypasses RoutePlanner)
+  // Route loaded from saved routes (bypasses RoutePlanner line)
   const [loadedRouteGeometry, setLoadedRouteGeometry] = useState<GeoJSON.Geometry | null>(null);
 
   // Auto-locate user when map first loads
@@ -42,38 +73,36 @@ export default function HikingMap() {
     if (!map || !navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 13, duration: 1500 });
+        const lngLat: [number, number] = [pos.coords.longitude, pos.coords.latitude];
+        map.flyTo({ center: lngLat, zoom: 13, duration: 1500 });
+        setMyLocation(lngLat);
       },
       () => {}, // silent — keep default center if denied
       { enableHighAccuracy: false, timeout: 8000 }
     );
   }, [map]);
 
-  // Sync start marker on map
+  // Draw start waypoint circle on GL canvas (re-runs after style change)
   useEffect(() => {
     if (!map) return;
-    startMarkerRef.current?.remove();
-    startMarkerRef.current = null;
-    if (!startCoords) return;
-    import('maplibre-gl').then(({ default: mgl }) => {
-      startMarkerRef.current = new mgl.Marker({ color: '#22c55e' })
-        .setLngLat(startCoords)
-        .addTo(map);
-    });
-  }, [map, startCoords]);
+    setPointLayer(map, 'wp-start', 'wp-start-circle', startCoords, '#22c55e');
+  }, [map, startCoords, styleVersion]);
 
-  // Sync end marker on map
+  // Draw end waypoint circle on GL canvas (re-runs after style change)
   useEffect(() => {
     if (!map) return;
-    endMarkerRef.current?.remove();
-    endMarkerRef.current = null;
-    if (!endCoords) return;
-    import('maplibre-gl').then(({ default: mgl }) => {
-      endMarkerRef.current = new mgl.Marker({ color: '#ef4444' })
-        .setLngLat(endCoords)
-        .addTo(map);
-    });
-  }, [map, endCoords]);
+    setPointLayer(map, 'wp-end', 'wp-end-circle', endCoords, '#ef4444');
+  }, [map, endCoords, styleVersion]);
+
+  // Draw "my location" blue dot (re-runs after style change)
+  useEffect(() => {
+    if (!map) return;
+    setPointLayer(map, 'my-loc', 'my-loc-circle', myLocation, '#3b82f6');
+  }, [map, myLocation, styleVersion]);
+
+  const handleStyleLoad = useCallback(() => {
+    setStyleVersion((v) => v + 1);
+  }, []);
 
   const handleStyleChange = (id: string, style: string | Record<string, unknown>) => {
     setStyleId(id);
@@ -97,25 +126,45 @@ export default function HikingMap() {
     setEndCoords(null);
   };
 
+  const handleLocate = useCallback((lngLat: [number, number]) => {
+    setMyLocation(lngLat);
+  }, []);
+
   const handleRouteChange = useCallback((route: RouteResult | null, start: string, end: string) => {
     setCurrentRoute(route);
     setCurrentStartLabel(start);
     setCurrentEndLabel(end);
-    setLoadedRouteGeometry(null); // RoutePlanner controls the line
+    setLoadedRouteGeometry(null);
   }, []);
 
   const handleLoadSavedRoute = useCallback((saved: SavedRoute) => {
     setLoadedRouteGeometry(saved.geometry);
     setCurrentRoute({ geometry: saved.geometry, distance: saved.distance, duration: saved.duration });
-  }, []);
+    // Fit the map viewport to the loaded route
+    if (map && saved.geometry.type === 'LineString') {
+      const coords = (saved.geometry as GeoJSON.LineString).coordinates as [number, number][];
+      if (coords.length >= 2) {
+        const lngs = coords.map(([lng]) => lng);
+        const lats = coords.map(([, lat]) => lat);
+        map.fitBounds(
+          [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+          { padding: 60, maxZoom: 15, duration: 800 }
+        );
+      }
+    }
+  }, [map]);
 
   const handleSaveMap = () => {
     if (!map) return;
-    const canvas = map.getCanvas();
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.download = 'hiking-map.png';
-    link.click();
+    // triggerRepaint forces a WebGL frame; capture after idle to ensure buffer is populated
+    map.once('idle', () => {
+      const canvas = map.getCanvas();
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'hiking-map.png';
+      link.click();
+    });
+    map.triggerRepaint();
   };
 
   return (
@@ -143,7 +192,7 @@ export default function HikingMap() {
       <div className="flex flex-col md:flex-row gap-4 h-[calc(100vh-13rem)]">
         {/* Map */}
         <div className="relative flex-1 min-h-[55vh] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-          <MapView style={mapStyle} onMapReady={setMap} onMapClick={handleMapClick} />
+          <MapView style={mapStyle} onMapReady={setMap} onMapClick={handleMapClick} onStyleLoad={handleStyleLoad} />
 
           {/* Tap-to-set hint when no waypoints set */}
           {map && !startCoords && (
@@ -161,7 +210,7 @@ export default function HikingMap() {
 
           {/* GPS button — bottom right */}
           <div className="absolute bottom-4 right-4 z-10">
-            <GpsLocateButton map={map} />
+            <GpsLocateButton map={map} onLocate={handleLocate} />
           </div>
 
           {/* Style switcher — top left */}
@@ -173,7 +222,7 @@ export default function HikingMap() {
             />
           </div>
 
-          {/* Waypoint badge — top right when waypoints are active */}
+          {/* Waypoint badge — shows tap state */}
           {startCoords && (
             <div className="absolute top-4 right-16 z-10 flex items-center gap-1 bg-white dark:bg-gray-800 rounded-full px-3 py-1 shadow text-xs font-medium text-gray-700 dark:text-gray-300">
               <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
@@ -188,7 +237,7 @@ export default function HikingMap() {
 
         {/* Sidebar */}
         <div className="md:w-72 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
-          {/* Loaded saved route overlay (when not using RoutePlanner line) */}
+          {/* Loaded saved route overlay */}
           {loadedRouteGeometry && <RouteDisplay map={map} geometry={loadedRouteGeometry} />}
 
           <RoutePlanner

@@ -6,6 +6,7 @@ interface Props {
   style: string | Record<string, unknown>;
   onMapReady: (map: maplibregl.Map) => void;
   onMapClick?: (lngLat: [number, number]) => void;
+  onStyleLoad?: () => void;
 }
 
 /** Parse tile z/x/y from a raster tile URL like .../tiles/10/327/704.png */
@@ -15,11 +16,13 @@ function parseTileCoords(url: string): { z: number; x: number; y: number } | nul
   return { z: parseInt(match[1]), x: parseInt(match[2]), y: parseInt(match[3]) };
 }
 
-export default function MapView({ style, onMapReady, onMapClick }: Props) {
+export default function MapView({ style, onMapReady, onMapClick, onStyleLoad }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const onMapClickRef = useRef(onMapClick);
+  const onStyleLoadRef = useRef(onStyleLoad);
   onMapClickRef.current = onMapClick;
+  onStyleLoadRef.current = onStyleLoad;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -48,6 +51,10 @@ export default function MapView({ style, onMapReady, onMapClick }: Props) {
       map.on('load', () => {
         mapRef.current = map;
         onMapReady(map);
+      });
+
+      map.on('style.load', () => {
+        onStyleLoadRef.current?.();
       });
 
       map.on('click', (e) => {

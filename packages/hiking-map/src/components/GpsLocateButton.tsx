@@ -6,9 +6,11 @@ type State = 'idle' | 'locating' | 'error';
 
 interface Props {
   map: maplibregl.Map | null;
+  /** Called with [lng, lat] when location is successfully found. */
+  onLocate?: (lngLat: [number, number]) => void;
 }
 
-export default function GpsLocateButton({ map }: Props) {
+export default function GpsLocateButton({ map, onLocate }: Props) {
   const { t } = useTranslation();
   const [state, setState] = useState<State>('idle');
 
@@ -17,7 +19,9 @@ export default function GpsLocateButton({ map }: Props) {
     setState('locating');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 14 });
+        const lngLat: [number, number] = [pos.coords.longitude, pos.coords.latitude];
+        map.flyTo({ center: lngLat, zoom: 14 });
+        onLocate?.(lngLat);
         setState('idle');
       },
       () => setState('error'),
