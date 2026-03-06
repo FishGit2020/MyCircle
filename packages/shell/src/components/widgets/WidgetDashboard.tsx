@@ -1209,6 +1209,41 @@ const DocScannerWidget = React.memo(function DocScannerWidget() {
 
 const HikingMapWidget = React.memo(function HikingMapWidget() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const [myCount, setMyCount] = React.useState<number | null>(null);
+  const [publicCount, setPublicCount] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    let unsubMy: (() => void) | undefined;
+    let unsubPublic: (() => void) | undefined;
+
+    function subscribe() {
+      const hr = (window as any).__hikingRoutes;
+      if (!hr) return;
+      // Personal routes (only when signed in)
+      if (user && hr.subscribe) {
+        unsubMy = hr.subscribe((routes: any[]) => setMyCount(routes.length));
+      } else {
+        setMyCount(null);
+      }
+      // Public routes (always visible)
+      if (hr.subscribePublic) {
+        unsubPublic = hr.subscribePublic((routes: any[]) => setPublicCount(routes.length));
+      }
+    }
+
+    subscribe();
+    const handler = () => { unsubMy?.(); unsubPublic?.(); subscribe(); };
+    window.addEventListener(WindowEvents.HIKING_ROUTES_CHANGED, handler);
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    return () => {
+      unsubMy?.();
+      unsubPublic?.();
+      window.removeEventListener(WindowEvents.HIKING_ROUTES_CHANGED, handler);
+      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    };
+  }, [user]);
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
@@ -1221,6 +1256,24 @@ const HikingMapWidget = React.memo(function HikingMapWidget() {
           <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.hikingMap')}</h4>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.hikingMapDesc')}</p>
         </div>
+      </div>
+      <div className="flex gap-3 mt-1">
+        {user && myCount !== null && (
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">
+              {t('hiking.myRoutes')}: <span className="font-semibold text-gray-800 dark:text-gray-200">{myCount}</span>
+            </span>
+          </div>
+        )}
+        {publicCount !== null && (
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-400" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">
+              {t('hiking.communityRoutes')}: <span className="font-semibold text-gray-800 dark:text-gray-200">{publicCount}</span>
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

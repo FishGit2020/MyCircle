@@ -14,6 +14,8 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
   isNativePlatform: () => false,
+  useUnits: () => ({ tempUnit: 'C', speedUnit: 'ms', distanceUnit: 'km', setTempUnit: vi.fn(), setSpeedUnit: vi.fn(), setDistanceUnit: vi.fn() }),
+  StorageKeys: { TEMP_UNIT: 'tempUnit', SPEED_UNIT: 'speedUnit', DISTANCE_UNIT: 'distanceUnit' },
 }));
 
 let mockUser: any = null;
@@ -30,6 +32,9 @@ vi.mock('../../context/AuthContext', () => ({
     resetPassword: mockResetPassword,
     signOut: mockSignOut,
     updateDarkMode: vi.fn(),
+    updateTempUnit: vi.fn(),
+    updateSpeedUnit: vi.fn(),
+    updateDistanceUnit: vi.fn(),
     knownAccounts: mockKnownAccounts,
     switchToAccount: mockSwitchToAccount,
     removeKnownAccount: mockRemoveKnownAccount,

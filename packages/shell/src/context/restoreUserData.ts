@@ -34,6 +34,10 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     localStorage.setItem(StorageKeys.SPEED_UNIT, profile.speedUnit);
     window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
   }
+  if (profile.distanceUnit) {
+    localStorage.setItem(StorageKeys.DISTANCE_UNIT, profile.distanceUnit);
+    window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
+  }
 
   // Restore stock watchlist
   if (profile.stockWatchlist && profile.stockWatchlist.length > 0) {
