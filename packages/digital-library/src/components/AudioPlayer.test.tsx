@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import AudioPlayer from './AudioPlayer';
 
 // Capture the AudioSource passed to the global player
@@ -9,7 +9,14 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   StorageKeys: { BOOK_AUDIO_PROGRESS: 'bp', BOOK_NOW_PLAYING: 'bnp', BOOK_LAST_PLAYED: 'blp' },
   WindowEvents: { BOOK_LAST_PLAYED_CHANGED: 'blpc' },
-  MFEvents: { AUDIO_PLAY: 'mf:audio-play', AUDIO_TOGGLE_PLAY: 'mf:audio-toggle-play' },
+  MFEvents: {
+    AUDIO_PLAY: 'mf:audio-play',
+    AUDIO_TOGGLE_PLAY: 'mf:audio-toggle-play',
+    AUDIO_PLAYBACK_STATE: 'mf:audio-playback-state',
+    AUDIO_SEEK: 'mf:audio-seek',
+    AUDIO_CHANGE_SPEED: 'mf:audio-change-speed',
+    AUDIO_SET_SLEEP_TIMER: 'mf:audio-set-sleep-timer',
+  },
   eventBus: {
     publish: vi.fn((_event: string, source?: any) => {
       if (source?.navigateTo) capturedSource = source;
@@ -25,7 +32,7 @@ const chapters = [
 ];
 
 describe('AudioPlayer', () => {
-  it('builds navigateTo with bookId and query params', () => {
+  it('builds navigateTo with bookId and query params', async () => {
     render(
       <AudioPlayer
         chapters={chapters}
@@ -36,14 +43,15 @@ describe('AudioPlayer', () => {
     );
 
     // Click play to trigger buildAudioSource
-    const playButton = screen.getByRole('button', { name: /library\.play/i });
-    playButton.click();
+    await act(async () => {
+      screen.getByRole('button', { name: 'library.play' }).click();
+    });
 
     expect(capturedSource).toBeTruthy();
     expect(capturedSource.navigateTo).toBe('/library/abc-123?tab=listen&autoPlay=1');
   });
 
-  it('falls back to /library when bookId is missing', () => {
+  it('falls back to /library when bookId is missing', async () => {
     capturedSource = null;
     render(
       <AudioPlayer
@@ -52,8 +60,9 @@ describe('AudioPlayer', () => {
       />,
     );
 
-    const playButton = screen.getByRole('button', { name: /library\.play/i });
-    playButton.click();
+    await act(async () => {
+      screen.getByRole('button', { name: 'library.play' }).click();
+    });
 
     expect(capturedSource).toBeTruthy();
     expect(capturedSource.navigateTo).toBe('/library');
