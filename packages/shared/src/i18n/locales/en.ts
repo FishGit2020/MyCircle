@@ -1916,6 +1916,7 @@ const en = {
   'hiking.downloadComplete': 'Download complete',
   'hiking.downloadError': 'Download failed',
   'hiking.clearCache': 'Clear Cache',
+  'hiking.synced': 'synced',
   'hiking.myRoutes': 'My Routes',
   'hiking.communityRoutes': 'Community Routes',
   'hiking.noCommunityRoutes': 'No routes shared yet',

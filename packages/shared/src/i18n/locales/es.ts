@@ -1918,6 +1918,7 @@ const es: Record<TranslationKey, string> = {
   'hiking.downloadComplete': 'Descarga completa',
   'hiking.downloadError': 'Error en la descarga',
   'hiking.clearCache': 'Limpiar cach\u00e9',
+  'hiking.synced': 'sincronizado',
   'hiking.myRoutes': 'Mis Rutas',
   'hiking.communityRoutes': 'Rutas de la Comunidad',
   'hiking.noCommunityRoutes': 'A\u00fan no hay rutas compartidas',
