@@ -17,8 +17,10 @@ test.describe('Child Development', () => {
   });
 
   test('shows Get Started button in setup view', async ({ page }) => {
+    // Extend test timeout: MFE + RequireAuth async token check can take >10s in CI
+    test.setTimeout(25_000);
     await expect(
       page.getByRole('button', { name: /get started|comenzar|开始/i })
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: 20_000 });
   });
 });
