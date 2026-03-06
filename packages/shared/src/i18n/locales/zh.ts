@@ -1918,6 +1918,10 @@ const zh: Record<TranslationKey, string> = {
   'hiking.downloadComplete': '\u4e0b\u8f7d\u5b8c\u6210',
   'hiking.downloadError': '\u4e0b\u8f7d\u5931\u8d25',
   'hiking.clearCache': '\u6e05\u9664\u7f13\u5b58',
+  'hiking.synced': '\u5df2\u540c\u6b65',
+  'hiking.save': '\u4fdd\u5b58',
+  'hiking.renameRoute': '\u91cd\u547d\u540d\u8def\u7ebf',
+  'hiking.routeNamePlaceholder': '\u8def\u7ebf\u540d\u79f0...',
 };
 
 export default zh;

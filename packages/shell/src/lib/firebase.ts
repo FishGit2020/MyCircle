@@ -1003,6 +1003,76 @@ if (firebaseEnabled) {
   };
 }
 
+// Hiking Routes — user-scoped subcollection
+export async function getHikingRoutes(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function addHikingRoute(uid: string, route: {
+  name: string;
+  distance: number;
+  duration: number;
+  geometry: object;
+  startLabel?: string;
+  endLabel?: string;
+}) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'users', uid, 'hikingRoutes'), {
+    ...route,
+    createdAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateHikingRoute(uid: string, routeId: string, updates: { name?: string }) {
+  if (!db) throw new Error('Firebase not initialized');
+  await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteHikingRoute(uid: string, routeId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'users', uid, 'hikingRoutes', routeId));
+}
+
+export function subscribeToHikingRoutes(uid: string, callback: (routes: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, (error) => {
+    log.warn('Hiking routes snapshot error:', error);
+  });
+}
+
+// Expose hiking routes API for MFEs
+if (firebaseEnabled) {
+  window.__hikingRoutes = {
+    getAll: () => auth?.currentUser ? getHikingRoutes(auth.currentUser.uid) : Promise.resolve([]),
+    add: (route) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addHikingRoute(auth.currentUser.uid, route);
+    },
+    update: (id, updates) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateHikingRoute(auth.currentUser.uid, id, updates);
+    },
+    delete: (id) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteHikingRoute(auth.currentUser.uid, id);
+    },
+    subscribe: (callback) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToHikingRoutes(auth.currentUser.uid, callback);
+    },
+  };
+}
+
 // Immigration Tracker — user-scoped subcollection
 export async function getImmigrationCases(uid: string) {
   if (!db) return [];

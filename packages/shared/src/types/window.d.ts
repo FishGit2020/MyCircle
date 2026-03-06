@@ -73,6 +73,15 @@ declare global {
       subscribe?: (callback: (entries: any[]) => void) => () => void;
     };
 
+    /* ── Hiking Routes ─────────────────────────────────────── */
+    __hikingRoutes?: {
+      getAll: () => Promise<any[]>;
+      add: (route: { name: string; distance: number; duration: number; geometry: object; startLabel?: string; endLabel?: string }) => Promise<string>;
+      update: (id: string, updates: { name?: string }) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (routes: any[]) => void) => () => void;
+    };
+
     /* ── Immigration Tracker ───────────────────────────────── */
     __immigrationTracker?: {
       getAll: () => Promise<any[]>;

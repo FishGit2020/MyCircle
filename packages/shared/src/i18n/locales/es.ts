@@ -1918,6 +1918,10 @@ const es: Record<TranslationKey, string> = {
   'hiking.downloadComplete': 'Descarga completa',
   'hiking.downloadError': 'Error en la descarga',
   'hiking.clearCache': 'Limpiar cach\u00e9',
+  'hiking.synced': 'sincronizado',
+  'hiking.save': 'Guardar',
+  'hiking.renameRoute': 'Renombrar ruta',
+  'hiking.routeNamePlaceholder': 'Nombre de la ruta...',
 };
 
 export default es;
