@@ -228,21 +228,34 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
   const goToChapter = useCallback((index: number) => {
     if (!renditionRef.current || !chapters[index]) return;
-    // Use epubjs spine section by index — most reliable navigation method
+    // Try multiple strategies to navigate to the chapter:
+    // 1. Spine section href (epubjs internal)
+    // 2. Spine index as number (epubjs accepts numeric spine position)
+    // 3. Firestore chapter href (from epub2 backend)
     const book = bookRef.current;
     const section = book?.spine?.get?.(index);
-    if (section?.href) {
-      renditionRef.current.display(section.href).catch((err: any) => {
-        logger.error('Failed to navigate via spine section', err);
-      });
-    } else {
-      // Fallback: try Firestore chapter href
-      renditionRef.current.display(chapters[index].href).catch((err: any) => {
-        logger.error('Failed to navigate via chapter href', err);
-      });
-    }
-    setCurrentChapter(index);
-    setTocOpen(false);
+    const target = section?.href || index;
+    renditionRef.current.display(target).then(() => {
+      setCurrentChapter(index);
+      setTocOpen(false);
+    }).catch(() => {
+      // Spine-based navigation failed, try chapter href from Firestore
+      const chapterHref = chapters[index].href;
+      if (chapterHref) {
+        renditionRef.current!.display(chapterHref).then(() => {
+          setCurrentChapter(index);
+          setTocOpen(false);
+        }).catch((err: any) => {
+          logger.error('All chapter navigation methods failed', { index, target, chapterHref, err });
+          // Still update UI even if display fails
+          setCurrentChapter(index);
+          setTocOpen(false);
+        });
+      } else {
+        setCurrentChapter(index);
+        setTocOpen(false);
+      }
+    });
   }, [chapters]);
 
   const goNext = useCallback(() => {
