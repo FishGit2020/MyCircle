@@ -136,17 +136,8 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         if (cancelled) return;
         setLoading(false);
 
-        // Build spine mapping for TOC navigation using epubjs loaded spine
-        try {
-          const spine = await book.loaded.spine;
-          const items = spine?.spineItems || spine?.items || (Array.isArray(spine) ? spine : []);
-          if (items.length > 0) {
-            spineItemsRef.current = items.map((item: any, idx: number) => ({
-              href: item.href,
-              index: idx,
-            }));
-          }
-        } catch { /* ignore */ }
+        // Wait for spine to be ready (needed for goToChapter)
+        try { await book.loaded.spine; } catch { /* ignore */ }
 
         // Extract text for TTS + page info
         rendition.on('relocated', async (location: any) => {
@@ -237,20 +228,19 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
   const goToChapter = useCallback((index: number) => {
     if (!renditionRef.current || !chapters[index]) return;
-    const chapterHref = chapters[index].href;
-    const hrefBase = chapterHref.split('#')[0];
-    // Try spine item match by href, then partial match, then use chapter href directly
-    const spineItem = spineItemsRef.current.find(
-      (item: any) => item.href === chapterHref || item.href === hrefBase
-        || item.href.endsWith('/' + hrefBase) || hrefBase.endsWith('/' + item.href)
-    );
-    // Also try epubjs section lookup by index as fallback
+    // Use epubjs spine section by index — most reliable navigation method
     const book = bookRef.current;
     const section = book?.spine?.get?.(index);
-    const href = spineItem?.href || section?.href || chapterHref;
-    renditionRef.current.display(href).catch((err: any) => {
-      logger.error('Failed to navigate to chapter', err);
-    });
+    if (section?.href) {
+      renditionRef.current.display(section.href).catch((err: any) => {
+        logger.error('Failed to navigate via spine section', err);
+      });
+    } else {
+      // Fallback: try Firestore chapter href
+      renditionRef.current.display(chapters[index].href).catch((err: any) => {
+        logger.error('Failed to navigate via chapter href', err);
+      });
+    }
     setCurrentChapter(index);
     setTocOpen(false);
   }, [chapters]);
