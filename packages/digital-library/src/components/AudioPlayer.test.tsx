@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import AudioPlayer from './AudioPlayer';
 
 // Capture the AudioSource passed to the global player
@@ -32,7 +32,7 @@ const chapters = [
 ];
 
 describe('AudioPlayer', () => {
-  it('builds navigateTo with bookId and query params', async () => {
+  it('builds navigateTo with bookId and query params', () => {
     render(
       <AudioPlayer
         chapters={chapters}
@@ -42,16 +42,14 @@ describe('AudioPlayer', () => {
       />,
     );
 
-    // Click play to trigger buildAudioSource
-    await act(async () => {
-      screen.getByRole('button', { name: 'library.play' }).click();
-    });
+    // Click play to trigger buildAudioSource → eventBus.publish
+    fireEvent.click(screen.getByRole('button', { name: 'library.play' }));
 
     expect(capturedSource).toBeTruthy();
     expect(capturedSource.navigateTo).toBe('/library/abc-123?tab=listen&autoPlay=1');
   });
 
-  it('falls back to /library when bookId is missing', async () => {
+  it('falls back to /library when bookId is missing', () => {
     capturedSource = null;
     render(
       <AudioPlayer
@@ -60,9 +58,7 @@ describe('AudioPlayer', () => {
       />,
     );
 
-    await act(async () => {
-      screen.getByRole('button', { name: 'library.play' }).click();
-    });
+    fireEvent.click(screen.getByRole('button', { name: 'library.play' }));
 
     expect(capturedSource).toBeTruthy();
     expect(capturedSource.navigateTo).toBe('/library');
