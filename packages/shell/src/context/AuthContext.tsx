@@ -10,30 +10,9 @@ import {
   resetPassword as firebaseResetPassword,
   logOut,
   getUserProfile,
-  updateUserDarkMode,
-  updateUserLocale,
-  updateUserTempUnit,
-  updateUserSpeedUnit,
-  addRecentCity,
-  removeRecentCity,
-  clearRecentCities,
-  getRecentCities,
-  toggleFavoriteCity,
   updateStockWatchlist,
   updatePodcastSubscriptions,
   updateUserBabyDueDate,
-  updateUserBottomNavOrder,
-  updateBibleBookmarks,
-  updateWorshipFavorites,
-  updateChildData,
-  updateWidgetLayout,
-  updateBookBookmarks,
-  updateBookAudioProgress,
-  updateBookLastPlayed,
-  getDailyLogEntries,
-  getUserFiles,
-  getWorshipSongs,
-  getBenchmarkSummary,
   identifyUser,
   clearUserIdentity,
   logEvent,
@@ -44,6 +23,10 @@ import {
   KnownAccount,
 } from '../lib/firebase';
 import { useKnownAccounts } from '../hooks/useKnownAccounts';
+import { useFirestoreSync } from '../hooks/useFirestoreSync';
+import { useCityManager } from '../hooks/useCityManager';
+import { usePreferences } from '../hooks/usePreferences';
+import { restoreUserData } from './restoreUserData';
 
 const logger = createLogger('AuthContext');
 
@@ -116,9 +99,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [recentCities, setRecentCities] = useState<RecentCity[]>([]);
-  const [favoriteCities, setFavoriteCities] = useState<FavoriteCity[]>([]);
-  const { accounts: knownAccounts, addOrUpdate, remove: removeKnownAccount, getOthers } = useKnownAccounts();
+  const { accounts: knownAccounts, addOrUpdate, remove: removeKnownAccount } = useKnownAccounts();
+
+  const cityManager = useCityManager(user);
+  const preferences = usePreferences(user, setProfile);
+  useFirestoreSync(user);
 
   const refreshProfile = async () => {
     if (user) {
@@ -126,8 +111,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfile(userProfile);
       window.__isAdmin = userProfile?.isAdmin ?? false;
       if (userProfile) {
-        setRecentCities(userProfile.recentCities || []);
-        setFavoriteCities(userProfile.favoriteCities || []);
+        cityManager.setRecentCities(userProfile.recentCities || []);
+        cityManager.setFavoriteCities(userProfile.favoriteCities || []);
       }
     }
   };
@@ -136,191 +121,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = subscribeToAuthChanges(async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        // Track this account in the known accounts list
         addOrUpdate(firebaseUser);
 
-        // Link analytics sessions to this authenticated user
         const method = firebaseUser.providerData[0]?.providerId === 'password' ? 'email' : 'google';
-        identifyUser(firebaseUser.uid, {
-          sign_in_method: method,
-        });
+        identifyUser(firebaseUser.uid, { sign_in_method: method });
         logEvent('login', { method });
 
-        // Clear previous user's data before restoring from Firestore
         clearUserSpecificStorage();
 
         const userProfile = await getUserProfile(firebaseUser.uid);
         setProfile(userProfile);
         window.__isAdmin = userProfile?.isAdmin ?? false;
         if (userProfile) {
-          setRecentCities(userProfile.recentCities || []);
-          setFavoriteCities(userProfile.favoriteCities || []);
-
-          // Restore saved preferences to localStorage so shared hooks pick them up
-          if (userProfile.tempUnit) {
-            localStorage.setItem(StorageKeys.TEMP_UNIT, userProfile.tempUnit);
-            window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
-          }
-          if (userProfile.speedUnit) {
-            localStorage.setItem(StorageKeys.SPEED_UNIT, userProfile.speedUnit);
-            window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
-          }
-
-          // Restore stock watchlist
-          if (userProfile.stockWatchlist && userProfile.stockWatchlist.length > 0) {
-            localStorage.setItem(StorageKeys.STOCK_WATCHLIST, JSON.stringify(userProfile.stockWatchlist));
-            window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
-          }
-
-          // Restore podcast subscriptions
-          if (userProfile.podcastSubscriptions && userProfile.podcastSubscriptions.length > 0) {
-            localStorage.setItem(StorageKeys.PODCAST_SUBSCRIPTIONS, JSON.stringify(userProfile.podcastSubscriptions));
-            window.dispatchEvent(new Event(WindowEvents.SUBSCRIPTIONS_CHANGED));
-          }
-
-          // Restore baby due date
-          if (userProfile.babyDueDate) {
-            localStorage.setItem(StorageKeys.BABY_DUE_DATE, userProfile.babyDueDate);
-            window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
-          }
-
-          // Restore bottom nav order
-          if (userProfile.bottomNavOrder && userProfile.bottomNavOrder.length > 0) {
-            localStorage.setItem(StorageKeys.BOTTOM_NAV_ORDER, JSON.stringify(userProfile.bottomNavOrder));
-            window.dispatchEvent(new Event(WindowEvents.BOTTOM_NAV_ORDER_CHANGED));
-          }
-
-
-          // Restore Bible bookmarks
-          if (userProfile.bibleBookmarks && userProfile.bibleBookmarks.length > 0) {
-            localStorage.setItem(StorageKeys.BIBLE_BOOKMARKS, JSON.stringify(userProfile.bibleBookmarks));
-            window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
-          }
-
-          // Restore worship favorites
-          if (userProfile.worshipFavorites && userProfile.worshipFavorites.length > 0) {
-            localStorage.setItem(StorageKeys.WORSHIP_FAVORITES, JSON.stringify(userProfile.worshipFavorites));
-            window.dispatchEvent(new Event(WindowEvents.WORSHIP_FAVORITES_CHANGED));
-          }
-
-          // Restore last-played podcast for cross-device resume
-          if (userProfile.lastPlayed?.episode) {
-            const lp = userProfile.lastPlayed;
-            localStorage.setItem(StorageKeys.PODCAST_LAST_PLAYED, JSON.stringify(lp));
-            localStorage.setItem(StorageKeys.PODCAST_NOW_PLAYING, JSON.stringify({
-              episode: lp.episode,
-              podcast: lp.podcast,
-            }));
-            // Merge position into progress map (take the further position)
-            try {
-              const progressRaw = localStorage.getItem(StorageKeys.PODCAST_PROGRESS);
-              const progress: Record<string, { position: number; duration: number }> = progressRaw ? JSON.parse(progressRaw) : {};
-              const key = String(lp.episode.id);
-              const existing = progress[key];
-              if (!existing || lp.position > existing.position) {
-                progress[key] = { position: lp.position, duration: existing?.duration || 0 };
-                localStorage.setItem(StorageKeys.PODCAST_PROGRESS, JSON.stringify(progress));
-              }
-            } catch { /* ignore */ }
-            window.dispatchEvent(new Event(WindowEvents.LAST_PLAYED_CHANGED));
-          }
-
-          // Restore podcast played episodes
-          if (userProfile.podcastPlayedEpisodes && userProfile.podcastPlayedEpisodes.length > 0) {
-            // Merge with existing local played episodes
-            try {
-              const localRaw = localStorage.getItem(StorageKeys.PODCAST_PLAYED_EPISODES);
-              const local: string[] = localRaw ? JSON.parse(localRaw) : [];
-              const merged = [...new Set([...local, ...userProfile.podcastPlayedEpisodes])];
-              localStorage.setItem(StorageKeys.PODCAST_PLAYED_EPISODES, JSON.stringify(merged));
-            } catch {
-              localStorage.setItem(StorageKeys.PODCAST_PLAYED_EPISODES, JSON.stringify(userProfile.podcastPlayedEpisodes));
-            }
-            window.dispatchEvent(new Event(WindowEvents.PODCAST_PLAYED_CHANGED));
-          }
-
-          // Restore Child Development data
-          if (userProfile.childName) {
-            localStorage.setItem(StorageKeys.CHILD_NAME, userProfile.childName);
-          }
-          if (userProfile.childBirthDate) {
-            // Firestore may have a plain date (new) or btoa-encoded date (legacy).
-            // Normalise to plain first, then encode for localStorage.
-            let plainDate = userProfile.childBirthDate;
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(plainDate)) {
-              try { plainDate = atob(plainDate); } catch { /* use as-is */ }
-            }
-            // btoa() is safe for date strings (pure ASCII); no fallback needed
-            localStorage.setItem(StorageKeys.CHILD_BIRTH_DATE, btoa(plainDate));
-          }
-          if (userProfile.childName || userProfile.childBirthDate) {
-            window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
-          }
-
-          // Restore widget layout from Firestore only if local is empty
-          const hasLocalLayout = !!localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
-          if (!hasLocalLayout && userProfile.widgetLayout && userProfile.widgetLayout.length > 0) {
-            const withSizes = userProfile.widgetLayout.map((w: any) => ({
-              ...w,
-              size: w.size || 'medium',
-            }));
-            localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(withSizes));
-            window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
-          }
-
-          // Restore book bookmarks
-          if (userProfile.bookBookmarks && userProfile.bookBookmarks.length > 0) {
-            localStorage.setItem(StorageKeys.BOOK_BOOKMARKS, JSON.stringify(userProfile.bookBookmarks));
-            window.dispatchEvent(new Event(WindowEvents.BOOK_BOOKMARKS_CHANGED));
-          }
-
-          // Restore book audio progress
-          if (userProfile.bookAudioProgress) {
-            localStorage.setItem(StorageKeys.BOOK_AUDIO_PROGRESS, JSON.stringify(userProfile.bookAudioProgress));
-          }
-
-          // Restore last-played book for cross-device resume
-          if (userProfile.bookLastPlayed?.bookId) {
-            localStorage.setItem(StorageKeys.BOOK_LAST_PLAYED, JSON.stringify(userProfile.bookLastPlayed));
-            window.dispatchEvent(new Event(WindowEvents.BOOK_LAST_PLAYED_CHANGED));
-          }
-
-          window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-
-          // Restore subcollection data for dashboard widgets (non-blocking)
-          const uid = firebaseUser.uid;
-          getDailyLogEntries(uid).then(entries => {
-            if (entries.length > 0) {
-              localStorage.setItem(StorageKeys.DAILY_LOG_CACHE, JSON.stringify(entries));
-            }
-            window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
-          }).catch(() => {});
-          getUserFiles(uid).then(files => {
-            if (files.length > 0) {
-              localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(files));
-            }
-            window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
-          }).catch(() => {});
-          getWorshipSongs().then(songs => {
-            if (songs.length > 0) {
-              localStorage.setItem(StorageKeys.WORSHIP_SONGS_CACHE, JSON.stringify(songs));
-            }
-            window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-          }).catch(() => {});
-          getBenchmarkSummary(uid).then(summary => {
-            if (summary) {
-              localStorage.setItem(StorageKeys.BENCHMARK_CACHE, JSON.stringify(summary));
-            }
-            window.dispatchEvent(new Event(WindowEvents.BENCHMARK_CHANGED));
-          }).catch(() => {});
+          const { recentCities, favoriteCities } = restoreUserData(userProfile, firebaseUser.uid);
+          cityManager.setRecentCities(recentCities);
+          cityManager.setFavoriteCities(favoriteCities);
         }
-        // Notify all MFE hooks that auth state changed (sign-in)
         window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
       } else {
         clearUserIdentity();
         setProfile(null);
-        setRecentCities([]);
-        setFavoriteCities([]);
+        cityManager.setRecentCities([]);
+        cityManager.setFavoriteCities([]);
         window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
       }
       setLoading(false);
@@ -371,12 +193,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearUserSpecificStorage();
       window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
 
-      // Clear Apollo GraphQL cache to prevent stale queries from previous user
       await getApolloClient().clearStore();
 
       setProfile(null);
-      setRecentCities([]);
-      setFavoriteCities([]);
+      cityManager.setRecentCities([]);
+      cityManager.setFavoriteCities([]);
     } catch (error) {
       logger.error('Sign out failed:', error);
       throw error;
@@ -390,72 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!password) throw new Error('Password required for email accounts');
       await firebaseSignInWithEmail(account.email!, password);
     }
-    // onAuthStateChanged will handle clearing old data + restoring new profile
   };
-
-  const updateDarkMode = async (darkMode: boolean) => {
-    if (user) {
-      await updateUserDarkMode(user.uid, darkMode);
-      setProfile((prev) => (prev ? { ...prev, darkMode } : null));
-    }
-  };
-
-  const updateLocale = useCallback(async (locale: string) => {
-    if (user) {
-      await updateUserLocale(user.uid, locale);
-      setProfile((prev) => (prev ? { ...prev, locale } : null));
-    }
-  }, [user]);
-
-  const updateTempUnit = useCallback(async (tempUnit: 'C' | 'F') => {
-    if (user) {
-      await updateUserTempUnit(user.uid, tempUnit);
-      setProfile((prev) => (prev ? { ...prev, tempUnit } : null));
-    }
-  }, [user]);
-
-  const updateSpeedUnit = useCallback(async (speedUnit: 'ms' | 'mph' | 'kmh') => {
-    if (user) {
-      await updateUserSpeedUnit(user.uid, speedUnit);
-      setProfile((prev) => (prev ? { ...prev, speedUnit } : null));
-    }
-  }, [user]);
-
-  const addCity = useCallback(async (city: Omit<RecentCity, 'searchedAt'>) => {
-    if (user) {
-      await addRecentCity(user.uid, city);
-      const cities = await getRecentCities(user.uid);
-      setRecentCities(cities);
-    }
-    logEvent('city_searched', { city_name: city.name, city_country: city.country });
-  }, [user]);
-
-  const removeCity = useCallback(async (cityId: string) => {
-    if (user) {
-      await removeRecentCity(user.uid, cityId);
-      const cities = await getRecentCities(user.uid);
-      setRecentCities(cities);
-    }
-  }, [user]);
-
-  const clearCities = useCallback(async () => {
-    if (user) {
-      await clearRecentCities(user.uid);
-      setRecentCities([]);
-    }
-  }, [user]);
-
-  const toggleFavorite = useCallback(async (city: FavoriteCity): Promise<boolean> => {
-    if (user) {
-      const isNowFavorite = await toggleFavoriteCity(user.uid, city);
-      const updatedProfile = await getUserProfile(user.uid);
-      if (updatedProfile) {
-        setFavoriteCities(updatedProfile.favoriteCities || []);
-      }
-      return isNowFavorite;
-    }
-    return false;
-  }, [user]);
 
   const syncStockWatchlist = useCallback(async (watchlist: WatchlistItem[]) => {
     if (user) {
@@ -475,143 +231,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // Auto-sync baby due date changes from localStorage to Firestore
-  useEffect(() => {
-    function handleBabyDueDateChanged() {
-      const date = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
-      if (user) {
-        updateUserBabyDueDate(user.uid, date);
-      }
-    }
-    window.addEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleBabyDueDateChanged);
-    return () => window.removeEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleBabyDueDateChanged);
-  }, [user]);
-
-  // Auto-sync bottom nav order changes from localStorage to Firestore
-  useEffect(() => {
-    function handleBottomNavOrderChanged() {
-      const stored = localStorage.getItem(StorageKeys.BOTTOM_NAV_ORDER);
-      if (user) {
-        try {
-          const order = stored ? JSON.parse(stored) : null;
-          updateUserBottomNavOrder(user.uid, order);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-    window.addEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
-    return () => window.removeEventListener(WindowEvents.BOTTOM_NAV_ORDER_CHANGED, handleBottomNavOrderChanged);
-  }, [user]);
-
-  // Auto-sync Bible bookmarks from localStorage to Firestore
-  useEffect(() => {
-    function handleBibleBookmarksChanged() {
-      if (user) {
-        try {
-          const stored = localStorage.getItem(StorageKeys.BIBLE_BOOKMARKS);
-          const bookmarks = stored ? JSON.parse(stored) : [];
-          updateBibleBookmarks(user.uid, bookmarks);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-    window.addEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, handleBibleBookmarksChanged);
-    return () => window.removeEventListener(WindowEvents.BIBLE_BOOKMARKS_CHANGED, handleBibleBookmarksChanged);
-  }, [user]);
-
-  // Auto-sync worship favorites from localStorage to Firestore
-  useEffect(() => {
-    function handleWorshipFavoritesChanged() {
-      if (user) {
-        try {
-          const stored = localStorage.getItem(StorageKeys.WORSHIP_FAVORITES);
-          const favorites = stored ? JSON.parse(stored) : [];
-          updateWorshipFavorites(user.uid, favorites);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-    window.addEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, handleWorshipFavoritesChanged);
-    return () => window.removeEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, handleWorshipFavoritesChanged);
-  }, [user]);
-
-  // Auto-sync child development data from localStorage to Firestore
-  useEffect(() => {
-    function handleChildDataChanged() {
-      if (user) {
-        const childName = localStorage.getItem(StorageKeys.CHILD_NAME);
-        const rawBirthDate = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
-        // Decode before uploading — localStorage stores btoa-encoded dates,
-        // but Firestore should have plain dates so the restore path can encode once.
-        let childBirthDate: string | null = null;
-        if (rawBirthDate) {
-          try { childBirthDate = atob(rawBirthDate); } catch { childBirthDate = rawBirthDate; }
-        }
-        updateChildData(user.uid, { childName, childBirthDate });
-      }
-    }
-    window.addEventListener(WindowEvents.CHILD_DATA_CHANGED, handleChildDataChanged);
-    return () => window.removeEventListener(WindowEvents.CHILD_DATA_CHANGED, handleChildDataChanged);
-  }, [user]);
-
-  // Auto-sync widget layout from localStorage to Firestore
-  useEffect(() => {
-    function handleWidgetLayoutChanged() {
-      if (user) {
-        try {
-          const stored = localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
-          const layout = stored ? JSON.parse(stored) : null;
-          updateWidgetLayout(user.uid, layout);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-    window.addEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
-    return () => window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
-  }, [user]);
-
-  // Auto-sync book bookmarks from localStorage to Firestore
-  useEffect(() => {
-    function handleBookBookmarksChanged() {
-      if (user) {
-        try {
-          const stored = localStorage.getItem(StorageKeys.BOOK_BOOKMARKS);
-          const bookmarks = stored ? JSON.parse(stored) : [];
-          updateBookBookmarks(user.uid, bookmarks);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-    window.addEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, handleBookBookmarksChanged);
-    return () => window.removeEventListener(WindowEvents.BOOK_BOOKMARKS_CHANGED, handleBookBookmarksChanged);
-  }, [user]);
-
-  // Auto-sync book audio progress from localStorage to Firestore
-  useEffect(() => {
-    function handleBookAudioProgressChanged() {
-      if (user) {
-        try {
-          const stored = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
-          const progress = stored ? JSON.parse(stored) : null;
-          updateBookAudioProgress(user.uid, progress);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-    // Listen for storage changes from the audio player (custom event)
-    window.addEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
-    return () => window.removeEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
-  }, [user]);
-
-  // Auto-sync book last-played from localStorage to Firestore
-  useEffect(() => {
-    function handleBookLastPlayedChanged() {
-      if (user) {
-        try {
-          const stored = localStorage.getItem(StorageKeys.BOOK_LAST_PLAYED);
-          const data = stored ? JSON.parse(stored) : null;
-          updateBookLastPlayed(user.uid, data);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-    window.addEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleBookLastPlayedChanged);
-    return () => window.removeEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleBookLastPlayedChanged);
-  }, [user]);
-
   return (
     <AuthContext.Provider
       value={{
@@ -623,19 +242,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUpWithEmail: signUpWithEmailFn,
         resetPassword: resetPasswordFn,
         signOut: signOutUser,
-        updateDarkMode,
-        updateLocale,
-        updateTempUnit,
-        updateSpeedUnit,
-        addCity,
-        removeCity,
-        clearCities,
-        toggleFavorite,
+        updateDarkMode: preferences.updateDarkMode,
+        updateLocale: preferences.updateLocale,
+        updateTempUnit: preferences.updateTempUnit,
+        updateSpeedUnit: preferences.updateSpeedUnit,
+        addCity: cityManager.addCity,
+        removeCity: cityManager.removeCity,
+        clearCities: cityManager.clearCities,
+        toggleFavorite: cityManager.toggleFavorite,
         syncStockWatchlist,
         syncPodcastSubscriptions,
         syncBabyDueDate,
-        recentCities,
-        favoriteCities,
+        recentCities: cityManager.recentCities,
+        favoriteCities: cityManager.favoriteCities,
         refreshProfile,
         knownAccounts,
         switchToAccount,
