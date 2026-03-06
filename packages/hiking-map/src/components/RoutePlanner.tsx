@@ -41,9 +41,11 @@ interface Props {
   externalEnd?: string;
   /** Called when user clears the route (also clears map markers) */
   onClearWaypoints?: () => void;
+  /** Called whenever the planned route changes (or clears to null). */
+  onRouteChange?: (route: RouteResult | null, start: string, end: string) => void;
 }
 
-export default function RoutePlanner({ map, routingConfig, externalStart, externalEnd, onClearWaypoints }: Props) {
+export default function RoutePlanner({ map, routingConfig, externalStart, externalEnd, onClearWaypoints, onRouteChange }: Props) {
   const { t } = useTranslation();
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
@@ -86,6 +88,7 @@ export default function RoutePlanner({ map, routingConfig, externalStart, extern
       const provider = createRoutingProvider(routingConfig);
       const result = await provider.getRoute(startCoords, endCoords);
       setRoute(result);
+      onRouteChange?.(result, start, end);
       // Fit map to route bounds
       const coords = result.geometry.coordinates as [number, number][];
       if (coords.length > 1) {
@@ -113,6 +116,7 @@ export default function RoutePlanner({ map, routingConfig, externalStart, extern
     setStart('');
     setEnd('');
     onClearWaypoints?.();
+    onRouteChange?.(null, '', '');
   };
 
   return (

@@ -1899,6 +1899,22 @@ const en = {
   'hiking.zoomIn': 'Zoom in',
   'hiking.zoomOut': 'Zoom out',
   'hiking.saveMap': 'Save Map',
+  'hiking.savedRoutes': 'Saved Routes',
+  'hiking.saveCurrentRoute': 'Save Current Route',
+  'hiking.saving': 'Saving...',
+  'hiking.noSavedRoutes': 'No saved routes yet',
+  'hiking.loadRoute': 'Load route',
+  'hiking.deleteRoute': 'Delete route',
+  'hiking.route': 'Route',
+  'hiking.offlineTitle': 'Offline Maps',
+  'hiking.offlineHint': 'Download the current map view for offline use',
+  'hiking.cachedTiles': '{count} tiles cached',
+  'hiking.tilesDownloaded': 'tiles downloaded',
+  'hiking.downloadViewport': 'Download Viewport',
+  'hiking.cancelDownload': 'Cancel',
+  'hiking.downloadComplete': 'Download complete',
+  'hiking.downloadError': 'Download failed',
+  'hiking.clearCache': 'Clear Cache',
 } as const;
 
 export default en;

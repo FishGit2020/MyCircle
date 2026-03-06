@@ -1901,6 +1901,22 @@ const es: Record<TranslationKey, string> = {
   'hiking.zoomIn': 'Acercar',
   'hiking.zoomOut': 'Alejar',
   'hiking.saveMap': 'Guardar mapa',
+  'hiking.savedRoutes': 'Rutas guardadas',
+  'hiking.saveCurrentRoute': 'Guardar ruta actual',
+  'hiking.saving': 'Guardando...',
+  'hiking.noSavedRoutes': 'A\u00fan no hay rutas guardadas',
+  'hiking.loadRoute': 'Cargar ruta',
+  'hiking.deleteRoute': 'Eliminar ruta',
+  'hiking.route': 'Ruta',
+  'hiking.offlineTitle': 'Mapas sin conexi\u00f3n',
+  'hiking.offlineHint': 'Descarga la vista actual para usar sin conexi\u00f3n',
+  'hiking.cachedTiles': '{count} mosaicos en cach\u00e9',
+  'hiking.tilesDownloaded': 'mosaicos descargados',
+  'hiking.downloadViewport': 'Descargar vista',
+  'hiking.cancelDownload': 'Cancelar',
+  'hiking.downloadComplete': 'Descarga completa',
+  'hiking.downloadError': 'Error en la descarga',
+  'hiking.clearCache': 'Limpiar cach\u00e9',
 };
 
 export default es;

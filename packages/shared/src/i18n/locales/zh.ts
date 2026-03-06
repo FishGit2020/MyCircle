@@ -1901,6 +1901,22 @@ const zh: Record<TranslationKey, string> = {
   'hiking.zoomIn': '放大',
   'hiking.zoomOut': '缩小',
   'hiking.saveMap': '保存地图',
+  'hiking.savedRoutes': '\u5df2\u4fdd\u5b58\u8def\u7ebf',
+  'hiking.saveCurrentRoute': '\u4fdd\u5b58\u5f53\u524d\u8def\u7ebf',
+  'hiking.saving': '\u4fdd\u5b58\u4e2d...',
+  'hiking.noSavedRoutes': '\u6682\u65e0\u5df2\u4fdd\u5b58\u7684\u8def\u7ebf',
+  'hiking.loadRoute': '\u52a0\u8f7d\u8def\u7ebf',
+  'hiking.deleteRoute': '\u5220\u9664\u8def\u7ebf',
+  'hiking.route': '\u8def\u7ebf',
+  'hiking.offlineTitle': '\u79bb\u7ebf\u5730\u56fe',
+  'hiking.offlineHint': '\u4e0b\u8f7d\u5f53\u524d\u5730\u56fe\u89c6\u56fe\u4ee5\u4f9b\u79bb\u7ebf\u4f7f\u7528',
+  'hiking.cachedTiles': '\u5df2\u7f13\u5b58 {count} \u5f20\u74e6\u7247',
+  'hiking.tilesDownloaded': '\u5f20\u74e6\u7247\u5df2\u4e0b\u8f7d',
+  'hiking.downloadViewport': '\u4e0b\u8f7d\u5f53\u524d\u89c6\u56fe',
+  'hiking.cancelDownload': '\u53d6\u6d88',
+  'hiking.downloadComplete': '\u4e0b\u8f7d\u5b8c\u6210',
+  'hiking.downloadError': '\u4e0b\u8f7d\u5931\u8d25',
+  'hiking.clearCache': '\u6e05\u9664\u7f13\u5b58',
 };
 
 export default zh;

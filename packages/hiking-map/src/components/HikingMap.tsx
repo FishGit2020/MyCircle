@@ -6,6 +6,11 @@ import GpsLocateButton from './GpsLocateButton';
 import MapStyleSwitcher from './MapStyleSwitcher';
 import RoutePlanner from './RoutePlanner';
 import ZoomControls from './ZoomControls';
+import SavedRoutes from './SavedRoutes';
+import OfflineTileManager from './OfflineTileManager';
+import RouteDisplay from './RouteDisplay';
+import type { RouteResult } from '../providers/RoutingProvider';
+import type { SavedRoute } from '../services/routeStorageService';
 import { MAP_CONFIG } from '../config/mapConfig';
 
 /** Format [lng, lat] as "lat, lng" string for route planner inputs. */
@@ -24,6 +29,13 @@ export default function HikingMap() {
   const [endCoords, setEndCoords] = useState<[number, number] | null>(null);
   const startMarkerRef = useRef<maplibregl.Marker | null>(null);
   const endMarkerRef = useRef<maplibregl.Marker | null>(null);
+
+  // Current planned route (shared between RoutePlanner, SavedRoutes)
+  const [currentRoute, setCurrentRoute] = useState<RouteResult | null>(null);
+  const [currentStartLabel, setCurrentStartLabel] = useState('');
+  const [currentEndLabel, setCurrentEndLabel] = useState('');
+  // Route loaded from saved routes (bypasses RoutePlanner)
+  const [loadedRouteGeometry, setLoadedRouteGeometry] = useState<GeoJSON.Geometry | null>(null);
 
   // Auto-locate user when map first loads
   useEffect(() => {
@@ -84,6 +96,18 @@ export default function HikingMap() {
     setStartCoords(null);
     setEndCoords(null);
   };
+
+  const handleRouteChange = useCallback((route: RouteResult | null, start: string, end: string) => {
+    setCurrentRoute(route);
+    setCurrentStartLabel(start);
+    setCurrentEndLabel(end);
+    setLoadedRouteGeometry(null); // RoutePlanner controls the line
+  }, []);
+
+  const handleLoadSavedRoute = useCallback((saved: SavedRoute) => {
+    setLoadedRouteGeometry(saved.geometry);
+    setCurrentRoute({ geometry: saved.geometry, distance: saved.distance, duration: saved.duration });
+  }, []);
 
   const handleSaveMap = () => {
     if (!map) return;
@@ -164,13 +188,27 @@ export default function HikingMap() {
 
         {/* Sidebar */}
         <div className="md:w-72 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+          {/* Loaded saved route overlay (when not using RoutePlanner line) */}
+          {loadedRouteGeometry && <RouteDisplay map={map} geometry={loadedRouteGeometry} />}
+
           <RoutePlanner
             map={map}
             routingConfig={MAP_CONFIG.routing}
             externalStart={startCoords ? lngLatToString(startCoords) : undefined}
             externalEnd={endCoords ? lngLatToString(endCoords) : undefined}
             onClearWaypoints={handleClearWaypoints}
+            onRouteChange={handleRouteChange}
           />
+
+          <SavedRoutes
+            map={map}
+            currentRoute={currentRoute}
+            currentStart={currentStartLabel}
+            currentEnd={currentEndLabel}
+            onLoadRoute={handleLoadSavedRoute}
+          />
+
+          <OfflineTileManager map={map} />
         </div>
       </div>
     </PageContent>
