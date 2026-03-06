@@ -131,23 +131,11 @@ describe('Layout', () => {
     expect(screen.queryByRole('menuitem', { name: /Weather/i })).not.toBeInTheDocument();
   });
 
-  it('renders footer with OpenWeatherMap attribution', () => {
+  it('renders footer with privacy and terms links', () => {
     renderWithRouter(<Layout />);
 
-    expect(screen.getByText('OpenWeatherMap')).toBeInTheDocument();
-  });
-
-  it('renders footer with Finnhub and PodcastIndex attribution', () => {
-    renderWithRouter(<Layout />);
-
-    expect(screen.getByText('Finnhub')).toBeInTheDocument();
-    expect(screen.getByText('PodcastIndex')).toBeInTheDocument();
-  });
-
-  it('renders footer with tech stack info', () => {
-    renderWithRouter(<Layout />);
-
-    expect(screen.getByText(/Built with React, Vite, and Micro Frontend Architecture/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Privacy Policy/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Terms of Service/i })).toBeInTheDocument();
   });
 
   it('header logo links to home', () => {
@@ -156,14 +144,6 @@ describe('Layout', () => {
     // Mobile + desktop headers both have logo links
     const logoLinks = screen.getAllByRole('link', { name: /MyCircle|Home/i });
     expect(logoLinks.some(link => link.getAttribute('href') === '/')).toBe(true);
-  });
-
-  it('OpenWeatherMap link opens in new tab', () => {
-    renderWithRouter(<Layout />);
-
-    const owmLink = screen.getByRole('link', { name: 'OpenWeatherMap' });
-    expect(owmLink).toHaveAttribute('target', '_blank');
-    expect(owmLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders search buttons for both desktop and mobile', () => {

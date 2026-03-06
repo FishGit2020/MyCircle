@@ -7,6 +7,7 @@ const SECTIONS: { titleKey: TranslationKey; textKey: TranslationKey }[] = [
   { titleKey: 'privacy.useTitle', textKey: 'privacy.useText' },
   { titleKey: 'privacy.sharingTitle', textKey: 'privacy.sharingText' },
   { titleKey: 'privacy.securityTitle', textKey: 'privacy.securityText' },
+  { titleKey: 'privacy.dataProvidersTitle', textKey: 'privacy.dataProvidersText' },
   { titleKey: 'privacy.contactTitle', textKey: 'privacy.contactText' },
 ];
 
