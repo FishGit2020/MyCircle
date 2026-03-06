@@ -1813,6 +1813,8 @@ const es: Record<TranslationKey, string> = {
   'privacy.sharingText': 'No vendemos su informaci\u00f3n personal. Podemos compartir datos con proveedores de servicios que nos ayudan a operar nuestra aplicaci\u00f3n.',
   'privacy.securityTitle': 'Seguridad de Datos',
   'privacy.securityText': 'Implementamos medidas de seguridad est\u00e1ndar de la industria para proteger sus datos. Sin embargo, ning\u00fan m\u00e9todo es completamente seguro.',
+  'privacy.dataProvidersTitle': 'Proveedores de Datos de Terceros',
+  'privacy.dataProvidersText': 'MyCircle utiliza datos de los siguientes proveedores externos: OpenWeatherMap (datos meteorol\u00f3gicos), Finnhub (datos del mercado de valores), PodcastIndex (datos de podcasts) y YouVersion (contenido b\u00edblico). El uso de estos servicios est\u00e1 sujeto a sus respectivas pol\u00edticas de privacidad.',
   'privacy.contactTitle': 'Cont\u00e1ctenos',
   'privacy.contactText': 'Si tiene preguntas sobre esta Pol\u00edtica de Privacidad, cont\u00e1ctenos a trav\u00e9s de nuestro repositorio de GitHub.',
 

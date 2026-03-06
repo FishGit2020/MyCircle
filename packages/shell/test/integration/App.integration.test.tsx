@@ -113,7 +113,7 @@ describe('App Integration', () => {
     it('renders header and footer on all pages', () => {
       renderApp('/');
       expect(screen.getAllByText('MyCircle').length).toBeGreaterThan(0);
-      expect(screen.getByText('OpenWeatherMap')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /Privacy Policy/i })).toBeInTheDocument();
     });
   });
 });

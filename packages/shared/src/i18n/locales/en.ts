@@ -1811,6 +1811,8 @@ const en = {
   'privacy.sharingText': 'We do not sell your personal information. We may share data with third-party service providers that help us operate our application, subject to confidentiality agreements.',
   'privacy.securityTitle': 'Data Security',
   'privacy.securityText': 'We implement industry-standard security measures to protect your data. However, no method of electronic transmission or storage is completely secure.',
+  'privacy.dataProvidersTitle': 'Third-Party Data Providers',
+  'privacy.dataProvidersText': 'MyCircle uses data from the following third-party providers: OpenWeatherMap (weather data), Finnhub (stock market data), PodcastIndex (podcast data), and YouVersion (Bible content). Your use of these services is subject to their respective privacy policies.',
   'privacy.contactTitle': 'Contact Us',
   'privacy.contactText': 'If you have questions about this Privacy Policy, please contact us through our GitHub repository.',
 
