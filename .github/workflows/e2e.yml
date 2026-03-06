@@ -13,14 +13,14 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: e2e-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   # ── Shared setup: install + build once, cache for both test jobs ──────
   setup:
     runs-on: ubuntu-latest
+    # Cancel older setup runs for the same branch to save minutes
+    concurrency:
+      group: e2e-setup-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
@@ -62,6 +62,9 @@ jobs:
   e2e:
     needs: setup
     runs-on: ubuntu-latest
+    concurrency:
+      group: e2e-shard-${{ matrix.shard }}-${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
@@ -118,6 +121,9 @@ jobs:
   e2e-emulator:
     needs: setup
     runs-on: ubuntu-latest
+    concurrency:
+      group: e2e-emulator-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 
