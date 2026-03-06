@@ -360,6 +360,22 @@ export const manageTopicSubscription = onCall(
 
 // ─── Announcement Push Notifications ────────────────────────────
 
+/** Build the FCM message payload for an announcement. Exported for testing. */
+export function buildAnnouncementMessage(data: Record<string, unknown>) {
+  const title = (data.title as string) || 'New Announcement';
+  const body = (data.description as string) || '';
+  // icon field stores category tags ('feature','fix','improvement'), not URLs.
+  // Only use imageUrl if the field looks like a URL.
+  const rawIcon = (data.icon as string) || '';
+  const imageUrl = rawIcon.startsWith('http') ? rawIcon : undefined;
+
+  return {
+    topic: 'announcements' as const,
+    notification: { title, body, ...(imageUrl ? { imageUrl } : {}) },
+    webpush: { fcmOptions: { link: '/' } },
+  };
+}
+
 /**
  * Firestore trigger: sends a push notification to the 'announcements' topic
  * whenever a new announcement document is created.
@@ -373,26 +389,11 @@ export const onAnnouncementCreated = onDocumentCreated(
       return;
     }
 
-    const title = (data.title as string) || 'New Announcement';
-    const body = (data.description as string) || '';
-    // icon field stores category tags ('feature','fix','improvement'), not URLs.
-    // Only use imageUrl if the field looks like a URL.
-    const rawIcon = (data.icon as string) || '';
-    const imageUrl = rawIcon.startsWith('http') ? rawIcon : undefined;
-
     const messaging = getMessaging();
 
     try {
-      await messaging.send({
-        topic: 'announcements',
-        notification: { title, body, ...(imageUrl ? { imageUrl } : {}) },
-        webpush: {
-          fcmOptions: {
-            link: '/',
-          },
-        },
-      });
-      logger.info('Sent announcement push notification', { title });
+      await messaging.send(buildAnnouncementMessage(data));
+      logger.info('Sent announcement push notification', { title: data.title });
     } catch (err: any) {
       logger.error('Failed to send announcement notification', { error: err.message });
     }
