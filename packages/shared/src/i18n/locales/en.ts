@@ -1932,6 +1932,21 @@ const en = {
   'hiking.renameRoute': 'Rename route',
   'hiking.routeNamePlaceholder': 'Route name...',
   'hiking.save': 'Save',
+
+  // ─── Children (multi-child) ──────────────────────────────────
+  'children.addChild': 'Add Child',
+  'children.add': 'Add',
+  'children.editChild': 'Edit Child',
+  'children.deleteChild': 'Delete Child',
+  'children.deleteConfirm': 'Are you sure you want to remove {name}? This cannot be undone.',
+  'children.name': 'Name',
+  'children.namePlaceholder': 'Child\'s name',
+  'children.birthDate': 'Birth Date',
+  'children.dueDate': 'Due Date (optional)',
+  'children.save': 'Save',
+  'children.cancel': 'Cancel',
+  'children.noChildren': 'No children added yet.',
+  'children.switchChild': 'Switch child',
 } as const;
 
 export default en;

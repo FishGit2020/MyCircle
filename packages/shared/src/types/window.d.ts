@@ -116,6 +116,15 @@ declare global {
       delete: (stageId: number) => Promise<void>;
     };
 
+    /* ── Children (multi-child) ────────────────────────────── */
+    __children?: {
+      getAll: () => Promise<Array<import('./child').Child>>;
+      add: (child: Omit<import('./child').Child, 'id'>) => Promise<string>;
+      update: (id: string, updates: Partial<Omit<import('./child').Child, 'id'>>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (children: Array<import('./child').Child>) => void) => () => void;
+    };
+
     /* ── Family Games ──────────────────────────────────────── */
     __familyGames?: {
       getScores: (gameType: string) => Promise<any[]>;

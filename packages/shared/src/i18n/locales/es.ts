@@ -1934,6 +1934,21 @@ const es: Record<TranslationKey, string> = {
   'hiking.renameRoute': 'Renombrar ruta',
   'hiking.routeNamePlaceholder': 'Nombre de la ruta...',
   'hiking.save': 'Guardar',
+
+  // ─── Children (multi-child) ──────────────────────────────────
+  'children.addChild': 'Agregar hijo',
+  'children.add': 'Agregar',
+  'children.editChild': 'Editar hijo',
+  'children.deleteChild': 'Eliminar hijo',
+  'children.deleteConfirm': '\u00bfEst\u00e1s seguro de que deseas eliminar a {name}? Esta acci\u00f3n no se puede deshacer.',
+  'children.name': 'Nombre',
+  'children.namePlaceholder': 'Nombre del ni\u00f1o',
+  'children.birthDate': 'Fecha de nacimiento',
+  'children.dueDate': 'Fecha de parto (opcional)',
+  'children.save': 'Guardar',
+  'children.cancel': 'Cancelar',
+  'children.noChildren': 'A\u00fan no se han agregado hijos.',
+  'children.switchChild': 'Cambiar hijo',
 };
 
 export default es;

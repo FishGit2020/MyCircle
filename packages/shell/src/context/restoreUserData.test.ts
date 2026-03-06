@@ -21,6 +21,7 @@ vi.mock('@mycircle/shared', () => ({
     CLOUD_FILES_CHANGED: 'cloud-files-changed',
     WORSHIP_SONGS_CHANGED: 'worship-songs-changed',
     BENCHMARK_CHANGED: 'benchmark-changed',
+    CHILDREN_CHANGED: 'children-changed',
   },
   StorageKeys: {
     TEMP_UNIT: 'tempUnit',
@@ -45,6 +46,7 @@ vi.mock('@mycircle/shared', () => ({
     CLOUD_FILES_CACHE: 'cloud-files-cache',
     WORSHIP_SONGS_CACHE: 'worship-songs-cache',
     BENCHMARK_CACHE: 'benchmark-cache',
+    CHILDREN_CACHE: 'children-cache',
   },
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
 }));
@@ -53,12 +55,16 @@ const mockGetDailyLogEntries = vi.fn().mockResolvedValue([]);
 const mockGetUserFiles = vi.fn().mockResolvedValue([]);
 const mockGetWorshipSongs = vi.fn().mockResolvedValue([]);
 const mockGetBenchmarkSummary = vi.fn().mockResolvedValue(null);
+const mockMigrateToMultiChild = vi.fn().mockResolvedValue(undefined);
+const mockGetChildren = vi.fn().mockResolvedValue([]);
 
 vi.mock('../lib/firebase', () => ({
   getDailyLogEntries: (...args: unknown[]) => mockGetDailyLogEntries(...args),
   getUserFiles: (...args: unknown[]) => mockGetUserFiles(...args),
   getWorshipSongs: (...args: unknown[]) => mockGetWorshipSongs(...args),
   getBenchmarkSummary: (...args: unknown[]) => mockGetBenchmarkSummary(...args),
+  migrateToMultiChild: (...args: unknown[]) => mockMigrateToMultiChild(...args),
+  getChildren: (...args: unknown[]) => mockGetChildren(...args),
 }));
 
 const makeProfile = (overrides = {}) => ({

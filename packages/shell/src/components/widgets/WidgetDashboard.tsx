@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents, eventBus } from '@mycircle/shared';
-import type { Episode, Podcast } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, subscribeToMFEvent, MFEvents, eventBus, getAgeInMonths, getAgeRemainingDays } from '@mycircle/shared';
+import type { Episode, Podcast, Child } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
 import ErrorBoundary from '../common/ErrorBoundary';
 import { logEvent } from '../../lib/firebase';
@@ -627,48 +627,37 @@ function getStageLabel(months: number): string {
 
 const ChildDevWidget = React.memo(function ChildDevWidget() {
   const { t } = useTranslation();
-  const [childName, setChildName] = React.useState<string | null>(null);
-  const [ageMonths, setAgeMonths] = React.useState<number | null>(null);
-  const [ageDays, setAgeDays] = React.useState<number>(0);
+  const [children, setChildren] = React.useState<Child[]>([]);
 
   useEffect(() => {
-    function compute() {
+    function load() {
       try {
-        const name = localStorage.getItem(StorageKeys.CHILD_NAME);
-        const birthRaw = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
-        setChildName(name);
-        if (birthRaw) {
-          let birthStr: string;
-          try { birthStr = atob(birthRaw); } catch { birthStr = birthRaw; }
-          const birth = new Date(birthStr + 'T00:00:00');
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const months = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
-          const safeMonths = Math.max(0, months);
-          setAgeMonths(safeMonths);
-          // Calculate remaining days in the current month
-          const monthStart = new Date(birth);
-          monthStart.setMonth(monthStart.getMonth() + safeMonths);
-          const diffMs = today.getTime() - monthStart.getTime();
-          setAgeDays(Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24))));
+        const raw = localStorage.getItem(StorageKeys.CHILDREN_CACHE);
+        if (raw) {
+          const parsed: Child[] = JSON.parse(raw);
+          // Filter to 0-60 months (child-dev range)
+          setChildren(parsed.filter(c => {
+            const m = getAgeInMonths(c.birthDate);
+            return m >= 0 && m <= 60;
+          }));
         } else {
-          setAgeMonths(null);
-          setAgeDays(0);
+          setChildren([]);
         }
-      } catch { setChildName(null); setAgeMonths(null); setAgeDays(0); }
+      } catch { setChildren([]); }
     }
-    compute();
-    window.addEventListener('child-data-changed', compute);
-    return () => window.removeEventListener('child-data-changed', compute);
+    load();
+    window.addEventListener(WindowEvents.CHILDREN_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.CHILDREN_CHANGED, load);
   }, []);
 
-  const ageDisplay = ageMonths !== null
-    ? ageMonths >= 24
-      ? t('childDev.yearsMonthsOld' as any).replace('{years}', String(Math.floor(ageMonths / 12))).replace('{months}', String(ageMonths % 12)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '')
-      : t('childDev.monthsOld' as any).replace('{months}', String(ageMonths)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '')
-    : null;
-
-  const stageLabel = ageMonths !== null ? getStageLabel(ageMonths) : null;
+  function formatAge(child: Child): string {
+    const ageMonths = getAgeInMonths(child.birthDate);
+    const ageDays = getAgeRemainingDays(child.birthDate);
+    if (ageMonths >= 24) {
+      return t('childDev.yearsMonthsOld' as any).replace('{years}', String(Math.floor(ageMonths / 12))).replace('{months}', String(ageMonths % 12)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '');
+    }
+    return t('childDev.monthsOld' as any).replace('{months}', String(ageMonths)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '');
+  }
 
   return (
     <div>
@@ -683,16 +672,24 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.childDevDesc')}</p>
         </div>
       </div>
-      {childName && ageDisplay ? (
-        <div className="bg-teal-50/50 dark:bg-teal-900/10 rounded-lg p-2.5">
-          <p className="text-sm font-medium text-teal-700 dark:text-teal-300">
-            {childName} — {ageDisplay}
-          </p>
-          {stageLabel && (
-            <p className="text-xs text-teal-600 dark:text-teal-400 mt-1">
-              {stageLabel}
-            </p>
-          )}
+      {children.length > 0 ? (
+        <div className="space-y-1.5">
+          {children.map(child => {
+            const ageMonths = getAgeInMonths(child.birthDate);
+            const stageLabel = getStageLabel(ageMonths);
+            return (
+              <div key={child.id} className="bg-teal-50/50 dark:bg-teal-900/10 rounded-lg p-2.5">
+                <p className="text-sm font-medium text-teal-700 dark:text-teal-300">
+                  {child.name} — {formatAge(child)}
+                </p>
+                {stageLabel && (
+                  <p className="text-xs text-teal-600 dark:text-teal-400 mt-1">
+                    {stageLabel}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
       ) : (
         <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noChildData')}</p>

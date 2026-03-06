@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useVerseOfDay, parseVerseReference, PageContent } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useChildren, useVerseOfDay, parseVerseReference, PageContent, ChildSelector } from '@mycircle/shared';
+import type { Child } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
@@ -35,19 +36,40 @@ function HeartIcon({ className = 'w-5 h-5' }: { className?: string }) {
   );
 }
 
+/** Filter: children that have a dueDate, or are under 12 months old */
+function babyFilter(child: Child): boolean {
+  if (child.dueDate) return true;
+  const birth = new Date(child.birthDate + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const months = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
+  return months < 12;
+}
+
 export default function BabyTracker() {
   const { t } = useTranslation();
-  const [dueDate, setDueDate] = useState<string>('');
+  const { allChildren, selectedChild, selectedId, setSelectedId, addChild, updateChild } = useChildren();
+  const babyChildren = useMemo(() => allChildren.filter(babyFilter), [allChildren]);
+
+  // Fall back to legacy localStorage due date if no children
+  const [legacyDueDate, setLegacyDueDate] = useState<string>('');
   const [inputDate, setInputDate] = useState<string>('');
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
   const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
   const { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated, loading: photosLoading } = useBabyPhotos();
+  const [isAddingChild, setIsAddingChild] = useState(false);
+  const [inputName, setInputName] = useState('');
+  const [inputBirthDate, setInputBirthDate] = useState('');
 
-  // Load due date from localStorage on mount
+  // The effective selected baby (from multi-child or single)
+  const currentBaby = babyChildren.find(c => c.id === selectedId) ?? babyChildren[0] ?? null;
+  const dueDate = currentBaby?.dueDate || legacyDueDate;
+
+  // Load legacy due date from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
     if (stored) {
-      setDueDate(stored);
+      setLegacyDueDate(stored);
       setInputDate(stored);
     }
   }, []);
@@ -57,10 +79,10 @@ export default function BabyTracker() {
     function handleDueDateChanged() {
       const stored = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
       if (stored) {
-        setDueDate(stored);
+        setLegacyDueDate(stored);
         setInputDate(stored);
       } else {
-        setDueDate('');
+        setLegacyDueDate('');
         setInputDate('');
       }
     }
@@ -68,20 +90,45 @@ export default function BabyTracker() {
     return () => window.removeEventListener(WindowEvents.BABY_DUE_DATE_CHANGED, handleDueDateChanged);
   }, []);
 
-  const saveDueDate = useCallback(() => {
-    if (!inputDate) return;
-    localStorage.setItem(StorageKeys.BABY_DUE_DATE, inputDate);
-    setDueDate(inputDate);
-    window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
-    window.__logAnalyticsEvent?.('baby_due_date_save');
-  }, [inputDate]);
+  // Sync inputDate when switching children
+  useEffect(() => {
+    if (currentBaby?.dueDate) setInputDate(currentBaby.dueDate);
+  }, [currentBaby?.id, currentBaby?.dueDate]);
 
-  const clearDueDate = useCallback(() => {
-    localStorage.removeItem(StorageKeys.BABY_DUE_DATE);
-    setDueDate('');
-    setInputDate('');
-    window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
-  }, []);
+  const saveDueDate = useCallback(async () => {
+    if (!inputDate) return;
+    if (currentBaby) {
+      // Save to child's dueDate via bridge
+      await updateChild(currentBaby.id, { dueDate: inputDate });
+    } else {
+      // Legacy: save to localStorage
+      localStorage.setItem(StorageKeys.BABY_DUE_DATE, inputDate);
+      setLegacyDueDate(inputDate);
+      window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+    }
+    window.__logAnalyticsEvent?.('baby_due_date_save');
+  }, [inputDate, currentBaby, updateChild]);
+
+  const clearDueDate = useCallback(async () => {
+    if (currentBaby) {
+      await updateChild(currentBaby.id, { dueDate: undefined });
+    } else {
+      localStorage.removeItem(StorageKeys.BABY_DUE_DATE);
+      setLegacyDueDate('');
+      setInputDate('');
+      window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
+    }
+  }, [currentBaby, updateChild]);
+
+  const saveNewChild = useCallback(async () => {
+    if (!inputName.trim() || !inputBirthDate) return;
+    const child: Omit<Child, 'id'> = { name: inputName.trim(), birthDate: inputBirthDate };
+    await addChild(child);
+    setInputName('');
+    setInputBirthDate('');
+    setIsAddingChild(false);
+    window.__logAnalyticsEvent?.('baby_child_add');
+  }, [inputName, inputBirthDate, addChild]);
 
   // Computed pregnancy state
   const gestationalAge = useMemo(() => {
@@ -108,6 +155,66 @@ export default function BabyTracker() {
   const isNotPregnantYet = currentWeek !== null && currentWeek < 0;
   const isValidPregnancy = currentWeek !== null && currentWeek >= 1 && currentWeek <= 40;
 
+  // ─── Add Child Form ─────────────────────────────────────────────────────
+  if (isAddingChild) {
+    return (
+      <PageContent maxWidth="md">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2">
+            <HeartIcon className="w-6 h-6 text-pink-500" />
+            {t('children.addChild' as any)}
+          </h1>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="child-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('children.name' as any)}
+              </label>
+              <input
+                id="child-name"
+                type="text"
+                value={inputName}
+                onChange={e => setInputName(e.target.value)}
+                placeholder={t('children.namePlaceholder' as any)}
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition"
+              />
+            </div>
+            <div>
+              <label htmlFor="birth-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('children.birthDate' as any)}
+              </label>
+              <input
+                id="birth-date"
+                type="date"
+                value={inputBirthDate}
+                onChange={e => setInputBirthDate(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={saveNewChild}
+                disabled={!inputName.trim() || !inputBirthDate}
+                className="flex-1 py-2.5 px-4 bg-pink-500 hover:bg-pink-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
+              >
+                {t('children.save' as any)}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAddingChild(false)}
+                className="py-2.5 px-4 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-gray-500"
+              >
+                {t('children.cancel' as any)}
+              </button>
+            </div>
+          </div>
+        </div>
+      </PageContent>
+    );
+  }
+
   return (
     <PageContent maxWidth="2xl" className="space-y-6">
       {/* Header */}
@@ -118,6 +225,18 @@ export default function BabyTracker() {
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">{t('baby.subtitle')}</p>
       </div>
+
+      {/* Child Selector */}
+      {babyChildren.length > 0 && (
+        <div className="flex justify-center">
+          <ChildSelector
+            children={babyChildren}
+            selectedId={currentBaby?.id ?? null}
+            onSelect={setSelectedId}
+            onAdd={() => setIsAddingChild(true)}
+          />
+        </div>
+      )}
 
       {/* Verse Section */}
       <section className="bg-pink-50 dark:bg-pink-900/10 rounded-xl p-5 border border-pink-200 dark:border-pink-800">

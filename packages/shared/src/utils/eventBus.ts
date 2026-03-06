@@ -77,6 +77,7 @@ export const WindowEvents = {
   BREADCRUMB_DETAIL: 'breadcrumb-detail',
   FAMILY_GAMES_CHANGED: 'family-games-changed',
   HIKING_ROUTES_CHANGED: 'hiking-routes-changed',
+  CHILDREN_CHANGED: 'children-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -138,6 +139,8 @@ export const StorageKeys = {
   BOOK_NOW_PLAYING: 'book-now-playing',
   BOOK_LAST_PLAYED: 'book-last-played',
   FAMILY_GAMES_CACHE: 'family-games-cache',
+  CHILDREN_CACHE: 'children-cache',
+  SELECTED_CHILD_ID: 'selected-child-id',
 } as const;
 
 export interface CitySelectedEvent {
