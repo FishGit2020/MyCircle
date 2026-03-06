@@ -1868,6 +1868,31 @@ const es: Record<TranslationKey, string> = {
   'docScanner.scanAnother': 'Escanear otro',
   'docScanner.delete': 'Eliminar',
   'docScanner.deleteConfirm': 'Toca de nuevo para confirmar',
+
+  // Hiking Map
+  'commandPalette.goToHiking': 'Ir al mapa de senderismo',
+  'shortcuts.goHikingMap': 'Ir al mapa de senderismo',
+  'nav.hikingMap': 'Mapa de senderismo',
+  'nav.group.outdoor': 'Aire libre',
+  'widgets.hikingMap': 'Mapa de senderismo',
+  'widgets.hikingMapDesc': 'Explora senderos y planifica rutas',
+  'hiking.title': 'Mapa de senderismo',
+  'hiking.subtitle': 'Explora senderos y planifica tu ruta',
+  'hiking.locateMe': 'Ubicarme',
+  'hiking.locating': 'Ubicando...',
+  'hiking.locationError': 'No se pudo obtener la ubicaci\u00f3n',
+  'hiking.routePlanner': 'Planificador de rutas',
+  'hiking.startPoint': 'Punto de inicio (lat, lng)',
+  'hiking.endPoint': 'Punto de destino (lat, lng)',
+  'hiking.planRoute': 'Planificar ruta',
+  'hiking.planning': 'Planificando...',
+  'hiking.routeError': 'No se pudo encontrar una ruta',
+  'hiking.clearRoute': 'Borrar ruta',
+  'hiking.mapStyle': 'Estilo de mapa',
+  'hiking.styleStreet': 'Calles',
+  'hiking.styleTopo': 'Topogr\u00e1fico',
+  'hiking.distance': 'Distancia',
+  'hiking.duration': 'Duraci\u00f3n',
 };
 
 export default es;

@@ -1868,6 +1868,31 @@ const zh: Record<TranslationKey, string> = {
   'docScanner.scanAnother': '\u518d\u626b\u63cf\u4e00\u4efd',
   'docScanner.delete': '\u5220\u9664',
   'docScanner.deleteConfirm': '\u518d\u6b21\u70b9\u51fb\u786e\u8ba4\u5220\u9664',
+
+  // Hiking Map
+  'commandPalette.goToHiking': '\u524d\u5f80\u5f92\u6b65\u5730\u56fe',
+  'shortcuts.goHikingMap': '\u524d\u5f80\u5f92\u6b65\u5730\u56fe',
+  'nav.hikingMap': '\u5f92\u6b65\u5730\u56fe',
+  'nav.group.outdoor': '\u6237\u5916',
+  'widgets.hikingMap': '\u5f92\u6b65\u5730\u56fe',
+  'widgets.hikingMapDesc': '\u63a2\u7d22\u6237\u5916\u8def\u7ebf\u5e76\u89c4\u5212\u884c\u7a0b',
+  'hiking.title': '\u5f92\u6b65\u5730\u56fe',
+  'hiking.subtitle': '\u63a2\u7d22\u6237\u5916\u8def\u7ebf\u5e76\u89c4\u5212\u884c\u7a0b',
+  'hiking.locateMe': '\u5b9a\u4f4d\u6211',
+  'hiking.locating': '\u5b9a\u4f4d\u4e2d...',
+  'hiking.locationError': '\u65e0\u6cd5\u83b7\u53d6\u4f4d\u7f6e',
+  'hiking.routePlanner': '\u8def\u7ebf\u89c4\u5212',
+  'hiking.startPoint': '\u8d77\u70b9\uff08\u7eac\u5ea6, \u7ecf\u5ea6\uff09',
+  'hiking.endPoint': '\u7ec8\u70b9\uff08\u7eac\u5ea6, \u7ecf\u5ea6\uff09',
+  'hiking.planRoute': '\u89c4\u5212\u8def\u7ebf',
+  'hiking.planning': '\u89c4\u5212\u4e2d...',
+  'hiking.routeError': '\u65e0\u6cd5\u627e\u5230\u8def\u7ebf',
+  'hiking.clearRoute': '\u6e05\u9664\u8def\u7ebf',
+  'hiking.mapStyle': '\u5730\u56fe\u6837\u5f0f',
+  'hiking.styleStreet': '\u8857\u9053',
+  'hiking.styleTopo': '\u5730\u5f62',
+  'hiking.distance': '\u8ddd\u79bb',
+  'hiking.duration': '\u65f6\u957f',
 };
 
 export default zh;

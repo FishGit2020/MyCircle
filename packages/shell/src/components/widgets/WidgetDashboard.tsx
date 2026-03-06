@@ -8,7 +8,7 @@ import { logEvent } from '../../lib/firebase';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap';
 
 export type WidgetSize = 'small' | 'medium' | 'large';
 
@@ -35,6 +35,7 @@ const DEFAULT_LAYOUT: WidgetConfig[] = [
   { id: 'digitalLibrary', visible: true },
   { id: 'familyGames', visible: true },
   { id: 'docScanner', visible: true },
+  { id: 'hikingMap', visible: true },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -1200,6 +1201,25 @@ const DocScannerWidget = React.memo(function DocScannerWidget() {
   );
 });
 
+const HikingMapWidget = React.memo(function HikingMapWidget() {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-green-500">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.hikingMap')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.hikingMapDesc')}</p>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   weather: WeatherWidget,
   stocks: StockWidget,
@@ -1217,6 +1237,7 @@ const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   digitalLibrary: DigitalLibraryWidget,
   familyGames: FamilyGamesWidget,
   docScanner: DocScannerWidget,
+  hikingMap: HikingMapWidget,
 };
 
 const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -1236,6 +1257,7 @@ const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<
   digitalLibrary: '/library',
   familyGames: '/family-games',
   docScanner: '/doc-scanner',
+  hikingMap: '/hiking',
 };
 
 // ─── Dashboard Reducer ──────────────────────────────────────────────────────

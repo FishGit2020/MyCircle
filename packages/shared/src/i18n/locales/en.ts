@@ -1866,6 +1866,31 @@ const en = {
   'docScanner.scanAnother': 'Scan Another',
   'docScanner.delete': 'Delete',
   'docScanner.deleteConfirm': 'Tap again to confirm delete',
+
+  // Hiking Map
+  'commandPalette.goToHiking': 'Go to Hiking Map',
+  'shortcuts.goHikingMap': 'Go to Hiking Map',
+  'nav.hikingMap': 'Hiking Map',
+  'nav.group.outdoor': 'Outdoor',
+  'widgets.hikingMap': 'Hiking Map',
+  'widgets.hikingMapDesc': 'Explore trails and plan routes',
+  'hiking.title': 'Hiking Map',
+  'hiking.subtitle': 'Explore trails and plan your route',
+  'hiking.locateMe': 'Locate Me',
+  'hiking.locating': 'Locating...',
+  'hiking.locationError': 'Could not get location',
+  'hiking.routePlanner': 'Route Planner',
+  'hiking.startPoint': 'Start point (lat, lng)',
+  'hiking.endPoint': 'End point (lat, lng)',
+  'hiking.planRoute': 'Plan Route',
+  'hiking.planning': 'Planning...',
+  'hiking.routeError': 'Could not find a route',
+  'hiking.clearRoute': 'Clear Route',
+  'hiking.mapStyle': 'Map Style',
+  'hiking.styleStreet': 'Street',
+  'hiking.styleTopo': 'Topo',
+  'hiking.distance': 'Distance',
+  'hiking.duration': 'Duration',
 } as const;
 
 export default en;

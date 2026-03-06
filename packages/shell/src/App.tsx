@@ -36,6 +36,7 @@ const ImmigrationTrackerMF = tracedLazy('mfe_immigration_load', () => import('im
 const DigitalLibraryMF = tracedLazy('mfe_digital_library_load', () => import('digitalLibrary/DigitalLibrary'), getPerf);
 const FamilyGamesMF = tracedLazy('mfe_family_games_load', () => import('familyGames/FamilyGames'), getPerf);
 const DocScannerMF = tracedLazy('mfe_doc_scanner_load', () => import('docScanner/DocScanner'), getPerf);
+const HikingMapMF = tracedLazy('mfe_hiking_map_load', () => import('hikingMap/HikingMap'), getPerf);
 
 // Fallback components for when remote modules fail to load
 const WeatherDisplayFallback = () => (
@@ -473,6 +474,23 @@ function DocScannerPage() {
   );
 }
 
+// Fallback for Hiking Map MFE
+const HikingMapFallback = () => (
+  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+    <p className="text-yellow-700 dark:text-yellow-300">Hiking Map module is loading...</p>
+  </div>
+);
+
+function HikingMapPage() {
+  return (
+    <ErrorBoundary fallback={<HikingMapFallback />}>
+      <Suspense fallback={<Loading />}>
+        <HikingMapMF />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 // 404 Not Found
 function NotFound() {
   const { t } = useTranslation();
@@ -535,6 +553,8 @@ export default function App() {
         <Route path="family-games" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
         <Route path="family-games/:gameType" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
         <Route path="doc-scanner" element={<RequireAuth><DocScannerPage /></RequireAuth>} />
+        <Route path="hiking" element={<HikingMapPage />} />
+        <Route path="hiking/*" element={<HikingMapPage />} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />
         <Route path="terms" element={<TermsOfServicePage />} />
