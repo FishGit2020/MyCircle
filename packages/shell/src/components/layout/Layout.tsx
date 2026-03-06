@@ -471,8 +471,7 @@ export default function Layout() {
 
       <footer
         role="contentinfo"
-        className="flex-shrink-0 bg-gray-800 dark:bg-gray-950 text-white py-6 md:pb-6 mt-12 md:mt-0 transition-colors"
-        style={{ paddingBottom: `calc(${isPlayerVisible ? '8rem' : '4rem'} + env(safe-area-inset-bottom, 0px))` }}
+        className="flex-shrink-0 bg-gray-800 dark:bg-gray-950 text-white py-6 md:py-2 mt-12 md:mt-0 transition-colors"
       >
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">
@@ -545,6 +544,12 @@ export default function Layout() {
               ))}
             </div>
           )}
+          {/* Mobile spacer for fixed BottomNav + audio player clearance */}
+          <div
+            className="md:hidden"
+            style={{ height: `calc(${isPlayerVisible ? '8rem' : '4rem'} + env(safe-area-inset-bottom, 0px))` }}
+            aria-hidden="true"
+          />
         </div>
       </footer>
     </div>
