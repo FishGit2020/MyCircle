@@ -75,11 +75,18 @@ declare global {
 
     /* ── Hiking Routes ─────────────────────────────────────── */
     __hikingRoutes?: {
+      // Personal routes
       getAll: () => Promise<any[]>;
       add: (route: { name: string; distance: number; duration: number; geometry: object; startLabel?: string; endLabel?: string }) => Promise<string>;
-      update: (id: string, updates: { name?: string }) => Promise<void>;
+      update: (id: string, updates: Record<string, any>) => Promise<void>;
       delete: (id: string) => Promise<void>;
       subscribe: (callback: (routes: any[]) => void) => () => void;
+      // Sharing
+      share: (routeId: string, route: { name: string; distance: number; duration: number; geometry: object; startLabel?: string; endLabel?: string }) => Promise<void>;
+      unshare: (routeId: string) => Promise<void>;
+      // Public/community routes
+      getAllPublic: () => Promise<any[]>;
+      subscribePublic: (callback: (routes: any[]) => void) => () => void;
     };
 
     /* ── Immigration Tracker ───────────────────────────────── */

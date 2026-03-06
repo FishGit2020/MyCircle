@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 import { useOfflineTiles } from '../hooks/useOfflineTiles';
@@ -7,6 +7,9 @@ import { MAP_CONFIG } from '../config/mapConfig';
 
 interface Props {
   map: maplibregl.Map | null;
+  showCacheOverlay: boolean;
+  onToggleCacheOverlay: () => void;
+  onCacheChanged: () => void;
 }
 
 /** Extracts a raster tile URL template from the active topo style, if present. */
@@ -22,15 +25,24 @@ function getRasterTileUrl(): string | null {
   return null;
 }
 
-export default function OfflineTileManager({ map }: Props) {
+export default function OfflineTileManager({ map, showCacheOverlay, onToggleCacheOverlay, onCacheChanged }: Props) {
   const { t } = useTranslation();
   const { state, progress, cachedCount, startDownload, cancelDownload, refreshCachedCount } = useOfflineTiles();
   const [isExpanded, setIsExpanded] = useState(false);
   const [clearing, setClearing] = useState(false);
 
+  const prevStateRef = useRef(state);
   useEffect(() => {
     refreshCachedCount();
   }, [refreshCachedCount]);
+
+  // Notify parent when a download finishes so the overlay can refresh
+  useEffect(() => {
+    if (prevStateRef.current === 'downloading' && (state === 'done' || state === 'error')) {
+      onCacheChanged();
+    }
+    prevStateRef.current = state;
+  }, [state, onCacheChanged]);
 
   const handleDownloadViewport = () => {
     if (!map) return;
@@ -53,6 +65,7 @@ export default function OfflineTileManager({ map }: Props) {
     setClearing(true);
     await clearAllTiles();
     await refreshCachedCount();
+    onCacheChanged();
     setClearing(false);
   };
 
@@ -135,6 +148,21 @@ export default function OfflineTileManager({ map }: Props) {
               </button>
             )}
           </div>
+
+          {cachedCount > 0 && (
+            <button
+              type="button"
+              onClick={onToggleCacheOverlay}
+              className={`w-full py-1.5 text-xs font-medium rounded-lg transition flex items-center justify-center gap-1.5
+                ${showCacheOverlay
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+            >
+              <span className={`w-2 h-2 rounded-sm ${showCacheOverlay ? 'bg-green-500' : 'bg-gray-400'}`} />
+              {showCacheOverlay ? t('hiking.hideCacheOverlay') : t('hiking.showCacheOverlay')}
+            </button>
+          )}
         </div>
       )}
     </div>
