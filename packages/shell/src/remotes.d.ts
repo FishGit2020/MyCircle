@@ -105,3 +105,8 @@ declare module 'hikingMap/HikingMap' {
   const HikingMap: React.ComponentType;
   export default HikingMap;
 }
+
+declare module 'youthTracker/YouthTracker' {
+  const YouthTracker: React.ComponentType;
+  export default YouthTracker;
+}

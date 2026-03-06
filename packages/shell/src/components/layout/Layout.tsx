@@ -42,6 +42,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/family-games': () => import('familyGames/FamilyGames'),
   '/doc-scanner': () => import('docScanner/DocScanner'),
   '/hiking': () => import('hikingMap/HikingMap'),
+  '/youth-tracker': () => import('youthTracker/YouthTracker'),
 };
 
 function prefetchRoute(path: string) {
@@ -93,6 +94,8 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
     case 'hiking':
       return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>;
+    case 'youth-tracker':
+      return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" /></svg>;
     default:
       return <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg>;
   }
@@ -115,6 +118,7 @@ const NAV_GROUPS: NavGroup[] = [
   { labelKey: 'nav.group.family', items: [
     { path: '/baby',      labelKey: 'nav.baby',     icon: 'baby' },
     { path: '/child-dev', labelKey: 'nav.childDev', icon: 'child-dev' },
+    { path: '/youth-tracker', labelKey: 'nav.youthTracker' as any, icon: 'youth-tracker' },
     { path: '/immigration', labelKey: 'nav.immigration', icon: 'immigration' },
     { path: '/family-games', labelKey: 'nav.familyGames', icon: 'family-games' },
   ]},

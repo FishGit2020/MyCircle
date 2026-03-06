@@ -172,6 +172,10 @@ const hikingMapRemote = isProduction
   ? '/hiking-map/assets/remoteEntry.js'
   : 'http://localhost:3022/assets/remoteEntry.js';
 
+const youthTrackerRemote = isProduction
+  ? '/youth-tracker/assets/remoteEntry.js'
+  : 'http://localhost:3023/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -198,7 +202,8 @@ export default defineConfig({
         digitalLibrary: digitalLibraryRemote,
         familyGames: familyGamesRemote,
         docScanner: docScannerRemote,
-        hikingMap: hikingMapRemote
+        hikingMap: hikingMapRemote,
+        youthTracker: youthTrackerRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
