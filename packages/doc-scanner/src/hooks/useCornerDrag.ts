@@ -17,43 +17,48 @@ export function useCornerDrag(
 ): UseCornerDragReturn {
   const [corners, setCorners] = useState<Point[]>(initialCorners);
   const [activeCorner, setActiveCorner] = useState<number | null>(null);
-  const offsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Use refs to avoid stale closures in pointer event handlers
+  const activeCornerRef = useRef<number | null>(null);
+  const canvasRectRef = useRef(canvasRect);
+  const imageSizeRef = useRef(imageSize);
+  const cornersRef = useRef(corners);
+
+  canvasRectRef.current = canvasRect;
+  imageSizeRef.current = imageSize;
+  cornersRef.current = corners;
 
   const handlePointerDown = useCallback((e: React.PointerEvent, cornerIndex: number) => {
     e.preventDefault();
+    e.stopPropagation();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    activeCornerRef.current = cornerIndex;
     setActiveCorner(cornerIndex);
-    if (canvasRect) {
-      const scaleX = imageSize.width / canvasRect.width;
-      const scaleY = imageSize.height / canvasRect.height;
-      const imgX = (e.clientX - canvasRect.left) * scaleX;
-      const imgY = (e.clientY - canvasRect.top) * scaleY;
-      offsetRef.current = {
-        x: corners[cornerIndex].x - imgX,
-        y: corners[cornerIndex].y - imgY,
-      };
-    }
-  }, [corners, canvasRect, imageSize]);
+  }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (activeCorner === null || !canvasRect) return;
+    const idx = activeCornerRef.current;
+    const rect = canvasRectRef.current;
+    const imgSize = imageSizeRef.current;
+    if (idx === null || !rect) return;
 
-    const scaleX = imageSize.width / canvasRect.width;
-    const scaleY = imageSize.height / canvasRect.height;
-    const imgX = (e.clientX - canvasRect.left) * scaleX + offsetRef.current.x;
-    const imgY = (e.clientY - canvasRect.top) * scaleY + offsetRef.current.y;
+    const scaleX = imgSize.width / rect.width;
+    const scaleY = imgSize.height / rect.height;
+    const imgX = (e.clientX - rect.left) * scaleX;
+    const imgY = (e.clientY - rect.top) * scaleY;
 
-    const clampedX = Math.max(0, Math.min(imageSize.width - 1, Math.round(imgX)));
-    const clampedY = Math.max(0, Math.min(imageSize.height - 1, Math.round(imgY)));
+    const clampedX = Math.max(0, Math.min(imgSize.width - 1, Math.round(imgX)));
+    const clampedY = Math.max(0, Math.min(imgSize.height - 1, Math.round(imgY)));
 
     setCorners(prev => {
       const next = [...prev];
-      next[activeCorner] = { x: clampedX, y: clampedY };
+      next[idx] = { x: clampedX, y: clampedY };
       return next;
     });
-  }, [activeCorner, canvasRect, imageSize]);
+  }, []);
 
   const handlePointerUp = useCallback(() => {
+    activeCornerRef.current = null;
     setActiveCorner(null);
   }, []);
 
