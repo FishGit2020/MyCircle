@@ -73,14 +73,37 @@ jobs:
       - name: Typecheck all packages
         run: pnpm typecheck:all
 
-  # ── Unit tests (sharded, parallel with typecheck) ─────────────────────
-  test:
+  # ── Unit tests: root (shell + shared) ─────────────────────────────────
+  test-root:
     needs: setup
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1/2, 2/2]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore workspace
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/shared/dist
+          key: workspace-${{ github.sha }}
+
+      - name: Unit tests (root — shell + shared)
+        run: pnpm test:run --reporter=dot
+        env:
+          NODE_OPTIONS: '--max-old-space-size=6144'
+
+  # ── Unit tests: MFE packages ────────────────────────────────────────
+  test-mfe:
+    needs: setup
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -101,13 +124,7 @@ jobs:
             packages/shared/dist
           key: workspace-${{ github.sha }}
 
-      - name: Unit tests (shard ${{ matrix.shard }})
-        run: pnpm test:run --reporter=dot --shard=${{ matrix.shard }}
-        env:
-          NODE_OPTIONS: '--max-old-space-size=6144'
-
       - name: Unit tests (changed MFE packages)
-        if: matrix.shard == '1/2'
         run: |
           # Run tests only for packages with changes relative to main
           CHANGED=$(pnpm --filter '!mycircle' --filter '...[origin/main]' -r exec -- echo '$PNPM_PACKAGE_NAME' 2>/dev/null | grep '@mycircle/' || true)
@@ -217,14 +234,15 @@ jobs:
   # ── Gate job for branch protection (preserves "ci" check name) ─────────
   ci:
     if: always()
-    needs: [typecheck, test]
+    needs: [typecheck, test-root, test-mfe]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
-          # Matrix jobs report as a single "test" result — "success" only if ALL shards pass
-          if [ "${{ needs.typecheck.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ]; then
-            echo "Required jobs failed: typecheck=${{ needs.typecheck.result }}, test=${{ needs.test.result }}"
+          if [ "${{ needs.typecheck.result }}" != "success" ] || \
+             [ "${{ needs.test-root.result }}" != "success" ] || \
+             [ "${{ needs.test-mfe.result }}" != "success" ]; then
+            echo "Required jobs failed: typecheck=${{ needs.typecheck.result }}, test-root=${{ needs.test-root.result }}, test-mfe=${{ needs.test-mfe.result }}"
             exit 1
           fi
           echo "All required jobs passed"
