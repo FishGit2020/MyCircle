@@ -987,13 +987,18 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 |-----------|-----------|---------|
 | **App (Shell)** | `packages/shell/src/App.tsx` | Routing, lazy MFE loading |
 | **Layout** | `packages/shell/src/components/layout/Layout.tsx` | Header, grouped nav dropdowns, toggles, footer |
+| **NavIcon** | `packages/shell/src/components/layout/NavIcon.tsx` | Shared SVG icon component (used by Layout + BottomNav) |
+| **Nav Config** | `packages/shell/src/lib/navConfig.ts` | NAV_GROUPS, ALL_NAV_ITEMS, ROUTE_MODULE_MAP, prefetchRoute |
+| **MFEPageWrapper** | `packages/shell/src/components/common/MFEPageWrapper.tsx` | Generic ErrorBoundary + Suspense wrapper for MFE routes |
 | **CitySearchWrapper** | `packages/shell/src/components/widgets/CitySearchWrapper.tsx` | MFE host, event listener, city persistence |
 | **UseMyLocation** | `packages/shell/src/components/widgets/UseMyLocation.tsx` | Geolocation + reverse geocode |
 | **FavoriteCities** | `packages/shell/src/components/widgets/FavoriteCities.tsx` | Favorited cities grid |
 | **WeatherCompare** | `packages/shell/src/components/widgets/WeatherCompare.tsx` | Legacy multi-city comparison page |
 | **WeatherComparison** | `packages/weather-display/src/components/WeatherComparison.tsx` | Inline weather comparison (within weather detail) |
 | **HistoricalWeather** | `packages/weather-display/src/components/HistoricalWeather.tsx` | "This day last year" side-by-side comparison |
-| **WidgetDashboard** | `packages/shell/src/components/widgets/WidgetDashboard.tsx` | Drag-and-drop customizable widget grid |
+| **WidgetDashboard** | `packages/shell/src/components/widgets/WidgetDashboard.tsx` | Drag-and-drop customizable widget grid (layout, edit mode) |
+| **Widget Config** | `packages/shell/src/components/widgets/widgetConfig.ts` | Widget types, DEFAULT_LAYOUT, WIDGET_COMPONENTS, WIDGET_ROUTES |
+| **Individual Widgets** | `packages/shell/src/components/widgets/*Widget.tsx` | 18 extracted widget components (Weather, Stock, Verse, etc.) |
 | **PwaInstallPrompt** | `packages/shell/src/components/layout/PwaInstallPrompt.tsx` | Add to Home Screen banner |
 | **DashboardPage** | `packages/shell/src/pages/DashboardPage.tsx` | Dashboard homepage with quick access cards |
 | **SubscribedPodcasts** | `packages/podcast-player/src/components/SubscribedPodcasts.tsx` | Subscribed podcasts tab view |
@@ -1042,7 +1047,9 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 | **usePublicNotes** | `packages/notebook/src/hooks/usePublicNotes.ts` | Public notes CRUD hook via window bridge |
 | **Web Vitals** | `packages/shared/src/utils/webVitals.ts` | Core Web Vitals reporting (LCP, CLS, INP) |
 | **tracedLazy** | `packages/shell/src/lib/tracedLazy.ts` | React.lazy wrapper with Firebase Performance traces for MFE loads |
-| **Firebase Functions** | `functions/src/index.ts` | Production Cloud Functions (GraphQL, proxies, AI) |
+| **Firebase Functions** | `functions/src/index.ts` | Re-exports all Cloud Function handlers |
+| **Function Handlers** | `functions/src/handlers/*.ts` | Individual handlers: graphql, aiChat, stockProxy, podcastProxy, cloudFiles, babyPhotos, digitalLibrary, weatherAlerts, notifications |
+| **Function Resolvers** | `functions/src/resolvers/*.ts` | Domain-split GraphQL resolvers: weather, stocks, crypto, bible, podcasts, ai, immigration |
 | **CI Workflow** | `.github/workflows/ci.yml` | PR checks: typecheck, lint, test |
 | **Deploy Workflow** | `.github/workflows/deploy.yml` | Firebase Hosting deployment on push to main |
 | **E2E Workflow** | `.github/workflows/e2e.yml` | Playwright E2E tests on PR (mocked + emulator) |
@@ -1070,15 +1077,15 @@ mycircle/
 |   |   +-- src/
 |   |       +-- components/
 |   |       |   +-- layout/      # Layout, BottomNav, ThemeToggle, UserMenu, etc.
-|   |       |   +-- widgets/     # WidgetDashboard, CitySearchWrapper, FavoriteCities, etc.
+|   |       |   +-- widgets/     # WidgetDashboard, widgetConfig, 18 *Widget.tsx, CitySearchWrapper, FavoriteCities
 |   |       |   +-- notifications/ # NotificationBell, WhatsNew, WhatsNewButton
 |   |       |   +-- player/      # GlobalAudioPlayer
-|   |       |   +-- common/      # Loading, ErrorBoundary
+|   |       |   +-- common/      # Loading, ErrorBoundary, MFEPageWrapper
 |   |       |   +-- settings/    # UnitToggle, SpeedToggle
 |   |       |   +-- sync/        # ThemeSync, DataSync, ReloadPrompt, Onboarding
 |   |       +-- context/         # AuthContext, ThemeContext, RemoteConfigContext
 |   |       +-- hooks/           # useDailyVerse, useAnnouncements
-|   |       +-- lib/             # Firebase integration (auth, Firestore, FCM, App Check)
+|   |       +-- lib/             # Firebase integration, navConfig, routeConfig, tracedLazy
 |   |       +-- App.tsx          # Routes & providers
 |   +-- city-search/             # City search micro frontend
 |   |   +-- src/
@@ -1127,9 +1134,29 @@ mycircle/
 |   +-- types/                   # Server TypeScript types
 +-- functions/                   # Firebase Cloud Functions (production)
 |   +-- src/
-|       +-- index.ts             # GraphQL, stock proxy, podcast proxy, AI chat
+|       +-- index.ts             # Re-exports all handlers
+|       +-- handlers/            # Individual Cloud Function handlers
+|       |   +-- shared.ts        # Firebase Admin init, CORS, rate limiter, auth helpers
+|       |   +-- graphql.ts       # GraphQL endpoint (Apollo Server)
+|       |   +-- aiChat.ts        # AI chat + streaming endpoints
+|       |   +-- stockProxy.ts    # Finnhub stock proxy
+|       |   +-- podcastProxy.ts  # PodcastIndex proxy
+|       |   +-- cloudFiles.ts    # File upload/management
+|       |   +-- babyPhotos.ts    # Baby photo upload
+|       |   +-- digitalLibrary.ts # EPUB upload + TTS
+|       |   +-- weatherAlerts.ts # Weather alert subscriptions + scheduler
+|       |   +-- notifications.ts # Topic management + announcement triggers
+|       +-- resolvers/           # Domain-split GraphQL resolvers
+|       |   +-- index.ts         # Merges all domain resolvers
+|       |   +-- weather.ts       # Weather queries
+|       |   +-- stocks.ts        # Stock queries
+|       |   +-- crypto.ts        # Crypto queries
+|       |   +-- bible.ts         # Bible/verse queries
+|       |   +-- podcasts.ts      # Podcast queries
+|       |   +-- ai.ts            # AI chat + benchmark mutations/queries
+|       |   +-- immigration.ts   # USCIS case status
+|       |   +-- shared.ts        # JSON scalar, shared types
 |       +-- schema.ts            # GraphQL schema (production)
-|       +-- resolvers.ts         # Self-contained resolvers
 |       +-- recaptcha.ts         # reCAPTCHA verification
 +-- e2e/                         # Playwright end-to-end tests
 |   +-- fixtures.ts              # Browser-level API mocks (page.route)

@@ -109,7 +109,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     // All widgets should show "Visible" toggle
     const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(17);
+    expect(visibleButtons.length).toBe(18);
   });
 
   it('can toggle widget visibility', () => {
@@ -126,8 +126,8 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(17);
-    expect(downButtons.length).toBe(17);
+    expect(upButtons.length).toBe(18);
+    expect(downButtons.length).toBe(18);
   });
 
   it('persists layout to localStorage', () => {
@@ -167,7 +167,7 @@ describe('WidgetDashboard', () => {
     fireEvent.click(screen.getByText('widgets.reset'));
     // All should be visible again
     const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(17);
+    expect(allVisible.length).toBe(18);
   });
 
   it('renders worship widget with song count', () => {

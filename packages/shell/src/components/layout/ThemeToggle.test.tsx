@@ -11,6 +11,7 @@ vi.mock('../../context/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'light',
     toggleTheme: mockToggleTheme,
+    setThemeMode: vi.fn(),
   }),
 }));
 

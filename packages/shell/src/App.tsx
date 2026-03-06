@@ -1,19 +1,18 @@
-import React, { Suspense, useState, useRef, useEffect } from 'react';
-import { Routes, Route, useParams, useSearchParams, useNavigate } from 'react-router';
-import { useTranslation, createLogger } from '@mycircle/shared';
+import React, { Suspense, useRef, useEffect } from 'react';
+import { Routes, Route } from 'react-router';
+import { useTranslation } from '@mycircle/shared';
 import { Layout } from './components/layout';
-import { Loading, ErrorBoundary, RequireAuth } from './components/common';
+import { Loading, ErrorBoundary, RequireAuth, MFEPageWrapper } from './components/common';
 import { WeatherCompare } from './components/widgets';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
 import WhatsNewPage from './pages/WhatsNewPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
-import { useAuth } from './context/AuthContext';
+import FavoriteButton from './components/weather/FavoriteButton';
+import ShareButton from './components/weather/ShareButton';
 import { tracedLazy } from './lib/tracedLazy';
 import { perf } from './lib/firebase';
-
-const logger = createLogger('App');
 
 const getPerf = () => perf;
 
@@ -36,152 +35,16 @@ const DigitalLibraryMF = tracedLazy('mfe_digital_library_load', () => import('di
 const FamilyGamesMF = tracedLazy('mfe_family_games_load', () => import('familyGames/FamilyGames'), getPerf);
 const DocScannerMF = tracedLazy('mfe_doc_scanner_load', () => import('docScanner/DocScanner'), getPerf);
 const HikingMapMF = tracedLazy('mfe_hiking_map_load', () => import('hikingMap/HikingMap'), getPerf);
+const YouthTrackerMF = tracedLazy('mfe_youth_tracker_load', () => import('youthTracker/YouthTracker'), getPerf);
 
-// Fallback components for when remote modules fail to load
-const WeatherDisplayFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Weather Display module is loading...</p>
-  </div>
-);
-
-// Favorite star button for weather page
-function FavoriteButton() {
-  const { t } = useTranslation();
-  const { coords } = useParams<{ coords: string }>();
-  const [searchParams] = useSearchParams();
-  const { user, favoriteCities, toggleFavorite } = useAuth();
-
-  if (!user || !coords) return null;
-
-  const [lat, lon] = coords.split(',').map(Number);
-  if (isNaN(lat) || isNaN(lon)) return null;
-
-  const cityName = searchParams.get('name') || 'Unknown';
-  const cityId = `${lat},${lon}`;
-  const isFavorite = favoriteCities.some(c => c.id === cityId);
-
-  const handleToggle = async () => {
-    await toggleFavorite({
-      id: cityId,
-      name: cityName,
-      country: '',
-      lat,
-      lon,
-    });
-  };
-
-  return (
-    <button
-      onClick={handleToggle}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-        isFavorite
-          ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300'
-          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
-      }`}
-      title={isFavorite ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
-    >
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-      </svg>
-      <span className="hidden sm:inline">{isFavorite ? t('favorites.favorited') : t('favorites.favorite')}</span>
-    </button>
-  );
-}
-
-// Share button for weather page — supports link sharing and image download
-function ShareButton({ weatherRef }: { weatherRef: React.RefObject<HTMLDivElement | null> }) {
-  const { t } = useTranslation();
-  const [copied, setCopied] = useState(false);
-  const [capturing, setCapturing] = useState(false);
-  const [searchParams] = useSearchParams();
-  const cityName = searchParams.get('name') || 'Weather';
-
-  const handleShareLink = async () => {
-    const url = window.location.href;
-    const text = `Check out the weather in ${cityName}!`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: `${cityName} Weather`, text, url });
-        return;
-      } catch {
-        // User cancelled or share failed — fall through to clipboard
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback for older browsers
-    }
-  };
-
-  const handleShareImage = async () => {
-    if (!weatherRef.current || capturing) return;
-    setCapturing(true);
-    try {
-      const { toPng } = await import('html-to-image');
-      const dataUrl = await toPng(weatherRef.current, {
-        backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-        pixelRatio: 2,
-      });
-
-      // Try native share with file if supported
-      if (navigator.share && navigator.canShare) {
-        const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], `${cityName}-weather.png`, { type: 'image/png' });
-        if (navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({ files: [file], title: `${cityName} Weather` });
-            return;
-          } catch { /* fall through to download */ }
-        }
-      }
-
-      // Download as fallback
-      const link = document.createElement('a');
-      link.download = `${cityName}-weather.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      logger.error('Failed to capture weather image:', err);
-    } finally {
-      setCapturing(false);
-    }
-  };
-
-  return (
-    <div className="flex items-center gap-1">
-      <button
-        onClick={handleShareLink}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
-        title={t('share.shareLink')}
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-        </svg>
-        <span className="hidden sm:inline">{copied ? t('share.copied') : t('share.share')}</span>
-      </button>
-      <button
-        onClick={handleShareImage}
-        disabled={capturing}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition disabled:opacity-50"
-        title={t('share.saveAsImage')}
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <span className="hidden sm:inline">{capturing ? t('share.saving') : t('share.image')}</span>
-      </button>
-    </div>
-  );
-}
-
-// Weather page with full weather display
+// Weather page with full weather display (special case: has FavoriteButton/ShareButton)
 function WeatherPage() {
   const weatherRef = useRef<HTMLDivElement>(null);
+  const fallback = (
+    <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+      <p className="text-yellow-700 dark:text-yellow-300">Weather Display module is loading...</p>
+    </div>
+  );
   return (
     <div>
       <div className="flex justify-end gap-2 mb-4">
@@ -189,302 +52,13 @@ function WeatherPage() {
         <FavoriteButton />
       </div>
       <div ref={weatherRef}>
-        <ErrorBoundary fallback={<WeatherDisplayFallback />}>
+        <ErrorBoundary fallback={fallback}>
           <Suspense fallback={<Loading />}>
             <WeatherDisplayMF />
           </Suspense>
         </ErrorBoundary>
       </div>
     </div>
-  );
-}
-
-// Fallback for stock tracker MFE
-const StockTrackerFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Stock Tracker module is loading...</p>
-  </div>
-);
-
-function StocksPage() {
-  return (
-    <ErrorBoundary fallback={<StockTrackerFallback />}>
-      <Suspense fallback={<Loading />}>
-        <StockTrackerMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for podcast player MFE
-const PodcastPlayerFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Podcast Player module is loading...</p>
-  </div>
-);
-
-function PodcastsPage() {
-  return (
-    <ErrorBoundary fallback={<PodcastPlayerFallback />}>
-      <Suspense fallback={<Loading />}>
-        <PodcastPlayerMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for AI assistant MFE
-const AiAssistantFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">AI Assistant module is loading...</p>
-  </div>
-);
-
-function AiPage() {
-  return (
-    <ErrorBoundary fallback={<AiAssistantFallback />}>
-      <Suspense fallback={<Loading />}>
-        <AiAssistantMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Bible Reader MFE
-const BibleReaderFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Bible Reader module is loading...</p>
-  </div>
-);
-
-function BiblePage() {
-  return (
-    <ErrorBoundary fallback={<BibleReaderFallback />}>
-      <Suspense fallback={<Loading />}>
-        <BibleReaderMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Worship Songs MFE
-const WorshipSongsFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Worship Songs module is loading...</p>
-  </div>
-);
-
-function WorshipPage() {
-  return (
-    <ErrorBoundary fallback={<WorshipSongsFallback />}>
-      <Suspense fallback={<Loading />}>
-        <WorshipSongsMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Notebook MFE
-const NotebookFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Notebook module is loading...</p>
-  </div>
-);
-
-function NotebookPage() {
-  return (
-    <ErrorBoundary fallback={<NotebookFallback />}>
-      <Suspense fallback={<Loading />}>
-        <NotebookMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Baby Tracker MFE
-const BabyTrackerFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Baby Tracker module is loading...</p>
-  </div>
-);
-
-function BabyPage() {
-  return (
-    <ErrorBoundary fallback={<BabyTrackerFallback />}>
-      <Suspense fallback={<Loading />}>
-        <BabyTrackerMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Child Development MFE
-const ChildDevelopmentFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Child Development module is loading...</p>
-  </div>
-);
-
-function ChildDevPage() {
-  return (
-    <ErrorBoundary fallback={<ChildDevelopmentFallback />}>
-      <Suspense fallback={<Loading />}>
-        <ChildDevelopmentMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Flash Cards MFE
-const FlashCardsFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Flash Cards module is loading...</p>
-  </div>
-);
-
-function FlashCardsPage() {
-  return (
-    <ErrorBoundary fallback={<FlashCardsFallback />}>
-      <Suspense fallback={<Loading />}>
-        <FlashCardsMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Daily Log MFE
-const DailyLogFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Daily Log module is loading...</p>
-  </div>
-);
-
-function DailyLogPage() {
-  return (
-    <ErrorBoundary fallback={<DailyLogFallback />}>
-      <Suspense fallback={<Loading />}>
-        <DailyLogMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Cloud Files MFE
-const CloudFilesFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Cloud Files module is loading...</p>
-  </div>
-);
-
-function CloudFilesPage() {
-  return (
-    <ErrorBoundary fallback={<CloudFilesFallback />}>
-      <Suspense fallback={<Loading />}>
-        <CloudFilesMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Model Benchmark MFE
-const ModelBenchmarkFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Model Benchmark module is loading...</p>
-  </div>
-);
-
-function BenchmarkPage() {
-  return (
-    <ErrorBoundary fallback={<ModelBenchmarkFallback />}>
-      <Suspense fallback={<Loading />}>
-        <ModelBenchmarkMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Immigration Tracker MFE
-const ImmigrationTrackerFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Immigration Tracker module is loading...</p>
-  </div>
-);
-
-function ImmigrationPage() {
-  return (
-    <ErrorBoundary fallback={<ImmigrationTrackerFallback />}>
-      <Suspense fallback={<Loading />}>
-        <ImmigrationTrackerMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Digital Library MFE
-const DigitalLibraryFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Digital Library module is loading...</p>
-  </div>
-);
-
-function LibraryPage() {
-  return (
-    <ErrorBoundary fallback={<DigitalLibraryFallback />}>
-      <Suspense fallback={<Loading />}>
-        <DigitalLibraryMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Family Games MFE
-const FamilyGamesFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Family Games module is loading...</p>
-  </div>
-);
-
-function FamilyGamesPage() {
-  return (
-    <ErrorBoundary fallback={<FamilyGamesFallback />}>
-      <Suspense fallback={<Loading />}>
-        <FamilyGamesMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Doc Scanner MFE
-const DocScannerFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Doc Scanner module is loading...</p>
-  </div>
-);
-
-function DocScannerPage() {
-  return (
-    <ErrorBoundary fallback={<DocScannerFallback />}>
-      <Suspense fallback={<Loading />}>
-        <DocScannerMF />
-      </Suspense>
-    </ErrorBoundary>
-  );
-}
-
-// Fallback for Hiking Map MFE
-const HikingMapFallback = () => (
-  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-    <p className="text-yellow-700 dark:text-yellow-300">Hiking Map module is loading...</p>
-  </div>
-);
-
-function HikingMapPage() {
-  return (
-    <ErrorBoundary fallback={<HikingMapFallback />}>
-      <Suspense fallback={<Loading />}>
-        <HikingMapMF />
-      </Suspense>
-    </ErrorBoundary>
   );
 }
 
@@ -525,33 +99,34 @@ export default function App() {
         <Route index element={<DashboardPage />} />
         <Route path="weather" element={<WeatherLandingPage />} />
         <Route path="weather/:coords" element={<WeatherPage />} />
-        <Route path="stocks" element={<StocksPage />} />
-        <Route path="stocks/:symbol" element={<StocksPage />} />
-        <Route path="podcasts" element={<PodcastsPage />} />
-        <Route path="podcasts/:podcastId" element={<PodcastsPage />} />
-        <Route path="ai" element={<RequireAuth><AiPage /></RequireAuth>} />
-        <Route path="bible" element={<RequireAuth><BiblePage /></RequireAuth>} />
-        <Route path="worship" element={<RequireAuth><WorshipPage /></RequireAuth>} />
-        <Route path="worship/new" element={<RequireAuth><WorshipPage /></RequireAuth>} />
-        <Route path="worship/:songId" element={<RequireAuth><WorshipPage /></RequireAuth>} />
-        <Route path="worship/:songId/edit" element={<RequireAuth><WorshipPage /></RequireAuth>} />
-        <Route path="notebook" element={<RequireAuth><NotebookPage /></RequireAuth>} />
-        <Route path="notebook/new" element={<RequireAuth><NotebookPage /></RequireAuth>} />
-        <Route path="notebook/:noteId" element={<RequireAuth><NotebookPage /></RequireAuth>} />
-        <Route path="baby" element={<RequireAuth><BabyPage /></RequireAuth>} />
-        <Route path="child-dev" element={<RequireAuth><ChildDevPage /></RequireAuth>} />
-        <Route path="flashcards" element={<RequireAuth><FlashCardsPage /></RequireAuth>} />
-        <Route path="daily-log" element={<RequireAuth><DailyLogPage /></RequireAuth>} />
-        <Route path="files" element={<RequireAuth><CloudFilesPage /></RequireAuth>} />
-        <Route path="benchmark" element={<RequireAuth><BenchmarkPage /></RequireAuth>} />
-        <Route path="immigration" element={<RequireAuth><ImmigrationPage /></RequireAuth>} />
-        <Route path="library" element={<RequireAuth><LibraryPage /></RequireAuth>} />
-        <Route path="library/:bookId" element={<RequireAuth><LibraryPage /></RequireAuth>} />
-        <Route path="family-games" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
-        <Route path="family-games/:gameType" element={<RequireAuth><FamilyGamesPage /></RequireAuth>} />
-        <Route path="doc-scanner" element={<RequireAuth><DocScannerPage /></RequireAuth>} />
-        <Route path="hiking" element={<HikingMapPage />} />
-        <Route path="hiking/*" element={<HikingMapPage />} />
+        <Route path="stocks" element={<MFEPageWrapper component={StockTrackerMF} name="Stock Tracker" />} />
+        <Route path="stocks/:symbol" element={<MFEPageWrapper component={StockTrackerMF} name="Stock Tracker" />} />
+        <Route path="podcasts" element={<MFEPageWrapper component={PodcastPlayerMF} name="Podcast Player" />} />
+        <Route path="podcasts/:podcastId" element={<MFEPageWrapper component={PodcastPlayerMF} name="Podcast Player" />} />
+        <Route path="ai" element={<RequireAuth><MFEPageWrapper component={AiAssistantMF} name="AI Assistant" /></RequireAuth>} />
+        <Route path="bible" element={<RequireAuth><MFEPageWrapper component={BibleReaderMF} name="Bible Reader" /></RequireAuth>} />
+        <Route path="worship" element={<RequireAuth><MFEPageWrapper component={WorshipSongsMF} name="Worship Songs" /></RequireAuth>} />
+        <Route path="worship/new" element={<RequireAuth><MFEPageWrapper component={WorshipSongsMF} name="Worship Songs" /></RequireAuth>} />
+        <Route path="worship/:songId" element={<RequireAuth><MFEPageWrapper component={WorshipSongsMF} name="Worship Songs" /></RequireAuth>} />
+        <Route path="worship/:songId/edit" element={<RequireAuth><MFEPageWrapper component={WorshipSongsMF} name="Worship Songs" /></RequireAuth>} />
+        <Route path="notebook" element={<RequireAuth><MFEPageWrapper component={NotebookMF} name="Notebook" /></RequireAuth>} />
+        <Route path="notebook/new" element={<RequireAuth><MFEPageWrapper component={NotebookMF} name="Notebook" /></RequireAuth>} />
+        <Route path="notebook/:noteId" element={<RequireAuth><MFEPageWrapper component={NotebookMF} name="Notebook" /></RequireAuth>} />
+        <Route path="baby" element={<RequireAuth><MFEPageWrapper component={BabyTrackerMF} name="Baby Tracker" /></RequireAuth>} />
+        <Route path="child-dev" element={<RequireAuth><MFEPageWrapper component={ChildDevelopmentMF} name="Child Development" /></RequireAuth>} />
+        <Route path="youth-tracker" element={<RequireAuth><MFEPageWrapper component={YouthTrackerMF} name="Youth Tracker" /></RequireAuth>} />
+        <Route path="flashcards" element={<RequireAuth><MFEPageWrapper component={FlashCardsMF} name="Flash Cards" /></RequireAuth>} />
+        <Route path="daily-log" element={<RequireAuth><MFEPageWrapper component={DailyLogMF} name="Daily Log" /></RequireAuth>} />
+        <Route path="files" element={<RequireAuth><MFEPageWrapper component={CloudFilesMF} name="Cloud Files" /></RequireAuth>} />
+        <Route path="benchmark" element={<RequireAuth><MFEPageWrapper component={ModelBenchmarkMF} name="Model Benchmark" /></RequireAuth>} />
+        <Route path="immigration" element={<RequireAuth><MFEPageWrapper component={ImmigrationTrackerMF} name="Immigration Tracker" /></RequireAuth>} />
+        <Route path="library" element={<RequireAuth><MFEPageWrapper component={DigitalLibraryMF} name="Digital Library" /></RequireAuth>} />
+        <Route path="library/:bookId" element={<RequireAuth><MFEPageWrapper component={DigitalLibraryMF} name="Digital Library" /></RequireAuth>} />
+        <Route path="family-games" element={<RequireAuth><MFEPageWrapper component={FamilyGamesMF} name="Family Games" /></RequireAuth>} />
+        <Route path="family-games/:gameType" element={<RequireAuth><MFEPageWrapper component={FamilyGamesMF} name="Family Games" /></RequireAuth>} />
+        <Route path="doc-scanner" element={<RequireAuth><MFEPageWrapper component={DocScannerMF} name="Doc Scanner" /></RequireAuth>} />
+        <Route path="hiking" element={<MFEPageWrapper component={HikingMapMF} name="Hiking Map" />} />
+        <Route path="hiking/*" element={<MFEPageWrapper component={HikingMapMF} name="Hiking Map" />} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />
         <Route path="terms" element={<TermsOfServicePage />} />

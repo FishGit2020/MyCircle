@@ -7,6 +7,8 @@ import {
   getUserFiles,
   getWorshipSongs,
   getBenchmarkSummary,
+  migrateToMultiChild,
+  getChildren,
 } from '../lib/firebase';
 
 export interface RestoreResult {
@@ -24,6 +26,10 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
   const favoriteCities = profile.favoriteCities || [];
 
   // Restore saved preferences to localStorage so shared hooks pick them up
+  if (profile.theme) {
+    localStorage.setItem(StorageKeys.THEME, profile.theme);
+    window.dispatchEvent(new Event(WindowEvents.THEME_CHANGED));
+  }
   if (profile.tempUnit) {
     localStorage.setItem(StorageKeys.TEMP_UNIT, profile.tempUnit);
     window.dispatchEvent(new Event(WindowEvents.UNITS_CHANGED));
@@ -181,6 +187,17 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
       localStorage.setItem(StorageKeys.BENCHMARK_CACHE, JSON.stringify(summary));
     }
     window.dispatchEvent(new Event(WindowEvents.BENCHMARK_CHANGED));
+  }).catch(() => {});
+
+  // Migrate legacy single-child to multi-child (non-blocking)
+  migrateToMultiChild(uid, profile).then(() => {
+    // Load children into localStorage cache
+    return getChildren(uid);
+  }).then(children => {
+    if (children.length > 0) {
+      localStorage.setItem(StorageKeys.CHILDREN_CACHE, JSON.stringify(children));
+    }
+    window.dispatchEvent(new Event(WindowEvents.CHILDREN_CHANGED));
   }).catch(() => {});
 
   return { recentCities, favoriteCities };

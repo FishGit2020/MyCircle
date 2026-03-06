@@ -1,0 +1,306 @@
+import axios from 'axios';
+import NodeCache from 'node-cache';
+
+const YOUVERSION_API_BASE = process.env.YOUVERSION_API_BASE_URL || 'https://api.youversion.com/v1';
+
+export const bibleCache = new NodeCache({ stdTTL: 3600, checkperiod: 300 });
+
+// USFM book abbreviations for all 66 canonical books
+const BOOK_ABBREVIATIONS: Record<string, string> = {
+  'Genesis': 'GEN', 'Exodus': 'EXO', 'Leviticus': 'LEV', 'Numbers': 'NUM', 'Deuteronomy': 'DEU',
+  'Joshua': 'JOS', 'Judges': 'JDG', 'Ruth': 'RUT', '1 Samuel': '1SA', '2 Samuel': '2SA',
+  '1 Kings': '1KI', '2 Kings': '2KI', '1 Chronicles': '1CH', '2 Chronicles': '2CH', 'Ezra': 'EZR',
+  'Nehemiah': 'NEH', 'Esther': 'EST', 'Job': 'JOB', 'Psalm': 'PSA', 'Psalms': 'PSA', 'Proverbs': 'PRO',
+  'Ecclesiastes': 'ECC', 'Song of Solomon': 'SNG', 'Isaiah': 'ISA', 'Jeremiah': 'JER',
+  'Lamentations': 'LAM', 'Ezekiel': 'EZK', 'Daniel': 'DAN', 'Hosea': 'HOS', 'Joel': 'JOL',
+  'Amos': 'AMO', 'Obadiah': 'OBA', 'Jonah': 'JON', 'Micah': 'MIC', 'Nahum': 'NAM',
+  'Habakkuk': 'HAB', 'Zephaniah': 'ZEP', 'Haggai': 'HAG', 'Zechariah': 'ZEC', 'Malachi': 'MAL',
+  'Matthew': 'MAT', 'Mark': 'MRK', 'Luke': 'LUK', 'John': 'JHN', 'Acts': 'ACT', 'Romans': 'ROM',
+  '1 Corinthians': '1CO', '2 Corinthians': '2CO', 'Galatians': 'GAL', 'Ephesians': 'EPH',
+  'Philippians': 'PHP', 'Colossians': 'COL', '1 Thessalonians': '1TH', '2 Thessalonians': '2TH',
+  '1 Timothy': '1TI', '2 Timothy': '2TI', 'Titus': 'TIT', 'Philemon': 'PHM', 'Hebrews': 'HEB',
+  'James': 'JAS', '1 Peter': '1PE', '2 Peter': '2PE', '1 John': '1JN', '2 John': '2JN',
+  '3 John': '3JN', 'Jude': 'JUD', 'Revelation': 'REV',
+};
+
+/**
+ * Convert a human-readable reference like "John 3" or "Genesis 1:1-10" to USFM format.
+ * Examples: "John 3" -> "JHN.3", "Genesis 1:1-10" -> "GEN.1.1-GEN.1.10", "Psalms 23" -> "PSA.23"
+ */
+export function convertToUsfmRef(reference: string): string {
+  // Parse "Book Chapter" or "Book Chapter:Verse" or "Book Chapter:Start-End"
+  const match = reference.match(/^(.+?)\s+(\d+)(?::(\d+)(?:-(\d+))?)?$/);
+  if (!match) return reference;
+
+  const [, bookName, chapter, verseStart, verseEnd] = match;
+  const usfm = BOOK_ABBREVIATIONS[bookName];
+  if (!usfm) return reference;
+
+  if (verseStart && verseEnd) {
+    return `${usfm}.${chapter}.${verseStart}-${verseEnd}`;
+  }
+  if (verseStart) {
+    return `${usfm}.${chapter}.${verseStart}`;
+  }
+  return `${usfm}.${chapter}`;
+}
+
+// Cache for YouVersion versions list (24hr TTL)
+const youversionVersionsCache = new NodeCache({ stdTTL: 86400, checkperiod: 3600 });
+
+interface YouVersionBible {
+  id: number;
+  abbreviation: string;
+  title: string;
+}
+
+/** Fetch available English Bible versions from YouVersion API */
+async function getYouVersionBibles(apiKey: string): Promise<YouVersionBible[]> {
+  const cacheKey = 'youversion:bibles:en';
+  const cached = youversionVersionsCache.get<YouVersionBible[]>(cacheKey);
+  if (cached) return cached;
+
+  const response = await axios.get(`${YOUVERSION_API_BASE}/bibles`, {
+    params: { 'language_ranges[]': 'en', all_available: true },
+    headers: { 'x-yvp-app-key': apiKey },
+    timeout: 10000,
+  });
+
+  const bibles: YouVersionBible[] = (response.data.data || response.data || []).map((b: any) => ({
+    id: b.id,
+    abbreviation: b.abbreviation || b.abbr || '',
+    title: b.title || b.name || '',
+  }));
+
+  youversionVersionsCache.set(cacheKey, bibles);
+  return bibles;
+}
+
+/**
+ * Parse individual verses from YouVersion HTML content.
+ * YouVersion HTML format uses:
+ *   <span class="yv-v" v="1"></span><span class="yv-vlbl">1</span>Verse text...
+ * Text between markers (including continuation paragraphs and poetry blocks)
+ * belongs to the preceding verse.
+ * Returns empty array if no verse markers found.
+ */
+function parseVersesFromHtml(html: string): Array<{ number: number; text: string }> {
+  // Strategy 1: YouVersion yv-v markers (confirmed format from API)
+  // Split at each <span class="yv-v" v="N"></span> boundary
+  const yvParts = html.split(/<span\s+class="yv-v"\s+v="(\d+)"[^>]*><\/span>/);
+  if (yvParts.length > 2) {
+    const verses: Array<{ number: number; text: string }> = [];
+    for (let i = 1; i < yvParts.length; i += 2) {
+      const num = parseInt(yvParts[i], 10);
+      const rawHtml = yvParts[i + 1] || '';
+      const cleaned = rawHtml
+        .replace(/<span\s+class="yv-vlbl"[^>]*>\d+<\/span>/g, '') // remove visible verse labels
+        .replace(/<\/div>\s*<div[^>]*>/g, ' ');  // add space between paragraphs/poetry blocks
+      const text = stripHtml(cleaned);
+      if (text && !isNaN(num)) {
+        verses.push({ number: num, text });
+      }
+    }
+    if (verses.length > 0) {
+      verses.sort((a, b) => a.number - b.number);
+      return verses;
+    }
+  }
+
+  // Strategy 2: <sup>N</sup> verse numbers (other Bible API formats)
+  const supParts = html.split(/<sup[^>]*>\s*(\d+)\s*<\/sup>/i);
+  if (supParts.length > 2) {
+    const verses: Array<{ number: number; text: string }> = [];
+    for (let i = 1; i < supParts.length; i += 2) {
+      const num = parseInt(supParts[i], 10);
+      const rawText = stripHtml(supParts[i + 1] || '');
+      if (rawText && !isNaN(num)) {
+        verses.push({ number: num, text: rawText });
+      }
+    }
+    if (verses.length > 0) {
+      verses.sort((a, b) => a.number - b.number);
+      return verses;
+    }
+  }
+
+  return [];
+}
+
+/** Strip HTML tags and normalize whitespace.
+ *  Loops until stable to handle malformed/nested tags like <<script>. */
+function stripHtml(html: string): string {
+  let result = html;
+  let prev = '';
+  while (result !== prev) {
+    prev = result;
+    result = result.replace(/<[^>]+>/g, '');
+  }
+  return result.replace(/\s+/g, ' ').trim();
+}
+
+/** Fetch a passage from YouVersion API */
+export async function getYouVersionPassage(
+  bibleId: number,
+  reference: string,
+  apiKey: string
+): Promise<{ text: string; reference: string; translation: string; verseCount: number; copyright: string | null; verses: Array<{ number: number; text: string }> }> {
+  const usfmRef = convertToUsfmRef(reference);
+  const cacheKey = `youversion:passage:${bibleId}:${usfmRef}`;
+  const cached = bibleCache.get<any>(cacheKey);
+  if (cached) return cached;
+
+  // Fetch HTML format to extract verse-level structure
+  const response = await axios.get(
+    `${YOUVERSION_API_BASE}/bibles/${bibleId}/passages/${encodeURIComponent(usfmRef)}`,
+    {
+      params: { format: 'html' },
+      headers: { 'x-yvp-app-key': apiKey },
+      timeout: 10000,
+    }
+  );
+
+  const data = response.data;
+  const htmlContent = (data.content || data.text || '').trim();
+  const verses = parseVersesFromHtml(htmlContent);
+
+  const result = {
+    text: verses.length > 0
+      ? verses.map(v => v.text).join(' ')
+      : stripHtml(htmlContent),
+    reference: data.reference || reference,
+    translation: data.bible_abbreviation || data.translation || String(bibleId),
+    verseCount: verses.length || data.verse_count || data.verses?.length || 0,
+    copyright: data.copyright || null,
+    verses,
+  };
+
+  bibleCache.set(cacheKey, result, 3600);
+  return result;
+}
+
+/** Fetch Verse of the Day from YouVersion API.
+ *  Step 1: GET /v1/verse_of_the_days/{day} -> { day, passage_id }
+ *  Step 2: Fetch the passage text using the passage_id (already in USFM format) */
+async function getYouVersionVotd(day: number, apiKey: string): Promise<{ text: string; reference: string; translation: string; copyright: string | null }> {
+  const cacheKey = `youversion:votd:${day}`;
+  const cached = bibleCache.get<any>(cacheKey);
+  if (cached) return cached;
+
+  // Step 1: Get the passage_id for this day
+  const votdResponse = await axios.get(`${YOUVERSION_API_BASE}/verse_of_the_days/${day}`, {
+    headers: { 'x-yvp-app-key': apiKey },
+    timeout: 10000,
+  });
+
+  const passageId: string = votdResponse.data.passage_id;
+  if (!passageId) throw new Error(`No passage_id returned for day ${day}`);
+
+  // Step 2: Fetch the passage text using the USFM passage_id
+  const passageResponse = await axios.get(
+    `${YOUVERSION_API_BASE}/bibles/${DEFAULT_YOUVERSION_BIBLE_ID}/passages/${encodeURIComponent(passageId)}`,
+    {
+      params: { format: 'text' },
+      headers: { 'x-yvp-app-key': apiKey },
+      timeout: 10000,
+    }
+  );
+
+  const data = passageResponse.data;
+  const result = {
+    text: (data.content || data.text || '').trim(),
+    reference: data.reference || passageId,
+    translation: data.bible_abbreviation || data.translation || 'NIV',
+    copyright: data.copyright || null,
+  };
+
+  bibleCache.set(cacheKey, result, 3600);
+  return result;
+}
+
+// 90 curated encouraging verse references (USFM format for direct YouVersion API use)
+export const DAILY_VERSES = [
+  { reference: "JER.29.11" }, { reference: "ISA.41.10" }, { reference: "JOS.1.9" },
+  { reference: "PHP.4.13" }, { reference: "ISA.40.31" }, { reference: "ROM.8.28" },
+  { reference: "DEU.31.6" }, { reference: "PSA.46.1" }, { reference: "MAT.11.28" },
+  { reference: "ROM.15.13" }, { reference: "PSA.23.4" }, { reference: "JHN.14.27" },
+  { reference: "PHP.4.6-PHP.4.7" }, { reference: "PSA.34.18" }, { reference: "1PE.5.7" },
+  { reference: "ISA.26.3" }, { reference: "PSA.147.3" }, { reference: "PSA.55.22" },
+  { reference: "PSA.46.10" }, { reference: "COL.3.15" }, { reference: "2CO.12.9" },
+  { reference: "PSA.27.1" }, { reference: "ISA.40.29" }, { reference: "PSA.28.7" },
+  { reference: "PSA.18.2" }, { reference: "2TI.1.7" }, { reference: "ISA.12.2" },
+  { reference: "PSA.118.6" }, { reference: "PSA.73.26" }, { reference: "NAM.1.7" },
+  { reference: "LAM.3.22-LAM.3.23" }, { reference: "2TH.3.3" }, { reference: "PHP.1.6" },
+  { reference: "NUM.6.24-NUM.6.26" }, { reference: "PSA.37.4" }, { reference: "JER.31.3" },
+  { reference: "PSA.145.18" }, { reference: "PSA.138.7" }, { reference: "HEB.13.5" },
+  { reference: "ISA.49.15-ISA.49.16" }, { reference: "ROM.8.31" }, { reference: "JHN.16.33" },
+  { reference: "GAL.6.9" }, { reference: "JAS.1.2-JAS.1.3" }, { reference: "JAS.1.12" },
+  { reference: "2CO.4.16-2CO.4.17" }, { reference: "HEB.10.35-HEB.10.36" },
+  { reference: "ROM.5.3-ROM.5.4" }, { reference: "HEB.12.1" }, { reference: "PSA.31.24" },
+  { reference: "PRO.3.5-PRO.3.6" }, { reference: "PSA.56.3" }, { reference: "JER.17.7" },
+  { reference: "PSA.62.1-PSA.62.2" }, { reference: "PRO.16.3" }, { reference: "ISA.30.21" },
+  { reference: "PSA.32.8" }, { reference: "PSA.16.8" }, { reference: "PSA.121.1-PSA.121.2" },
+  { reference: "MIC.7.7" }, { reference: "PSA.91.1-PSA.91.2" }, { reference: "ISA.43.2" },
+  { reference: "PSA.121.7-PSA.121.8" }, { reference: "PSA.91.11" }, { reference: "ISA.54.17" },
+  { reference: "PSA.34.4" }, { reference: "PRO.18.10" }, { reference: "PSA.94.19" },
+  { reference: "PSA.40.1-PSA.40.2" }, { reference: "DEU.33.27" }, { reference: "PSA.30.5" },
+  { reference: "ISA.43.18-ISA.43.19" }, { reference: "2CO.5.17" }, { reference: "ECC.3.11" },
+  { reference: "JHN.15.11" }, { reference: "ROM.12.12" }, { reference: "HAB.3.17-HAB.3.18" },
+  { reference: "ZEP.3.17" }, { reference: "PSA.23.1" }, { reference: "JER.29.13" },
+  { reference: "ROM.8.38-ROM.8.39" }, { reference: "1JN.4.18" }, { reference: "EPH.3.20" },
+  { reference: "PHP.4.19" }, { reference: "JHN.10.10" }, { reference: "PSA.103.2-PSA.103.4" },
+  { reference: "ISA.40.28" }, { reference: "MAT.11.29-MAT.11.30" }, { reference: "ISA.61.1" },
+  { reference: "JHN.14.1" },
+];
+
+// Default Bible version (NIV 2011 = 111 on YouVersion)
+export const DEFAULT_YOUVERSION_BIBLE_ID = 111;
+
+// ─── Bible Query Resolvers ─────────────────────────────────────
+
+export function createBibleQueryResolvers(getYouVersionKey?: () => string) {
+  return {
+    bibleVersions: async () => {
+      const yvKey = getYouVersionKey?.() || '';
+      if (!yvKey) throw new Error('YOUVERSION_APP_KEY not configured');
+      return await getYouVersionBibles(yvKey);
+    },
+
+    bibleVotd: async (_: any, { day }: { day: number }) => {
+      const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
+      return { text: '', reference: DAILY_VERSES[index].reference, translation: 'NIV', copyright: null };
+    },
+
+    bibleVotdApi: async (_: any, { day }: { day: number }) => {
+      const yvKey = getYouVersionKey?.() || '';
+      if (yvKey) {
+        try {
+          return await getYouVersionVotd(day, yvKey);
+        } catch {
+          console.warn('[bibleVotdApi] YouVersion VOTD API failed for day', day, '— trying biblePassage fallback');
+        }
+      }
+      // Fallback 1: try fetching verse text via biblePassage API using curated reference
+      const index = ((day - 1) % DAILY_VERSES.length + DAILY_VERSES.length) % DAILY_VERSES.length;
+      const curated = DAILY_VERSES[index];
+      if (yvKey) {
+        try {
+          const passage = await getYouVersionPassage(DEFAULT_YOUVERSION_BIBLE_ID, curated.reference, yvKey);
+          return { text: passage.text, reference: passage.reference, translation: passage.translation, copyright: passage.copyright };
+        } catch {
+          console.warn('[bibleVotdApi] biblePassage fallback failed for', curated.reference, '— using hardcoded text');
+        }
+      }
+      // Fallback 2: return reference only (text fetched from API failed)
+      return { text: '', reference: curated.reference, translation: 'NIV', copyright: null };
+    },
+
+    biblePassage: async (_: any, { reference, translation }: { reference: string; translation?: string }) => {
+      const yvKey = getYouVersionKey?.() || '';
+      if (!yvKey) throw new Error('YOUVERSION_APP_KEY not configured');
+      const parsed = translation ? parseInt(translation, 10) : NaN;
+      const bibleId = isNaN(parsed) ? DEFAULT_YOUVERSION_BIBLE_ID : parsed;
+      return await getYouVersionPassage(bibleId, reference, yvKey);
+    },
+  };
+}

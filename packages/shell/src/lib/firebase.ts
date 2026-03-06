@@ -118,6 +118,7 @@ export interface UserProfile {
   displayName: string | null;
   photoURL: string | null;
   darkMode: boolean;
+  theme?: 'light' | 'dark' | 'auto';
   locale?: string;
   tempUnit?: 'C' | 'F';
   speedUnit?: 'ms' | 'mph' | 'kmh';
@@ -324,6 +325,15 @@ export async function updateUserDarkMode(uid: string, darkMode: boolean) {
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     darkMode,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateUserTheme(uid: string, theme: 'light' | 'dark' | 'auto') {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    theme,
     updatedAt: serverTimestamp(),
   });
 }
@@ -1646,6 +1656,110 @@ if (db && auth) {
         playedBy: { uid: user.uid, displayName: user.displayName || 'Anonymous' },
         playedAt: serverTimestamp(),
       });
+    },
+  };
+}
+
+// ─── Children (multi-child) ─────────────────────────────────────────────────
+
+import type { Child } from '@mycircle/shared';
+
+export async function getChildren(uid: string): Promise<Child[]> {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'children'), orderBy('name', 'asc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Child));
+}
+
+export async function addChild(uid: string, child: Omit<Child, 'id'>): Promise<string> {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'users', uid, 'children'), {
+    ...child,
+    createdAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updateChild(uid: string, childId: string, updates: Partial<Omit<Child, 'id'>>): Promise<void> {
+  if (!db) throw new Error('Firebase not initialized');
+  await updateDoc(doc(db, 'users', uid, 'children', childId), {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteChild(uid: string, childId: string): Promise<void> {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'users', uid, 'children', childId));
+}
+
+export function subscribeToChildren(uid: string, callback: (children: Child[]) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'children'), orderBy('name', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    const children = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Child));
+    callback(children);
+  }, (error) => {
+    log.warn('Children snapshot error:', error);
+  });
+}
+
+/**
+ * Migrate legacy single-child fields (childName, childBirthDate) from user
+ * profile into the children subcollection. Runs once on sign-in if legacy
+ * fields exist and children subcollection is empty.
+ */
+export async function migrateToMultiChild(uid: string, profile: UserProfile): Promise<void> {
+  if (!db) return;
+  const { childName, childBirthDate } = profile;
+  if (!childName || !childBirthDate) return;
+
+  // Normalise legacy btoa-encoded birth date
+  let plainDate = childBirthDate;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(plainDate)) {
+    try { plainDate = atob(plainDate); } catch { /* use as-is */ }
+  }
+
+  // Only migrate if children subcollection is empty
+  const existing = await getChildren(uid);
+  if (existing.length > 0) return;
+
+  log.info('Migrating legacy single-child to multi-child:', childName);
+  const childData: Omit<Child, 'id'> = { name: childName, birthDate: plainDate };
+
+  // Carry over due date from baby tracker if present
+  if (profile.babyDueDate) {
+    childData.dueDate = profile.babyDueDate;
+  }
+
+  await addChild(uid, childData);
+
+  // Clear legacy fields from user profile
+  await updateDoc(doc(db, 'users', uid), {
+    childName: deleteField(),
+    childBirthDate: deleteField(),
+  });
+}
+
+// Expose children bridge API for MFEs
+if (firebaseEnabled) {
+  window.__children = {
+    getAll: () => auth?.currentUser ? getChildren(auth.currentUser.uid) : Promise.resolve([]),
+    add: (child) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addChild(auth.currentUser.uid, child);
+    },
+    update: (id, updates) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateChild(auth.currentUser.uid, id, updates);
+    },
+    delete: (id) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteChild(auth.currentUser.uid, id);
+    },
+    subscribe: (callback) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToChildren(auth.currentUser.uid, callback);
     },
   };
 }

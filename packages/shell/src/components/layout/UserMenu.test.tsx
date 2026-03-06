@@ -32,9 +32,11 @@ vi.mock('../../context/AuthContext', () => ({
     resetPassword: mockResetPassword,
     signOut: mockSignOut,
     updateDarkMode: vi.fn(),
+    updateTheme: vi.fn(),
     updateTempUnit: vi.fn(),
     updateSpeedUnit: vi.fn(),
     updateDistanceUnit: vi.fn(),
+    updateUnitSystem: vi.fn(),
     knownAccounts: mockKnownAccounts,
     switchToAccount: mockSwitchToAccount,
     removeKnownAccount: mockRemoveKnownAccount,
@@ -42,7 +44,7 @@ vi.mock('../../context/AuthContext', () => ({
 }));
 
 vi.mock('../../context/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'light', toggleTheme: vi.fn() }),
+  useTheme: () => ({ theme: 'auto', toggleTheme: vi.fn(), setThemeMode: vi.fn() }),
 }));
 
 vi.mock('../../lib/firebase', () => ({

@@ -133,7 +133,7 @@ export function validatePwaShortcuts(): string {
 // ─── Validator: Widget registry consistency ───────────────────
 
 export function validateWidgetRegistry(): string {
-  const dashboardFile = readFile('packages/shell/src/components/widgets/WidgetDashboard.tsx');
+  const dashboardFile = readFile('packages/shell/src/components/widgets/widgetConfig.ts');
 
   // Extract WidgetType union: type WidgetType = 'weather' | 'stocks' | ...
   const typeMatch = dashboardFile.match(/type\s+WidgetType\s*=\s*([^;]+)/);
