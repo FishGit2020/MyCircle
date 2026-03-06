@@ -73,10 +73,14 @@ jobs:
       - name: Typecheck all packages
         run: pnpm typecheck:all
 
-  # ── Unit tests (parallel with typecheck) ───────────────────────────────
+  # ── Unit tests (sharded, parallel with typecheck) ─────────────────────
   test:
     needs: setup
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/2, 2/2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -97,12 +101,13 @@ jobs:
             packages/shared/dist
           key: workspace-${{ github.sha }}
 
-      - name: Unit tests (root — shell + shared)
-        run: pnpm test:run --reporter=dot
+      - name: Unit tests (shard ${{ matrix.shard }})
+        run: pnpm test:run --reporter=dot --shard=${{ matrix.shard }}
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
 
       - name: Unit tests (changed MFE packages)
+        if: matrix.shard == '1/2'
         run: |
           # Run tests only for packages with changes relative to main
           CHANGED=$(pnpm --filter '!mycircle' --filter '...[origin/main]' -r exec -- echo '$PNPM_PACKAGE_NAME' 2>/dev/null | grep '@mycircle/' || true)
@@ -217,6 +222,7 @@ jobs:
     steps:
       - name: Check required jobs
         run: |
+          # Matrix jobs report as a single "test" result — "success" only if ALL shards pass
           if [ "${{ needs.typecheck.result }}" != "success" ] || [ "${{ needs.test.result }}" != "success" ]; then
             echo "Required jobs failed: typecheck=${{ needs.typecheck.result }}, test=${{ needs.test.result }}"
             exit 1
