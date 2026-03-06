@@ -547,7 +547,7 @@ async function getPodcastEpisodesAPI(apiKey: string, apiSecret: string, feedId: 
 
   const headers = getPodcastIndexHeaders(apiKey, apiSecret);
   const response = await axios.get(`${PODCASTINDEX_BASE}/api/1.0/episodes/byfeedid`, {
-    params: { id: feedId, max: 20 },
+    params: { id: feedId, max: 100 },
     headers,
     timeout: 10000,
   });

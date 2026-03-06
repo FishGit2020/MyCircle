@@ -430,8 +430,20 @@ const NotebookWidget = React.memo(function NotebookWidget() {
     }
     load();
     window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
-    // On auth change, the notebook subscription needs time to populate the cache
-    const handleAuth = () => { setTimeout(load, 2000); };
+    // On auth change, fetch note count directly then poll cache as backup
+    const handleAuth = () => {
+      load();
+      const api = window.__notebook;
+      if (api?.getAll) {
+        api.getAll().then((notes: any[]) => {
+          setNoteCount(notes.length);
+          try { localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(notes.length)); } catch { /* ignore */ }
+        }).catch(() => { /* ignore */ });
+      }
+      // Poll cache as fallback in case subscription populates it
+      const interval = setInterval(load, 1000);
+      setTimeout(() => clearInterval(interval), 10000);
+    };
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
     return () => {
       window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, load);

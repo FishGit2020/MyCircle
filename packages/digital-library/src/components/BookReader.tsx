@@ -59,6 +59,12 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [activeTab, setActiveTab] = useState<'read' | 'listen'>(initialTab);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Sync activeTab when URL search params change (e.g. audio pill navigation)
+  useEffect(() => {
+    const tab = searchParams.get('tab') === 'listen' ? 'listen' : 'read';
+    setActiveTab(tab);
+  }, [searchParams]);
+
   // Sync activeTab to URL search param
   const handleTabChange = useCallback((tab: 'read' | 'listen') => {
     setActiveTab(tab);
@@ -176,10 +182,19 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
     };
   }, [epubUrl, chapters]);
 
-  // Update font size
+  // Update font size — inject !important CSS to override EPUB inline styles
   useEffect(() => {
-    if (renditionRef.current) {
-      renditionRef.current.themes.fontSize(`${fontSize}px`);
+    const r = renditionRef.current;
+    if (!r) return;
+    r.themes.fontSize(`${fontSize}px`);
+    // Force CSS override on all text elements inside the EPUB iframe
+    r.hooks?.content?.register((contents: any) => {
+      contents.addStylesheetRules({ 'body, body *': { 'font-size': `${fontSize}px !important` } });
+    });
+    // Re-display current location to apply the new size
+    const loc = r.location;
+    if (loc?.start?.cfi) {
+      r.display(loc.start.cfi);
     }
   }, [fontSize]);
 
@@ -295,6 +310,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
       <div className="flex items-center gap-2 mb-3 flex-shrink-0">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate flex-1">{title}</h2>
 
+        {activeTab === 'read' && (<>
         {/* Bookmark button */}
         <div className="relative">
           <button
@@ -384,6 +400,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             </svg>
           )}
         </button>
+        </>)}
       </div>
 
       {/* Tabs */}

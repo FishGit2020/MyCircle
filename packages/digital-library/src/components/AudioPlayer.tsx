@@ -229,7 +229,8 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
   if (audioChapters.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 space-y-3">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex flex-col gap-3 h-full">
+      <div className="space-y-3 flex-shrink-0">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate flex-1">
           {current?.title || bookTitle}
@@ -410,9 +411,10 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
         </div>
       </div>
 
+      </div>
       {/* Chapter list */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
-        <div className="max-h-40 overflow-y-auto space-y-1">
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex-1 min-h-0 overflow-y-auto">
+        <div className="space-y-1">
           {audioChapters.map((ch, idx) => {
             const progress = getChapterProgressFraction(idx);
             const complete = isChapterComplete(idx);

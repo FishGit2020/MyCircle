@@ -135,13 +135,13 @@ export default function AiAssistant() {
   return (
     <PageContent maxWidth="3xl" fill className="ai-assistant">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-y-2 mb-4">
+        <div className="min-w-0 flex-shrink">
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <svg className="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-7 h-7 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
-            {t('ai.title')}
+            <span className="truncate">{t('ai.title')}</span>
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {t('ai.subtitle')}
@@ -168,7 +168,7 @@ export default function AiAssistant() {
                 value={selectedModel}
                 onChange={handleModelChange}
                 disabled={modelsLoading || displayModels.length === 0}
-                className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50"
+                className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-50 max-w-[140px] truncate"
               >
                 {modelsLoading ? (
                   <option value="">{t('app.loading')}</option>
