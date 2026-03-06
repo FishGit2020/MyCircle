@@ -67,7 +67,7 @@ describe('ChildDevelopment', () => {
   });
 
   it('saves child data to localStorage and dispatches event', { timeout: 5_000 }, async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
     render(<ChildDevelopment />);

@@ -49,7 +49,7 @@ describe('SongEditor', () => {
   });
 
   it('includes YouTube URL in saved data', { timeout: 5_000 }, async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     render(<SongEditor onSave={onSave} onCancel={onCancel} />);
 
     await user.type(screen.getByRole('textbox', { name: /worship\.songTitle/ }), 'Test Song');

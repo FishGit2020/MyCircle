@@ -58,6 +58,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 
 - **Max timeout: 5000ms** — never set `{ timeout: X }` above 5000 in any test file (unit or e2e). Tests that need more time indicate a design problem: mock the slow dependency instead.
 - Unit tests must complete in milliseconds — mock all network calls, timers, and async side effects.
+- **userEvent**: always use `userEvent.setup({ delay: null })` — the default typing delay makes tests slow in CI.
 
 ## Test Gotchas
 
