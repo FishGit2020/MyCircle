@@ -62,6 +62,13 @@ service cloud.firestore {
       }
     }
 
+    // Public hiking routes - authenticated read/create, creator-only delete
+    match /publicHikingRoutes/{routeId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.sharedBy.uid == request.auth.uid;
+    }
+
     // Feedback collection - anyone can submit feedback (write-only inbox)
     match /feedback/{feedbackId} {
       allow create: if request.resource.data.message is string

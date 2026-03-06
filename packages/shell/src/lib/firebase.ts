@@ -1003,36 +1003,29 @@ if (firebaseEnabled) {
   };
 }
 
-// Hiking Routes — user-scoped subcollection
+// ─── Hiking Routes — user-scoped (private) + public shared collection ─────
+
 export async function getHikingRoutes(uid: string) {
   if (!db) return [];
   const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
 export async function addHikingRoute(uid: string, route: {
-  name: string;
-  distance: number;
-  duration: number;
-  geometry: object;
-  startLabel?: string;
-  endLabel?: string;
+  name: string; distance: number; duration: number; geometry: object;
+  startLabel?: string; endLabel?: string;
 }) {
   if (!db) throw new Error('Firebase not initialized');
   const docRef = await addDoc(collection(db, 'users', uid, 'hikingRoutes'), {
-    ...route,
-    createdAt: serverTimestamp(),
+    ...route, createdAt: serverTimestamp(),
   });
   return docRef.id;
 }
 
-export async function updateHikingRoute(uid: string, routeId: string, updates: { name?: string }) {
+export async function updateHikingRoute(uid: string, routeId: string, updates: Record<string, any>) {
   if (!db) throw new Error('Firebase not initialized');
-  await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), {
-    ...updates,
-    updatedAt: serverTimestamp(),
-  });
+  await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), { ...updates, updatedAt: serverTimestamp() });
 }
 
 export async function deleteHikingRoute(uid: string, routeId: string) {
@@ -1043,11 +1036,44 @@ export async function deleteHikingRoute(uid: string, routeId: string) {
 export function subscribeToHikingRoutes(uid: string, callback: (routes: Array<Record<string, any>>) => void): () => void {
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
-  return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-  }, (error) => {
-    log.warn('Hiking routes snapshot error:', error);
+  return onSnapshot(q, (snap) => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    (err) => log.warn('Hiking routes snapshot error:', err));
+}
+
+// Public hiking routes — shareable to all users
+export async function getPublicHikingRoutes() {
+  if (!db) return [];
+  const q = query(collection(db, 'publicHikingRoutes'), orderBy('sharedAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function shareHikingRoute(uid: string, displayName: string, routeId: string, route: {
+  name: string; distance: number; duration: number; geometry: object;
+  startLabel?: string; endLabel?: string;
+}) {
+  if (!db) throw new Error('Firebase not initialized');
+  // Use same id in public collection so we can match them
+  await setDoc(doc(db, 'publicHikingRoutes', routeId), {
+    ...route,
+    sharedBy: { uid, displayName },
+    sharedAt: serverTimestamp(),
   });
+  // Mark the personal route as shared
+  await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), { sharedId: routeId });
+}
+
+export async function unshareHikingRoute(uid: string, routeId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'publicHikingRoutes', routeId));
+  await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), { sharedId: null });
+}
+
+export function subscribeToPublicHikingRoutes(callback: (routes: Array<Record<string, any>>) => void): () => void {
+  if (!db) return () => {};
+  const q = query(collection(db, 'publicHikingRoutes'), orderBy('sharedAt', 'desc'));
+  return onSnapshot(q, (snap) => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+    (err) => log.warn('Public hiking routes snapshot error:', err));
 }
 
 // Expose hiking routes API for MFEs
@@ -1070,9 +1096,21 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) return () => {};
       return subscribeToHikingRoutes(auth.currentUser.uid, callback);
     },
+    share: (routeId, route) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const displayName = auth.currentUser.displayName || auth.currentUser.email || 'Hiker';
+      return shareHikingRoute(auth.currentUser.uid, displayName, routeId, route);
+    },
+    unshare: (routeId) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return unshareHikingRoute(auth.currentUser.uid, routeId);
+    },
+    getAllPublic: () => getPublicHikingRoutes(),
+    subscribePublic: subscribeToPublicHikingRoutes,
   };
 }
 
+// ─── Immigration Tracker — user-scoped subcollection ─────────────────────
 // Immigration Tracker — user-scoped subcollection
 export async function getImmigrationCases(uid: string) {
   if (!db) return [];
