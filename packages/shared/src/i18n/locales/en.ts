@@ -1042,6 +1042,7 @@ const en = {
   'childDev.birthDatePlaceholder': 'Select birth date',
   'childDev.monthsOld': '{months} months old',
   'childDev.yearsMonthsOld': '{years} years {months} months old',
+  'childDev.daysCount': '{days} days',
   'childDev.pastStage': 'Completed',
   'childDev.currentStage': 'Current',
   'childDev.upcomingStage': 'Upcoming',

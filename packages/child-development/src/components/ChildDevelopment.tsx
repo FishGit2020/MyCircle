@@ -104,6 +104,18 @@ export default function ChildDevelopment() {
     return Math.max(0, months);
   }, [birthDate]);
 
+  const ageInDays = useMemo(() => {
+    if (!birthDate || ageInMonths === null) return 0;
+    const birth = new Date(birthDate + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // Calculate the start of the current month-age to find remaining days
+    const monthStart = new Date(birth);
+    monthStart.setMonth(monthStart.getMonth() + ageInMonths);
+    const diffMs = today.getTime() - monthStart.getTime();
+    return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+  }, [birthDate, ageInMonths]);
+
   const currentAgeRange = useMemo(() => {
     if (ageInMonths === null) return null;
     return getAgeRangeForMonths(ageInMonths) || null;
@@ -112,12 +124,20 @@ export default function ChildDevelopment() {
   const ageDisplay = useMemo(() => {
     if (ageInMonths === null) return '';
     if (ageInMonths < 24) {
-      return t('childDev.monthsOld' as any).replace('{months}', String(ageInMonths));
+      const base = t('childDev.monthsOld' as any).replace('{months}', String(ageInMonths));
+      if (ageInDays > 0) {
+        return base + ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageInDays));
+      }
+      return base;
     }
     const years = Math.floor(ageInMonths / 12);
     const months = ageInMonths % 12;
-    return t('childDev.yearsMonthsOld' as any).replace('{years}', String(years)).replace('{months}', String(months));
-  }, [ageInMonths, t]);
+    const base = t('childDev.yearsMonthsOld' as any).replace('{years}', String(years)).replace('{months}', String(months));
+    if (ageInDays > 0) {
+      return base + ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageInDays));
+    }
+    return base;
+  }, [ageInMonths, ageInDays, t]);
 
   // Actions
   const saveChild = useCallback(() => {

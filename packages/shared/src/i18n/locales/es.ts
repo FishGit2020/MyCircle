@@ -1044,6 +1044,7 @@ const es: Record<TranslationKey, string> = {
   'childDev.birthDatePlaceholder': 'Selecciona la fecha de nacimiento',
   'childDev.monthsOld': '{months} meses',
   'childDev.yearsMonthsOld': '{years} a\u00f1os {months} meses',
+  'childDev.daysCount': '{days} d\u00edas',
   'childDev.pastStage': 'Completada',
   'childDev.currentStage': 'Actual',
   'childDev.upcomingStage': 'Pr\u00f3xima',

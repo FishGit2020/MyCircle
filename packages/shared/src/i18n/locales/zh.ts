@@ -1044,6 +1044,7 @@ const zh: Record<TranslationKey, string> = {
   'childDev.birthDatePlaceholder': '\u9009\u62e9\u51fa\u751f\u65e5\u671f',
   'childDev.monthsOld': '{months}\u4e2a\u6708',
   'childDev.yearsMonthsOld': '{years}\u5c81{months}\u4e2a\u6708',
+  'childDev.daysCount': '{days}\u5929',
   'childDev.pastStage': '\u5df2\u5b8c\u6210',
   'childDev.currentStage': '\u5f53\u524d',
   'childDev.upcomingStage': '\u5373\u5c06',

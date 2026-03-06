@@ -140,12 +140,14 @@ function NavDropdown({
   group,
   isOpen,
   onToggle,
+  onClose,
   pathname,
   t: translate,
 }: {
   group: NavGroup;
   isOpen: boolean;
   onToggle: () => void;
+  onClose: () => void;
   pathname: string;
   t: (key: TranslationKey) => string;
 }) {
@@ -186,6 +188,7 @@ function NavDropdown({
                 key={item.path}
                 to={item.path}
                 role="menuitem"
+                onClick={onClose}
                 onMouseEnter={() => prefetchRoute(item.path)}
                 onFocus={() => prefetchRoute(item.path)}
                 className={`flex items-center gap-2 px-3 py-2 text-sm transition ${
@@ -210,12 +213,14 @@ function OverflowMenu({
   groups,
   isOpen,
   onToggle,
+  onClose,
   pathname,
   t: translate,
 }: {
   groups: NavGroup[];
   isOpen: boolean;
   onToggle: () => void;
+  onClose: () => void;
   pathname: string;
   t: (key: TranslationKey) => string;
 }) {
@@ -260,6 +265,7 @@ function OverflowMenu({
                     key={item.path}
                     to={item.path}
                     role="menuitem"
+                    onClick={onClose}
                     onMouseEnter={() => prefetchRoute(item.path)}
                     onFocus={() => prefetchRoute(item.path)}
                     className={`flex items-center gap-2 px-3 py-2 text-sm transition ${
@@ -318,16 +324,21 @@ export default function Layout() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click — use both pointerdown and mousedown for
+  // broad browser compat (pointerdown covers touch; mousedown covers legacy)
   useEffect(() => {
     if (openGroup === null) return;
-    function handleMouseDown(e: MouseEvent) {
+    function handleOutsideClick(e: Event) {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setOpenGroup(null);
       }
     }
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
+    document.addEventListener('pointerdown', handleOutsideClick);
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutsideClick);
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
   }, [openGroup]);
 
   // Close dropdown on Escape
@@ -415,6 +426,7 @@ export default function Layout() {
                       return next;
                     });
                   }}
+                  onClose={() => setOpenGroup(null)}
                   pathname={location.pathname}
                   t={t}
                 />
@@ -426,6 +438,7 @@ export default function Layout() {
                   onToggle={() => {
                     setOpenGroup(prev => prev === '__overflow__' ? null : '__overflow__');
                   }}
+                  onClose={() => setOpenGroup(null)}
                   pathname={location.pathname}
                   t={t}
                 />
