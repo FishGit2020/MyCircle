@@ -629,6 +629,7 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
   const { t } = useTranslation();
   const [childName, setChildName] = React.useState<string | null>(null);
   const [ageMonths, setAgeMonths] = React.useState<number | null>(null);
+  const [ageDays, setAgeDays] = React.useState<number>(0);
 
   useEffect(() => {
     function compute() {
@@ -641,12 +642,20 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
           try { birthStr = atob(birthRaw); } catch { birthStr = birthRaw; }
           const birth = new Date(birthStr + 'T00:00:00');
           const today = new Date();
+          today.setHours(0, 0, 0, 0);
           const months = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
-          setAgeMonths(Math.max(0, months));
+          const safeMonths = Math.max(0, months);
+          setAgeMonths(safeMonths);
+          // Calculate remaining days in the current month
+          const monthStart = new Date(birth);
+          monthStart.setMonth(monthStart.getMonth() + safeMonths);
+          const diffMs = today.getTime() - monthStart.getTime();
+          setAgeDays(Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24))));
         } else {
           setAgeMonths(null);
+          setAgeDays(0);
         }
-      } catch { setChildName(null); setAgeMonths(null); }
+      } catch { setChildName(null); setAgeMonths(null); setAgeDays(0); }
     }
     compute();
     window.addEventListener('child-data-changed', compute);
@@ -655,8 +664,8 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
 
   const ageDisplay = ageMonths !== null
     ? ageMonths >= 24
-      ? `${Math.floor(ageMonths / 12)}y ${ageMonths % 12}m`
-      : `${ageMonths}m`
+      ? `${Math.floor(ageMonths / 12)}y ${ageMonths % 12}m` + (ageDays > 0 ? ` ${ageDays}d` : '')
+      : `${ageMonths}m` + (ageDays > 0 ? ` ${ageDays}d` : '')
     : null;
 
   const stageLabel = ageMonths !== null ? getStageLabel(ageMonths) : null;
