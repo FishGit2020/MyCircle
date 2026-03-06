@@ -4,7 +4,7 @@ import type { TileProviderConfig } from '../config/mapConfig';
 interface Props {
   providers: TileProviderConfig[];
   activeId: string;
-  onChange: (id: string, styleUrl: string) => void;
+  onChange: (id: string, style: string | Record<string, unknown>) => void;
 }
 
 export default function MapStyleSwitcher({ providers, activeId, onChange }: Props) {
@@ -17,7 +17,7 @@ export default function MapStyleSwitcher({ providers, activeId, onChange }: Prop
           key={p.id}
           type="button"
           aria-pressed={activeId === p.id}
-          onClick={() => onChange(p.id, p.styleUrl)}
+          onClick={() => onChange(p.id, p.style)}
           className={`px-3 py-1.5 rounded text-sm font-medium transition text-left
             ${activeId === p.id
               ? 'bg-blue-600 text-white'

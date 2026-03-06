@@ -2,13 +2,16 @@ import { useEffect, useRef } from 'react';
 import type maplibregl from 'maplibre-gl';
 
 interface Props {
-  styleUrl: string;
+  style: string | Record<string, unknown>;
   onMapReady: (map: maplibregl.Map) => void;
+  onMapClick?: (lngLat: [number, number]) => void;
 }
 
-export default function MapView({ styleUrl, onMapReady }: Props) {
+export default function MapView({ style, onMapReady, onMapClick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const onMapClickRef = useRef(onMapClick);
+  onMapClickRef.current = onMapClick;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -18,14 +21,19 @@ export default function MapView({ styleUrl, onMapReady }: Props) {
       import('maplibre-gl/dist/maplibre-gl.css').catch(() => {});
       map = new maplibregl.Map({
         container: containerRef.current!,
-        style: styleUrl,
+        style: style as Parameters<typeof maplibregl.Map>[0]['style'],
         center: [-122.4194, 37.7749],
         zoom: 10,
+        preserveDrawingBuffer: true, // needed for map.getCanvas().toDataURL()
       });
-      map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
       map.on('load', () => {
         mapRef.current = map;
         onMapReady(map);
+      });
+
+      map.on('click', (e) => {
+        onMapClickRef.current?.([e.lngLat.lng, e.lngLat.lat]);
       });
     });
 
@@ -38,9 +46,9 @@ export default function MapView({ styleUrl, onMapReady }: Props) {
 
   useEffect(() => {
     if (mapRef.current) {
-      mapRef.current.setStyle(styleUrl);
+      mapRef.current.setStyle(style as Parameters<ReturnType<typeof mapRef.current.setStyle>>[0]);
     }
-  }, [styleUrl]);
+  }, [style]);
 
   return <div ref={containerRef} className="w-full h-full" role="application" aria-label="Map" />;
 }

@@ -1893,7 +1893,14 @@ const es: Record<TranslationKey, string> = {
   'hiking.styleTopo': 'Topogr\u00e1fico',
   'hiking.distance': 'Distancia',
   'hiking.duration': 'Duraci\u00f3n',
-  'hiking.coordsHint': 'Ingresa coordenadas en grados decimales (p. ej. 37.7749, -122.4194)',
+  'hiking.coordsHint': 'Formato: lat, lng  p. ej. 37.7749, -122.4194  (paréntesis ok)',
+  'hiking.coordsError': 'Coordenadas inválidas — usa: lat, lng (p. ej. 47.67, -122.12)',
+  'hiking.tapToSetRoute': 'Toca el mapa para colocar puntos de inicio y fin',
+  'hiking.tapForEnd': 'toca el mapa para el fin',
+  'hiking.useMyLocation': 'Usar mi ubicación',
+  'hiking.zoomIn': 'Acercar',
+  'hiking.zoomOut': 'Alejar',
+  'hiking.saveMap': 'Guardar mapa',
 };
 
 export default es;
