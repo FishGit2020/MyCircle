@@ -192,16 +192,19 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
     if (!currentRoute) return;
     setSaving(true);
     setShowNameInput(false);
-    await saveRoute({
-      name: saveName.trim() || `${t('hiking.route')} ${new Date().toLocaleDateString()}`,
-      distance: currentRoute.distance,
-      duration: currentRoute.duration,
-      geometry: currentRoute.geometry,
-      startLabel: currentStart,
-      endLabel: currentEnd,
-    });
-    await refresh();
-    setSaving(false);
+    try {
+      await saveRoute({
+        name: saveName.trim() || `${t('hiking.route')} ${new Date().toLocaleDateString()}`,
+        distance: currentRoute.distance,
+        duration: currentRoute.duration,
+        geometry: currentRoute.geometry,
+        startLabel: currentStart,
+        endLabel: currentEnd,
+      });
+      await refresh();
+    } finally {
+      setSaving(false);
+    }
   };
 
   // ── Delete ──
