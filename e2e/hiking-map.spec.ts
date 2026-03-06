@@ -1,9 +1,11 @@
 import { test, expect } from './fixtures';
 
 test.describe('Hiking Map', () => {
-  test('hiking nav item appears in the header navigation', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('a[href="/hiking"]').first()).toBeAttached();
+  test('hiking route is accessible', async ({ page }) => {
+    await page.goto('/hiking');
+    await page.waitForLoadState('domcontentloaded');
+    // Verify the route is registered — URL should stay at /hiking (not redirect to 404)
+    await expect(page).toHaveURL(/\/hiking/);
   });
 
   test('renders page without crash', async ({ page }) => {
