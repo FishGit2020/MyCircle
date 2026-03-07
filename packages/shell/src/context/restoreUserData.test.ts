@@ -202,10 +202,12 @@ describe('restoreUserData', () => {
   });
 
   it('restores widget layout only when local is empty', () => {
-    const layout = [{ id: 'weather', visible: true }];
+    const layout = [{ id: 'weather', visible: true, size: 'large' }];
     restoreUserData(makeProfile({ widgetLayout: layout }) as any, 'user1');
     const stored = JSON.parse(localStorage.getItem('widget-dashboard-layout')!);
-    expect(stored[0].size).toBe('medium');
+    // Legacy per-widget size is stripped
+    expect(stored[0].size).toBeUndefined();
+    expect(stored[0].id).toBe('weather');
   });
 
   it('does not overwrite existing local widget layout', () => {
