@@ -183,6 +183,9 @@ export default function WidgetDashboard() {
     [layout]
   );
 
+  // Hide the entire widget section when nothing is pinned and not in edit mode
+  if (!editing && visibleWidgets.length === 0) return null;
+
   return (
     <section aria-label={t('widgets.title')}>
       {/* Header */}
