@@ -24,6 +24,9 @@ vi.mock('@mycircle/shared', () => ({
     BIBLE_DEVOTIONAL_LOG: 'bible-devotional-log',
     BIBLE_TRANSLATION: 'bible-translation',
   },
+  WindowEvents: {
+    AUTH_STATE_CHANGED: 'auth-state-changed',
+  },
   getDailyDevotional: () => ({ book: 'Psalms', chapter: 23, theme: 'The Lord is my shepherd' }),
   parseVerseReference: (ref: string) => {
     const cleaned = ref.replace(/[\u2013\u2014].*/g, '').trim();

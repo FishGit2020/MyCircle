@@ -104,7 +104,7 @@ export default function App() {
         <Route path="podcasts" element={<MFEPageWrapper component={PodcastPlayerMF} name="Podcast Player" />} />
         <Route path="podcasts/:podcastId" element={<MFEPageWrapper component={PodcastPlayerMF} name="Podcast Player" />} />
         <Route path="ai" element={<RequireAuth><MFEPageWrapper component={AiAssistantMF} name="AI Assistant" /></RequireAuth>} />
-        <Route path="bible" element={<RequireAuth><MFEPageWrapper component={BibleReaderMF} name="Bible Reader" /></RequireAuth>} />
+        <Route path="bible" element={<MFEPageWrapper component={BibleReaderMF} name="Bible Reader" />} />
         <Route path="worship" element={<RequireAuth><MFEPageWrapper component={WorshipSongsMF} name="Worship Songs" /></RequireAuth>} />
         <Route path="worship/new" element={<RequireAuth><MFEPageWrapper component={WorshipSongsMF} name="Worship Songs" /></RequireAuth>} />
         <Route path="worship/:songId" element={<RequireAuth><MFEPageWrapper component={WorshipSongsMF} name="Worship Songs" /></RequireAuth>} />
