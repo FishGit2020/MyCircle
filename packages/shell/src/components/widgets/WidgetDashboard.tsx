@@ -129,6 +129,13 @@ export default function WidgetDashboard() {
     return () => window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handler);
   }, []);
 
+  // Sync widget size when sign-in restore writes it to localStorage
+  useEffect(() => {
+    const handler = () => setWidgetSize(loadWidgetSize());
+    window.addEventListener(WindowEvents.WIDGET_SIZE_CHANGED, handler);
+    return () => window.removeEventListener(WindowEvents.WIDGET_SIZE_CHANGED, handler);
+  }, []);
+
   const handleSizeChange = useCallback((size: WidgetSize) => {
     setWidgetSize(size);
     saveWidgetSize(size);

@@ -383,7 +383,7 @@ export default function Layout() {
 
       <footer
         role="contentinfo"
-        className="flex-shrink-0 bg-gray-800 dark:bg-gray-950 text-white py-6 md:py-2 mt-12 md:mt-0 transition-colors"
+        className="flex-shrink-0 bg-gray-800 dark:bg-gray-950 text-white py-1 md:py-2 transition-colors"
       >
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-gray-400">

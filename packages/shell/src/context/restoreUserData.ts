@@ -145,6 +145,7 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
   // Restore global widget size
   if (profile.widgetSize) {
     localStorage.setItem(StorageKeys.WIDGET_SIZE, profile.widgetSize);
+    window.dispatchEvent(new Event(WindowEvents.WIDGET_SIZE_CHANGED));
   }
 
   // Restore book bookmarks
