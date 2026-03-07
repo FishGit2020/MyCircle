@@ -137,6 +137,7 @@ export default function WhatsNewButton() {
         onClick={handleButtonClick}
         className="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         aria-label={t('whatsNew.title')}
+        title={t('whatsNew.title')}
         data-testid="whats-new-button"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

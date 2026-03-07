@@ -200,6 +200,7 @@ export default function NotificationBell() {
               : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
           aria-label={t('notifications.preferences')}
+          title={t('notifications.preferences')}
           aria-expanded={showPanel}
           aria-haspopup="true"
         >

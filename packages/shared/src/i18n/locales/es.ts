@@ -30,6 +30,8 @@ const es: Record<TranslationKey, string> = {
   'home.quickStocksDesc': 'Sigue tu lista de acciones',
   'home.quickPodcastsDesc': 'Descubre y escucha podcasts',
   'home.quickAccess': 'Acceso R\u00e1pido',
+  'home.pinWidget': 'Fijar como widget',
+  'home.unpinWidget': 'Desfijar widget',
 
   // Search
   'search.search': 'Buscar',

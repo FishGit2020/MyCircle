@@ -28,6 +28,8 @@ const en = {
   'home.quickStocksDesc': 'Track your stock watchlist',
   'home.quickPodcastsDesc': 'Discover and listen to podcasts',
   'home.quickAccess': 'Quick Access',
+  'home.pinWidget': 'Pin as widget',
+  'home.unpinWidget': 'Unpin widget',
 
   // Search
   'search.search': 'Search',
