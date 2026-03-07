@@ -60,6 +60,7 @@ function PersonalRouteCard({
   onRenameStart, onRenameChange, onRenameConfirm, onRenameCancel,
 }: PersonalCardProps) {
   const { t } = useTranslation();
+  const { distanceUnit } = useUnits();
   const isShared = !!route.sharedId;
   const isSharingThis = sharing === route.id;
 
