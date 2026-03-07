@@ -366,12 +366,15 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-grow flex flex-col overflow-y-auto container mx-auto px-4 py-6 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
-        style={{ '--player-h': isPlayerVisible ? '5rem' : '0px' } as React.CSSProperties}
+        className="flex-grow flex flex-col overflow-y-auto container mx-auto px-4 py-6 md:pb-4"
+        style={{
+          '--player-h': isPlayerVisible ? '5rem' : '0px',
+          paddingBottom: isPlayerVisible
+            ? 'calc(8rem + env(safe-area-inset-bottom, 0px))'
+            : 'calc(4rem + env(safe-area-inset-bottom, 0px))',
+        } as React.CSSProperties}
       >
         <Outlet />
-        {/* PWA safe area bottom spacer for notched devices */}
-        <div className="md:hidden" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} aria-hidden="true" />
       </main>
 
       <GlobalAudioPlayer onPlayerStateChange={handlePlayerStateChange} onPlayerVisibilityChange={handlePlayerVisibilityChange} />

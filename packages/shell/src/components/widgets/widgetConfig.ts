@@ -31,24 +31,24 @@ export interface WidgetConfig {
 }
 
 export const DEFAULT_LAYOUT: WidgetConfig[] = [
-  { id: 'weather', visible: true },
-  { id: 'stocks', visible: true },
-  { id: 'verse', visible: true },
-  { id: 'nowPlaying', visible: true },
-  { id: 'notebook', visible: true },
-  { id: 'babyTracker', visible: true },
-  { id: 'childDev', visible: true },
-  { id: 'worship', visible: true },
-  { id: 'flashcards', visible: true },
-  { id: 'dailyLog', visible: true },
-  { id: 'cloudFiles', visible: true },
-  { id: 'benchmark', visible: true },
-  { id: 'immigration', visible: true },
-  { id: 'digitalLibrary', visible: true },
-  { id: 'familyGames', visible: true },
-  { id: 'docScanner', visible: true },
-  { id: 'hikingMap', visible: true },
-  { id: 'youthTracker', visible: true },
+  { id: 'weather', visible: false },
+  { id: 'stocks', visible: false },
+  { id: 'verse', visible: false },
+  { id: 'nowPlaying', visible: false },
+  { id: 'notebook', visible: false },
+  { id: 'babyTracker', visible: false },
+  { id: 'childDev', visible: false },
+  { id: 'worship', visible: false },
+  { id: 'flashcards', visible: false },
+  { id: 'dailyLog', visible: false },
+  { id: 'cloudFiles', visible: false },
+  { id: 'benchmark', visible: false },
+  { id: 'immigration', visible: false },
+  { id: 'digitalLibrary', visible: false },
+  { id: 'familyGames', visible: false },
+  { id: 'docScanner', visible: false },
+  { id: 'hikingMap', visible: false },
+  { id: 'youthTracker', visible: false },
 ];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
@@ -143,3 +143,10 @@ export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities:
   hikingMap: '/hiking',
   youthTracker: '/youth-tracker',
 };
+
+/** Reverse map: first path segment → WidgetType (for pin button lookup by route) */
+export const ROUTE_SEGMENT_TO_WIDGET: Record<string, WidgetType> = Object.fromEntries(
+  (Object.entries(WIDGET_ROUTES) as [WidgetType, string | Function][])
+    .filter(([, route]) => typeof route === 'string')
+    .map(([widgetId, route]) => [(route as string).replace(/^\//, ''), widgetId])
+);

@@ -11,8 +11,20 @@ vi.mock('react-router', () => ({
   useSearchParams: () => [mockSearchParams],
 }));
 
+vi.mock('../../hooks/useWidgetPinned', () => ({
+  useWidgetPinned: () => ({ pinned: false, toggle: vi.fn() }),
+}));
+
+vi.mock('../widgets/widgetConfig', () => ({
+  ROUTE_SEGMENT_TO_WIDGET: {
+    weather: 'weather', stocks: 'stocks', bible: 'verse', podcasts: 'nowPlaying',
+    notebook: 'notebook', baby: 'babyTracker', 'child-dev': 'childDev', worship: 'worship',
+  },
+}));
+
 vi.mock('@mycircle/shared', () => ({
-  WindowEvents: { BREADCRUMB_DETAIL: 'breadcrumb-detail' },
+  WindowEvents: { BREADCRUMB_DETAIL: 'breadcrumb-detail', WIDGET_LAYOUT_CHANGED: 'widget-layout-changed' },
+  StorageKeys: { WIDGET_LAYOUT: 'widget-dashboard-layout' },
   useTranslation: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {

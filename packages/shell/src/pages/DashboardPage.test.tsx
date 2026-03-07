@@ -15,6 +15,8 @@ vi.mock('@mycircle/shared', () => ({
     if (!match) return null;
     return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
   },
+  WindowEvents: { WIDGET_LAYOUT_CHANGED: 'widget-layout-changed' },
+  StorageKeys: { WIDGET_LAYOUT: 'widget-dashboard-layout' },
 }));
 
 // Mock useCuratedVerse hook — returns API verse with text by default
