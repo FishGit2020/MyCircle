@@ -74,28 +74,35 @@ const renderWidget = () =>
     </MemoryRouter>
   );
 
+// Renders with at least one widget visible so the section is not hidden
+const renderWidgetWithPinned = () => {
+  getItemSpy.mockImplementation((key: string) => {
+    if (key === 'widget-dashboard-layout') return JSON.stringify([{ id: 'weather', visible: true }]);
+    return null;
+  });
+  return render(<MemoryRouter><WidgetDashboard /></MemoryRouter>);
+};
+
 describe('WidgetDashboard', () => {
   it('renders the widgets title', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders empty dashboard by default (all widgets hidden)', () => {
-    renderWidget();
-    // With default all-hidden layout, no widget tiles are shown in the grid
-    // Customize button is always visible
-    expect(screen.getByText('widgets.customize')).toBeInTheDocument();
-    // No weather widget card in the grid
-    expect(screen.queryByText('widgets.weather')).not.toBeInTheDocument();
+  it('renders nothing by default when all widgets are hidden', () => {
+    const { container } = renderWidget();
+    // With default all-hidden layout and no editing, entire section is hidden
+    expect(container.querySelector('section')).toBeNull();
+    expect(screen.queryByText('widgets.customize')).not.toBeInTheDocument();
   });
 
   it('renders customize button', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     expect(screen.getByText('widgets.customize')).toBeInTheDocument();
   });
 
   it('enters editing mode when customize is clicked', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     fireEvent.click(screen.getByText('widgets.customize'));
     // In editing mode, "Done" button replaces "Customize"
     expect(screen.getByText('widgets.done')).toBeInTheDocument();
@@ -104,24 +111,24 @@ describe('WidgetDashboard', () => {
   });
 
   it('shows visibility toggles in editing mode', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // All widgets default to hidden
-    const hiddenButtons = screen.getAllByText('widgets.hidden');
-    expect(hiddenButtons.length).toBe(18);
+    // 1 pinned widget shows 'widgets.visible', rest are hidden
+    expect(screen.getAllByText('widgets.visible').length).toBe(1);
+    expect(screen.getAllByText('widgets.hidden').length).toBe(17);
   });
 
   it('can toggle widget visibility', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     fireEvent.click(screen.getByText('widgets.customize'));
     const hiddenButtons = screen.getAllByText('widgets.hidden');
     fireEvent.click(hiddenButtons[0]);
-    // After toggling one from hidden, it should now show "Visible"
-    expect(screen.getByText('widgets.visible')).toBeInTheDocument();
+    // After toggling one from hidden, we now have 2 visible
+    expect(screen.getAllByText('widgets.visible').length).toBe(2);
   });
 
   it('shows move up/down buttons in editing mode', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     fireEvent.click(screen.getByText('widgets.customize'));
     const upButtons = screen.getAllByLabelText('widgets.moveUp');
     const downButtons = screen.getAllByLabelText('widgets.moveDown');
@@ -157,17 +164,15 @@ describe('WidgetDashboard', () => {
   });
 
   it('resets layout when reset button is clicked', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // Toggle first widget from hidden to visible
+    // Toggle a hidden widget to visible (now 2 visible)
     const hiddenButtons = screen.getAllByText('widgets.hidden');
     fireEvent.click(hiddenButtons[0]);
-    expect(screen.getByText('widgets.visible')).toBeInTheDocument();
-    // Click reset
+    expect(screen.getAllByText('widgets.visible').length).toBe(2);
+    // Click reset → all 18 go back to DEFAULT_LAYOUT (all hidden)
     fireEvent.click(screen.getByText('widgets.reset'));
-    // All should be hidden again (default)
-    const allHidden = screen.getAllByText('widgets.hidden');
-    expect(allHidden.length).toBe(18);
+    expect(screen.getAllByText('widgets.hidden').length).toBe(18);
   });
 
   it('renders worship widget with song count', () => {
@@ -185,7 +190,7 @@ describe('WidgetDashboard', () => {
   });
 
   it('has proper a11y labels on the section', () => {
-    renderWidget();
+    renderWidgetWithPinned();
     expect(screen.getByRole('region', { name: 'widgets.title' })).toBeInTheDocument();
   });
 
