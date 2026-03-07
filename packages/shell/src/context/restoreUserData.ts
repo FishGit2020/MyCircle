@@ -136,12 +136,24 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
   // Restore widget layout from Firestore only if local is empty
   const hasLocalLayout = !!localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
   if (!hasLocalLayout && profile.widgetLayout && profile.widgetLayout.length > 0) {
-    const withSizes = profile.widgetLayout.map((w: any) => ({
-      ...w,
-      size: w.size || 'medium',
-    }));
-    localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(withSizes));
+    // Strip legacy per-widget size field and auto-migrate
+    const cleaned = profile.widgetLayout.map(({ size: _, ...rest }: any) => rest);
+    localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(cleaned));
     window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
+  }
+
+  // Restore global widget size (prefer explicit field, fallback to legacy per-widget majority)
+  if (profile.widgetSize) {
+    localStorage.setItem(StorageKeys.WIDGET_SIZE, profile.widgetSize);
+    window.dispatchEvent(new Event(WindowEvents.WIDGET_SIZE_CHANGED));
+  } else if (profile.widgetLayout?.some((w: any) => w.size)) {
+    // Auto-migrate: pick the most common per-widget size as the global default
+    const sizes = profile.widgetLayout.map((w: any) => w.size).filter(Boolean);
+    const counts: Record<string, number> = {};
+    for (const s of sizes) counts[s] = (counts[s] || 0) + 1;
+    const migrated = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'medium';
+    localStorage.setItem(StorageKeys.WIDGET_SIZE, migrated);
+    window.dispatchEvent(new Event(WindowEvents.WIDGET_SIZE_CHANGED));
   }
 
   // Restore book bookmarks

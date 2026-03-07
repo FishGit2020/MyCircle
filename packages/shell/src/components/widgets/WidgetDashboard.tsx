@@ -105,19 +105,27 @@ export default function WidgetDashboard() {
   const { layout, widgetSize, editing, dragIndex, dragOverIndex } = state;
   const dragNodeRef = useRef<HTMLDivElement | null>(null);
 
-  // Persist layout on change
+  // Skip initial render — only persist after user-driven changes
+  const isInitialRef = useRef(true);
+  const selfDispatchRef = useRef(false);
+
+  // Persist layout on change (skip initial render to avoid unnecessary Firestore write)
   useEffect(() => {
+    if (isInitialRef.current) return;
     selfDispatchRef.current = true;
     saveLayout(layout);
   }, [layout]);
 
-  // Persist global widget size
+  // Persist global widget size (skip initial render)
   useEffect(() => {
+    if (isInitialRef.current) return;
     saveWidgetSize(widgetSize);
   }, [widgetSize]);
 
-  // Reload layout when auth context updates localStorage (e.g. sign-in restore)
-  const selfDispatchRef = useRef(false);
+  // Mark initial render complete after all effects run
+  useEffect(() => {
+    isInitialRef.current = false;
+  }, []);
   useEffect(() => {
     const handler = () => {
       if (selfDispatchRef.current) { selfDispatchRef.current = false; return; }

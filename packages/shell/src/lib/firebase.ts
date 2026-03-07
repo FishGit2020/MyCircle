@@ -550,11 +550,20 @@ export async function updateWorshipFavorites(uid: string, favorites: string[]) {
 }
 
 
-export async function updateWidgetLayout(uid: string, layout: Array<{ id: string; visible: boolean; size?: string }> | null) {
+export async function updateWidgetLayout(uid: string, layout: Array<{ id: string; visible: boolean }> | null) {
   if (!db) return;
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     widgetLayout: layout || null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updateWidgetSize(uid: string, size: string) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    widgetSize: size,
     updatedAt: serverTimestamp(),
   });
 }

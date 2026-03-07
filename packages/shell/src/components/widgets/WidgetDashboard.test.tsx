@@ -130,10 +130,10 @@ describe('WidgetDashboard', () => {
     expect(downButtons.length).toBe(18);
   });
 
-  it('persists layout to localStorage', () => {
+  it('does not persist layout on initial mount (avoids Firestore write loop)', () => {
     renderWidget();
-    // Layout is saved on mount
-    expect(setItemSpy).toHaveBeenCalledWith(
+    // Layout should NOT be saved on initial mount — only after user-driven changes
+    expect(setItemSpy).not.toHaveBeenCalledWith(
       'widget-dashboard-layout',
       expect.any(String)
     );
