@@ -282,6 +282,13 @@ export function subscribeToAuthChanges(callback: (user: User | null) => void) {
     callback(null);
     return () => {};
   }
+  // E2E test bypass: if a fixture has injected __e2eAuthCallback, use it to
+  // resolve auth state immediately instead of waiting for Firebase network calls.
+  const e2eMock = (window as any).__e2eAuthCallback as ((cb: (user: User | null) => void) => void) | undefined;
+  if (e2eMock) {
+    e2eMock(callback);
+    return () => {};
+  }
   return onAuthStateChanged(auth, callback);
 }
 

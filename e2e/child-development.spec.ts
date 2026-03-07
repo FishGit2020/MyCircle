@@ -16,9 +16,10 @@ test.describe('Child Development', () => {
     await expect(nameInput.or(dateInput).first()).toBeVisible({ timeout: 15_000 });
   });
 
-  test('shows Get Started button in setup view', async ({ page }) => {
+  test('shows Add Child button in setup view', async ({ page }) => {
+    // Button text changed from "Get Started" to "Add Child" in PR #538 (multi-child)
     await expect(
-      page.getByRole('button', { name: /get started|comenzar|开始/i })
-    ).toBeVisible({ timeout: 15_000 });
+      page.getByRole('button', { name: /add child|agregar|添加/i })
+    ).toBeVisible({ timeout: 5_000 });
   });
 });

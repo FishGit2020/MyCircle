@@ -529,6 +529,10 @@ async function mockFirebaseAuth(page: Page) {
       set: () => { /* silently ignore overwrites from firebase.ts */ },
       configurable: true,
     });
+    // Bypass Firebase onAuthStateChanged network calls in CI.
+    // subscribeToAuthChanges in firebase.ts checks this and fires immediately
+    // with null user instead of waiting for Firebase auth servers to respond.
+    (window as any).__e2eAuthCallback = (cb: (user: null) => void) => cb(null);
   });
 }
 
