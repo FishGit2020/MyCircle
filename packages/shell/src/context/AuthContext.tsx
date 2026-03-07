@@ -38,6 +38,7 @@ const keysToPreserve = new Set([
   StorageKeys.ANNOUNCEMENT_ALERTS,
   StorageKeys.KNOWN_ACCOUNTS,
   StorageKeys.WIDGET_LAYOUT,
+  StorageKeys.WIDGET_SIZE,
 ]);
 
 /** Clear user-specific localStorage and dispatch change events */
