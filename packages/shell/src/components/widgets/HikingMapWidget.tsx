@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 const HikingMapWidget = React.memo(function HikingMapWidget() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const uid = user?.uid;
   const [myCount, setMyCount] = React.useState<number | null>(null);
   const [publicCount, setPublicCount] = React.useState<number | null>(null);
 
@@ -16,7 +17,7 @@ const HikingMapWidget = React.memo(function HikingMapWidget() {
       const hr = (window as any).__hikingRoutes;
       if (!hr) return;
       // Personal routes (only when signed in)
-      if (user && hr.subscribe) {
+      if (uid && hr.subscribe) {
         unsubMy = hr.subscribe((routes: any[]) => setMyCount(routes.length));
       } else {
         setMyCount(null);
@@ -28,16 +29,16 @@ const HikingMapWidget = React.memo(function HikingMapWidget() {
     }
 
     subscribe();
+
+    // Re-subscribe when hiking data changes externally (e.g. route saved from MFE)
     const handler = () => { unsubMy?.(); unsubPublic?.(); subscribe(); };
     window.addEventListener(WindowEvents.HIKING_ROUTES_CHANGED, handler);
-    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
     return () => {
       unsubMy?.();
       unsubPublic?.();
       window.removeEventListener(WindowEvents.HIKING_ROUTES_CHANGED, handler);
-      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
     };
-  }, [user]);
+  }, [uid]);
 
   return (
     <div>
@@ -53,7 +54,7 @@ const HikingMapWidget = React.memo(function HikingMapWidget() {
         </div>
       </div>
       <div className="flex gap-3 mt-1">
-        {user && myCount !== null && (
+        {uid && myCount !== null && (
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-green-500" />
             <span className="text-xs text-gray-600 dark:text-gray-400">
