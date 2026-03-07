@@ -136,11 +136,9 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
   // Restore widget layout from Firestore only if local is empty
   const hasLocalLayout = !!localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
   if (!hasLocalLayout && profile.widgetLayout && profile.widgetLayout.length > 0) {
-    const withSizes = profile.widgetLayout.map((w: any) => ({
-      ...w,
-      size: w.size || 'medium',
-    }));
-    localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(withSizes));
+    // Strip legacy per-widget size field
+    const cleaned = profile.widgetLayout.map(({ size: _, ...rest }: any) => rest);
+    localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(cleaned));
     window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
   }
 

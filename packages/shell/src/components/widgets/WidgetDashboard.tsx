@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useCallback, useRef } from 'react';
+import React, { useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { useAuth } from '../../context/AuthContext';
@@ -10,6 +10,8 @@ import {
   DEFAULT_LAYOUT,
   loadLayout,
   saveLayout,
+  loadWidgetSize,
+  saveWidgetSize,
   WIDGET_COMPONENTS,
   WIDGET_ROUTES,
 } from './widgetConfig';
@@ -29,7 +31,6 @@ type DashboardAction =
   | { type: 'DRAG_END' }
   | { type: 'MOVE_WIDGET'; index: number; direction: -1 | 1 }
   | { type: 'TOGGLE_VISIBILITY'; index: number }
-  | { type: 'RESIZE_WIDGET'; index: number; size: WidgetSize }
   | { type: 'RESET' };
 
 interface DashboardState {
@@ -76,13 +77,6 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
           i === action.index ? { ...w, visible: !w.visible } : w
         ),
       };
-    case 'RESIZE_WIDGET':
-      return {
-        ...state,
-        layout: state.layout.map((w, i) =>
-          i === action.index ? { ...w, size: action.size } : w
-        ),
-      };
     case 'RESET':
       return { ...state, layout: DEFAULT_LAYOUT };
     case 'RELOAD':
@@ -105,6 +99,9 @@ export default function WidgetDashboard() {
   }));
   const { layout, editing, dragIndex, dragOverIndex } = state;
   const dragNodeRef = useRef<HTMLDivElement | null>(null);
+
+  // Global widget size (separate from layout to keep it simple)
+  const [widgetSize, setWidgetSize] = useState<WidgetSize>(loadWidgetSize);
 
   // Skip initial render — only persist after user-driven changes
   const isInitialRef = useRef(true);
@@ -132,6 +129,12 @@ export default function WidgetDashboard() {
     return () => window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handler);
   }, []);
 
+  const handleSizeChange = useCallback((size: WidgetSize) => {
+    setWidgetSize(size);
+    saveWidgetSize(size);
+    logEvent('widget_size_change', { size });
+  }, []);
+
   // ── Drag handlers ──────────────────────────────────────────────────────
 
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
@@ -139,7 +142,6 @@ export default function WidgetDashboard() {
     dragNodeRef.current = e.currentTarget as HTMLDivElement;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', String(index));
-    // Slight delay for visual feedback
     requestAnimationFrame(() => {
       if (dragNodeRef.current) {
         dragNodeRef.current.style.opacity = '0.4';
@@ -182,6 +184,25 @@ export default function WidgetDashboard() {
           {t('widgets.title')}
         </h3>
         <div className="flex items-center gap-2">
+          {/* Global size selector */}
+          <div className="flex items-center gap-0.5 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+            {(['small', 'medium', 'large'] as const).map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => handleSizeChange(s)}
+                className={`text-xs px-2 py-1 transition-colors ${
+                  widgetSize === s
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                aria-label={`${t('widgets.size')} ${s}`}
+                aria-pressed={widgetSize === s}
+              >
+                {s === 'small' ? 'S' : s === 'medium' ? 'M' : 'L'}
+              </button>
+            ))}
+          </div>
           {editing && (
             <button
               type="button"
@@ -240,7 +261,7 @@ export default function WidgetDashboard() {
                     </svg>
                   </span>
 
-                  {/* Move buttons (tap on mobile, click on desktop) */}
+                  {/* Move buttons */}
                   <button
                     type="button"
                     onClick={() => dispatch({ type: 'MOVE_WIDGET', index, direction: -1 })}
@@ -265,26 +286,6 @@ export default function WidgetDashboard() {
                   </button>
 
                   <span className="flex-1" />
-
-                  {/* Size selector */}
-                  <div className="flex items-center gap-0.5 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
-                    {(['small', 'medium', 'large'] as const).map(s => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => dispatch({ type: 'RESIZE_WIDGET', index, size: s })}
-                        className={`text-xs px-2 py-1 transition-colors ${
-                          (widget.size || 'medium') === s
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                        }`}
-                        aria-label={`${t('widgets.size')} ${s}`}
-                        aria-pressed={(widget.size || 'medium') === s}
-                      >
-                        {s === 'small' ? 'S' : s === 'medium' ? 'M' : 'L'}
-                      </button>
-                    ))}
-                  </div>
 
                   {/* Visibility toggle */}
                   <button
@@ -317,13 +318,12 @@ export default function WidgetDashboard() {
             const WidgetComponent = WIDGET_COMPONENTS[widget.id];
             const routeDef = WIDGET_ROUTES[widget.id];
             const to = typeof routeDef === 'function' ? routeDef({ favoriteCities }) : routeDef;
-            const size = widget.size || 'medium';
-            const spanClass = size === 'large'
+            const spanClass = widgetSize === 'large'
               ? 'col-span-2 lg:col-span-4 2xl:col-span-3'
-              : size === 'small'
+              : widgetSize === 'small'
                 ? 'col-span-1'
                 : 'col-span-2 lg:col-span-2';
-            const sizeClass = size === 'small' ? 'p-3 min-h-[80px]' : 'p-5 min-h-[120px]';
+            const sizeClass = widgetSize === 'small' ? 'p-3 min-h-[80px]' : 'p-5 min-h-[120px]';
             return (
               <Link
                 key={widget.id}
