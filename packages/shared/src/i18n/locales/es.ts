@@ -704,6 +704,7 @@ const es: Record<TranslationKey, string> = {
   'bible.copied': '\u00a1Copiado!',
   'bible.bookmark': 'Marcar',
   'bible.bookmarked': 'Marcado',
+  'bible.signInToBookmark': 'Inicia sesión para marcar',
   'bible.continueReading': 'Continuar leyendo',
   'bible.fontSmaller': 'Texto m\u00e1s peque\u00f1o',
   'bible.fontLarger': 'Texto m\u00e1s grande',

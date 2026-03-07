@@ -704,6 +704,7 @@ const zh: Record<TranslationKey, string> = {
   'bible.copied': '\u5df2\u590d\u5236\uff01',
   'bible.bookmark': '\u4e66\u7b7e',
   'bible.bookmarked': '\u5df2\u6807\u8bb0',
+  'bible.signInToBookmark': '\u767b\u5f55\u540e\u53ef\u4e66\u7b7e',
   'bible.continueReading': '\u7ee7\u7eed\u9605\u8bfb',
   'bible.fontSmaller': '\u7f29\u5c0f\u5b57\u4f53',
   'bible.fontLarger': '\u653e\u5927\u5b57\u4f53',

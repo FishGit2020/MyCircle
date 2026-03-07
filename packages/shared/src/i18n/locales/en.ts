@@ -702,6 +702,7 @@ const en = {
   'bible.copied': 'Copied!',
   'bible.bookmark': 'Bookmark',
   'bible.bookmarked': 'Bookmarked',
+  'bible.signInToBookmark': 'Sign in to bookmark',
   'bible.continueReading': 'Continue reading',
   'bible.fontSmaller': 'Smaller text',
   'bible.fontLarger': 'Larger text',

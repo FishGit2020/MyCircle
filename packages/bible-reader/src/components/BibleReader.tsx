@@ -336,7 +336,22 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
   const [fontSize, setFontSize] = useState(loadFontSize);
   const [copied, setCopied] = useState(false);
   const [bookmarks, setBookmarks] = useState(loadBookmarks);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isBookmarked = bookmarks.some(b => b.book === book && b.chapter === chapter);
+
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      try {
+        const token = await (window as any).__getFirebaseIdToken?.();
+        if (mounted) setIsAuthenticated(!!token);
+      } catch { if (mounted) setIsAuthenticated(false); }
+    };
+    check();
+    const handler = () => check();
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler); };
+  }, []);
 
   const toggleBookmark = useCallback(() => {
     setBookmarks(prev => {
@@ -475,20 +490,33 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
             )}
           </button>
 
-          {/* Bookmark */}
-          <button
-            onClick={toggleBookmark}
-            className={`flex items-center gap-1 px-2 py-1 text-xs border rounded-lg transition ${
-              isBookmarked
-                ? 'text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20'
-                : 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:text-yellow-600 dark:hover:text-yellow-400'
-            }`}
-          >
-            <svg className="w-3.5 h-3.5" fill={isBookmarked ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-            </svg>
-            {isBookmarked ? t('bible.bookmarked') : t('bible.bookmark')}
-          </button>
+          {/* Bookmark — only for signed-in users */}
+          {isAuthenticated ? (
+            <button
+              onClick={toggleBookmark}
+              className={`flex items-center gap-1 px-2 py-1 text-xs border rounded-lg transition ${
+                isBookmarked
+                  ? 'text-yellow-600 dark:text-yellow-400 border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20'
+                  : 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:text-yellow-600 dark:hover:text-yellow-400'
+              }`}
+            >
+              <svg className="w-3.5 h-3.5" fill={isBookmarked ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              {isBookmarked ? t('bible.bookmarked') : t('bible.bookmark')}
+            </button>
+          ) : (
+            <span
+              title={t('bible.signInToBookmark')}
+              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-300 dark:text-gray-600 border border-gray-100 dark:border-gray-700 rounded-lg cursor-default select-none"
+              aria-label={t('bible.signInToBookmark')}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              {t('bible.bookmark')}
+            </span>
+          )}
 
           {/* Share link */}
           <button
