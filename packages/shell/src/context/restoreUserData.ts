@@ -142,6 +142,11 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
   }
 
+  // Restore global widget size
+  if (profile.widgetSize) {
+    localStorage.setItem(StorageKeys.WIDGET_SIZE, profile.widgetSize);
+  }
+
   // Restore book bookmarks
   if (profile.bookBookmarks && profile.bookBookmarks.length > 0) {
     localStorage.setItem(StorageKeys.BOOK_BOOKMARKS, JSON.stringify(profile.bookBookmarks));

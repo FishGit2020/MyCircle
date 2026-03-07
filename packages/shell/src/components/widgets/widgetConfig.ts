@@ -94,7 +94,10 @@ export function loadWidgetSize(): WidgetSize {
 }
 
 export function saveWidgetSize(size: WidgetSize) {
-  try { localStorage.setItem(StorageKeys.WIDGET_SIZE, size); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(StorageKeys.WIDGET_SIZE, size);
+    window.dispatchEvent(new Event(WindowEvents.WIDGET_SIZE_CHANGED));
+  } catch { /* ignore */ }
 }
 
 // ─── Widget Registry ─────────────────────────────────────────────────────────
