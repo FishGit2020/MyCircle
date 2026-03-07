@@ -102,6 +102,7 @@ export const StorageKeys = {
   BIBLE_FONT_SIZE: 'bible-font-size',
   BIBLE_DEVOTIONAL_LOG: 'bible-devotional-log',
   WIDGET_LAYOUT: 'widget-dashboard-layout',
+  WIDGET_SIZE: 'widget-dashboard-size',
   RECENT_CITIES: 'recent-cities',
   LAST_SEEN_ANNOUNCEMENT: 'last-seen-announcement',
   BIBLE_TRANSLATION: 'bible-translation',

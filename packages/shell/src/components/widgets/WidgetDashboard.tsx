@@ -10,6 +10,8 @@ import {
   DEFAULT_LAYOUT,
   loadLayout,
   saveLayout,
+  loadWidgetSize,
+  saveWidgetSize,
   WIDGET_COMPONENTS,
   WIDGET_ROUTES,
 } from './widgetConfig';
@@ -29,11 +31,12 @@ type DashboardAction =
   | { type: 'DRAG_END' }
   | { type: 'MOVE_WIDGET'; index: number; direction: -1 | 1 }
   | { type: 'TOGGLE_VISIBILITY'; index: number }
-  | { type: 'RESIZE_WIDGET'; index: number; size: WidgetSize }
+  | { type: 'SET_SIZE'; size: WidgetSize }
   | { type: 'RESET' };
 
 interface DashboardState {
   layout: WidgetConfig[];
+  widgetSize: WidgetSize;
   editing: boolean;
   dragIndex: number | null;
   dragOverIndex: number | null;
@@ -76,13 +79,8 @@ function dashboardReducer(state: DashboardState, action: DashboardAction): Dashb
           i === action.index ? { ...w, visible: !w.visible } : w
         ),
       };
-    case 'RESIZE_WIDGET':
-      return {
-        ...state,
-        layout: state.layout.map((w, i) =>
-          i === action.index ? { ...w, size: action.size } : w
-        ),
-      };
+    case 'SET_SIZE':
+      return { ...state, widgetSize: action.size };
     case 'RESET':
       return { ...state, layout: DEFAULT_LAYOUT };
     case 'RELOAD':
@@ -99,11 +97,12 @@ export default function WidgetDashboard() {
   const { favoriteCities } = useAuth();
   const [state, dispatch] = useReducer(dashboardReducer, undefined, () => ({
     layout: loadLayout(),
+    widgetSize: loadWidgetSize(),
     editing: false,
     dragIndex: null,
     dragOverIndex: null,
   }));
-  const { layout, editing, dragIndex, dragOverIndex } = state;
+  const { layout, widgetSize, editing, dragIndex, dragOverIndex } = state;
   const dragNodeRef = useRef<HTMLDivElement | null>(null);
 
   // Persist layout on change
@@ -111,6 +110,11 @@ export default function WidgetDashboard() {
     selfDispatchRef.current = true;
     saveLayout(layout);
   }, [layout]);
+
+  // Persist global widget size
+  useEffect(() => {
+    saveWidgetSize(widgetSize);
+  }, [widgetSize]);
 
   // Reload layout when auth context updates localStorage (e.g. sign-in restore)
   const selfDispatchRef = useRef(false);
@@ -173,6 +177,25 @@ export default function WidgetDashboard() {
           {t('widgets.title')}
         </h3>
         <div className="flex items-center gap-2">
+          {/* Global size selector */}
+          <div className="flex items-center gap-0.5 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+            {(['small', 'medium', 'large'] as const).map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => { logEvent('widget_size_change', { size: s }); dispatch({ type: 'SET_SIZE', size: s }); }}
+                className={`text-xs px-2 py-1 transition-colors ${
+                  widgetSize === s
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+                aria-label={`${t('widgets.size')} ${s}`}
+                aria-pressed={widgetSize === s}
+              >
+                {s === 'small' ? 'S' : s === 'medium' ? 'M' : 'L'}
+              </button>
+            ))}
+          </div>
           {editing && (
             <button
               type="button"
@@ -257,26 +280,6 @@ export default function WidgetDashboard() {
 
                   <span className="flex-1" />
 
-                  {/* Size selector */}
-                  <div className="flex items-center gap-0.5 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
-                    {(['small', 'medium', 'large'] as const).map(s => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => dispatch({ type: 'RESIZE_WIDGET', index, size: s })}
-                        className={`text-xs px-2 py-1 transition-colors ${
-                          (widget.size || 'medium') === s
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                        }`}
-                        aria-label={`${t('widgets.size')} ${s}`}
-                        aria-pressed={(widget.size || 'medium') === s}
-                      >
-                        {s === 'small' ? 'S' : s === 'medium' ? 'M' : 'L'}
-                      </button>
-                    ))}
-                  </div>
-
                   {/* Visibility toggle */}
                   <button
                     type="button"
@@ -308,13 +311,12 @@ export default function WidgetDashboard() {
             const WidgetComponent = WIDGET_COMPONENTS[widget.id];
             const routeDef = WIDGET_ROUTES[widget.id];
             const to = typeof routeDef === 'function' ? routeDef({ favoriteCities }) : routeDef;
-            const size = widget.size || 'medium';
-            const spanClass = size === 'large'
+            const spanClass = widgetSize === 'large'
               ? 'col-span-2 lg:col-span-4 2xl:col-span-3'
-              : size === 'small'
+              : widgetSize === 'small'
                 ? 'col-span-1'
                 : 'col-span-2 lg:col-span-2';
-            const sizeClass = size === 'small' ? 'p-3 min-h-[80px]' : 'p-5 min-h-[120px]';
+            const sizeClass = widgetSize === 'small' ? 'p-3 min-h-[80px]' : 'p-5 min-h-[120px]';
             return (
               <Link
                 key={widget.id}
