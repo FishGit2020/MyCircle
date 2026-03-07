@@ -243,7 +243,7 @@ export default function Layout() {
   }, [openGroup]);
 
   return (
-    <div className="h-dvh flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:outline-none"
