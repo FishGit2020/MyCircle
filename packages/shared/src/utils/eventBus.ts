@@ -71,6 +71,7 @@ export const WindowEvents = {
   IMMIGRATION_CASES_CHANGED: 'immigration-cases-changed',
   BOOKS_CHANGED: 'books-changed',
   WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
+  WIDGET_SIZE_CHANGED: 'widget-size-changed',
   BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
   BOOK_LAST_PLAYED_CHANGED: 'book-last-played-changed',
   BOOK_LISTEN_TAB_ACTIVE: 'book-listen-tab-active',
