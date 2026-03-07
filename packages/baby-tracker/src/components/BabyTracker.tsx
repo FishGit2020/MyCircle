@@ -226,14 +226,14 @@ export default function BabyTracker() {
         <p className="text-gray-500 dark:text-gray-400 mt-1">{t('baby.subtitle')}</p>
       </div>
 
-      {/* Child Selector */}
+      {/* Child Selector — no "Add" when one baby already exists */}
       {babyChildren.length > 0 && (
         <div className="flex justify-center">
           <ChildSelector
             children={babyChildren}
             selectedId={currentBaby?.id ?? null}
             onSelect={setSelectedId}
-            onAdd={() => setIsAddingChild(true)}
+            onAdd={babyChildren.length === 0 ? () => setIsAddingChild(true) : undefined}
           />
         </div>
       )}
