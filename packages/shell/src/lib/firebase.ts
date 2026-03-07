@@ -34,6 +34,7 @@ if (firebaseEnabled) {
   auth = getAuth(app);
   db = initializeFirestore(app, {
     localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    experimentalAutoDetectLongPolling: true,
   });
   perf = getPerformance(app);
   analytics = getAnalytics(app);
