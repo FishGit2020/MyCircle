@@ -14,7 +14,6 @@ vi.mock('@mycircle/shared', () => ({
     PODCAST_PLAYED_CHANGED: 'podcast-played-changed',
     CHILD_DATA_CHANGED: 'child-data-changed',
     WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
-    WIDGET_SIZE_CHANGED: 'widget-size-changed',
     BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
     BOOK_LAST_PLAYED_CHANGED: 'book-last-played-changed',
     NOTEBOOK_CHANGED: 'notebook-changed',
@@ -40,7 +39,6 @@ vi.mock('@mycircle/shared', () => ({
     CHILD_NAME: 'child-name',
     CHILD_BIRTH_DATE: 'child-birth-date',
     WIDGET_LAYOUT: 'widget-dashboard-layout',
-    WIDGET_SIZE: 'widget-dashboard-size',
     BOOK_BOOKMARKS: 'book-bookmarks',
     BOOK_AUDIO_PROGRESS: 'book-audio-progress',
     BOOK_LAST_PLAYED: 'book-last-played',
@@ -204,14 +202,10 @@ describe('restoreUserData', () => {
   });
 
   it('restores widget layout only when local is empty', () => {
-    const layout = [{ id: 'weather', visible: true, size: 'large' }];
+    const layout = [{ id: 'weather', visible: true }];
     restoreUserData(makeProfile({ widgetLayout: layout }) as any, 'user1');
     const stored = JSON.parse(localStorage.getItem('widget-dashboard-layout')!);
-    // Legacy per-widget size is stripped
-    expect(stored[0].size).toBeUndefined();
-    expect(stored[0].id).toBe('weather');
-    // Auto-migrates per-widget size to global widget size
-    expect(localStorage.getItem('widget-dashboard-size')).toBe('large');
+    expect(stored[0].size).toBe('medium');
   });
 
   it('does not overwrite existing local widget layout', () => {

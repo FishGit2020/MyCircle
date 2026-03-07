@@ -28,6 +28,7 @@ export type WidgetSize = 'small' | 'medium' | 'large';
 export interface WidgetConfig {
   id: WidgetType;
   visible: boolean;
+  size?: WidgetSize;
 }
 
 export const DEFAULT_LAYOUT: WidgetConfig[] = [
@@ -67,8 +68,8 @@ export function loadLayout(): WidgetConfig[] {
       for (const def of DEFAULT_LAYOUT) {
         if (!ids.has(def.id)) filtered.push(def);
       }
-      // Strip legacy per-widget size field if present
-      return filtered.map(({ size: _, ...rest }: any) => rest);
+      // Ensure every widget has a size (default 'medium')
+      return filtered.map(w => ({ ...w, size: w.size || 'medium' }));
     }
   } catch { /* ignore */ }
   return DEFAULT_LAYOUT;
@@ -78,25 +79,6 @@ export function saveLayout(layout: WidgetConfig[]) {
   try {
     localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(layout));
     window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
-  } catch { /* ignore */ }
-}
-
-// ─── Global Widget Size ───────────────────────────────────────────────────────
-
-const VALID_SIZES: WidgetSize[] = ['small', 'medium', 'large'];
-
-export function loadWidgetSize(): WidgetSize {
-  try {
-    const stored = localStorage.getItem(StorageKeys.WIDGET_SIZE);
-    if (stored && VALID_SIZES.includes(stored as WidgetSize)) return stored as WidgetSize;
-  } catch { /* ignore */ }
-  return 'medium';
-}
-
-export function saveWidgetSize(size: WidgetSize) {
-  try {
-    localStorage.setItem(StorageKeys.WIDGET_SIZE, size);
-    window.dispatchEvent(new Event(WindowEvents.WIDGET_SIZE_CHANGED));
   } catch { /* ignore */ }
 }
 
