@@ -71,8 +71,17 @@ export default function MapView({ style, onMapReady, onMapClick, onStyleLoad }: 
 
     return () => {
       ro?.disconnect();
-      map?.remove();
+      // Null the ref FIRST so any in-flight ResizeObserver / style callbacks
+      // that fire during map.remove() won't try to use a half-torn-down map.
       mapRef.current = null;
+      try {
+        map?.remove();
+      } catch {
+        // Safari + MapLibre: map.remove() clears this.style mid-teardown;
+        // any pending passive effect that calls map.getLayer() after that
+        // throws "undefined is not an object (evaluating 'this.style.getLayer')".
+        // Swallowing here is safe — the map is being destroyed anyway.
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

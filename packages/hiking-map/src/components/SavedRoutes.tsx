@@ -161,8 +161,12 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
 
   const [sharing, setSharing] = useState<string | null>(null);
 
+  const mountedRef = useRef(true);
+  useEffect(() => { return () => { mountedRef.current = false; }; }, []);
+
   const refresh = useCallback(async () => {
     const [my, pub] = await Promise.all([listRoutes(), listPublicRoutes()]);
+    if (!mountedRef.current) return;
     setMyRoutes(my);
     setPublicRoutes(pub);
   }, []);
