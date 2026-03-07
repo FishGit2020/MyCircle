@@ -53,7 +53,8 @@ const PUBLIC_CONFIG: MapConfig = {
     },
   ],
   routing: {
-    baseUrl: 'https://router.project-osrm.org',
+    // routing.openstreetmap.de/routed-foot serves a foot/walking OSRM profile
+    baseUrl: 'https://routing.openstreetmap.de/routed-foot',
     type: 'osrm' as const,
     profile: 'foot',
   },
