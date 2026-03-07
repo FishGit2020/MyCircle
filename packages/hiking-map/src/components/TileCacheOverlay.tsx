@@ -80,9 +80,11 @@ export default function TileCacheOverlay({ map, visible, cacheVersion = 0 }: Pro
     if (!map) return;
 
     const removeOverlay = () => {
-      if (map.getLayer(BORDER_ID)) map.removeLayer(BORDER_ID);
-      if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
-      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      try {
+        if (map.getLayer(BORDER_ID)) map.removeLayer(BORDER_ID);
+        if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
+        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      } catch { /* Map may be mid-teardown on navigate-away; safe to ignore */ }
     };
 
     if (!visible) {
@@ -122,8 +124,10 @@ export default function TileCacheOverlay({ map, visible, cacheVersion = 0 }: Pro
     map.on('zoomend', updateOverlay);
 
     return () => {
-      map.off('moveend', updateOverlay);
-      map.off('zoomend', updateOverlay);
+      try {
+        map.off('moveend', updateOverlay);
+        map.off('zoomend', updateOverlay);
+      } catch { /* ignore */ }
       removeOverlay();
     };
   }, [map, visible, cacheVersion]);

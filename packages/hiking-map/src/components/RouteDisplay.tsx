@@ -19,8 +19,10 @@ export default function RouteDisplay({ map, geometry }: Props) {
     if (!map) return;
 
     const remove = () => {
-      if (map.getLayer(LAYER)) map.removeLayer(LAYER);
-      if (map.getSource(SOURCE)) map.removeSource(SOURCE);
+      try {
+        if (map.getLayer(LAYER)) map.removeLayer(LAYER);
+        if (map.getSource(SOURCE)) map.removeSource(SOURCE);
+      } catch { /* Map may be mid-teardown on navigate-away; safe to ignore */ }
     };
 
     remove();
