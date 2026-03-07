@@ -3,6 +3,18 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import BabyTracker from './BabyTracker';
 
+const mockUseChildren = vi.fn(() => ({
+  children: [],
+  allChildren: [],
+  selectedChild: null,
+  selectedId: null,
+  setSelectedId: vi.fn(),
+  addChild: vi.fn(),
+  updateChild: vi.fn(),
+  deleteChild: vi.fn(),
+  loading: false,
+}));
+
 // Mock @mycircle/shared
 vi.mock('@mycircle/shared', () => ({
   PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
@@ -27,18 +39,12 @@ vi.mock('@mycircle/shared', () => ({
     if (!match) return null;
     return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
   },
-  useChildren: vi.fn(() => ({
-    children: [],
-    allChildren: [],
-    selectedChild: null,
-    selectedId: null,
-    setSelectedId: vi.fn(),
-    addChild: vi.fn(),
-    updateChild: vi.fn(),
-    deleteChild: vi.fn(),
-    loading: false,
-  })),
-  ChildSelector: ({ children: _c }: any) => <div data-testid="child-selector" />,
+  useChildren: (...args: any[]) => mockUseChildren(...args),
+  ChildSelector: ({ children: _c, onAdd }: any) => (
+    <div data-testid="child-selector">
+      {onAdd && <button type="button" onClick={onAdd} data-testid="child-selector-add">add-baby</button>}
+    </div>
+  ),
 }));
 
 vi.mock('react-router', () => ({
@@ -57,6 +63,18 @@ describe('BabyTracker', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {});
+    mockUseChildren.mockReset();
+    mockUseChildren.mockReturnValue({
+      children: [],
+      allChildren: [],
+      selectedChild: null,
+      selectedId: null,
+      setSelectedId: vi.fn(),
+      addChild: vi.fn(),
+      updateChild: vi.fn(),
+      deleteChild: vi.fn(),
+      loading: false,
+    });
   });
 
   afterEach(() => {
@@ -229,6 +247,29 @@ describe('BabyTracker', () => {
 
     const saveBtn = screen.getByText('baby.save');
     expect(saveBtn).toBeDisabled();
+  });
+
+  it('hides Add button in ChildSelector when one baby already exists', () => {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 140);
+    const dueDateStr = futureDate.toISOString().split('T')[0];
+    const babyData = {
+      children: [{ id: 'b1', name: 'Baby', birthDate: '2025-01-01', dueDate: dueDateStr }],
+      allChildren: [{ id: 'b1', name: 'Baby', birthDate: '2025-01-01', dueDate: dueDateStr }],
+      selectedChild: { id: 'b1', name: 'Baby', birthDate: '2025-01-01', dueDate: dueDateStr },
+      selectedId: 'b1',
+      setSelectedId: vi.fn(),
+      addChild: vi.fn(),
+      updateChild: vi.fn(),
+      deleteChild: vi.fn(),
+      loading: false,
+    };
+    // Use mockReturnValue (not Once) so re-renders also get baby data
+    mockUseChildren.mockReturnValue(babyData);
+    render(<BabyTracker />);
+    // ChildSelector should render but without the add button (single-baby limit)
+    expect(screen.getByTestId('child-selector')).toBeInTheDocument();
+    expect(screen.queryByTestId('child-selector-add')).not.toBeInTheDocument();
   });
 
   it('responds to external BABY_DUE_DATE_CHANGED events', () => {

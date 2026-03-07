@@ -4,6 +4,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ChildDevelopment from './ChildDevelopment';
 
 const mockAddChild = vi.fn();
+const mockUpdateChild = vi.fn();
+const mockDeleteChild = vi.fn();
 const mockSetSelectedId = vi.fn();
 
 const mockUseChildren = vi.fn(() => ({
@@ -63,8 +65,8 @@ describe('ChildDevelopment', () => {
       selectedId: null,
       setSelectedId: mockSetSelectedId,
       addChild: mockAddChild,
-      updateChild: vi.fn(),
-      deleteChild: vi.fn(),
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
       loading: false,
     });
   });
@@ -105,8 +107,8 @@ describe('ChildDevelopment', () => {
       selectedId: 'c1',
       setSelectedId: mockSetSelectedId,
       addChild: mockAddChild,
-      updateChild: vi.fn(),
-      deleteChild: vi.fn(),
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
       loading: false,
     });
     render(<ChildDevelopment />);
@@ -121,8 +123,8 @@ describe('ChildDevelopment', () => {
       selectedId: 'c1',
       setSelectedId: mockSetSelectedId,
       addChild: mockAddChild,
-      updateChild: vi.fn(),
-      deleteChild: vi.fn(),
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
       loading: false,
     });
     render(<ChildDevelopment />);
@@ -139,8 +141,8 @@ describe('ChildDevelopment', () => {
       selectedId: 'c1',
       setSelectedId: mockSetSelectedId,
       addChild: mockAddChild,
-      updateChild: vi.fn(),
-      deleteChild: vi.fn(),
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
       loading: false,
     });
     render(<ChildDevelopment />);
@@ -156,8 +158,8 @@ describe('ChildDevelopment', () => {
       selectedId: 'c1',
       setSelectedId: mockSetSelectedId,
       addChild: mockAddChild,
-      updateChild: vi.fn(),
-      deleteChild: vi.fn(),
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
       loading: false,
     });
     render(<ChildDevelopment />);
@@ -174,8 +176,8 @@ describe('ChildDevelopment', () => {
       selectedId: 'c1',
       setSelectedId: mockSetSelectedId,
       addChild: mockAddChild,
-      updateChild: vi.fn(),
-      deleteChild: vi.fn(),
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
       loading: false,
     });
     render(<ChildDevelopment />);
@@ -190,8 +192,8 @@ describe('ChildDevelopment', () => {
       selectedId: 'c1',
       setSelectedId: mockSetSelectedId,
       addChild: mockAddChild,
-      updateChild: vi.fn(),
-      deleteChild: vi.fn(),
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
       loading: false,
     });
     render(<ChildDevelopment />);
@@ -206,5 +208,79 @@ describe('ChildDevelopment', () => {
     const shuffleBtn = screen.getByRole('button', { name: 'childDev.shuffleVerse' });
     expect(shuffleBtn).toBeInTheDocument();
     await user.click(shuffleBtn);
+  });
+
+  it('shows edit and delete buttons when a child is selected', () => {
+    mockUseChildren.mockReturnValue({
+      children: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      allChildren: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      selectedChild: { id: 'c1', name: 'Emma', birthDate: '2024-01-01' },
+      selectedId: 'c1',
+      setSelectedId: mockSetSelectedId,
+      addChild: mockAddChild,
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
+      loading: false,
+    });
+    render(<ChildDevelopment />);
+    expect(screen.getByRole('button', { name: 'children.editChild' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'children.deleteChild' })).toBeInTheDocument();
+  });
+
+  it('opens edit form when Edit button is clicked', () => {
+    mockUseChildren.mockReturnValue({
+      children: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      allChildren: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      selectedChild: { id: 'c1', name: 'Emma', birthDate: '2024-01-01' },
+      selectedId: 'c1',
+      setSelectedId: mockSetSelectedId,
+      addChild: mockAddChild,
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
+      loading: false,
+    });
+    render(<ChildDevelopment />);
+    fireEvent.click(screen.getByRole('button', { name: 'children.editChild' }));
+    expect(screen.getByText('children.editChild')).toBeInTheDocument();
+    expect(screen.getByLabelText('childDev.childName')).toHaveValue('Emma');
+  });
+
+  it('calls updateChild when edit form is saved', async () => {
+    mockUpdateChild.mockResolvedValue(undefined);
+    mockUseChildren.mockReturnValue({
+      children: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      allChildren: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      selectedChild: { id: 'c1', name: 'Emma', birthDate: '2024-01-01' },
+      selectedId: 'c1',
+      setSelectedId: mockSetSelectedId,
+      addChild: mockAddChild,
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
+      loading: false,
+    });
+    render(<ChildDevelopment />);
+    fireEvent.click(screen.getByRole('button', { name: 'children.editChild' }));
+    fireEvent.change(screen.getByLabelText('childDev.childName'), { target: { value: 'Emma Rose' } });
+    fireEvent.click(screen.getByText('children.save'));
+    expect(mockUpdateChild).toHaveBeenCalledWith('c1', { name: 'Emma Rose', birthDate: '2024-01-01' });
+  });
+
+  it('calls deleteChild after confirm', async () => {
+    mockDeleteChild.mockResolvedValue(undefined);
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    mockUseChildren.mockReturnValue({
+      children: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      allChildren: [{ id: 'c1', name: 'Emma', birthDate: '2024-01-01' }],
+      selectedChild: { id: 'c1', name: 'Emma', birthDate: '2024-01-01' },
+      selectedId: 'c1',
+      setSelectedId: mockSetSelectedId,
+      addChild: mockAddChild,
+      updateChild: mockUpdateChild,
+      deleteChild: mockDeleteChild,
+      loading: false,
+    });
+    render(<ChildDevelopment />);
+    fireEvent.click(screen.getByRole('button', { name: 'children.deleteChild' }));
+    expect(mockDeleteChild).toHaveBeenCalledWith('c1');
   });
 });
