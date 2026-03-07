@@ -30,6 +30,8 @@ const zh: Record<TranslationKey, string> = {
   'home.quickStocksDesc': '\u8ddf\u8e2a\u60a8\u7684\u80a1\u7968\u81ea\u9009\u5217\u8868',
   'home.quickPodcastsDesc': '\u53d1\u73b0\u548c\u6536\u542c\u64ad\u5ba2',
   'home.quickAccess': '\u5feb\u6377\u8bbf\u95ee',
+  'home.pinWidget': '\u56fa\u5b9a\u4e3a\u5c0f\u7ec4\u4ef6',
+  'home.unpinWidget': '\u53d6\u6d88\u56fa\u5b9a',
 
   // Search
   'search.search': '\u641c\u7d22',
