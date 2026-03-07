@@ -8,7 +8,6 @@ import {
   updateWorshipFavorites,
   updateChildData,
   updateWidgetLayout,
-  updateWidgetSize,
   updateBookBookmarks,
   updateBookAudioProgress,
   updateBookLastPlayed,
@@ -108,18 +107,6 @@ export function useFirestoreSync(user: User | null) {
     }
     window.addEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
     return () => window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
-  }, [user]);
-
-  // Auto-sync widget size from localStorage to Firestore
-  useEffect(() => {
-    function handleWidgetSizeChanged() {
-      if (user) {
-        const size = localStorage.getItem(StorageKeys.WIDGET_SIZE);
-        if (size) updateWidgetSize(user.uid, size);
-      }
-    }
-    window.addEventListener(WindowEvents.WIDGET_SIZE_CHANGED, handleWidgetSizeChanged);
-    return () => window.removeEventListener(WindowEvents.WIDGET_SIZE_CHANGED, handleWidgetSizeChanged);
   }, [user]);
 
   // Auto-sync book bookmarks from localStorage to Firestore

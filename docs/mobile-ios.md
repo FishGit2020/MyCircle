@@ -95,6 +95,27 @@ WKWebView on iOS does not support service workers. The following features are au
 | FCM push notifications | `messaging.ts` | `requestNotificationPermission()` returns `null` |
 | PWA install prompt | `PwaInstallPrompt.tsx` | Skips `beforeinstallprompt` listener |
 
+## iOS PWA Gotchas
+
+### `h-dvh` / `100dvh` timing gap
+
+**Symptom:** A white gap appears below the bottom navigation rail when the app first loads as a PWA on iOS. The gap disappears after rotating the screen to landscape and back.
+
+**Root cause:** On initial load, WebKit calculates `100dvh` before it has fully initialized safe-area insets. The value is computed as a plain viewport height (without accounting for the home indicator / safe area), then corrected after the first resize or orientation change event. Any element sized with `h-dvh` or `min-h-dvh` will visibly jump.
+
+**Fix:** Avoid `dvh` units on the root layout container. Use a percentage height chain instead:
+
+```css
+/* index.css */
+html { height: 100%; }
+body { height: 100%; }
+#root { height: 100%; display: flex; flex-direction: column; }
+```
+
+Then on the layout container use `flex-1` (fills remaining height via flexbox) rather than `h-dvh`. This propagates height from the browser's root without any timing dependency and stays stable on initial load.
+
+**Do not use:** `h-dvh`, `min-h-dvh`, `h-[100dvh]` on the root shell container or the bottom navigation spacer. These units work correctly in a regular browser tab but misbehave on iOS PWA initial paint.
+
 ## Known Limitations
 
 - **No service workers** — WKWebView does not support SW. Offline caching relies on Capacitor's native WebView cache and Firestore offline persistence.

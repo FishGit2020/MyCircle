@@ -202,19 +202,24 @@ describe('restoreUserData', () => {
   });
 
   it('restores widget layout only when local is empty', () => {
-    const layout = [{ id: 'weather', visible: true, size: 'large' }];
+    const layout = { pinned: ['weather', 'stocks'], size: 'large' };
     restoreUserData(makeProfile({ widgetLayout: layout }) as any, 'user1');
     const stored = JSON.parse(localStorage.getItem('widget-dashboard-layout')!);
-    // Legacy per-widget size is stripped
-    expect(stored[0].size).toBeUndefined();
-    expect(stored[0].id).toBe('weather');
+    expect(stored.pinned).toEqual(['weather', 'stocks']);
+    expect(stored.size).toBe('large');
   });
 
   it('does not overwrite existing local widget layout', () => {
-    localStorage.setItem('widget-dashboard-layout', JSON.stringify([{ id: 'stocks', visible: true }]));
-    restoreUserData(makeProfile({ widgetLayout: [{ id: 'weather', visible: true }] }) as any, 'user1');
+    localStorage.setItem('widget-dashboard-layout', JSON.stringify({ pinned: ['stocks'], size: 'small' }));
+    restoreUserData(makeProfile({ widgetLayout: { pinned: ['weather'], size: 'medium' } }) as any, 'user1');
     const stored = JSON.parse(localStorage.getItem('widget-dashboard-layout')!);
-    expect(stored[0].id).toBe('stocks');
+    expect(stored.pinned).toEqual(['stocks']);
+  });
+
+  it('ignores old array-format widget layout from Firestore', () => {
+    const oldLayout = [{ id: 'weather', visible: true }];
+    restoreUserData(makeProfile({ widgetLayout: oldLayout }) as any, 'user1');
+    expect(localStorage.getItem('widget-dashboard-layout')).toBeNull();
   });
 
   it('restores book bookmarks', () => {

@@ -106,9 +106,10 @@ describe('useFirestoreSync', () => {
 
   it('syncs widget layout on event', () => {
     renderHook(() => useFirestoreSync(makeUser()));
-    localStorage.setItem('widget-dashboard-layout', JSON.stringify([{ id: 'w1', visible: true }]));
+    const layout = { pinned: ['weather', 'stocks'], size: 'medium' };
+    localStorage.setItem('widget-dashboard-layout', JSON.stringify(layout));
     window.dispatchEvent(new Event('widget-layout-changed'));
-    expect(mockUpdateWidgetLayout).toHaveBeenCalledWith('user1', [{ id: 'w1', visible: true }]);
+    expect(mockUpdateWidgetLayout).toHaveBeenCalledWith('user1', layout);
   });
 
   it('syncs book bookmarks on event', () => {
