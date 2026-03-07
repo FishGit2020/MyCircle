@@ -243,7 +243,7 @@ export default function Layout() {
   }, [openGroup]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="h-dvh flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:outline-none"
@@ -364,7 +364,7 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-grow flex flex-col container mx-auto px-4 py-6 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
+        className={`flex-grow flex flex-col overflow-y-auto container mx-auto px-4 py-6 ${isPlayerVisible ? 'pb-32 md:pb-20' : 'pb-16 md:pb-4'}`}
         style={{ '--player-h': isPlayerVisible ? '5rem' : '0px' } as React.CSSProperties}
       >
         <Outlet />
@@ -383,7 +383,7 @@ export default function Layout() {
 
       <footer
         role="contentinfo"
-        className="flex-shrink-0 bg-gray-800 dark:bg-gray-950 text-white py-1 md:py-2 transition-colors"
+        className="hidden md:block flex-shrink-0 bg-gray-800 dark:bg-gray-950 text-white py-1 md:py-2 transition-colors"
       >
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-gray-400">
@@ -403,12 +403,6 @@ export default function Layout() {
               GitHub
             </a>
           </p>
-          {/* Mobile spacer for fixed BottomNav + audio player clearance */}
-          <div
-            className="md:hidden"
-            style={{ height: `calc(${isPlayerVisible ? '8rem' : '4rem'} + env(safe-area-inset-bottom, 0px))` }}
-            aria-hidden="true"
-          />
         </div>
       </footer>
     </div>
