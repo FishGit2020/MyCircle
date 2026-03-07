@@ -19,6 +19,7 @@ vi.mock('@mycircle/shared', () => ({
     LAST_PLAYED_CHANGED: 'last-played-changed',
     BOOK_LAST_PLAYED_CHANGED: 'book-last-played-changed',
     BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
+    WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
   },
   StorageKeys: {
     STOCK_WATCHLIST: 'stock-tracker-watchlist',
@@ -79,15 +80,13 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders all default widgets', () => {
+  it('renders empty dashboard by default (all widgets hidden)', () => {
     renderWidget();
-    expect(screen.getByText('widgets.weather')).toBeInTheDocument();
-    expect(screen.getByText('widgets.stocks')).toBeInTheDocument();
-    expect(screen.getByText('widgets.bible')).toBeInTheDocument();
-    expect(screen.getByText('widgets.notebook')).toBeInTheDocument();
-    expect(screen.getByText('widgets.babyTracker')).toBeInTheDocument();
-    expect(screen.getByText('widgets.childDev')).toBeInTheDocument();
-    expect(screen.getByText('widgets.worship')).toBeInTheDocument();
+    // With default all-hidden layout, no widget tiles are shown in the grid
+    // Customize button is always visible
+    expect(screen.getByText('widgets.customize')).toBeInTheDocument();
+    // No weather widget card in the grid
+    expect(screen.queryByText('widgets.weather')).not.toBeInTheDocument();
   });
 
   it('renders customize button', () => {
@@ -107,18 +106,18 @@ describe('WidgetDashboard', () => {
   it('shows visibility toggles in editing mode', () => {
     renderWidget();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // All widgets should show "Visible" toggle
-    const visibleButtons = screen.getAllByText('widgets.visible');
-    expect(visibleButtons.length).toBe(18);
+    // All widgets default to hidden
+    const hiddenButtons = screen.getAllByText('widgets.hidden');
+    expect(hiddenButtons.length).toBe(18);
   });
 
   it('can toggle widget visibility', () => {
     renderWidget();
     fireEvent.click(screen.getByText('widgets.customize'));
-    const visibleButtons = screen.getAllByText('widgets.visible');
-    fireEvent.click(visibleButtons[0]);
-    // After toggling, one should now show "Hidden"
-    expect(screen.getByText('widgets.hidden')).toBeInTheDocument();
+    const hiddenButtons = screen.getAllByText('widgets.hidden');
+    fireEvent.click(hiddenButtons[0]);
+    // After toggling one from hidden, it should now show "Visible"
+    expect(screen.getByText('widgets.visible')).toBeInTheDocument();
   });
 
   it('shows move up/down buttons in editing mode', () => {
@@ -152,28 +151,31 @@ describe('WidgetDashboard', () => {
     renderWidget();
     // Enter editing mode to see hidden widget
     fireEvent.click(screen.getByText('widgets.customize'));
-    // nowPlaying widget should be hidden
-    expect(screen.getByText('widgets.hidden')).toBeInTheDocument();
+    // nowPlaying and other widgets should be hidden
+    const hiddenToggles = screen.getAllByText('widgets.hidden');
+    expect(hiddenToggles.length).toBeGreaterThan(0);
   });
 
   it('resets layout when reset button is clicked', () => {
     renderWidget();
     fireEvent.click(screen.getByText('widgets.customize'));
-    // Toggle first widget to hidden
-    const visibleButtons = screen.getAllByText('widgets.visible');
-    fireEvent.click(visibleButtons[0]);
-    expect(screen.getByText('widgets.hidden')).toBeInTheDocument();
+    // Toggle first widget from hidden to visible
+    const hiddenButtons = screen.getAllByText('widgets.hidden');
+    fireEvent.click(hiddenButtons[0]);
+    expect(screen.getByText('widgets.visible')).toBeInTheDocument();
     // Click reset
     fireEvent.click(screen.getByText('widgets.reset'));
-    // All should be visible again
-    const allVisible = screen.getAllByText('widgets.visible');
-    expect(allVisible.length).toBe(18);
+    // All should be hidden again (default)
+    const allHidden = screen.getAllByText('widgets.hidden');
+    expect(allHidden.length).toBe(18);
   });
 
   it('renders worship widget with song count', () => {
     const songs = [{ id: '1', title: 'Amazing Grace' }, { id: '2', title: 'Holy Holy Holy' }];
     const favs = ['1'];
+    const layout = JSON.stringify([{ id: 'worship', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
+      if (key === 'widget-dashboard-layout') return layout;
       if (key === 'worship-songs-cache') return JSON.stringify(songs);
       if (key === 'worship-favorites') return JSON.stringify(favs);
       return null;
@@ -202,7 +204,9 @@ describe('WidgetDashboard', () => {
       },
       podcast: { id: 10, title: 'Persisted Podcast', author: '', artwork: '', description: '', feedUrl: '', episodeCount: 1, categories: {} },
     };
+    const layout = JSON.stringify([{ id: 'nowPlaying', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
+      if (key === 'widget-dashboard-layout') return layout;
       if (key === 'podcast-now-playing') return JSON.stringify(nowPlaying);
       return null;
     });
@@ -226,7 +230,9 @@ describe('WidgetDashboard', () => {
       },
       podcast: { id: 10, title: 'Persisted Podcast', author: '', artwork: '', description: '', feedUrl: '', episodeCount: 1, categories: {} },
     };
+    const layout = JSON.stringify([{ id: 'nowPlaying', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
+      if (key === 'widget-dashboard-layout') return layout;
       if (key === 'podcast-now-playing') return JSON.stringify(nowPlaying);
       return null;
     });
@@ -241,7 +247,9 @@ describe('WidgetDashboard', () => {
       position: 120,
       savedAt: Date.now(),
     };
+    const layout = JSON.stringify([{ id: 'nowPlaying', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
+      if (key === 'widget-dashboard-layout') return layout;
       if (key === 'podcast-last-played') return JSON.stringify(lastPlayed);
       return null;
     });

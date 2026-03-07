@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router';
 import { useTranslation, WindowEvents } from '@mycircle/shared';
 import { ROUTE_LABEL_KEYS } from '../../routeConfig';
+import { ROUTE_SEGMENT_TO_WIDGET } from '../widgets/widgetConfig';
+import { useWidgetPinned } from '../../hooks/useWidgetPinned';
 
 function resolveDetailLabel(
   firstSegment: string,
@@ -35,6 +37,33 @@ function resolveDetailLabel(
     default:
       return t('nav.detail');
   }
+}
+
+function PinButton({ segment }: { segment: string }) {
+  const { t } = useTranslation();
+  const widgetId = ROUTE_SEGMENT_TO_WIDGET[segment];
+  const { pinned, toggle } = useWidgetPinned(widgetId);
+
+  if (!widgetId) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      title={pinned ? t('home.unpinWidget') : t('home.pinWidget')}
+      aria-label={pinned ? t('home.unpinWidget') : t('home.pinWidget')}
+      aria-pressed={pinned}
+      className={`ml-2 p-1 rounded transition-colors ${
+        pinned
+          ? 'text-blue-500 dark:text-blue-400'
+          : 'text-gray-300 dark:text-gray-600 hover:text-blue-400 dark:hover:text-blue-400'
+      }`}
+    >
+      <svg className="w-3.5 h-3.5" fill={pinned ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" />
+      </svg>
+    </button>
+  );
 }
 
 export default function Breadcrumbs() {
@@ -71,8 +100,8 @@ export default function Breadcrumbs() {
   const tabParam = searchParams.get('tab');
 
   return (
-    <nav aria-label={t('nav.breadcrumbLabel')} className="container mx-auto px-4 py-2">
-      <ol className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-1">
+    <nav aria-label={t('nav.breadcrumbLabel')} className="container mx-auto px-4 py-2 flex items-center">
+      <ol className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-1 flex-1 min-w-0">
         <li>
           <Link
             to="/"
@@ -141,6 +170,7 @@ export default function Breadcrumbs() {
           </li>
         )}
       </ol>
+      <PinButton segment={firstSegment} />
     </nav>
   );
 }
