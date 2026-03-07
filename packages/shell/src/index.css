@@ -4,6 +4,19 @@
 
 html {
   scrollbar-gutter: stable;
+  height: 100%;
+}
+
+/* Stable full-screen height for iOS PWA — avoids the dvh timing gap where
+   100dvh is miscalculated on initial load and corrects only after a resize. */
+body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slide-up {
