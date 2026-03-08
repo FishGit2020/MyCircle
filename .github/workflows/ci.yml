@@ -47,10 +47,11 @@ jobs:
             packages/shared/dist
           key: workspace-${{ github.sha }}
 
-  # ── Lint (parallel with typecheck and test, non-blocking) ─────────────
+  # ── Lint (parallel, non-blocking — surfaces real issues) ──────────────
   lint:
     needs: setup
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
 
@@ -70,14 +71,13 @@ jobs:
           key: workspace-${{ github.sha }}
 
       - name: ESLint
-        run: |
-          pnpm lint 2>&1 | tail -5 || true
-          echo "::notice::ESLint completed (warnings/errors above are tracked, not blocking)"
+        run: pnpm lint
 
-  # ── Security audit (parallel, non-blocking) ─────────────────────────
+  # ── Security audit (parallel, non-blocking — surfaces real issues) ───
   audit:
     needs: setup
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
 
@@ -97,9 +97,7 @@ jobs:
           key: workspace-${{ github.sha }}
 
       - name: Security audit
-        run: |
-          pnpm audit --audit-level=high 2>&1 | tail -20 || true
-          echo "::notice::Security audit completed (advisories above are tracked, not blocking)"
+        run: pnpm audit --audit-level=high
 
   # ── Typecheck (parallel with test) ─────────────────────────────────────
   typecheck:

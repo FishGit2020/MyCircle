@@ -19,9 +19,6 @@ export default function NotificationBell() {
 
   const anyEnabled = weatherEnabled || announcementEnabled;
 
-  // Don't render if Firebase or Notification API isn't available
-  if (!firebaseEnabled || typeof Notification === 'undefined') return null;
-
   const showFeedback = (message: string) => {
     if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
     setFeedback(message);
@@ -189,6 +186,9 @@ export default function NotificationBell() {
     });
   }, [anyEnabled]);
 
+  // Don't render if Firebase or Notification API isn't available
+  if (!firebaseEnabled || typeof Notification === 'undefined') return null;
+
   return (
     <>
       <div className="relative" ref={panelRef}>
@@ -336,4 +336,3 @@ function NotificationToggle({
     </button>
   );
 }
-

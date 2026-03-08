@@ -10,7 +10,7 @@ function noteIndex(note: string): number {
   return CHROMATIC_FLAT.indexOf(note);
 }
 
-function useFlats(targetRoot: string): boolean {
+function shouldUseFlats(targetRoot: string): boolean {
   return FLAT_KEYS.has(targetRoot);
 }
 
@@ -29,7 +29,7 @@ export function transposeChord(chord: string, semitones: number): string {
   if (rootIdx === -1) return chord;
 
   const newRootIdx = ((rootIdx + semitones) % 12 + 12) % 12;
-  const scale = useFlats(CHROMATIC_SHARP[newRootIdx]) ? CHROMATIC_FLAT : CHROMATIC_SHARP;
+  const scale = shouldUseFlats(CHROMATIC_SHARP[newRootIdx]) ? CHROMATIC_FLAT : CHROMATIC_SHARP;
   let result = scale[newRootIdx] + quality;
 
   if (bass) {

@@ -112,7 +112,7 @@ export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities:
 
 /** Reverse map: first path segment → WidgetType (for pin button lookup by route) */
 export const ROUTE_SEGMENT_TO_WIDGET: Record<string, WidgetType> = Object.fromEntries(
-  (Object.entries(WIDGET_ROUTES) as [WidgetType, string | Function][])
+  (Object.entries(WIDGET_ROUTES) as [WidgetType, string | ((...args: unknown[]) => unknown)][])
     .filter(([, route]) => typeof route === 'string')
     .map(([widgetId, route]) => [(route as string).replace(/^\//, ''), widgetId])
 );
