@@ -21,7 +21,8 @@ html.dark body {
 }
 
 #root {
-  height: 100%;
+  min-height: 100%;
+  min-height: 100dvh; /* iOS PWA: ensure root fills viewport even with short content */
   display: flex;
   flex-direction: column;
 }
