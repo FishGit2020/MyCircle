@@ -37,7 +37,6 @@ const keysToPreserve = new Set([
   StorageKeys.WEATHER_ALERTS,
   StorageKeys.ANNOUNCEMENT_ALERTS,
   StorageKeys.KNOWN_ACCOUNTS,
-  StorageKeys.WIDGET_LAYOUT,
 ]);
 
 /** Clear user-specific localStorage and dispatch change events */
