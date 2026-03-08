@@ -213,6 +213,13 @@ export default function Layout() {
     const mainEl = document.getElementById('main-content');
     if (mainEl?.scrollTo) mainEl.scrollTo(0, 0);
     window.scrollTo(0, 0);
+    // iOS PWA: force a style recalculation so env(safe-area-inset-bottom)
+    // re-evaluates immediately on navigation, rather than waiting for the
+    // next MFE CSS injection to trigger it (which caused a visible gap
+    // below BottomNav during the loading-spinner phase).
+    const s = document.createElement('style');
+    document.head.appendChild(s);
+    document.head.removeChild(s);
   }, [location.pathname]);
 
   // Close dropdown on outside click — use both pointerdown and mousedown for

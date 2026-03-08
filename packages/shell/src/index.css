@@ -11,6 +11,13 @@ html {
    100dvh is miscalculated on initial load and corrects only after a resize. */
 body {
   height: 100%;
+  /* Match BottomNav background so any iOS safe-area gap during navigation
+     is invisible rather than showing the browser's default white. */
+  background-color: #ffffff;
+}
+
+html.dark body {
+  background-color: #1f2937; /* gray-800 — matches dark:bg-gray-800 BottomNav */
 }
 
 #root {
