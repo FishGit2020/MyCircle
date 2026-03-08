@@ -47,6 +47,58 @@ jobs:
             packages/shared/dist
           key: workspace-${{ github.sha }}
 
+  # ── Lint (parallel with typecheck and test) ───────────────────────────
+  lint:
+    needs: setup
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore workspace
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/shared/dist
+          key: workspace-${{ github.sha }}
+
+      - name: ESLint
+        run: pnpm lint
+
+  # ── Security audit (parallel, non-blocking) ─────────────────────────
+  audit:
+    needs: setup
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore workspace
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            packages/shared/dist
+          key: workspace-${{ github.sha }}
+
+      - name: Security audit
+        run: pnpm audit --audit-level=high
+
   # ── Typecheck (parallel with test) ─────────────────────────────────────
   typecheck:
     needs: setup
@@ -242,15 +294,16 @@ jobs:
   # ── Gate job for branch protection (preserves "ci" check name) ─────────
   ci:
     if: always()
-    needs: [typecheck, test-root, test-mfe]
+    needs: [lint, typecheck, test-root, test-mfe]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
+          # Lint is non-blocking for now (continue-on-error) — tracked separately
           if [ "${{ needs.typecheck.result }}" != "success" ] || \
              [ "${{ needs.test-root.result }}" != "success" ] || \
              [ "${{ needs.test-mfe.result }}" != "success" ]; then
             echo "Required jobs failed: typecheck=${{ needs.typecheck.result }}, test-root=${{ needs.test-root.result }}, test-mfe=${{ needs.test-mfe.result }}"
             exit 1
           fi
-          echo "All required jobs passed"
+          echo "All required jobs passed (lint=${{ needs.lint.result }})"
