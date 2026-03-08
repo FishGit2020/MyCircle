@@ -121,7 +121,7 @@
     "graphql-ws": "^6.0.7",
     "html-to-image": "^1.11.13",
     "node-cache": "^5.1.2",
-    "openai": "^4.104.0",
+    "openai": "^6.27.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.13.1",
@@ -154,7 +154,7 @@
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
     "@types/ws": "^8.18.1",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-react": "^5.1.4",
     "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.27",
     "concurrently": "^9.2.1",
@@ -173,7 +173,7 @@
     "typescript-eslint": "^8.56.1",
     "vite": "^5.4.21",
     "vitest": "^4.0.18",
-    "zod": "^3.25.76"
+    "zod": "^4.3.6"
   },
   "pnpm": {
     "overrides": {
