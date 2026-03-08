@@ -242,6 +242,15 @@ jobs:
           done
           cat bundle-report.md
 
+      - name: Check shell bundle size limit
+        run: |
+          SHELL_SIZE=$(du -sb packages/shell/dist 2>/dev/null | cut -f1)
+          LIMIT=5242880  # 5MB
+          echo "Shell bundle: $(du -sh packages/shell/dist | cut -f1) ($SHELL_SIZE bytes, limit: $LIMIT)"
+          if [ "$SHELL_SIZE" -gt "$LIMIT" ]; then
+            echo "::warning::Shell bundle exceeds 5MB limit"
+          fi
+
       - name: Upload bundle size report
         if: always()
         uses: actions/upload-artifact@v4
