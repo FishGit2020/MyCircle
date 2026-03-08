@@ -209,11 +209,11 @@ describe('restoreUserData', () => {
     expect(stored.size).toBe('large');
   });
 
-  it('does not overwrite existing local widget layout', () => {
-    localStorage.setItem('widget-dashboard-layout', JSON.stringify({ pinned: ['stocks'], size: 'small' }));
-    restoreUserData(makeProfile({ widgetLayout: { pinned: ['weather'], size: 'medium' } }) as any, 'user1');
+  it('overwrites local widget layout with Firestore data on sign-in', () => {
+    localStorage.setItem('widget-dashboard-layout', JSON.stringify({ pinned: ['stocks'], size: 'comfortable' }));
+    restoreUserData(makeProfile({ widgetLayout: { pinned: ['weather'], size: 'comfortable' } }) as any, 'user1');
     const stored = JSON.parse(localStorage.getItem('widget-dashboard-layout')!);
-    expect(stored.pinned).toEqual(['stocks']);
+    expect(stored.pinned).toEqual(['weather']);
   });
 
   it('ignores old array-format widget layout from Firestore', () => {
