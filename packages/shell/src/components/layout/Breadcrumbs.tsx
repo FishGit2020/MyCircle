@@ -55,8 +55,8 @@ function PinButton({ segment }: { segment: string }) {
       aria-pressed={pinned}
       className={`ml-2 p-1 rounded transition-colors ${
         pinned
-          ? 'text-yellow-400 dark:text-yellow-300'
-          : 'text-gray-300 dark:text-gray-600 hover:text-yellow-400 dark:hover:text-yellow-300'
+          ? 'text-blue-500 dark:text-blue-400'
+          : 'text-gray-300 dark:text-gray-600 hover:text-blue-500 dark:hover:text-blue-400'
       }`}
     >
       <svg className="w-3.5 h-3.5" fill={pinned ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
