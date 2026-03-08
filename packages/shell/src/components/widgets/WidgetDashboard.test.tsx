@@ -54,6 +54,7 @@ vi.mock('@mycircle/shared', () => ({
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
     user: null,
+    loading: false,
     favoriteCities: [],
     recentCities: [],
   }),
@@ -77,7 +78,7 @@ const renderWidget = () =>
 // Renders with at least one widget visible so the section is not hidden
 const renderWidgetWithPinned = () => {
   getItemSpy.mockImplementation((key: string) => {
-    if (key === 'widget-dashboard-layout') return JSON.stringify([{ id: 'weather', visible: true }]);
+    if (key === 'widget-dashboard-layout') return JSON.stringify({ pinned: ['weather'], size: 'comfortable' });
     return null;
   });
   return render(<MemoryRouter><WidgetDashboard /></MemoryRouter>);
@@ -89,109 +90,41 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('widgets.title')).toBeInTheDocument();
   });
 
-  it('renders nothing by default when all widgets are hidden', () => {
+  it('renders nothing when no widgets are pinned', () => {
     const { container } = renderWidget();
-    // With default all-hidden layout and no editing, entire section is hidden
     expect(container.querySelector('section')).toBeNull();
-    expect(screen.queryByText('widgets.customize')).not.toBeInTheDocument();
   });
 
-  it('renders customize button', () => {
+  it('has proper a11y labels on the section', () => {
     renderWidgetWithPinned();
-    expect(screen.getByText('widgets.customize')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'widgets.title' })).toBeInTheDocument();
   });
 
-  it('enters editing mode when customize is clicked', () => {
+  it('renders Comfortable/Tight size toggle buttons', () => {
     renderWidgetWithPinned();
-    fireEvent.click(screen.getByText('widgets.customize'));
-    // In editing mode, "Done" button replaces "Customize"
-    expect(screen.getByText('widgets.done')).toBeInTheDocument();
-    // Reset layout button appears
-    expect(screen.getByText('widgets.reset')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'widgets.sizeComfortable' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'widgets.sizeTight' })).toBeInTheDocument();
   });
 
-  it('shows visibility toggles in editing mode', () => {
-    renderWidgetWithPinned();
-    fireEvent.click(screen.getByText('widgets.customize'));
-    // 1 pinned widget shows 'widgets.visible', rest are hidden
-    expect(screen.getAllByText('widgets.visible').length).toBe(1);
-    expect(screen.getAllByText('widgets.hidden').length).toBe(17);
-  });
-
-  it('can toggle widget visibility', () => {
-    renderWidgetWithPinned();
-    fireEvent.click(screen.getByText('widgets.customize'));
-    const hiddenButtons = screen.getAllByText('widgets.hidden');
-    fireEvent.click(hiddenButtons[0]);
-    // After toggling one from hidden, we now have 2 visible
-    expect(screen.getAllByText('widgets.visible').length).toBe(2);
-  });
-
-  it('shows move up/down buttons in editing mode', () => {
-    renderWidgetWithPinned();
-    fireEvent.click(screen.getByText('widgets.customize'));
-    const upButtons = screen.getAllByLabelText('widgets.moveUp');
-    const downButtons = screen.getAllByLabelText('widgets.moveDown');
-    expect(upButtons.length).toBe(18);
-    expect(downButtons.length).toBe(18);
-  });
-
-  it('does not persist layout on initial mount (avoids Firestore write loop)', () => {
+  it('does not persist layout on initial mount', () => {
     renderWidget();
-    // Layout should NOT be saved on initial mount — only after user-driven changes
     expect(setItemSpy).not.toHaveBeenCalledWith(
       'widget-dashboard-layout',
       expect.any(String)
     );
   });
 
-  it('loads layout from localStorage', () => {
-    const customLayout = JSON.stringify([
-      { id: 'verse', visible: true },
-      { id: 'weather', visible: true },
-      { id: 'nowPlaying', visible: false },
-    ]);
-    getItemSpy.mockImplementation((key: string) => {
-      if (key === 'widget-dashboard-layout') return customLayout;
-      return null;
-    });
-    renderWidget();
-    // Enter editing mode to see hidden widget
-    fireEvent.click(screen.getByText('widgets.customize'));
-    // nowPlaying and other widgets should be hidden
-    const hiddenToggles = screen.getAllByText('widgets.hidden');
-    expect(hiddenToggles.length).toBeGreaterThan(0);
-  });
-
-  it('resets layout when reset button is clicked', () => {
-    renderWidgetWithPinned();
-    fireEvent.click(screen.getByText('widgets.customize'));
-    // Toggle a hidden widget to visible (now 2 visible)
-    const hiddenButtons = screen.getAllByText('widgets.hidden');
-    fireEvent.click(hiddenButtons[0]);
-    expect(screen.getAllByText('widgets.visible').length).toBe(2);
-    // Click reset → all 18 go back to DEFAULT_LAYOUT (all hidden)
-    fireEvent.click(screen.getByText('widgets.reset'));
-    expect(screen.getAllByText('widgets.hidden').length).toBe(18);
-  });
-
   it('renders worship widget with song count', () => {
     const songs = [{ id: '1', title: 'Amazing Grace' }, { id: '2', title: 'Holy Holy Holy' }];
     const favs = ['1'];
-    const layout = JSON.stringify([{ id: 'worship', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
-      if (key === 'widget-dashboard-layout') return layout;
+      if (key === 'widget-dashboard-layout') return JSON.stringify({ pinned: ['worship'], size: 'comfortable' });
       if (key === 'worship-songs-cache') return JSON.stringify(songs);
       if (key === 'worship-favorites') return JSON.stringify(favs);
       return null;
     });
     renderWidget();
     expect(screen.getByText('widgets.worship')).toBeInTheDocument();
-  });
-
-  it('has proper a11y labels on the section', () => {
-    renderWidgetWithPinned();
-    expect(screen.getByRole('region', { name: 'widgets.title' })).toBeInTheDocument();
   });
 
   it('hydrates NowPlayingWidget from persisted localStorage', () => {
@@ -209,9 +142,8 @@ describe('WidgetDashboard', () => {
       },
       podcast: { id: 10, title: 'Persisted Podcast', author: '', artwork: '', description: '', feedUrl: '', episodeCount: 1, categories: {} },
     };
-    const layout = JSON.stringify([{ id: 'nowPlaying', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
-      if (key === 'widget-dashboard-layout') return layout;
+      if (key === 'widget-dashboard-layout') return JSON.stringify({ pinned: ['nowPlaying'], size: 'comfortable' });
       if (key === 'podcast-now-playing') return JSON.stringify(nowPlaying);
       return null;
     });
@@ -235,9 +167,8 @@ describe('WidgetDashboard', () => {
       },
       podcast: { id: 10, title: 'Persisted Podcast', author: '', artwork: '', description: '', feedUrl: '', episodeCount: 1, categories: {} },
     };
-    const layout = JSON.stringify([{ id: 'nowPlaying', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
-      if (key === 'widget-dashboard-layout') return layout;
+      if (key === 'widget-dashboard-layout') return JSON.stringify({ pinned: ['nowPlaying'], size: 'comfortable' });
       if (key === 'podcast-now-playing') return JSON.stringify(nowPlaying);
       return null;
     });
@@ -252,9 +183,8 @@ describe('WidgetDashboard', () => {
       position: 120,
       savedAt: Date.now(),
     };
-    const layout = JSON.stringify([{ id: 'nowPlaying', visible: true }]);
     getItemSpy.mockImplementation((key: string) => {
-      if (key === 'widget-dashboard-layout') return layout;
+      if (key === 'widget-dashboard-layout') return JSON.stringify({ pinned: ['nowPlaying'], size: 'comfortable' });
       if (key === 'podcast-last-played') return JSON.stringify(lastPlayed);
       return null;
     });
@@ -262,5 +192,14 @@ describe('WidgetDashboard', () => {
     expect(screen.getByText('Restored Episode')).toBeInTheDocument();
     expect(screen.getByText('Restored Podcast')).toBeInTheDocument();
     expect(screen.getByText('widgets.continueListening')).toBeInTheDocument();
+  });
+
+  it('size toggle calls saveWidgetLayout with new size', () => {
+    renderWidgetWithPinned();
+    fireEvent.click(screen.getByRole('button', { name: 'widgets.sizeTight' }));
+    expect(setItemSpy).toHaveBeenCalledWith(
+      'widget-dashboard-layout',
+      expect.stringContaining('"size":"tight"')
+    );
   });
 });

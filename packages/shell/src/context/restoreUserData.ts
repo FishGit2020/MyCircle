@@ -134,18 +134,12 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
   }
 
   // Restore widget layout from Firestore only if local is empty
+  // New format: { pinned: string[], size: string }; old array format is ignored (fresh start)
   const hasLocalLayout = !!localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
-  if (!hasLocalLayout && profile.widgetLayout && profile.widgetLayout.length > 0) {
-    // Strip legacy per-widget size field
-    const cleaned = profile.widgetLayout.map(({ size: _, ...rest }: any) => rest);
-    localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(cleaned));
+  const wl = profile.widgetLayout as any;
+  if (!hasLocalLayout && wl && typeof wl === 'object' && !Array.isArray(wl) && Array.isArray(wl.pinned)) {
+    localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(wl));
     window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
-  }
-
-  // Restore global widget size
-  if (profile.widgetSize) {
-    localStorage.setItem(StorageKeys.WIDGET_SIZE, profile.widgetSize);
-    window.dispatchEvent(new Event(WindowEvents.WIDGET_SIZE_CHANGED));
   }
 
   // Restore book bookmarks

@@ -137,7 +137,7 @@ export interface UserProfile {
   podcastPlayedEpisodes?: string[];
   childName?: string;
   childBirthDate?: string;
-  widgetLayout?: Array<{ id: string; visible: boolean; size?: string }>;
+  widgetLayout?: { pinned: string[]; size: string };
   bookBookmarks?: Array<{ bookId: string; bookTitle: string; cfi: string; label: string; createdAt: number }>;
   bookAudioProgress?: Record<string, { position: number; duration: number; chapter: number }>;
   bookLastPlayed?: BookLastPlayedData;
@@ -551,20 +551,11 @@ export async function updateWorshipFavorites(uid: string, favorites: string[]) {
 }
 
 
-export async function updateWidgetLayout(uid: string, layout: Array<{ id: string; visible: boolean }> | null) {
+export async function updateWidgetLayout(uid: string, layout: { pinned: string[]; size: string } | null) {
   if (!db) return;
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     widgetLayout: layout || null,
-    updatedAt: serverTimestamp(),
-  });
-}
-
-export async function updateWidgetSize(uid: string, size: string) {
-  if (!db) return;
-  const userRef = doc(db, 'users', uid);
-  await updateDoc(userRef, {
-    widgetSize: size,
     updatedAt: serverTimestamp(),
   });
 }

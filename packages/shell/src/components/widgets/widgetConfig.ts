@@ -23,80 +23,46 @@ import YouthTrackerWidget from './YouthTrackerWidget';
 
 export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'youthTracker';
 
-export type WidgetSize = 'small' | 'medium' | 'large';
+export type WidgetSize = 'comfortable' | 'tight';
 
-export interface WidgetConfig {
-  id: WidgetType;
-  visible: boolean;
+/** Persisted widget preferences: ordered pin list + global size. */
+export interface WidgetLayout {
+  /** Ordered list of pinned widget IDs — order = pin order. */
+  pinned: WidgetType[];
+  size: WidgetSize;
 }
-
-export const DEFAULT_LAYOUT: WidgetConfig[] = [
-  { id: 'weather', visible: false },
-  { id: 'stocks', visible: false },
-  { id: 'verse', visible: false },
-  { id: 'nowPlaying', visible: false },
-  { id: 'notebook', visible: false },
-  { id: 'babyTracker', visible: false },
-  { id: 'childDev', visible: false },
-  { id: 'worship', visible: false },
-  { id: 'flashcards', visible: false },
-  { id: 'dailyLog', visible: false },
-  { id: 'cloudFiles', visible: false },
-  { id: 'benchmark', visible: false },
-  { id: 'immigration', visible: false },
-  { id: 'digitalLibrary', visible: false },
-  { id: 'familyGames', visible: false },
-  { id: 'docScanner', visible: false },
-  { id: 'hikingMap', visible: false },
-  { id: 'youthTracker', visible: false },
-];
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
 
-export const VALID_IDS = new Set<string>(DEFAULT_LAYOUT.map(w => w.id));
+const DEFAULT_WIDGET_LAYOUT: WidgetLayout = { pinned: [], size: 'comfortable' };
 
-export function loadLayout(): WidgetConfig[] {
+const ALL_WIDGET_IDS = new Set<string>([
+  'weather', 'stocks', 'verse', 'nowPlaying', 'notebook', 'babyTracker',
+  'childDev', 'worship', 'flashcards', 'dailyLog', 'cloudFiles', 'benchmark',
+  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'youthTracker',
+]);
+
+export function loadWidgetLayout(): WidgetLayout {
   try {
     const stored = localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
-    if (stored) {
-      const parsed: WidgetConfig[] = JSON.parse(stored);
-      // Remove stale widget IDs that no longer exist (e.g. removed features)
-      const filtered = parsed.filter(w => VALID_IDS.has(w.id));
-      // Ensure all current widget types exist (forward-compat)
-      const ids = new Set(filtered.map(w => w.id));
-      for (const def of DEFAULT_LAYOUT) {
-        if (!ids.has(def.id)) filtered.push(def);
-      }
-      // Strip legacy per-widget size field
-      return filtered.map(({ size: _, ...rest }: any) => rest);
+    if (!stored) return DEFAULT_WIDGET_LAYOUT;
+    const parsed = JSON.parse(stored);
+    // New format: { pinned: string[], size: string }
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Array.isArray(parsed.pinned)) {
+      return {
+        pinned: (parsed.pinned as string[]).filter(id => ALL_WIDGET_IDS.has(id)) as WidgetType[],
+        size: (['comfortable', 'tight'] as const).includes(parsed.size) ? parsed.size as WidgetSize : 'comfortable',
+      };
     }
+    // Old array format → ignore, start fresh (user clears old data manually)
   } catch { /* ignore */ }
-  return DEFAULT_LAYOUT;
+  return DEFAULT_WIDGET_LAYOUT;
 }
 
-export function saveLayout(layout: WidgetConfig[]) {
+export function saveWidgetLayout(layout: WidgetLayout) {
   try {
     localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(layout));
     window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
-  } catch { /* ignore */ }
-}
-
-// ─── Global Widget Size ───────────────────────────────────────────────────────
-
-const VALID_SIZES: WidgetSize[] = ['small', 'medium', 'large'];
-
-export function loadWidgetSize(): WidgetSize {
-  try {
-    const stored = localStorage.getItem(StorageKeys.WIDGET_SIZE);
-    if (stored && VALID_SIZES.includes(stored as WidgetSize)) return stored as WidgetSize;
-  } catch { /* ignore */ }
-  return 'medium';
-}
-
-export function saveWidgetSize(size: WidgetSize) {
-  try {
-    localStorage.setItem(StorageKeys.WIDGET_SIZE, size);
-    window.dispatchEvent(new Event(WindowEvents.WIDGET_SIZE_CHANGED));
   } catch { /* ignore */ }
 }
 
