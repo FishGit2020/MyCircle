@@ -10,27 +10,25 @@ MyCircle uses **GitHub Actions** for continuous integration, end-to-end testing,
   PR opened to main
        │
        ├──► CI  (ci.yml)               ✅ Required   ⬚ Skipped if only docs changed
-       │     ├─ pnpm install --frozen-lockfile
-       │     ├─ Check shared dependency versions
-       │     ├─ Build shared package (dist/)
-       │     ├─ Typecheck all packages
-       │     └─ Unit tests (root + all MFEs)
+       │     ├─ setup: pnpm install, check shared versions, build shared
+       │     ├─ lint: ESLint (non-blocking, continue-on-error)
+       │     ├─ audit: pnpm audit --audit-level=high (non-blocking)
+       │     ├─ typecheck: tsc --noEmit (all packages)
+       │     ├─ test-root: vitest (shell + shared)
+       │     ├─ test-mfe: vitest (changed MFE packages only)
+       │     ├─ bundle-report: build + size report (non-blocking)
+       │     └─ lighthouse: Lighthouse CI with Core Web Vitals thresholds (non-blocking)
        │
-       ├──► E2E  (e2e.yml → e2e job)   ✅ Required   ⬚ Skipped if only docs changed
+       ├──► E2E  (e2e.yml → 3 sharded jobs)   ✅ Required   ⬚ Skipped if only docs changed
        │     ├─ Build full app (firebase:build)
        │     ├─ Serve dist/firebase/ via express.static
-       │     └─ Playwright E2E tests (browser-mocked)
+       │     └─ Playwright E2E tests (3 shards in parallel, browser-mocked)
        │
-       ├──► E2E Emulator (e2e.yml → e2e-emulator job)   ⚪ Optional
-       │     ├─ Build full app + setup Java
-       │     ├─ Start mock API server + Firebase emulators
-       │     ├─ Seed Firestore emulator
-       │     └─ Playwright E2E tests (full-stack, no browser mocks)
-       │
-       └──► Lighthouse CI (lighthouse.yml)   ⚪ Informational
-             ├─ Build shared + MFEs + shell
-             ├─ Run Lighthouse against shell dist
-             └─ Assert: a11y ≥ 90 (error), perf/BP/SEO ≥ 80-90 (warn)
+       └──► E2E Emulator (e2e.yml → e2e-emulator job)   ✅ Required
+             ├─ Build full app + setup Java
+             ├─ Start mock API server + Firebase emulators
+             ├─ Seed Firestore emulator
+             └─ Playwright E2E tests (full-stack, no browser mocks)
 
   CI + E2E pass → PR can be merged (squash)
 
