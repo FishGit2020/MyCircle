@@ -133,13 +133,22 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.CHILD_DATA_CHANGED));
   }
 
-  // Restore widget layout from Firestore only if local is empty
+  // Restore widget layout from Firestore if local is missing or old array format
   // New format: { pinned: string[], size: string }; old array format is ignored (fresh start)
-  const hasLocalLayout = !!localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
   const wl = profile.widgetLayout as any;
-  if (!hasLocalLayout && wl && typeof wl === 'object' && !Array.isArray(wl) && Array.isArray(wl.pinned)) {
-    localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(wl));
-    window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
+  if (wl && typeof wl === 'object' && !Array.isArray(wl) && Array.isArray(wl.pinned)) {
+    try {
+      const localRaw = localStorage.getItem(StorageKeys.WIDGET_LAYOUT);
+      const localParsed = localRaw ? JSON.parse(localRaw) : null;
+      const hasValidLocal = localParsed && !Array.isArray(localParsed) && Array.isArray(localParsed.pinned);
+      if (!hasValidLocal) {
+        localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(wl));
+        window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
+      }
+    } catch {
+      localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(wl));
+      window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));
+    }
   }
 
   // Restore book bookmarks
