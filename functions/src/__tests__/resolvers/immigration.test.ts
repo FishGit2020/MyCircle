@@ -7,6 +7,15 @@ vi.mock('../../uscisApi.js', () => ({
 
 import { fetchUscisStatus } from '../../uscisApi.js';
 
+const makeMockResult = (overrides = {}) => ({
+  receiptNumber: 'EAC2190000001',
+  formType: 'I-765',
+  status: 'Case Was Received',
+  statusDescription: 'On January 1, 2026, we received your Form I-765.',
+  checkedAt: new Date().toISOString(),
+  ...overrides,
+});
+
 describe('immigration resolvers', () => {
   let resolvers: ReturnType<typeof createImmigrationQueryResolvers>;
 
@@ -27,7 +36,7 @@ describe('immigration resolvers', () => {
   });
 
   it('accepts valid receipt number format (3 letters + 10 digits)', async () => {
-    const mockResult = { status: 'Case Was Received', details: 'On Jan 1...' };
+    const mockResult = makeMockResult();
     vi.mocked(fetchUscisStatus).mockResolvedValueOnce(mockResult);
 
     const result = await resolvers.checkCaseStatus(null, { receiptNumber: 'EAC2190000001' });
@@ -37,7 +46,7 @@ describe('immigration resolvers', () => {
   });
 
   it('normalizes receipt number to uppercase and trims whitespace', async () => {
-    vi.mocked(fetchUscisStatus).mockResolvedValueOnce({ status: 'OK' });
+    vi.mocked(fetchUscisStatus).mockResolvedValueOnce(makeMockResult({ receiptNumber: 'EAC2190000002' }));
 
     await resolvers.checkCaseStatus(null, { receiptNumber: '  eac2190000002  ' });
 
@@ -45,7 +54,7 @@ describe('immigration resolvers', () => {
   });
 
   it('returns cached result on second call with same receipt number', async () => {
-    vi.mocked(fetchUscisStatus).mockResolvedValueOnce({ status: 'Approved' });
+    vi.mocked(fetchUscisStatus).mockResolvedValueOnce(makeMockResult({ receiptNumber: 'MSC2190000002' }));
 
     await resolvers.checkCaseStatus(null, { receiptNumber: 'MSC2190000002' });
     await resolvers.checkCaseStatus(null, { receiptNumber: 'MSC2190000002' });
