@@ -20,38 +20,15 @@ export type { WidgetType, WidgetSize } from './widgetConfig';
 
 export default function WidgetDashboard() {
   const { t } = useTranslation();
-  const { user, loading: authLoading, favoriteCities } = useAuth();
+  const { favoriteCities } = useAuth();
   const [layout, setLayout] = useState<WidgetLayout>(loadWidgetLayout);
-  const [layoutReady, setLayoutReady] = useState(false);
 
-  // Keep layout in sync with storage events
+  // Keep layout in sync with storage events (e.g. Firestore restore on sign-in)
   useEffect(() => {
     const handler = () => setLayout(loadWidgetLayout());
     window.addEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handler);
     return () => window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handler);
   }, []);
-
-  // Flash fix: gate render until auth resolves and potential Firestore restore fires
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      // Not signed in — no Firestore restore coming, use local immediately
-      setLayoutReady(true);
-      return;
-    }
-    // Signed in — wait for WIDGET_LAYOUT_CHANGED from Firestore restore
-    const onRestored = () => setLayoutReady(true);
-    window.addEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, onRestored, { once: true });
-    // Safety timeout: if no widget data saved in Firestore, still show after 2s
-    const timer = setTimeout(() => {
-      setLayoutReady(true);
-      window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, onRestored);
-    }, 2000);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, onRestored);
-    };
-  }, [authLoading, user]);
 
   const handleSizeChange = useCallback((size: WidgetSize) => {
     const current = loadWidgetLayout();
@@ -59,7 +36,7 @@ export default function WidgetDashboard() {
     logEvent('widget_size_change', { size });
   }, []);
 
-  if (!layoutReady || layout.pinned.length === 0) return null;
+  if (layout.pinned.length === 0) return null;
 
   return (
     <section aria-label={t('widgets.title')}>
