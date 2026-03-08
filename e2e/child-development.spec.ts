@@ -17,9 +17,11 @@ test.describe('Child Development', () => {
   });
 
   test('shows Add Child button in setup view', async ({ page }) => {
+    // Wait for the MFE to fully load before checking for the button
+    await page.waitForLoadState('networkidle');
     // Button text changed from "Get Started" to "Add Child" in PR #538 (multi-child)
     await expect(
       page.getByRole('button', { name: /add child|agregar|添加/i })
-    ).toBeVisible({ timeout: 5_000 });
+    ).toBeVisible();
   });
 });

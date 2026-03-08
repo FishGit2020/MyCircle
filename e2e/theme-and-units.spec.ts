@@ -7,8 +7,12 @@ test.describe('Theme toggle', () => {
     await page.addInitScript(() => localStorage.setItem('theme', 'light'));
     await page.goto('/');
 
+    // Wait for the shell to fully render before interacting with the theme button
+    await page.waitForLoadState('networkidle');
+
     // Match both old aria-label ("Switch to dark mode") and new ("Theme")
     const themeButton = page.getByRole('button', { name: /^switch to (dark|light) mode$|^theme$/i }).first();
+    await themeButton.waitFor({ state: 'visible' });
 
     const html = page.locator('html');
     const wasDark = await html.evaluate(el => el.classList.contains('dark'));
