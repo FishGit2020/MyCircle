@@ -1,7 +1,8 @@
 module.exports = {
   ci: {
     collect: {
-      staticDistDir: './dist/firebase',
+      // Shell dist has index.html after pnpm firebase:build:mf
+      staticDistDir: './packages/shell/dist',
       url: ['http://localhost/'],
       numberOfRuns: 3,
     },

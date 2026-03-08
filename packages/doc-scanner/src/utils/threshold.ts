@@ -22,7 +22,7 @@ export function cannyThreshold(
       let angle = (direction[idx] * 180) / Math.PI;
       if (angle < 0) angle += 180;
 
-      let n1 = 0, n2 = 0;
+      let n1: number, n2: number;
       if ((angle < 22.5) || (angle >= 157.5)) {
         n1 = magnitude[y * width + (x + 1)];
         n2 = magnitude[y * width + (x - 1)];
