@@ -5,7 +5,7 @@ export interface FileItem {
   size: number;
   downloadUrl: string;
   storagePath: string;
-  uploadedAt: { toDate?: () => Date } | Date;
+  uploadedAt: string;
 }
 
 export interface SharedFileItem {
@@ -15,6 +15,7 @@ export interface SharedFileItem {
   size: number;
   downloadUrl: string;
   storagePath: string;
-  sharedBy: { uid: string; displayName: string };
-  sharedAt: { toDate?: () => Date } | Date;
+  sharedByUid: string;
+  sharedByName: string;
+  sharedAt: string;
 }

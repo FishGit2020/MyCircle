@@ -88,22 +88,15 @@ declare global {
     };
 
     /* ── Cloud Files ───────────────────────────────────────── */
+    /* NOTE: list/share/delete are now served via GraphQL. Only upload remains as REST. */
     __cloudFiles?: {
-      getAll: () => Promise<any[]>;
-      subscribe: (callback: (files: any[]) => void) => () => void;
       upload: (fileName: string, fileBase64: string, contentType: string) => Promise<{ fileId: string; downloadUrl: string }>;
-      share: (fileId: string) => Promise<{ ok: boolean; downloadUrl: string }>;
-      delete: (fileId: string) => Promise<{ ok: boolean }>;
-      getAllShared: () => Promise<any[]>;
-      subscribeShared: (callback: (files: any[]) => void) => () => void;
-      deleteShared: (fileId: string) => Promise<{ ok: boolean }>;
     };
 
     /* ── Baby Photos ───────────────────────────────────────── */
+    /* NOTE: list/delete are now served via GraphQL. Only upload remains as REST. */
     __babyPhotos?: {
       upload: (stageId: number, file: Blob, caption?: string) => Promise<string>;
-      getAll: () => Promise<Array<{ id: string; photoUrl: string; caption?: string; uploadedAt?: any }>>;
-      delete: (stageId: number) => Promise<void>;
     };
 
     /* ── Children (multi-child) ────────────────────────────── */
