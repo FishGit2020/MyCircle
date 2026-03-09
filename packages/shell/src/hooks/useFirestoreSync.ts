@@ -6,6 +6,7 @@ import {
   updateUserBottomNavOrder,
   updateBibleBookmarks,
   updateWorshipFavorites,
+  updateRadioFavorites,
   updateChildData,
   updateWidgetLayout,
   updateBookBookmarks,
@@ -107,6 +108,21 @@ export function useFirestoreSync(user: User | null) {
     }
     window.addEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
     return () => window.removeEventListener(WindowEvents.WIDGET_LAYOUT_CHANGED, handleWidgetLayoutChanged);
+  }, [user]);
+
+  // Auto-sync radio favorites from localStorage to Firestore
+  useEffect(() => {
+    function handleRadioChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.RADIO_FAVORITES);
+          const favorites = stored ? JSON.parse(stored) : [];
+          updateRadioFavorites(user.uid, favorites);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.RADIO_CHANGED, handleRadioChanged);
+    return () => window.removeEventListener(WindowEvents.RADIO_CHANGED, handleRadioChanged);
   }, [user]);
 
   // Auto-sync book bookmarks from localStorage to Firestore
