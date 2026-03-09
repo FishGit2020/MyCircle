@@ -1944,6 +1944,8 @@ const en = {
   'nav.youthTracker': 'Youth Tracker',
   'youth.title': 'Youth Tracker',
   'youth.subtitle': 'Track development milestones for ages 5-18',
+  'youth.tabElementary': 'Elementary',
+  'youth.tabTeen': 'Teen',
   'youth.domainPhysical': 'Physical & Health',
   'youth.domainPhysicalDesc': 'Growth, puberty, checkups, fitness',
   'youth.domainAcademic': 'Academic & Cognitive',

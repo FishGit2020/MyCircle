@@ -13,9 +13,11 @@ const DOMAIN_COLORS: Record<Domain, { bg: string; text: string; darkBg: string; 
 interface YouthTimelineProps {
   ageInMonths: number | null;
   currentAgeRange: AgeRange | null;
+  /** When provided, only show ranges within this group */
+  ageRangeIds?: Set<string>;
 }
 
-export default function YouthTimeline({ ageInMonths, currentAgeRange }: YouthTimelineProps) {
+export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeIds }: YouthTimelineProps) {
   const { t } = useTranslation();
 
   const stageStatus = useMemo(() => {
@@ -47,7 +49,7 @@ export default function YouthTimeline({ ageInMonths, currentAgeRange }: YouthTim
       <div className="relative">
         <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
 
-        {AGE_RANGES.map((range) => {
+        {AGE_RANGES.filter(r => !ageRangeIds || ageRangeIds.has(r.id)).map((range) => {
           const status = stageStatus[range.id] || 'upcoming';
           const milestones = MILESTONES.filter(m => m.ageRangeId === range.id);
           const isPast = status === 'past';
