@@ -4,7 +4,6 @@ import {
   FavoriteCity,
   getDailyLogEntries,
   getUserFiles,
-  getWorshipSongs,
   getBenchmarkSummary,
   getUserNotes,
   migrateToMultiChild,
@@ -175,12 +174,7 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     }
     window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
   }).catch(() => {});
-  getWorshipSongs().then(songs => {
-    if (songs.length > 0) {
-      localStorage.setItem(StorageKeys.WORSHIP_SONGS_CACHE, JSON.stringify(songs));
-    }
-    window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-  }).catch(() => {});
+  // Worship songs are now served via Apollo GraphQL — no localStorage restore needed.
   getBenchmarkSummary(uid).then(summary => {
     if (summary) {
       localStorage.setItem(StorageKeys.BENCHMARK_CACHE, JSON.stringify(summary));

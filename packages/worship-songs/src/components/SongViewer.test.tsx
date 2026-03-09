@@ -27,8 +27,8 @@ const baseSong: WorshipSong = {
   content: '[G]Amazing [C]grace',
   notes: 'Play softly',
   tags: ['hymn'],
-  createdAt: { seconds: 1700000000, nanoseconds: 0 },
-  updatedAt: { seconds: 1700000000, nanoseconds: 0 },
+  createdAt: new Date(1700000000000).toISOString(),
+  updatedAt: new Date(1700000000000).toISOString(),
 };
 
 describe('SongViewer', () => {

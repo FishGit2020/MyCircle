@@ -305,13 +305,21 @@ export type HourlyForecast = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
   deleteBenchmarkRun: Scalars['Boolean']['output'];
+  deleteWorshipSong: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
   scoreBenchmarkResponse: BenchmarkQualityResult;
+  updateWorshipSong: WorshipSong;
+};
+
+
+export type MutationAddWorshipSongArgs = {
+  input: WorshipSongInput;
 };
 
 
@@ -332,6 +340,11 @@ export type MutationDeleteBenchmarkEndpointArgs = {
 
 export type MutationDeleteBenchmarkRunArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteWorshipSongArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -358,6 +371,12 @@ export type MutationScoreBenchmarkResponseArgs = {
   judgeProvider: Scalars['String']['input'];
   prompt: Scalars['String']['input'];
   response: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateWorshipSongArgs = {
+  id: Scalars['ID']['input'];
+  input: WorshipSongUpdateInput;
 };
 
 export type OllamaRunningModel = {
@@ -449,6 +468,8 @@ export type Query = {
   stockQuote?: Maybe<StockQuote>;
   trendingPodcasts: PodcastTrendingResponse;
   weather: WeatherData;
+  worshipSong?: Maybe<WorshipSong>;
+  worshipSongs: Array<WorshipSong>;
 };
 
 
@@ -587,6 +608,11 @@ export type QueryWeatherArgs = {
   lon: Scalars['Float']['input'];
 };
 
+
+export type QueryWorshipSongArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type StockCandle = {
   __typename?: 'StockCandle';
   c: Array<Scalars['Float']['output']>;
@@ -672,6 +698,47 @@ export type Wind = {
   deg: Scalars['Int']['output'];
   gust?: Maybe<Scalars['Float']['output']>;
   speed: Scalars['Float']['output'];
+};
+
+export type WorshipSong = {
+  __typename?: 'WorshipSong';
+  artist: Scalars['String']['output'];
+  bpm?: Maybe<Scalars['Int']['output']>;
+  content: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  format: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  notes: Scalars['String']['output'];
+  originalKey: Scalars['String']['output'];
+  tags?: Maybe<Array<Scalars['String']['output']>>;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+  youtubeUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type WorshipSongInput = {
+  artist: Scalars['String']['input'];
+  bpm?: InputMaybe<Scalars['Int']['input']>;
+  content: Scalars['String']['input'];
+  format: Scalars['String']['input'];
+  notes: Scalars['String']['input'];
+  originalKey: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  title: Scalars['String']['input'];
+  youtubeUrl?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WorshipSongUpdateInput = {
+  artist?: InputMaybe<Scalars['String']['input']>;
+  bpm?: InputMaybe<Scalars['Int']['input']>;
+  content?: InputMaybe<Scalars['String']['input']>;
+  format?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  originalKey?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  youtubeUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type WeatherConditionFieldsFragment = { __typename?: 'WeatherCondition', id: number, main: string, description: string, icon: string };
@@ -949,6 +1016,42 @@ export type SaveBenchmarkRunMutationVariables = Exact<{
 
 
 export type SaveBenchmarkRunMutation = { __typename?: 'Mutation', saveBenchmarkRun: { __typename?: 'BenchmarkRun', id: string, createdAt: string } };
+
+export type WorshipSongFieldsFragment = { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null };
+
+export type GetWorshipSongsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetWorshipSongsQuery = { __typename?: 'Query', worshipSongs: Array<{ __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null }> };
+
+export type GetWorshipSongQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetWorshipSongQuery = { __typename?: 'Query', worshipSong?: { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null } | null };
+
+export type AddWorshipSongMutationVariables = Exact<{
+  input: WorshipSongInput;
+}>;
+
+
+export type AddWorshipSongMutation = { __typename?: 'Mutation', addWorshipSong: { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null } };
+
+export type UpdateWorshipSongMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: WorshipSongUpdateInput;
+}>;
+
+
+export type UpdateWorshipSongMutation = { __typename?: 'Mutation', updateWorshipSong: { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null } };
+
+export type DeleteWorshipSongMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWorshipSongMutation = { __typename?: 'Mutation', deleteWorshipSong: boolean };
 
 export type WeatherUpdatesSubscriptionVariables = Exact<{
   lat: Scalars['Float']['input'];
