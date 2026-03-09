@@ -9,9 +9,10 @@ interface TrashItem {
   collectionPath: string;
 }
 
-type TrashType = 'note' | 'flashcard' | 'file' | 'trip' | 'route' | 'child' | 'book';
+type TrashType = 'note' | 'flashcard' | 'file' | 'trip' | 'route' | 'child' | 'book' | 'poll' | 'worship';
 
-const TYPE_ORDER: TrashType[] = ['note', 'flashcard', 'file', 'book', 'trip', 'route', 'child'];
+const PERSONAL_TYPES: TrashType[] = ['note', 'flashcard', 'file', 'trip', 'route', 'child'];
+const PUBLIC_TYPES: TrashType[] = ['book', 'poll', 'worship'];
 
 function TypeBadge({ type, t }: { type: string; t: (key: string) => string }) {
   const colors: Record<string, string> = {
@@ -22,6 +23,8 @@ function TypeBadge({ type, t }: { type: string; t: (key: string) => string }) {
     route: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
     child: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300',
     book: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+    poll: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
+    worship: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
@@ -33,18 +36,96 @@ function TypeBadge({ type, t }: { type: string; t: (key: string) => string }) {
 function formatDate(ts: number | null): string {
   if (!ts) return '';
   return new Date(ts).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   });
+}
+
+interface TrashSectionProps {
+  title: string;
+  types: TrashType[];
+  items: Record<TrashType, TrashItem[]>;
+  actionLoading: string | null;
+  onRestore: (type: string, id: string) => void;
+  onDelete: (type: string, id: string) => void;
+  t: (key: string) => string;
+}
+
+function TrashSection({ title, types, items, actionLoading, onRestore, onDelete, t }: TrashSectionProps) {
+  const count = types.reduce((sum, type) => sum + items[type].length, 0);
+  if (count === 0) return null;
+
+  return (
+    <div>
+      <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+        {title}
+        <span className="text-xs font-normal text-gray-400 dark:text-gray-500">({count})</span>
+      </h2>
+      <div className="space-y-4">
+        {types.map((type) => {
+          const typeItems = items[type];
+          if (typeItems.length === 0) return null;
+          return (
+            <div key={type}>
+              <div className="flex items-center gap-2 mb-2">
+                <TypeBadge type={type} t={t} />
+                <span className="text-xs text-gray-400 dark:text-gray-500">({typeItems.length})</span>
+              </div>
+              <ul className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                {typeItems.map((item) => {
+                  const restoreKey = `restore-${item.type}-${item.id}`;
+                  const deleteKey = `delete-${item.type}-${item.id}`;
+                  return (
+                    <li key={item.id} className="px-4 py-3 flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
+                        {item.deletedAt && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            {t('recycleBin.deletedOn')} {formatDate(item.deletedAt)}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => onRestore(item.type, item.id)}
+                          disabled={actionLoading === restoreKey}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-md transition-colors disabled:opacity-50 min-h-[44px]"
+                          aria-label={`${t('recycleBin.restore')} ${item.name}`}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                          </svg>
+                          {t('recycleBin.restore')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDelete(item.type, item.id)}
+                          disabled={actionLoading === deleteKey}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-md transition-colors disabled:opacity-50 min-h-[44px]"
+                          aria-label={`${t('recycleBin.deleteForever')} ${item.name}`}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          {t('recycleBin.deleteForever')}
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export default function RecycleBinPage() {
   const { t } = useTranslation();
   const [items, setItems] = useState<Record<TrashType, TrashItem[]>>({
-    note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [],
+    note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [], poll: [], worship: [],
   });
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -52,17 +133,11 @@ export default function RecycleBinPage() {
   const loadItems = useCallback(async () => {
     try {
       const trash = window.__trash;
-      if (!trash) {
-        setLoading(false);
-        return;
-      }
+      if (!trash) { setLoading(false); return; }
       const result = await trash.getAll();
       setItems(result as Record<TrashType, TrashItem[]>);
-    } catch (err) {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
+    } catch { /* ignore */ }
+    finally { setLoading(false); }
   }, []);
 
   useEffect(() => {
@@ -73,29 +148,21 @@ export default function RecycleBinPage() {
   }, [loadItems]);
 
   const handleRestore = async (type: string, id: string) => {
-    const key = `restore-${type}-${id}`;
-    setActionLoading(key);
-    try {
-      await window.__trash?.restore(type, id);
-      await loadItems();
-    } finally {
-      setActionLoading(null);
-    }
+    setActionLoading(`restore-${type}-${id}`);
+    try { await window.__trash?.restore(type, id); await loadItems(); }
+    finally { setActionLoading(null); }
   };
 
   const handlePermanentDelete = async (type: string, id: string) => {
     if (!window.confirm(t('recycleBin.deleteForeverConfirm'))) return;
-    const key = `delete-${type}-${id}`;
-    setActionLoading(key);
-    try {
-      await window.__trash?.permanentlyDelete(type, id);
-      await loadItems();
-    } finally {
-      setActionLoading(null);
-    }
+    setActionLoading(`delete-${type}-${id}`);
+    try { await window.__trash?.permanentlyDelete(type, id); await loadItems(); }
+    finally { setActionLoading(null); }
   };
 
-  const totalItems = TYPE_ORDER.reduce((sum, type) => sum + items[type].length, 0);
+  const totalPersonal = PERSONAL_TYPES.reduce((sum, type) => sum + items[type].length, 0);
+  const totalPublic = PUBLIC_TYPES.reduce((sum, type) => sum + items[type].length, 0);
+  const totalItems = totalPersonal + totalPublic;
 
   if (loading) {
     return (
@@ -126,65 +193,25 @@ export default function RecycleBinPage() {
           <p className="text-gray-500 dark:text-gray-400 text-lg">{t('recycleBin.empty')}</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {TYPE_ORDER.map((type) => {
-            const typeItems = items[type];
-            if (typeItems.length === 0) return null;
-            return (
-              <div key={type}>
-                <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <TypeBadge type={type} t={t} />
-                  <span>({typeItems.length})</span>
-                </h2>
-                <ul className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  {typeItems.map((item) => {
-                    const restoreKey = `restore-${item.type}-${item.id}`;
-                    const deleteKey = `delete-${item.type}-${item.id}`;
-                    return (
-                      <li key={item.id} className="px-4 py-3 flex items-center gap-3">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {item.name}
-                          </p>
-                          {item.deletedAt && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                              {t('recycleBin.deletedOn')} {formatDate(item.deletedAt)}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => handleRestore(item.type, item.id)}
-                            disabled={actionLoading === restoreKey}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-md transition-colors disabled:opacity-50"
-                            aria-label={`${t('recycleBin.restore')} ${item.name}`}
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-                            </svg>
-                            {t('recycleBin.restore')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handlePermanentDelete(item.type, item.id)}
-                            disabled={actionLoading === deleteKey}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-md transition-colors disabled:opacity-50"
-                            aria-label={`${t('recycleBin.deleteForever')} ${item.name}`}
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            {t('recycleBin.deleteForever')}
-                          </button>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            );
-          })}
+        <div className="space-y-8">
+          <TrashSection
+            title={t('recycleBin.personalSection')}
+            types={PERSONAL_TYPES}
+            items={items}
+            actionLoading={actionLoading}
+            onRestore={handleRestore}
+            onDelete={handlePermanentDelete}
+            t={t}
+          />
+          <TrashSection
+            title={t('recycleBin.publicSection')}
+            types={PUBLIC_TYPES}
+            items={items}
+            actionLoading={actionLoading}
+            onRestore={handleRestore}
+            onDelete={handlePermanentDelete}
+            t={t}
+          />
         </div>
       )}
     </div>

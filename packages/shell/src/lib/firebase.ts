@@ -720,7 +720,7 @@ export async function updateWorshipSong(id: string, updates: Record<string, any>
 
 export async function deleteWorshipSong(id: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'worshipSongs', id));
+  await updateDoc(doc(db, 'worshipSongs', id), { isDeleted: true, deletedAt: serverTimestamp() });
 }
 
 /** Subscribe to real-time worship songs updates via Firestore onSnapshot */
@@ -728,7 +728,7 @@ export function subscribeToWorshipSongs(callback: (songs: Array<Record<string, a
   if (!db) return () => {};
   const q = query(collection(db, 'worshipSongs'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    const songs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const songs = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
     callback(songs);
   }, (error) => {
     log.warn('Worship songs snapshot error:', error);
@@ -1854,7 +1854,7 @@ async function getPolls() {
   if (!db) return [];
   const q = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
 async function addPoll(uid: string, poll: Record<string, unknown>) {
@@ -1870,7 +1870,7 @@ async function addPoll(uid: string, poll: Record<string, unknown>) {
 
 async function deletePoll(pollId: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'polls', pollId));
+  await updateDoc(doc(db, 'polls', pollId), { isDeleted: true, deletedAt: serverTimestamp() });
 }
 
 async function votePoll(pollId: string, optionId: string) {
@@ -1889,7 +1889,7 @@ function subscribeToPolls(callback: (polls: Array<Record<string, unknown>>) => v
   if (!db) return () => {};
   const q = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+    callback(snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() })));
   }, (error) => { log.warn('Polls snapshot error:', error); });
 }
 
@@ -1936,7 +1936,7 @@ interface TrashItem {
   collectionPath: string;
 }
 
-type TrashType = 'note' | 'flashcard' | 'file' | 'trip' | 'route' | 'child' | 'book';
+type TrashType = 'note' | 'flashcard' | 'file' | 'trip' | 'route' | 'child' | 'book' | 'poll' | 'worship';
 
 const TRASH_COLLECTIONS: Array<{ type: TrashType; label: string; subPath: string; nameField: string }> = [
   { type: 'note', label: 'Note', subPath: 'notes', nameField: 'title' },
@@ -1948,8 +1948,8 @@ const TRASH_COLLECTIONS: Array<{ type: TrashType; label: string; subPath: string
 ];
 
 async function getDeletedItems(uid: string): Promise<Record<TrashType, TrashItem[]>> {
-  if (!db) return { note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [] };
-  const result: Record<TrashType, TrashItem[]> = { note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [] };
+  if (!db) return { note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [], poll: [], worship: [] };
+  const result: Record<TrashType, TrashItem[]> = { note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [], poll: [], worship: [] };
 
   const promises = TRASH_COLLECTIONS.map(async ({ type, subPath, nameField }) => {
     const colRef = collection(db!, 'users', uid, subPath);
@@ -1982,6 +1982,30 @@ async function getDeletedItems(uid: string): Promise<Record<TrashType, TrashItem
       });
   })());
 
+  // Deleted polls (only ones created by current user)
+  promises.push((async () => {
+    const pollsSnap = await getDocs(collection(db!, 'polls'));
+    result.poll = pollsSnap.docs
+      .filter(d => d.data().isDeleted === true && d.data().createdBy === uid)
+      .map(d => {
+        const data = d.data();
+        const deletedAt = data.deletedAt?.toMillis?.() ?? data.deletedAt ?? null;
+        return { id: d.id, type: 'poll' as const, name: data.question || d.id, deletedAt, collectionPath: 'polls' };
+      });
+  })());
+
+  // Deleted worship songs (any deleted by current user — tracked via deletedBy)
+  promises.push((async () => {
+    const worshipSnap = await getDocs(collection(db!, 'worshipSongs'));
+    result.worship = worshipSnap.docs
+      .filter(d => d.data().isDeleted === true)
+      .map(d => {
+        const data = d.data();
+        const deletedAt = data.deletedAt?.toMillis?.() ?? data.deletedAt ?? null;
+        return { id: d.id, type: 'worship' as const, name: data.title || d.id, deletedAt, collectionPath: 'worshipSongs' };
+      });
+  })());
+
   await Promise.all(promises);
   return result;
 }
@@ -1989,14 +2013,15 @@ async function getDeletedItems(uid: string): Promise<Record<TrashType, TrashItem
 if (firebaseEnabled) {
   window.__trash = {
     getAll: () => {
-      if (!auth?.currentUser) return Promise.resolve({ note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [] });
+      if (!auth?.currentUser) return Promise.resolve({ note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [], poll: [], worship: [] });
       return getDeletedItems(auth.currentUser.uid);
     },
     restore: async (type: string, id: string) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       const uid = auth.currentUser.uid;
+      // Public collections — direct Firestore access
+      const PUBLIC_COLLECTIONS: Record<string, string> = { poll: 'polls', worship: 'worshipSongs' };
       if (type === 'book') {
-        // Books use Cloud Function endpoint
         const token = await auth.currentUser.getIdToken();
         const apiBase = window.__digitalLibraryApiBase?.() || '';
         await fetch(`${apiBase}/digital-library-api/restore`, {
@@ -2005,6 +2030,8 @@ if (firebaseEnabled) {
           body: JSON.stringify({ bookId: id }),
         });
         window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
+      } else if (PUBLIC_COLLECTIONS[type]) {
+        await restoreItem(PUBLIC_COLLECTIONS[type], id);
       } else {
         const config = TRASH_COLLECTIONS.find(c => c.type === type);
         if (!config) throw new Error(`Unknown trash type: ${type}`);
@@ -2015,8 +2042,8 @@ if (firebaseEnabled) {
     permanentlyDelete: async (type: string, id: string) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       const uid = auth.currentUser.uid;
+      const PUBLIC_COLLECTIONS: Record<string, string> = { poll: 'polls', worship: 'worshipSongs' };
       if (type === 'book') {
-        // Books use Cloud Function endpoint (handles Storage cleanup)
         const token = await auth.currentUser.getIdToken();
         const apiBase = window.__digitalLibraryApiBase?.() || '';
         await fetch(`${apiBase}/digital-library-api/permanent-delete`, {
@@ -2025,6 +2052,8 @@ if (firebaseEnabled) {
           body: JSON.stringify({ bookId: id }),
         });
         window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
+      } else if (PUBLIC_COLLECTIONS[type]) {
+        await permanentlyDeleteItem(PUBLIC_COLLECTIONS[type], id);
       } else {
         const config = TRASH_COLLECTIONS.find(c => c.type === type);
         if (!config) throw new Error(`Unknown trash type: ${type}`);

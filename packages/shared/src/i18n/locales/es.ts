@@ -2223,6 +2223,10 @@ const es: Record<TranslationKey, string> = {
   'recycleBin.type.route': 'Ruta',
   'recycleBin.type.child': 'Perfil de ni\u00f1o',
   'recycleBin.type.book': 'Libro',
+  'recycleBin.type.poll': 'Encuesta',
+  'recycleBin.type.worship': 'Canci\u00f3n de adoraci\u00f3n',
+  'recycleBin.personalSection': 'Personal',
+  'recycleBin.publicSection': 'Compartido / P\u00fablico',
 };
 
 export default es;
