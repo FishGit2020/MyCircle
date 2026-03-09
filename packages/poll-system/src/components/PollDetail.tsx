@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PageContent } from '@mycircle/shared';
 import type { Poll } from '../types';
 
 interface PollDetailProps {
@@ -26,7 +26,7 @@ export default function PollDetail({ poll, onVote, onDelete, onBack }: PollDetai
   }, [poll.id, onVote, expired]);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <PageContent maxWidth="4xl" className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -123,6 +123,6 @@ export default function PollDetail({ poll, onVote, onDelete, onBack }: PollDetai
           {t('pollSystem.clickToVote')}
         </p>
       )}
-    </div>
+    </PageContent>
   );
 }

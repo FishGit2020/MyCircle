@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PageContent } from '@mycircle/shared';
 import type { Poll, PollOption } from '../types';
 
 interface PollFormProps {
@@ -53,7 +53,7 @@ export default function PollForm({ onSave, onCancel }: PollFormProps) {
   const validCount = options.filter(o => o.text.trim()).length;
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
+    <PageContent maxWidth="3xl" className="space-y-4"><form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">
           {t('pollSystem.newPoll')}
@@ -160,6 +160,6 @@ export default function PollForm({ onSave, onCancel }: PollFormProps) {
       >
         {t('pollSystem.createPoll')}
       </button>
-    </form>
+    </form></PageContent>
   );
 }
