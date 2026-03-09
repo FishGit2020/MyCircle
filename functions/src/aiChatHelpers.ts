@@ -171,6 +171,8 @@ export const ollamaTools: OpenAI.ChatCompletionTool[] = [
   { type: 'function', function: { name: 'getStockQuote', description: 'Get stock price for a symbol.', parameters: { type: 'object', properties: { symbol: { type: 'string', description: 'Stock ticker' } }, required: ['symbol'] } } },
   { type: 'function', function: { name: 'getCryptoPrices', description: 'Get crypto prices.', parameters: { type: 'object', properties: {} } } },
   { type: 'function', function: { name: 'navigateTo', description: 'Navigate to a page.', parameters: { type: 'object', properties: { page: { type: 'string', description: 'Page name' } }, required: ['page'] } } },
+  { type: 'function', function: { name: 'listFavoriteCities', description: 'List the user\'s favorite cities from their saved preferences.', parameters: { type: 'object', properties: {} } } },
+  { type: 'function', function: { name: 'listStockWatchlist', description: 'List the user\'s stock watchlist symbols.', parameters: { type: 'object', properties: {} } } },
 ];
 
 // ─── Gemini tool declarations ────────────────────────────────────────
@@ -216,17 +218,35 @@ export function buildGeminiToolDeclarations(Type: any): { functionDeclarations: 
     description: 'Get current prices for major cryptocurrencies (Bitcoin, Ethereum, Solana, etc.) from CoinGecko.',
     parameters: { type: Type.OBJECT, properties: {} },
   };
+  const listFavoriteCitiesDecl: FunctionDeclaration = {
+    name: 'listFavoriteCities',
+    description: 'List the user\'s favorite cities from their saved preferences.',
+    parameters: { type: Type.OBJECT, properties: {} },
+  };
+  const listStockWatchlistDecl: FunctionDeclaration = {
+    name: 'listStockWatchlist',
+    description: 'List the user\'s stock watchlist symbols.',
+    parameters: { type: Type.OBJECT, properties: {} },
+  };
 
-  return [{ functionDeclarations: [getWeatherDecl, searchCitiesDecl, getStockQuoteDecl, navigateToDecl, getCryptoPricesDecl] }];
+  return [{ functionDeclarations: [getWeatherDecl, searchCitiesDecl, getStockQuoteDecl, navigateToDecl, getCryptoPricesDecl, listFavoriteCitiesDecl, listStockWatchlistDecl] }];
 }
 
 // ─── Tool execution ──────────────────────────────────────────────────
-export async function executeTool(name: string, args: Record<string, unknown>): Promise<string> {
+export async function executeTool(name: string, args: Record<string, unknown>, context?: Record<string, unknown>): Promise<string> {
   if (name === 'getWeather') return await executeGetWeather(args.city as string);
   if (name === 'searchCities') return await executeSearchCities(args.query as string);
   if (name === 'getStockQuote') return await executeGetStockQuote(args.symbol as string);
   if (name === 'getCryptoPrices') return await executeGetCryptoPrices();
   if (name === 'navigateTo') return JSON.stringify({ navigateTo: args.page });
+  if (name === 'listFavoriteCities') {
+    const cities = Array.isArray(context?.favoriteCities) ? context!.favoriteCities : [];
+    return JSON.stringify({ favoriteCities: cities, count: cities.length });
+  }
+  if (name === 'listStockWatchlist') {
+    const symbols = Array.isArray(context?.stockWatchlist) ? context!.stockWatchlist : [];
+    return JSON.stringify({ watchlist: symbols, count: symbols.length });
+  }
   return JSON.stringify({ error: `Unknown tool: ${name}` });
 }
 

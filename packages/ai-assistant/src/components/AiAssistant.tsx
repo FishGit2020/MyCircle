@@ -32,7 +32,7 @@ const TOOL_MODE_STORAGE_KEY = 'mycircle-ai-tool-mode';
 
 export default function AiAssistant() {
   const { t } = useTranslation();
-  const { messages, loading, streaming, streamingContent, activeToolCalls, error, canRetry, sendMessage, clearChat, retry } = useAiChatWithStreaming();
+  const { messages, loading, streaming, streamingContent, activeToolCalls, thinkingSteps, error, canRetry, sendMessage, clearChat, retry } = useAiChatWithStreaming();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's Ollama endpoints
@@ -337,6 +337,34 @@ export default function AiAssistant() {
                   <span className="w-1.5 h-1.5 rounded-full animate-pulse bg-current" />
                   {streaming ? t('ai.streamingBadge') : t('ai.generatingBadge')}
                 </span>
+              </div>
+            )}
+
+            {/* Thinking steps — show what the AI is doing before the response */}
+            {streaming && thinkingSteps.length > 0 && (
+              <div className="flex justify-start">
+                <div className="max-w-[85%] sm:max-w-[75%] bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-2xl rounded-bl-md px-4 py-2.5">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <svg className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide">{t('ai.thinking')}</span>
+                  </div>
+                  <ul className="space-y-0.5">
+                    {thinkingSteps.map((step, i) => (
+                      <li key={i} className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                        {i === thinkingSteps.length - 1 && !streamingContent ? (
+                          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse flex-shrink-0" />
+                        ) : (
+                          <svg className="w-3 h-3 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             )}
 

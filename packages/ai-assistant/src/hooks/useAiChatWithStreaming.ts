@@ -148,6 +148,7 @@ export function useAiChatWithStreaming() {
     streaming: isStreaming,
     activeToolCalls,
     streamingContent,
+    thinkingSteps,
     sendStream,
     stopStream,
   } = useAiChatStream();
@@ -300,6 +301,7 @@ export function useAiChatWithStreaming() {
     streaming: effectiveStreaming,
     streamingContent: effectiveStreamingContent,
     activeToolCalls,
+    thinkingSteps,
     error: state.error,
     canRetry: !!state.lastUserContent && !state.loading && !effectiveStreaming,
     sendMessage,

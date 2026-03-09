@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import type { ChatMessage, ToolCall, AiAction } from './useAiChat';
 
 interface StreamEvent {
-  type: 'text' | 'tool_start' | 'tool_result' | 'done' | 'error';
+  type: 'text' | 'thinking' | 'tool_start' | 'tool_result' | 'done' | 'error';
   content?: string;
   name?: string;
   args?: Record<string, unknown>;
@@ -28,6 +28,7 @@ interface StreamState {
   streaming: boolean;
   activeToolCalls: ActiveToolCall[];
   streamingContent: string;
+  thinkingSteps: string[];
 }
 
 /**
@@ -39,6 +40,7 @@ export function useAiChatStream() {
     streaming: false,
     activeToolCalls: [],
     streamingContent: '',
+    thinkingSteps: [],
   });
   const abortRef = useRef<AbortController | null>(null);
 
@@ -65,7 +67,7 @@ export function useAiChatStream() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setStreamState({ streaming: true, activeToolCalls: [], streamingContent: '' });
+    setStreamState({ streaming: true, activeToolCalls: [], streamingContent: '', thinkingSteps: [] });
 
     const token = await window.__getFirebaseIdToken?.();
     if (!token) throw new Error('Authentication required');
@@ -125,6 +127,13 @@ export function useAiChatStream() {
           catch { continue; }
 
           switch (event.type) {
+            case 'thinking':
+              setStreamState(prev => ({
+                ...prev,
+                thinkingSteps: [...prev.thinkingSteps, event.content || ''],
+              }));
+              break;
+
             case 'text':
               fullContent += event.content || '';
               setStreamState(prev => ({
