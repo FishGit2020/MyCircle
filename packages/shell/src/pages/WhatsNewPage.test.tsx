@@ -11,6 +11,7 @@ const mockAnnouncements = [
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  PageContent: ({ children }: any) => <div>{children}</div>,
 }));
 
 let mockHasUnread = true;
