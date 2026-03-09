@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { useMutation, AI_CHAT } from '@mycircle/shared';
+import { useMutation, AI_CHAT, StorageKeys } from '@mycircle/shared';
 import { useAiChatStream } from './useAiChatStream';
 import type { ChatMessage, ToolCall, AiAction } from './useAiChat';
 
@@ -13,47 +13,46 @@ const STREAMING_AVAILABLE_KEY = 'ai-streaming-available';
 function gatherUserContext(): Record<string, unknown> {
   const ctx: Record<string, unknown> = {};
   try {
-    const watchlist = localStorage.getItem('stock-watchlist');
+    const watchlist = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
     if (watchlist) {
       const parsed = JSON.parse(watchlist);
       if (Array.isArray(parsed) && parsed.length > 0) ctx.stockWatchlist = parsed.map((w: any) => w.symbol || w).slice(0, 20);
     }
-    const subs = localStorage.getItem('podcast-subscriptions');
+    const subs = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
     if (subs) {
       const parsed = JSON.parse(subs);
       if (Array.isArray(parsed) && parsed.length > 0) ctx.podcastSubscriptions = parsed.length;
     }
-    const favs = localStorage.getItem('mycircle-favorite-cities');
-    if (favs) {
-      const parsed = JSON.parse(favs);
-      if (Array.isArray(parsed) && parsed.length > 0) ctx.favoriteCities = parsed.map((c: any) => c.name || c).slice(0, 10);
-    }
-    const recents = localStorage.getItem('mycircle-recent-cities');
+    const recents = localStorage.getItem(StorageKeys.RECENT_CITIES);
     if (recents) {
       const parsed = JSON.parse(recents);
       if (Array.isArray(parsed) && parsed.length > 0) ctx.recentCities = parsed.map((c: any) => c.name || c).slice(0, 5);
     }
-    const babyDueDate = localStorage.getItem('baby-due-date');
+    const babyDueDate = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
     if (babyDueDate) ctx.babyDueDate = babyDueDate;
-    const childName = localStorage.getItem('child-name');
+    const childName = localStorage.getItem(StorageKeys.CHILD_NAME);
     if (childName) ctx.childName = childName;
-    const childBirthDate = localStorage.getItem('child-birth-date');
+    const childBirthDate = localStorage.getItem(StorageKeys.CHILD_BIRTH_DATE);
     if (childBirthDate) ctx.childBirthDate = childBirthDate;
-    const milestones = localStorage.getItem('child-milestones');
+    const milestones = localStorage.getItem(StorageKeys.CHILD_MILESTONES);
     if (milestones) { try { const parsed = JSON.parse(milestones); if (Array.isArray(parsed)) ctx.childMilestonesCount = parsed.length; } catch { /* */ } }
-    const worshipFavs = localStorage.getItem('worship-favorites');
+    const worshipFavs = localStorage.getItem(StorageKeys.WORSHIP_FAVORITES);
     if (worshipFavs) { try { const parsed = JSON.parse(worshipFavs); if (Array.isArray(parsed)) ctx.worshipFavoritesCount = parsed.length; } catch { /* */ } }
-    const cloudFiles = localStorage.getItem('cloud-files-cache');
+    const cloudFiles = localStorage.getItem(StorageKeys.CLOUD_FILES_CACHE);
     if (cloudFiles) { try { const parsed = JSON.parse(cloudFiles); if (Array.isArray(parsed)) ctx.cloudFilesCount = parsed.length; } catch { /* */ } }
-    const immCases = localStorage.getItem('immigration-cases-cache');
+    const immCases = localStorage.getItem(StorageKeys.IMMIGRATION_CASES_CACHE);
     if (immCases) { try { const parsed = JSON.parse(immCases); if (Array.isArray(parsed)) ctx.immigrationCasesCount = parsed.length; } catch { /* */ } }
-    const dailyLogEntries = localStorage.getItem('daily-log-cache');
+    const dailyLogEntries = localStorage.getItem(StorageKeys.DAILY_LOG_CACHE);
     if (dailyLogEntries) { try { const parsed = JSON.parse(dailyLogEntries); if (Array.isArray(parsed)) ctx.dailyLogEntriesCount = parsed.length; } catch { /* */ } }
-    const locale = localStorage.getItem('mycircle-locale');
+    const locale = localStorage.getItem(StorageKeys.LOCALE);
     if (locale) ctx.locale = locale;
-    const tempUnit = localStorage.getItem('mycircle-temp-unit');
+    const tempUnit = localStorage.getItem(StorageKeys.TEMP_UNIT);
     if (tempUnit) ctx.tempUnit = tempUnit;
-    const theme = localStorage.getItem('mycircle-theme');
+    const speedUnit = localStorage.getItem(StorageKeys.SPEED_UNIT);
+    if (speedUnit) ctx.speedUnit = speedUnit;
+    const distanceUnit = localStorage.getItem(StorageKeys.DISTANCE_UNIT);
+    if (distanceUnit) ctx.distanceUnit = distanceUnit;
+    const theme = localStorage.getItem(StorageKeys.THEME);
     if (theme) ctx.theme = theme;
     ctx.currentPage = window.location.pathname;
   } catch { /* ignore */ }
