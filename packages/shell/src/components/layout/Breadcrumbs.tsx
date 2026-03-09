@@ -99,6 +99,10 @@ export default function Breadcrumbs() {
   const hasDetail = segments.length > 1;
   const tabParam = searchParams.get('tab');
 
+  // For notebook detail pages, resolve the active tab even when there's no ?tab param
+  // Default tab is 'my' (personal), so breadcrumb should show it
+  const resolvedTab = firstSegment === 'notebook' ? (tabParam || 'my') : tabParam;
+
   return (
     <nav aria-label={t('nav.breadcrumbLabel')} className="container mx-auto px-4 py-2 flex items-center">
       <ol className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-1 flex-1 min-w-0">
@@ -115,7 +119,7 @@ export default function Breadcrumbs() {
           <>
             <li>
               <Link
-                to={`/${firstSegment}`}
+                to={`/${firstSegment}${resolvedTab && resolvedTab !== 'my' ? `?tab=${resolvedTab}` : ''}`}
                 onClick={() => {
                   window.dispatchEvent(new Event('breadcrumb-navigate-parent'));
                   setMfeDetail(null);
@@ -125,6 +129,19 @@ export default function Breadcrumbs() {
                 {t(labelKey)}
               </Link>
             </li>
+            {resolvedTab && (
+              <>
+                <li aria-hidden="true" className="select-none">/</li>
+                <li>
+                  <Link
+                    to={`/${firstSegment}${resolvedTab !== 'my' ? `?tab=${resolvedTab}` : ''}`}
+                    className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                  >
+                    {t(`${firstSegment}.tabs.${resolvedTab}` as any)}
+                  </Link>
+                </li>
+              </>
+            )}
             <li aria-hidden="true" className="select-none">/</li>
             <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200 truncate max-w-[200px]">
               {mfeDetail || resolveDetailLabel(firstSegment, segments, searchParams, t)}
