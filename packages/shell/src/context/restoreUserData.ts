@@ -7,6 +7,7 @@ import {
   getUserFiles,
   getWorshipSongs,
   getBenchmarkSummary,
+  getUserNotes,
   migrateToMultiChild,
   getChildren,
 } from '../lib/firebase';
@@ -158,9 +159,13 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.BOOK_LAST_PLAYED_CHANGED));
   }
 
-  window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-
   // Restore subcollection data for dashboard widgets (non-blocking)
+  getUserNotes(uid).then(notes => {
+    localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(notes.length));
+    window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+  }).catch(() => {
+    window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+  });
   getDailyLogEntries(uid).then(entries => {
     if (entries.length > 0) {
       localStorage.setItem(StorageKeys.DAILY_LOG_CACHE, JSON.stringify(entries));

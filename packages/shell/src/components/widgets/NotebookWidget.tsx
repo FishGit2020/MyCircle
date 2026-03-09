@@ -49,7 +49,11 @@ const NotebookWidget = React.memo(function NotebookWidget() {
     }
     loadPublic();
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, loadPublic);
-    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, loadPublic);
+    window.addEventListener(WindowEvents.PUBLIC_NOTES_CHANGED, loadPublic);
+    return () => {
+      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, loadPublic);
+      window.removeEventListener(WindowEvents.PUBLIC_NOTES_CHANGED, loadPublic);
+    };
   }, []);
 
   return (
