@@ -1,3 +1,10 @@
+export interface Ticket {
+  id: string;
+  type: 'flight' | 'train' | 'bus' | 'boat' | 'other';
+  description: string;
+  date: string;
+}
+
 export interface Trip {
   id: string;
   destination: string;
@@ -7,6 +14,7 @@ export interface Trip {
   budget: number;
   currency: string;
   itinerary: ItineraryDay[];
+  tickets?: Ticket[];
   createdAt: number;
   updatedAt: number;
 }
