@@ -2,96 +2,101 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCityManager } from './useCityManager';
 
-const mockAddRecentCity = vi.fn();
-const mockRemoveRecentCity = vi.fn();
-const mockClearRecentCities = vi.fn();
 const mockToggleFavoriteCity = vi.fn().mockResolvedValue(true);
-const mockGetRecentCities = vi.fn().mockResolvedValue([]);
 const mockGetUserProfile = vi.fn().mockResolvedValue(null);
-const mockLogEvent = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
+  StorageKeys: { RECENT_CITIES: 'recent-cities' },
+  eventBus: { subscribe: vi.fn(() => vi.fn()), publish: vi.fn() },
+  MFEvents: { CITY_SELECTED: 'city_selected' },
 }));
 
 vi.mock('../lib/firebase', () => ({
-  addRecentCity: (...args: unknown[]) => mockAddRecentCity(...args),
-  removeRecentCity: (...args: unknown[]) => mockRemoveRecentCity(...args),
-  clearRecentCities: (...args: unknown[]) => mockClearRecentCities(...args),
   toggleFavoriteCity: (...args: unknown[]) => mockToggleFavoriteCity(...args),
-  getRecentCities: (...args: unknown[]) => mockGetRecentCities(...args),
   getUserProfile: (...args: unknown[]) => mockGetUserProfile(...args),
-  logEvent: (...args: unknown[]) => mockLogEvent(...args),
+  logEvent: vi.fn(),
 }));
 
 const makeUser = (uid = 'user1') => ({ uid } as any);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  localStorage.clear();
 });
 
 describe('useCityManager', () => {
-  it('starts with empty cities', () => {
+  it('starts with empty cities when localStorage is empty', () => {
     const { result } = renderHook(() => useCityManager(null));
     expect(result.current.recentCities).toEqual([]);
     expect(result.current.favoriteCities).toEqual([]);
   });
 
-  it('addCity calls firebase and updates state', async () => {
-    const updatedCities = [{ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74, searchedAt: new Date() }];
-    mockGetRecentCities.mockResolvedValue(updatedCities);
+  it('initializes recentCities from localStorage', () => {
+    const stored = [{ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74, searchedAt: new Date().toISOString() }];
+    localStorage.setItem('recent-cities', JSON.stringify(stored));
 
+    const { result } = renderHook(() => useCityManager(null));
+    expect(result.current.recentCities).toHaveLength(1);
+    expect(result.current.recentCities[0].name).toBe('NYC');
+  });
+
+  it('addCity saves to localStorage and updates state', async () => {
     const { result } = renderHook(() => useCityManager(makeUser()));
 
     await act(async () => {
       await result.current.addCity({ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74 });
     });
 
-    expect(mockAddRecentCity).toHaveBeenCalledWith('user1', { id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74 });
-    expect(result.current.recentCities).toEqual(updatedCities);
-    expect(mockLogEvent).toHaveBeenCalledWith('city_searched', { city_name: 'NYC', city_country: 'US' });
+    expect(result.current.recentCities).toHaveLength(1);
+    expect(result.current.recentCities[0].name).toBe('NYC');
+    const stored = JSON.parse(localStorage.getItem('recent-cities') || '[]');
+    expect(stored).toHaveLength(1);
+    expect(stored[0].name).toBe('NYC');
   });
 
-  it('addCity still logs event when user is null', async () => {
+  it('addCity deduplicates cities by id', async () => {
+    const { result } = renderHook(() => useCityManager(makeUser()));
+
+    await act(async () => {
+      await result.current.addCity({ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74 });
+      await result.current.addCity({ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74 });
+    });
+
+    expect(result.current.recentCities).toHaveLength(1);
+  });
+
+  it('addCity works when user is null', async () => {
     const { result } = renderHook(() => useCityManager(null));
 
     await act(async () => {
       await result.current.addCity({ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74 });
     });
 
-    expect(mockAddRecentCity).not.toHaveBeenCalled();
-    expect(mockLogEvent).toHaveBeenCalledWith('city_searched', { city_name: 'NYC', city_country: 'US' });
+    expect(result.current.recentCities).toHaveLength(1);
   });
 
-  it('removeCity calls firebase and refreshes list', async () => {
-    mockGetRecentCities.mockResolvedValue([]);
-
+  it('removeCity removes from localStorage and state', async () => {
     const { result } = renderHook(() => useCityManager(makeUser()));
+
+    await act(async () => {
+      await result.current.addCity({ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74 });
+    });
 
     await act(async () => {
       await result.current.removeCity('1');
     });
 
-    expect(mockRemoveRecentCity).toHaveBeenCalledWith('user1', '1');
-    expect(mockGetRecentCities).toHaveBeenCalledWith('user1');
+    expect(result.current.recentCities).toHaveLength(0);
+    const stored = JSON.parse(localStorage.getItem('recent-cities') || '[]');
+    expect(stored).toHaveLength(0);
   });
 
-  it('removeCity does nothing when user is null', async () => {
-    const { result } = renderHook(() => useCityManager(null));
-
-    await act(async () => {
-      await result.current.removeCity('1');
-    });
-
-    expect(mockRemoveRecentCity).not.toHaveBeenCalled();
-  });
-
-  it('clearCities clears firebase and local state', async () => {
+  it('clearCities clears localStorage and state', async () => {
     const { result } = renderHook(() => useCityManager(makeUser()));
 
-    // First add cities via setter
-    act(() => {
-      result.current.setRecentCities([{ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74, searchedAt: new Date() }]);
+    await act(async () => {
+      await result.current.addCity({ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74 });
     });
     expect(result.current.recentCities).toHaveLength(1);
 
@@ -99,8 +104,8 @@ describe('useCityManager', () => {
       await result.current.clearCities();
     });
 
-    expect(mockClearRecentCities).toHaveBeenCalledWith('user1');
     expect(result.current.recentCities).toEqual([]);
+    expect(localStorage.getItem('recent-cities')).toBe('[]');
   });
 
   it('toggleFavorite calls firebase and returns result', async () => {
@@ -129,15 +134,13 @@ describe('useCityManager', () => {
     expect(isNowFavorite).toBe(false);
   });
 
-  it('setRecentCities and setFavoriteCities update state', () => {
+  it('setFavoriteCities updates state', () => {
     const { result } = renderHook(() => useCityManager(null));
 
     act(() => {
-      result.current.setRecentCities([{ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74, searchedAt: new Date() }]);
       result.current.setFavoriteCities([{ id: '2', name: 'LA', country: 'US', lat: 34, lon: -118 }]);
     });
 
-    expect(result.current.recentCities).toHaveLength(1);
     expect(result.current.favoriteCities).toHaveLength(1);
   });
 });

@@ -1,7 +1,6 @@
 import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import {
   UserProfile,
-  RecentCity,
   FavoriteCity,
   getDailyLogEntries,
   getUserFiles,
@@ -13,7 +12,6 @@ import {
 } from '../lib/firebase';
 
 export interface RestoreResult {
-  recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
 }
 
@@ -23,7 +21,6 @@ export interface RestoreResult {
  * Returns city arrays for state initialisation in AuthProvider.
  */
 export function restoreUserData(profile: UserProfile, uid: string): RestoreResult {
-  const recentCities = profile.recentCities || [];
   const favoriteCities = profile.favoriteCities || [];
 
   // Restore saved preferences to localStorage so shared hooks pick them up
@@ -202,5 +199,5 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.CHILDREN_CHANGED));
   }).catch(() => {});
 
-  return { recentCities, favoriteCities };
+  return { favoriteCities };
 }
