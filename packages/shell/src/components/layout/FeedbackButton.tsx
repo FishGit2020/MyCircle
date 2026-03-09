@@ -41,14 +41,17 @@ export default function FeedbackButton() {
     previouslyFocused.current?.focus();
   }, []);
 
-  // Close on Escape key
+  // Close on Escape; block arrow keys from reaching content behind the modal
   useEffect(() => {
     if (!open) return;
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') { closeModal(); return; }
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.stopPropagation();
+      }
     };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener('keydown', handleKey, true); // capture phase beats page-turn listener
+    return () => document.removeEventListener('keydown', handleKey, true);
   }, [open, closeModal]);
 
   // Focus trap: cycle Tab focus within the dialog

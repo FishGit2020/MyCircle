@@ -99,9 +99,13 @@ export default function Breadcrumbs() {
   const hasDetail = segments.length > 1;
   const tabParam = searchParams.get('tab');
 
-  // For notebook detail pages, resolve the active tab even when there's no ?tab param
-  // Default tab is 'my' (personal), so breadcrumb should show it
-  const resolvedTab = firstSegment === 'notebook' ? (tabParam || 'my') : tabParam;
+  // When on a detail page (e.g. /library/{bookId}?tab=read), the ?tab is
+  // contextual to that detail — not a separate navigation level. Only show
+  // the tab segment when there's no detail sub-route (e.g. /notebook?tab=public).
+  // Exception: notebook detail pages always resolve their tab.
+  const resolvedTab = firstSegment === 'notebook' ? (tabParam || 'my')
+    : hasDetail ? null
+    : tabParam;
 
   return (
     <nav aria-label={t('nav.breadcrumbLabel')} className="container mx-auto px-4 py-2 flex items-center">

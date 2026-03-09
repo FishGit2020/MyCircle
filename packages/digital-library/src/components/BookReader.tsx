@@ -70,7 +70,9 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
     setActiveTab(tab);
   }, [searchParams]);
 
-  // Close bookmark and TOC dropdowns on outside click
+  // Close bookmark and TOC dropdowns on outside click.
+  // Also listen on the EPUB iframe's contentDocument (clicks inside the
+  // iframe don't bubble to the parent document).
   useEffect(() => {
     if (!bookmarksOpen && !tocOpen) return;
     function handleMouseDown(e: MouseEvent) {
@@ -84,8 +86,23 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         setTocOpen(false);
       }
     }
+    // Close unconditionally when the user clicks inside the EPUB iframe
+    function handleIframeMouseDown() {
+      if (bookmarksOpen) setBookmarksOpen(false);
+      if (tocOpen) setTocOpen(false);
+    }
     document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
+    // Attach to all iframes inside the viewer (epubjs creates them)
+    const iframes = viewerRef.current?.querySelectorAll('iframe') ?? [];
+    iframes.forEach(iframe => {
+      try { iframe.contentDocument?.addEventListener('mousedown', handleIframeMouseDown); } catch { /* cross-origin */ }
+    });
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      iframes.forEach(iframe => {
+        try { iframe.contentDocument?.removeEventListener('mousedown', handleIframeMouseDown); } catch { /* cross-origin */ }
+      });
+    };
   }, [bookmarksOpen, tocOpen]);
 
   // Sync activeTab to URL search param
