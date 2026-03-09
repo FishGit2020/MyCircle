@@ -1,97 +1,47 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from '@mycircle/shared';
-import { WindowEvents, StorageKeys } from '@mycircle/shared';
+import { useCallback } from 'react';
+import { useQuery, useMutation, useTranslation, WindowEvents, GET_CLOUD_FILES, SHARE_FILE, DELETE_FILE } from '@mycircle/shared';
 import type { FileItem } from '../types';
 import { fileToBase64 } from '../utils/fileHelpers';
 
-interface CloudFilesApi {
-  getAll: () => Promise<any[]>;
-  subscribe: (cb: (files: any[]) => void) => () => void;
-  upload: (fileName: string, fileBase64: string, contentType: string) => Promise<{ fileId: string; downloadUrl: string }>;
-  share: (fileId: string) => Promise<{ ok: boolean }>;
-  delete: (fileId: string) => Promise<{ ok: boolean }>;
-}
-
-function getApi(): CloudFilesApi | null {
-  return window.__cloudFiles ?? null;
-}
-
 export function useFiles() {
   const { t } = useTranslation();
-  const [files, setFiles] = useState<FileItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, loading, error, refetch } = useQuery(GET_CLOUD_FILES);
+  const [shareFileMutation] = useMutation(SHARE_FILE, {
+    refetchQueries: [{ query: GET_CLOUD_FILES }],
+  });
+  const [deleteFileMutation] = useMutation(DELETE_FILE, {
+    refetchQueries: [{ query: GET_CLOUD_FILES }],
+  });
 
-  const load = useCallback(async () => {
-    const api = getApi();
-    if (!api) return;
-    try {
-      const data = await api.getAll();
-      setFiles(data as FileItem[]);
-      try {
-        localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(data));
-      } catch { /* quota exceeded */ }
-      setError(null);
-    } catch {
-      setError(t('cloudFiles.loadError'));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    // Load cached data first
-    try {
-      const cached = localStorage.getItem(StorageKeys.CLOUD_FILES_CACHE);
-      if (cached) {
-        setFiles(JSON.parse(cached));
-        setLoading(false);
-      }
-    } catch { /* ignore */ }
-
-    const api = getApi();
-    if (!api) {
-      setLoading(false);
-      return;
-    }
-
-    // Subscribe to real-time updates
-    const unsub = api.subscribe((data) => {
-      setFiles(data as FileItem[]);
-      setLoading(false);
-      try {
-        localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(data));
-      } catch { /* quota exceeded */ }
-    });
-
-    // Also load once
-    load();
-
-    return unsub;
-  }, [load]);
+  const files: FileItem[] = (data?.cloudFiles ?? []) as FileItem[];
 
   const uploadFile = useCallback(async (file: File) => {
-    const api = getApi();
-    if (!api) throw new Error('Not authenticated');
+    const api = window.__cloudFiles;
+    if (!api?.upload) throw new Error('Not authenticated');
     const base64 = await fileToBase64(file);
     const result = await api.upload(file.name, base64, file.type);
+    await refetch();
     window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
     return result;
-  }, []);
+  }, [refetch]);
 
   const shareFile = useCallback(async (fileId: string) => {
-    const api = getApi();
-    if (!api) throw new Error('Not authenticated');
-    await api.share(fileId);
+    await shareFileMutation({ variables: { fileId } });
     window.dispatchEvent(new Event(WindowEvents.SHARED_FILES_CHANGED));
-  }, []);
+  }, [shareFileMutation]);
 
   const deleteFile = useCallback(async (fileId: string) => {
-    const api = getApi();
-    if (!api) throw new Error('Not authenticated');
-    await api.delete(fileId);
+    await deleteFileMutation({ variables: { fileId } });
     window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
-  }, []);
+  }, [deleteFileMutation]);
 
-  return { files, loading, error, uploadFile, shareFile, deleteFile, reload: load };
+  return {
+    files,
+    loading,
+    error: error ? t('cloudFiles.loadError') : null,
+    uploadFile,
+    shareFile,
+    deleteFile,
+    reload: refetch,
+  };
 }

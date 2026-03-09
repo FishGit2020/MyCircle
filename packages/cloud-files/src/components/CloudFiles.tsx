@@ -26,8 +26,6 @@ export default function CloudFiles() {
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
     return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
   }, []);
-  const hasApi = typeof window.__cloudFiles !== 'undefined';
-
   const handleUpload = useCallback(async (file: File) => {
     window.__logAnalyticsEvent?.('file_upload', { file_type: file.type, file_size: file.size });
     await uploadFile(file);
@@ -49,7 +47,7 @@ export default function CloudFiles() {
     await deleteSharedFile(fileId);
   }, [deleteSharedFile, t]);
 
-  if (!isAuthenticated || !hasApi) {
+  if (!isAuthenticated) {
     return (
       <div className="text-center py-16">
         <svg className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

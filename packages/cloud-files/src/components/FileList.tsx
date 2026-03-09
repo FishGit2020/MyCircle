@@ -65,7 +65,7 @@ export default function FileList({ files, emptyMessage, isShared, onShare, onDel
                 size={file.size}
                 downloadUrl={file.downloadUrl}
                 date={isShared ? shared.sharedAt : (file as FileItem).uploadedAt}
-                sharedBy={isShared ? shared.sharedBy?.displayName : undefined}
+                sharedBy={isShared ? shared.sharedByName : undefined}
                 onShare={!isShared && onShare ? () => onShare(file.id) : undefined}
                 onDelete={onDelete ? () => onDelete(file.id) : undefined}
               />

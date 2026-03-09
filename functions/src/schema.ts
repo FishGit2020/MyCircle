@@ -93,6 +93,92 @@ export const typeDefs = `#graphql
     lon: Float!
   }
 
+  # ─── Cloud Files Types ─────────────────────────────────────────
+
+  type CloudFile {
+    id: ID!
+    fileName: String!
+    contentType: String!
+    size: Int!
+    downloadUrl: String!
+    storagePath: String!
+    uploadedAt: String!
+  }
+
+  type SharedFile {
+    id: ID!
+    fileName: String!
+    contentType: String!
+    size: Int!
+    downloadUrl: String!
+    storagePath: String!
+    sharedByUid: String!
+    sharedByName: String!
+    sharedAt: String!
+  }
+
+  type ShareFileResult {
+    ok: Boolean!
+    downloadUrl: String!
+  }
+
+  # ─── Baby Photos Types ──────────────────────────────────────────
+
+  type BabyPhoto {
+    stageId: Int!
+    photoUrl: String!
+    caption: String
+    uploadedAt: String!
+  }
+
+  # ─── Digital Library Types ──────────────────────────────────────
+
+  type BookUploader {
+    uid: String!
+    displayName: String!
+  }
+
+  type Book {
+    id: ID!
+    title: String!
+    author: String!
+    description: String!
+    language: String!
+    coverUrl: String!
+    epubUrl: String!
+    fileSize: Int!
+    chapterCount: Int!
+    totalCharacters: Int!
+    uploadedBy: BookUploader!
+    uploadedAt: String!
+    audioStatus: String!
+    audioProgress: Int!
+    audioError: String
+  }
+
+  type BookChapter {
+    id: ID!
+    index: Int!
+    title: String!
+    href: String!
+    characterCount: Int!
+    audioUrl: String
+    audioDuration: Int
+  }
+
+  type BookConversionProgress {
+    audioStatus: String!
+    audioProgress: Int!
+    audioError: String
+    canContinue: Boolean!
+  }
+
+  type TtsQuota {
+    used: Int!
+    limit: Int!
+    remaining: Int!
+  }
+
   # ─── USCIS Case Status Types ─────────────────────────────────
 
   type CaseStatusHistory {
@@ -283,6 +369,19 @@ export const typeDefs = `#graphql
     # Worship songs
     worshipSongs: [WorshipSong!]!
     worshipSong(id: ID!): WorshipSong
+
+    # Cloud Files (auth required)
+    cloudFiles: [CloudFile!]!
+    sharedFiles: [SharedFile!]!
+
+    # Baby Photos (auth required)
+    babyPhotos: [BabyPhoto!]!
+
+    # Digital Library (auth required)
+    books: [Book!]!
+    bookChapters(bookId: ID!): [BookChapter!]!
+    bookConversionProgress(bookId: ID!): BookConversionProgress!
+    ttsQuota: TtsQuota!
   }
 
   # ─── AI Usage & Monitoring Types ──────────────────────────────
@@ -492,6 +591,19 @@ export const typeDefs = `#graphql
     addWorshipSong(input: WorshipSongInput!): WorshipSong!
     updateWorshipSong(id: ID!, input: WorshipSongUpdateInput!): WorshipSong!
     deleteWorshipSong(id: ID!): Boolean!
+
+    # Cloud Files (auth required)
+    shareFile(fileId: ID!): ShareFileResult!
+    deleteFile(fileId: ID!): Boolean!
+    deleteSharedFile(fileId: ID!): Boolean!
+
+    # Baby Photos (auth required)
+    deleteBabyPhoto(stageId: Int!): Boolean!
+
+    # Digital Library (auth required)
+    deleteBook(id: ID!): Boolean!
+    restoreBook(id: ID!): Boolean!
+    permanentDeleteBook(id: ID!): Boolean!
   }
 
   schema {

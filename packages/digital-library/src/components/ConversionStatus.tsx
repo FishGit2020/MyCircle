@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation, createLogger, WindowEvents } from '@mycircle/shared';
+import { useTranslation, createLogger, WindowEvents, useLazyQuery, GET_BOOK_CONVERSION_PROGRESS } from '@mycircle/shared';
 
 const logger = createLogger('ConversionStatus');
 
@@ -39,36 +39,31 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const langCode = getLangCode(language);
   const voiceOptions = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
 
+  const [fetchConversionProgress] = useLazyQuery(GET_BOOK_CONVERSION_PROGRESS, { fetchPolicy: 'network-only' });
+
   const checkStatus = useCallback(async () => {
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) return;
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/list`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      const book = (data.books || []).find((b: any) => b.id === bookId);
-      if (!book) return;
+      const result = await fetchConversionProgress({ variables: { bookId } });
+      const prog = result.data?.bookConversionProgress;
+      if (!prog) return;
 
-      if (book.audioStatus === 'complete') {
+      if (prog.audioStatus === 'complete') {
         setStatus('complete');
         setProgress(100);
         onComplete();
-      } else if (book.audioStatus === 'error') {
+      } else if (prog.audioStatus === 'error') {
         setStatus('error');
-        setError(book.audioError || t('library.conversionFailed'));
-      } else if (book.audioStatus === 'paused') {
+        setError(prog.audioError || t('library.conversionFailed'));
+      } else if (prog.audioStatus === 'paused') {
         setStatus('paused');
-        setProgress(book.audioProgress || 0);
-      } else if (book.audioStatus === 'processing') {
-        setProgress(book.audioProgress || 0);
+        setProgress(prog.audioProgress || 0);
+      } else if (prog.audioStatus === 'processing') {
+        setProgress(prog.audioProgress || 0);
       }
     } catch (err) {
       logger.error('Failed to check conversion status', err);
     }
-  }, [bookId, onComplete, t]);
+  }, [bookId, onComplete, t, fetchConversionProgress]);
 
   useEffect(() => {
     if (initialStatus === 'complete') onComplete();
