@@ -52,7 +52,6 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 const mockGetDailyLogEntries = vi.fn().mockResolvedValue([]);
-const mockGetUserFiles = vi.fn().mockResolvedValue([]);
 const mockGetBenchmarkSummary = vi.fn().mockResolvedValue(null);
 const mockGetUserNotes = vi.fn().mockResolvedValue([]);
 const mockMigrateToMultiChild = vi.fn().mockResolvedValue(undefined);
@@ -60,7 +59,6 @@ const mockGetChildren = vi.fn().mockResolvedValue([]);
 
 vi.mock('../lib/firebase', () => ({
   getDailyLogEntries: (...args: unknown[]) => mockGetDailyLogEntries(...args),
-  getUserFiles: (...args: unknown[]) => mockGetUserFiles(...args),
   getBenchmarkSummary: (...args: unknown[]) => mockGetBenchmarkSummary(...args),
   getUserNotes: (...args: unknown[]) => mockGetUserNotes(...args),
   migrateToMultiChild: (...args: unknown[]) => mockMigrateToMultiChild(...args),
@@ -250,7 +248,6 @@ describe('restoreUserData', () => {
   it('fires subcollection fetches', () => {
     restoreUserData(makeProfile() as any, 'user1');
     expect(mockGetDailyLogEntries).toHaveBeenCalledWith('user1');
-    expect(mockGetUserFiles).toHaveBeenCalledWith('user1');
     expect(mockGetBenchmarkSummary).toHaveBeenCalledWith('user1');
     expect(mockGetUserNotes).toHaveBeenCalledWith('user1');
   });
