@@ -43,6 +43,10 @@
         "function": "digitalLibrary"
       },
       {
+        "source": "/worship-songs-api/**",
+        "function": "worshipSongsApi"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

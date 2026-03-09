@@ -667,11 +667,20 @@ export async function getFirebaseIdToken(): Promise<string | null> {
 }
 
 // Worship Songs — public read, auth-required write
+// Reads come from a Storage-backed JSON served by the worshipSongsApi Cloud Function
+// (cheaper than Firestore per-doc reads for large collections).
+// Falls back to direct Firestore read if the endpoint is unavailable.
 export async function getWorshipSongs() {
+  try {
+    const apiBase = window.__worshipSongsApiBase?.() || '';
+    const res = await fetch(`${apiBase}/worship-songs-api/list`);
+    if (res.ok) return res.json();
+  } catch { /* fall through */ }
+  // Fallback to direct Firestore read
   if (!db) return [];
   const q = query(collection(db, 'worshipSongs'), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
 export async function getWorshipSong(id: string) {
@@ -1620,6 +1629,14 @@ export async function getBenchmarkSummary(uid: string): Promise<{ lastRunAt?: st
 window.__digitalLibraryApiBase = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
     return 'http://localhost:5001/mycircle-dash/us-central1/digitalLibrary';
+  }
+  return '';
+};
+
+// Expose worship songs API base
+window.__worshipSongsApiBase = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:5001/mycircle-dash/us-central1/worshipSongsApi';
   }
   return '';
 };

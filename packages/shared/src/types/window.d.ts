@@ -17,6 +17,7 @@ declare global {
     __currentUid?: string | null;
     __REMOTE_CONFIG__?: Record<string, string>;
     __digitalLibraryApiBase?: () => string;
+    __worshipSongsApiBase?: () => string;
     __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
 
     /* ── Worship Songs ─────────────────────────────────────── */
