@@ -26,8 +26,8 @@ const makeSong = (overrides: Partial<WorshipSong> = {}): WorshipSong => ({
   content: '[G]Amazing [C]grace',
   notes: '',
   tags: ['hymn'],
-  createdAt: { seconds: 1700000000, nanoseconds: 0 },
-  updatedAt: { seconds: 1700000000, nanoseconds: 0 },
+  createdAt: new Date(1700000000000).toISOString(),
+  updatedAt: new Date(1700000000000).toISOString(),
   ...overrides,
 });
 

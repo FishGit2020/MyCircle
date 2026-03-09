@@ -78,7 +78,7 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
     if (sort === 'alpha') {
       result = [...result].sort((a, b) => a.title.localeCompare(b.title));
     } else {
-      result = [...result].sort((a, b) => (b.updatedAt?.seconds ?? 0) - (a.updatedAt?.seconds ?? 0));
+      result = [...result].sort((a, b) => new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime());
     }
 
     return result;

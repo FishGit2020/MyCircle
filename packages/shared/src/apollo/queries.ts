@@ -620,6 +620,68 @@ export const SAVE_BENCHMARK_RUN = gql`
   }
 `;
 
+// ─── Worship Songs ──────────────────────────────────────────────
+
+const WORSHIP_SONG_FIELDS = gql`
+  fragment WorshipSongFields on WorshipSong {
+    id
+    title
+    artist
+    originalKey
+    format
+    content
+    notes
+    youtubeUrl
+    bpm
+    tags
+    createdAt
+    updatedAt
+    createdBy
+  }
+`;
+
+export const GET_WORSHIP_SONGS = gql`
+  ${WORSHIP_SONG_FIELDS}
+  query GetWorshipSongs {
+    worshipSongs {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const GET_WORSHIP_SONG = gql`
+  ${WORSHIP_SONG_FIELDS}
+  query GetWorshipSong($id: ID!) {
+    worshipSong(id: $id) {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const ADD_WORSHIP_SONG = gql`
+  ${WORSHIP_SONG_FIELDS}
+  mutation AddWorshipSong($input: WorshipSongInput!) {
+    addWorshipSong(input: $input) {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const UPDATE_WORSHIP_SONG = gql`
+  ${WORSHIP_SONG_FIELDS}
+  mutation UpdateWorshipSong($id: ID!, $input: WorshipSongUpdateInput!) {
+    updateWorshipSong(id: $id, input: $input) {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const DELETE_WORSHIP_SONG = gql`
+  mutation DeleteWorshipSong($id: ID!) {
+    deleteWorshipSong(id: $id)
+  }
+`;
+
 export const WEATHER_UPDATES = gql`
   ${WEATHER_CONDITION_FRAGMENT}
   subscription WeatherUpdates($lat: Float!, $lon: Float!) {

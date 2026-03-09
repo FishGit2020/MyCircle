@@ -35,12 +35,18 @@ export type {
   GetBenchmarkEndpointModelsQuery,
   GetBenchmarkHistoryQuery,
   GetBenchmarkSummaryQuery,
+  GetWorshipSongsQuery,
+  GetWorshipSongQuery,
+  GetWorshipSongQueryVariables,
   // Mutation operation types
   AiChatMutation,
   RunBenchmarkMutation,
   SaveBenchmarkEndpointMutation,
   DeleteBenchmarkEndpointMutation,
   SaveBenchmarkRunMutation,
+  AddWorshipSongMutation,
+  UpdateWorshipSongMutation,
+  DeleteWorshipSongMutation,
   // Subscription operation types
   WeatherUpdatesSubscription,
   // Schema entity types (only those that don't conflict with ./types)
@@ -77,6 +83,9 @@ export type {
   Clouds,
   WeatherData,
   WeatherUpdate,
+  WorshipSong as GqlWorshipSong,
+  WorshipSongInput,
+  WorshipSongUpdateInput,
 } from './generated';
 
 // Re-export Apollo React hooks so MFEs can import from @mycircle/shared

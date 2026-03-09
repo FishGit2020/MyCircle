@@ -3,16 +3,17 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import WorshipSongs from './WorshipSongs';
+import type { WorshipSong } from '../types';
 
-const mockSongs = [
+const mockSongs: WorshipSong[] = [
   {
     id: '1',
     title: 'Amazing Grace',
     artist: 'John Newton',
-    lyrics: 'Amazing grace how sweet the sound',
-    format: 'plain' as const,
-    key: 'G',
-    tags: ['hymn'],
+    originalKey: 'G',
+    format: 'chordpro',
+    content: '[G]Amazing [C]grace',
+    notes: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -20,25 +21,38 @@ const mockSongs = [
     id: '2',
     title: '10000 Reasons',
     artist: 'Matt Redman',
-    lyrics: '[G]Bless the [C]Lord',
-    format: 'chordpro' as const,
-    key: 'G',
-    tags: ['worship'],
+    originalKey: 'G',
+    format: 'chordpro',
+    content: '[G]Bless the [C]Lord',
+    notes: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
 ];
 
+const mockAddSong = vi.fn().mockResolvedValue('3');
+const mockUpdateSong = vi.fn().mockResolvedValue(undefined);
+const mockDeleteSong = vi.fn().mockResolvedValue(undefined);
+const mockGetSong = vi.fn().mockImplementation((id: string) =>
+  Promise.resolve(mockSongs.find((s) => s.id === id) ?? null)
+);
+const mockRefresh = vi.fn().mockResolvedValue({});
+
+vi.mock('../hooks/useWorshipSongs', () => ({
+  useWorshipSongs: () => ({
+    songs: mockSongs,
+    loading: false,
+    isAuthenticated: true,
+    addSong: mockAddSong,
+    updateSong: mockUpdateSong,
+    deleteSong: mockDeleteSong,
+    getSong: mockGetSong,
+    refresh: mockRefresh,
+  }),
+}));
+
 beforeEach(() => {
-  window.__worshipSongs = {
-    getAll: vi.fn().mockResolvedValue(mockSongs),
-    get: vi.fn().mockImplementation((id: string) =>
-      Promise.resolve(mockSongs.find((s) => s.id === id) ?? null)
-    ),
-    add: vi.fn().mockResolvedValue('3'),
-    update: vi.fn().mockResolvedValue(undefined),
-    delete: vi.fn().mockResolvedValue(undefined),
-  };
+  vi.clearAllMocks();
   window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
   localStorage.clear();
 });

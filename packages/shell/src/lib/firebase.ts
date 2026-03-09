@@ -882,17 +882,8 @@ export function subscribeToChineseCharacters(callback: (chars: Array<Record<stri
   });
 }
 
-// Expose worship songs API for MFEs
-if (firebaseEnabled) {
-  window.__worshipSongs = {
-    getAll: getWorshipSongs as any,
-    get: getWorshipSong as any,
-    add: addWorshipSong,
-    update: updateWorshipSong,
-    delete: deleteWorshipSong,
-    subscribe: subscribeToWorshipSongs,
-  };
-}
+// NOTE: worship songs are now served via GraphQL (worshipSongs query/mutations)
+// The window.__worshipSongs bridge is no longer needed.
 
 // Expose notebook API for MFEs
 if (firebaseEnabled) {

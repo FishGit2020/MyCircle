@@ -279,6 +279,10 @@ export const typeDefs = `#graphql
     benchmarkEndpointModels(endpointId: ID!): [String!]!
     benchmarkHistory(limit: Int = 10): [BenchmarkRun!]!
     benchmarkSummary: BenchmarkSummary!
+
+    # Worship songs
+    worshipSongs: [WorshipSong!]!
+    worshipSong(id: ID!): WorshipSong
   }
 
   # ─── AI Usage & Monitoring Types ──────────────────────────────
@@ -433,6 +437,48 @@ export const typeDefs = `#graphql
     fastestTps: Float
   }
 
+  # ─── Worship Songs Types ──────────────────────────────────────
+
+  type WorshipSong {
+    id: ID!
+    title: String!
+    artist: String!
+    originalKey: String!
+    format: String!
+    content: String!
+    notes: String!
+    youtubeUrl: String
+    bpm: Int
+    tags: [String!]
+    createdAt: String!
+    updatedAt: String!
+    createdBy: String
+  }
+
+  input WorshipSongInput {
+    title: String!
+    artist: String!
+    originalKey: String!
+    format: String!
+    content: String!
+    notes: String!
+    youtubeUrl: String
+    bpm: Int
+    tags: [String!]
+  }
+
+  input WorshipSongUpdateInput {
+    title: String
+    artist: String
+    originalKey: String
+    format: String
+    content: String
+    notes: String
+    youtubeUrl: String
+    bpm: Int
+    tags: [String!]
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
@@ -441,6 +487,11 @@ export const typeDefs = `#graphql
     scoreBenchmarkResponse(prompt: String!, response: String!, judgeProvider: String!, judgeEndpointId: String, judgeModel: String): BenchmarkQualityResult!
     saveBenchmarkRun(results: JSON!): BenchmarkRun!
     deleteBenchmarkRun(id: String!): Boolean!
+
+    # Worship songs (auth required for mutations)
+    addWorshipSong(input: WorshipSongInput!): WorshipSong!
+    updateWorshipSong(id: ID!, input: WorshipSongUpdateInput!): WorshipSong!
+    deleteWorshipSong(id: ID!): Boolean!
   }
 
   schema {

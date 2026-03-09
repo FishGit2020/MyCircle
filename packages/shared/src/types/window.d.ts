@@ -19,16 +19,6 @@ declare global {
     __digitalLibraryApiBase?: () => string;
     __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
 
-    /* ── Worship Songs ─────────────────────────────────────── */
-    __worshipSongs?: {
-      getAll: () => Promise<any[]>;
-      get: (id: string) => Promise<any>;
-      add: (song: Record<string, any>) => Promise<string>;
-      update: (id: string, updates: Record<string, any>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-      subscribe?: (callback: (songs: any[]) => void) => () => void;
-    };
-
     /* ── Notebook ──────────────────────────────────────────── */
     __notebook?: {
       getAll: () => Promise<any[]>;
