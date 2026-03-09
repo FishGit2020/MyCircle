@@ -288,6 +288,14 @@ export const aiChat = onRequest(
       if (name === 'getStockQuote') return await executeGetStockQuote(args.symbol as string);
       if (name === 'getCryptoPrices') return await executeGetCryptoPrices();
       if (name === 'navigateTo') return JSON.stringify({ navigateTo: args.page });
+      if (name === 'listFavoriteCities') {
+        const cities = Array.isArray(context?.favoriteCities) ? context!.favoriteCities : [];
+        return JSON.stringify({ favoriteCities: cities, count: cities.length });
+      }
+      if (name === 'listStockWatchlist') {
+        const symbols = Array.isArray(context?.stockWatchlist) ? context!.stockWatchlist : [];
+        return JSON.stringify({ watchlist: symbols, count: symbols.length });
+      }
       return JSON.stringify({ error: `Unknown tool: ${name}` });
     }
 
@@ -676,6 +684,23 @@ export const aiChatStream = onRequest(
       res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`);
     }
 
+    /** Emit a thinking event with a human-readable description of what the AI is doing. */
+    function sendThinking(toolName: string, args: Record<string, unknown>) {
+      const messages: Record<string, string> = {
+        getWeather: `Checking weather for ${args.city || 'a city'}...`,
+        searchCities: `Searching for cities matching "${args.query || ''}"...`,
+        getStockQuote: `Looking up stock price for ${args.symbol || ''}...`,
+        getCryptoPrices: 'Fetching cryptocurrency prices...',
+        navigateTo: `Navigating to ${args.page || ''}...`,
+        listFavoriteCities: 'Looking up your favorite cities...',
+        listStockWatchlist: 'Checking your stock watchlist...',
+        getBibleVerse: `Looking up ${args.reference || 'a verse'}...`,
+        searchPodcasts: `Searching podcasts for "${args.query || ''}"...`,
+        checkCaseStatus: `Checking case status for ${args.receiptNumber || ''}...`,
+      };
+      sendEvent('thinking', { content: messages[toolName] || `Running ${toolName}...` });
+    }
+
     const endpoint = await getUserOllamaEndpointHelper(uid, reqEndpointId || undefined);
     const ollamaBaseUrl = endpoint?.url || '';
     const geminiKey = process.env.GEMINI_API_KEY;
@@ -770,11 +795,12 @@ export const aiChatStream = onRequest(
 
             for (const [, buf] of toolCallBuffers) {
               const args = JSON.parse(buf.arguments || '{}') as Record<string, unknown>;
+              sendThinking(buf.name, args);
               sendEvent('tool_start', { name: buf.name, args });
 
               const toolStart = Date.now();
               let result = '';
-              try { result = await executeToolHelper(buf.name, args); }
+              try { result = await executeToolHelper(buf.name, args, context); }
               catch (err: any) { result = JSON.stringify({ error: err.message }); }
               toolCallTimings.push({ name: buf.name, durationMs: Date.now() - toolStart });
 
@@ -844,11 +870,12 @@ export const aiChatStream = onRequest(
           if (match) {
             try {
               const parsed = JSON.parse(match[1]) as { name: string; args: Record<string, unknown> };
+              sendThinking(parsed.name, parsed.args);
               sendEvent('tool_start', { name: parsed.name, args: parsed.args });
 
               const toolStart = Date.now();
               let result = '';
-              try { result = await executeToolHelper(parsed.name, parsed.args); }
+              try { result = await executeToolHelper(parsed.name, parsed.args, context); }
               catch (err: any) { result = JSON.stringify({ error: err.message }); }
               toolCallTimings.push({ name: parsed.name, durationMs: Date.now() - toolStart });
               sendEvent('tool_result', { name: parsed.name, result });
@@ -941,11 +968,12 @@ export const aiChatStream = onRequest(
             hasToolCalls = true;
             const fc = part.functionCall;
             const args = (fc.args || {}) as Record<string, unknown>;
+            sendThinking(fc.name!, args);
             sendEvent('tool_start', { name: fc.name!, args });
 
             const toolStart = Date.now();
             let result = '';
-            try { result = await executeToolHelper(fc.name!, args); }
+            try { result = await executeToolHelper(fc.name!, args, context); }
             catch (err: any) { result = JSON.stringify({ error: err.message }); }
             toolCallTimings.push({ name: fc.name!, durationMs: Date.now() - toolStart });
 

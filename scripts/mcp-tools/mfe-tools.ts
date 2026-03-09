@@ -63,6 +63,20 @@ export const navigateToTool: ToolDef = {
   isFrontendAction: true,
 };
 
+export const listFavoriteCitiesTool: ToolDef = {
+  name: 'listFavoriteCities',
+  description: 'List the user\'s favorite cities. Returns city names from user context. Use this when the user asks about their favorite cities or wants weather for all favorites.',
+  parameters: z.object({}),
+  category: 'weather',
+};
+
+export const listStockWatchlistTool: ToolDef = {
+  name: 'listStockWatchlist',
+  description: 'List the user\'s stock watchlist symbols. Returns stock symbols from user context.',
+  parameters: z.object({}),
+  category: 'stocks',
+};
+
 // ─── New tools ────────────────────────────────────────────────
 
 export const addFlashcardTool: ToolDef = {
@@ -199,7 +213,9 @@ export const planHikingRouteTool: ToolDef = {
 export const ALL_TOOLS: ToolDef[] = [
   getWeatherTool,
   searchCitiesTool,
+  listFavoriteCitiesTool,
   getStockQuoteTool,
+  listStockWatchlistTool,
   getCryptoPricesTool,
   navigateToTool,
   addFlashcardTool,
