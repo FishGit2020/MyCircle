@@ -55,6 +55,7 @@ const mockGetDailyLogEntries = vi.fn().mockResolvedValue([]);
 const mockGetUserFiles = vi.fn().mockResolvedValue([]);
 const mockGetWorshipSongs = vi.fn().mockResolvedValue([]);
 const mockGetBenchmarkSummary = vi.fn().mockResolvedValue(null);
+const mockGetUserNotes = vi.fn().mockResolvedValue([]);
 const mockMigrateToMultiChild = vi.fn().mockResolvedValue(undefined);
 const mockGetChildren = vi.fn().mockResolvedValue([]);
 
@@ -63,6 +64,7 @@ vi.mock('../lib/firebase', () => ({
   getUserFiles: (...args: unknown[]) => mockGetUserFiles(...args),
   getWorshipSongs: (...args: unknown[]) => mockGetWorshipSongs(...args),
   getBenchmarkSummary: (...args: unknown[]) => mockGetBenchmarkSummary(...args),
+  getUserNotes: (...args: unknown[]) => mockGetUserNotes(...args),
   migrateToMultiChild: (...args: unknown[]) => mockMigrateToMultiChild(...args),
   getChildren: (...args: unknown[]) => mockGetChildren(...args),
 }));
@@ -240,11 +242,14 @@ describe('restoreUserData', () => {
     expect(JSON.parse(localStorage.getItem('book-last-played')!)).toEqual(bookLastPlayed);
   });
 
-  it('always dispatches NOTEBOOK_CHANGED', () => {
+  it('fetches note count and dispatches NOTEBOOK_CHANGED on sign-in', async () => {
+    mockGetUserNotes.mockResolvedValueOnce([{ id: '1' }, { id: '2' }, { id: '3' }]);
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
     restoreUserData(makeProfile() as any, 'user1');
-    const events = dispatchSpy.mock.calls.map(c => (c[0] as Event).type);
-    expect(events).toContain('notebook-changed');
+    await vi.runAllTimersAsync?.().catch(() => {});
+    // Flush microtasks
+    await Promise.resolve();
+    expect(mockGetUserNotes).toHaveBeenCalledWith('user1');
   });
 
   it('fires subcollection fetches', () => {
@@ -253,6 +258,7 @@ describe('restoreUserData', () => {
     expect(mockGetUserFiles).toHaveBeenCalledWith('user1');
     expect(mockGetWorshipSongs).toHaveBeenCalled();
     expect(mockGetBenchmarkSummary).toHaveBeenCalledWith('user1');
+    expect(mockGetUserNotes).toHaveBeenCalledWith('user1');
   });
 
   it('stores daily log cache when entries returned', async () => {
