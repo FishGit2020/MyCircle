@@ -29,9 +29,9 @@ test.describe('City Search Autocomplete with Recents', () => {
     await page.goto('/weather');
     await page.waitForSelector('input[role="combobox"]', { timeout: 30000 });
 
-    // Focus input - should show "Recent Searches" with Paris
+    // Focus input - should show "Recent Searches" in the dropdown listbox
     await page.locator('input[role="combobox"]').focus();
-    await expect(page.getByText('Recent Searches')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('listbox').getByText('Recent Searches')).toBeVisible({ timeout: 5000 });
   });
 
   test('Escape closes dropdown', async ({ page }) => {

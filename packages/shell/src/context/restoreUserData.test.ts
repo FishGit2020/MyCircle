@@ -88,17 +88,14 @@ beforeEach(() => {
 });
 
 describe('restoreUserData', () => {
-  it('returns empty cities when profile has none', () => {
+  it('returns empty favoriteCities when profile has none', () => {
     const result = restoreUserData(makeProfile() as any, 'user1');
-    expect(result.recentCities).toEqual([]);
     expect(result.favoriteCities).toEqual([]);
   });
 
-  it('returns cities from profile', () => {
-    const cities = [{ id: '1', name: 'NYC', country: 'US', lat: 40, lon: -74, searchedAt: new Date() }];
+  it('returns favoriteCities from profile', () => {
     const favs = [{ id: '2', name: 'LA', country: 'US', lat: 34, lon: -118 }];
-    const result = restoreUserData(makeProfile({ recentCities: cities, favoriteCities: favs }) as any, 'user1');
-    expect(result.recentCities).toEqual(cities);
+    const result = restoreUserData(makeProfile({ favoriteCities: favs }) as any, 'user1');
     expect(result.favoriteCities).toEqual(favs);
   });
 
