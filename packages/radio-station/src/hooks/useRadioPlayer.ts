@@ -1,77 +1,74 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { eventBus, MFEvents, subscribeToMFEvent, StorageKeys, WindowEvents } from '@mycircle/shared';
+import type { AudioSource, AudioPlaybackStateEvent } from '@mycircle/shared';
 import type { RadioStation } from '../types';
 
+/**
+ * Radio player hook that delegates to the shell's GlobalAudioPlayer
+ * via the shared event bus. No local Audio element is created.
+ */
 export function useRadioPlayer() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState(0.8);
 
-  const getAudio = useCallback(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.volume = 0.8;
-      audioRef.current.addEventListener('error', () => {
-        setIsPlaying(false);
-      });
-      audioRef.current.addEventListener('playing', () => {
-        setIsPlaying(true);
-      });
-      audioRef.current.addEventListener('pause', () => {
-        setIsPlaying(false);
-      });
+  // Listen to playback state from GlobalAudioPlayer
+  useEffect(() => {
+    const unsub = subscribeToMFEvent<AudioPlaybackStateEvent>(
+      MFEvents.AUDIO_PLAYBACK_STATE,
+      (data) => {
+        if (data.type === 'radio') {
+          setIsPlaying(data.isPlaying);
+        } else {
+          // Another source took over — radio is no longer playing
+          if (isPlaying) setIsPlaying(false);
+        }
+      },
+    );
+    return unsub;
+  }, [isPlaying]);
+
+  const play = useCallback((station: RadioStation) => {
+    // If same station is playing, toggle pause
+    if (currentStation?.stationuuid === station.stationuuid && isPlaying) {
+      eventBus.publish(MFEvents.AUDIO_TOGGLE_PLAY);
+      return;
     }
-    return audioRef.current;
-  }, []);
 
-  const play = useCallback(
-    (station: RadioStation) => {
-      const audio = getAudio();
-      const streamUrl = station.url_resolved || station.url;
-      if (currentStation?.stationuuid === station.stationuuid && isPlaying) {
-        audio.pause();
-        return;
-      }
-      audio.src = streamUrl;
-      audio.play().catch(() => {
-        setIsPlaying(false);
-      });
-      setCurrentStation(station);
-    },
-    [getAudio, currentStation, isPlaying],
-  );
+    const source: AudioSource = {
+      type: 'radio',
+      track: {
+        id: station.stationuuid,
+        url: station.url_resolved || station.url,
+        title: station.name,
+      },
+      collection: {
+        id: station.stationuuid,
+        title: station.name,
+        artwork: station.favicon || undefined,
+        tracks: [{
+          id: station.stationuuid,
+          url: station.url_resolved || station.url,
+          title: station.name,
+        }],
+      },
+      trackIndex: 0,
+      navigateTo: '/radio',
+      progressKey: StorageKeys.RADIO_FAVORITES, // radio is live, no real progress
+      nowPlayingKey: StorageKeys.RADIO_FAVORITES,
+      lastPlayedKey: StorageKeys.RADIO_FAVORITES,
+      lastPlayedEvent: WindowEvents.RADIO_CHANGED,
+      canQueue: false,
+    };
+
+    eventBus.publish(MFEvents.AUDIO_PLAY, source);
+    setCurrentStation(station);
+  }, [currentStation, isPlaying]);
 
   const stop = useCallback(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      audio.src = '';
-    }
+    eventBus.publish(MFEvents.AUDIO_CLOSE);
     setCurrentStation(null);
     setIsPlaying(false);
   }, []);
 
-  const setVolume = useCallback(
-    (v: number) => {
-      const clamped = Math.max(0, Math.min(1, v));
-      setVolumeState(clamped);
-      const audio = audioRef.current;
-      if (audio) {
-        audio.volume = clamped;
-      }
-    },
-    [],
-  );
-
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
-  return { play, stop, currentStation, isPlaying, volume, setVolume };
+  return { play, stop, currentStation, isPlaying };
 }

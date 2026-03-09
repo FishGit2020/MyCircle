@@ -3,14 +3,13 @@ import { useTranslation, PageContent } from '@mycircle/shared';
 import { useRadioStations } from '../hooks/useRadioStations';
 import { useRadioPlayer } from '../hooks/useRadioPlayer';
 import StationCard from './StationCard';
-import PlayerBar from './PlayerBar';
 
 type Tab = 'browse' | 'favorites';
 
 const RadioStation: React.FC = () => {
   const { t } = useTranslation();
   const { stations, favorites, loading, error, search, toggleFavorite } = useRadioStations();
-  const { play, stop, currentStation, isPlaying, volume, setVolume } = useRadioPlayer();
+  const { play, currentStation, isPlaying } = useRadioPlayer();
   const [activeTab, setActiveTab] = useState<Tab>('browse');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -22,12 +21,6 @@ const RadioStation: React.FC = () => {
     [search, searchQuery],
   );
 
-  const handlePlayPause = useCallback(() => {
-    if (currentStation) {
-      play(currentStation);
-    }
-  }, [currentStation, play]);
-
   const isFavorite = useCallback(
     (stationuuid: string) => favorites.some((s) => s.stationuuid === stationuuid),
     [favorites],
@@ -36,7 +29,7 @@ const RadioStation: React.FC = () => {
   const displayStations = activeTab === 'browse' ? stations : favorites;
 
   return (
-    <PageContent className="pb-20">
+    <PageContent>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-orange-600 dark:text-orange-400">
@@ -137,18 +130,6 @@ const RadioStation: React.FC = () => {
             />
           ))}
         </div>
-      )}
-
-      {/* Player bar */}
-      {currentStation && (
-        <PlayerBar
-          station={currentStation}
-          isPlaying={isPlaying}
-          volume={volume}
-          onPlayPause={handlePlayPause}
-          onStop={stop}
-          onVolumeChange={setVolume}
-        />
       )}
     </PageContent>
   );
