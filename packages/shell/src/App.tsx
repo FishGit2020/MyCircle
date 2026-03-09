@@ -35,6 +35,7 @@ const DigitalLibraryMF = tracedLazy('mfe_digital_library_load', () => import('di
 const FamilyGamesMF = tracedLazy('mfe_family_games_load', () => import('familyGames/FamilyGames'), getPerf);
 const DocScannerMF = tracedLazy('mfe_doc_scanner_load', () => import('docScanner/DocScanner'), getPerf);
 const HikingMapMF = tracedLazy('mfe_hiking_map_load', () => import('hikingMap/HikingMap'), getPerf);
+const TripPlannerMF = tracedLazy('mfe_trip_planner_load', () => import('tripPlanner/TripPlanner'), getPerf);
 const YouthTrackerMF = tracedLazy('mfe_youth_tracker_load', () => import('youthTracker/YouthTracker'), getPerf);
 
 // Weather page with full weather display (special case: has FavoriteButton/ShareButton)
@@ -127,6 +128,7 @@ export default function App() {
         <Route path="doc-scanner" element={<RequireAuth><MFEPageWrapper component={DocScannerMF} name="Doc Scanner" /></RequireAuth>} />
         <Route path="hiking" element={<MFEPageWrapper component={HikingMapMF} name="Hiking Map" />} />
         <Route path="hiking/*" element={<MFEPageWrapper component={HikingMapMF} name="Hiking Map" />} />
+        <Route path="trips" element={<RequireAuth><MFEPageWrapper component={TripPlannerMF} name="Trip Planner" /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />
         <Route path="terms" element={<TermsOfServicePage />} />

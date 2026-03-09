@@ -36,6 +36,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/doc-scanner', labelKey: 'nav.docScanner', color: 'bg-sky-50 text-sky-500', darkColor: 'dark:bg-sky-900/20 dark:text-sky-400', widgetId: 'docScanner', iconKey: 'doc-scanner' },
   { path: '/benchmark', labelKey: 'nav.benchmark', color: 'bg-orange-50 text-orange-500', darkColor: 'dark:bg-orange-900/20 dark:text-orange-400', widgetId: 'benchmark', iconKey: 'benchmark' },
   { path: '/immigration', labelKey: 'nav.immigration', color: 'bg-sky-50 text-sky-500', darkColor: 'dark:bg-sky-900/20 dark:text-sky-400', widgetId: 'immigration', iconKey: 'immigration' },
+  { path: '/trips', labelKey: 'nav.tripPlanner' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'tripPlanner', iconKey: 'trip-planner' },
 ];
 
 function QuickAccessTile({ item }: { item: QuickAccessItem }) {

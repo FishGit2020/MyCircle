@@ -30,6 +30,7 @@ COPY packages/family-games/package.json packages/family-games/
 COPY packages/doc-scanner/package.json packages/doc-scanner/
 COPY packages/hiking-map/package.json packages/hiking-map/
 COPY packages/youth-tracker/package.json packages/youth-tracker/
+COPY packages/trip-planner/package.json packages/trip-planner/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -87,6 +88,7 @@ COPY --from=builder /app/packages/family-games/package.json packages/family-game
 COPY --from=builder /app/packages/doc-scanner/package.json packages/doc-scanner/
 COPY --from=builder /app/packages/hiking-map/package.json packages/hiking-map/
 COPY --from=builder /app/packages/youth-tracker/package.json packages/youth-tracker/
+COPY --from=builder /app/packages/trip-planner/package.json packages/trip-planner/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune

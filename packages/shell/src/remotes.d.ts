@@ -106,6 +106,11 @@ declare module 'hikingMap/HikingMap' {
   export default HikingMap;
 }
 
+declare module 'tripPlanner/TripPlanner' {
+  const TripPlanner: React.ComponentType;
+  export default TripPlanner;
+}
+
 declare module 'youthTracker/YouthTracker' {
   const YouthTracker: React.ComponentType;
   export default YouthTracker;
