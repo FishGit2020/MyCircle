@@ -81,6 +81,7 @@ export const WindowEvents = {
   CHILDREN_CHANGED: 'children-changed',
   TRIP_PLANNER_CHANGED: 'trip-planner-changed',
   POLL_SYSTEM_CHANGED: 'poll-system-changed',
+  RADIO_CHANGED: 'radio-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -145,6 +146,7 @@ export const StorageKeys = {
   FAMILY_GAMES_CACHE: 'family-games-cache',
   CHILDREN_CACHE: 'children-cache',
   SELECTED_CHILD_ID: 'selected-child-id',
+  RADIO_FAVORITES: 'radio-favorites',
 } as const;
 
 export interface CitySelectedEvent {

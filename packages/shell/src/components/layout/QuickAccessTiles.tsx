@@ -38,6 +38,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/immigration', labelKey: 'nav.immigration', color: 'bg-sky-50 text-sky-500', darkColor: 'dark:bg-sky-900/20 dark:text-sky-400', widgetId: 'immigration', iconKey: 'immigration' },
   { path: '/trips', labelKey: 'nav.tripPlanner' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'tripPlanner', iconKey: 'trip-planner' },
   { path: '/polls', labelKey: 'nav.pollSystem' as any, color: 'bg-violet-50 text-violet-500', darkColor: 'dark:bg-violet-900/20 dark:text-violet-400', widgetId: 'pollSystem', iconKey: 'poll-system' },
+  { path: '/radio', labelKey: 'nav.radio', color: 'bg-amber-50 text-amber-500', darkColor: 'dark:bg-amber-900/20 dark:text-amber-400', widgetId: 'radioStation', iconKey: 'radio' },
 ];
 
 function QuickAccessTile({ item }: { item: QuickAccessItem }) {

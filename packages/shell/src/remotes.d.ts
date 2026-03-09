@@ -120,3 +120,8 @@ declare module 'pollSystem/PollSystem' {
   const PollSystem: React.ComponentType;
   export default PollSystem;
 }
+
+declare module 'radioStation/RadioStation' {
+  const RadioStation: React.ComponentType;
+  export default RadioStation;
+}
