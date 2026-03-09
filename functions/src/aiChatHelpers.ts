@@ -152,12 +152,14 @@ export function buildSystemInstruction(context?: Record<string, unknown>): strin
       ctxParts.push(`Subscribed to ${context.podcastSubscriptions} podcasts`);
     }
     if (context.tempUnit) ctxParts.push(`Preferred temperature unit: ${context.tempUnit === 'F' ? 'Fahrenheit' : 'Celsius'}`);
-    if (context.locale) ctxParts.push(`Language: ${context.locale === 'es' ? 'Spanish' : 'English'}`);
+    if (context.speedUnit) ctxParts.push(`Preferred speed unit: ${context.speedUnit === 'mph' ? 'mph' : 'km/h'}`);
+    if (context.distanceUnit) ctxParts.push(`Preferred distance unit: ${context.distanceUnit === 'mi' ? 'miles' : 'km'}`);
+    if (context.locale) ctxParts.push(`Language: ${context.locale === 'es' ? 'Spanish' : context.locale === 'zh' ? 'Chinese' : 'English'}`);
     if (context.currentPage) ctxParts.push(`Currently on: ${context.currentPage}`);
 
     if (ctxParts.length > 0) {
       systemInstruction += '\n\nUser context:\n' + ctxParts.join('\n');
-      systemInstruction += '\n\nUse this context to personalize responses. For example, if the user asks "how is the weather?" you can check their favorite or recent cities. If they ask about stocks, reference their watchlist.';
+      systemInstruction += '\n\nUse this context to personalize responses. Always use the user\'s preferred units (temperature, speed, distance) when presenting data. For example, if the user asks "how is the weather?" you can check their favorite or recent cities. If they ask about stocks, reference their watchlist.';
     }
   }
 
