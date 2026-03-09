@@ -5,8 +5,14 @@ import { MemoryRouter } from 'react-router';
 vi.mock('@mycircle/shared', () => ({
   PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
   useTranslation: () => ({ t: (key: string) => key }),
-  WindowEvents: { AUTH_STATE_CHANGED: 'auth-state-changed', BOOKS_CHANGED: 'books-changed' },
+  WindowEvents: { AUTH_STATE_CHANGED: 'auth-state-changed', BOOKS_CHANGED: 'books-changed', BREADCRUMB_DETAIL: 'breadcrumb-detail' },
   createLogger: () => ({ info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() }),
+  useQuery: () => ({ data: undefined, loading: false, refetch: vi.fn() }),
+  useMutation: () => [vi.fn()],
+  useLazyQuery: () => [vi.fn().mockResolvedValue({ data: { bookChapters: [] } })],
+  GET_BOOKS: {},
+  GET_BOOK_CHAPTERS: {},
+  DELETE_BOOK: {},
 }));
 
 // Mock BookReader to avoid epubjs dependency in tests
@@ -36,7 +42,6 @@ describe('DigitalLibrary', () => {
 
   it('shows empty state when no books loaded', async () => {
     renderWithRouter();
-    // After loading completes, should show empty state
     const emptyMsg = await screen.findByText('library.emptyLibrary');
     expect(emptyMsg).toBeInTheDocument();
   });

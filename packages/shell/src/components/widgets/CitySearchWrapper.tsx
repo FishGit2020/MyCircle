@@ -1,9 +1,5 @@
-import React, { Suspense, lazy, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { eventBus, MFEvents, createLogger } from '@mycircle/shared';
+import React, { Suspense, lazy } from 'react';
 import { Loading, ErrorBoundary } from '../common';
-
-const logger = createLogger('CitySearchWrapper');
 
 const CitySearchMF = lazy(() => import('citySearch/CitySearch'));
 
@@ -14,36 +10,10 @@ const CitySearchFallback = () => (
 );
 
 export default function CitySearchWrapper() {
-  const { user, addCity, removeCity, clearCities, recentCities } = useAuth();
-
-  useEffect(() => {
-    if (!user) return;
-
-    const unsubscribe = eventBus.subscribe(MFEvents.CITY_SELECTED, async (data: any) => {
-      const { city } = data;
-      if (city) {
-        try {
-          await addCity({
-            id: city.id || `${city.lat},${city.lon}`,
-            name: city.name,
-            country: city.country,
-            state: city.state,
-            lat: city.lat,
-            lon: city.lon,
-          });
-        } catch (error) {
-          logger.error('Failed to save recent city:', error);
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, [user, addCity]);
-
   return (
     <ErrorBoundary fallback={<CitySearchFallback />}>
       <Suspense fallback={<Loading />}>
-        <CitySearchMF recentCities={recentCities} onRemoveCity={user ? removeCity : undefined} onClearRecents={user ? clearCities : undefined} />
+        <CitySearchMF />
       </Suspense>
     </ErrorBoundary>
   );

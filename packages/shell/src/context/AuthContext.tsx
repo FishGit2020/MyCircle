@@ -37,6 +37,7 @@ const keysToPreserve = new Set([
   StorageKeys.WEATHER_ALERTS,
   StorageKeys.ANNOUNCEMENT_ALERTS,
   StorageKeys.KNOWN_ACCOUNTS,
+  StorageKeys.RECENT_CITIES,
 ]);
 
 /** Clear user-specific localStorage and dispatch change events */
@@ -114,7 +115,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setProfile(userProfile);
       window.__isAdmin = userProfile?.isAdmin ?? false;
       if (userProfile) {
-        cityManager.setRecentCities(userProfile.recentCities || []);
         cityManager.setFavoriteCities(userProfile.favoriteCities || []);
       }
     }
@@ -136,15 +136,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(userProfile);
         window.__isAdmin = userProfile?.isAdmin ?? false;
         if (userProfile) {
-          const { recentCities, favoriteCities } = restoreUserData(userProfile, firebaseUser.uid);
-          cityManager.setRecentCities(recentCities);
+          const { favoriteCities } = restoreUserData(userProfile, firebaseUser.uid);
           cityManager.setFavoriteCities(favoriteCities);
         }
         window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
       } else {
         clearUserIdentity();
         setProfile(null);
-        cityManager.setRecentCities([]);
         cityManager.setFavoriteCities([]);
         window.dispatchEvent(new Event(WindowEvents.AUTH_STATE_CHANGED));
       }
@@ -199,7 +197,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await getApolloClient().clearStore();
 
       setProfile(null);
-      cityManager.setRecentCities([]);
       cityManager.setFavoriteCities([]);
     } catch (error) {
       logger.error('Sign out failed:', error);

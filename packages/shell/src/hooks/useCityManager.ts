@@ -1,16 +1,28 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import {
-  RecentCity,
   FavoriteCity,
-  addRecentCity,
-  removeRecentCity,
-  clearRecentCities,
+  RecentCity,
   toggleFavoriteCity,
-  getRecentCities,
   getUserProfile,
   logEvent,
 } from '../lib/firebase';
+import { StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
+
+const MAX_RECENTS = 10;
+
+function loadLocalRecents(): RecentCity[] {
+  try {
+    const stored = localStorage.getItem(StorageKeys.RECENT_CITIES);
+    return stored ? JSON.parse(stored) : [];
+  } catch { return []; }
+}
+
+function saveLocalRecents(cities: RecentCity[]) {
+  try {
+    localStorage.setItem(StorageKeys.RECENT_CITIES, JSON.stringify(cities.slice(0, MAX_RECENTS)));
+  } catch { /* ignore */ }
+}
 
 export interface CityManagerResult {
   recentCities: RecentCity[];
@@ -26,32 +38,39 @@ export interface CityManagerResult {
 }
 
 export function useCityManager(user: User | null): CityManagerResult {
-  const [recentCities, setRecentCities] = useState<RecentCity[]>([]);
+  const [recentCities, setRecentCities] = useState<RecentCity[]>(loadLocalRecents);
   const [favoriteCities, setFavoriteCities] = useState<FavoriteCity[]>([]);
 
+  // Refresh state when CitySearch MFE selects a city and updates localStorage
+  useEffect(() => {
+    const unsubscribe = eventBus.subscribe(MFEvents.CITY_SELECTED, () => {
+      setRecentCities(loadLocalRecents());
+    });
+    return () => unsubscribe();
+  }, []);
+
   const addCity = useCallback(async (city: Omit<RecentCity, 'searchedAt'>) => {
-    if (user) {
-      await addRecentCity(user.uid, city);
-      const cities = await getRecentCities(user.uid);
-      setRecentCities(cities);
-    }
+    const prev = loadLocalRecents();
+    const filtered = prev.filter(c => c.id !== city.id);
+    const updated: RecentCity[] = [
+      { ...city, searchedAt: new Date() },
+      ...filtered,
+    ].slice(0, MAX_RECENTS);
+    saveLocalRecents(updated);
+    setRecentCities(updated);
     logEvent('city_searched', { city_name: city.name, city_country: city.country });
-  }, [user]);
+  }, []);
 
   const removeCity = useCallback(async (cityId: string) => {
-    if (user) {
-      await removeRecentCity(user.uid, cityId);
-      const cities = await getRecentCities(user.uid);
-      setRecentCities(cities);
-    }
-  }, [user]);
+    const updated = loadLocalRecents().filter(c => c.id !== cityId);
+    saveLocalRecents(updated);
+    setRecentCities(updated);
+  }, []);
 
   const clearCities = useCallback(async () => {
-    if (user) {
-      await clearRecentCities(user.uid);
-      setRecentCities([]);
-    }
-  }, [user]);
+    saveLocalRecents([]);
+    setRecentCities([]);
+  }, []);
 
   const toggleFavorite = useCallback(async (city: FavoriteCity): Promise<boolean> => {
     if (user) {

@@ -720,7 +720,7 @@ export async function updateWorshipSong(id: string, updates: Record<string, any>
 
 export async function deleteWorshipSong(id: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'worshipSongs', id));
+  await updateDoc(doc(db, 'worshipSongs', id), { isDeleted: true, deletedAt: serverTimestamp() });
 }
 
 /** Subscribe to real-time worship songs updates via Firestore onSnapshot */
@@ -728,7 +728,7 @@ export function subscribeToWorshipSongs(callback: (songs: Array<Record<string, a
   if (!db) return () => {};
   const q = query(collection(db, 'worshipSongs'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    const songs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const songs = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
     callback(songs);
   }, (error) => {
     log.warn('Worship songs snapshot error:', error);
@@ -740,7 +740,7 @@ export async function getUserNotes(uid: string) {
   if (!db) return [];
   const q = query(collection(db, 'users', uid, 'notes'), orderBy('updatedAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
 export async function getUserNote(uid: string, noteId: string) {
@@ -772,7 +772,10 @@ export async function updateUserNote(uid: string, noteId: string, updates: Parti
 
 export async function deleteUserNote(uid: string, noteId: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
+  await updateDoc(doc(db, 'users', uid, 'notes', noteId), {
+    isDeleted: true,
+    deletedAt: serverTimestamp(),
+  });
 }
 
 /** Subscribe to real-time private notes updates via Firestore onSnapshot */
@@ -780,7 +783,7 @@ export function subscribeToUserNotes(uid: string, callback: (notes: Array<Record
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'notes'), orderBy('updatedAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    const notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const notes = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
     callback(notes);
   }, (error) => {
     log.warn('User notes snapshot error:', error);
@@ -879,17 +882,8 @@ export function subscribeToChineseCharacters(callback: (chars: Array<Record<stri
   });
 }
 
-// Expose worship songs API for MFEs
-if (firebaseEnabled) {
-  window.__worshipSongs = {
-    getAll: getWorshipSongs as any,
-    get: getWorshipSong as any,
-    add: addWorshipSong,
-    update: updateWorshipSong,
-    delete: deleteWorshipSong,
-    subscribe: subscribeToWorshipSongs,
-  };
-}
+// NOTE: worship songs are now served via GraphQL (worshipSongs query/mutations)
+// The window.__worshipSongs bridge is no longer needed.
 
 // Expose notebook API for MFEs
 if (firebaseEnabled) {
@@ -1037,7 +1031,7 @@ export async function getHikingRoutes(uid: string) {
   if (!db) return [];
   const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
 export async function addHikingRoute(uid: string, route: {
@@ -1061,13 +1055,16 @@ export async function updateHikingRoute(uid: string, routeId: string, updates: R
 
 export async function deleteHikingRoute(uid: string, routeId: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'users', uid, 'hikingRoutes', routeId));
+  await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), {
+    isDeleted: true,
+    deletedAt: serverTimestamp(),
+  });
 }
 
 export function subscribeToHikingRoutes(uid: string, callback: (routes: Array<Record<string, any>>) => void): () => void {
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
-  return onSnapshot(q, (snap) => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+  return onSnapshot(q, (snap) => callback(snap.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }))),
     (err) => log.warn('Hiking routes snapshot error:', err));
 }
 
@@ -1291,7 +1288,7 @@ export async function getUserFlashcards(uid: string) {
   if (!db) return [];
   const q = query(collection(db, 'users', uid, 'flashcards'), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
 export async function addUserFlashcard(uid: string, card: Record<string, any>) {
@@ -1329,14 +1326,17 @@ export async function updateUserFlashcard(uid: string, cardId: string, updates: 
 
 export async function deleteUserFlashcard(uid: string, cardId: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'users', uid, 'flashcards', cardId));
+  await updateDoc(doc(db, 'users', uid, 'flashcards', cardId), {
+    isDeleted: true,
+    deletedAt: serverTimestamp(),
+  });
 }
 
 export function subscribeToUserFlashcards(uid: string, callback: (cards: Array<Record<string, any>>) => void): () => void {
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'flashcards'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    const cards = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const cards = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
     callback(cards);
   }, (error) => {
     log.warn('Flashcard snapshot error:', error);
@@ -1439,28 +1439,7 @@ async function uploadBabyPhotoViaFunction(token: string, stageId: number, file: 
   return data.photoUrl;
 }
 
-async function deleteBabyPhotoViaFunction(token: string, stageId: number): Promise<void> {
-  const res = await fetch('/baby-photos/delete', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify({ stageId }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: 'Delete failed' }));
-    throw new Error(err.error || 'Delete failed');
-  }
-}
-
-async function getBabyMilestones(uid: string): Promise<Record<string, any>[]> {
-  if (!db) return [];
-  const snapshot = await getDocs(collection(db, 'users', uid, 'babyMilestones'));
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-// Expose baby photos API for MFEs
+// Expose baby photos upload API for MFEs (list/delete now via GraphQL)
 if (firebaseEnabled) {
   window.__babyPhotos = {
     upload: async (stageId: number, file: Blob, caption?: string) => {
@@ -1468,64 +1447,12 @@ if (firebaseEnabled) {
       const token = await auth.currentUser.getIdToken();
       return uploadBabyPhotoViaFunction(token, stageId, file, caption);
     },
-    getAll: () => {
-      if (!auth?.currentUser) return Promise.resolve([]);
-      return getBabyMilestones(auth.currentUser.uid);
-    },
-    delete: async (stageId: number) => {
-      if (!auth?.currentUser) throw new Error('Not authenticated');
-      const token = await auth.currentUser.getIdToken();
-      await deleteBabyPhotoViaFunction(token, stageId);
-    },
   };
 }
 
-// Cloud Files — personal files (user-scoped subcollection)
-export async function getUserFiles(uid: string) {
-  if (!db) return [];
-  const q = query(collection(db, 'users', uid, 'files'), orderBy('uploadedAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-export function subscribeToUserFiles(uid: string, callback: (files: Array<Record<string, any>>) => void): () => void {
-  if (!db) return () => {};
-  const q = query(collection(db, 'users', uid, 'files'), orderBy('uploadedAt', 'desc'));
-  return onSnapshot(q, (snapshot) => {
-    const files = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    callback(files);
-  }, (error) => {
-    log.warn('User files snapshot error:', error);
-  });
-}
-
-// Shared files — public read collection
-export async function getSharedFiles() {
-  if (!db) return [];
-  const q = query(collection(db, 'sharedFiles'), orderBy('sharedAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-export function subscribeToSharedFiles(callback: (files: Array<Record<string, any>>) => void): () => void {
-  if (!db) return () => {};
-  const q = query(collection(db, 'sharedFiles'), orderBy('sharedAt', 'desc'));
-  return onSnapshot(q, (snapshot) => {
-    const files = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    callback(files);
-  }, (error) => {
-    log.warn('Shared files snapshot error:', error);
-  });
-}
-
-// Expose cloud files API for MFEs
+// Expose cloud files upload API for MFEs (list/share/delete now via GraphQL)
 if (firebaseEnabled) {
   window.__cloudFiles = {
-    getAll: () => auth?.currentUser ? getUserFiles(auth.currentUser.uid) : Promise.resolve([]),
-    subscribe: (callback: (files: Array<Record<string, any>>) => void) => {
-      if (!auth?.currentUser) return () => {};
-      return subscribeToUserFiles(auth.currentUser.uid, callback);
-    },
     upload: async (fileName: string, fileBase64: string, contentType: string) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       const token = await auth.currentUser.getIdToken();
@@ -1537,50 +1464,6 @@ if (firebaseEnabled) {
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Upload failed' }));
         throw new Error(err.error || 'Upload failed');
-      }
-      return res.json();
-    },
-    share: async (fileId: string) => {
-      if (!auth?.currentUser) throw new Error('Not authenticated');
-      const token = await auth.currentUser.getIdToken();
-      const res = await fetch('/cloud-files/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ fileId }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Share failed' }));
-        throw new Error(err.error || 'Share failed');
-      }
-      return res.json();
-    },
-    delete: async (fileId: string) => {
-      if (!auth?.currentUser) throw new Error('Not authenticated');
-      const token = await auth.currentUser.getIdToken();
-      const res = await fetch('/cloud-files/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ fileId }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Delete failed' }));
-        throw new Error(err.error || 'Delete failed');
-      }
-      return res.json();
-    },
-    getAllShared: () => getSharedFiles(),
-    subscribeShared: subscribeToSharedFiles,
-    deleteShared: async (fileId: string) => {
-      if (!auth?.currentUser) throw new Error('Not authenticated');
-      const token = await auth.currentUser.getIdToken();
-      const res = await fetch('/cloud-files/delete-shared', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ fileId }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Delete failed' }));
-        throw new Error(err.error || 'Delete failed');
       }
       return res.json();
     },
@@ -1676,7 +1559,7 @@ export async function getChildren(uid: string): Promise<Child[]> {
   if (!db) return [];
   const q = query(collection(db, 'users', uid, 'children'), orderBy('name', 'asc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Child));
+  return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() } as Child));
 }
 
 export async function addChild(uid: string, child: Omit<Child, 'id'>): Promise<string> {
@@ -1698,14 +1581,17 @@ export async function updateChild(uid: string, childId: string, updates: Partial
 
 export async function deleteChild(uid: string, childId: string): Promise<void> {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'users', uid, 'children', childId));
+  await updateDoc(doc(db, 'users', uid, 'children', childId), {
+    isDeleted: true,
+    deletedAt: serverTimestamp(),
+  });
 }
 
 export function subscribeToChildren(uid: string, callback: (children: Child[]) => void): () => void {
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'children'), orderBy('name', 'asc'));
   return onSnapshot(q, (snapshot) => {
-    const children = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Child));
+    const children = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() } as Child));
     callback(children);
   }, (error) => {
     log.warn('Children snapshot error:', error);
@@ -1777,7 +1663,7 @@ async function getTrips(uid: string) {
   if (!db) return [];
   const q = query(collection(db, 'users', uid, 'trips'), orderBy('startDate', 'asc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
 async function addTrip(uid: string, trip: Record<string, unknown>) {
@@ -1800,14 +1686,17 @@ async function updateTrip(uid: string, tripId: string, updates: Record<string, u
 
 async function deleteTrip(uid: string, tripId: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'users', uid, 'trips', tripId));
+  await updateDoc(doc(db, 'users', uid, 'trips', tripId), {
+    isDeleted: true,
+    deletedAt: serverTimestamp(),
+  });
 }
 
 function subscribeToTrips(uid: string, callback: (trips: Array<Record<string, unknown>>) => void) {
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'trips'), orderBy('startDate', 'asc'));
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+    callback(snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() })));
   }, (error) => { log.warn('Trips snapshot error:', error); });
 }
 
@@ -1839,7 +1728,7 @@ async function getPolls() {
   if (!db) return [];
   const q = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
 async function addPoll(uid: string, poll: Record<string, unknown>) {
@@ -1855,7 +1744,7 @@ async function addPoll(uid: string, poll: Record<string, unknown>) {
 
 async function deletePoll(pollId: string) {
   if (!db) throw new Error('Firebase not initialized');
-  await deleteDoc(doc(db, 'polls', pollId));
+  await updateDoc(doc(db, 'polls', pollId), { isDeleted: true, deletedAt: serverTimestamp() });
 }
 
 async function votePoll(pollId: string, optionId: string) {
@@ -1874,7 +1763,7 @@ function subscribeToPolls(callback: (polls: Array<Record<string, unknown>>) => v
   if (!db) return () => {};
   const q = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+    callback(snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() })));
   }, (error) => { log.warn('Polls snapshot error:', error); });
 }
 
@@ -1895,6 +1784,156 @@ if (firebaseEnabled) {
     },
     subscribe: (callback: (polls: Array<Record<string, unknown>>) => void) => {
       return subscribeToPolls(callback);
+    },
+  };
+}
+
+// ─── Soft-delete helpers: restore & permanent delete ───────────────────────
+
+async function restoreItem(collectionPath: string, docId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await updateDoc(doc(db, ...collectionPath.split('/'), docId), { isDeleted: false, deletedAt: null });
+}
+
+async function permanentlyDeleteItem(collectionPath: string, docId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, ...collectionPath.split('/'), docId));
+}
+
+// ─── Trash / Recycle Bin API (window.__trash) ──────────────────────────────
+
+interface TrashItem {
+  id: string;
+  type: string;
+  name: string;
+  deletedAt: number | null;
+  collectionPath: string;
+}
+
+type TrashType = 'note' | 'flashcard' | 'file' | 'trip' | 'route' | 'child' | 'book' | 'poll' | 'worship';
+
+const TRASH_COLLECTIONS: Array<{ type: TrashType; label: string; subPath: string; nameField: string }> = [
+  { type: 'note', label: 'Note', subPath: 'notes', nameField: 'title' },
+  { type: 'flashcard', label: 'Flashcard', subPath: 'flashcards', nameField: 'front' },
+  { type: 'file', label: 'File', subPath: 'files', nameField: 'fileName' },
+  { type: 'trip', label: 'Trip', subPath: 'trips', nameField: 'destination' },
+  { type: 'route', label: 'Route', subPath: 'hikingRoutes', nameField: 'name' },
+  { type: 'child', label: 'Child Profile', subPath: 'children', nameField: 'name' },
+];
+
+async function getDeletedItems(uid: string): Promise<Record<TrashType, TrashItem[]>> {
+  if (!db) return { note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [], poll: [], worship: [] };
+  const result: Record<TrashType, TrashItem[]> = { note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [], poll: [], worship: [] };
+
+  const promises = TRASH_COLLECTIONS.map(async ({ type, subPath, nameField }) => {
+    const colRef = collection(db!, 'users', uid, subPath);
+    const snapshot = await getDocs(colRef);
+    const deleted = snapshot.docs
+      .filter(d => d.data().isDeleted === true)
+      .map(d => {
+        const data = d.data();
+        const deletedAt = data.deletedAt?.toMillis?.() ?? data.deletedAt ?? null;
+        return {
+          id: d.id,
+          type,
+          name: data[nameField] || data.title || data.name || d.id,
+          deletedAt,
+          collectionPath: `users/${uid}/${subPath}`,
+        };
+      });
+    result[type] = deleted;
+  });
+
+  // Also fetch deleted books (public collection, filtered by uploader)
+  promises.push((async () => {
+    const booksSnap = await getDocs(collection(db!, 'books'));
+    result.book = booksSnap.docs
+      .filter(d => d.data().isDeleted === true && d.data().uploadedBy?.uid === uid)
+      .map(d => {
+        const data = d.data();
+        const deletedAt = data.deletedAt?.toMillis?.() ?? data.deletedAt ?? null;
+        return { id: d.id, type: 'book' as const, name: data.title || d.id, deletedAt, collectionPath: 'books' };
+      });
+  })());
+
+  // Deleted polls (only ones created by current user)
+  promises.push((async () => {
+    const pollsSnap = await getDocs(collection(db!, 'polls'));
+    result.poll = pollsSnap.docs
+      .filter(d => d.data().isDeleted === true && d.data().createdBy === uid)
+      .map(d => {
+        const data = d.data();
+        const deletedAt = data.deletedAt?.toMillis?.() ?? data.deletedAt ?? null;
+        return { id: d.id, type: 'poll' as const, name: data.question || d.id, deletedAt, collectionPath: 'polls' };
+      });
+  })());
+
+  // Deleted worship songs (any deleted by current user — tracked via deletedBy)
+  promises.push((async () => {
+    const worshipSnap = await getDocs(collection(db!, 'worshipSongs'));
+    result.worship = worshipSnap.docs
+      .filter(d => d.data().isDeleted === true)
+      .map(d => {
+        const data = d.data();
+        const deletedAt = data.deletedAt?.toMillis?.() ?? data.deletedAt ?? null;
+        return { id: d.id, type: 'worship' as const, name: data.title || d.id, deletedAt, collectionPath: 'worshipSongs' };
+      });
+  })());
+
+  await Promise.all(promises);
+  return result;
+}
+
+if (firebaseEnabled) {
+  window.__trash = {
+    getAll: () => {
+      if (!auth?.currentUser) return Promise.resolve({ note: [], flashcard: [], file: [], book: [], trip: [], route: [], child: [], poll: [], worship: [] });
+      return getDeletedItems(auth.currentUser.uid);
+    },
+    restore: async (type: string, id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      // Public collections — direct Firestore access
+      const PUBLIC_COLLECTIONS: Record<string, string> = { poll: 'polls', worship: 'worshipSongs' };
+      if (type === 'book') {
+        const token = await auth.currentUser.getIdToken();
+        const apiBase = window.__digitalLibraryApiBase?.() || '';
+        await fetch(`${apiBase}/digital-library-api/restore`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ bookId: id }),
+        });
+        window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
+      } else if (PUBLIC_COLLECTIONS[type]) {
+        await restoreItem(PUBLIC_COLLECTIONS[type], id);
+      } else {
+        const config = TRASH_COLLECTIONS.find(c => c.type === type);
+        if (!config) throw new Error(`Unknown trash type: ${type}`);
+        await restoreItem(`users/${uid}/${config.subPath}`, id);
+      }
+      window.dispatchEvent(new Event(WindowEvents.TRASH_CHANGED));
+    },
+    permanentlyDelete: async (type: string, id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      const PUBLIC_COLLECTIONS: Record<string, string> = { poll: 'polls', worship: 'worshipSongs' };
+      if (type === 'book') {
+        const token = await auth.currentUser.getIdToken();
+        const apiBase = window.__digitalLibraryApiBase?.() || '';
+        await fetch(`${apiBase}/digital-library-api/permanent-delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ bookId: id }),
+        });
+        window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
+      } else if (PUBLIC_COLLECTIONS[type]) {
+        await permanentlyDeleteItem(PUBLIC_COLLECTIONS[type], id);
+      } else {
+        const config = TRASH_COLLECTIONS.find(c => c.type === type);
+        if (!config) throw new Error(`Unknown trash type: ${type}`);
+        await permanentlyDeleteItem(`users/${uid}/${config.subPath}`, id);
+      }
+      window.dispatchEvent(new Event(WindowEvents.TRASH_CHANGED));
     },
   };
 }

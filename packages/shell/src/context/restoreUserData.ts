@@ -1,18 +1,15 @@
 import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import {
   UserProfile,
-  RecentCity,
   FavoriteCity,
   getDailyLogEntries,
-  getUserFiles,
-  getWorshipSongs,
   getBenchmarkSummary,
+  getUserNotes,
   migrateToMultiChild,
   getChildren,
 } from '../lib/firebase';
 
 export interface RestoreResult {
-  recentCities: RecentCity[];
   favoriteCities: FavoriteCity[];
 }
 
@@ -22,7 +19,6 @@ export interface RestoreResult {
  * Returns city arrays for state initialisation in AuthProvider.
  */
 export function restoreUserData(profile: UserProfile, uid: string): RestoreResult {
-  const recentCities = profile.recentCities || [];
   const favoriteCities = profile.favoriteCities || [];
 
   // Restore saved preferences to localStorage so shared hooks pick them up
@@ -158,27 +154,22 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.BOOK_LAST_PLAYED_CHANGED));
   }
 
-  window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-
   // Restore subcollection data for dashboard widgets (non-blocking)
+  getUserNotes(uid).then(notes => {
+    localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(notes.length));
+    window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+  }).catch(() => {
+    window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+  });
   getDailyLogEntries(uid).then(entries => {
     if (entries.length > 0) {
       localStorage.setItem(StorageKeys.DAILY_LOG_CACHE, JSON.stringify(entries));
     }
     window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
   }).catch(() => {});
-  getUserFiles(uid).then(files => {
-    if (files.length > 0) {
-      localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(files));
-    }
-    window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
-  }).catch(() => {});
-  getWorshipSongs().then(songs => {
-    if (songs.length > 0) {
-      localStorage.setItem(StorageKeys.WORSHIP_SONGS_CACHE, JSON.stringify(songs));
-    }
-    window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-  }).catch(() => {});
+  // Cloud files are now fetched via GraphQL — just signal MFEs to refresh
+  window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
+  // Worship songs are now served via Apollo GraphQL — no localStorage restore needed.
   getBenchmarkSummary(uid).then(summary => {
     if (summary) {
       localStorage.setItem(StorageKeys.BENCHMARK_CACHE, JSON.stringify(summary));
@@ -197,5 +188,5 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.CHILDREN_CHANGED));
   }).catch(() => {});
 
-  return { recentCities, favoriteCities };
+  return { favoriteCities };
 }

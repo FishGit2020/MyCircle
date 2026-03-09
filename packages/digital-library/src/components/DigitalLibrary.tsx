@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation, WindowEvents, createLogger, PageContent } from '@mycircle/shared';
+import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK } from '@mycircle/shared';
 import BookReader from './BookReader';
 import { useParams, useNavigate } from 'react-router';
 
@@ -56,7 +56,7 @@ function BookCard({ book, onSelect, onSelectListen, onDelete, currentUid }: {
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center">
             <svg className="w-16 h-16 text-blue-300 dark:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
             </svg>
           </div>
         )}
@@ -137,7 +137,6 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
 
       const apiBase = window.__digitalLibraryApiBase?.() || '';
 
-      // Convert file to base64 and upload in one step (same pattern as cloudFiles)
       const arrayBuffer = await file.arrayBuffer();
       const bytes = new Uint8Array(arrayBuffer);
       let binary = '';
@@ -224,97 +223,61 @@ export default function DigitalLibrary() {
   const { t } = useTranslation();
   const { bookId: urlBookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentUid, setCurrentUid] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const pendingBookIdRef = useRef<string | undefined>(urlBookId);
 
-  const fetchBooks = useCallback(async () => {
-    try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/list`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('Failed to fetch books');
-      const data = await res.json();
-      setBooks(data.books || []);
-    } catch (err) {
-      logger.error('Failed to fetch books', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, loading, refetch } = useQuery(GET_BOOKS);
+  const [fetchChapters] = useLazyQuery(GET_BOOK_CHAPTERS, { fetchPolicy: 'network-only' });
+  const [deleteBookMutation] = useMutation(DELETE_BOOK, {
+    refetchQueries: [{ query: GET_BOOKS }],
+  });
 
-  useEffect(() => {
-    fetchBooks();
-  }, [fetchBooks]);
+  const books: Book[] = (data?.books ?? []) as Book[];
 
-  // Listen for auth state and book changes
+  // Listen for auth state
   useEffect(() => {
     const handleAuth = () => {
       window.__getFirebaseIdToken?.().then(token => {
         setCurrentUid(token ? window.__currentUid || null : null);
       });
     };
-    const handleBooksChanged = () => fetchBooks();
-
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
-    window.addEventListener(WindowEvents.BOOKS_CHANGED, handleBooksChanged);
     handleAuth();
-    return () => {
-      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
-      window.removeEventListener(WindowEvents.BOOKS_CHANGED, handleBooksChanged);
-    };
-  }, [fetchBooks]);
+    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
+  }, []);
+
+  // Refetch when BOOKS_CHANGED event fires (after upload)
+  useEffect(() => {
+    const handleBooksChanged = () => refetch();
+    window.addEventListener(WindowEvents.BOOKS_CHANGED, handleBooksChanged);
+    return () => window.removeEventListener(WindowEvents.BOOKS_CHANGED, handleBooksChanged);
+  }, [refetch]);
 
   const handleDelete = useCallback(async (bookId: string) => {
     if (!confirm(t('library.confirmDelete'))) return;
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) return;
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ bookId }),
-      });
-      if (!res.ok) throw new Error('Delete failed');
+      await deleteBookMutation({ variables: { id: bookId } });
       logger.info('Book deleted', { bookId });
-      window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
     } catch (err) {
       logger.error('Failed to delete book', err);
     }
-  }, [t]);
+  }, [t, deleteBookMutation]);
 
   const handleSelect = useCallback(async (book: Book, tab?: 'read' | 'listen') => {
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) return;
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/chapters/${book.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setChapters(data.chapters || []);
-      }
+      const result = await fetchChapters({ variables: { bookId: book.id } });
+      const rawChapters = result.data?.bookChapters ?? [];
+      setChapters(rawChapters as Chapter[]);
     } catch (err) {
       logger.error('Failed to fetch chapters', err);
     }
     setSelectedBook(book);
-    // Broadcast book title for breadcrumb before navigation so it isn't cleared
     window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: book.title }));
-    // Update URL to /library/:bookId with optional tab param
     const url = tab ? `/library/${book.id}?tab=${tab}${tab === 'listen' ? '&autoPlay=1' : ''}` : `/library/${book.id}`;
     navigate(url, { replace: true });
-  }, [navigate]);
+  }, [navigate, fetchChapters]);
 
   const handleSelectListen = useCallback((book: Book) => {
     handleSelect(book, 'listen');
@@ -360,7 +323,6 @@ export default function DigitalLibrary() {
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}
         onBack={handleBack}
-        isAdmin={!!window.__isAdmin}
       />
     );
   }
@@ -371,7 +333,7 @@ export default function DigitalLibrary() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('library.title')}</h2>
       </div>
 
-      <BookUpload onUploadComplete={fetchBooks} />
+      <BookUpload onUploadComplete={refetch} />
 
       {loading ? (
         <div className="flex justify-center py-12">
@@ -380,7 +342,7 @@ export default function DigitalLibrary() {
       ) : books.length === 0 ? (
         <div className="text-center py-12">
           <svg className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
           </svg>
           <p className="text-gray-500 dark:text-gray-400">{t('library.emptyLibrary')}</p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('library.uploadFirst')}</p>

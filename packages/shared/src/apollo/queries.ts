@@ -620,6 +620,227 @@ export const SAVE_BENCHMARK_RUN = gql`
   }
 `;
 
+// ─── Worship Songs ──────────────────────────────────────────────
+
+const WORSHIP_SONG_FIELDS = gql`
+  fragment WorshipSongFields on WorshipSong {
+    id
+    title
+    artist
+    originalKey
+    format
+    content
+    notes
+    youtubeUrl
+    bpm
+    tags
+    createdAt
+    updatedAt
+    createdBy
+  }
+`;
+
+export const GET_WORSHIP_SONGS = gql`
+  ${WORSHIP_SONG_FIELDS}
+  query GetWorshipSongs {
+    worshipSongs {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const GET_WORSHIP_SONG = gql`
+  ${WORSHIP_SONG_FIELDS}
+  query GetWorshipSong($id: ID!) {
+    worshipSong(id: $id) {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const ADD_WORSHIP_SONG = gql`
+  ${WORSHIP_SONG_FIELDS}
+  mutation AddWorshipSong($input: WorshipSongInput!) {
+    addWorshipSong(input: $input) {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const UPDATE_WORSHIP_SONG = gql`
+  ${WORSHIP_SONG_FIELDS}
+  mutation UpdateWorshipSong($id: ID!, $input: WorshipSongUpdateInput!) {
+    updateWorshipSong(id: $id, input: $input) {
+      ...WorshipSongFields
+    }
+  }
+`;
+
+export const DELETE_WORSHIP_SONG = gql`
+  mutation DeleteWorshipSong($id: ID!) {
+    deleteWorshipSong(id: $id)
+  }
+`;
+
+// ─── Cloud Files ────────────────────────────────────────────
+
+export const GET_CLOUD_FILES = gql`
+  query GetCloudFiles {
+    cloudFiles {
+      id
+      fileName
+      contentType
+      size
+      downloadUrl
+      storagePath
+      uploadedAt
+    }
+  }
+`;
+
+export const GET_SHARED_FILES = gql`
+  query GetSharedFiles {
+    sharedFiles {
+      id
+      fileName
+      contentType
+      size
+      downloadUrl
+      storagePath
+      sharedByUid
+      sharedByName
+      sharedAt
+    }
+  }
+`;
+
+export const SHARE_FILE = gql`
+  mutation ShareFile($fileId: ID!) {
+    shareFile(fileId: $fileId) {
+      ok
+      downloadUrl
+    }
+  }
+`;
+
+export const DELETE_FILE = gql`
+  mutation DeleteFile($fileId: ID!) {
+    deleteFile(fileId: $fileId)
+  }
+`;
+
+export const DELETE_SHARED_FILE = gql`
+  mutation DeleteSharedFile($fileId: ID!) {
+    deleteSharedFile(fileId: $fileId)
+  }
+`;
+
+// ─── Baby Photos ─────────────────────────────────────────────
+
+export const GET_BABY_PHOTOS = gql`
+  query GetBabyPhotos {
+    babyPhotos {
+      stageId
+      photoUrl
+      caption
+      uploadedAt
+    }
+  }
+`;
+
+export const DELETE_BABY_PHOTO = gql`
+  mutation DeleteBabyPhoto($stageId: Int!) {
+    deleteBabyPhoto(stageId: $stageId)
+  }
+`;
+
+// ─── Digital Library ──────────────────────────────────────────
+
+const BOOK_FIELDS = gql`
+  fragment BookFields on Book {
+    id
+    title
+    author
+    description
+    language
+    coverUrl
+    epubUrl
+    fileSize
+    chapterCount
+    totalCharacters
+    uploadedBy {
+      uid
+      displayName
+    }
+    uploadedAt
+    audioStatus
+    audioProgress
+    audioError
+  }
+`;
+
+export const GET_BOOKS = gql`
+  ${BOOK_FIELDS}
+  query GetBooks {
+    books {
+      ...BookFields
+    }
+  }
+`;
+
+export const GET_BOOK_CHAPTERS = gql`
+  query GetBookChapters($bookId: ID!) {
+    bookChapters(bookId: $bookId) {
+      id
+      index
+      title
+      href
+      characterCount
+      audioUrl
+      audioDuration
+    }
+  }
+`;
+
+export const GET_BOOK_CONVERSION_PROGRESS = gql`
+  query GetBookConversionProgress($bookId: ID!) {
+    bookConversionProgress(bookId: $bookId) {
+      audioStatus
+      audioProgress
+      audioError
+      canContinue
+    }
+  }
+`;
+
+export const GET_TTS_QUOTA = gql`
+  query GetTtsQuota {
+    ttsQuota {
+      used
+      limit
+      remaining
+    }
+  }
+`;
+
+export const DELETE_BOOK = gql`
+  mutation DeleteBook($id: ID!) {
+    deleteBook(id: $id)
+  }
+`;
+
+export const RESTORE_BOOK = gql`
+  mutation RestoreBook($id: ID!) {
+    restoreBook(id: $id)
+  }
+`;
+
+export const PERMANENT_DELETE_BOOK = gql`
+  mutation PermanentDeleteBook($id: ID!) {
+    permanentDeleteBook(id: $id)
+  }
+`;
+
 export const WEATHER_UPDATES = gql`
   ${WEATHER_CONDITION_FRAGMENT}
   subscription WeatherUpdates($lat: Float!, $lon: Float!) {

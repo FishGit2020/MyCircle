@@ -12,10 +12,15 @@ interface TripDetailProps {
 
 function generateDates(start: string, end: string): string[] {
   const dates: string[] = [];
-  const current = new Date(start);
-  const endDate = new Date(end);
+  const [sy, sm, sd] = start.split('-').map(Number);
+  const [ey, em, ed] = end.split('-').map(Number);
+  const current = new Date(sy, sm - 1, sd);
+  const endDate = new Date(ey, em - 1, ed);
   while (current <= endDate) {
-    dates.push(current.toISOString().slice(0, 10));
+    const y = current.getFullYear();
+    const m = String(current.getMonth() + 1).padStart(2, '0');
+    const d = String(current.getDate()).padStart(2, '0');
+    dates.push(`${y}-${m}-${d}`);
     current.setDate(current.getDate() + 1);
   }
   return dates;

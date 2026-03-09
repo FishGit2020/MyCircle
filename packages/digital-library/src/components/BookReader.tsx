@@ -36,10 +36,9 @@ interface BookReaderProps {
   audioStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   audioProgress: number;
   onBack: () => void;
-  isAdmin?: boolean;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack, isAdmin }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack }: BookReaderProps) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') === 'listen' ? 'listen' : 'read';
@@ -61,12 +60,33 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [controlsVisible, setControlsVisible] = useState(true);
   const [pageInfo, setPageInfo] = useState<{ page: number; total: number } | undefined>();
   const containerRef = useRef<HTMLDivElement>(null);
+  const bookmarksRef = useRef<HTMLDivElement>(null);
+  const tocButtonRef = useRef<HTMLButtonElement>(null);
+  const tocPanelRef = useRef<HTMLDivElement>(null);
 
   // Sync activeTab when URL search params change (e.g. audio pill navigation)
   useEffect(() => {
     const tab = searchParams.get('tab') === 'listen' ? 'listen' : 'read';
     setActiveTab(tab);
   }, [searchParams]);
+
+  // Close bookmark and TOC dropdowns on outside click
+  useEffect(() => {
+    if (!bookmarksOpen && !tocOpen) return;
+    function handleMouseDown(e: MouseEvent) {
+      const target = e.target as Node;
+      if (bookmarksOpen && bookmarksRef.current && !bookmarksRef.current.contains(target)) {
+        setBookmarksOpen(false);
+      }
+      if (tocOpen &&
+        tocButtonRef.current && !tocButtonRef.current.contains(target) &&
+        tocPanelRef.current && !tocPanelRef.current.contains(target)) {
+        setTocOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [bookmarksOpen, tocOpen]);
 
   // Sync activeTab to URL search param
   const handleTabChange = useCallback((tab: 'read' | 'listen') => {
@@ -397,7 +417,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
         {activeTab === 'read' && (<>
         {/* Bookmark button */}
-        <div className="relative">
+        <div className="relative" ref={bookmarksRef}>
           <button
             type="button"
             onClick={() => setBookmarksOpen(!bookmarksOpen)}
@@ -457,6 +477,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
         {/* TOC button */}
         <button
+          ref={tocButtonRef}
           type="button"
           onClick={() => setTocOpen(!tocOpen)}
           className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -523,12 +544,14 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         <div className="flex flex-1 min-h-0 gap-4 overflow-hidden relative">
           {/* TOC Sidebar */}
           {tocOpen && (
-            <TableOfContents
-              chapters={chapters}
-              currentChapter={currentChapter}
-              onSelect={goToChapter}
-              onClose={() => setTocOpen(false)}
-            />
+            <div ref={tocPanelRef}>
+              <TableOfContents
+                chapters={chapters}
+                currentChapter={currentChapter}
+                onSelect={goToChapter}
+                onClose={() => setTocOpen(false)}
+              />
+            </div>
           )}
 
           {/* Reader */}
@@ -586,7 +609,6 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
                 body: JSON.stringify({ bookId, voiceName }),
               });
             }}
-            isAdmin={isAdmin}
           />
           {showAudioPlayer && (
             <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} autoPlay={autoPlayOnMount} />

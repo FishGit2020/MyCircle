@@ -19,16 +19,6 @@ declare global {
     __digitalLibraryApiBase?: () => string;
     __logAnalyticsEvent?: (eventName: string, params?: Record<string, any>) => void;
 
-    /* ── Worship Songs ─────────────────────────────────────── */
-    __worshipSongs?: {
-      getAll: () => Promise<any[]>;
-      get: (id: string) => Promise<any>;
-      add: (song: Record<string, any>) => Promise<string>;
-      update: (id: string, updates: Record<string, any>) => Promise<void>;
-      delete: (id: string) => Promise<void>;
-      subscribe?: (callback: (songs: any[]) => void) => () => void;
-    };
-
     /* ── Notebook ──────────────────────────────────────────── */
     __notebook?: {
       getAll: () => Promise<any[]>;
@@ -98,22 +88,15 @@ declare global {
     };
 
     /* ── Cloud Files ───────────────────────────────────────── */
+    /* NOTE: list/share/delete are now served via GraphQL. Only upload remains as REST. */
     __cloudFiles?: {
-      getAll: () => Promise<any[]>;
-      subscribe: (callback: (files: any[]) => void) => () => void;
       upload: (fileName: string, fileBase64: string, contentType: string) => Promise<{ fileId: string; downloadUrl: string }>;
-      share: (fileId: string) => Promise<{ ok: boolean; downloadUrl: string }>;
-      delete: (fileId: string) => Promise<{ ok: boolean }>;
-      getAllShared: () => Promise<any[]>;
-      subscribeShared: (callback: (files: any[]) => void) => () => void;
-      deleteShared: (fileId: string) => Promise<{ ok: boolean }>;
     };
 
     /* ── Baby Photos ───────────────────────────────────────── */
+    /* NOTE: list/delete are now served via GraphQL. Only upload remains as REST. */
     __babyPhotos?: {
       upload: (stageId: number, file: Blob, caption?: string) => Promise<string>;
-      getAll: () => Promise<Array<{ id: string; photoUrl: string; caption?: string; uploadedAt?: any }>>;
-      delete: (stageId: number) => Promise<void>;
     };
 
     /* ── Children (multi-child) ────────────────────────────── */
@@ -130,6 +113,31 @@ declare global {
       getScores: (gameType: string) => Promise<any[]>;
       subscribe: (gameType: string, callback: (scores: any[]) => void) => () => void;
       saveScore: (data: { gameType: string; score: number; timeMs: number; difficulty: string }) => Promise<void>;
+    };
+
+    /* ── Trip Planner ──────────────────────────────────────── */
+    __tripPlanner?: {
+      getAll: () => Promise<any[]>;
+      add: (trip: Record<string, unknown>) => Promise<string>;
+      update: (id: string, updates: Record<string, unknown>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (trips: any[]) => void) => () => void;
+    };
+
+    /* ── Poll System ──────────────────────────────────────── */
+    __pollSystem?: {
+      getAll: () => Promise<any[]>;
+      add: (poll: Record<string, unknown>) => Promise<string>;
+      delete: (id: string) => Promise<void>;
+      vote: (pollId: string, optionId: string) => Promise<void>;
+      subscribe: (callback: (polls: any[]) => void) => () => void;
+    };
+
+    /* ── Trash / Recycle Bin ───────────────────────────────── */
+    __trash?: {
+      getAll: () => Promise<Record<string, Array<{ id: string; type: string; name: string; deletedAt: number | null; collectionPath: string }>>>;
+      restore: (type: string, id: string) => Promise<void>;
+      permanentlyDelete: (type: string, id: string) => Promise<void>;
     };
 
     /* ── DevTools / Testing ────────────────────────────────── */

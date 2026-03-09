@@ -11,7 +11,7 @@ export interface WorshipSong {
   youtubeUrl?: string;
   bpm?: number;
   tags?: string[];
-  createdAt: { seconds: number; nanoseconds: number };
-  updatedAt: { seconds: number; nanoseconds: number };
+  createdAt: string;
+  updatedAt: string;
   createdBy?: string;
 }

@@ -160,7 +160,9 @@ export const digitalLibrary = onRequest(
     // GET /digital-library-api/list
     if (req.method === 'GET' && route === 'list') {
       const snapshot = await db.collection('books').orderBy('uploadedAt', 'desc').get();
-      const books = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const books = snapshot.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter((b: any) => !b.isDeleted);
       res.json({ books });
       return;
     }
@@ -175,7 +177,7 @@ export const digitalLibrary = onRequest(
       return;
     }
 
-    // POST /digital-library-api/delete
+    // POST /digital-library-api/delete (soft-delete — moves to recycle bin)
     if (req.method === 'POST' && route === 'delete') {
       const bookId = validateBookId(req.body.bookId);
       if (!bookId) { res.status(400).json({ error: 'Invalid or missing bookId' }); return; }
@@ -187,10 +189,49 @@ export const digitalLibrary = onRequest(
       const bookData = bookDoc.data()!;
       if (bookData.uploadedBy?.uid !== uid) { res.status(403).json({ error: 'Only the uploader can delete this book' }); return; }
 
+      // Soft-delete: mark as deleted, keep storage files for 30-day recovery
+      await bookRef.update({ isDeleted: true, deletedAt: FieldValue.serverTimestamp() });
+
+      logger.info('Book soft-deleted', { bookId });
+      res.json({ ok: true });
+      return;
+    }
+
+    // POST /digital-library-api/restore (restore from recycle bin)
+    if (req.method === 'POST' && route === 'restore') {
+      const bookId = validateBookId(req.body.bookId);
+      if (!bookId) { res.status(400).json({ error: 'Invalid or missing bookId' }); return; }
+
+      const bookRef = db.collection('books').doc(bookId);
+      const bookDoc = await bookRef.get();
+      if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
+
+      const bookData = bookDoc.data()!;
+      if (bookData.uploadedBy?.uid !== uid) { res.status(403).json({ error: 'Only the uploader can restore this book' }); return; }
+
+      await bookRef.update({ isDeleted: false, deletedAt: null });
+
+      logger.info('Book restored', { bookId });
+      res.json({ ok: true });
+      return;
+    }
+
+    // POST /digital-library-api/permanent-delete (hard-delete with storage cleanup)
+    if (req.method === 'POST' && route === 'permanent-delete') {
+      const bookId = validateBookId(req.body.bookId);
+      if (!bookId) { res.status(400).json({ error: 'Invalid or missing bookId' }); return; }
+
+      const bookRef = db.collection('books').doc(bookId);
+      const bookDoc = await bookRef.get();
+      if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
+
+      const bookData = bookDoc.data()!;
+      if (bookData.uploadedBy?.uid !== uid) { res.status(403).json({ error: 'Only the uploader can permanently delete this book' }); return; }
+
       // Delete chapters subcollection
       const chaptersSnap = await bookRef.collection('chapters').get();
       const batch = db.batch();
-      for (const doc of chaptersSnap.docs) batch.delete(doc.ref);
+      for (const chapDoc of chaptersSnap.docs) batch.delete(chapDoc.ref);
       batch.delete(bookRef);
       await batch.commit();
 
@@ -203,7 +244,7 @@ export const digitalLibrary = onRequest(
         for (const f of audioFiles) { try { await f.delete(); } catch { /* ignore */ } }
       } catch { /* ignore */ }
 
-      logger.info('Book deleted', { bookId });
+      logger.info('Book permanently deleted', { bookId });
       res.json({ ok: true });
       return;
     }
@@ -251,17 +292,13 @@ export const digitalLibrary = onRequest(
       return;
     }
 
-    // POST /digital-library-api/admin/reset-conversion/:bookId
-    if (req.method === 'POST' && route.startsWith('admin/reset-conversion/')) {
-      const bookId = validateBookId(route.replace('admin/reset-conversion/', ''));
+    // POST /digital-library-api/reset-conversion/:bookId  (any authenticated user)
+    // Also accepts legacy admin/reset-conversion/:bookId path for backwards compat
+    const resetRoute = route.startsWith('reset-conversion/') ? route
+      : route.startsWith('admin/reset-conversion/') ? route.replace('admin/', '') : null;
+    if (req.method === 'POST' && resetRoute) {
+      const bookId = validateBookId(resetRoute.replace('reset-conversion/', ''));
       if (!bookId) { res.status(400).json({ error: 'Invalid bookId' }); return; }
-
-      // Verify caller is admin
-      const userDoc = await db.collection('users').doc(uid).get();
-      if (!userDoc.exists || !userDoc.data()?.isAdmin) {
-        res.status(403).json({ error: 'Admin access required' });
-        return;
-      }
 
       const bookDoc = await db.collection('books').doc(bookId).get();
       if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
@@ -274,6 +311,35 @@ export const digitalLibrary = onRequest(
       });
 
       res.json({ ok: true, message: 'Conversion reset successfully' });
+      return;
+    }
+
+    // POST /digital-library-api/preview-voice  — synthesizes a short TTS sample
+    if (req.method === 'POST' && route === 'preview-voice') {
+      const { voiceName } = req.body as { voiceName?: string };
+      if (!voiceName || typeof voiceName !== 'string') {
+        res.status(400).json({ error: 'voiceName required' });
+        return;
+      }
+      // Derive language code from voice name (e.g. "en-US-Neural2-D" → "en-US")
+      const langCode = voiceName.split('-').slice(0, 2).join('-');
+      const sampleText = langCode.startsWith('cmn') ? '你好，这是语音预览。'
+        : langCode.startsWith('es') ? 'Hola, esta es una vista previa de la voz.'
+        : 'Hello, this is a voice preview sample.';
+      try {
+        const { TextToSpeechClient } = await import('@google-cloud/text-to-speech');
+        const ttsClient = new TextToSpeechClient();
+        const [ttsResponse] = await ttsClient.synthesizeSpeech({
+          input: { text: sampleText },
+          voice: { languageCode: langCode, name: voiceName },
+          audioConfig: { audioEncoding: 'MP3' },
+        });
+        const audio = Buffer.from(ttsResponse.audioContent as Uint8Array).toString('base64');
+        res.json({ audio });
+      } catch (err) {
+        logger.error('Preview voice TTS failed', err);
+        res.status(500).json({ error: 'TTS preview failed' });
+      }
       return;
     }
 

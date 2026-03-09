@@ -1,22 +1,17 @@
-import React, { useEffect } from 'react';
-import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
+import React, { useEffect, useState } from 'react';
+import { useTranslation, StorageKeys, WindowEvents, useQuery, GET_WORSHIP_SONGS } from '@mycircle/shared';
 
 const WorshipWidget = React.memo(function WorshipWidget() {
   const { t } = useTranslation();
-  const [songCount, setSongCount] = React.useState(0);
-  const [favCount, setFavCount] = React.useState(0);
+  const [favCount, setFavCount] = useState(0);
+
+  const { data } = useQuery(GET_WORSHIP_SONGS, {
+    fetchPolicy: 'cache-and-network',
+  });
+  const songCount = data?.worshipSongs?.length ?? 0;
 
   useEffect(() => {
-    function load() {
-      try {
-        const raw = localStorage.getItem(StorageKeys.WORSHIP_SONGS_CACHE);
-        if (raw) {
-          const songs = JSON.parse(raw);
-          setSongCount(Array.isArray(songs) ? songs.length : 0);
-        } else {
-          setSongCount(0);
-        }
-      } catch { setSongCount(0); }
+    function loadFavs() {
       try {
         const rawFav = localStorage.getItem(StorageKeys.WORSHIP_FAVORITES);
         if (rawFav) {
@@ -27,13 +22,9 @@ const WorshipWidget = React.memo(function WorshipWidget() {
         }
       } catch { setFavCount(0); }
     }
-    load();
-    window.addEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, load);
-    window.addEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, load);
-    return () => {
-      window.removeEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, load);
-      window.removeEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, load);
-    };
+    loadFavs();
+    window.addEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, loadFavs);
+    return () => window.removeEventListener(WindowEvents.WORSHIP_FAVORITES_CHANGED, loadFavs);
   }, []);
 
   return (

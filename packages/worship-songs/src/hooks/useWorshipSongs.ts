@@ -1,30 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, StorageKeys, createLogger } from '@mycircle/shared';
+import {
+  useQuery,
+  useMutation,
+  getApolloClient,
+  GET_WORSHIP_SONGS,
+  GET_WORSHIP_SONG,
+  ADD_WORSHIP_SONG,
+  UPDATE_WORSHIP_SONG,
+  DELETE_WORSHIP_SONG,
+  createLogger,
+  WindowEvents,
+} from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 
 const logger = createLogger('useWorshipSongs');
 
-
-function getCachedSongs(): WorshipSong[] {
-  try {
-    const cached = localStorage.getItem(StorageKeys.WORSHIP_SONGS_CACHE);
-    if (cached) return JSON.parse(cached);
-  } catch { /* ignore */ }
-  return [];
-}
-
-function setCachedSongs(songs: WorshipSong[]) {
-  try {
-    localStorage.setItem(StorageKeys.WORSHIP_SONGS_CACHE, JSON.stringify(songs));
-  } catch { /* ignore */ }
-}
-
 export function useWorshipSongs() {
-  const [songs, setSongs] = useState<WorshipSong[]>(getCachedSongs);
-  const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check auth state — re-check instantly when auth changes
+  // Track auth state via Firebase token
   useEffect(() => {
     let mounted = true;
     const checkAuth = async () => {
@@ -36,72 +30,60 @@ export function useWorshipSongs() {
       }
     };
     checkAuth();
-
     const handler = () => { checkAuth(); };
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
     return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler); };
   }, []);
 
-  // Load songs — one-shot fallback when subscribe is unavailable
-  const loadSongs = useCallback(async () => {
-    setLoading(true);
-    try {
-      if (window.__worshipSongs) {
-        const data = await window.__worshipSongs.getAll();
-        setSongs(data);
-        setCachedSongs(data);
-      }
-    } catch (err) {
-      logger.error('Failed to load worship songs:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, loading, refetch } = useQuery(GET_WORSHIP_SONGS, {
+    fetchPolicy: 'cache-and-network',
+  });
 
-  // Use real-time subscription if available, fall back to one-shot fetch
-  useEffect(() => {
-    if (window.__worshipSongs?.subscribe) {
-      const unsubscribe = window.__worshipSongs.subscribe((data) => {
-        setSongs(data);
-        setCachedSongs(data);
-        setLoading(false);
-      });
-      return unsubscribe;
-    }
-    // Fallback: one-shot fetch + event listener
-    loadSongs();
-    const handler = () => { loadSongs(); };
-    window.addEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, handler);
-    return () => window.removeEventListener(WindowEvents.WORSHIP_SONGS_CHANGED, handler);
-  }, [loadSongs]);
+  const [addSongMutation] = useMutation(ADD_WORSHIP_SONG, {
+    refetchQueries: [{ query: GET_WORSHIP_SONGS }],
+  });
 
-  const addSong = useCallback(async (song: Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!window.__worshipSongs) throw new Error('Worship songs API not available');
-    const id = await window.__worshipSongs.add(song);
-    // Real-time listener will auto-update; dispatch event for non-real-time consumers
-    window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-    return id;
-  }, []);
+  const [updateSongMutation] = useMutation(UPDATE_WORSHIP_SONG, {
+    refetchQueries: [{ query: GET_WORSHIP_SONGS }],
+  });
 
-  const updateSong = useCallback(async (id: string, updates: Partial<WorshipSong>) => {
-    if (!window.__worshipSongs) throw new Error('Worship songs API not available');
-    await window.__worshipSongs.update(id, updates);
-    window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-  }, []);
+  const [deleteSongMutation] = useMutation(DELETE_WORSHIP_SONG, {
+    refetchQueries: [{ query: GET_WORSHIP_SONGS }],
+  });
 
-  const deleteSong = useCallback(async (id: string) => {
-    if (!window.__worshipSongs) throw new Error('Worship songs API not available');
-    await window.__worshipSongs.delete(id);
-    window.dispatchEvent(new Event(WindowEvents.WORSHIP_SONGS_CHANGED));
-  }, []);
+  const songs = (data?.worshipSongs ?? []) as WorshipSong[];
+
+  const addSong = useCallback(
+    async (song: Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>): Promise<string> => {
+      const result = await addSongMutation({ variables: { input: song } });
+      return result.data?.addWorshipSong?.id ?? '';
+    },
+    [addSongMutation],
+  );
+
+  const updateSong = useCallback(
+    async (id: string, updates: Partial<Omit<WorshipSong, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>>) => {
+      await updateSongMutation({ variables: { id, input: updates } });
+    },
+    [updateSongMutation],
+  );
+
+  const deleteSong = useCallback(
+    async (id: string) => {
+      await deleteSongMutation({ variables: { id } });
+    },
+    [deleteSongMutation],
+  );
 
   const getSong = useCallback(async (id: string): Promise<WorshipSong | null> => {
-    if (!window.__worshipSongs) {
-      logger.warn('Worship songs API not available');
-      return null;
-    }
     try {
-      return await window.__worshipSongs.get(id);
+      const client = getApolloClient();
+      const result = await client.query({
+        query: GET_WORSHIP_SONG,
+        variables: { id },
+        fetchPolicy: 'cache-first',
+      });
+      return (result.data?.worshipSong ?? null) as WorshipSong | null;
     } catch (err) {
       logger.error('Failed to get worship song:', id, err);
       return null;
@@ -116,6 +98,6 @@ export function useWorshipSongs() {
     updateSong,
     deleteSong,
     getSong,
-    refresh: loadSongs,
+    refresh: refetch,
   };
 }

@@ -95,6 +95,14 @@ export type AirQuality = {
   so2: Scalars['Float']['output'];
 };
 
+export type BabyPhoto = {
+  __typename?: 'BabyPhoto';
+  caption?: Maybe<Scalars['String']['output']>;
+  photoUrl: Scalars['String']['output'];
+  stageId: Scalars['Int']['output'];
+  uploadedAt: Scalars['String']['output'];
+};
+
 export type BenchmarkEndpoint = {
   __typename?: 'BenchmarkEndpoint';
   hasCfAccess: Scalars['Boolean']['output'];
@@ -195,6 +203,50 @@ export type BibleVersion = {
   title: Scalars['String']['output'];
 };
 
+export type Book = {
+  __typename?: 'Book';
+  audioError?: Maybe<Scalars['String']['output']>;
+  audioProgress: Scalars['Int']['output'];
+  audioStatus: Scalars['String']['output'];
+  author: Scalars['String']['output'];
+  chapterCount: Scalars['Int']['output'];
+  coverUrl: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  epubUrl: Scalars['String']['output'];
+  fileSize: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  language: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  totalCharacters: Scalars['Int']['output'];
+  uploadedAt: Scalars['String']['output'];
+  uploadedBy: BookUploader;
+};
+
+export type BookChapter = {
+  __typename?: 'BookChapter';
+  audioDuration?: Maybe<Scalars['Int']['output']>;
+  audioUrl?: Maybe<Scalars['String']['output']>;
+  characterCount: Scalars['Int']['output'];
+  href: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  index: Scalars['Int']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type BookConversionProgress = {
+  __typename?: 'BookConversionProgress';
+  audioError?: Maybe<Scalars['String']['output']>;
+  audioProgress: Scalars['Int']['output'];
+  audioStatus: Scalars['String']['output'];
+  canContinue: Scalars['Boolean']['output'];
+};
+
+export type BookUploader = {
+  __typename?: 'BookUploader';
+  displayName: Scalars['String']['output'];
+  uid: Scalars['String']['output'];
+};
+
 export type CaseStatus = {
   __typename?: 'CaseStatus';
   checkedAt: Scalars['String']['output'];
@@ -221,6 +273,17 @@ export type City = {
   lon: Scalars['Float']['output'];
   name: Scalars['String']['output'];
   state?: Maybe<Scalars['String']['output']>;
+};
+
+export type CloudFile = {
+  __typename?: 'CloudFile';
+  contentType: Scalars['String']['output'];
+  downloadUrl: Scalars['String']['output'];
+  fileName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  size: Scalars['Int']['output'];
+  storagePath: Scalars['String']['output'];
+  uploadedAt: Scalars['String']['output'];
 };
 
 export type Clouds = {
@@ -305,13 +368,28 @@ export type HourlyForecast = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
+  deleteBabyPhoto: Scalars['Boolean']['output'];
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
   deleteBenchmarkRun: Scalars['Boolean']['output'];
+  deleteBook: Scalars['Boolean']['output'];
+  deleteFile: Scalars['Boolean']['output'];
+  deleteSharedFile: Scalars['Boolean']['output'];
+  deleteWorshipSong: Scalars['Boolean']['output'];
+  permanentDeleteBook: Scalars['Boolean']['output'];
+  restoreBook: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
   scoreBenchmarkResponse: BenchmarkQualityResult;
+  shareFile: ShareFileResult;
+  updateWorshipSong: WorshipSong;
+};
+
+
+export type MutationAddWorshipSongArgs = {
+  input: WorshipSongInput;
 };
 
 
@@ -325,6 +403,11 @@ export type MutationAiChatArgs = {
 };
 
 
+export type MutationDeleteBabyPhotoArgs = {
+  stageId: Scalars['Int']['input'];
+};
+
+
 export type MutationDeleteBenchmarkEndpointArgs = {
   id: Scalars['String']['input'];
 };
@@ -332,6 +415,36 @@ export type MutationDeleteBenchmarkEndpointArgs = {
 
 export type MutationDeleteBenchmarkRunArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteBookArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteFileArgs = {
+  fileId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteSharedFileArgs = {
+  fileId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteWorshipSongArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationPermanentDeleteBookArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationRestoreBookArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -358,6 +471,17 @@ export type MutationScoreBenchmarkResponseArgs = {
   judgeProvider: Scalars['String']['input'];
   prompt: Scalars['String']['input'];
   response: Scalars['String']['input'];
+};
+
+
+export type MutationShareFileArgs = {
+  fileId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateWorshipSongArgs = {
+  id: Scalars['ID']['input'];
+  input: WorshipSongUpdateInput;
 };
 
 export type OllamaRunningModel = {
@@ -422,6 +546,7 @@ export type Query = {
   aiRecentLogs: Array<AiChatLogEntry>;
   aiUsageSummary: AiUsageSummary;
   airQuality?: Maybe<AirQuality>;
+  babyPhotos: Array<BabyPhoto>;
   benchmarkEndpointModels: Array<Scalars['String']['output']>;
   benchmarkEndpoints: Array<BenchmarkEndpoint>;
   benchmarkHistory: Array<BenchmarkRun>;
@@ -430,7 +555,11 @@ export type Query = {
   bibleVersions: Array<BibleVersion>;
   bibleVotd: BibleVerse;
   bibleVotdApi: BibleVerse;
+  bookChapters: Array<BookChapter>;
+  bookConversionProgress: BookConversionProgress;
+  books: Array<Book>;
   checkCaseStatus: CaseStatus;
+  cloudFiles: Array<CloudFile>;
   companyNews: Array<CompanyNews>;
   cryptoPrices: Array<CryptoPrice>;
   currentWeather: CurrentWeather;
@@ -445,10 +574,14 @@ export type Query = {
   searchCities: Array<City>;
   searchPodcasts: PodcastSearchResponse;
   searchStocks: Array<StockSearchResult>;
+  sharedFiles: Array<SharedFile>;
   stockCandles?: Maybe<StockCandle>;
   stockQuote?: Maybe<StockQuote>;
   trendingPodcasts: PodcastTrendingResponse;
+  ttsQuota: TtsQuota;
   weather: WeatherData;
+  worshipSong?: Maybe<WorshipSong>;
+  worshipSongs: Array<WorshipSong>;
 };
 
 
@@ -491,6 +624,16 @@ export type QueryBibleVotdArgs = {
 
 export type QueryBibleVotdApiArgs = {
   day: Scalars['Int']['input'];
+};
+
+
+export type QueryBookChaptersArgs = {
+  bookId: Scalars['ID']['input'];
+};
+
+
+export type QueryBookConversionProgressArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -587,6 +730,30 @@ export type QueryWeatherArgs = {
   lon: Scalars['Float']['input'];
 };
 
+
+export type QueryWorshipSongArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type ShareFileResult = {
+  __typename?: 'ShareFileResult';
+  downloadUrl: Scalars['String']['output'];
+  ok: Scalars['Boolean']['output'];
+};
+
+export type SharedFile = {
+  __typename?: 'SharedFile';
+  contentType: Scalars['String']['output'];
+  downloadUrl: Scalars['String']['output'];
+  fileName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  sharedAt: Scalars['String']['output'];
+  sharedByName: Scalars['String']['output'];
+  sharedByUid: Scalars['String']['output'];
+  size: Scalars['Int']['output'];
+  storagePath: Scalars['String']['output'];
+};
+
 export type StockCandle = {
   __typename?: 'StockCandle';
   c: Array<Scalars['Float']['output']>;
@@ -644,6 +811,13 @@ export type ToolCallResult = {
   result?: Maybe<Scalars['String']['output']>;
 };
 
+export type TtsQuota = {
+  __typename?: 'TtsQuota';
+  limit: Scalars['Int']['output'];
+  remaining: Scalars['Int']['output'];
+  used: Scalars['Int']['output'];
+};
+
 export type WeatherCondition = {
   __typename?: 'WeatherCondition';
   description: Scalars['String']['output'];
@@ -672,6 +846,47 @@ export type Wind = {
   deg: Scalars['Int']['output'];
   gust?: Maybe<Scalars['Float']['output']>;
   speed: Scalars['Float']['output'];
+};
+
+export type WorshipSong = {
+  __typename?: 'WorshipSong';
+  artist: Scalars['String']['output'];
+  bpm?: Maybe<Scalars['Int']['output']>;
+  content: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  format: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  notes: Scalars['String']['output'];
+  originalKey: Scalars['String']['output'];
+  tags?: Maybe<Array<Scalars['String']['output']>>;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+  youtubeUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export type WorshipSongInput = {
+  artist: Scalars['String']['input'];
+  bpm?: InputMaybe<Scalars['Int']['input']>;
+  content: Scalars['String']['input'];
+  format: Scalars['String']['input'];
+  notes: Scalars['String']['input'];
+  originalKey: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  title: Scalars['String']['input'];
+  youtubeUrl?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WorshipSongUpdateInput = {
+  artist?: InputMaybe<Scalars['String']['input']>;
+  bpm?: InputMaybe<Scalars['Int']['input']>;
+  content?: InputMaybe<Scalars['String']['input']>;
+  format?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  originalKey?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  youtubeUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type WeatherConditionFieldsFragment = { __typename?: 'WeatherCondition', id: number, main: string, description: string, icon: string };
@@ -949,6 +1164,132 @@ export type SaveBenchmarkRunMutationVariables = Exact<{
 
 
 export type SaveBenchmarkRunMutation = { __typename?: 'Mutation', saveBenchmarkRun: { __typename?: 'BenchmarkRun', id: string, createdAt: string } };
+
+export type WorshipSongFieldsFragment = { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null };
+
+export type GetWorshipSongsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetWorshipSongsQuery = { __typename?: 'Query', worshipSongs: Array<{ __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null }> };
+
+export type GetWorshipSongQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetWorshipSongQuery = { __typename?: 'Query', worshipSong?: { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null } | null };
+
+export type AddWorshipSongMutationVariables = Exact<{
+  input: WorshipSongInput;
+}>;
+
+
+export type AddWorshipSongMutation = { __typename?: 'Mutation', addWorshipSong: { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null } };
+
+export type UpdateWorshipSongMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: WorshipSongUpdateInput;
+}>;
+
+
+export type UpdateWorshipSongMutation = { __typename?: 'Mutation', updateWorshipSong: { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null } };
+
+export type DeleteWorshipSongMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWorshipSongMutation = { __typename?: 'Mutation', deleteWorshipSong: boolean };
+
+export type GetCloudFilesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCloudFilesQuery = { __typename?: 'Query', cloudFiles: Array<{ __typename?: 'CloudFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, uploadedAt: string }> };
+
+export type GetSharedFilesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSharedFilesQuery = { __typename?: 'Query', sharedFiles: Array<{ __typename?: 'SharedFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, sharedByUid: string, sharedByName: string, sharedAt: string }> };
+
+export type ShareFileMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+}>;
+
+
+export type ShareFileMutation = { __typename?: 'Mutation', shareFile: { __typename?: 'ShareFileResult', ok: boolean, downloadUrl: string } };
+
+export type DeleteFileMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteFileMutation = { __typename?: 'Mutation', deleteFile: boolean };
+
+export type DeleteSharedFileMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteSharedFileMutation = { __typename?: 'Mutation', deleteSharedFile: boolean };
+
+export type GetBabyPhotosQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBabyPhotosQuery = { __typename?: 'Query', babyPhotos: Array<{ __typename?: 'BabyPhoto', stageId: number, photoUrl: string, caption?: string | null, uploadedAt: string }> };
+
+export type DeleteBabyPhotoMutationVariables = Exact<{
+  stageId: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteBabyPhotoMutation = { __typename?: 'Mutation', deleteBabyPhoto: boolean };
+
+export type BookFieldsFragment = { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } };
+
+export type GetBooksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } }> };
+
+export type GetBookChaptersQueryVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type GetBookChaptersQuery = { __typename?: 'Query', bookChapters: Array<{ __typename?: 'BookChapter', id: string, index: number, title: string, href: string, characterCount: number, audioUrl?: string | null, audioDuration?: number | null }> };
+
+export type GetBookConversionProgressQueryVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type GetBookConversionProgressQuery = { __typename?: 'Query', bookConversionProgress: { __typename?: 'BookConversionProgress', audioStatus: string, audioProgress: number, audioError?: string | null, canContinue: boolean } };
+
+export type GetTtsQuotaQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTtsQuotaQuery = { __typename?: 'Query', ttsQuota: { __typename?: 'TtsQuota', used: number, limit: number, remaining: number } };
+
+export type DeleteBookMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteBookMutation = { __typename?: 'Mutation', deleteBook: boolean };
+
+export type RestoreBookMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RestoreBookMutation = { __typename?: 'Mutation', restoreBook: boolean };
+
+export type PermanentDeleteBookMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type PermanentDeleteBookMutation = { __typename?: 'Mutation', permanentDeleteBook: boolean };
 
 export type WeatherUpdatesSubscriptionVariables = Exact<{
   lat: Scalars['Float']['input'];

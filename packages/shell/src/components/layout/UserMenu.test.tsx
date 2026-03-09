@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import UserMenu from './UserMenu';
 
 const mockSignIn = vi.fn();
@@ -63,18 +64,18 @@ beforeEach(() => {
 describe('UserMenu', () => {
   it('shows loading skeleton when auth is loading', () => {
     mockLoading = true;
-    const { container } = render(<UserMenu />);
+    const { container } = render(<MemoryRouter><UserMenu /></MemoryRouter>);
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('shows sign in button when no user', () => {
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
     const signInBtn = screen.getByText('auth.signIn');
     expect(signInBtn).toBeInTheDocument();
   });
 
   it('opens auth modal when sign in button is clicked', () => {
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
     fireEvent.click(screen.getByText('auth.signIn'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
@@ -85,7 +86,7 @@ describe('UserMenu', () => {
       email: 'test@example.com',
       photoURL: 'https://example.com/photo.jpg',
     };
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
     const avatar = screen.getByAltText('Test User');
     expect(avatar).toBeInTheDocument();
     expect(avatar).toHaveAttribute('src', 'https://example.com/photo.jpg');
@@ -97,13 +98,13 @@ describe('UserMenu', () => {
       email: 'alice@example.com',
       photoURL: null,
     };
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
     expect(screen.getByText('A')).toBeInTheDocument();
   });
 
   it('has aria-label and aria-expanded on menu button', () => {
     mockUser = { displayName: 'Test', email: 'test@test.com', photoURL: null };
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
     const btn = screen.getByLabelText('auth.userMenu');
     expect(btn).toHaveAttribute('aria-expanded', 'false');
     expect(btn).toHaveAttribute('aria-haspopup', 'true');
@@ -111,7 +112,7 @@ describe('UserMenu', () => {
 
   it('toggles dropdown menu on click', () => {
     mockUser = { displayName: 'Test', email: 'test@test.com', photoURL: null };
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     expect(screen.getByRole('menu')).toBeInTheDocument();
@@ -121,7 +122,7 @@ describe('UserMenu', () => {
 
   it('calls signOut and closes menu', () => {
     mockUser = { displayName: 'Test', email: 'test@test.com', photoURL: null };
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     fireEvent.click(screen.getByText('auth.signOut'));
@@ -130,7 +131,7 @@ describe('UserMenu', () => {
 
   it('closes menu on outside click', () => {
     mockUser = { displayName: 'Test', email: 'test@test.com', photoURL: null };
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     expect(screen.getByRole('menu')).toBeInTheDocument();
@@ -144,7 +145,7 @@ describe('UserMenu', () => {
     mockKnownAccounts = [
       { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
     ];
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     expect(screen.getByText('auth.currentAccount')).toBeInTheDocument();
@@ -156,7 +157,7 @@ describe('UserMenu', () => {
       { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 2000 },
       { uid: 'user2', email: 'other@test.com', displayName: 'Other', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
     ];
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     expect(screen.getByText('Other')).toBeInTheDocument();
@@ -171,7 +172,7 @@ describe('UserMenu', () => {
       otherAccount,
     ];
     mockSwitchToAccount.mockResolvedValue(undefined);
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     fireEvent.click(screen.getByLabelText('Switch to Other'));
@@ -184,7 +185,7 @@ describe('UserMenu', () => {
       { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 2000 },
       { uid: 'user2', email: 'email@test.com', displayName: 'Email User', photoURL: null, providerId: 'password', lastSignedInAt: 1000 },
     ];
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     fireEvent.click(screen.getByLabelText('Switch to Email User'));
@@ -199,7 +200,7 @@ describe('UserMenu', () => {
       { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 2000 },
       { uid: 'user2', email: 'other@test.com', displayName: 'Other', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
     ];
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     fireEvent.click(screen.getByLabelText('auth.removeAccount'));
@@ -210,7 +211,7 @@ describe('UserMenu', () => {
   it('shows "Add another account" button', () => {
     mockUser = { uid: 'user1', displayName: 'Test', email: 'test@test.com', photoURL: null };
     mockKnownAccounts = [];
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     expect(screen.getByText('auth.addAnotherAccount')).toBeInTheDocument();
@@ -226,7 +227,7 @@ describe('UserMenu', () => {
       providerId: 'google.com',
       lastSignedInAt: 1000 + i,
     }));
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     expect(screen.getByText('auth.maxAccountsReached')).toBeInTheDocument();
@@ -237,7 +238,7 @@ describe('UserMenu', () => {
     mockKnownAccounts = [
       { uid: 'user1', email: 'test@test.com', displayName: 'Test', photoURL: null, providerId: 'google.com', lastSignedInAt: 1000 },
     ];
-    render(<UserMenu />);
+    render(<MemoryRouter><UserMenu /></MemoryRouter>);
 
     fireEvent.click(screen.getByLabelText('auth.userMenu'));
     expect(screen.queryByLabelText('auth.removeAccount')).not.toBeInTheDocument();

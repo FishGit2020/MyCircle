@@ -376,11 +376,17 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
       });
     };
     const onPause = () => {
+      // Sync UI when audio is paused externally (e.g. headphone button, iOS media controls)
+      setIsPlaying(false);
       const src = sourceRef.current;
       if (src && audio.currentTime > 0) {
         saveSourceProgress(src, audio.currentTime, audio.duration || 0);
         saveLastPlayed(src, audio.currentTime);
       }
+    };
+    const onPlay = () => {
+      // Sync UI when audio resumes externally (e.g. headphone button, iOS media controls)
+      setIsPlaying(true);
     };
 
     audio.addEventListener('timeupdate', onTimeUpdate);
@@ -388,6 +394,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('durationchange', onDurationChange);
     audio.addEventListener('pause', onPause);
+    audio.addEventListener('play', onPlay);
 
     return () => {
       audio.removeEventListener('timeupdate', onTimeUpdate);
@@ -395,6 +402,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
       audio.removeEventListener('ended', onEnded);
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('play', onPlay);
     };
   }, [source?.track.id, source?.trackIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
