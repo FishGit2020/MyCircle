@@ -151,8 +151,25 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     </button>
   ) : null;
 
+  const [previewing, setPreviewing] = useState(false);
+
+  const handlePreview = useCallback(() => {
+    if (!('speechSynthesis' in window)) return;
+    setPreviewing(true);
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(
+      langCode === 'cmn-CN' ? '\u4f60\u597d\uff0c\u8fd9\u662f\u8bed\u97f3\u9884\u89c8\u3002'
+        : langCode === 'es-US' ? 'Hola, esta es una vista previa de la voz.'
+        : 'Hello, this is a voice preview sample.',
+    );
+    utterance.lang = langCode === 'cmn-CN' ? 'zh-CN' : langCode === 'es-US' ? 'es' : 'en-US';
+    utterance.onend = () => setPreviewing(false);
+    utterance.onerror = () => setPreviewing(false);
+    window.speechSynthesis.speak(utterance);
+  }, [langCode]);
+
   const voicePicker = (
-    <div className="flex items-center gap-2 mb-2">
+    <div className="flex flex-wrap items-center gap-2 mb-2">
       <label htmlFor={`voice-select-${bookId}`} className="text-sm text-gray-600 dark:text-gray-400">
         {t('library.selectVoice')}
       </label>
@@ -166,6 +183,31 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           <option key={v} value={v}>{v}</option>
         ))}
       </select>
+      {'speechSynthesis' in window && (
+        <button
+          type="button"
+          onClick={handlePreview}
+          disabled={previewing}
+          className="flex items-center gap-1 px-2 py-1 text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition min-h-[44px] disabled:opacity-50"
+          aria-label={t('library.previewVoice')}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+          </svg>
+          {previewing ? t('library.playing') : t('library.previewVoice')}
+        </button>
+      )}
+      <a
+        href="https://cloud.google.com/text-to-speech#section-2"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs text-blue-500 dark:text-blue-400 hover:underline flex items-center gap-0.5"
+      >
+        {t('library.browseVoices')}
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>
+      </a>
     </div>
   );
 
