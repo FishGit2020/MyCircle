@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { WindowEvents, StorageKeys } from '@mycircle/shared';
 import type { RadioStation } from '../types';
 
 const API_BASE = 'https://de1.api.radio-browser.info/json/stations/search';
-const FAVORITES_KEY = 'radio-favorites';
 
 function loadFavorites(): RadioStation[] {
   try {
-    const raw = localStorage.getItem(FAVORITES_KEY);
+    const raw = localStorage.getItem(StorageKeys.RADIO_FAVORITES);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -14,7 +14,8 @@ function loadFavorites(): RadioStation[] {
 }
 
 function saveFavorites(stations: RadioStation[]): void {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(stations));
+  localStorage.setItem(StorageKeys.RADIO_FAVORITES, JSON.stringify(stations));
+  window.dispatchEvent(new Event(WindowEvents.RADIO_CHANGED));
 }
 
 export function useRadioStations() {

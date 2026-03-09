@@ -141,6 +141,7 @@ export interface UserProfile {
   bookBookmarks?: Array<{ bookId: string; bookTitle: string; cfi: string; label: string; createdAt: number }>;
   bookAudioProgress?: Record<string, { position: number; duration: number; chapter: number }>;
   bookLastPlayed?: BookLastPlayedData;
+  radioFavorites?: Array<{ stationuuid: string; name: string; url: string; favicon: string; country: string; language: string; codec: string; bitrate: number }>;
   isAdmin?: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -550,6 +551,15 @@ export async function updateWorshipFavorites(uid: string, favorites: string[]) {
   });
 }
 
+
+export async function updateRadioFavorites(uid: string, favorites: any[]) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    radioFavorites: favorites,
+    updatedAt: serverTimestamp(),
+  });
+}
 
 export async function updateWidgetLayout(uid: string, layout: { pinned: string[]; size: string } | null) {
   if (!db) return;

@@ -75,6 +75,12 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.WORSHIP_FAVORITES_CHANGED));
   }
 
+  // Restore radio favorites
+  if (profile.radioFavorites && profile.radioFavorites.length > 0) {
+    localStorage.setItem(StorageKeys.RADIO_FAVORITES, JSON.stringify(profile.radioFavorites));
+    window.dispatchEvent(new Event(WindowEvents.RADIO_CHANGED));
+  }
+
   // Restore last-played podcast for cross-device resume
   if (profile.lastPlayed?.episode) {
     const lp = profile.lastPlayed;
