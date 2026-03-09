@@ -115,3 +115,8 @@ declare module 'youthTracker/YouthTracker' {
   const YouthTracker: React.ComponentType;
   export default YouthTracker;
 }
+
+declare module 'pollSystem/PollSystem' {
+  const PollSystem: React.ComponentType;
+  export default PollSystem;
+}

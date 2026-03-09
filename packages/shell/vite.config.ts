@@ -180,6 +180,10 @@ const youthTrackerRemote = isProduction
   ? '/youth-tracker/assets/remoteEntry.js'
   : 'http://localhost:3023/assets/remoteEntry.js';
 
+const pollSystemRemote = isProduction
+  ? '/poll-system/assets/remoteEntry.js'
+  : 'http://localhost:3025/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -208,7 +212,8 @@ export default defineConfig({
         docScanner: docScannerRemote,
         hikingMap: hikingMapRemote,
         tripPlanner: tripPlannerRemote,
-        youthTracker: youthTrackerRemote
+        youthTracker: youthTrackerRemote,
+        pollSystem: pollSystemRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

@@ -8,7 +8,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "dev": "pnpm build:remotes && concurrently -n server,shell,city,weather,stock,podcast,ai,bible,worship,notebook,baby,child-dev,chinese,english,flashcards,daily-log,cloud-files,benchmark,immigration,library,games,doc-scan,hiking,youth,trip -c blue,green,yellow,magenta,cyan,white,red,#d97706,#8b5cf6,#10b981,#ec4899,#14b8a6,#f59e0b,#6366f1,#f97316,#a855f7,#06b6d4,#84cc16,#e11d48,#0ea5e9,#d946ef,#9333ea,#22c55e,#fb923c \"pnpm dev:server\" \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:daily-log\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\" \"pnpm preview:digital-library\" \"pnpm preview:family-games\" \"pnpm preview:doc-scanner\" \"pnpm preview:hiking\" \"pnpm preview:youth\" \"pnpm preview:trip-planner\"",
+    "dev": "pnpm build:remotes && concurrently -n server,shell,city,weather,stock,podcast,ai,bible,worship,notebook,baby,child-dev,chinese,english,flashcards,daily-log,cloud-files,benchmark,immigration,library,games,doc-scan,hiking,youth,trip,polls -c blue,green,yellow,magenta,cyan,white,red,#d97706,#8b5cf6,#10b981,#ec4899,#14b8a6,#f59e0b,#6366f1,#f97316,#a855f7,#06b6d4,#84cc16,#e11d48,#0ea5e9,#d946ef,#9333ea,#22c55e,#fb923c,#7c3aed \"pnpm dev:server\" \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:daily-log\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\" \"pnpm preview:digital-library\" \"pnpm preview:family-games\" \"pnpm preview:doc-scanner\" \"pnpm preview:hiking\" \"pnpm preview:youth\" \"pnpm preview:trip-planner\" \"pnpm preview:poll-system\"",
     "dev:server": "tsx server/index.ts",
     "dev:shell": "pnpm --filter @mycircle/shell dev",
     "dev:city": "pnpm --filter @mycircle/city-search dev",
@@ -32,6 +32,7 @@
     "dev:hiking": "pnpm --filter @mycircle/hiking-map dev",
     "dev:youth": "pnpm --filter @mycircle/youth-tracker dev",
     "dev:trip-planner": "pnpm --filter @mycircle/trip-planner dev",
+    "dev:poll-system": "pnpm --filter @mycircle/poll-system dev",
     "dev:remote": "node scripts/dev-remote.mjs",
     "preview:city": "pnpm --filter @mycircle/city-search preview",
     "preview:weather": "pnpm --filter @mycircle/weather-display preview",
@@ -54,8 +55,9 @@
     "preview:hiking": "pnpm --filter @mycircle/hiking-map preview",
     "preview:youth": "pnpm --filter @mycircle/youth-tracker preview",
     "preview:trip-planner": "pnpm --filter @mycircle/trip-planner preview",
+    "preview:poll-system": "pnpm --filter @mycircle/poll-system preview",
     "build:remotes": "pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
-    "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:daily-log\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\" \"pnpm preview:digital-library\" \"pnpm preview:family-games\" \"pnpm preview:doc-scanner\" \"pnpm preview:hiking\" \"pnpm preview:youth\" \"pnpm preview:trip-planner\"",
+    "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:daily-log\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\" \"pnpm preview:digital-library\" \"pnpm preview:family-games\" \"pnpm preview:doc-scanner\" \"pnpm preview:hiking\" \"pnpm preview:youth\" \"pnpm preview:trip-planner\" \"pnpm preview:poll-system\"",
     "build": "pnpm build:shared && pnpm build:mf",
     "codegen": "node scripts/extract-schema.mjs && ([ -f schema.graphql ] && graphql-codegen --config codegen.ts || true)",
     "build:shared": "pnpm codegen && pnpm --filter @mycircle/shared build",

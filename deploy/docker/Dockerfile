@@ -31,6 +31,7 @@ COPY packages/doc-scanner/package.json packages/doc-scanner/
 COPY packages/hiking-map/package.json packages/hiking-map/
 COPY packages/youth-tracker/package.json packages/youth-tracker/
 COPY packages/trip-planner/package.json packages/trip-planner/
+COPY packages/poll-system/package.json packages/poll-system/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -89,6 +90,7 @@ COPY --from=builder /app/packages/doc-scanner/package.json packages/doc-scanner/
 COPY --from=builder /app/packages/hiking-map/package.json packages/hiking-map/
 COPY --from=builder /app/packages/youth-tracker/package.json packages/youth-tracker/
 COPY --from=builder /app/packages/trip-planner/package.json packages/trip-planner/
+COPY --from=builder /app/packages/poll-system/package.json packages/poll-system/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune
