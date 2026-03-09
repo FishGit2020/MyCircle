@@ -23,6 +23,7 @@ export default {
     "../doc-scanner/src/**/*.{js,ts,jsx,tsx}",
     "../hiking-map/src/**/*.{js,ts,jsx,tsx}",
     "../youth-tracker/src/**/*.{js,ts,jsx,tsx}",
+    "../trip-planner/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

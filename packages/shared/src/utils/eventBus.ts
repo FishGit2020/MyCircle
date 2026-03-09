@@ -79,6 +79,8 @@ export const WindowEvents = {
   FAMILY_GAMES_CHANGED: 'family-games-changed',
   HIKING_ROUTES_CHANGED: 'hiking-routes-changed',
   CHILDREN_CHANGED: 'children-changed',
+  TRIP_PLANNER_CHANGED: 'trip-planner-changed',
+  POLL_SYSTEM_CHANGED: 'poll-system-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals

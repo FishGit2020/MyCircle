@@ -24,6 +24,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/doc-scanner': () => import('docScanner/DocScanner'),
   '/hiking': () => import('hikingMap/HikingMap'),
   '/youth-tracker': () => import('youthTracker/YouthTracker'),
+  '/trips': () => import('tripPlanner/TripPlanner'),
 };
 
 export { ROUTE_MODULE_MAP };
@@ -65,6 +66,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/library', labelKey: 'nav.digitalLibrary', icon: 'digital-library' },
     { path: '/daily-log', labelKey: 'nav.dailyLog', icon: 'daily-log' },
     { path: '/doc-scanner', labelKey: 'nav.docScanner', icon: 'doc-scanner' },
+    { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' },
   ]},
   { labelKey: 'nav.group.outdoor', items: [
     { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
@@ -92,4 +94,5 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/family-games', labelKey: 'nav.familyGames', icon: 'family-games' },
   { path: '/doc-scanner', labelKey: 'nav.docScanner', icon: 'doc-scanner' },
   { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
+  { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' },
 ];

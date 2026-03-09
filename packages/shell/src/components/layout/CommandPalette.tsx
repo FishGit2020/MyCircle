@@ -38,6 +38,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/family-games': 'commandPalette.goToFamilyGames',
   '/doc-scanner': 'commandPalette.goToDocScanner',
   '/hiking': 'commandPalette.goToHiking',
+  '/trips': 'commandPalette.goToTripPlanner',
 };
 
 const clockIcon = (
@@ -201,6 +202,11 @@ export default function CommandPalette({ recentPages = [] }: Props) {
       id: 'nav-family-games', label: t('commandPalette.goToFamilyGames'), description: '/family-games',
       icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
       action: () => { navigate('/family-games'); setOpen(false); }, category: 'navigation',
+    },
+    {
+      id: 'nav-trips', label: t('commandPalette.goToTripPlanner' as any), description: '/trips',
+      icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>,
+      action: () => { navigate('/trips'); setOpen(false); }, category: 'navigation',
     },
   ];
 

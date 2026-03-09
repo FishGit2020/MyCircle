@@ -17,11 +17,12 @@ import DigitalLibraryWidget from './DigitalLibraryWidget';
 import FamilyGamesWidget from './FamilyGamesWidget';
 import DocScannerWidget from './DocScannerWidget';
 import HikingMapWidget from './HikingMapWidget';
+import TripPlannerWidget from './TripPlannerWidget';
 import YouthTrackerWidget from './YouthTrackerWidget';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'youthTracker';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'tripPlanner' | 'youthTracker';
 
 export type WidgetSize = 'comfortable' | 'tight';
 
@@ -39,7 +40,7 @@ const DEFAULT_WIDGET_LAYOUT: WidgetLayout = { pinned: [], size: 'comfortable' };
 const ALL_WIDGET_IDS = new Set<string>([
   'weather', 'stocks', 'verse', 'nowPlaying', 'notebook', 'babyTracker',
   'childDev', 'worship', 'flashcards', 'dailyLog', 'cloudFiles', 'benchmark',
-  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'youthTracker',
+  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'tripPlanner', 'youthTracker',
 ]);
 
 export function loadWidgetLayout(): WidgetLayout {
@@ -86,6 +87,7 @@ export const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   familyGames: FamilyGamesWidget,
   docScanner: DocScannerWidget,
   hikingMap: HikingMapWidget,
+  tripPlanner: TripPlannerWidget,
   youthTracker: YouthTrackerWidget,
 };
 
@@ -107,6 +109,7 @@ export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities:
   familyGames: '/family-games',
   docScanner: '/doc-scanner',
   hikingMap: '/hiking',
+  tripPlanner: '/trips',
   youthTracker: '/youth-tracker',
 };
 

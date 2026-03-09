@@ -172,6 +172,10 @@ const hikingMapRemote = isProduction
   ? '/hiking-map/assets/remoteEntry.js'
   : 'http://localhost:3022/assets/remoteEntry.js';
 
+const tripPlannerRemote = isProduction
+  ? '/trip-planner/assets/remoteEntry.js'
+  : 'http://localhost:3024/assets/remoteEntry.js';
+
 const youthTrackerRemote = isProduction
   ? '/youth-tracker/assets/remoteEntry.js'
   : 'http://localhost:3023/assets/remoteEntry.js';
@@ -203,6 +207,7 @@ export default defineConfig({
         familyGames: familyGamesRemote,
         docScanner: docScannerRemote,
         hikingMap: hikingMapRemote,
+        tripPlanner: tripPlannerRemote,
         youthTracker: youthTrackerRemote
       },
       shared: {
