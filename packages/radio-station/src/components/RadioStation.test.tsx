@@ -5,8 +5,11 @@ import RadioStation from './RadioStation';
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   PageContent: ({ children, className }: any) => <div className={className}>{children}</div>,
-  WindowEvents: {},
-  StorageKeys: {},
+  WindowEvents: { RADIO_CHANGED: 'radio-changed' },
+  StorageKeys: { RADIO_FAVORITES: 'radio-favorites' },
+  MFEvents: { AUDIO_PLAY: 'mf:audio-play', AUDIO_CLOSE: 'mf:audio-close', AUDIO_TOGGLE_PLAY: 'mf:audio-toggle-play', AUDIO_PLAYBACK_STATE: 'mf:audio-playback-state' },
+  eventBus: { publish: vi.fn() },
+  subscribeToMFEvent: () => () => {},
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
 }));
 
