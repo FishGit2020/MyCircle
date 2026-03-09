@@ -198,9 +198,9 @@ export default function HikingMap() {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 h-[calc(100svh-12rem)] md:h-[calc(100vh-13rem)]">
+      <div className="flex flex-col md:flex-row gap-4 md:h-[calc(100vh-13rem)]">
         {/* Map */}
-        <div className="relative flex-1 min-h-[55vh] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="relative h-[55vh] md:h-auto md:flex-1 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
           <MapView style={mapStyle} onMapReady={setMap} onMapClick={handleMapClick} onStyleLoad={handleStyleLoad} />
 
           {/* Tap-to-set hint when no waypoints set */}
