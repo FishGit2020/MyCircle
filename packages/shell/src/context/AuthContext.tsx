@@ -15,6 +15,7 @@ import {
   updateUserBabyDueDate,
   identifyUser,
   clearUserIdentity,
+  logEvent,
   UserProfile,
   RecentCity,
   FavoriteCity,
