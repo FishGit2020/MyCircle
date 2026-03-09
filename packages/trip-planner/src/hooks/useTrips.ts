@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, StorageKeys, createLogger } from '@mycircle/shared';
+import { WindowEvents, createLogger } from '@mycircle/shared';
 import type { Trip } from '../types';
 
 const logger = createLogger('useTrips');
@@ -10,54 +10,45 @@ export function useTrips() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadTrips = useCallback(async () => {
-    try {
-      // Try API first
-      const api = window.__tripPlanner;
-      if (api?.getAll) {
-        const data = await api.getAll();
+  useEffect(() => {
+    const api = window.__tripPlanner as any;
+
+    // Prefer real-time subscription
+    if (api?.subscribe) {
+      const unsubscribe = api.subscribe((data: Trip[]) => {
         setTrips(data);
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* */ }
         setLoading(false);
-        return;
-      }
-
-      // Try subscription
-      if (api?.subscribe) {
-        api.subscribe((data: Trip[]) => {
-          setTrips(data);
-          try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* */ }
-          setLoading(false);
-        });
-        return;
-      }
-
-      // Fallback to cache
-      try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) setTrips(JSON.parse(cached));
-      } catch { /* */ }
-      setLoading(false);
-    } catch (err) {
-      logger.error('Failed to load trips:', err);
-      setError('Failed to load trips');
-      setLoading(false);
+      });
+      return unsubscribe;
     }
+
+    // One-shot fallback
+    if (api?.getAll) {
+      api.getAll().then((data: Trip[]) => {
+        setTrips(data);
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* */ }
+        setLoading(false);
+      }).catch((err: unknown) => {
+        logger.error('Failed to load trips:', err);
+        setError('Failed to load trips');
+        setLoading(false);
+      });
+      return;
+    }
+
+    // Cache fallback
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) setTrips(JSON.parse(cached));
+    } catch { /* */ }
+    setLoading(false);
   }, []);
 
-  useEffect(() => {
-    loadTrips();
-
-    const handler = () => loadTrips();
-    window.addEventListener(WindowEvents.TRIP_PLANNER_CHANGED, handler);
-    return () => window.removeEventListener(WindowEvents.TRIP_PLANNER_CHANGED, handler);
-  }, [loadTrips]);
-
   const addTrip = useCallback(async (trip: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const api = window.__tripPlanner;
+    const api = window.__tripPlanner as any;
     if (api?.add) {
       await api.add(trip);
-      window.dispatchEvent(new Event(WindowEvents.TRIP_PLANNER_CHANGED));
       return;
     }
     // Local fallback
@@ -75,10 +66,9 @@ export function useTrips() {
   }, []);
 
   const updateTrip = useCallback(async (id: string, data: Partial<Trip>) => {
-    const api = window.__tripPlanner;
+    const api = window.__tripPlanner as any;
     if (api?.update) {
       await api.update(id, data);
-      window.dispatchEvent(new Event(WindowEvents.TRIP_PLANNER_CHANGED));
       return;
     }
     setTrips(prev => {
@@ -89,10 +79,9 @@ export function useTrips() {
   }, []);
 
   const deleteTrip = useCallback(async (id: string) => {
-    const api = window.__tripPlanner;
+    const api = window.__tripPlanner as any;
     if (api?.delete) {
       await api.delete(id);
-      window.dispatchEvent(new Event(WindowEvents.TRIP_PLANNER_CHANGED));
       return;
     }
     setTrips(prev => {
@@ -102,5 +91,5 @@ export function useTrips() {
     });
   }, []);
 
-  return { trips, loading, error, addTrip, updateTrip, deleteTrip, reload: loadTrips };
+  return { trips, loading, error, addTrip, updateTrip, deleteTrip };
 }

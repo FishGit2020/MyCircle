@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, createLogger } from '@mycircle/shared';
+import { createLogger } from '@mycircle/shared';
 import type { Poll } from '../types';
 
 const logger = createLogger('usePolls');
@@ -10,57 +10,47 @@ export function usePolls() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadPolls = useCallback(async () => {
-    try {
-      // Try API first
-      const api = (window as any).__pollSystem;
-      if (api?.getAll) {
-        const data = await api.getAll();
+  useEffect(() => {
+    const api = (window as any).__pollSystem;
+
+    // Prefer real-time subscription (polls are public — all users see updates)
+    if (api?.subscribe) {
+      const unsubscribe = api.subscribe((data: Poll[]) => {
         setPolls(data);
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* */ }
         setLoading(false);
-        return;
-      }
-
-      // Try subscription
-      if (api?.subscribe) {
-        api.subscribe((data: Poll[]) => {
-          setPolls(data);
-          try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* */ }
-          setLoading(false);
-        });
-        return;
-      }
-
-      // Fallback to cache
-      try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) setPolls(JSON.parse(cached));
-      } catch { /* */ }
-      setLoading(false);
-    } catch (err) {
-      logger.error('Failed to load polls:', err);
-      setError('Failed to load polls');
-      setLoading(false);
+      });
+      return unsubscribe;
     }
+
+    // One-shot fallback
+    if (api?.getAll) {
+      api.getAll().then((data: Poll[]) => {
+        setPolls(data);
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* */ }
+        setLoading(false);
+      }).catch((err: unknown) => {
+        logger.error('Failed to load polls:', err);
+        setError('Failed to load polls');
+        setLoading(false);
+      });
+      return;
+    }
+
+    // Cache fallback
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) setPolls(JSON.parse(cached));
+    } catch { /* */ }
+    setLoading(false);
   }, []);
-
-  useEffect(() => {
-    loadPolls();
-
-    const handler = () => loadPolls();
-    window.addEventListener(WindowEvents.POLL_SYSTEM_CHANGED, handler);
-    return () => window.removeEventListener(WindowEvents.POLL_SYSTEM_CHANGED, handler);
-  }, [loadPolls]);
 
   const addPoll = useCallback(async (poll: Omit<Poll, 'id' | 'createdAt' | 'updatedAt'>) => {
     const api = (window as any).__pollSystem;
     if (api?.add) {
       await api.add(poll);
-      window.dispatchEvent(new Event(WindowEvents.POLL_SYSTEM_CHANGED));
       return;
     }
-    // Local fallback
     const newPoll: Poll = {
       ...poll,
       id: `poll-${Date.now()}`,
@@ -78,7 +68,6 @@ export function usePolls() {
     const api = (window as any).__pollSystem;
     if (api?.delete) {
       await api.delete(id);
-      window.dispatchEvent(new Event(WindowEvents.POLL_SYSTEM_CHANGED));
       return;
     }
     setPolls(prev => {
@@ -92,24 +81,20 @@ export function usePolls() {
     const api = (window as any).__pollSystem;
     if (api?.vote) {
       await api.vote(pollId, optionId);
-      window.dispatchEvent(new Event(WindowEvents.POLL_SYSTEM_CHANGED));
       return;
     }
-    setPolls(prev => {
-      const updated = prev.map(p => {
-        if (p.id !== pollId) return p;
-        return {
-          ...p,
-          updatedAt: Date.now(),
-          options: p.options.map(o =>
-            o.id === optionId ? { ...o, votes: o.votes + 1 } : o,
-          ),
-        };
-      });
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify(updated)); } catch { /* */ }
-      return updated;
-    });
+    // Optimistic local update
+    setPolls(prev => prev.map(p => {
+      if (p.id !== pollId) return p;
+      return {
+        ...p,
+        updatedAt: Date.now(),
+        options: p.options.map(o =>
+          o.id === optionId ? { ...o, votes: o.votes + 1 } : o,
+        ),
+      };
+    }));
   }, []);
 
-  return { polls, loading, error, addPoll, deletePoll, vote, reload: loadPolls };
+  return { polls, loading, error, addPoll, deletePoll, vote };
 }
