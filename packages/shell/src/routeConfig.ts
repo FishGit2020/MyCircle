@@ -25,4 +25,5 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   trips: 'nav.tripPlanner',
   polls: 'nav.pollSystem',
   radio: 'nav.radio',
+  trash: 'nav.recycleBin',
 };

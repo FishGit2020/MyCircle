@@ -132,6 +132,31 @@ declare global {
       saveScore: (data: { gameType: string; score: number; timeMs: number; difficulty: string }) => Promise<void>;
     };
 
+    /* ── Trip Planner ──────────────────────────────────────── */
+    __tripPlanner?: {
+      getAll: () => Promise<any[]>;
+      add: (trip: Record<string, unknown>) => Promise<string>;
+      update: (id: string, updates: Record<string, unknown>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (trips: any[]) => void) => () => void;
+    };
+
+    /* ── Poll System ──────────────────────────────────────── */
+    __pollSystem?: {
+      getAll: () => Promise<any[]>;
+      add: (poll: Record<string, unknown>) => Promise<string>;
+      delete: (id: string) => Promise<void>;
+      vote: (pollId: string, optionId: string) => Promise<void>;
+      subscribe: (callback: (polls: any[]) => void) => () => void;
+    };
+
+    /* ── Trash / Recycle Bin ───────────────────────────────── */
+    __trash?: {
+      getAll: () => Promise<Record<string, Array<{ id: string; type: string; name: string; deletedAt: number | null; collectionPath: string }>>>;
+      restore: (type: string, id: string) => Promise<void>;
+      permanentlyDelete: (type: string, id: string) => Promise<void>;
+    };
+
     /* ── DevTools / Testing ────────────────────────────────── */
     __APOLLO_CLIENT__?: any;
     __signInForTest?: (email: string, password: string) => Promise<any>;

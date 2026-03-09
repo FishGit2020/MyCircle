@@ -7,6 +7,7 @@ import { WeatherCompare } from './components/widgets';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
 import WhatsNewPage from './pages/WhatsNewPage';
+import RecycleBinPage from './pages/RecycleBinPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import FavoriteButton from './components/weather/FavoriteButton';
@@ -133,6 +134,7 @@ export default function App() {
         <Route path="trips" element={<RequireAuth><MFEPageWrapper component={TripPlannerMF} name="Trip Planner" /></RequireAuth>} />
         <Route path="polls" element={<RequireAuth><MFEPageWrapper component={PollSystemMF} name="Poll System" /></RequireAuth>} />
         <Route path="radio" element={<MFEPageWrapper component={RadioStationMF} name="Radio Station" />} />
+        <Route path="trash" element={<RequireAuth><RecycleBinPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />
         <Route path="terms" element={<TermsOfServicePage />} />
