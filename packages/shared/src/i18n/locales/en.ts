@@ -2204,6 +2204,23 @@ const en = {
   'radio.nowPlaying': 'Now playing',
   'radio.tabs.browse': 'Browse',
   'radio.tabs.favorites': 'Favorites',
+
+  // ─── Recycle Bin ────────────────────────────────────────────
+  'nav.recycleBin': 'Recycle Bin',
+  'recycleBin.title': 'Recycle Bin',
+  'recycleBin.empty': 'Recycle bin is empty',
+  'recycleBin.restore': 'Restore',
+  'recycleBin.deleteForever': 'Delete Forever',
+  'recycleBin.deleteForeverConfirm': 'This will permanently delete this item. This cannot be undone.',
+  'recycleBin.deletedOn': 'Deleted on',
+  'recycleBin.autoDelete': 'Items are automatically deleted after 30 days',
+  'recycleBin.type.note': 'Note',
+  'recycleBin.type.flashcard': 'Flashcard',
+  'recycleBin.type.file': 'File',
+  'recycleBin.type.trip': 'Trip',
+  'recycleBin.type.route': 'Route',
+  'recycleBin.type.child': 'Child Profile',
+  'recycleBin.type.book': 'Book',
 } as const;
 
 export default en;

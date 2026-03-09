@@ -82,6 +82,7 @@ export const WindowEvents = {
   TRIP_PLANNER_CHANGED: 'trip-planner-changed',
   POLL_SYSTEM_CHANGED: 'poll-system-changed',
   RADIO_CHANGED: 'radio-changed',
+  TRASH_CHANGED: 'trash-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals

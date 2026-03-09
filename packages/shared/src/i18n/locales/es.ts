@@ -2206,6 +2206,23 @@ const es: Record<TranslationKey, string> = {
   'radio.nowPlaying': 'Reproduciendo ahora',
   'radio.tabs.browse': 'Explorar',
   'radio.tabs.favorites': 'Favoritos',
+
+  // ─── Recycle Bin ────────────────────────────────────────────
+  'nav.recycleBin': 'Papelera de reciclaje',
+  'recycleBin.title': 'Papelera de reciclaje',
+  'recycleBin.empty': 'La papelera est\u00e1 vac\u00eda',
+  'recycleBin.restore': 'Restaurar',
+  'recycleBin.deleteForever': 'Eliminar permanentemente',
+  'recycleBin.deleteForeverConfirm': 'Esto eliminar\u00e1 permanentemente este elemento. Esta acci\u00f3n no se puede deshacer.',
+  'recycleBin.deletedOn': 'Eliminado el',
+  'recycleBin.autoDelete': 'Los elementos se eliminan autom\u00e1ticamente despu\u00e9s de 30 d\u00edas',
+  'recycleBin.type.note': 'Nota',
+  'recycleBin.type.flashcard': 'Tarjeta',
+  'recycleBin.type.file': 'Archivo',
+  'recycleBin.type.trip': 'Viaje',
+  'recycleBin.type.route': 'Ruta',
+  'recycleBin.type.child': 'Perfil de ni\u00f1o',
+  'recycleBin.type.book': 'Libro',
 };
 
 export default es;

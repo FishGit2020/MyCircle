@@ -2206,6 +2206,23 @@ const zh: Record<TranslationKey, string> = {
   'radio.nowPlaying': '\u6b63\u5728\u64ad\u653e',
   'radio.tabs.browse': '\u6d4f\u89c8',
   'radio.tabs.favorites': '\u6536\u85cf',
+
+  // ─── Recycle Bin ────────────────────────────────────────────
+  'nav.recycleBin': '\u56de\u6536\u7ad9',
+  'recycleBin.title': '\u56de\u6536\u7ad9',
+  'recycleBin.empty': '\u56de\u6536\u7ad9\u4e3a\u7a7a',
+  'recycleBin.restore': '\u6062\u590d',
+  'recycleBin.deleteForever': '\u6c38\u4e45\u5220\u9664',
+  'recycleBin.deleteForeverConfirm': '\u8fd9\u5c06\u6c38\u4e45\u5220\u9664\u6b64\u9879\u76ee\u3002\u6b64\u64cd\u4f5c\u65e0\u6cd5\u64a4\u6d88\u3002',
+  'recycleBin.deletedOn': '\u5220\u9664\u4e8e',
+  'recycleBin.autoDelete': '\u9879\u76ee\u5c06\u572830\u5929\u540e\u81ea\u52a8\u5220\u9664',
+  'recycleBin.type.note': '\u7b14\u8bb0',
+  'recycleBin.type.flashcard': '\u95ea\u5361',
+  'recycleBin.type.file': '\u6587\u4ef6',
+  'recycleBin.type.trip': '\u65c5\u884c',
+  'recycleBin.type.route': '\u8def\u7ebf',
+  'recycleBin.type.child': '\u5b69\u5b50\u8d44\u6599',
+  'recycleBin.type.book': '\u4e66\u7c4d',
 };
 
 export default zh;
