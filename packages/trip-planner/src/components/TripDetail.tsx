@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import type { Trip, Activity, ItineraryDay } from '../types';
+import type { Trip, Activity, ItineraryDay, Ticket } from '../types';
 
 interface TripDetailProps {
   trip: Trip;
@@ -33,6 +33,10 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
   const [actTime, setActTime] = useState('09:00');
   const [actLocation, setActLocation] = useState('');
   const [actCost, setActCost] = useState(0);
+  const [addingTicket, setAddingTicket] = useState(false);
+  const [ticketType, setTicketType] = useState<Ticket['type']>('flight');
+  const [ticketDesc, setTicketDesc] = useState('');
+  const [ticketDate, setTicketDate] = useState(trip.startDate);
 
   const dates = generateDates(trip.startDate, trip.endDate);
   const totalSpent = trip.itinerary.reduce(
@@ -74,6 +78,31 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
       .filter(d => d.activities.length > 0);
     onUpdate(trip.id, { itinerary: updated });
   }, [trip, onUpdate]);
+
+  const handleAddTicket = useCallback(() => {
+    if (!ticketDesc.trim()) return;
+    const ticket: Ticket = {
+      id: `tkt-${Date.now()}`,
+      type: ticketType,
+      description: ticketDesc.trim(),
+      date: ticketDate,
+    };
+    onUpdate(trip.id, { tickets: [...(trip.tickets || []), ticket] });
+    setTicketDesc('');
+    setAddingTicket(false);
+  }, [ticketType, ticketDesc, ticketDate, trip, onUpdate]);
+
+  const handleDeleteTicket = useCallback((ticketId: string) => {
+    onUpdate(trip.id, { tickets: (trip.tickets || []).filter(t => t.id !== ticketId) });
+  }, [trip, onUpdate]);
+
+  const TICKET_ICONS: Record<Ticket['type'], string> = {
+    flight: '\u2708',
+    train: '\u{1F682}',
+    bus: '\u{1F68C}',
+    boat: '\u26F5',
+    other: '\u{1F3AB}',
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -119,6 +148,93 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
       {trip.notes && (
         <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">{trip.notes}</p>
       )}
+
+      {/* Tickets */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{t('tripPlanner.tickets')}</h3>
+          <button
+            type="button"
+            onClick={() => setAddingTicket(!addingTicket)}
+            className="text-xs text-cyan-600 dark:text-cyan-400 hover:underline"
+          >
+            + {t('tripPlanner.addTicket')}
+          </button>
+        </div>
+
+        {addingTicket && (
+          <div className="p-3 mb-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2">
+            <div className="flex gap-2">
+              <select
+                value={ticketType}
+                onChange={e => setTicketType(e.target.value as Ticket['type'])}
+                className="w-28 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                aria-label={t('tripPlanner.ticketType')}
+              >
+                <option value="flight">{t('tripPlanner.ticketFlight')}</option>
+                <option value="train">{t('tripPlanner.ticketTrain')}</option>
+                <option value="bus">{t('tripPlanner.ticketBus')}</option>
+                <option value="boat">{t('tripPlanner.ticketBoat')}</option>
+                <option value="other">{t('tripPlanner.ticketOther')}</option>
+              </select>
+              <input
+                type="date"
+                value={ticketDate}
+                onChange={e => setTicketDate(e.target.value)}
+                className="w-36 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+            <input
+              type="text"
+              value={ticketDesc}
+              onChange={e => setTicketDesc(e.target.value)}
+              placeholder={t('tripPlanner.ticketDescription')}
+              className="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+            />
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setAddingTicket(false)} className="px-3 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400">
+                {t('tripPlanner.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleAddTicket}
+                disabled={!ticketDesc.trim()}
+                className="px-3 py-1 text-xs bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-400 text-white rounded transition"
+              >
+                {t('tripPlanner.add')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {(trip.tickets || []).length > 0 ? (
+          <div className="space-y-2">
+            {(trip.tickets || []).sort((a, b) => a.date.localeCompare(b.date)).map(ticket => (
+              <div key={ticket.id} className="flex items-center gap-3 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <span className="text-lg flex-shrink-0" aria-hidden="true">{TICKET_ICONS[ticket.type]}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-800 dark:text-white truncate">{ticket.description}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    {new Date(ticket.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteTicket(ticket.id)}
+                  className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition"
+                  aria-label={t('tripPlanner.deleteTicket')}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : !addingTicket && (
+          <p className="text-sm text-gray-400 dark:text-gray-500">{t('tripPlanner.noTickets')}</p>
+        )}
+      </div>
 
       {/* Itinerary */}
       <div>
