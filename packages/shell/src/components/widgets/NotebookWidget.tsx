@@ -7,18 +7,15 @@ const NotebookWidget = React.memo(function NotebookWidget() {
   const [publicCount, setPublicCount] = React.useState<number | null>(null);
 
   useEffect(() => {
-    function load() {
+    function loadFromCache() {
       try {
         const stored = localStorage.getItem(StorageKeys.NOTEBOOK_CACHE);
         if (stored) setNoteCount(JSON.parse(stored));
         else setNoteCount(null);
       } catch { /* ignore */ }
     }
-    load();
-    window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
-    // On auth change, fetch note count directly then poll cache as backup
-    const handleAuth = () => {
-      load();
+
+    function fetchDirect() {
       const api = window.__notebook;
       if (api?.getAll) {
         api.getAll().then((notes: any[]) => {
@@ -26,13 +23,30 @@ const NotebookWidget = React.memo(function NotebookWidget() {
           try { localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(notes.length)); } catch { /* ignore */ }
         }).catch(() => { /* ignore */ });
       }
-      // Poll cache as fallback in case subscription populates it
-      const interval = setInterval(load, 1000);
-      setTimeout(() => clearInterval(interval), 10000);
+    }
+
+    loadFromCache();
+
+    // On NOTEBOOK_CHANGED (fired by restoreUserData after getUserNotes resolves):
+    // read cache AND fetch directly to ensure count is accurate
+    const handleNotebookChanged = () => {
+      loadFromCache();
+      fetchDirect();
+    };
+    window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, handleNotebookChanged);
+
+    // On auth change: fetch with a short delay to ensure window.__notebook
+    // has a valid auth.currentUser (it's set asynchronously by the shell)
+    const handleAuth = () => {
+      loadFromCache();
+      fetchDirect();
+      // Retry after 500ms in case the first call raced with auth init
+      const timer = setTimeout(fetchDirect, 500);
+      return () => clearTimeout(timer);
     };
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
     return () => {
-      window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, load);
+      window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, handleNotebookChanged);
       window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
     };
   }, []);

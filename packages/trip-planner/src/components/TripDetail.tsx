@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { Trip, Activity, ItineraryDay, Ticket } from '../types';
 
@@ -39,6 +39,21 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
   const [ticketDate, setTicketDate] = useState(trip.startDate);
 
   const dates = generateDates(trip.startDate, trip.endDate);
+
+  // Deduplicate itinerary entries with the same date (merge their activities)
+  const deduped = useMemo(() => {
+    const map = new Map<string, ItineraryDay>();
+    for (const day of trip.itinerary) {
+      const existing = map.get(day.date);
+      if (existing) {
+        map.set(day.date, { ...existing, activities: [...existing.activities, ...day.activities] });
+      } else {
+        map.set(day.date, day);
+      }
+    }
+    return map;
+  }, [trip.itinerary]);
+
   const totalSpent = trip.itinerary.reduce(
     (sum, day) => sum + day.activities.reduce((s, a) => s + (a.cost || 0), 0),
     0,
@@ -241,7 +256,7 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">{t('tripPlanner.itinerary')}</h3>
         <div className="space-y-4">
           {dates.map((date, idx) => {
-            const day = trip.itinerary.find(d => d.date === date);
+            const day = deduped.get(date);
             const dayLabel = new Date(date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
             return (
               <div key={date} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
