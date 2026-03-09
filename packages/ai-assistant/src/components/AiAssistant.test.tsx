@@ -229,25 +229,9 @@ describe('AiAssistant', () => {
     expect(screen.getByText('Crypto prices')).toBeInTheDocument();
   });
 
-  it('does not show scrollbar on empty chat (overflow-hidden)', () => {
-    renderWithProviders(<AiAssistant />);
-    const chatArea = screen.getByRole('list', { name: 'Chat messages' });
-    expect(chatArea.className).toContain('overflow-hidden');
-    expect(chatArea.className).not.toContain('overflow-y-auto');
-  });
-
-  it('shows scrollbar when messages are present (overflow-y-auto)', () => {
-    mockUseAiChat.mockReturnValue({
-      messages: [{ id: '1', role: 'user', content: 'Hello', timestamp: Date.now() }],
-      loading: false,
-      error: null,
-      sendMessage: vi.fn(),
-      clearChat: vi.fn(),
-    });
-
+  it('chat area always uses overflow-y-auto for scroll containment', () => {
     renderWithProviders(<AiAssistant />);
     const chatArea = screen.getByRole('list', { name: 'Chat messages' });
     expect(chatArea.className).toContain('overflow-y-auto');
-    expect(chatArea.className).not.toContain('overflow-hidden');
   });
 });

@@ -32,7 +32,7 @@ const TOOL_MODE_STORAGE_KEY = 'mycircle-ai-tool-mode';
 
 export default function AiAssistant() {
   const { t } = useTranslation();
-  const { messages, loading, streaming, streamingContent, activeToolCalls, thinkingSteps, error, canRetry, sendMessage, clearChat, retry } = useAiChatWithStreaming();
+  const { messages, loading, streaming, streamingContent, activeToolCalls, thinkingSteps, error, canRetry, sendMessage, clearChat, retry, abort } = useAiChatWithStreaming();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's Ollama endpoints
@@ -96,16 +96,18 @@ export default function AiAssistant() {
   }, [displayModels, selectedModel]);
 
   const handleEndpointChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (loading || streaming) abort();
     const id = e.target.value;
     setSelectedEndpoint(id);
     try { localStorage.setItem(ENDPOINT_STORAGE_KEY, id); } catch { /* */ }
-  }, []);
+  }, [loading, streaming, abort]);
 
   const handleModelChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (loading || streaming) abort();
     const model = e.target.value;
     setSelectedModel(model);
     try { localStorage.setItem(MODEL_STORAGE_KEY, model); } catch { /* */ }
-  }, []);
+  }, [loading, streaming, abort]);
 
   const [debugMode, setDebugMode] = useState(() => {
     try { return localStorage.getItem(DEBUG_STORAGE_KEY) === 'true'; } catch { return false; }
@@ -133,7 +135,7 @@ export default function AiAssistant() {
   }, [messages, loading, streaming, streamingContent]);
 
   return (
-    <PageContent maxWidth="3xl" fill className="ai-assistant">
+    <PageContent maxWidth="3xl" fill className="ai-assistant min-h-0 overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-y-2 mb-4">
         <div className="min-w-0 flex-shrink">
@@ -281,10 +283,10 @@ export default function AiAssistant() {
           <AiMonitor />
         </Suspense>
       ) : (
-        <>
+        <div className="flex-1 flex flex-col min-h-0">
           {/* Messages area */}
           <div
-            className={`flex-1 space-y-4 mb-4 min-h-0 ${messages.length > 0 || loading || streaming ? 'overflow-y-auto' : 'overflow-hidden'}`}
+            className={`flex-1 space-y-4 mb-4 min-h-0 overflow-y-auto`}
             role="list"
             aria-label={t('ai.chatMessages')}
             aria-live="polite"
@@ -437,9 +439,26 @@ export default function AiAssistant() {
             </div>
           )}
 
+          {/* Stop button */}
+          {(loading || streaming) && (
+            <div className="flex justify-center mb-2">
+              <button
+                type="button"
+                onClick={abort}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                aria-label={t('ai.stop')}
+              >
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="6" width="12" height="12" rx="1" />
+                </svg>
+                {t('ai.stop')}
+              </button>
+            </div>
+          )}
+
           {/* Input */}
           <ChatInput onSend={sendMessage} disabled={loading || streaming} />
-        </>
+        </div>
       )}
     </PageContent>
   );

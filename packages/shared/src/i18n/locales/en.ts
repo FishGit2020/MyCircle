@@ -463,6 +463,7 @@ const en = {
   'ai.copyMessage': 'Copy message',
   'ai.copied': 'Copied!',
   'ai.retry': 'Retry',
+  'ai.stop': 'Stop',
   'ai.suggestWeather': "What's the weather in New York?",
   'ai.suggestStocks': 'How is AAPL doing today?',
   'ai.suggestNavigate': 'Take me to the podcasts page',
