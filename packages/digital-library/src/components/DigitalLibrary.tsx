@@ -28,15 +28,13 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function BookCard({ book, onSelect, onSelectListen, onDelete, currentUid }: {
+function BookCard({ book, onSelect, onSelectListen, onDelete }: {
   book: Book;
   onSelect: (book: Book) => void;
   onSelectListen: (book: Book) => void;
   onDelete: (bookId: string) => void;
-  currentUid: string | null;
 }) {
   const { t } = useTranslation();
-  const isOwner = currentUid === book.uploadedBy?.uid;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
@@ -93,18 +91,16 @@ function BookCard({ book, onSelect, onSelectListen, onDelete, currentUid }: {
           )}
         </div>
       </button>
-      {isOwner && (
-        <div className="px-4 pb-3">
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onDelete(book.id); }}
-            className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors min-h-[44px] flex items-center"
-            aria-label={`${t('library.deleteBook')}: ${book.title}`}
-          >
-            {t('library.delete')}
-          </button>
-        </div>
-      )}
+      <div className="px-4 pb-3">
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onDelete(book.id); }}
+          className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors min-h-[44px] flex items-center"
+          aria-label={`${t('library.deleteBook')}: ${book.title}`}
+        >
+          {t('library.delete')}
+        </button>
+      </div>
     </div>
   );
 }
@@ -223,7 +219,6 @@ export default function DigitalLibrary() {
   const { t } = useTranslation();
   const { bookId: urlBookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
-  const [currentUid, setCurrentUid] = useState<string | null>(null);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const pendingBookIdRef = useRef<string | undefined>(urlBookId);
@@ -235,18 +230,6 @@ export default function DigitalLibrary() {
   });
 
   const books: Book[] = (data?.books ?? []) as Book[];
-
-  // Listen for auth state
-  useEffect(() => {
-    const handleAuth = () => {
-      window.__getFirebaseIdToken?.().then(token => {
-        setCurrentUid(token ? window.__currentUid || null : null);
-      });
-    };
-    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
-    handleAuth();
-    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handleAuth);
-  }, []);
 
   // Refetch when BOOKS_CHANGED event fires (after upload)
   useEffect(() => {
@@ -356,7 +339,6 @@ export default function DigitalLibrary() {
               onSelect={handleSelect}
               onSelectListen={handleSelectListen}
               onDelete={handleDelete}
-              currentUid={currentUid}
             />
           ))}
         </div>

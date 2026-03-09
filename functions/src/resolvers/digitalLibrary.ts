@@ -138,54 +138,36 @@ export function createDigitalLibraryResolvers() {
 
     Mutation: {
       deleteBook: async (_: any, { id }: { id: string }, context: ResolverContext) => {
-        const uid = requireAuth(context);
+        requireAuth(context);
         const db = getFirestore();
         const bookRef = db.collection('books').doc(id);
         const bookDoc = await bookRef.get();
         if (!bookDoc.exists) {
           throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
-        }
-        const bookData = bookDoc.data()!;
-        if (bookData.uploadedBy?.uid !== uid) {
-          throw new GraphQLError('Only the uploader can delete this book', {
-            extensions: { code: 'FORBIDDEN' },
-          });
         }
         await bookRef.update({ isDeleted: true, deletedAt: FieldValue.serverTimestamp() });
         return true;
       },
 
       restoreBook: async (_: any, { id }: { id: string }, context: ResolverContext) => {
-        const uid = requireAuth(context);
+        requireAuth(context);
         const db = getFirestore();
         const bookRef = db.collection('books').doc(id);
         const bookDoc = await bookRef.get();
         if (!bookDoc.exists) {
           throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
-        }
-        const bookData = bookDoc.data()!;
-        if (bookData.uploadedBy?.uid !== uid) {
-          throw new GraphQLError('Only the uploader can restore this book', {
-            extensions: { code: 'FORBIDDEN' },
-          });
         }
         await bookRef.update({ isDeleted: false, deletedAt: null });
         return true;
       },
 
       permanentDeleteBook: async (_: any, { id }: { id: string }, context: ResolverContext) => {
-        const uid = requireAuth(context);
+        requireAuth(context);
         const db = getFirestore();
         const bookRef = db.collection('books').doc(id);
         const bookDoc = await bookRef.get();
         if (!bookDoc.exists) {
           throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
-        }
-        const bookData = bookDoc.data()!;
-        if (bookData.uploadedBy?.uid !== uid) {
-          throw new GraphQLError('Only the uploader can permanently delete this book', {
-            extensions: { code: 'FORBIDDEN' },
-          });
         }
 
         // Delete chapters subcollection + book doc in a batch

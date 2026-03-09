@@ -186,9 +186,6 @@ export const digitalLibrary = onRequest(
       const bookDoc = await bookRef.get();
       if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
 
-      const bookData = bookDoc.data()!;
-      if (bookData.uploadedBy?.uid !== uid) { res.status(403).json({ error: 'Only the uploader can delete this book' }); return; }
-
       // Soft-delete: mark as deleted, keep storage files for 30-day recovery
       await bookRef.update({ isDeleted: true, deletedAt: FieldValue.serverTimestamp() });
 
@@ -206,9 +203,6 @@ export const digitalLibrary = onRequest(
       const bookDoc = await bookRef.get();
       if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
 
-      const bookData = bookDoc.data()!;
-      if (bookData.uploadedBy?.uid !== uid) { res.status(403).json({ error: 'Only the uploader can restore this book' }); return; }
-
       await bookRef.update({ isDeleted: false, deletedAt: null });
 
       logger.info('Book restored', { bookId });
@@ -224,9 +218,6 @@ export const digitalLibrary = onRequest(
       const bookRef = db.collection('books').doc(bookId);
       const bookDoc = await bookRef.get();
       if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
-
-      const bookData = bookDoc.data()!;
-      if (bookData.uploadedBy?.uid !== uid) { res.status(403).json({ error: 'Only the uploader can permanently delete this book' }); return; }
 
       // Delete chapters subcollection
       const chaptersSnap = await bookRef.collection('chapters').get();
