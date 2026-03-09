@@ -3,7 +3,6 @@ import {
   UserProfile,
   FavoriteCity,
   getDailyLogEntries,
-  getUserFiles,
   getBenchmarkSummary,
   getUserNotes,
   migrateToMultiChild,
@@ -168,12 +167,8 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     }
     window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
   }).catch(() => {});
-  getUserFiles(uid).then(files => {
-    if (files.length > 0) {
-      localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(files));
-    }
-    window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
-  }).catch(() => {});
+  // Cloud files are now fetched via GraphQL — just signal MFEs to refresh
+  window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
   // Worship songs are now served via Apollo GraphQL — no localStorage restore needed.
   getBenchmarkSummary(uid).then(summary => {
     if (summary) {
