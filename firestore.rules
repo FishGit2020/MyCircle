@@ -65,6 +65,11 @@ service cloud.firestore {
       match /children/{childId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Trips subcollection - private per-user trip planning
+      match /trips/{tripId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Public hiking routes - authenticated read/create, creator-only delete
@@ -124,6 +129,14 @@ service cloud.firestore {
     // Scores stored as games/scores/{gameType}/{scoreId} (subcollection per game type)
     match /games/scores/{gameType}/{scoreId} {
       allow read, write: if request.auth != null;
+    }
+
+    // Polls - public read, authenticated create, creator can delete
+    match /polls/{pollId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
     }
 
     // Books - shared library, authenticated read, uploader can write/delete

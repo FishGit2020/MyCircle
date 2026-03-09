@@ -1772,4 +1772,131 @@ if (firebaseEnabled) {
   };
 }
 
+// ─── Trip Planner CRUD ─────────────────────────────────────────────
+async function getTrips(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'trips'), orderBy('startDate', 'asc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function addTrip(uid: string, trip: Record<string, unknown>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'users', uid, 'trips'), {
+    ...trip,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+async function updateTrip(uid: string, tripId: string, updates: Record<string, unknown>) {
+  if (!db) throw new Error('Firebase not initialized');
+  await updateDoc(doc(db, 'users', uid, 'trips', tripId), {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+async function deleteTrip(uid: string, tripId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'users', uid, 'trips', tripId));
+}
+
+function subscribeToTrips(uid: string, callback: (trips: Array<Record<string, unknown>>) => void) {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'trips'), orderBy('startDate', 'asc'));
+  return onSnapshot(q, (snapshot) => {
+    callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, (error) => { log.warn('Trips snapshot error:', error); });
+}
+
+if (firebaseEnabled) {
+  window.__tripPlanner = {
+    getAll: () => auth?.currentUser ? getTrips(auth.currentUser.uid) : Promise.resolve([]),
+    add: (trip: Record<string, unknown>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addTrip(auth.currentUser.uid, trip);
+    },
+    update: (id: string, updates: Record<string, unknown>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateTrip(auth.currentUser.uid, id, updates);
+    },
+    delete: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteTrip(auth.currentUser.uid, id);
+    },
+    subscribe: (callback: (trips: Array<Record<string, unknown>>) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToTrips(auth.currentUser.uid, callback);
+    },
+  };
+}
+
+// ─── Poll System CRUD ──────────────────────────────────────────────
+// Polls are stored publicly at /polls/{pollId} so anyone can vote
+async function getPolls() {
+  if (!db) return [];
+  const q = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function addPoll(uid: string, poll: Record<string, unknown>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const docRef = await addDoc(collection(db, 'polls'), {
+    ...poll,
+    createdBy: uid,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+async function deletePoll(pollId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  await deleteDoc(doc(db, 'polls', pollId));
+}
+
+async function votePoll(pollId: string, optionId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  const pollRef = doc(db, 'polls', pollId);
+  const snap = await getDoc(pollRef);
+  if (!snap.exists()) throw new Error('Poll not found');
+  const data = snap.data();
+  const options = (data.options || []).map((opt: Record<string, unknown>) =>
+    opt.id === optionId ? { ...opt, votes: ((opt.votes as number) || 0) + 1 } : opt,
+  );
+  await updateDoc(pollRef, { options, updatedAt: serverTimestamp() });
+}
+
+function subscribeToPolls(callback: (polls: Array<Record<string, unknown>>) => void) {
+  if (!db) return () => {};
+  const q = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    callback(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, (error) => { log.warn('Polls snapshot error:', error); });
+}
+
+if (firebaseEnabled) {
+  window.__pollSystem = {
+    getAll: () => getPolls(),
+    add: (poll: Record<string, unknown>) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addPoll(auth.currentUser.uid, poll);
+    },
+    delete: (id: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deletePoll(id);
+    },
+    vote: (pollId: string, optionId: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return votePoll(pollId, optionId);
+    },
+    subscribe: (callback: (polls: Array<Record<string, unknown>>) => void) => {
+      return subscribeToPolls(callback);
+    },
+  };
+}
+
 export { app, auth, db, perf, analytics, firebaseEnabled };
