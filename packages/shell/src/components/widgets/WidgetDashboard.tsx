@@ -78,8 +78,24 @@ export default function WidgetDashboard() {
             <Link
               key={widgetId}
               to={to}
-              className={`block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all ${sizeClass} ${spanClass}`}
+              className={`group relative block bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all ${sizeClass} ${spanClass}`}
             >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const l = loadWidgetLayout();
+                  saveWidgetLayout({ ...l, pinned: l.pinned.filter(id => id !== widgetId) });
+                }}
+                className="absolute top-1 right-1 p-1 rounded-full text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all z-10"
+                aria-label={t('home.unpinWidget')}
+                title={t('home.unpinWidget')}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
               <ErrorBoundary>
                 <WidgetComponent />
               </ErrorBoundary>

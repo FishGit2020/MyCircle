@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, PageContent } from '@mycircle/shared';
 import { useAnnouncements, type Announcement } from '../hooks/useAnnouncements';
 
 const ICON_MAP: Record<string, string> = {
@@ -36,7 +36,8 @@ export default function WhatsNewPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto" data-testid="whats-new-page">
+    <PageContent maxWidth="3xl">
+      <div data-testid="whats-new-page">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">{t('whatsNew.title')}</h1>
 
       {loading ? (
@@ -95,6 +96,7 @@ export default function WhatsNewPage() {
           })}
         </div>
       )}
-    </div>
+      </div>
+    </PageContent>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useTranslation, WindowEvents } from '@mycircle/shared';
+import { useTranslation, WindowEvents, PageContent } from '@mycircle/shared';
 
 interface TrashItem {
   id: string;
@@ -166,17 +166,17 @@ export default function RecycleBinPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <PageContent maxWidth="3xl">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('recycleBin.title')}</h1>
         <div className="flex items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
-      </div>
+      </PageContent>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <PageContent maxWidth="3xl">
       <div className="flex items-center gap-3 mb-2">
         <svg className="w-7 h-7 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -214,6 +214,6 @@ export default function RecycleBinPage() {
           />
         </div>
       )}
-    </div>
+    </PageContent>
   );
 }
