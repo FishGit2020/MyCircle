@@ -2221,6 +2221,10 @@ const en = {
   'recycleBin.type.route': 'Route',
   'recycleBin.type.child': 'Child Profile',
   'recycleBin.type.book': 'Book',
+  'recycleBin.type.poll': 'Poll',
+  'recycleBin.type.worship': 'Worship Song',
+  'recycleBin.personalSection': 'Personal',
+  'recycleBin.publicSection': 'Shared / Public',
 } as const;
 
 export default en;

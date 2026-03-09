@@ -2223,6 +2223,10 @@ const zh: Record<TranslationKey, string> = {
   'recycleBin.type.route': '\u8def\u7ebf',
   'recycleBin.type.child': '\u5b69\u5b50\u8d44\u6599',
   'recycleBin.type.book': '\u4e66\u7c4d',
+  'recycleBin.type.poll': '\u6295\u7968',
+  'recycleBin.type.worship': '\u6572\u62dc\u6b4c\u66f2',
+  'recycleBin.personalSection': '\u4e2a\u4eba',
+  'recycleBin.publicSection': '\u5171\u4eab / \u516c\u5f00',
 };
 
 export default zh;
