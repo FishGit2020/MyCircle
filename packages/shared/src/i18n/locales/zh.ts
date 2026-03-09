@@ -2195,6 +2195,8 @@ const zh: Record<TranslationKey, string> = {
   'commandPalette.goToRadio': '\u524d\u5f80\u5e7f\u64ad',
   'widgets.radio': '\u5e7f\u64ad',
   'widgets.radioDesc': '\u6536\u542c\u7f51\u7edc\u5e7f\u64ad\u7535\u53f0',
+  'widgets.aiAssistant': 'AI \u52a9\u624b',
+  'widgets.aiAssistantDesc': '\u4e0e\u4f60\u7684 AI \u52a9\u624b\u804a\u5929',
   'radio.title': '\u5e7f\u64ad\u7535\u53f0',
   'radio.search': '\u641c\u7d22\u7535\u53f0...',
   'radio.browse': '\u6d4f\u89c8',

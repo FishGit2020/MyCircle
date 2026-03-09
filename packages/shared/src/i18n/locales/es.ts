@@ -2195,6 +2195,8 @@ const es: Record<TranslationKey, string> = {
   'commandPalette.goToRadio': 'Ir a Radio',
   'widgets.radio': 'Radio',
   'widgets.radioDesc': 'Escucha estaciones de radio por internet',
+  'widgets.aiAssistant': 'Asistente IA',
+  'widgets.aiAssistantDesc': 'Chatea con tu asistente de IA',
   'radio.title': 'Estaciones de Radio',
   'radio.search': 'Buscar estaciones...',
   'radio.browse': 'Explorar',
