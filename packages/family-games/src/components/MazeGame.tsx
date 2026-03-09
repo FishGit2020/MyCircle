@@ -180,20 +180,20 @@ export default function MazeGame({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* D-pad controls for touch */}
-      <div className="grid grid-cols-3 gap-1 w-36">
+      <div className="grid grid-cols-3 gap-1.5 w-52">
         <div />
-        <button type="button" onClick={() => move(-1, 0)} className="p-3 bg-gray-200 dark:bg-gray-700 rounded-lg active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Up">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" /></svg>
+        <button type="button" onClick={() => move(-1, 0)} className="p-4 bg-gray-200 dark:bg-gray-700 rounded-xl active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Up">
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" /></svg>
         </button>
         <div />
-        <button type="button" onClick={() => move(0, -1)} className="p-3 bg-gray-200 dark:bg-gray-700 rounded-lg active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Left">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+        <button type="button" onClick={() => move(0, -1)} className="p-4 bg-gray-200 dark:bg-gray-700 rounded-xl active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Left">
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
         </button>
-        <button type="button" onClick={() => move(1, 0)} className="p-3 bg-gray-200 dark:bg-gray-700 rounded-lg active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Down">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        <button type="button" onClick={() => move(1, 0)} className="p-4 bg-gray-200 dark:bg-gray-700 rounded-xl active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Down">
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
         </button>
-        <button type="button" onClick={() => move(0, 1)} className="p-3 bg-gray-200 dark:bg-gray-700 rounded-lg active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Right">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        <button type="button" onClick={() => move(0, 1)} className="p-4 bg-gray-200 dark:bg-gray-700 rounded-xl active:bg-gray-300 dark:active:bg-gray-600 flex items-center justify-center" aria-label="Right">
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
         </button>
       </div>
     </div>

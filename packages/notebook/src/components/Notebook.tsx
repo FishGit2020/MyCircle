@@ -15,8 +15,8 @@ export default function Notebook() {
   const { noteId } = useParams<{ noteId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { notes, loading, error, saveNote, deleteNote, reload } = useNotes();
-  const { notes: publicNotes, loading: publicLoading, error: publicError, publishNote, updateNote: updatePublicNote, deleteNote: deletePublicNote, reload: reloadPublic } = usePublicNotes();
+  const { notes, loading, error, saveNote, deleteNote } = useNotes();
+  const { notes: publicNotes, loading: publicLoading, error: publicError, publishNote, updateNote: updatePublicNote, deleteNote: deletePublicNote } = usePublicNotes();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const VALID_TABS = new Set(['my', 'public']);
@@ -58,14 +58,16 @@ export default function Notebook() {
   const hasApi = typeof window.__notebook !== 'undefined';
 
   // All hooks MUST be above early returns (React rules of hooks)
+  const tabQuery = tab === 'public' ? '?tab=public' : '';
+
   const handleSave = useCallback(async (id: string | null, data: { title: string; content: string }) => {
     if (tab === 'public' && id) {
       await updatePublicNote(id, data);
     } else {
       await saveNote(id, data);
     }
-    navigate('/notebook', { replace: true });
-  }, [tab, updatePublicNote, saveNote, navigate]);
+    navigate(`/notebook${tabQuery}`, { replace: true });
+  }, [tab, tabQuery, updatePublicNote, saveNote, navigate]);
 
   const handleDelete = useCallback(async (id: string) => {
     if (view === 'edit') {
@@ -77,15 +79,15 @@ export default function Notebook() {
       await deleteNote(id);
     }
     if (view === 'edit') {
-      navigate('/notebook');
+      navigate(`/notebook${tabQuery}`);
     }
-  }, [view, tab, deletePublicNote, deleteNote, navigate, t]);
+  }, [view, tab, tabQuery, deletePublicNote, deleteNote, navigate, t]);
 
   const handlePublish = useCallback(async (data: { title: string; content: string }) => {
     await publishNote(data);
     setTab('public');
-    navigate('/notebook', { replace: true });
-  }, [publishNote, navigate]);
+    navigate('/notebook?tab=public', { replace: true });
+  }, [publishNote, setTab, navigate]);
 
   if (!isAuthenticated || !hasApi) {
     return (
@@ -122,7 +124,7 @@ export default function Notebook() {
       <NoteEditor
         note={view === 'edit' ? selectedNote : null}
         onSave={handleSave}
-        onCancel={() => navigate('/notebook')}
+        onCancel={() => navigate(`/notebook${tabQuery}`)}
         onDelete={view === 'edit' ? handleDelete : undefined}
         onPublish={tab === 'my' ? handlePublish : undefined}
       />
@@ -153,16 +155,6 @@ export default function Notebook() {
             {label}
           </button>
         ))}
-        <button
-          type="button"
-          onClick={() => { reload(); reloadPublic(); }}
-          className="ml-auto p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          aria-label={t('notebook.refresh')}
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
       </div>
 
       <NoteList
