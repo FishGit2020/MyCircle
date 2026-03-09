@@ -1667,6 +1667,8 @@ const es: Record<TranslationKey, string> = {
   'library.listenNow': 'Escuchar Ahora',
   'library.tabRead': 'Leer',
   'library.tabListen': 'Escuchar',
+  'library.tabs.read': 'Leer',
+  'library.tabs.listen': 'Escuchar',
   'library.convertToAudio': 'Convertir a Audio',
   'library.converting': 'Convirtiendo...',
   'library.conversionProgress': 'Progreso de conversi\u00f3n de audio',

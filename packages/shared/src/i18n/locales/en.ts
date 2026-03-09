@@ -1665,6 +1665,8 @@ const en = {
   'library.listenNow': 'Listen Now',
   'library.tabRead': 'Read',
   'library.tabListen': 'Listen',
+  'library.tabs.read': 'Read',
+  'library.tabs.listen': 'Listen',
   'library.convertToAudio': 'Convert to Audio',
   'library.converting': 'Converting...',
   'library.conversionProgress': 'Audio conversion progress',
