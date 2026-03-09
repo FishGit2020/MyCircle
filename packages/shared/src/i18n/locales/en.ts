@@ -2182,6 +2182,8 @@ const en = {
   'commandPalette.goToRadio': 'Go to Radio',
   'widgets.radio': 'Radio',
   'widgets.radioDesc': 'Listen to internet radio stations',
+  'widgets.aiAssistant': 'AI Assistant',
+  'widgets.aiAssistantDesc': 'Chat with your AI assistant',
   'radio.title': 'Radio Stations',
   'radio.search': 'Search stations...',
   'radio.browse': 'Browse',
