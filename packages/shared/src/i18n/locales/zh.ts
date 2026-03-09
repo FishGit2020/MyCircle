@@ -1691,6 +1691,9 @@ const zh: Record<TranslationKey, string> = {
   'library.download': '\u4e0b\u8f7d',
   'library.quotaReached': '\u6708\u5ea6TTS\u914d\u989d\u5df2\u7528\u5c3d ({used}M / {limit}M \u5b57\u7b26)\u3002\u4e0b\u6708\u91cd\u7f6e\u3002',
   'library.selectVoice': '\u9009\u62e9\u8bed\u97f3',
+  'library.previewVoice': '\u8bd5\u542c',
+  'library.playing': '\u64ad\u653e\u4e2d...',
+  'library.browseVoices': '\u6d4f\u89c8\u6240\u6709\u8bed\u97f3',
   'library.conversionTimedOut': '\u8f6c\u6362\u8d85\u65f6\u3002\u91cd\u8bd5\u4ee5\u7ee7\u7eed \u2014 \u5df2\u5b8c\u6210\u7684\u7ae0\u8282\u5c06\u88ab\u8df3\u8fc7\u3002',
   'library.tooManyConversions': '\u592a\u591a\u8f6c\u6362\u6b63\u5728\u8fdb\u884c\u4e2d\u3002\u8bf7\u7a0d\u540e\u91cd\u8bd5\u3002',
   'library.convertingRefresh': '\u97f3\u9891\u8f6c\u6362\u8fdb\u884c\u4e2d\u3002\u5237\u65b0\u4ee5\u67e5\u770b\u72b6\u6001\u3002',
@@ -2163,6 +2166,15 @@ const zh: Record<TranslationKey, string> = {
   'pollSystem.results': '\u7ed3\u679c',
   'pollSystem.activePolls': '\u8fdb\u884c\u4e2d\u7684\u6295\u7968',
   'pollSystem.noActive': '\u6ca1\u6709\u8fdb\u884c\u4e2d\u7684\u6295\u7968',
+  'pollSystem.expiredOn': '\u5df2\u4e8e\u8fc7\u671f',
+  'pollSystem.expiresOn': '\u5c06\u4e8e\u8fc7\u671f',
+  'pollSystem.voteFor': '\u6295\u7968\u7ed9',
+  'pollSystem.clickToVote': '\u70b9\u51fb\u9009\u9879\u8fdb\u884c\u6295\u7968',
+  'pollSystem.optionsLabel': '\u9009\u9879',
+  'pollSystem.option': '\u9009\u9879',
+  'pollSystem.makePublic': '\u8bbe\u4e3a\u516c\u5f00\u6295\u7968',
+  'pollSystem.setExpiration': '\u8bbe\u7f6e\u8fc7\u671f\u65e5\u671f',
+  'pollSystem.votes': '\u7968',
 };
 
 export default zh;

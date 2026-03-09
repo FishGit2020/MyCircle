@@ -1691,6 +1691,9 @@ const es: Record<TranslationKey, string> = {
   'library.download': 'Descargar',
   'library.quotaReached': 'Cuota mensual de TTS alcanzada ({used}M / {limit}M caracteres). Se renueva el pr\u00f3ximo mes.',
   'library.selectVoice': 'Seleccionar Voz',
+  'library.previewVoice': 'Vista previa',
+  'library.playing': 'Reproduciendo...',
+  'library.browseVoices': 'Ver todas las voces',
   'library.conversionTimedOut': 'La conversi\u00f3n expir\u00f3. Reintenta para continuar \u2014 los cap\u00edtulos completados se omitir\u00e1n.',
   'library.tooManyConversions': 'Demasiadas conversiones en progreso. Int\u00e9ntalo m\u00e1s tarde.',
   'library.convertingRefresh': 'Conversi\u00f3n de audio en progreso. Actualiza para ver el estado.',
@@ -2163,6 +2166,15 @@ const es: Record<TranslationKey, string> = {
   'pollSystem.results': 'Resultados',
   'pollSystem.activePolls': 'Encuestas activas',
   'pollSystem.noActive': 'No hay encuestas activas',
+  'pollSystem.expiredOn': 'Expir\u00f3 el',
+  'pollSystem.expiresOn': 'Expira el',
+  'pollSystem.voteFor': 'Votar por',
+  'pollSystem.clickToVote': 'Haz clic en una opci\u00f3n para votar',
+  'pollSystem.optionsLabel': 'Opciones',
+  'pollSystem.option': 'Opci\u00f3n',
+  'pollSystem.makePublic': 'Hacer p\u00fablica esta encuesta',
+  'pollSystem.setExpiration': 'Establecer fecha de expiraci\u00f3n',
+  'pollSystem.votes': 'votos',
 };
 
 export default es;

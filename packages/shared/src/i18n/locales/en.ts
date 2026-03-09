@@ -1689,6 +1689,9 @@ const en = {
   'library.download': 'Download',
   'library.quotaReached': 'Monthly TTS quota reached ({used}M / {limit}M chars). Resets next month.',
   'library.selectVoice': 'Select Voice',
+  'library.previewVoice': 'Preview',
+  'library.playing': 'Playing...',
+  'library.browseVoices': 'Browse all voices',
   'library.conversionTimedOut': 'Conversion timed out. Retry to continue — completed chapters will be skipped.',
   'library.tooManyConversions': 'Too many conversions in progress. Try again later.',
   'library.convertingRefresh': 'Audio conversion in progress. Refresh to check status.',
@@ -2161,6 +2164,15 @@ const en = {
   'pollSystem.results': 'Results',
   'pollSystem.activePolls': 'Active polls',
   'pollSystem.noActive': 'No active polls',
+  'pollSystem.expiredOn': 'Expired on',
+  'pollSystem.expiresOn': 'Expires on',
+  'pollSystem.voteFor': 'Vote for',
+  'pollSystem.clickToVote': 'Click an option to vote',
+  'pollSystem.optionsLabel': 'Options',
+  'pollSystem.option': 'Option',
+  'pollSystem.makePublic': 'Make this poll public',
+  'pollSystem.setExpiration': 'Set expiration date',
+  'pollSystem.votes': 'votes',
 } as const;
 
 export default en;
