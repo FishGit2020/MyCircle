@@ -23,4 +23,5 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   'doc-scanner': 'nav.docScanner',
   hiking: 'nav.hikingMap',
   trips: 'nav.tripPlanner',
+  polls: 'nav.pollSystem',
 };

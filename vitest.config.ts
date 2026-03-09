@@ -29,6 +29,7 @@ export default defineConfig({
       'hikingMap/HikingMap': resolve(__dirname, './packages/shell/test/mocks/HikingMapMock.tsx'),
       'tripPlanner/TripPlanner': resolve(__dirname, './packages/shell/test/mocks/TripPlannerMock.tsx'),
       'youthTracker/YouthTracker': resolve(__dirname, './packages/shell/test/mocks/YouthTrackerMock.tsx'),
+      'pollSystem/PollSystem': resolve(__dirname, './packages/shell/test/mocks/PollSystemMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/test/mocks/pwaRegisterReactMock.ts'),
       'epubjs': resolve(__dirname, './test/mocks/epubjsMock.ts'),
       '@mycircle/shared': resolve(__dirname, './packages/shared/src'),
