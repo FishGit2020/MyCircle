@@ -4,6 +4,11 @@ import type { Child } from '@mycircle/shared';
 import { getAgeRangeForMonths } from '../data/milestones';
 import YouthTimeline from './YouthTimeline';
 
+type StageTab = 'elementary' | 'teen';
+
+const ELEMENTARY_IDS = new Set(['5-6y', '6-8y', '8-10y']);
+const TEEN_IDS = new Set(['10-12y', '12-14y', '14-16y', '16-18y']);
+
 export default function YouthTracker() {
   const { t } = useTranslation();
   const { children, selectedChild, selectedId, setSelectedId, addChild, updateChild, deleteChild } = useChildren([60, 216]);
@@ -11,6 +16,7 @@ export default function YouthTracker() {
   const [isEditing, setIsEditing] = useState(false);
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
+  const [stageTab, setStageTab] = useState<StageTab | null>(null);
 
   const ageInMonths = useMemo(() => {
     if (!selectedChild) return null;
@@ -26,6 +32,13 @@ export default function YouthTracker() {
     if (ageInMonths === null) return null;
     return getAgeRangeForMonths(ageInMonths);
   }, [ageInMonths]);
+
+  // Auto-select tab based on child age (only when no explicit user choice)
+  const activeStageTab = useMemo(() => {
+    if (stageTab) return stageTab;
+    if (ageInMonths === null) return 'elementary';
+    return ageInMonths >= 120 ? 'teen' : 'elementary'; // 10 years = 120 months
+  }, [stageTab, ageInMonths]);
 
   const ageDisplay = useMemo(() => {
     if (ageInMonths === null) return '';
@@ -250,10 +263,39 @@ export default function YouthTracker() {
             </div>
           </div>
 
+          {/* Stage tabs */}
+          <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+            <button
+              type="button"
+              onClick={() => setStageTab('elementary')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeStageTab === 'elementary'
+                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              {t('youth.tabElementary' as any)}
+              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(5–10)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setStageTab('teen')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeStageTab === 'teen'
+                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              {t('youth.tabTeen' as any)}
+              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(10–18)</span>
+            </button>
+          </div>
+
           {/* Timeline */}
           <YouthTimeline
             ageInMonths={ageInMonths}
             currentAgeRange={currentAgeRange}
+            ageRangeIds={activeStageTab === 'elementary' ? ELEMENTARY_IDS : TEEN_IDS}
           />
         </>
       )}

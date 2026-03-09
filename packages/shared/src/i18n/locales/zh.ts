@@ -1946,6 +1946,8 @@ const zh: Record<TranslationKey, string> = {
   'nav.youthTracker': '\u9752\u5c11\u5e74\u8ffd\u8e2a',
   'youth.title': '\u9752\u5c11\u5e74\u8ffd\u8e2a',
   'youth.subtitle': '\u8ffd\u8e2a5-18\u5c81\u53d1\u5c55\u91cc\u7a0b\u7891',
+  'youth.tabElementary': '\u5c0f\u5b66',
+  'youth.tabTeen': '\u9752\u5c11\u5e74',
   'youth.domainPhysical': '\u8eab\u4f53\u4e0e\u5065\u5eb7',
   'youth.domainPhysicalDesc': '\u751f\u957f\u3001\u9752\u6625\u671f\u3001\u4f53\u68c0\u3001\u5065\u8eab',
   'youth.domainAcademic': '\u5b66\u4e1a\u4e0e\u8ba4\u77e5',

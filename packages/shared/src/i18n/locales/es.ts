@@ -1946,6 +1946,8 @@ const es: Record<TranslationKey, string> = {
   'nav.youthTracker': 'Seguimiento Juvenil',
   'youth.title': 'Seguimiento Juvenil',
   'youth.subtitle': 'Seguimiento de hitos del desarrollo para edades de 5 a 18 a\u00f1os',
+  'youth.tabElementary': 'Primaria',
+  'youth.tabTeen': 'Adolescente',
   'youth.domainPhysical': 'F\u00edsico y Salud',
   'youth.domainPhysicalDesc': 'Crecimiento, pubertad, chequeos, ejercicio',
   'youth.domainAcademic': 'Acad\u00e9mico y Cognitivo',
