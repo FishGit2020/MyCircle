@@ -294,6 +294,12 @@ export function useAiChatWithStreaming() {
     }
   }, [state.lastUserContent, sendMessage]);
 
+  const abort = useCallback(() => {
+    stopStream();
+    if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; }
+    setState(prev => ({ ...prev, loading: false, streaming: false, streamingContent: '' }));
+  }, [stopStream]);
+
   return {
     messages: state.messages,
     loading: state.loading,
@@ -306,5 +312,6 @@ export function useAiChatWithStreaming() {
     sendMessage,
     clearChat,
     retry,
+    abort,
   };
 }

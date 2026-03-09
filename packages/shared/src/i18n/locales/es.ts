@@ -465,6 +465,7 @@ const es: Record<TranslationKey, string> = {
   'ai.copyMessage': 'Copiar mensaje',
   'ai.copied': '\u00a1Copiado!',
   'ai.retry': 'Reintentar',
+  'ai.stop': 'Detener',
   'ai.suggestWeather': '\u00bfC\u00f3mo est\u00e1 el clima en Nueva York?',
   'ai.suggestStocks': '\u00bfC\u00f3mo va AAPL hoy?',
   'ai.suggestNavigate': 'Ll\u00e9vame a la p\u00e1gina de podcasts',

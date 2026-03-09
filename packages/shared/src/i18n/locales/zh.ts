@@ -465,6 +465,7 @@ const zh: Record<TranslationKey, string> = {
   'ai.copyMessage': '\u590d\u5236\u6d88\u606f',
   'ai.copied': '\u5df2\u590d\u5236\uff01',
   'ai.retry': '\u91cd\u8bd5',
+  'ai.stop': '\u505c\u6b62',
   'ai.suggestWeather': '\u7ebd\u7ea6\u5929\u6c14\u600e\u4e48\u6837\uff1f',
   'ai.suggestStocks': 'AAPL \u4eca\u5929\u8868\u73b0\u5982\u4f55\uff1f',
   'ai.suggestNavigate': '\u5e26\u6211\u53bb\u64ad\u5ba2\u9875\u9762',
