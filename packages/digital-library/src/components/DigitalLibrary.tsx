@@ -360,7 +360,6 @@ export default function DigitalLibrary() {
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}
         onBack={handleBack}
-        isAdmin={!!window.__isAdmin}
       />
     );
   }

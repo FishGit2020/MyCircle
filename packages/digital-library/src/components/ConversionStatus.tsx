@@ -24,10 +24,9 @@ interface ConversionStatusProps {
   initialProgress: number;
   onComplete: () => void;
   onConvert: (voiceName: string) => Promise<Response | undefined>;
-  isAdmin?: boolean;
 }
 
-export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert, isAdmin }: ConversionStatusProps) {
+export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert }: ConversionStatusProps) {
   const { t } = useTranslation();
   const [status, setStatus] = useState(initialStatus);
   const [progress, setProgress] = useState(initialProgress);
@@ -108,13 +107,13 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [onConvert, selectedVoice, t]);
 
-  const handleAdminReset = useCallback(async () => {
+  const handleReset = useCallback(async () => {
     setResetting(true);
     try {
       const token = await window.__getFirebaseIdToken?.();
       if (!token) return;
       const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/admin/reset-conversion/${bookId}`, {
+      const res = await fetch(`${apiBase}/digital-library-api/reset-conversion/${bookId}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -122,11 +121,10 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         setStatus('none');
         setProgress(0);
         setError(null);
-        logger.info('Admin reset conversion', { bookId });
         window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
       }
     } catch (err) {
-      logger.error('Admin reset failed', err);
+      logger.error('Reset conversion failed', err);
     } finally {
       setResetting(false);
     }
@@ -140,33 +138,45 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [status, converting, handleConvert]);
 
-  const adminResetButton = isAdmin && (status === 'processing' || status === 'paused' || status === 'error') ? (
+  const resetButton = (status === 'processing' || status === 'paused' || status === 'error') ? (
     <button
       type="button"
-      onClick={handleAdminReset}
+      onClick={handleReset}
       disabled={resetting}
       className="text-xs text-orange-600 dark:text-orange-400 hover:underline min-h-[44px] disabled:opacity-50"
     >
-      {resetting ? t('library.resetting') : t('library.adminForceReset')}
+      {resetting ? t('library.resetting') : t('library.resetConversion')}
     </button>
   ) : null;
 
   const [previewing, setPreviewing] = useState(false);
 
-  const handlePreview = useCallback(() => {
-    if (!('speechSynthesis' in window)) return;
+  const handlePreview = useCallback(async () => {
     setPreviewing(true);
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(
-      langCode === 'cmn-CN' ? '\u4f60\u597d\uff0c\u8fd9\u662f\u8bed\u97f3\u9884\u89c8\u3002'
-        : langCode === 'es-US' ? 'Hola, esta es una vista previa de la voz.'
-        : 'Hello, this is a voice preview sample.',
-    );
-    utterance.lang = langCode === 'cmn-CN' ? 'zh-CN' : langCode === 'es-US' ? 'es' : 'en-US';
-    utterance.onend = () => setPreviewing(false);
-    utterance.onerror = () => setPreviewing(false);
-    window.speechSynthesis.speak(utterance);
-  }, [langCode]);
+    try {
+      const token = await window.__getFirebaseIdToken?.();
+      if (!token) return;
+      const apiBase = window.__digitalLibraryApiBase?.() || '';
+      const res = await fetch(`${apiBase}/digital-library-api/preview-voice`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voiceName: selectedVoice }),
+      });
+      if (!res.ok) throw new Error('Preview failed');
+      const { audio } = await res.json();
+      const binary = atob(audio);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: 'audio/mpeg' });
+      const url = URL.createObjectURL(blob);
+      const player = new Audio(url);
+      player.onended = () => { setPreviewing(false); URL.revokeObjectURL(url); };
+      player.onerror = () => { setPreviewing(false); URL.revokeObjectURL(url); };
+      await player.play();
+    } catch {
+      setPreviewing(false);
+    }
+  }, [selectedVoice]);
 
   const voicePicker = (
     <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -183,8 +193,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           <option key={v} value={v}>{v}</option>
         ))}
       </select>
-      {'speechSynthesis' in window && (
-        <button
+      <button
           type="button"
           onClick={handlePreview}
           disabled={previewing}
@@ -196,7 +205,6 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           </svg>
           {previewing ? t('library.playing') : t('library.previewVoice')}
         </button>
-      )}
       <a
         href="https://cloud.google.com/text-to-speech#section-2"
         target="_blank"
@@ -254,7 +262,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           >
             {checking ? t('library.converting') : t('library.convertingRefresh')}
           </button>
-          {adminResetButton}
+          {resetButton}
         </div>
       </div>
     );
@@ -276,7 +284,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           </div>
         )}
         <p className="text-xs text-gray-500 dark:text-gray-400">{t('library.autoContinueHint')}</p>
-        {adminResetButton}
+        {resetButton}
       </div>
     );
   }
@@ -297,7 +305,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           >
             {converting ? t('library.converting') : progress > 0 ? t('library.retryConversion') : t('library.convertToAudio')}
           </button>
-          {adminResetButton}
+          {resetButton}
         </div>
       </div>
     );
