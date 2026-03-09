@@ -26,6 +26,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/youth-tracker': () => import('youthTracker/YouthTracker'),
   '/trips': () => import('tripPlanner/TripPlanner'),
   '/polls': () => import('pollSystem/PollSystem'),
+  '/radio': () => import('radioStation/RadioStation'),
 };
 
 export { ROUTE_MODULE_MAP };
@@ -44,6 +45,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/weather', labelKey: 'dashboard.weather', icon: 'weather' },
     { path: '/stocks',  labelKey: 'nav.stocks',        icon: 'stocks' },
     { path: '/podcasts', labelKey: 'nav.podcasts',     icon: 'podcasts' },
+    { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
   ]},
   { labelKey: 'nav.group.faith', items: [
     { path: '/bible',   labelKey: 'nav.bible',   icon: 'bible' },
@@ -98,4 +100,5 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
   { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' },
   { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' },
+  { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
 ];

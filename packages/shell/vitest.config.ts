@@ -46,6 +46,7 @@ export default defineConfig({
       'tripPlanner/TripPlanner': resolve(__dirname, './test/mocks/TripPlannerMock.tsx'),
       'youthTracker/YouthTracker': resolve(__dirname, './test/mocks/YouthTrackerMock.tsx'),
       'pollSystem/PollSystem': resolve(__dirname, './test/mocks/PollSystemMock.tsx'),
+      'radioStation/RadioStation': resolve(__dirname, './test/mocks/RadioStationMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }
