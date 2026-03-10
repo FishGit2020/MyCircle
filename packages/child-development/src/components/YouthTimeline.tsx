@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { AGE_RANGES, MILESTONES, DOMAINS } from '../data/youthMilestones';
 import type { AgeRange, Domain } from '../data/youthMilestones';
@@ -13,12 +13,36 @@ const DOMAIN_COLORS: Record<Domain, { bg: string; text: string; darkBg: string; 
 interface YouthTimelineProps {
   ageInMonths: number | null;
   currentAgeRange: AgeRange | null;
-  /** When provided, only show ranges within this group */
   ageRangeIds?: Set<string>;
 }
 
 export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeIds }: YouthTimelineProps) {
   const { t } = useTranslation();
+
+  const [expandedStages, setExpandedStages] = useState<Set<string>>(
+    () => new Set(currentAgeRange ? [currentAgeRange.id] : []),
+  );
+
+  // Auto-expand current stage when it changes
+  useEffect(() => {
+    if (currentAgeRange) {
+      setExpandedStages(prev => {
+        if (prev.has(currentAgeRange.id)) return prev;
+        const next = new Set(prev);
+        next.add(currentAgeRange.id);
+        return next;
+      });
+    }
+  }, [currentAgeRange]);
+
+  const toggleStage = (id: string) => {
+    setExpandedStages(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const stageStatus = useMemo(() => {
     if (!ageInMonths) return {};
@@ -30,6 +54,10 @@ export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeId
     }
     return result;
   }, [ageInMonths, currentAgeRange]);
+
+  const filteredRanges = ageRangeIds
+    ? AGE_RANGES.filter(r => ageRangeIds.has(r.id))
+    : AGE_RANGES;
 
   return (
     <div className="space-y-6">
@@ -49,11 +77,12 @@ export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeId
       <div className="relative">
         <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
 
-        {AGE_RANGES.filter(r => !ageRangeIds || ageRangeIds.has(r.id)).map((range) => {
+        {filteredRanges.map((range) => {
           const status = stageStatus[range.id] || 'upcoming';
           const milestones = MILESTONES.filter(m => m.ageRangeId === range.id);
           const isPast = status === 'past';
           const isCurrent = status === 'current';
+          const expanded = expandedStages.has(range.id);
 
           return (
             <div key={range.id} className="relative flex items-start gap-3 pb-6 last:pb-0">
@@ -70,19 +99,25 @@ export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeId
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
-                  <span className="text-xs font-bold">{range.id.split('-')[0]}+</span>
+                  <span className="text-xs font-bold">{range.id.split('-')[0]}</span>
                 )}
               </div>
 
               {/* Content */}
-              <div className={`flex-1 min-w-0 ${status === 'upcoming' ? 'opacity-50' : ''}`}>
-                <div className="flex items-center gap-2 flex-wrap mb-2">
+              <div className="flex-1 min-w-0">
+                {/* Clickable header */}
+                <button
+                  type="button"
+                  onClick={() => toggleStage(range.id)}
+                  className="w-full text-left flex items-center gap-2 flex-wrap mb-2"
+                  aria-expanded={expanded}
+                >
                   <span className={`text-sm font-semibold ${
                     isCurrent ? 'text-indigo-700 dark:text-indigo-300' :
                     isPast ? 'text-green-700 dark:text-green-300' :
-                    'text-gray-500 dark:text-gray-400'
+                    'text-gray-600 dark:text-gray-300'
                   }`}>
-                    {t(`youth.range_${range.id.replace('-', '_')}` as any) || range.label}
+                    {range.label}
                   </span>
                   {isCurrent && (
                     <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400">
@@ -94,10 +129,16 @@ export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeId
                       {t('childDev.pastStage' as any)}
                     </span>
                   )}
-                </div>
+                  <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">
+                    {milestones.length} {t('childDev.milestones' as any)}
+                  </span>
+                  <svg className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-                {/* Milestones grouped by domain */}
-                {(isCurrent || isPast) && (
+                {/* Expandable content */}
+                {expanded && (
                   <div className="space-y-2">
                     {DOMAINS.map(domain => {
                       const domainMilestones = milestones.filter(m => m.domain === domain.id);
@@ -118,6 +159,21 @@ export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeId
                         </div>
                       );
                     })}
+
+                    {/* CDC guide link */}
+                    {range.cdcLink && (
+                      <a
+                        href={range.cdcLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                      >
+                        {t('childDev.cdcGuide' as any)}
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 )}
               </div>
