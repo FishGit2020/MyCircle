@@ -1684,6 +1684,7 @@ const zh: Record<TranslationKey, string> = {
   'library.tabs.listen': '\u6536\u542c',
   'library.convertToAudio': '\u5168\u90e8\u8f6c\u6362\u4e3a\u97f3\u9891',
   'library.convertChapter': '\u8f6c\u6362',
+  'library.cancelConversion': '\u53d6\u6d88',
   'library.chapter': '\u7ae0\u8282',
   'library.chaptersConverted': '{converted}/{total} \u5df2\u8f6c\u6362',
   'library.chars': '\u5b57\u7b26',

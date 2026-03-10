@@ -1682,6 +1682,7 @@ const en = {
   'library.tabs.listen': 'Listen',
   'library.convertToAudio': 'Convert All to Audio',
   'library.convertChapter': 'Convert',
+  'library.cancelConversion': 'Cancel',
   'library.chapter': 'Chapter',
   'library.chaptersConverted': '{converted}/{total} converted',
   'library.chars': 'chars',

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { useTranslation, createLogger } from '@mycircle/shared';
+import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents } from '@mycircle/shared';
+import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
 
@@ -8,19 +9,53 @@ interface Chapter {
   title: string;
   characterCount: number;
   audioUrl?: string;
+  audioDuration?: number;
 }
 
 interface Props {
   bookId: string;
+  bookTitle: string;
+  coverUrl?: string;
   chapters: Chapter[];
   voiceName: string;
   onChapterConverted: () => void;
-  onPlay: (chapterIndex: number) => void;
 }
 
-export default function ChapterConvertList({ bookId, chapters, voiceName, onChapterConverted, onPlay }: Props) {
+export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted }: Props) {
   const { t } = useTranslation();
   const [converting, setConverting] = useState<number | null>(null);
+
+  const audioChapters = chapters.filter(ch => ch.audioUrl);
+
+  const handlePlay = useCallback((chapterIndex: number) => {
+    // Find the index within audio-only chapters
+    const audioOnly = chapters.filter(ch => ch.audioUrl);
+    const audioIdx = audioOnly.findIndex(ch => ch.index === chapterIndex);
+    if (audioIdx === -1) return;
+
+    const tracks = audioOnly.map(ch => ({
+      id: `${bookId}-${ch.index}`,
+      url: ch.audioUrl!,
+      title: ch.title || `${t('library.chapter')} ${ch.index + 1}`,
+    }));
+
+    const source: AudioSource = {
+      type: 'book',
+      track: tracks[audioIdx],
+      collection: { id: bookId, title: bookTitle, artwork: coverUrl, tracks },
+      trackIndex: audioIdx,
+      navigateTo: `/library/${bookId}?tab=listen&autoPlay=1`,
+      progressKey: StorageKeys.BOOK_AUDIO_PROGRESS,
+      nowPlayingKey: StorageKeys.BOOK_NOW_PLAYING,
+      lastPlayedKey: StorageKeys.BOOK_LAST_PLAYED,
+      lastPlayedEvent: WindowEvents.BOOK_LAST_PLAYED_CHANGED,
+      canQueue: true,
+      canShare: true,
+      skipSeconds: 10,
+    };
+
+    eventBus.publish(MFEvents.AUDIO_PLAY, source);
+  }, [chapters, bookId, bookTitle, coverUrl, t]);
 
   const handleConvert = useCallback(async (chapterIndex: number) => {
     setConverting(chapterIndex);
@@ -33,33 +68,30 @@ export default function ChapterConvertList({ bookId, chapters, voiceName, onChap
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ bookId, voiceName, chapterIndex }),
       });
-      if (res.ok) {
-        // Poll for completion — chapter conversion is fast (single chapter)
-        let attempts = 0;
-        const poll = async () => {
-          attempts++;
-          // Wait for chapter to appear with audioUrl via parent refetch
-          await new Promise(r => setTimeout(r, 3000));
-          onChapterConverted();
-          if (attempts < 40) { // max ~2 min polling
-            // Check if chapter now has audio by re-fetching
-            setTimeout(poll, 3000);
-          }
-        };
-        poll();
-      } else if (res.status === 429) {
-        const data = await res.json();
-        logger.warn('TTS quota reached', data);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        logger.warn('Chapter conversion failed', data);
       }
+      // Poll for completion
+      const poll = async (attempts: number) => {
+        if (attempts > 40) { setConverting(null); return; }
+        await new Promise(r => setTimeout(r, 3000));
+        onChapterConverted();
+        // Keep polling — parent will re-render with updated chapter data
+        setTimeout(() => poll(attempts + 1), 3000);
+      };
+      poll(0);
     } catch (err) {
       logger.error('Chapter conversion failed', err);
-    } finally {
-      // Clear converting state after a delay to let poll catch up
-      setTimeout(() => setConverting(null), 5000);
+      setConverting(null);
     }
   }, [bookId, voiceName, onChapterConverted]);
 
-  const convertedCount = chapters.filter(ch => ch.audioUrl).length;
+  const handleCancel = useCallback(() => {
+    setConverting(null);
+  }, []);
+
+  const convertedCount = audioChapters.length;
 
   return (
     <div>
@@ -104,11 +136,23 @@ export default function ChapterConvertList({ bookId, chapters, voiceName, onChap
                 )}
               </div>
 
-              {/* Action button */}
-              {hasAudio ? (
+              {/* Action buttons */}
+              {isConverting ? (
                 <button
                   type="button"
-                  onClick={() => onPlay(ch.index)}
+                  onClick={handleCancel}
+                  className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-md transition min-h-[44px]"
+                  aria-label={t('library.cancelConversion')}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  {t('library.cancelConversion')}
+                </button>
+              ) : hasAudio ? (
+                <button
+                  type="button"
+                  onClick={() => handlePlay(ch.index)}
                   className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-md transition min-h-[44px]"
                   aria-label={`${t('library.play')} ${ch.title}`}
                 >
@@ -121,14 +165,14 @@ export default function ChapterConvertList({ bookId, chapters, voiceName, onChap
                 <button
                   type="button"
                   onClick={() => handleConvert(ch.index)}
-                  disabled={isConverting || converting !== null}
+                  disabled={converting !== null}
                   className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-md transition min-h-[44px] disabled:opacity-50"
                   aria-label={`${t('library.convertChapter')} ${ch.title}`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
                   </svg>
-                  {isConverting ? t('library.converting') : t('library.convertChapter')}
+                  {t('library.convertChapter')}
                 </button>
               )}
             </li>
