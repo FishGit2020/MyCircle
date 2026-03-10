@@ -88,8 +88,7 @@ export function createWorshipSongResolvers() {
         const db = getFirestore();
         const snap = await db
           .collection(COLLECTION)
-          .where('isDeleted', '!=', true)
-          .orderBy('isDeleted')
+          .where('isDeleted', '==', false)
           .orderBy('createdAt', 'desc')
           .get();
         const songs = await Promise.all(
@@ -123,6 +122,7 @@ export function createWorshipSongResolvers() {
         const ref = await db.collection(COLLECTION).add({
           ...rest,
           storagePath: true,
+          isDeleted: false,
           createdBy: uid,
           createdAt: now,
           updatedAt: now,

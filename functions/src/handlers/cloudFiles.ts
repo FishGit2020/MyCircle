@@ -90,6 +90,7 @@ export const cloudFiles = onRequest(
           size: buffer.length,
           downloadUrl,
           storagePath: filePath,
+          isDeleted: false,
           uploadedAt: FieldValue.serverTimestamp(),
         });
 
