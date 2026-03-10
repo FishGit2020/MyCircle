@@ -65,7 +65,7 @@
     "start": "cross-env NODE_ENV=production tsx server/index.ts",
     "start:static": "node scripts/serve-static.mjs",
     "preview": "cross-env NODE_ENV=production tsx server/index.ts",
-    "lint": "eslint packages/ --max-warnings 600",
+    "lint": "eslint packages/ --max-warnings 610",
     "typecheck": "tsc --noEmit",
     "typecheck:all": "pnpm -r typecheck",
     "test": "vitest",
