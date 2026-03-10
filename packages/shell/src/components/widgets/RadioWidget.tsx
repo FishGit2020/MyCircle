@@ -1,8 +1,30 @@
-import React from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useEffect } from 'react';
+import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
 
 const RadioWidget = React.memo(function RadioWidget() {
   const { t } = useTranslation();
+  const [favCount, setFavCount] = React.useState(0);
+
+  useEffect(() => {
+    function load() {
+      try {
+        const stored = localStorage.getItem(StorageKeys.RADIO_FAVORITES);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) setFavCount(parsed.length);
+        } else {
+          setFavCount(0);
+        }
+      } catch { /* ignore */ }
+    }
+    load();
+    window.addEventListener(WindowEvents.RADIO_CHANGED, load);
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, load);
+    return () => {
+      window.removeEventListener(WindowEvents.RADIO_CHANGED, load);
+      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, load);
+    };
+  }, []);
 
   return (
     <div>
@@ -17,7 +39,13 @@ const RadioWidget = React.memo(function RadioWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.radioDesc')}</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('radio.title')}</p>
+      {favCount > 0 ? (
+        <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">
+          {t('widgets.radioFavCount' as any).replace('{count}', String(favCount))}
+        </p>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.radioNoFavorites' as any)}</p>
+      )}
     </div>
   );
 });
