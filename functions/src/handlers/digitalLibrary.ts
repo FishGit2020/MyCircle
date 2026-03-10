@@ -357,32 +357,35 @@ export const digitalLibrary = onRequest(
     }
 
     // POST /digital-library-api/convert-to-audio
+    // Supports optional `chapterIndex` param for per-chapter conversion
     if (req.method === 'POST' && route === 'convert-to-audio') {
       const bookId = validateBookId(req.body.bookId);
       if (!bookId) { res.status(400).json({ error: 'Invalid or missing bookId' }); return; }
+      const singleChapterIndex = typeof req.body.chapterIndex === 'number' ? req.body.chapterIndex : null;
 
       const bookRef = db.collection('books').doc(bookId);
       const bookDoc = await bookRef.get();
       if (!bookDoc.exists) { res.status(404).json({ error: 'Book not found' }); return; }
 
       const bookData = bookDoc.data()!;
-      if (bookData.audioStatus === 'processing') {
-        // Allow retry if stale (>10 min since last update)
+
+      // For whole-book conversion, check if already processing
+      if (singleChapterIndex === null && bookData.audioStatus === 'processing') {
         const updatedMs = bookData.updatedAt?.toMillis ? bookData.updatedAt.toMillis() : Date.now();
         if (Date.now() - updatedMs < 10 * 60 * 1000) {
           res.status(409).json({ error: 'Conversion already in progress' });
           return;
         }
       }
-      // 'paused' status: allow immediately — it's waiting for continuation
 
-      // Global concurrency limit: max 2 concurrent conversions (processing + paused)
-      const processingSnap = await db.collection('books').where('audioStatus', 'in', ['processing', 'paused']).get();
-      // Exclude current book from count (it might be a paused continuation or stale retry)
-      const activeCount = processingSnap.docs.filter(d => d.id !== bookId).length;
-      if (activeCount >= 2) {
-        res.status(429).json({ error: 'Too many conversions in progress. Try again later.' });
-        return;
+      // Global concurrency limit: max 2 concurrent conversions
+      if (singleChapterIndex === null) {
+        const processingSnap = await db.collection('books').where('audioStatus', 'in', ['processing', 'paused']).get();
+        const activeCount = processingSnap.docs.filter(d => d.id !== bookId).length;
+        if (activeCount >= 2) {
+          res.status(429).json({ error: 'Too many conversions in progress. Try again later.' });
+          return;
+        }
       }
 
       // Validate optional voiceName
@@ -393,31 +396,35 @@ export const digitalLibrary = onRequest(
         return;
       }
 
-      // Check monthly TTS quota before starting
+      // Check monthly TTS quota
       const quota = await getTtsUsage();
-      const bookChars = bookData.totalCharacters || 0;
-      if (quota.chars + bookChars > TTS_MONTHLY_CHAR_LIMIT) {
-        const remaining = Math.max(0, TTS_MONTHLY_CHAR_LIMIT - quota.chars);
+      const charsToCheck = singleChapterIndex !== null
+        ? ((await bookRef.collection('chapters').where('index', '==', singleChapterIndex).get()).docs[0]?.data()?.characterCount || 5000)
+        : (bookData.totalCharacters || 0);
+      if (quota.chars + charsToCheck > TTS_MONTHLY_CHAR_LIMIT) {
         res.status(429).json({
           error: 'Monthly TTS quota reached',
           used: quota.chars,
           limit: TTS_MONTHLY_CHAR_LIMIT,
-          remaining,
-          bookChars,
+          remaining: Math.max(0, TTS_MONTHLY_CHAR_LIMIT - quota.chars),
+          bookChars: charsToCheck,
         });
         return;
       }
 
-      // Mark as processing (updatedAt for stale detection)
-      await bookRef.update({ audioStatus: 'processing', audioProgress: 0, audioError: FieldValue.delete(), updatedAt: FieldValue.serverTimestamp() });
+      // Mark as processing
+      if (singleChapterIndex === null) {
+        await bookRef.update({ audioStatus: 'processing', audioProgress: 0, audioError: FieldValue.delete(), updatedAt: FieldValue.serverTimestamp() });
+      } else {
+        await bookRef.update({ updatedAt: FieldValue.serverTimestamp() });
+      }
 
-      // Start async conversion (respond immediately)
-      res.json({ ok: true, message: 'Conversion started' });
+      res.json({ ok: true, message: singleChapterIndex !== null ? 'Chapter conversion started' : 'Conversion started' });
 
       // Process in background
       try {
         const startTime = Date.now();
-        const TIME_BUDGET_MS = 4 * 60 * 1000; // 4 min, leave 1 min margin for 5-min CF timeout
+        const TIME_BUDGET_MS = 4 * 60 * 1000;
 
         const ttsClient = new (await import('@google-cloud/text-to-speech')).TextToSpeechClient();
 
@@ -444,22 +451,28 @@ export const digitalLibrary = onRequest(
         const voiceName = voiceNameParam || defaultVoice;
         const languageCode = voiceName.slice(0, voiceName.lastIndexOf('-Neural2'));
 
-        for (const chapterDoc of chaptersSnap.docs) {
+        // Filter to single chapter if requested
+        const docsToProcess = singleChapterIndex !== null
+          ? chaptersSnap.docs.filter(d => d.data().index === singleChapterIndex)
+          : chaptersSnap.docs;
+
+        for (const chapterDoc of docsToProcess) {
           const chData = chapterDoc.data();
 
-          // Skip chapters that already have audio (from previous partial run)
+          // Skip chapters that already have audio
           if (chData.audioUrl) {
             completedChapters++;
-            const progress = Math.round((completedChapters / totalChapters) * 100);
-            await bookRef.update({ audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
+            if (singleChapterIndex === null) {
+              const progress = Math.round((completedChapters / totalChapters) * 100);
+              await bookRef.update({ audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
+            }
             continue;
           }
 
-          // Check time budget before processing a new chapter
-          if (Date.now() - startTime > TIME_BUDGET_MS) {
+          // Check time budget (only for whole-book)
+          if (singleChapterIndex === null && Date.now() - startTime > TIME_BUDGET_MS) {
             const progress = Math.round((completedChapters / totalChapters) * 100);
             await bookRef.update({ audioStatus: 'paused', audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
-            // Record partial TTS usage
             if (totalCharsUsed > 0) await incrementTtsUsage(quota.ref, totalCharsUsed);
             try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
             logger.info('Audio conversion paused (time budget)', { bookId, completedChapters, totalChapters });
@@ -478,7 +491,6 @@ export const digitalLibrary = onRequest(
                   else resolve(data || '');
                 });
               });
-              // Strip HTML iteratively
               let stripped = rawHtml;
               let prev = '';
               while (prev !== stripped) { prev = stripped; stripped = stripped.replace(/<[^>]+>/g, ''); }
@@ -493,7 +505,6 @@ export const digitalLibrary = onRequest(
             continue;
           }
 
-          // Split into chunks of 4500 bytes (API limit is 5000)
           const MAX_BYTES = 4500;
           const chunks: string[] = [];
           let remaining = chapterText;
@@ -509,7 +520,6 @@ export const digitalLibrary = onRequest(
             remaining = remaining.slice(splitAt + 1).trimStart();
           }
 
-          // Synthesize each chunk and concatenate
           const audioBuffers: Buffer[] = [];
           for (const chunk of chunks) {
             const [ttsResponse] = await ttsClient.synthesizeSpeech({
@@ -522,7 +532,6 @@ export const digitalLibrary = onRequest(
             }
           }
 
-          // Track characters sent to TTS
           totalCharsUsed += chapterText.length;
 
           if (audioBuffers.length > 0) {
@@ -530,7 +539,6 @@ export const digitalLibrary = onRequest(
             const audioPath = `books/${bookId}/audio/chapter-${String(chData.index).padStart(4, '0')}.mp3`;
             const { downloadUrl: audioUrl } = await uploadToStorage(bucket, audioPath, combinedAudio, 'audio/mpeg');
 
-            // Estimate duration (rough: 150 words/min at normal speed)
             const wordCount = chapterText.split(/\s+/).length;
             const estimatedDuration = Math.round((wordCount / 150) * 60);
 
@@ -542,22 +550,33 @@ export const digitalLibrary = onRequest(
           }
 
           completedChapters++;
-          const progress = Math.round((completedChapters / totalChapters) * 100);
-          await bookRef.update({ audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
+          if (singleChapterIndex === null) {
+            const progress = Math.round((completedChapters / totalChapters) * 100);
+            await bookRef.update({ audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
+          }
         }
 
-        // Record actual TTS usage for the month
         await incrementTtsUsage(quota.ref, totalCharsUsed);
 
-        await bookRef.update({ audioStatus: 'complete', audioProgress: 100 });
+        // For whole-book, mark complete. For single chapter, update progress.
+        if (singleChapterIndex === null) {
+          await bookRef.update({ audioStatus: 'complete', audioProgress: 100 });
+        } else {
+          // Recount converted chapters for book-level progress
+          const allChaps = await bookRef.collection('chapters').get();
+          const convertedCount = allChaps.docs.filter(d => d.data().audioUrl).length;
+          const newProgress = Math.round((convertedCount / allChaps.size) * 100);
+          const newStatus = convertedCount === allChaps.size ? 'complete' : 'partial';
+          await bookRef.update({ audioStatus: newStatus, audioProgress: newProgress });
+        }
 
-        // Cleanup
         try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
-
-        logger.info('Audio conversion complete', { bookId, chapters: totalChapters, charsUsed: totalCharsUsed });
+        logger.info('Audio conversion complete', { bookId, chapterIndex: singleChapterIndex, charsUsed: totalCharsUsed });
       } catch (err) {
-        logger.error('Audio conversion failed', { bookId, error: String(err) });
-        await bookRef.update({ audioStatus: 'error', audioError: String(err).slice(0, 200) }).catch(() => {});
+        logger.error('Audio conversion failed', { bookId, chapterIndex: singleChapterIndex, error: String(err) });
+        if (singleChapterIndex === null) {
+          await bookRef.update({ audioStatus: 'error', audioError: String(err).slice(0, 200) }).catch(() => {});
+        }
       }
       return;
     }
