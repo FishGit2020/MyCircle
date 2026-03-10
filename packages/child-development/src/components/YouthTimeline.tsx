@@ -14,9 +14,11 @@ interface YouthTimelineProps {
   ageInMonths: number | null;
   currentAgeRange: AgeRange | null;
   ageRangeIds?: Set<string>;
+  checkedMilestones?: Set<string>;
+  onToggleMilestone?: (milestoneId: string) => void;
 }
 
-export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeIds }: YouthTimelineProps) {
+export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeIds, checkedMilestones, onToggleMilestone }: YouthTimelineProps) {
   const { t } = useTranslation();
 
   const [expandedStages, setExpandedStages] = useState<Set<string>>(
@@ -149,13 +151,24 @@ export default function YouthTimeline({ ageInMonths, currentAgeRange, ageRangeId
                           <p className={`text-xs font-semibold mb-1 ${colors.text} ${colors.darkText}`}>
                             {t(domain.labelKey as any)}
                           </p>
-                          <ul className="space-y-0.5">
-                            {domainMilestones.map(ms => (
-                              <li key={ms.id} className={`text-xs ${colors.text} ${colors.darkText} opacity-80`}>
-                                {t(ms.titleKey as any)}
-                              </li>
-                            ))}
-                          </ul>
+                          <div className="space-y-0.5">
+                            {domainMilestones.map(ms => {
+                              const checked = checkedMilestones?.has(ms.id) ?? false;
+                              return (
+                                <label key={ms.id} className="flex items-start gap-2 py-0.5 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => onToggleMilestone?.(ms.id)}
+                                    className="mt-0.5 w-3.5 h-3.5 rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500 dark:bg-gray-700 flex-shrink-0"
+                                  />
+                                  <span className={`text-xs transition-colors ${checked ? 'line-through opacity-50' : `${colors.text} ${colors.darkText} opacity-80`}`}>
+                                    {t(ms.titleKey as any)}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
                         </div>
                       );
                     })}
