@@ -2,6 +2,20 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { GameType } from './GameCard';
 
+const SCORING_RULES: Record<GameType, string> = {
+  trivia: 'games.scoringTrivia',
+  math: 'games.scoringMath',
+  word: 'games.scoringWord',
+  memory: 'games.scoringMemory',
+  headsup: 'games.scoringHeadsUp',
+  reaction: 'games.scoringReaction',
+  simon: 'games.scoringSimon',
+  sequence: 'games.scoringSequence',
+  colormatch: 'games.scoringColorMatch',
+  maze: 'games.scoringMaze',
+  anagram: 'games.scoringAnagram',
+};
+
 const GAME_NAME_KEYS: Record<GameType, string> = {
   trivia: 'games.trivia',
   math: 'games.mathChallenge',
@@ -73,6 +87,8 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
     }
   }, [gameType, score, t]);
 
+  const [showRules, setShowRules] = useState(false);
+
   return (
     <div className="flex flex-col items-center gap-6 py-8">
       <div className="text-center">
@@ -85,6 +101,25 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           {t('games.timeLabel')}: {(timeMs / 1000).toFixed(1)}s &middot; {difficulty}
         </p>
+      </div>
+
+      {/* Scoring rules (collapsible) */}
+      <div className="w-full max-w-xs">
+        <button
+          type="button"
+          onClick={() => setShowRules(!showRules)}
+          className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors mx-auto"
+        >
+          <svg className={`w-3.5 h-3.5 transition-transform ${showRules ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+          {t('games.howScoringWorks' as any)}
+        </button>
+        {showRules && (
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center leading-relaxed">
+            {t(SCORING_RULES[gameType] as any)}
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-3 w-full max-w-xs">
