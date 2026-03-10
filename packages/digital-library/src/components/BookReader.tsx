@@ -5,6 +5,7 @@ import TableOfContents from './TableOfContents';
 import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
 import ConversionStatus from './ConversionStatus';
+import ChapterConvertList from './ChapterConvertList';
 import AudioPlayer from './AudioPlayer';
 import useSwipe from '../hooks/useSwipe';
 
@@ -627,6 +628,25 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
               });
             }}
           />
+
+          {/* Per-chapter conversion list — always visible so users can convert individual chapters */}
+          <ChapterConvertList
+            bookId={bookId}
+            chapters={chapters}
+            voiceName={(() => {
+              const lc = (language || 'en').startsWith('zh') ? 'cmn-CN' : (language || 'en').startsWith('es') ? 'es-US' : 'en-US';
+              return `${lc}-Neural2-${lc === 'en-US' ? 'D' : 'A'}`;
+            })()}
+            onChapterConverted={() => {
+              // Trigger refetch of chapters to update audioUrl status
+              window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
+            }}
+            onPlay={(chapterIndex) => {
+              setShowAudioPlayer(true);
+              // AudioPlayer will pick up the chapter with audioUrl
+            }}
+          />
+
           {showAudioPlayer && (
             <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} autoPlay={autoPlayOnMount} />
           )}
