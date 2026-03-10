@@ -61,8 +61,11 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
       <div className="flex items-center gap-3 mb-2">
         <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-500">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <circle cx="16" cy="5" r="2.5" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 17.5c1-2 3-3 5.5-3h3c1.5 0 2.5.5 3.5 1.5M9.5 14.5c-.5-2-1-3.5-1-5 0-1.5 1-2.5 2.5-2.5s2.5 1 2.5 2.5l-.5 3M4 17.5v3M8 19v2" />
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="9" cy="10" r="1" fill="currentColor" />
+            <circle cx="15" cy="10" r="1" fill="currentColor" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 15c1 1.5 2 2 3 2s2-.5 3-2" />
+            <path strokeLinecap="round" d="M5 8c1-3 4-5 7-5s6 2 7 5" />
           </svg>
         </div>
         <div>

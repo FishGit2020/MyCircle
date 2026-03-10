@@ -4,4 +4,5 @@ export interface Child {
   birthDate: string; // YYYY-MM-DD
   dueDate?: string;
   avatarColor?: string;
+  checkedMilestones?: string[];
 }

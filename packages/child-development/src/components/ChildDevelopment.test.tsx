@@ -133,7 +133,7 @@ describe('ChildDevelopment', () => {
     expect(screen.getByText('childDev.cdcAttribution')).toBeInTheDocument();
   });
 
-  it('does not render any checkboxes or progress rings', () => {
+  it('renders milestone checkboxes for tracking progress', () => {
     mockUseChildren.mockReturnValue({
       children: [{ id: 'c1', name: 'Noah', birthDate: '2024-06-01' }],
       allChildren: [{ id: 'c1', name: 'Noah', birthDate: '2024-06-01' }],
@@ -146,7 +146,7 @@ describe('ChildDevelopment', () => {
       loading: false,
     });
     render(<ChildDevelopment />);
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.queryAllByRole('checkbox').length).toBeGreaterThan(0);
     expect(screen.queryByText(/%$/)).toBeNull();
   });
 

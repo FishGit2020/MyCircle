@@ -93,6 +93,20 @@ export default function ChildDevelopment() {
     return getYouthAgeRange(ageInMonths);
   }, [ageInMonths]);
 
+  // Checked milestones for selected child
+  const checkedMilestones = useMemo(() => {
+    return new Set(selectedChild?.checkedMilestones ?? []);
+  }, [selectedChild?.checkedMilestones]);
+
+  const toggleMilestone = useCallback((milestoneId: string) => {
+    if (!selectedChild) return;
+    const current = selectedChild.checkedMilestones ?? [];
+    const next = current.includes(milestoneId)
+      ? current.filter(id => id !== milestoneId)
+      : [...current, milestoneId];
+    updateChild(selectedChild.id, { checkedMilestones: next });
+  }, [selectedChild, updateChild]);
+
   // Auto-select stage tab based on child age (CDC age groups)
   const activeStageTab: StageTab = useMemo(() => {
     if (stageTab) return stageTab;
@@ -365,12 +379,16 @@ export default function ChildDevelopment() {
             <TimelineView
               ageInMonths={ageInMonths}
               currentAgeRange={currentAgeRange}
+              checkedMilestones={checkedMilestones}
+              onToggleMilestone={toggleMilestone}
             />
           ) : (
             <YouthTimeline
               ageInMonths={ageInMonths}
               currentAgeRange={youthAgeRange}
               ageRangeIds={activeStageTab === 'middleChildhood' ? MIDDLE_CHILDHOOD_IDS : TEEN_IDS}
+              checkedMilestones={checkedMilestones}
+              onToggleMilestone={toggleMilestone}
             />
           )}
         </>

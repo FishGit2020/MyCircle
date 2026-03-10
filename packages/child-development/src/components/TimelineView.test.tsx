@@ -167,9 +167,9 @@ describe('TimelineView', () => {
     expect(screen.getAllByRole('button', { pressed: true })).toHaveLength(1);
   });
 
-  it('does not render any checkboxes', () => {
+  it('renders milestone checkboxes', () => {
     render(<TimelineView {...DEFAULT_PROPS} />);
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.queryAllByRole('checkbox').length).toBeGreaterThan(0);
   });
 
   it('shows red flag badges on milestones', () => {

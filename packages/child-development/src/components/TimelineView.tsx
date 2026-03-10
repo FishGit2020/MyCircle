@@ -66,6 +66,8 @@ const AAP_LINKS: Record<AgeRangeId, string> = {
 interface TimelineViewProps {
   ageInMonths: number | null;
   currentAgeRange: AgeRangeMeta | null;
+  checkedMilestones?: Set<string>;
+  onToggleMilestone?: (milestoneId: string) => void;
 }
 
 /* ─── Component ────────────────────────────────────────────────────────────── */
@@ -73,6 +75,8 @@ interface TimelineViewProps {
 export default function TimelineView({
   ageInMonths,
   currentAgeRange,
+  checkedMilestones,
+  onToggleMilestone,
 }: TimelineViewProps) {
   const { t } = useTranslation();
 
@@ -311,19 +315,27 @@ export default function TimelineView({
                             </h5>
                           </div>
                           <div className="space-y-1">
-                            {milestones.map(m => (
-                              <div key={m.id} className="flex items-start gap-2 py-0.5">
-                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
-                                <span className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                                  {t(m.nameKey as any)}
-                                </span>
-                                {m.isRedFlag && (
-                                  <span className="flex-shrink-0 text-xs px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium" title={t('childDev.redFlagInfo' as any)}>
-                                    {t('childDev.redFlag' as any)}
+                            {milestones.map(m => {
+                              const checked = checkedMilestones?.has(m.id) ?? false;
+                              return (
+                                <label key={m.id} className="flex items-start gap-2 py-0.5 cursor-pointer group">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => onToggleMilestone?.(m.id)}
+                                    className="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500 dark:bg-gray-700 flex-shrink-0"
+                                  />
+                                  <span className={`text-sm leading-relaxed transition-colors ${checked ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
+                                    {t(m.nameKey as any)}
                                   </span>
-                                )}
-                              </div>
-                            ))}
+                                  {m.isRedFlag && (
+                                    <span className="flex-shrink-0 text-xs px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium" title={t('childDev.redFlagInfo' as any)}>
+                                      {t('childDev.redFlag' as any)}
+                                    </span>
+                                  )}
+                                </label>
+                              );
+                            })}
                           </div>
                         </div>
                       );
