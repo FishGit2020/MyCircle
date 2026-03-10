@@ -28,10 +28,10 @@ export const DOMAINS: { id: Domain; labelKey: string; descKey: string; color: st
 // https://www.cdc.gov/child-development/about/young-teens.html
 // https://www.cdc.gov/child-development/about/teenagers.html
 export const AGE_RANGES: AgeRange[] = [
-  { id: '6-8y',   label: 'Middle Childhood (6\u20138)',  minMonths: 72,  maxMonths: 108, cdcLink: 'https://www.cdc.gov/child-development/about/middle-childhood.html' },
-  { id: '9-11y',  label: 'Middle Childhood (9\u201311)', minMonths: 108, maxMonths: 144, cdcLink: 'https://www.cdc.gov/child-development/about/middle-childhood.html' },
-  { id: '12-14y', label: 'Young Teens (12\u201314)',     minMonths: 144, maxMonths: 180, cdcLink: 'https://www.cdc.gov/child-development/about/young-teens.html' },
-  { id: '15-17y', label: 'Teenagers (15\u201317)',       minMonths: 180, maxMonths: 216, cdcLink: 'https://www.cdc.gov/child-development/about/teenagers.html' },
+  { id: '6-8y',   label: 'Middle Childhood (6\u20138)',  minMonths: 72,  maxMonths: 108, cdcLink: 'https://www.cdc.gov/child-development/positive-parenting-tips/middle-childhood-6-8-years.html' },
+  { id: '9-11y',  label: 'Middle Childhood (9\u201311)', minMonths: 108, maxMonths: 144, cdcLink: 'https://www.cdc.gov/child-development/positive-parenting-tips/middle-childhood-9-11-years-old.html' },
+  { id: '12-14y', label: 'Young Teens (12\u201314)',     minMonths: 144, maxMonths: 180, cdcLink: 'https://www.cdc.gov/child-development/positive-parenting-tips/young-teens-12-14-years.html' },
+  { id: '15-17y', label: 'Teenagers (15\u201317)',       minMonths: 180, maxMonths: 216, cdcLink: 'https://www.cdc.gov/child-development/positive-parenting-tips/adolescence-15-17-years.html' },
 ];
 
 export function getAgeRangeForMonths(months: number): AgeRange | null {
