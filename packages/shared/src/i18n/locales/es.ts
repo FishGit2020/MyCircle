@@ -1684,6 +1684,7 @@ const es: Record<TranslationKey, string> = {
   'library.tabs.listen': 'Escuchar',
   'library.convertToAudio': 'Convertir Todo a Audio',
   'library.convertChapter': 'Convertir',
+  'library.cancelConversion': 'Cancelar',
   'library.chapter': 'Cap\u00edtulo',
   'library.chaptersConverted': '{converted}/{total} convertidos',
   'library.chars': 'caracteres',

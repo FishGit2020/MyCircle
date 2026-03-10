@@ -632,18 +632,15 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
           {/* Per-chapter conversion list — always visible so users can convert individual chapters */}
           <ChapterConvertList
             bookId={bookId}
+            bookTitle={title}
+            coverUrl={coverUrl}
             chapters={chapters}
             voiceName={(() => {
               const lc = (language || 'en').startsWith('zh') ? 'cmn-CN' : (language || 'en').startsWith('es') ? 'es-US' : 'en-US';
               return `${lc}-Neural2-${lc === 'en-US' ? 'D' : 'A'}`;
             })()}
             onChapterConverted={() => {
-              // Trigger refetch of chapters to update audioUrl status
               window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
-            }}
-            onPlay={(chapterIndex) => {
-              setShowAudioPlayer(true);
-              // AudioPlayer will pick up the chapter with audioUrl
             }}
           />
 
