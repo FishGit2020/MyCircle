@@ -22,7 +22,6 @@ export default {
     "../family-games/src/**/*.{js,ts,jsx,tsx}",
     "../doc-scanner/src/**/*.{js,ts,jsx,tsx}",
     "../hiking-map/src/**/*.{js,ts,jsx,tsx}",
-    "../youth-tracker/src/**/*.{js,ts,jsx,tsx}",
     "../trip-planner/src/**/*.{js,ts,jsx,tsx}",
     "../poll-system/src/**/*.{js,ts,jsx,tsx}",
     "../radio-station/src/**/*.{js,ts,jsx,tsx}",

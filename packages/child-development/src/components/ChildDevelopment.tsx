@@ -3,8 +3,16 @@ import { useTranslation, useChildren, getAgeInMonths, getAgeRemainingDays, useVe
 import type { Child } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getAgeRangeForMonths } from '../data/milestones';
+import { getAgeRangeForMonths as getYouthAgeRange } from '../data/youthMilestones';
 import { parentingVerses } from '../data/parentingVerses';
 import TimelineView from './TimelineView';
+import YouthTimeline from './YouthTimeline';
+
+type StageTab = 'toddler' | 'youth';
+type YouthSubTab = 'elementary' | 'teen';
+
+const ELEMENTARY_IDS = new Set(['5-6y', '6-8y', '8-10y']);
+const TEEN_IDS = new Set(['10-12y', '12-14y', '14-16y', '16-18y']);
 
 // ─── Verse Section ───────────────────────────────────────────────────────────
 
@@ -58,11 +66,13 @@ function VerseSection() {
 
 export default function ChildDevelopment() {
   const { t } = useTranslation();
-  const { children, selectedChild, selectedId, setSelectedId, addChild, updateChild, deleteChild } = useChildren([0, 60]);
+  const { children, selectedChild, selectedId, setSelectedId, addChild, updateChild, deleteChild } = useChildren([0, 216]);
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
+  const [stageTab, setStageTab] = useState<StageTab | null>(null);
+  const [youthSubTab, setYouthSubTab] = useState<YouthSubTab | null>(null);
 
   // Computed from selected child
   const ageInMonths = useMemo(() => {
@@ -79,6 +89,25 @@ export default function ChildDevelopment() {
     if (ageInMonths === null) return null;
     return getAgeRangeForMonths(ageInMonths) || null;
   }, [ageInMonths]);
+
+  const youthAgeRange = useMemo(() => {
+    if (ageInMonths === null) return null;
+    return getYouthAgeRange(ageInMonths);
+  }, [ageInMonths]);
+
+  // Auto-select stage tab based on child age
+  const activeStageTab: StageTab = useMemo(() => {
+    if (stageTab) return stageTab;
+    if (ageInMonths !== null && ageInMonths >= 60) return 'youth';
+    return 'toddler';
+  }, [stageTab, ageInMonths]);
+
+  // Auto-select youth sub-tab based on child age
+  const activeYouthSubTab: YouthSubTab = useMemo(() => {
+    if (youthSubTab) return youthSubTab;
+    if (ageInMonths !== null && ageInMonths >= 120) return 'teen';
+    return 'elementary';
+  }, [youthSubTab, ageInMonths]);
 
   const ageDisplay = useMemo(() => {
     if (ageInMonths === null) return '';
@@ -315,11 +344,74 @@ export default function ChildDevelopment() {
           {/* Verse */}
           <VerseSection />
 
-          {/* Timeline (the primary and only view) */}
-          <TimelineView
-            ageInMonths={ageInMonths}
-            currentAgeRange={currentAgeRange}
-          />
+          {/* Stage tabs: Toddler / Youth */}
+          <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+            <button
+              type="button"
+              onClick={() => setStageTab('toddler')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeStageTab === 'toddler'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              {t('childDev.tabToddler' as any)}
+              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(0–5)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setStageTab('youth')}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeStageTab === 'youth'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              {t('childDev.tabYouth' as any)}
+              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(5–18)</span>
+            </button>
+          </div>
+
+          {/* Content based on active tab */}
+          {activeStageTab === 'toddler' ? (
+            <TimelineView
+              ageInMonths={ageInMonths}
+              currentAgeRange={currentAgeRange}
+            />
+          ) : (
+            <>
+              {/* Youth sub-tabs: Elementary / Teen */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setYouthSubTab('elementary')}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                    activeYouthSubTab === 'elementary'
+                      ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {t('youth.tabElementary' as any)} (5–10)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setYouthSubTab('teen')}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                    activeYouthSubTab === 'teen'
+                      ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {t('youth.tabTeen' as any)} (10–18)
+                </button>
+              </div>
+              <YouthTimeline
+                ageInMonths={ageInMonths}
+                currentAgeRange={youthAgeRange}
+                ageRangeIds={activeYouthSubTab === 'elementary' ? ELEMENTARY_IDS : TEEN_IDS}
+              />
+            </>
+          )}
         </>
       )}
     </PageContent>

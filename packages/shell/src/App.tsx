@@ -37,7 +37,6 @@ const FamilyGamesMF = tracedLazy('mfe_family_games_load', () => import('familyGa
 const DocScannerMF = tracedLazy('mfe_doc_scanner_load', () => import('docScanner/DocScanner'), getPerf);
 const HikingMapMF = tracedLazy('mfe_hiking_map_load', () => import('hikingMap/HikingMap'), getPerf);
 const TripPlannerMF = tracedLazy('mfe_trip_planner_load', () => import('tripPlanner/TripPlanner'), getPerf);
-const YouthTrackerMF = tracedLazy('mfe_youth_tracker_load', () => import('youthTracker/YouthTracker'), getPerf);
 const PollSystemMF = tracedLazy('mfe_poll_system_load', () => import('pollSystem/PollSystem'), getPerf);
 const RadioStationMF = tracedLazy('mfe_radio_station_load', () => import('radioStation/RadioStation'), getPerf);
 
@@ -118,7 +117,6 @@ export default function App() {
         <Route path="notebook/:noteId" element={<RequireAuth><MFEPageWrapper component={NotebookMF} name="Notebook" /></RequireAuth>} />
         <Route path="baby" element={<RequireAuth><MFEPageWrapper component={BabyTrackerMF} name="Baby Tracker" /></RequireAuth>} />
         <Route path="child-dev" element={<RequireAuth><MFEPageWrapper component={ChildDevelopmentMF} name="Child Development" /></RequireAuth>} />
-        <Route path="youth-tracker" element={<RequireAuth><MFEPageWrapper component={YouthTrackerMF} name="Youth Tracker" /></RequireAuth>} />
         <Route path="flashcards" element={<RequireAuth><MFEPageWrapper component={FlashCardsMF} name="Flash Cards" /></RequireAuth>} />
         <Route path="daily-log" element={<RequireAuth><MFEPageWrapper component={DailyLogMF} name="Daily Log" /></RequireAuth>} />
         <Route path="files" element={<RequireAuth><MFEPageWrapper component={CloudFilesMF} name="Cloud Files" /></RequireAuth>} />

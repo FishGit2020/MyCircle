@@ -28,7 +28,6 @@ export default defineConfig({
       'docScanner/DocScanner': resolve(__dirname, './packages/shell/test/mocks/DocScannerMock.tsx'),
       'hikingMap/HikingMap': resolve(__dirname, './packages/shell/test/mocks/HikingMapMock.tsx'),
       'tripPlanner/TripPlanner': resolve(__dirname, './packages/shell/test/mocks/TripPlannerMock.tsx'),
-      'youthTracker/YouthTracker': resolve(__dirname, './packages/shell/test/mocks/YouthTrackerMock.tsx'),
       'pollSystem/PollSystem': resolve(__dirname, './packages/shell/test/mocks/PollSystemMock.tsx'),
       'radioStation/RadioStation': resolve(__dirname, './packages/shell/test/mocks/RadioStationMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/test/mocks/pwaRegisterReactMock.ts'),

@@ -23,7 +23,6 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/family-games': () => import('familyGames/FamilyGames'),
   '/doc-scanner': () => import('docScanner/DocScanner'),
   '/hiking': () => import('hikingMap/HikingMap'),
-  '/youth-tracker': () => import('youthTracker/YouthTracker'),
   '/trips': () => import('tripPlanner/TripPlanner'),
   '/polls': () => import('pollSystem/PollSystem'),
   '/radio': () => import('radioStation/RadioStation'),
@@ -54,7 +53,6 @@ export const NAV_GROUPS: NavGroup[] = [
   { labelKey: 'nav.group.family', items: [
     { path: '/baby',      labelKey: 'nav.baby',     icon: 'baby' },
     { path: '/child-dev', labelKey: 'nav.childDev', icon: 'child-dev' },
-    { path: '/youth-tracker', labelKey: 'nav.youthTracker' as any, icon: 'youth-tracker' },
     { path: '/immigration', labelKey: 'nav.immigration', icon: 'immigration' },
     { path: '/family-games', labelKey: 'nav.familyGames', icon: 'family-games' },
     { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' },
@@ -87,7 +85,6 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/notebook', labelKey: 'nav.notebook', icon: 'notebook' },
   { path: '/baby', labelKey: 'nav.baby', icon: 'baby' },
   { path: '/child-dev', labelKey: 'nav.childDev', icon: 'child-dev' },
-  { path: '/youth-tracker', labelKey: 'nav.youthTracker' as any, icon: 'youth-tracker' },
   { path: '/flashcards', labelKey: 'nav.flashcards', icon: 'flashcards' },
   { path: '/daily-log', labelKey: 'nav.dailyLog', icon: 'daily-log' },
   { path: '/files', labelKey: 'nav.cloudFiles', icon: 'cloud-files' },

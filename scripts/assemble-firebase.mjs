@@ -173,12 +173,6 @@ const hikingMapDest = path.join(firebaseDir, 'hiking-map');
 console.log(`Copying hiking-map to ${hikingMapDest}`);
 copyDir(hikingMapDist, hikingMapDest);
 
-// 23. Copy youth-tracker MF to /youth-tracker
-const youthTrackerDist = path.join(rootDir, 'packages', 'youth-tracker', 'dist');
-const youthTrackerDest = path.join(firebaseDir, 'youth-tracker');
-console.log(`Copying youth-tracker to ${youthTrackerDest}`);
-copyDir(youthTrackerDist, youthTrackerDest);
-
 // 24. Copy trip-planner MF to /trip-planner
 const tripPlannerDist = path.join(rootDir, 'packages', 'trip-planner', 'dist');
 const tripPlannerDest = path.join(firebaseDir, 'trip-planner');
@@ -205,7 +199,7 @@ const mfeDirs = [
   'ai-assistant', 'bible-reader', 'worship-songs', 'notebook',
   'baby-tracker', 'child-development', 'chinese-learning', 'english-learning',
   'flashcards', 'daily-log', 'cloud-files', 'model-benchmark', 'immigration-tracker',
-  'digital-library', 'family-games', 'doc-scanner', 'hiking-map', 'youth-tracker', 'trip-planner', 'poll-system', 'radio-station',
+  'digital-library', 'family-games', 'doc-scanner', 'hiking-map', 'trip-planner', 'poll-system', 'radio-station',
 ];
 for (const mfe of mfeDirs) {
   const mfeIndex = path.join(firebaseDir, mfe, 'index.html');
