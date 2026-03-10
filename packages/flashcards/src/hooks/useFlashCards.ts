@@ -48,7 +48,6 @@ export function useFlashCards() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('all');
   const migratedRef = useRef(false);
-  const chineseMigratedRef = useRef(false);
 
   // Auth state detection — event-driven instead of polling
   useEffect(() => {
@@ -227,22 +226,6 @@ export function useFlashCards() {
         window.__flashcards.updateProgress(localProgress).catch(() => { /* ignore */ });
       }
     }
-  }, [isAuthenticated]);
-
-  // One-time migration: Chinese characters → publicFlashcards + user flashcards
-  useEffect(() => {
-    if (!isAuthenticated || chineseMigratedRef.current || !window.__flashcards?.migrateChineseToPublic) return;
-    const migrated = localStorage.getItem('chinese-to-public-migrated');
-    if (migrated) { chineseMigratedRef.current = true; return; }
-    chineseMigratedRef.current = true;
-
-    log.info('Running Chinese → publicFlashcards migration');
-    window.__flashcards.migrateChineseToPublic().then(() => {
-      localStorage.setItem('chinese-to-public-migrated', '1');
-      log.info('Chinese migration complete');
-    }).catch((err) => {
-      log.warn('Chinese migration failed:', err);
-    });
   }, [isAuthenticated]);
 
   // One-time migration: merge old English/Chinese progress into flashcard progress

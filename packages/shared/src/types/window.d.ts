@@ -42,7 +42,6 @@ declare global {
       subscribePublic: (callback: (cards: any[]) => void) => () => void;
       publish: (card: Record<string, any>) => Promise<string>;
       deletePublic: (id: string) => Promise<void>;
-      migrateChineseToPublic: () => Promise<void>;
     };
 
     /* ── Chinese Characters ────────────────────────────────── */

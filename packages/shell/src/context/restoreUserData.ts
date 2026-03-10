@@ -5,7 +5,6 @@ import {
   getDailyLogEntries,
   getBenchmarkSummary,
   getUserNotes,
-  migrateToMultiChild,
   getChildren,
 } from '../lib/firebase';
 
@@ -183,11 +182,8 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.BENCHMARK_CHANGED));
   }).catch(() => {});
 
-  // Migrate legacy single-child to multi-child (non-blocking)
-  migrateToMultiChild(uid, profile).then(() => {
-    // Load children into localStorage cache
-    return getChildren(uid);
-  }).then(children => {
+  // Load children into localStorage cache
+  getChildren(uid).then(children => {
     if (children.length > 0) {
       localStorage.setItem(StorageKeys.CHILDREN_CACHE, JSON.stringify(children));
     }

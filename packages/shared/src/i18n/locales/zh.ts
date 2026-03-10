@@ -361,6 +361,7 @@ const zh: Record<TranslationKey, string> = {
   'stocks.removeFromWatchlist': '\u4ece\u81ea\u9009\u79fb\u9664',
   'stocks.noWatchlist': '\u81ea\u9009\u5217\u8868\u4e2d\u8fd8\u6ca1\u6709\u80a1\u7968\u3002',
   'stocks.addSome': '\u641c\u7d22\u80a1\u7968\u5e76\u6dfb\u52a0\u5230\u81ea\u9009\u5217\u8868\u3002',
+  'stocks.signInToSearch': '\u767b\u5f55\u540e\u53ef\u641c\u7d22\u80a1\u7968\u5e76\u67e5\u770b\u5b9e\u65f6\u62a5\u4ef7\u3002',
   'stocks.price': '\u4ef7\u683c',
   'stocks.change': '\u6da8\u8dcc',
   'stocks.high': '\u6700\u9ad8',
