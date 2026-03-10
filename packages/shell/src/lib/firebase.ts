@@ -8,6 +8,25 @@ import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } f
 
 const log = createLogger('firebase');
 
+/**
+ * Detect Safari IndexedDB connection loss errors from Firestore onSnapshot.
+ * Safari aggressively kills IndexedDB connections when tabs are backgrounded.
+ * When detected, dispatch an event so the UI can prompt a refresh.
+ */
+let indexedDbErrorHandled = false;
+function handleSnapshotError(context: string, error: unknown) {
+  const msg = error instanceof Error ? error.message : String(error);
+  const isIndexedDb = msg.includes('Indexed Database') || msg.includes('IndexedDB') || msg.includes('connection was lost');
+  if (isIndexedDb && !indexedDbErrorHandled) {
+    indexedDbErrorHandled = true;
+    log.warn(`IndexedDB connection lost in ${context}, prompting refresh`);
+    // Dispatch event for error boundary or toast to catch
+    window.dispatchEvent(new CustomEvent('indexeddb-error', { detail: { context, message: msg } }));
+  } else {
+    log.warn(`${context} snapshot error:`, error);
+  }
+}
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -741,7 +760,7 @@ export function subscribeToWorshipSongs(callback: (songs: Array<Record<string, a
     const songs = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
     callback(songs);
   }, (error) => {
-    log.warn('Worship songs snapshot error:', error);
+    handleSnapshotError('Worship songs', error);
   });
 }
 
@@ -796,7 +815,7 @@ export function subscribeToUserNotes(uid: string, callback: (notes: Array<Record
     const notes = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
     callback(notes);
   }, (error) => {
-    log.warn('User notes snapshot error:', error);
+    handleSnapshotError('User notes', error);
   });
 }
 
@@ -842,7 +861,7 @@ export function subscribeToPublicNotes(callback: (notes: Array<Record<string, an
     const notes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(notes);
   }, (error) => {
-    log.warn('Public notes snapshot error:', error);
+    handleSnapshotError('Public notes', error);
   });
 }
 
@@ -888,7 +907,7 @@ export function subscribeToChineseCharacters(callback: (chars: Array<Record<stri
     const chars = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(chars);
   }, (error) => {
-    log.warn('Chinese characters snapshot error:', error);
+    handleSnapshotError('Chinese characters', error);
   });
 }
 
@@ -1008,7 +1027,7 @@ export function subscribeToDailyLogEntries(uid: string, callback: (entries: Arra
     const entries = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(entries);
   }, (error) => {
-    log.warn('Daily log entries snapshot error:', error);
+    handleSnapshotError('Daily log entries', error);
   });
 }
 
@@ -1075,7 +1094,7 @@ export function subscribeToHikingRoutes(uid: string, callback: (routes: Array<Re
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => callback(snap.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }))),
-    (err) => log.warn('Hiking routes snapshot error:', err));
+    (err) => handleSnapshotError('Hiking routes', err));
 }
 
 // Public hiking routes — shareable to all users
@@ -1113,7 +1132,7 @@ export function subscribeToPublicHikingRoutes(callback: (routes: Array<Record<st
   if (!db) return () => {};
   const q = query(collection(db, 'publicHikingRoutes'), orderBy('sharedAt', 'desc'));
   return onSnapshot(q, (snap) => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
-    (err) => log.warn('Public hiking routes snapshot error:', err));
+    (err) => handleSnapshotError('Public hiking routes', err));
 }
 
 // Expose hiking routes API for MFEs
@@ -1186,7 +1205,7 @@ export function subscribeToImmigrationCases(uid: string, callback: (cases: Array
     const cases = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(cases);
   }, (error) => {
-    log.warn('Immigration cases snapshot error:', error);
+    handleSnapshotError('Immigration cases', error);
   });
 }
 
@@ -1243,7 +1262,7 @@ export function subscribeToPublicFlashcards(callback: (cards: Array<Record<strin
     const cards = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     callback(cards);
   }, (error) => {
-    log.warn('Public flashcards snapshot error:', error);
+    handleSnapshotError('Public flashcards', error);
   });
 }
 
@@ -1349,7 +1368,7 @@ export function subscribeToUserFlashcards(uid: string, callback: (cards: Array<R
     const cards = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
     callback(cards);
   }, (error) => {
-    log.warn('Flashcard snapshot error:', error);
+    handleSnapshotError('Flashcards', error);
   });
 }
 
@@ -1604,7 +1623,7 @@ export function subscribeToChildren(uid: string, callback: (children: Child[]) =
     const children = snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() } as Child));
     callback(children);
   }, (error) => {
-    log.warn('Children snapshot error:', error);
+    handleSnapshotError('Children', error);
   });
 }
 
@@ -1707,7 +1726,7 @@ function subscribeToTrips(uid: string, callback: (trips: Array<Record<string, un
   const q = query(collection(db, 'users', uid, 'trips'), orderBy('startDate', 'asc'));
   return onSnapshot(q, (snapshot) => {
     callback(snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() })));
-  }, (error) => { log.warn('Trips snapshot error:', error); });
+  }, (error) => { handleSnapshotError('Trips', error); });
 }
 
 if (firebaseEnabled) {
@@ -1774,7 +1793,7 @@ function subscribeToPolls(callback: (polls: Array<Record<string, unknown>>) => v
   const q = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
     callback(snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() })));
-  }, (error) => { log.warn('Polls snapshot error:', error); });
+  }, (error) => { handleSnapshotError('Polls', error); });
 }
 
 if (firebaseEnabled) {
