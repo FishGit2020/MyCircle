@@ -361,6 +361,7 @@ const es: Record<TranslationKey, string> = {
   'stocks.removeFromWatchlist': 'Quitar de lista',
   'stocks.noWatchlist': 'No hay acciones en tu lista a\u00fan.',
   'stocks.addSome': 'Busca acciones y agr\u00e9galas a tu lista.',
+  'stocks.signInToSearch': 'Inicia sesi\u00f3n para buscar acciones y ver cotizaciones en tiempo real.',
   'stocks.price': 'Precio',
   'stocks.change': 'Cambio',
   'stocks.high': 'M\u00e1ximo',

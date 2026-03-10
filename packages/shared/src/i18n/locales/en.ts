@@ -359,6 +359,7 @@ const en = {
   'stocks.removeFromWatchlist': 'Remove from watchlist',
   'stocks.noWatchlist': 'No stocks in your watchlist yet.',
   'stocks.addSome': 'Search for stocks and add them to your watchlist.',
+  'stocks.signInToSearch': 'Sign in to search stocks and view real-time quotes.',
   'stocks.price': 'Price',
   'stocks.change': 'Change',
   'stocks.high': 'High',

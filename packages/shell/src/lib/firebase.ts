@@ -1266,52 +1266,6 @@ export function subscribeToPublicFlashcards(callback: (cards: Array<Record<strin
   });
 }
 
-export async function migrateChineseToPublic() {
-  if (!db || !auth?.currentUser) return;
-  const user = auth.currentUser;
-  const uid = user.uid;
-  const displayName = user.displayName || user.email || 'Anonymous';
-  try {
-    const q = query(collection(db, 'chineseCharacters'), orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    const promises: Promise<void>[] = [];
-    for (const d of snapshot.docs) {
-      const data = d.data();
-      // Write to publicFlashcards
-      promises.push(
-        setDoc(doc(db!, 'publicFlashcards', d.id), {
-          id: d.id,
-          type: 'chinese',
-          front: data.character,
-          back: data.meaning,
-          category: data.category || 'phrases',
-          meta: { pinyin: data.pinyin },
-          isPublic: true,
-          createdBy: data.createdBy || { uid, displayName },
-          createdAt: data.createdAt || serverTimestamp(),
-        }, { merge: true })
-      );
-      // Write private copy to user's flashcards
-      const privateId = `zh-${d.id}`;
-      promises.push(
-        setDoc(doc(db!, 'users', uid, 'flashcards', privateId), {
-          id: privateId,
-          type: 'chinese',
-          front: data.character,
-          back: data.meaning,
-          category: data.category || 'phrases',
-          meta: { pinyin: data.pinyin },
-          createdAt: data.createdAt || serverTimestamp(),
-        }, { merge: true })
-      );
-    }
-    await Promise.all(promises);
-    log.info(`Migrated ${snapshot.docs.length} Chinese characters to publicFlashcards + user flashcards`);
-  } catch (error) {
-    log.warn('Chinese migration error:', error);
-  }
-}
-
 // Flash Cards — user-scoped subcollection
 export async function getUserFlashcards(uid: string) {
   if (!db) return [];
@@ -1428,7 +1382,6 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deletePublicFlashcard(id);
     },
-    migrateChineseToPublic: () => migrateChineseToPublic(),
   };
 }
 
@@ -1624,43 +1577,6 @@ export function subscribeToChildren(uid: string, callback: (children: Child[]) =
     callback(children);
   }, (error) => {
     handleSnapshotError('Children', error);
-  });
-}
-
-/**
- * Migrate legacy single-child fields (childName, childBirthDate) from user
- * profile into the children subcollection. Runs once on sign-in if legacy
- * fields exist and children subcollection is empty.
- */
-export async function migrateToMultiChild(uid: string, profile: UserProfile): Promise<void> {
-  if (!db) return;
-  const { childName, childBirthDate } = profile;
-  if (!childName || !childBirthDate) return;
-
-  // Normalise legacy btoa-encoded birth date
-  let plainDate = childBirthDate;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(plainDate)) {
-    try { plainDate = atob(plainDate); } catch { /* use as-is */ }
-  }
-
-  // Only migrate if children subcollection is empty
-  const existing = await getChildren(uid);
-  if (existing.length > 0) return;
-
-  log.info('Migrating legacy single-child to multi-child:', childName);
-  const childData: Omit<Child, 'id'> = { name: childName, birthDate: plainDate };
-
-  // Carry over due date from baby tracker if present
-  if (profile.babyDueDate) {
-    childData.dueDate = profile.babyDueDate;
-  }
-
-  await addChild(uid, childData);
-
-  // Clear legacy fields from user profile
-  await updateDoc(doc(db, 'users', uid), {
-    childName: deleteField(),
-    childBirthDate: deleteField(),
   });
 }
 

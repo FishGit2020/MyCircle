@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useTranslation, WindowEvents, StorageKeys, PageContent } from '@mycircle/shared';
 import StockSearch from './StockSearch';
@@ -37,6 +37,7 @@ export default function StockTracker() {
 
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(loadWatchlist);
   const [timeframe, setTimeframe] = useState<Timeframe>('1M');
+  const isInitialMount = useRef(true);
 
   const { quote: selectedQuote, loading: quoteLoading, lastUpdated, refetch } = useStockQuote(
     selectedSymbol,
@@ -44,11 +45,30 @@ export default function StockTracker() {
   );
   const { candles: selectedCandles, loading: candlesLoading } = useStockCandles(selectedSymbol, timeframe);
 
-  // Persist watchlist
+  // Persist watchlist — skip first render to avoid overwriting restored data
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     saveWatchlist(watchlist);
     window.dispatchEvent(new Event(WindowEvents.WATCHLIST_CHANGED));
   }, [watchlist]);
+
+  // Reload watchlist when restoreUserData writes to localStorage
+  useEffect(() => {
+    const handler = () => {
+      const restored = loadWatchlist();
+      setWatchlist(prev => {
+        // Only update if the restored list is non-empty and different
+        if (restored.length === 0) return prev;
+        if (JSON.stringify(prev) === JSON.stringify(restored)) return prev;
+        return restored;
+      });
+    };
+    window.addEventListener(WindowEvents.WATCHLIST_CHANGED, handler);
+    return () => window.removeEventListener(WindowEvents.WATCHLIST_CHANGED, handler);
+  }, []);
 
   // Reset form state when navigating to a different stock
   useEffect(() => {
@@ -79,6 +99,20 @@ export default function StockTracker() {
   const isPositive = selectedQuote ? selectedQuote.d >= 0 : true;
   const changeColor = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
 
+  // Auth check for search functionality
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = await window.__getFirebaseIdToken?.();
+        setIsAuthenticated(!!token);
+      } catch { setIsAuthenticated(false); }
+    };
+    checkAuth();
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
+    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
+  }, []);
+
   return (
     <PageContent maxWidth="4xl" className="stock-tracker-container">
       {/* Header */}
@@ -87,6 +121,16 @@ export default function StockTracker() {
           {t('stocks.title')}
         </h1>
       </div>
+
+      {/* Sign-in prompt */}
+      {!isAuthenticated && (
+        <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg flex items-center gap-3">
+          <svg className="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+          <p className="text-sm text-amber-800 dark:text-amber-200">{t('stocks.signInToSearch')}</p>
+        </div>
+      )}
 
       {/* Search */}
       <div className="mb-8">
