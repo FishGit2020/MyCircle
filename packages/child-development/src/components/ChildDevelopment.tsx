@@ -8,11 +8,10 @@ import { parentingVerses } from '../data/parentingVerses';
 import TimelineView from './TimelineView';
 import YouthTimeline from './YouthTimeline';
 
-type StageTab = 'toddler' | 'youth';
-type YouthSubTab = 'elementary' | 'teen';
+type StageTab = 'toddler' | 'middleChildhood' | 'teens';
 
-const ELEMENTARY_IDS = new Set(['5-6y', '6-8y', '8-10y']);
-const TEEN_IDS = new Set(['10-12y', '12-14y', '14-16y', '16-18y']);
+const MIDDLE_CHILDHOOD_IDS = new Set(['6-8y', '9-11y']);
+const TEEN_IDS = new Set(['12-14y', '15-17y']);
 
 // ─── Verse Section ───────────────────────────────────────────────────────────
 
@@ -72,7 +71,6 @@ export default function ChildDevelopment() {
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
   const [stageTab, setStageTab] = useState<StageTab | null>(null);
-  const [youthSubTab, setYouthSubTab] = useState<YouthSubTab | null>(null);
 
   // Computed from selected child
   const ageInMonths = useMemo(() => {
@@ -95,19 +93,14 @@ export default function ChildDevelopment() {
     return getYouthAgeRange(ageInMonths);
   }, [ageInMonths]);
 
-  // Auto-select stage tab based on child age
+  // Auto-select stage tab based on child age (CDC age groups)
   const activeStageTab: StageTab = useMemo(() => {
     if (stageTab) return stageTab;
-    if (ageInMonths !== null && ageInMonths >= 60) return 'youth';
-    return 'toddler';
+    if (ageInMonths === null) return 'toddler';
+    if (ageInMonths >= 144) return 'teens';        // 12+ → Young Teens / Teenagers
+    if (ageInMonths >= 72) return 'middleChildhood'; // 6-11 → Middle Childhood
+    return 'toddler';                                // 0-5 → Toddler (CDC Act Early)
   }, [stageTab, ageInMonths]);
-
-  // Auto-select youth sub-tab based on child age
-  const activeYouthSubTab: YouthSubTab = useMemo(() => {
-    if (youthSubTab) return youthSubTab;
-    if (ageInMonths !== null && ageInMonths >= 120) return 'teen';
-    return 'elementary';
-  }, [youthSubTab, ageInMonths]);
 
   const ageDisplay = useMemo(() => {
     if (ageInMonths === null) return '';
@@ -344,73 +337,41 @@ export default function ChildDevelopment() {
           {/* Verse */}
           <VerseSection />
 
-          {/* Stage tabs: Toddler / Youth */}
+          {/* CDC-aligned stage tabs */}
           <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
-            <button
-              type="button"
-              onClick={() => setStageTab('toddler')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeStageTab === 'toddler'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-              }`}
-            >
-              {t('childDev.tabToddler' as any)}
-              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(0–5)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setStageTab('youth')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeStageTab === 'youth'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-              }`}
-            >
-              {t('childDev.tabYouth' as any)}
-              <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(5–18)</span>
-            </button>
+            {([
+              { id: 'toddler' as StageTab, labelKey: 'childDev.tabToddler', ages: '0\u20135' },
+              { id: 'middleChildhood' as StageTab, labelKey: 'childDev.tabMiddleChildhood', ages: '6\u201311' },
+              { id: 'teens' as StageTab, labelKey: 'childDev.tabTeens', ages: '12\u201317' },
+            ]).map(tab => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setStageTab(tab.id)}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  activeStageTab === tab.id
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                }`}
+              >
+                {t(tab.labelKey as any)}
+                <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">({tab.ages})</span>
+              </button>
+            ))}
           </div>
 
-          {/* Content based on active tab */}
+          {/* Content based on active CDC stage */}
           {activeStageTab === 'toddler' ? (
             <TimelineView
               ageInMonths={ageInMonths}
               currentAgeRange={currentAgeRange}
             />
           ) : (
-            <>
-              {/* Youth sub-tabs: Elementary / Teen */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  type="button"
-                  onClick={() => setYouthSubTab('elementary')}
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    activeYouthSubTab === 'elementary'
-                      ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {t('youth.tabElementary' as any)} (5–10)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setYouthSubTab('teen')}
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    activeYouthSubTab === 'teen'
-                      ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {t('youth.tabTeen' as any)} (10–18)
-                </button>
-              </div>
-              <YouthTimeline
-                ageInMonths={ageInMonths}
-                currentAgeRange={youthAgeRange}
-                ageRangeIds={activeYouthSubTab === 'elementary' ? ELEMENTARY_IDS : TEEN_IDS}
-              />
-            </>
+            <YouthTimeline
+              ageInMonths={ageInMonths}
+              currentAgeRange={youthAgeRange}
+              ageRangeIds={activeStageTab === 'middleChildhood' ? MIDDLE_CHILDHOOD_IDS : TEEN_IDS}
+            />
           )}
         </>
       )}
