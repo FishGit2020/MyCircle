@@ -88,15 +88,16 @@ export function createWorshipSongResolvers() {
         const db = getFirestore();
         const snap = await db
           .collection(COLLECTION)
-          .where('isDeleted', '==', false)
           .orderBy('createdAt', 'desc')
           .get();
         const songs = await Promise.all(
-          snap.docs.map(async (d) => {
-            const data = d.data();
-            const content = await resolveContent(d.id, data);
-            return docToSong(d.id, data, content);
-          })
+          snap.docs
+            .filter(d => !d.data().isDeleted)
+            .map(async (d) => {
+              const data = d.data();
+              const content = await resolveContent(d.id, data);
+              return docToSong(d.id, data, content);
+            })
         );
         return songs;
       },
