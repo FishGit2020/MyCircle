@@ -199,6 +199,14 @@ export default function Layout() {
   useDocumentTitle();
   const { recent } = useRecentlyVisited();
 
+  // Safari IndexedDB connection loss recovery
+  const [showDbError, setShowDbError] = useState(false);
+  useEffect(() => {
+    const handler = () => setShowDbError(true);
+    window.addEventListener('indexeddb-error', handler);
+    return () => window.removeEventListener('indexeddb-error', handler);
+  }, []);
+
   const handlePlayerStateChange = useCallback((active: boolean) => {
     setHasActivePlayer(active);
   }, []);
@@ -258,6 +266,18 @@ export default function Layout() {
         {t('nav.skipToContent')}
       </a>
       <OfflineIndicator />
+      {showDbError && (
+        <div className="bg-amber-50 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-800 px-4 py-2 flex items-center justify-between gap-3" role="alert">
+          <p className="text-sm text-amber-800 dark:text-amber-200">{t('app.indexedDbError')}</p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="flex-shrink-0 px-3 py-1 text-xs font-medium bg-amber-600 hover:bg-amber-700 text-white rounded-md transition"
+          >
+            {t('app.refresh')}
+          </button>
+        </div>
+      )}
       <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="max-w-[1920px] mx-auto px-4 py-2 sm:py-3">
           {/* Mobile header */}

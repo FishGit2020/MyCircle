@@ -1031,6 +1031,8 @@ const zh: Record<TranslationKey, string> = {
   'commandPalette.stockSymbol': '\u80a1\u7968: {symbol}',
   'commandPalette.bibleBookmark': '\u4e66\u7b7e: {label}',
   'app.loading': '\u52a0\u8f7d\u4e2d\u2026',
+  'app.indexedDbError': '\u6570\u636e\u5e93\u8fde\u63a5\u4e22\u5931\u3002\u8bf7\u5237\u65b0\u9875\u9762\u4ee5\u91cd\u65b0\u8fde\u63a5\u3002',
+  'app.refresh': '\u5237\u65b0',
   'auth.userMenu': '\u7528\u6237\u83dc\u5355',
   'stocks.priceUp': '\u4e0a\u6da8',
   'stocks.priceDown': '\u4e0b\u8dcc',
