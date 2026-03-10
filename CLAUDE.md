@@ -109,6 +109,7 @@ const VALID_IDS = new Set(DEFAULT_LAYOUT.map(w => w.id));
 const filtered = parsed.filter(w => VALID_IDS.has(w.id));
 ```
 Also: delete e2e tests, remove i18n keys from all 3 locales, update `deploy/docker/Dockerfile` (remove `COPY` lines for deleted packages in both build and runtime stages), update `packages/shell/tailwind.config.js` `content` array (add/remove MFE src paths — missing this silently breaks arbitrary-value Tailwind classes like `z-[55]`), update docs, respect PWA shortcuts max of 10.
+- **Deleting scripts**: When removing files from `scripts/`, also remove any `package.json` script entries that reference them. Missing this breaks CI silently (e.g. `seed-firestore.mjs` deletion broke `emulator:seed-and-test` → e2e-emulator failed on every PR until the dangling reference was found).
 
 ## MCP Validators
 
