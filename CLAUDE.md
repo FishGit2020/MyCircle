@@ -122,6 +122,29 @@ MyCircle has a custom MCP server (`.mcp.json`) with project health validators. A
 
 Run `validate_all` after adding/removing features or packages.
 
+## Announcements (What's New)
+
+Announcements are stored in the Firestore `announcements` collection and shown to users via the notification bell. To create a new announcement, use the Firestore REST API with `gcloud` credentials:
+
+```bash
+TOKEN=$(gcloud auth application-default print-access-token) && curl -s -X POST \
+  "https://firestore.googleapis.com/v1/projects/mycircle-dash/databases/(default)/documents/announcements" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  --data-binary @- <<'ENDJSON'
+{
+  "fields": {
+    "title": {"stringValue": "Your Title Here"},
+    "description": {"stringValue": "Description with \\n\\n for paragraphs. Supports emoji."},
+    "icon": {"stringValue": "announcement"},
+    "createdAt": {"timestampValue": "YYYY-MM-DDTHH:MM:SSZ"}
+  }
+}
+ENDJSON
+```
+
+For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell or set manually. Emojis must use JSON Unicode escapes (e.g. `\ud83d\uddfa\ufe0f` for 🗺️) to avoid shell encoding issues. See [Announcements doc](./docs/announcements.md) for full schema and examples.
+
 ## Docs
 
 - [Architecture](./docs/architecture.md) — MFE structure, data flow
