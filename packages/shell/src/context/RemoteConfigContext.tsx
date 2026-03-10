@@ -25,6 +25,9 @@ export function RemoteConfigProvider({ children }: { children: React.ReactNode }
       // Expose on window so remote MFEs can read it without shared React context
       window.__REMOTE_CONFIG__ = config;
       setState({ config, loading: false });
+    }).catch(() => {
+      // Fallback: defaults already applied in initRemoteConfig, just stop loading
+      setState((prev) => ({ ...prev, loading: false }));
     });
   }, []);
 
