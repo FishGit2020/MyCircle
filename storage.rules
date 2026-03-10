@@ -23,5 +23,10 @@ service firebase.storage {
     match /shared-files/{fileId}/{fileName} {
       allow read: if request.auth != null;
     }
+
+    // Worship song content — writes go through Cloud Function, authenticated read
+    match /worship-songs/{songId}/content.txt {
+      allow read: if request.auth != null;
+    }
   }
 }
