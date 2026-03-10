@@ -18,9 +18,11 @@ export default function DataSync() {
     const handleWatchlistChanged = () => {
       try {
         const raw = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
-        if (!raw) return; // Don't sync empty — prevents overwriting Firestore on sign-in clear
+        // null = key removed by clearUserSpecificStorage → don't overwrite Firestore
+        // "[]" = user intentionally cleared → sync empty array to Firestore
+        if (raw === null) return;
         const watchlist = JSON.parse(raw);
-        if (!Array.isArray(watchlist) || watchlist.length === 0) return;
+        if (!Array.isArray(watchlist)) return;
         syncStockWatchlist(watchlist);
       } catch { /* ignore parse errors */ }
     };
@@ -28,9 +30,9 @@ export default function DataSync() {
     const handleSubscriptionsChanged = () => {
       try {
         const raw = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
-        if (!raw) return; // Don't sync empty — prevents overwriting Firestore on sign-in clear
+        if (raw === null) return;
         const subscriptionIds = JSON.parse(raw);
-        if (!Array.isArray(subscriptionIds) || subscriptionIds.length === 0) return;
+        if (!Array.isArray(subscriptionIds)) return;
         syncPodcastSubscriptions(subscriptionIds);
       } catch { /* ignore parse errors */ }
     };
