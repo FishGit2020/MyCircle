@@ -307,6 +307,11 @@ export default function DigitalLibrary() {
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}
         onBack={handleBack}
+        onRefreshChapters={async () => {
+          const result = await fetchChapters({ variables: { bookId: selectedBook.id } });
+          const rawChapters = result.data?.bookChapters ?? [];
+          setChapters(rawChapters as Chapter[]);
+        }}
       />
       </PageContent>
     );

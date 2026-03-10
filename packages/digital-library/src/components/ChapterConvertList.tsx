@@ -100,12 +100,12 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
       const token = await window.__getFirebaseIdToken?.();
       if (!token) return;
       const apiBase = window.__digitalLibraryApiBase?.() || '';
-      await fetch(`${apiBase}/digital-library-api/delete-chapter-audio`, {
+      const res = await fetch(`${apiBase}/digital-library-api/delete-chapter-audio`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ bookId, chapterIndex }),
       });
-      onChapterConverted();
+      if (res.ok) await onChapterConverted();
     } catch (err) {
       logger.error('Failed to delete chapter audio', err);
     } finally {
