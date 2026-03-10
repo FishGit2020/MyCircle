@@ -296,6 +296,7 @@ export default function DigitalLibrary() {
 
   if (selectedBook) {
     return (
+      <PageContent fill>
       <BookReader
         bookId={selectedBook.id}
         epubUrl={selectedBook.epubUrl}
@@ -307,6 +308,7 @@ export default function DigitalLibrary() {
         audioProgress={selectedBook.audioProgress}
         onBack={handleBack}
       />
+      </PageContent>
     );
   }
 

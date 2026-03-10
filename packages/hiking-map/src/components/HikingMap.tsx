@@ -177,7 +177,7 @@ export default function HikingMap() {
   };
 
   return (
-    <PageContent>
+    <PageContent fill>
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('hiking.title')}</h1>
@@ -198,7 +198,7 @@ export default function HikingMap() {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 md:h-[calc(100vh-13rem)]">
+      <div className="flex flex-col md:flex-row gap-4 md:flex-1 md:min-h-0">
         {/* Map */}
         <div className="relative h-[55vh] md:h-auto md:flex-1 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
           <MapView style={mapStyle} onMapReady={setMap} onMapClick={handleMapClick} onStyleLoad={handleStyleLoad} />
