@@ -1029,6 +1029,8 @@ const en = {
   'commandPalette.stockSymbol': 'Stock: {symbol}',
   'commandPalette.bibleBookmark': 'Bookmark: {label}',
   'app.loading': 'Loading…',
+  'app.indexedDbError': 'Database connection lost. Please refresh to reconnect.',
+  'app.refresh': 'Refresh',
   'auth.userMenu': 'User menu',
   'stocks.priceUp': 'up',
   'stocks.priceDown': 'down',

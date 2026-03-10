@@ -1031,6 +1031,8 @@ const es: Record<TranslationKey, string> = {
   'commandPalette.stockSymbol': 'Acci\u00f3n: {symbol}',
   'commandPalette.bibleBookmark': 'Marcador: {label}',
   'app.loading': 'Cargando\u2026',
+  'app.indexedDbError': 'Conexi\u00f3n a la base de datos perdida. Actualice para reconectar.',
+  'app.refresh': 'Actualizar',
   'auth.userMenu': 'Men\u00fa de usuario',
   'stocks.priceUp': 'al alza',
   'stocks.priceDown': 'a la baja',

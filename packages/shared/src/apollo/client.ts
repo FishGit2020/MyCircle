@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, Observable } from '@apollo/client';
 import { SetContextLink } from '@apollo/client/link/context';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
@@ -6,6 +6,51 @@ import { createClient } from 'graphql-ws';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('apollo');
+
+/**
+ * Retry link that catches Safari IndexedDB connection errors and retries.
+ * Safari aggressively kills IndexedDB connections when tabs are backgrounded,
+ * which causes Firestore persistence + Apollo queries to fail with
+ * "Connection to Indexed Database server lost".
+ */
+const INDEXEDDB_ERROR_PATTERNS = [
+  'Indexed Database',
+  'IndexedDB',
+  'connection was lost',
+  'database connection is closing',
+];
+
+function isIndexedDbError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error);
+  return INDEXEDDB_ERROR_PATTERNS.some(p => msg.includes(p));
+}
+
+const MAX_RETRIES = 2;
+const RETRY_DELAY = 1000;
+
+const retryLink = new ApolloLink((operation, forward) => {
+  let retryCount = 0;
+
+  return new Observable(observer => {
+    const attempt = () => {
+      const sub = forward(operation).subscribe({
+        next: observer.next.bind(observer),
+        complete: observer.complete.bind(observer),
+        error: (err: unknown) => {
+          if (isIndexedDbError(err) && retryCount < MAX_RETRIES) {
+            retryCount++;
+            logger.warn(`IndexedDB error, retrying (${retryCount}/${MAX_RETRIES})...`);
+            setTimeout(attempt, RETRY_DELAY * retryCount);
+          } else {
+            observer.error(err);
+          }
+        },
+      });
+      return sub;
+    };
+    attempt();
+  });
+});
 
 // Check if we're on the client side
 const isBrowser = typeof window !== 'undefined';
@@ -56,7 +101,7 @@ export function createApolloClient(graphqlUrl?: string, wsUrl?: string) {
     };
   });
 
-  const httpWithAuth = ApolloLink.from([authLink, appCheckLink, httpLink]);
+  const httpWithAuth = ApolloLink.from([retryLink, authLink, appCheckLink, httpLink]);
 
   let wsLink: GraphQLWsLink | null = null;
 
