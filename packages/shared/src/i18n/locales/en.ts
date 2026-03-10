@@ -887,6 +887,8 @@ const en = {
   'widgets.notebookDesc': 'Your personal notes',
   'widgets.noNotes': 'No notes yet',
   'widgets.noActivePolls': 'No active polls',
+  'widgets.pollPersonalCount': '{count} personal polls',
+  'widgets.pollPublicCount': '{count} public polls',
   'widgets.noUpcomingTrips': 'No upcoming trips',
   'widgets.publicNoteCount': '{count} public notes shared',
   'widgets.size': 'Size',

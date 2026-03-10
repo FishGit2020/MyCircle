@@ -889,6 +889,8 @@ const es: Record<TranslationKey, string> = {
   'widgets.notebookDesc': 'Tus notas personales',
   'widgets.noNotes': 'A\u00fan no hay notas',
   'widgets.noActivePolls': 'No hay encuestas activas',
+  'widgets.pollPersonalCount': '{count} encuestas personales',
+  'widgets.pollPublicCount': '{count} encuestas p\u00fablicas',
   'widgets.noUpcomingTrips': 'No hay viajes pr\u00f3ximos',
   'widgets.publicNoteCount': '{count} notas p\u00fablicas compartidas',
   'widgets.size': 'Tama\u00f1o',
