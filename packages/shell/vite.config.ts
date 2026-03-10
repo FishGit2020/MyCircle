@@ -176,10 +176,6 @@ const tripPlannerRemote = isProduction
   ? '/trip-planner/assets/remoteEntry.js'
   : 'http://localhost:3024/assets/remoteEntry.js';
 
-const youthTrackerRemote = isProduction
-  ? '/youth-tracker/assets/remoteEntry.js'
-  : 'http://localhost:3023/assets/remoteEntry.js';
-
 const pollSystemRemote = isProduction
   ? '/poll-system/assets/remoteEntry.js'
   : 'http://localhost:3025/assets/remoteEntry.js';
@@ -216,7 +212,6 @@ export default defineConfig({
         docScanner: docScannerRemote,
         hikingMap: hikingMapRemote,
         tripPlanner: tripPlannerRemote,
-        youthTracker: youthTrackerRemote,
         pollSystem: pollSystemRemote,
         radioStation: radioStationRemote
       },

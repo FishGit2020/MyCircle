@@ -18,14 +18,13 @@ import FamilyGamesWidget from './FamilyGamesWidget';
 import DocScannerWidget from './DocScannerWidget';
 import HikingMapWidget from './HikingMapWidget';
 import TripPlannerWidget from './TripPlannerWidget';
-import YouthTrackerWidget from './YouthTrackerWidget';
 import PollSystemWidget from './PollSystemWidget';
 import RadioWidget from './RadioWidget';
 import AiAssistantWidget from './AiAssistantWidget';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'tripPlanner' | 'youthTracker' | 'pollSystem' | 'radioStation' | 'aiAssistant';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'tripPlanner' | 'pollSystem' | 'radioStation' | 'aiAssistant';
 
 export type WidgetSize = 'comfortable' | 'tight';
 
@@ -43,7 +42,7 @@ const DEFAULT_WIDGET_LAYOUT: WidgetLayout = { pinned: [], size: 'comfortable' };
 const ALL_WIDGET_IDS = new Set<string>([
   'weather', 'stocks', 'verse', 'nowPlaying', 'notebook', 'babyTracker',
   'childDev', 'worship', 'flashcards', 'dailyLog', 'cloudFiles', 'benchmark',
-  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'tripPlanner', 'youthTracker', 'pollSystem', 'radioStation', 'aiAssistant',
+  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'tripPlanner', 'pollSystem', 'radioStation', 'aiAssistant',
 ]);
 
 export function loadWidgetLayout(): WidgetLayout {
@@ -91,7 +90,6 @@ export const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   docScanner: DocScannerWidget,
   hikingMap: HikingMapWidget,
   tripPlanner: TripPlannerWidget,
-  youthTracker: YouthTrackerWidget,
   pollSystem: PollSystemWidget,
   radioStation: RadioWidget,
   aiAssistant: AiAssistantWidget,
@@ -116,7 +114,6 @@ export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities:
   docScanner: '/doc-scanner',
   hikingMap: '/hiking',
   tripPlanner: '/trips',
-  youthTracker: '/youth-tracker',
   pollSystem: '/polls',
   radioStation: '/radio',
   aiAssistant: '/ai',

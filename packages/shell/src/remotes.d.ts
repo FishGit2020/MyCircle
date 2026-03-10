@@ -111,11 +111,6 @@ declare module 'tripPlanner/TripPlanner' {
   export default TripPlanner;
 }
 
-declare module 'youthTracker/YouthTracker' {
-  const YouthTracker: React.ComponentType;
-  export default YouthTracker;
-}
-
 declare module 'pollSystem/PollSystem' {
   const PollSystem: React.ComponentType;
   export default PollSystem;

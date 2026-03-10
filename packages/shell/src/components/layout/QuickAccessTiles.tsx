@@ -25,7 +25,6 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/notebook', labelKey: 'nav.notebook', color: 'bg-indigo-50 text-indigo-500', darkColor: 'dark:bg-indigo-900/20 dark:text-indigo-400', widgetId: 'notebook', iconKey: 'notebook' },
   { path: '/baby', labelKey: 'nav.baby', color: 'bg-rose-50 text-rose-500', darkColor: 'dark:bg-rose-900/20 dark:text-rose-400', widgetId: 'babyTracker', iconKey: 'baby' },
   { path: '/child-dev', labelKey: 'nav.childDev', color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'childDev', iconKey: 'child-dev' },
-  { path: '/youth-tracker', labelKey: 'nav.youthTracker', color: 'bg-lime-50 text-lime-500', darkColor: 'dark:bg-lime-900/20 dark:text-lime-400', widgetId: 'youthTracker', iconKey: 'youth-tracker' },
   { path: '/flashcards', labelKey: 'nav.flashcards', color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'flashcards', iconKey: 'flashcards' },
   { path: '/daily-log', labelKey: 'nav.dailyLog', color: 'bg-amber-50 text-amber-600', darkColor: 'dark:bg-amber-900/20 dark:text-amber-400', widgetId: 'dailyLog', iconKey: 'daily-log' },
   { path: '/files', labelKey: 'nav.cloudFiles', color: 'bg-cyan-50 text-cyan-500', darkColor: 'dark:bg-cyan-900/20 dark:text-cyan-400', widgetId: 'cloudFiles', iconKey: 'cloud-files' },
