@@ -1685,6 +1685,8 @@ const es: Record<TranslationKey, string> = {
   'library.convertToAudio': 'Convertir Todo a Audio',
   'library.convertChapter': 'Convertir',
   'library.cancelConversion': 'Cancelar',
+  'library.deleteAudio': 'Eliminar audio',
+  'library.deleteAudioConfirm': '\u00bfEliminar el audio convertido de este cap\u00edtulo? Puedes volver a convertirlo despu\u00e9s.',
   'library.chapter': 'Cap\u00edtulo',
   'library.chaptersConverted': '{converted}/{total} convertidos',
   'library.chars': 'caracteres',

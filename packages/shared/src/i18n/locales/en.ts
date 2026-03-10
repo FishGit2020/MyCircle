@@ -1683,6 +1683,8 @@ const en = {
   'library.convertToAudio': 'Convert All to Audio',
   'library.convertChapter': 'Convert',
   'library.cancelConversion': 'Cancel',
+  'library.deleteAudio': 'Delete audio',
+  'library.deleteAudioConfirm': 'Remove the converted audio for this chapter? You can re-convert it later.',
   'library.chapter': 'Chapter',
   'library.chaptersConverted': '{converted}/{total} converted',
   'library.chars': 'chars',
