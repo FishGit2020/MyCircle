@@ -121,6 +121,7 @@ export default function Notebook() {
 
   if (view === 'new' || view === 'edit') {
     return (
+      <PageContent fill>
       <NoteEditor
         note={view === 'edit' ? selectedNote : null}
         onSave={handleSave}
@@ -128,6 +129,7 @@ export default function Notebook() {
         onDelete={view === 'edit' ? handleDelete : undefined}
         onPublish={tab === 'my' ? handlePublish : undefined}
       />
+      </PageContent>
     );
   }
 

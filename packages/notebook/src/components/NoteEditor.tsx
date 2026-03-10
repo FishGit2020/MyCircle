@@ -53,7 +53,7 @@ export default function NoteEditor({ note, onSave, onCancel, onDelete, onPublish
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 min-h-[calc(100vh-12rem)]">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1">
       <div>
         <label htmlFor="note-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {t('notebook.noteTitle')}

@@ -26,7 +26,7 @@ export function PageContent({ children, maxWidth = 'none', className = '', fill 
     'flex-grow',
     widthClass,
     widthClass ? 'mx-auto w-full' : '',
-    fill ? 'flex flex-col' : '',
+    fill ? 'flex flex-col min-h-0' : '',
     className,
   ].filter(Boolean).join(' ');
 
