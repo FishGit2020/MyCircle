@@ -1,8 +1,31 @@
-import React from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useEffect } from 'react';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 
 const PollSystemWidget = React.memo(function PollSystemWidget() {
   const { t } = useTranslation();
+  const [counts, setCounts] = React.useState<{ personal: number; public: number } | null>(null);
+
+  useEffect(() => {
+    function fetchCounts() {
+      const api = window.__pollSystem;
+      if (api?.getAll) {
+        api.getAll().then((polls: any[]) => {
+          const personal = polls.filter((p: any) => !p.isPublic).length;
+          const pub = polls.filter((p: any) => p.isPublic).length;
+          setCounts({ personal, public: pub });
+        }).catch(() => { /* ignore */ });
+      }
+    }
+    fetchCounts();
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, fetchCounts);
+    window.addEventListener(WindowEvents.POLL_SYSTEM_CHANGED, fetchCounts);
+    return () => {
+      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, fetchCounts);
+      window.removeEventListener(WindowEvents.POLL_SYSTEM_CHANGED, fetchCounts);
+    };
+  }, []);
+
+  const total = counts ? counts.personal + counts.public : 0;
 
   return (
     <div>
@@ -17,7 +40,22 @@ const PollSystemWidget = React.memo(function PollSystemWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.pollSystemDesc' as any)}</p>
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noActivePolls' as any)}</p>
+      {total > 0 ? (
+        <div className="space-y-0.5">
+          {counts!.personal > 0 && (
+            <p className="text-sm text-violet-600 dark:text-violet-400 font-medium">
+              {t('widgets.pollPersonalCount' as any).replace('{count}', String(counts!.personal))}
+            </p>
+          )}
+          {counts!.public > 0 && (
+            <p className="text-xs text-violet-500 dark:text-violet-400/70">
+              {t('widgets.pollPublicCount' as any).replace('{count}', String(counts!.public))}
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noActivePolls' as any)}</p>
+      )}
     </div>
   );
 });

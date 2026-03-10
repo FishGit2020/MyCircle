@@ -889,6 +889,8 @@ const zh: Record<TranslationKey, string> = {
   'widgets.notebookDesc': '\u60a8\u7684\u4e2a\u4eba\u7b14\u8bb0',
   'widgets.noNotes': '\u8fd8\u6ca1\u6709\u7b14\u8bb0',
   'widgets.noActivePolls': '\u6ca1\u6709\u6d3b\u8dc3\u7684\u6295\u7968',
+  'widgets.pollPersonalCount': '{count} \u4e2a\u4eba\u6295\u7968',
+  'widgets.pollPublicCount': '{count} \u516c\u5f00\u6295\u7968',
   'widgets.noUpcomingTrips': '\u6ca1\u6709\u5373\u5c06\u5f00\u59cb\u7684\u65c5\u884c',
   'widgets.publicNoteCount': '{count} \u7bc7\u516c\u5f00\u7b14\u8bb0',
   'widgets.size': '\u5c3a\u5bf8',
