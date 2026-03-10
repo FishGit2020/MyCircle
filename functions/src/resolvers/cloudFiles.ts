@@ -31,8 +31,7 @@ export function createCloudFileResolvers() {
         const db = getFirestore();
         const snap = await db
           .collection(`users/${uid}/files`)
-          .where('isDeleted', '!=', true)
-          .orderBy('isDeleted')
+          .where('isDeleted', '==', false)
           .orderBy('uploadedAt', 'desc')
           .get();
         return snap.docs.map(d => {
