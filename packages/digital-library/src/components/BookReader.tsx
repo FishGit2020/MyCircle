@@ -36,9 +36,10 @@ interface BookReaderProps {
   audioStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   audioProgress: number;
   onBack: () => void;
+  onRefreshChapters?: () => Promise<void>;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack, onRefreshChapters }: BookReaderProps) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') === 'listen' ? 'listen' : 'read';
@@ -638,8 +639,9 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
               const lc = (language || 'en').startsWith('zh') ? 'cmn-CN' : (language || 'en').startsWith('es') ? 'es-US' : 'en-US';
               return `${lc}-Neural2-${lc === 'en-US' ? 'D' : 'A'}`;
             })()}
-            onChapterConverted={() => {
+            onChapterConverted={async () => {
               window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
+              await onRefreshChapters?.();
             }}
           />
 
