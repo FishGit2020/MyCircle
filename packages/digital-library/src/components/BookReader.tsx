@@ -6,7 +6,6 @@ import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
 import ConversionStatus from './ConversionStatus';
 import ChapterConvertList from './ChapterConvertList';
-import AudioPlayer from './AudioPlayer';
 import useSwipe from '../hooks/useSwipe';
 
 interface BookBookmark {
@@ -52,7 +51,6 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [tocOpen, setTocOpen] = useState(false);
   const [ttsText, setTtsText] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showAudioPlayer, setShowAudioPlayer] = useState(audioStatus === 'complete');
   const [readerExpanded, setReaderExpanded] = useState(true);
   const [bookmarks, setBookmarks] = useState<BookBookmark[]>([]);
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
@@ -117,9 +115,10 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
     }, { replace: true });
   }, [setSearchParams]);
 
-  // Broadcast listen-tab state so GlobalAudioPlayer can hide itself
+  // Keep GlobalAudioPlayer visible on Listen tab — ChapterConvertList
+  // triggers playback via eventBus, the global player handles the UI
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, { detail: activeTab === 'listen' }));
+    window.dispatchEvent(new CustomEvent(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, { detail: false }));
     return () => {
       window.dispatchEvent(new CustomEvent(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, { detail: false }));
     };
@@ -616,7 +615,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             language={language}
             initialStatus={audioStatus}
             initialProgress={audioProgress}
-            onComplete={() => setShowAudioPlayer(true)}
+            onComplete={() => { /* chapters refetch handles UI update */ }}
             onConvert={async (voiceName: string) => {
               const token = await window.__getFirebaseIdToken?.();
               if (!token) return undefined;
@@ -644,9 +643,6 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             }}
           />
 
-          {showAudioPlayer && (
-            <AudioPlayer chapters={chapters} bookTitle={title} bookId={bookId} coverUrl={coverUrl} autoPlay={autoPlayOnMount} />
-          )}
         </div>
       )}
     </div>

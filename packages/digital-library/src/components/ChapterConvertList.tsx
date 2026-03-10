@@ -91,6 +91,28 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
     setConverting(null);
   }, []);
 
+  const [deleting, setDeleting] = useState<number | null>(null);
+
+  const handleDeleteAudio = useCallback(async (chapterIndex: number) => {
+    if (!window.confirm(t('library.deleteAudioConfirm'))) return;
+    setDeleting(chapterIndex);
+    try {
+      const token = await window.__getFirebaseIdToken?.();
+      if (!token) return;
+      const apiBase = window.__digitalLibraryApiBase?.() || '';
+      await fetch(`${apiBase}/digital-library-api/delete-chapter-audio`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ bookId, chapterIndex }),
+      });
+      onChapterConverted();
+    } catch (err) {
+      logger.error('Failed to delete chapter audio', err);
+    } finally {
+      setDeleting(null);
+    }
+  }, [bookId, onChapterConverted, t]);
+
   const convertedCount = audioChapters.length;
 
   return (
@@ -150,17 +172,31 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
                   {t('library.cancelConversion')}
                 </button>
               ) : hasAudio ? (
-                <button
-                  type="button"
-                  onClick={() => handlePlay(ch.index)}
-                  className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-md transition min-h-[44px]"
-                  aria-label={`${t('library.play')} ${ch.title}`}
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-                  </svg>
-                  {t('library.play')}
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handlePlay(ch.index)}
+                    className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 rounded-md transition min-h-[44px]"
+                    aria-label={`${t('library.play')} ${ch.title}`}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                    </svg>
+                    {t('library.play')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteAudio(ch.index)}
+                    disabled={deleting === ch.index}
+                    className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition min-h-[44px] min-w-[44px] flex items-center justify-center disabled:opacity-50"
+                    aria-label={`${t('library.deleteAudio')} ${ch.title}`}
+                    title={t('library.deleteAudio')}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"

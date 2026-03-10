@@ -240,6 +240,36 @@ export const digitalLibrary = onRequest(
       return;
     }
 
+    // POST /digital-library-api/delete-chapter-audio (soft-delete: clears audioUrl, keeps Storage file)
+    if (req.method === 'POST' && route === 'delete-chapter-audio') {
+      const bookId = validateBookId(req.body.bookId);
+      if (!bookId) { res.status(400).json({ error: 'Invalid or missing bookId' }); return; }
+      const chapterIndex = typeof req.body.chapterIndex === 'number' ? req.body.chapterIndex : null;
+      if (chapterIndex === null) { res.status(400).json({ error: 'chapterIndex required' }); return; }
+
+      const bookRef = db.collection('books').doc(bookId);
+      const chaptersSnap = await bookRef.collection('chapters').where('index', '==', chapterIndex).get();
+      if (chaptersSnap.empty) { res.status(404).json({ error: 'Chapter not found' }); return; }
+
+      const chapterDoc = chaptersSnap.docs[0];
+      await chapterDoc.ref.update({
+        audioUrl: FieldValue.delete(),
+        audioStoragePath: FieldValue.delete(),
+        audioDuration: FieldValue.delete(),
+      });
+
+      // Update book-level progress
+      const allChaps = await bookRef.collection('chapters').get();
+      const convertedCount = allChaps.docs.filter(d => d.data().audioUrl && d.id !== chapterDoc.id).length;
+      const newProgress = Math.round((convertedCount / allChaps.size) * 100);
+      const newStatus = convertedCount === 0 ? 'none' : convertedCount === allChaps.size ? 'complete' : 'partial';
+      await bookRef.update({ audioStatus: newStatus, audioProgress: newProgress });
+
+      logger.info('Chapter audio deleted (soft)', { bookId, chapterIndex });
+      res.json({ ok: true });
+      return;
+    }
+
     // GET /digital-library-api/progress/:bookId
     if (req.method === 'GET' && route.startsWith('progress/')) {
       const bookId = validateBookId(route.replace('progress/', ''));

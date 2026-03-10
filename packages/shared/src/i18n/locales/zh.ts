@@ -1685,6 +1685,8 @@ const zh: Record<TranslationKey, string> = {
   'library.convertToAudio': '\u5168\u90e8\u8f6c\u6362\u4e3a\u97f3\u9891',
   'library.convertChapter': '\u8f6c\u6362',
   'library.cancelConversion': '\u53d6\u6d88',
+  'library.deleteAudio': '\u5220\u9664\u97f3\u9891',
+  'library.deleteAudioConfirm': '\u5220\u9664\u6b64\u7ae0\u8282\u7684\u8f6c\u6362\u97f3\u9891\uff1f\u4f60\u53ef\u4ee5\u7a0d\u540e\u91cd\u65b0\u8f6c\u6362\u3002',
   'library.chapter': '\u7ae0\u8282',
   'library.chaptersConverted': '{converted}/{total} \u5df2\u8f6c\u6362',
   'library.chars': '\u5b57\u7b26',
