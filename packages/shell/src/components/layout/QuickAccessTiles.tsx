@@ -28,7 +28,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/flashcards', labelKey: 'nav.flashcards', color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'flashcards', iconKey: 'flashcards' },
   { path: '/daily-log', labelKey: 'nav.dailyLog', color: 'bg-amber-50 text-amber-600', darkColor: 'dark:bg-amber-900/20 dark:text-amber-400', widgetId: 'dailyLog', iconKey: 'daily-log' },
   { path: '/files', labelKey: 'nav.cloudFiles', color: 'bg-cyan-50 text-cyan-500', darkColor: 'dark:bg-cyan-900/20 dark:text-cyan-400', widgetId: 'cloudFiles', iconKey: 'cloud-files' },
-  { path: '/ai', labelKey: 'nav.ai', color: 'bg-violet-50 text-violet-500', darkColor: 'dark:bg-violet-900/20 dark:text-violet-400', iconKey: 'ai' },
+  { path: '/ai', labelKey: 'nav.ai', color: 'bg-violet-50 text-violet-500', darkColor: 'dark:bg-violet-900/20 dark:text-violet-400', widgetId: 'aiAssistant', iconKey: 'ai' },
   { path: '/library', labelKey: 'nav.digitalLibrary', color: 'bg-indigo-50 text-indigo-500', darkColor: 'dark:bg-indigo-900/20 dark:text-indigo-400', widgetId: 'digitalLibrary', iconKey: 'digital-library' },
   { path: '/family-games', labelKey: 'nav.familyGames', color: 'bg-fuchsia-50 text-fuchsia-500', darkColor: 'dark:bg-fuchsia-900/20 dark:text-fuchsia-400', widgetId: 'familyGames', iconKey: 'family-games' },
   { path: '/hiking', labelKey: 'nav.hikingMap', color: 'bg-green-50 text-green-600', darkColor: 'dark:bg-green-900/20 dark:text-green-400', widgetId: 'hikingMap', iconKey: 'hiking' },
