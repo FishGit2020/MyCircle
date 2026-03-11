@@ -625,6 +625,8 @@ const es: Record<TranslationKey, string> = {
   'worship.filterTag': 'Filtrar por etiqueta',
   'worship.allArtists': 'Todos los artistas',
   'worship.allTags': 'Todas las etiquetas',
+  'worship.showingCount': 'Mostrando {{shown}} de {{total}} canciones',
+  'worship.loadMore': 'Cargar m\u00e1s canciones',
   'worship.targetKey': 'Tono objetivo',
   'worship.scrollSpeed': 'Velocidad de desplazamiento',
   'worship.copyLyrics': 'Copiar',

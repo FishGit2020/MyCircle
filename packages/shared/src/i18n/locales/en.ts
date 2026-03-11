@@ -623,6 +623,8 @@ const en = {
   'worship.filterTag': 'Filter by tag',
   'worship.allArtists': 'All Artists',
   'worship.allTags': 'All Tags',
+  'worship.showingCount': 'Showing {{shown}} of {{total}} songs',
+  'worship.loadMore': 'Load More Songs',
   'worship.targetKey': 'Target key',
   'worship.scrollSpeed': 'Scroll speed',
   'worship.copyLyrics': 'Copy',

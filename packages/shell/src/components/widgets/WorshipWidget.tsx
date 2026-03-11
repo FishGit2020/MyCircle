@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation, StorageKeys, WindowEvents, useQuery, GET_WORSHIP_SONGS } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents, useQuery, GET_WORSHIP_SONGS_LIST } from '@mycircle/shared';
 
 const WorshipWidget = React.memo(function WorshipWidget() {
   const { t } = useTranslation();
   const [favCount, setFavCount] = useState(0);
 
-  const { data } = useQuery(GET_WORSHIP_SONGS, {
+  const { data } = useQuery(GET_WORSHIP_SONGS_LIST, {
+    variables: { limit: 1, offset: 0 },
     fetchPolicy: 'cache-and-network',
   });
-  const songCount = data?.worshipSongs?.length ?? 0;
+  const songCount = data?.worshipSongsList?.totalCount ?? 0;
 
   useEffect(() => {
     function loadFavs() {

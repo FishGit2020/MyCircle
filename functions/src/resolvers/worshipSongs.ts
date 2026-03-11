@@ -81,25 +81,33 @@ function docToSong(id: string, data: FirebaseFirestore.DocumentData, content: st
   };
 }
 
+function docToSongListItem(id: string, data: FirebaseFirestore.DocumentData) {
+  return {
+    id,
+    title: data.title ?? '',
+    artist: data.artist ?? '',
+    originalKey: data.originalKey ?? '',
+    format: data.format ?? 'text',
+    tags: data.tags ?? null,
+    updatedAt: toTimestampString(data.updatedAt),
+  };
+}
+
 export function createWorshipSongResolvers() {
   return {
     Query: {
-      worshipSongs: async () => {
+      worshipSongsList: async (_: any, { limit, offset = 0 }: { limit?: number; offset?: number }) => {
         const db = getFirestore();
         const snap = await db
           .collection(COLLECTION)
           .orderBy('createdAt', 'desc')
           .get();
-        const songs = await Promise.all(
-          snap.docs
-            .filter(d => !d.data().isDeleted)
-            .map(async (d) => {
-              const data = d.data();
-              const content = await resolveContent(d.id, data);
-              return docToSong(d.id, data, content);
-            })
-        );
-        return songs;
+        const allDocs = snap.docs.filter(d => !d.data().isDeleted);
+        const totalCount = allDocs.length;
+        const cap = limit ? Math.min(limit, 200) : totalCount;
+        const paged = allDocs.slice(offset, offset + cap);
+        const songs = paged.map(d => docToSongListItem(d.id, d.data()));
+        return { songs, totalCount };
       },
 
       worshipSong: async (_: any, { id }: { id: string }) => {

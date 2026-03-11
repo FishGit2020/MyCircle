@@ -367,7 +367,7 @@ export const typeDefs = `#graphql
     benchmarkSummary: BenchmarkSummary!
 
     # Worship songs
-    worshipSongs: [WorshipSong!]!
+    worshipSongsList(limit: Int, offset: Int): WorshipSongsPage!
     worshipSong(id: ID!): WorshipSong
 
     # Cloud Files (auth required)
@@ -552,6 +552,21 @@ export const typeDefs = `#graphql
     createdAt: String!
     updatedAt: String!
     createdBy: String
+  }
+
+  type WorshipSongListItem {
+    id: ID!
+    title: String!
+    artist: String!
+    originalKey: String!
+    format: String!
+    tags: [String!]
+    updatedAt: String!
+  }
+
+  type WorshipSongsPage {
+    songs: [WorshipSongListItem!]!
+    totalCount: Int!
   }
 
   input WorshipSongInput {

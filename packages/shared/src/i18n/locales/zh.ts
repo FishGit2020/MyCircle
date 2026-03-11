@@ -625,6 +625,8 @@ const zh: Record<TranslationKey, string> = {
   'worship.filterTag': '\u6309\u6807\u7b7e\u7b5b\u9009',
   'worship.allArtists': '\u6240\u6709\u827a\u672f\u5bb6',
   'worship.allTags': '\u6240\u6709\u6807\u7b7e',
+  'worship.showingCount': '\u663e\u793a {{shown}} / {{total}} \u9996\u6b4c\u66f2',
+  'worship.loadMore': '\u52a0\u8f7d\u66f4\u591a\u6b4c\u66f2',
   'worship.targetKey': '\u76ee\u6807\u8c03\u53f7',
   'worship.scrollSpeed': '\u6eda\u52a8\u901f\u5ea6',
   'worship.copyLyrics': '\u590d\u5236',
