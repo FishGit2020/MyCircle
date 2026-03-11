@@ -581,6 +581,7 @@ const es: Record<TranslationKey, string> = {
   'worship.editSong': 'Editar canci\u00f3n',
   'worship.deleteSong': 'Eliminar canci\u00f3n',
   'worship.deleteConfirm': '\u00bfEst\u00e1s seguro de que quieres eliminar esta canci\u00f3n?',
+  'worship.deleteFailed': 'No se pudo eliminar la canci\u00f3n. Int\u00e9ntalo de nuevo.',
   'worship.songTitle': 'T\u00edtulo de la canci\u00f3n',
   'worship.artist': 'Artista / Autor',
   'worship.key': 'Tono',

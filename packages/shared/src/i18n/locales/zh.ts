@@ -581,6 +581,7 @@ const zh: Record<TranslationKey, string> = {
   'worship.editSong': '\u7f16\u8f91\u6b4c\u66f2',
   'worship.deleteSong': '\u5220\u9664\u6b4c\u66f2',
   'worship.deleteConfirm': '\u786e\u5b9a\u8981\u5220\u9664\u8fd9\u9996\u6b4c\u66f2\u5417\uff1f',
+  'worship.deleteFailed': '\u5220\u9664\u6b4c\u66f2\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002',
   'worship.songTitle': '\u6b4c\u66f2\u540d\u79f0',
   'worship.artist': '\u827a\u672f\u5bb6 / \u4f5c\u8005',
   'worship.key': '\u8c03\u53f7',
