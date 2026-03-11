@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useMutation, AI_CHAT, StorageKeys } from '@mycircle/shared';
+import { useMutation, AI_CHAT } from '@mycircle/shared';
 
 export interface ChatMessage {
   id: string;
@@ -11,9 +11,46 @@ export interface ChatMessage {
 interface PersistedState {
   messages: ChatMessage[];
   question: string;
+  document: string;
+  sessionId: string;
 }
 
 const STORAGE_KEY = 'interview-chat-history';
+
+const SYSTEM_PROMPT = `You are an experienced coding interviewer conducting a technical interview. Your role:
+- Act as a professional, encouraging but rigorous interviewer
+- Do NOT give the answer directly. Guide the candidate through hints and Socratic questions
+- Ask clarifying questions about their approach before they start coding
+- When they share code or pseudocode, review it for correctness, edge cases, and time/space complexity
+- Probe their understanding: "What's the time complexity?" "What happens with empty input?"
+- If they're stuck, provide incremental hints rather than full solutions
+- Evaluate both their communication skills and technical ability
+- Reference specific lines from the candidate's working document when giving feedback
+
+When the candidate asks to end the interview, provide a structured rubric assessment:
+
+**Coding Ability: Score: X/4**
+Justification: [Reference specific lines, variable names, boundary checks, algorithmic correctness]
+
+**Problem-Solving: Score: X/4**
+Justification: [Evaluate approach exploration, optimization attempts, edge case identification, debugging]
+
+**Communication: Score: X/4**
+Justification: [Assess clarity of explanation, ability to walk through examples, complexity analysis accuracy]
+
+**Overall Feedback:**
+[2-4 sentences: performance summary, key strengths, specific areas for improvement with line references]
+
+Scores can be integers or half-points (e.g., 3.5/4). Be specific and honest.
+Respond concisely (under 200 words) unless giving an end-of-interview assessment.`;
+
+function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function generateSessionId(): string {
+  return `session-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
 
 function loadPersistedState(): PersistedState | null {
   try {
@@ -33,51 +70,31 @@ function clearPersistedState() {
   try { localStorage.removeItem(STORAGE_KEY); } catch { /* */ }
 }
 
+function buildUserMessage(question: string, document: string, message: string): string {
+  return `[Coding Problem]
+${question || 'No question provided yet'}
+
+[Candidate's Working Document]
+${document || 'Empty'}
+
+[Candidate's Message]
+${message}`;
+}
+
 interface InterviewChatState {
   messages: ChatMessage[];
   loading: boolean;
   error: string | null;
 }
 
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-function buildSystemPrompt(question: string): string {
-  return `You are an experienced coding interviewer conducting a technical interview.
-
-The candidate has been given the following coding problem:
-
----
-${question}
----
-
-Your role:
-- Act as a professional, encouraging but rigorous interviewer
-- Do NOT give the answer directly. Guide the candidate through hints and Socratic questions
-- Ask clarifying questions about their approach before they start coding
-- When they share code or pseudocode, review it for correctness, edge cases, and time/space complexity
-- Probe their understanding: "What's the time complexity?" "What happens with empty input?"
-- If they're stuck, provide incremental hints rather than full solutions
-- Evaluate both their communication skills and technical ability
-
-When the candidate asks to end the interview, provide a structured rubric assessment in exactly this format:
-
-**Coding Ability: Score: X/4**
-Justification: [Reference specific lines, variable names, boundary checks, algorithmic correctness, code quality]
-
-**Problem-Solving: Score: X/4**
-Justification: [Evaluate approach exploration, optimization attempts, edge case identification, debugging ability]
-
-**Communication: Score: X/4**
-Justification: [Assess clarity of explanation, ability to walk through examples, complexity analysis accuracy]
-
-**Overall Feedback:**
-[2-4 sentences summarizing performance, key strengths, specific areas for improvement with line references where applicable, and whether hints were needed]
-
-Scores can be integers or half-points (e.g., 3.5/4). Be specific and reference their actual code/responses. Do not inflate scores — be honest and constructive.
-
-Respond naturally and concisely as an interviewer would in a real coding interview. Keep responses focused and under 200 words unless giving an end-of-interview assessment.`;
+export interface InterviewSession {
+  id: string;
+  questionPreview: string;
+  messageCount: number;
+  updatedAt: number | null;
+  createdAt: number | null;
 }
 
 export function useInterviewChat() {
@@ -88,16 +105,74 @@ export function useInterviewChat() {
     error: null,
   });
   const questionRef = useRef<string>(persisted?.question ?? '');
+  const documentRef = useRef<string>(persisted?.document ?? '');
+  const sessionIdRef = useRef<string>(persisted?.sessionId ?? generateSessionId());
   const abortRef = useRef<AbortController | null>(null);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [sessions, setSessions] = useState<InterviewSession[]>([]);
 
-  // Persist messages whenever they change
+  // Persist to localStorage whenever messages change
   useEffect(() => {
     if (state.messages.length > 0 && questionRef.current) {
-      persistState({ messages: state.messages, question: questionRef.current });
+      persistState({
+        messages: state.messages,
+        question: questionRef.current,
+        document: documentRef.current,
+        sessionId: sessionIdRef.current,
+      });
     }
   }, [state.messages]);
 
   const [aiChatMutation] = useMutation(AI_CHAT);
+
+  // Debounced save to Firebase
+  const saveToFirebase = useCallback(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(async () => {
+      if (!window.__interviewApi || state.messages.length === 0) return;
+      try {
+        setSaveStatus('saving');
+        await window.__interviewApi.save({
+          sessionId: sessionIdRef.current,
+          question: questionRef.current,
+          document: documentRef.current,
+          messages: state.messages,
+        });
+        setSaveStatus('saved');
+      } catch {
+        setSaveStatus('error');
+      }
+    }, 2000);
+  }, [state.messages]);
+
+  // Auto-save to Firebase on message changes
+  useEffect(() => {
+    if (state.messages.length > 0) {
+      saveToFirebase();
+    }
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, [state.messages, saveToFirebase]);
+
+  const setQuestion = useCallback((q: string) => {
+    questionRef.current = q;
+  }, []);
+
+  const setDocument = useCallback((d: string) => {
+    documentRef.current = d;
+    // Debounce persist on document changes
+    if (state.messages.length > 0) {
+      persistState({
+        messages: state.messages,
+        question: questionRef.current,
+        document: documentRef.current,
+        sessionId: sessionIdRef.current,
+      });
+      saveToFirebase();
+    }
+  }, [state.messages, saveToFirebase]);
 
   const sendRawMessage = useCallback(async (content: string, endpointId?: string, model?: string) => {
     const userMessage: ChatMessage = {
@@ -125,15 +200,19 @@ export function useInterviewChat() {
         content: m.content,
       }));
 
-      const systemPrompt = buildSystemPrompt(questionRef.current);
+      const dynamicMessage = buildUserMessage(
+        questionRef.current,
+        documentRef.current,
+        content,
+      );
 
       const { data, errors } = await aiChatMutation({
         variables: {
-          message: content,
+          message: dynamicMessage,
           history,
           model,
           endpointId,
-          systemPrompt,
+          systemPrompt: SYSTEM_PROMPT,
         },
         context: {
           fetchOptions: { signal: abortRef.current.signal },
@@ -170,6 +249,7 @@ export function useInterviewChat() {
 
   const startInterview = useCallback((question: string, endpointId?: string, model?: string) => {
     questionRef.current = question;
+    sessionIdRef.current = generateSessionId();
     setState({ messages: [], loading: false, error: null });
     setTimeout(() => {
       sendRawMessage(
@@ -210,8 +290,54 @@ export function useInterviewChat() {
 
   const clearChat = useCallback(() => {
     questionRef.current = '';
+    documentRef.current = '';
+    sessionIdRef.current = generateSessionId();
     setState({ messages: [], loading: false, error: null });
     clearPersistedState();
+    setSaveStatus('idle');
+  }, []);
+
+  // Load sessions list from Firebase
+  const loadSessions = useCallback(async () => {
+    if (!window.__interviewApi) return;
+    try {
+      const result = await window.__interviewApi.list();
+      setSessions(result.sessions);
+    } catch { /* */ }
+  }, []);
+
+  // Load a specific session from Firebase
+  const loadSession = useCallback(async (sessionId: string) => {
+    if (!window.__interviewApi) return;
+    try {
+      const result = await window.__interviewApi.load(sessionId);
+      const { session } = result;
+      questionRef.current = session.question;
+      documentRef.current = session.document;
+      sessionIdRef.current = sessionId;
+      setState({
+        messages: session.messages as ChatMessage[],
+        loading: false,
+        error: null,
+      });
+      persistState({
+        messages: session.messages as ChatMessage[],
+        question: session.question,
+        document: session.document,
+        sessionId,
+      });
+      return session;
+    } catch { /* */ }
+    return null;
+  }, []);
+
+  // Delete a session from Firebase
+  const deleteSession = useCallback(async (sessionId: string) => {
+    if (!window.__interviewApi) return;
+    try {
+      await window.__interviewApi.delete(sessionId);
+      setSessions(prev => prev.filter(s => s.id !== sessionId));
+    } catch { /* */ }
   }, []);
 
   const hasPersistedSession = persisted !== null && persisted.messages.length > 0;
@@ -221,12 +347,20 @@ export function useInterviewChat() {
     loading: state.loading,
     error: state.error,
     question: questionRef.current,
+    document: documentRef.current,
     hasPersistedSession,
+    saveStatus,
+    sessions,
+    setQuestion,
+    setDocument,
     sendMessage,
     startInterview,
     repeatQuestion,
     requestHint,
     endInterview,
     clearChat,
+    loadSessions,
+    loadSession,
+    deleteSession,
   };
 }

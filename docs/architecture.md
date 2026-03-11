@@ -314,14 +314,15 @@ Exposes `WorshipSongs` component via Module Federation.
 Exposes `AiInterviewer` component via Module Federation.
 
 **Key Behavior:**
-- Split-panel layout: left side for pasting coding questions (plain textarea), right side for chat with AI interviewer
-- Reuses existing `aiChat` GraphQL mutation with custom `systemPrompt` parameter
+- Split-panel layout: left side is a **working document** (collapsible question area + scratchpad for approach/pseudocode/code), right side is chat with AI interviewer
+- Reuses existing `aiChat` GraphQL mutation with a **hardcoded system prompt** (stable, cacheable) and **dynamic user messages** that include the coding problem + working document content + candidate's message
 - Endpoint/model selector reuses benchmark infrastructure (`GET_BENCHMARK_ENDPOINTS`, `GET_BENCHMARK_ENDPOINT_MODELS`)
-- AI acts as a coding interviewer: guides without giving answers, asks probing questions, evaluates approach
+- AI acts as a coding interviewer: guides without giving answers, asks probing questions, references the candidate's working document
 - **Rubric assessment**: At end of interview, AI provides structured scores (0-4) for Coding Ability, Problem-Solving, and Communication with specific justifications
 - Action buttons: Start Interview, Repeat Question, Hint, End Interview
-- Chat history persisted to localStorage (`interview-chat-history`)
-- No tool calls or MyCircle context — pure interview interaction
+- **Firebase persistence**: Sessions saved to Firebase Storage (`users/{uid}/interview-sessions/{sessionId}.json`) with Firestore metadata refs (`users/{uid}/interviewSessions/{sessionId}`). REST API at `/interview-api/*` (Cloud Function: `interviewSessions`). localStorage used as fast cache, Firebase as durable storage. Auto-save on message send and document change (debounced).
+- Session management: list/load/delete sessions from header dropdown
+- Dashboard widget shows session count and "Continue last session" link, updates on login/logout
 
 ### Notebook - `packages/notebook/`
 

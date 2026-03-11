@@ -132,6 +132,34 @@ declare global {
       subscribe: (callback: (polls: any[]) => void) => () => void;
     };
 
+    /* ── Interview Sessions ──────────────────────────────────── */
+    __interviewApi?: {
+      save: (session: {
+        sessionId: string;
+        question: string;
+        document: string;
+        messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
+      }) => Promise<{ ok: boolean; sessionId: string }>;
+      list: () => Promise<{
+        sessions: Array<{
+          id: string;
+          questionPreview: string;
+          messageCount: number;
+          updatedAt: number | null;
+          createdAt: number | null;
+        }>;
+      }>;
+      load: (sessionId: string) => Promise<{
+        session: {
+          id: string;
+          question: string;
+          document: string;
+          messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
+        };
+      }>;
+      delete: (sessionId: string) => Promise<{ ok: boolean }>;
+    };
+
     /* ── Trash / Recycle Bin ───────────────────────────────── */
     __trash?: {
       getAll: () => Promise<Record<string, Array<{ id: string; type: string; name: string; deletedAt: number | null; collectionPath: string }>>>;

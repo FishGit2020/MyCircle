@@ -1,8 +1,46 @@
-import React from 'react';
-import { useTranslation } from '@mycircle/shared';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation, WindowEvents } from '@mycircle/shared';
 
 const InterviewWidget = React.memo(function InterviewWidget() {
   const { t } = useTranslation();
+  const [sessionCount, setSessionCount] = useState(0);
+  const [latestSession, setLatestSession] = useState<{ id: string; questionPreview: string } | null>(null);
+
+  const fetchSessions = useCallback(async () => {
+    if (!window.__interviewApi) {
+      setSessionCount(0);
+      setLatestSession(null);
+      return;
+    }
+    try {
+      const result = await window.__interviewApi.list();
+      setSessionCount(result.sessions.length);
+      setLatestSession(result.sessions[0] ?? null);
+    } catch {
+      setSessionCount(0);
+      setLatestSession(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Fetch on mount (covers initial login state)
+    fetchSessions();
+
+    // Re-fetch or reset on auth state change (login/logout)
+    const onAuthChange = () => {
+      if (window.__currentUid) {
+        fetchSessions();
+      } else {
+        setSessionCount(0);
+        setLatestSession(null);
+      }
+    };
+
+    window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, onAuthChange);
+    return () => {
+      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, onAuthChange);
+    };
+  }, [fetchSessions]);
 
   return (
     <div>
@@ -13,9 +51,31 @@ const InterviewWidget = React.memo(function InterviewWidget() {
           </svg>
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.interview' as any)}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.interviewDesc' as any)}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.interview')}</h4>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.interviewDesc')}</p>
         </div>
+      </div>
+      <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+        {sessionCount > 0 ? (
+          <>
+            <p>{t('aiInterviewer.sessionCount', { count: sessionCount })}</p>
+            {latestSession && (
+              <a
+                href="/interview"
+                className="text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block"
+              >
+                {t('aiInterviewer.continueLastSession')}
+              </a>
+            )}
+          </>
+        ) : (
+          <a
+            href="/interview"
+            className="text-indigo-600 dark:text-indigo-400 hover:underline"
+          >
+            {t('aiInterviewer.startFirstInterview')}
+          </a>
+        )}
       </div>
     </div>
   );
