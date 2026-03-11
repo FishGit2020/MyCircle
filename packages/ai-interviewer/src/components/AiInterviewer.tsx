@@ -176,8 +176,8 @@ export default function AiInterviewer() {
 
         {/* Split panel: vertical stack on mobile, side-by-side on desktop */}
         <div className="flex flex-col md:flex-row flex-1 min-h-0">
-          {/* Question panel — 40% on desktop */}
-          <div className="md:w-[40%] border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 min-h-[200px] md:min-h-0 flex flex-col">
+          {/* Working document panel — 65% on desktop */}
+          <div className="md:w-[65%] border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 min-h-[200px] md:min-h-0 flex flex-col">
             <QuestionPanel
               question={question}
               document={document}
@@ -196,7 +196,7 @@ export default function AiInterviewer() {
             />
           </div>
 
-          {/* Chat panel — 60% on desktop */}
+          {/* Chat panel — 35% on desktop */}
           <div className="flex-1 min-h-0 flex flex-col">
             <InterviewChat
               messages={messages}
