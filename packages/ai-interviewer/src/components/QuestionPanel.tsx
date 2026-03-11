@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useTranslation, useQuery, useLazyQuery, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
-import type { GetBenchmarkEndpointsQuery, GetBenchmarkEndpointModelsQuery } from '@mycircle/shared';
+import { useTranslation } from '@mycircle/shared';
 
 interface QuestionPanelProps {
   question: string;
@@ -8,15 +7,12 @@ interface QuestionPanelProps {
   onQuestionChange: (text: string) => void;
   onDocumentChange: (text: string) => void;
   interviewActive: boolean;
-  endpointId: string;
-  model: string;
-  onEndpointChange: (id: string) => void;
-  onModelChange: (model: string) => void;
   onStart: () => void;
   onRepeat: () => void;
   onHint: () => void;
   onEnd: () => void;
   loading: boolean;
+  modelSelected: boolean;
 }
 
 export default function QuestionPanel({
@@ -25,72 +21,18 @@ export default function QuestionPanel({
   onQuestionChange,
   onDocumentChange,
   interviewActive,
-  endpointId,
-  model,
-  onEndpointChange,
-  onModelChange,
   onStart,
   onRepeat,
   onHint,
   onEnd,
   loading,
+  modelSelected,
 }: QuestionPanelProps) {
   const { t } = useTranslation();
   const [questionCollapsed, setQuestionCollapsed] = useState(false);
 
-  const { data: endpointsData } = useQuery<GetBenchmarkEndpointsQuery>(GET_BENCHMARK_ENDPOINTS, {
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const [fetchModels, { data: modelsData }] = useLazyQuery<GetBenchmarkEndpointModelsQuery>(
-    GET_BENCHMARK_ENDPOINT_MODELS,
-  );
-
-  const endpoints = endpointsData?.benchmarkEndpoints ?? [];
-  const models = modelsData?.benchmarkEndpointModels ?? [];
-
-  const handleEndpointChange = (id: string) => {
-    onEndpointChange(id);
-    onModelChange('');
-    if (id) {
-      fetchModels({ variables: { endpointId: id } });
-    }
-  };
-
   return (
     <div className="flex flex-col h-full min-h-0 p-4 gap-3">
-      {/* Endpoint / Model selectors */}
-      <div className="flex flex-wrap gap-2">
-        <select
-          value={endpointId}
-          onChange={(e) => handleEndpointChange(e.target.value)}
-          className="flex-1 min-w-[140px] rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label={t('aiInterviewer.endpoint')}
-        >
-          <option value="">{t('aiInterviewer.selectEndpoint')}</option>
-          {endpoints.map((ep) => (
-            <option key={ep.id} value={ep.id}>
-              {ep.name}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={model}
-          onChange={(e) => onModelChange(e.target.value)}
-          disabled={!endpointId}
-          className="flex-1 min-w-[140px] rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          aria-label={t('aiInterviewer.model')}
-        >
-          <option value="">{t('aiInterviewer.selectModel')}</option>
-          {models.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* Question section (collapsible) */}
       <div className="flex flex-col">
         <button
@@ -137,7 +79,6 @@ export default function QuestionPanel({
               const end = target.selectionEnd;
               const val = target.value;
               onDocumentChange(val.substring(0, start) + '  ' + val.substring(end));
-              // Restore cursor position after React re-render
               requestAnimationFrame(() => {
                 target.selectionStart = target.selectionEnd = start + 2;
               });
@@ -155,10 +96,10 @@ export default function QuestionPanel({
           <button
             type="button"
             onClick={onStart}
-            disabled={!question.trim() || loading}
+            disabled={!question.trim() || loading || !modelSelected}
             className="flex-1 rounded-lg bg-green-600 dark:bg-green-500 text-white px-4 py-2 text-sm font-medium hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {t('aiInterviewer.startInterview')}
+            {!modelSelected ? t('aiInterviewer.selectModelFirst') : t('aiInterviewer.startInterview')}
           </button>
         ) : (
           <>
