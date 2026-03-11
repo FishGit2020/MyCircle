@@ -353,6 +353,7 @@ export function useInterviewChat() {
         question: session.question,
         document: session.document,
         sessionId,
+        sessionName: sessionNameRef.current,
       });
       return session;
     } catch { /* */ }
@@ -376,6 +377,7 @@ export function useInterviewChat() {
     error: state.error,
     question: questionRef.current,
     document: documentRef.current,
+    sessionId: sessionIdRef.current,
     hasPersistedSession,
     saveStatus,
     sessions,

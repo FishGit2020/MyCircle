@@ -61,7 +61,7 @@ const InterviewWidget = React.memo(function InterviewWidget() {
             <p>{t('aiInterviewer.sessionCount', { count: sessionCount })}</p>
             {latestSession && (
               <a
-                href="/interview"
+                href={`/interview#${latestSession.id}`}
                 className="text-indigo-600 dark:text-indigo-400 hover:underline mt-1 inline-block"
               >
                 {t('aiInterviewer.continueLastSession')}
