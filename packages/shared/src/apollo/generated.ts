@@ -908,6 +908,8 @@ export type WorshipSongUpdateInput = {
 
 export type WorshipSongsPage = {
   __typename?: 'WorshipSongsPage';
+  allArtists: Array<Scalars['String']['output']>;
+  allTags: Array<Scalars['String']['output']>;
   songs: Array<WorshipSongListItem>;
   totalCount: Scalars['Int']['output'];
 };
@@ -1198,7 +1200,7 @@ export type GetWorshipSongsListQueryVariables = Exact<{
 }>;
 
 
-export type GetWorshipSongsListQuery = { __typename?: 'Query', worshipSongsList: { __typename?: 'WorshipSongsPage', totalCount: number, songs: Array<{ __typename?: 'WorshipSongListItem', id: string, title: string, artist: string, originalKey: string, format: string, tags?: Array<string> | null, updatedAt: string }> } };
+export type GetWorshipSongsListQuery = { __typename?: 'Query', worshipSongsList: { __typename?: 'WorshipSongsPage', totalCount: number, allArtists: Array<string>, allTags: Array<string>, songs: Array<{ __typename?: 'WorshipSongListItem', id: string, title: string, artist: string, originalKey: string, format: string, tags?: Array<string> | null, updatedAt: string }> } };
 
 export type GetWorshipSongQueryVariables = Exact<{
   id: Scalars['ID']['input'];

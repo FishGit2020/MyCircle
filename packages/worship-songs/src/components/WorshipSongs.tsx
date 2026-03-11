@@ -15,7 +15,7 @@ export default function WorshipSongs() {
   const { songId } = useParams<{ songId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { songs, totalCount, hasMore, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong, loadMore } = useWorshipSongs();
+  const { songs, totalCount, totalPages, page, allArtists, allTags, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong, goToPage } = useWorshipSongs();
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [songLoading, setSongLoading] = useState(false);
@@ -137,12 +137,15 @@ export default function WorshipSongs() {
           <SongList
             songs={songs}
             totalCount={totalCount}
-            hasMore={hasMore}
+            totalPages={totalPages}
+            page={page}
+            allArtists={allArtists}
+            allTags={allTags}
             loading={loading}
             isAuthenticated={isAuthenticated}
             onSelectSong={handleSelectSong}
             onNewSong={handleNewSong}
-            onLoadMore={loadMore}
+            onPageChange={goToPage}
             onDeleteSong={async (id: string) => {
               if (!window.confirm(t('worship.deleteConfirm'))) return;
               try {

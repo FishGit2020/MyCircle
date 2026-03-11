@@ -15,10 +15,11 @@ import type { WorshipSong, WorshipSongListItem } from '../types';
 
 const logger = createLogger('useWorshipSongs');
 
-const PAGE_SIZE = 50;
+export const PAGE_SIZE = 24;
 
 export function useWorshipSongs() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [page, setPage] = useState(1);
 
   // Track auth state via Firebase token
   useEffect(() => {
@@ -37,44 +38,33 @@ export function useWorshipSongs() {
     return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler); };
   }, []);
 
-  const { data, loading, refetch, fetchMore } = useQuery(GET_WORSHIP_SONGS_LIST, {
-    variables: { limit: PAGE_SIZE, offset: 0 },
+  const offset = (page - 1) * PAGE_SIZE;
+
+  const { data, loading, refetch } = useQuery(GET_WORSHIP_SONGS_LIST, {
+    variables: { limit: PAGE_SIZE, offset },
     fetchPolicy: 'cache-and-network',
   });
 
   const totalCount: number = data?.worshipSongsList?.totalCount ?? 0;
   const songs = (data?.worshipSongsList?.songs ?? []) as WorshipSongListItem[];
-  const hasMore = songs.length < totalCount;
+  const allArtists: string[] = data?.worshipSongsList?.allArtists ?? [];
+  const allTags: string[] = data?.worshipSongsList?.allTags ?? [];
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-  const loadMore = useCallback(async () => {
-    if (!hasMore) return;
-    await fetchMore({
-      variables: { limit: PAGE_SIZE, offset: songs.length },
-      updateQuery: (prev: any, { fetchMoreResult }: any) => {
-        if (!fetchMoreResult) return prev;
-        return {
-          worshipSongsList: {
-            ...fetchMoreResult.worshipSongsList,
-            songs: [
-              ...prev.worshipSongsList.songs,
-              ...fetchMoreResult.worshipSongsList.songs,
-            ],
-          },
-        };
-      },
-    });
-  }, [fetchMore, hasMore, songs.length]);
+  const goToPage = useCallback((p: number) => {
+    setPage(Math.max(1, Math.min(p, totalPages)));
+  }, [totalPages]);
 
   const [addSongMutation] = useMutation(ADD_WORSHIP_SONG, {
-    refetchQueries: [{ query: GET_WORSHIP_SONGS_LIST, variables: { limit: PAGE_SIZE, offset: 0 } }],
+    refetchQueries: [{ query: GET_WORSHIP_SONGS_LIST, variables: { limit: PAGE_SIZE, offset } }],
   });
 
   const [updateSongMutation] = useMutation(UPDATE_WORSHIP_SONG, {
-    refetchQueries: [{ query: GET_WORSHIP_SONGS_LIST, variables: { limit: PAGE_SIZE, offset: 0 } }],
+    refetchQueries: [{ query: GET_WORSHIP_SONGS_LIST, variables: { limit: PAGE_SIZE, offset } }],
   });
 
   const [deleteSongMutation] = useMutation(DELETE_WORSHIP_SONG, {
-    refetchQueries: [{ query: GET_WORSHIP_SONGS_LIST, variables: { limit: PAGE_SIZE, offset: 0 } }],
+    refetchQueries: [{ query: GET_WORSHIP_SONGS_LIST, variables: { limit: PAGE_SIZE, offset } }],
   });
 
   const addSong = useCallback(
@@ -117,14 +107,17 @@ export function useWorshipSongs() {
   return {
     songs,
     totalCount,
-    hasMore,
+    totalPages,
+    page,
+    allArtists,
+    allTags,
     loading,
     isAuthenticated,
     addSong,
     updateSong,
     deleteSong,
     getSong,
-    loadMore,
+    goToPage,
     refresh: refetch,
   };
 }

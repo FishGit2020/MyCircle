@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SongList from './SongList';
-import type { WorshipSong } from '../types';
+import type { WorshipSongListItem } from '../types';
 
 vi.mock('@mycircle/shared', () => {
   const t = (key: string) => key;
@@ -17,48 +17,52 @@ vi.mock('@mycircle/shared', () => {
   };
 });
 
-const makeSong = (overrides: Partial<WorshipSong> = {}): WorshipSong => ({
+const makeSong = (overrides: Partial<WorshipSongListItem> = {}): WorshipSongListItem => ({
   id: '1',
   title: 'Amazing Grace',
   artist: 'John Newton',
   originalKey: 'G',
   format: 'chordpro',
-  content: '[G]Amazing [C]grace',
-  notes: '',
   tags: ['hymn'],
-  createdAt: new Date(1700000000000).toISOString(),
   updatedAt: new Date(1700000000000).toISOString(),
   ...overrides,
 });
 
-const songs: WorshipSong[] = [
+const songs: WorshipSongListItem[] = [
   makeSong({ id: '1', title: 'Amazing Grace', artist: 'John Newton', tags: ['hymn'] }),
   makeSong({ id: '2', title: 'How Great Thou Art', artist: 'Carl Boberg', format: 'text', tags: ['classic'] }),
   makeSong({ id: '3', title: '10000 Reasons', artist: 'Matt Redman', tags: ['worship'] }),
 ];
 
-describe('SongList', () => {
-  const onSelectSong = vi.fn();
-  const onNewSong = vi.fn();
+const defaultProps = {
+  songs,
+  totalCount: 3,
+  totalPages: 1,
+  page: 1,
+  allArtists: ['Carl Boberg', 'John Newton', 'Matt Redman'],
+  allTags: ['classic', 'hymn', 'worship'],
+  loading: false,
+  isAuthenticated: true,
+  onSelectSong: vi.fn(),
+  onNewSong: vi.fn(),
+  onPageChange: vi.fn(),
+};
 
+describe('SongList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
   });
 
   it('renders song titles when given songs', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} />);
     expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
     expect(screen.getByText('How Great Thou Art')).toBeInTheDocument();
     expect(screen.getByText('10000 Reasons')).toBeInTheDocument();
   });
 
   it('renders song artists', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} />);
     // Artists appear in both song cards and the artist filter dropdown
     expect(screen.getAllByText('John Newton').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Carl Boberg').length).toBeGreaterThanOrEqual(1);
@@ -66,41 +70,29 @@ describe('SongList', () => {
   });
 
   it('shows loading skeletons when loading', () => {
-    const { container } = render(
-      <SongList songs={[]} loading={true} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    const { container } = render(<SongList {...defaultProps} songs={[]} loading={true} />);
     const skeletons = container.querySelectorAll('.animate-pulse');
     expect(skeletons.length).toBe(3);
   });
 
   it('shows empty state when no songs', () => {
-    render(
-      <SongList songs={[]} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} songs={[]} totalCount={0} />);
     expect(screen.getByText('worship.noSongs')).toBeInTheDocument();
   });
 
   it('shows no-results state when search finds nothing', async () => {
     const user = userEvent.setup({ delay: null });
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
-
+    render(<SongList {...defaultProps} />);
     const input = screen.getByPlaceholderText('worship.searchPlaceholder');
     await user.type(input, 'zzzznonexistent');
-
     expect(screen.getByText('worship.noResults')).toBeInTheDocument();
   });
 
   it('filters songs by search query on title', async () => {
     const user = userEvent.setup({ delay: null });
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
-
+    render(<SongList {...defaultProps} />);
     const input = screen.getByPlaceholderText('worship.searchPlaceholder');
     await user.type(input, 'Amazing');
-
     expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
     expect(screen.queryByText('How Great Thou Art')).not.toBeInTheDocument();
     expect(screen.queryByText('10000 Reasons')).not.toBeInTheDocument();
@@ -108,82 +100,60 @@ describe('SongList', () => {
 
   it('filters songs by search query on artist', async () => {
     const user = userEvent.setup({ delay: null });
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
-
+    render(<SongList {...defaultProps} />);
     const input = screen.getByPlaceholderText('worship.searchPlaceholder');
     await user.type(input, 'Matt');
-
     expect(screen.getByText('10000 Reasons')).toBeInTheDocument();
     expect(screen.queryByText('Amazing Grace')).not.toBeInTheDocument();
   });
 
   it('filters songs by search query on tags', async () => {
     const user = userEvent.setup({ delay: null });
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
-
+    render(<SongList {...defaultProps} />);
     const input = screen.getByPlaceholderText('worship.searchPlaceholder');
     await user.type(input, 'classic');
-
     expect(screen.getByText('How Great Thou Art')).toBeInTheDocument();
     expect(screen.queryByText('Amazing Grace')).not.toBeInTheDocument();
   });
 
   it('calls onSelectSong when a song is clicked', async () => {
     const user = userEvent.setup({ delay: null });
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
-
+    const onSelectSong = vi.fn();
+    render(<SongList {...defaultProps} onSelectSong={onSelectSong} />);
     await user.click(screen.getByText('Amazing Grace'));
     expect(onSelectSong).toHaveBeenCalledWith('1');
   });
 
   it('shows add song button when authenticated', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} isAuthenticated={true} />);
     expect(screen.getByText('worship.addSong')).toBeInTheDocument();
   });
 
   it('does not show add song button when not authenticated', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={false} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} isAuthenticated={false} />);
     expect(screen.queryByText('worship.addSong')).not.toBeInTheDocument();
   });
 
   it('calls onNewSong when add song button is clicked', async () => {
     const user = userEvent.setup({ delay: null });
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
-
+    const onNewSong = vi.fn();
+    render(<SongList {...defaultProps} onNewSong={onNewSong} />);
     await user.click(screen.getByText('worship.addSong'));
     expect(onNewSong).toHaveBeenCalled();
   });
 
   it('shows login-to-edit message when not authenticated', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={false} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} isAuthenticated={false} />);
     expect(screen.getByText('worship.loginToEdit')).toBeInTheDocument();
   });
 
   it('does not show login-to-edit message when authenticated', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} isAuthenticated={true} />);
     expect(screen.queryByText('worship.loginToEdit')).not.toBeInTheDocument();
   });
 
   it('renders song tags', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} />);
     // Tags appear in both song cards and the tag filter dropdown
     expect(screen.getAllByText('hymn').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('classic').length).toBeGreaterThanOrEqual(1);
@@ -191,18 +161,13 @@ describe('SongList', () => {
   });
 
   it('renders original key badges', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
-    // All songs have key 'G'
+    render(<SongList {...defaultProps} />);
     const keyBadges = screen.getAllByText('G');
     expect(keyBadges.length).toBe(3);
   });
 
   it('renders format badges', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} />);
     // 2 chordpro songs + 1 toolbar filter button = 3 chordpro texts
     // 1 text song + 1 toolbar filter button = 2 text texts
     const chordproBadges = screen.getAllByText('worship.formatChordpro');
@@ -212,9 +177,32 @@ describe('SongList', () => {
   });
 
   it('renders the title heading', () => {
-    render(
-      <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
-    );
+    render(<SongList {...defaultProps} />);
     expect(screen.getByText('worship.title')).toBeInTheDocument();
+  });
+
+  it('shows pagination when multiple pages', () => {
+    render(<SongList {...defaultProps} totalPages={5} page={3} totalCount={120} />);
+    expect(screen.getByLabelText('worship.prevPage')).toBeInTheDocument();
+    expect(screen.getByLabelText('worship.nextPage')).toBeInTheDocument();
+    expect(screen.getByText('3')).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('disables previous button on first page', () => {
+    render(<SongList {...defaultProps} totalPages={3} page={1} />);
+    expect(screen.getByLabelText('worship.prevPage')).toBeDisabled();
+  });
+
+  it('disables next button on last page', () => {
+    render(<SongList {...defaultProps} totalPages={3} page={3} />);
+    expect(screen.getByLabelText('worship.nextPage')).toBeDisabled();
+  });
+
+  it('calls onPageChange when page button is clicked', async () => {
+    const user = userEvent.setup({ delay: null });
+    const onPageChange = vi.fn();
+    render(<SongList {...defaultProps} totalPages={5} page={2} onPageChange={onPageChange} />);
+    await user.click(screen.getByLabelText('worship.nextPage'));
+    expect(onPageChange).toHaveBeenCalledWith(3);
   });
 });
