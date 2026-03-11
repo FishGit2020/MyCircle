@@ -43,6 +43,10 @@
         "function": "digitalLibrary"
       },
       {
+        "source": "/interview-api/**",
+        "function": "interviewSessions"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
