@@ -36,6 +36,21 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sort, setSort] = useState<SortMode>('alpha');
   const [filterFormat, setFilterFormat] = useState<'all' | 'chordpro' | 'text'>('all');
+  const [filterArtist, setFilterArtist] = useState('');
+  const [filterTag, setFilterTag] = useState('');
+
+  // Build unique artist and tag lists from all songs
+  const allArtists = useMemo(() => {
+    const set = new Set<string>();
+    songs.forEach(s => { if (s.artist) set.add(s.artist); });
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [songs]);
+
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    songs.forEach(s => s.tags?.forEach(tag => set.add(tag)));
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [songs]);
 
   const toggleFavorite = useCallback((e: React.MouseEvent, songId: string) => {
     e.stopPropagation();
@@ -66,6 +81,16 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
       result = result.filter(s => s.format === filterFormat);
     }
 
+    // Filter by artist
+    if (filterArtist) {
+      result = result.filter(s => s.artist === filterArtist);
+    }
+
+    // Filter by tag
+    if (filterTag) {
+      result = result.filter(s => s.tags?.includes(filterTag));
+    }
+
     // Search
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -83,7 +108,7 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
     }
 
     return result;
-  }, [songs, search, favorites, showFavoritesOnly, sort, filterFormat]);
+  }, [songs, search, favorites, showFavoritesOnly, sort, filterFormat, filterArtist, filterTag]);
 
   return (
     <div>
@@ -149,6 +174,32 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
             </button>
           ))}
         </div>
+
+        {/* Artist filter */}
+        {allArtists.length > 1 && (
+          <select
+            value={filterArtist}
+            onChange={e => setFilterArtist(e.target.value)}
+            className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none min-h-[44px]"
+            aria-label={t('worship.filterArtist')}
+          >
+            <option value="">{t('worship.allArtists')}</option>
+            {allArtists.map(a => <option key={a} value={a}>{a}</option>)}
+          </select>
+        )}
+
+        {/* Tag filter */}
+        {allTags.length > 0 && (
+          <select
+            value={filterTag}
+            onChange={e => setFilterTag(e.target.value)}
+            className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none min-h-[44px]"
+            aria-label={t('worship.filterTag')}
+          >
+            <option value="">{t('worship.allTags')}</option>
+            {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
+          </select>
+        )}
 
         {/* Sort */}
         <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden ml-auto">
