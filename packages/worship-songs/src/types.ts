@@ -15,3 +15,13 @@ export interface WorshipSong {
   updatedAt: string;
   createdBy?: string;
 }
+
+export interface WorshipSongListItem {
+  id: string;
+  title: string;
+  artist: string;
+  originalKey: string;
+  format: SongFormat;
+  tags?: string[];
+  updatedAt: string;
+}

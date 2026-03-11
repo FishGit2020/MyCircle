@@ -307,6 +307,7 @@ Exposes `WorshipSongs` component via Module Federation.
 - Favorites system with `StorageKeys.WORSHIP_FAVORITES` (Firestore sync when signed in)
 - **Real-time sync** via Firestore `onSnapshot` — changes by any user push instantly to all connected clients; `useWorshipSongs` hook prefers `subscribe()` over one-shot `getAll()`, with localStorage cache as initial data
 - Tag-based filtering and full-text search
+- **Paginated lightweight list**: The song list uses `worshipSongsList` GraphQL query which returns `WorshipSongListItem` (no `content`/`notes`) with server-side `limit`/`offset` pagination and `totalCount`. The list fetches 50 songs per page with a "Load More" button. Full song details (including content) are fetched on-demand via `worshipSong(id)` when viewing/editing a song. This reduces the initial payload from ~310 KiB to ~15 KiB.
 
 ### Notebook - `packages/notebook/`
 

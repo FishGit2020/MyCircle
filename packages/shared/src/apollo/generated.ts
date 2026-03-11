@@ -581,7 +581,7 @@ export type Query = {
   ttsQuota: TtsQuota;
   weather: WeatherData;
   worshipSong?: Maybe<WorshipSong>;
-  worshipSongs: Array<WorshipSong>;
+  worshipSongsList: WorshipSongsPage;
 };
 
 
@@ -735,6 +735,12 @@ export type QueryWorshipSongArgs = {
   id: Scalars['ID']['input'];
 };
 
+
+export type QueryWorshipSongsListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type ShareFileResult = {
   __typename?: 'ShareFileResult';
   downloadUrl: Scalars['String']['output'];
@@ -877,6 +883,17 @@ export type WorshipSongInput = {
   youtubeUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type WorshipSongListItem = {
+  __typename?: 'WorshipSongListItem';
+  artist: Scalars['String']['output'];
+  format: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  originalKey: Scalars['String']['output'];
+  tags?: Maybe<Array<Scalars['String']['output']>>;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
 export type WorshipSongUpdateInput = {
   artist?: InputMaybe<Scalars['String']['input']>;
   bpm?: InputMaybe<Scalars['Int']['input']>;
@@ -887,6 +904,12 @@ export type WorshipSongUpdateInput = {
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   title?: InputMaybe<Scalars['String']['input']>;
   youtubeUrl?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WorshipSongsPage = {
+  __typename?: 'WorshipSongsPage';
+  songs: Array<WorshipSongListItem>;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type WeatherConditionFieldsFragment = { __typename?: 'WeatherCondition', id: number, main: string, description: string, icon: string };
@@ -1167,10 +1190,15 @@ export type SaveBenchmarkRunMutation = { __typename?: 'Mutation', saveBenchmarkR
 
 export type WorshipSongFieldsFragment = { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null };
 
-export type GetWorshipSongsQueryVariables = Exact<{ [key: string]: never; }>;
+export type WorshipSongListFieldsFragment = { __typename?: 'WorshipSongListItem', id: string, title: string, artist: string, originalKey: string, format: string, tags?: Array<string> | null, updatedAt: string };
+
+export type GetWorshipSongsListQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
 
 
-export type GetWorshipSongsQuery = { __typename?: 'Query', worshipSongs: Array<{ __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null }> };
+export type GetWorshipSongsListQuery = { __typename?: 'Query', worshipSongsList: { __typename?: 'WorshipSongsPage', totalCount: number, songs: Array<{ __typename?: 'WorshipSongListItem', id: string, title: string, artist: string, originalKey: string, format: string, tags?: Array<string> | null, updatedAt: string }> } };
 
 export type GetWorshipSongQueryVariables = Exact<{
   id: Scalars['ID']['input'];

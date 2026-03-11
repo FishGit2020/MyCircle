@@ -50,7 +50,7 @@ vi.mock('@mycircle/shared', () => ({
   subscribeToMFEvent: () => () => {},
   eventBus: { publish: vi.fn(), subscribe: vi.fn(() => () => {}) },
   useQuery: () => ({ data: undefined, loading: false }),
-  GET_WORSHIP_SONGS: {},
+  GET_WORSHIP_SONGS_LIST: {},
   WORSHIP_FAVORITES_CHANGED: 'worship-favorites-changed',
 }));
 

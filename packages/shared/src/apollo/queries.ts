@@ -640,11 +640,26 @@ const WORSHIP_SONG_FIELDS = gql`
   }
 `;
 
-export const GET_WORSHIP_SONGS = gql`
-  ${WORSHIP_SONG_FIELDS}
-  query GetWorshipSongs {
-    worshipSongs {
-      ...WorshipSongFields
+const WORSHIP_SONG_LIST_FIELDS = gql`
+  fragment WorshipSongListFields on WorshipSongListItem {
+    id
+    title
+    artist
+    originalKey
+    format
+    tags
+    updatedAt
+  }
+`;
+
+export const GET_WORSHIP_SONGS_LIST = gql`
+  ${WORSHIP_SONG_LIST_FIELDS}
+  query GetWorshipSongsList($limit: Int, $offset: Int) {
+    worshipSongsList(limit: $limit, offset: $offset) {
+      songs {
+        ...WorshipSongListFields
+      }
+      totalCount
     }
   }
 `;
