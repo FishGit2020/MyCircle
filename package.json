@@ -59,7 +59,7 @@
     "build:remotes": "pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
     "dev:mf": "concurrently \"pnpm dev:shell\" \"pnpm preview:city\" \"pnpm preview:weather\" \"pnpm preview:stock\" \"pnpm preview:podcast\" \"pnpm preview:ai\" \"pnpm preview:bible\" \"pnpm preview:worship\" \"pnpm preview:notebook\" \"pnpm preview:baby\" \"pnpm preview:child-dev\" \"pnpm preview:chinese\" \"pnpm preview:english\" \"pnpm preview:flashcards\" \"pnpm preview:daily-log\" \"pnpm preview:cloud-files\" \"pnpm preview:benchmark\" \"pnpm preview:immigration\" \"pnpm preview:digital-library\" \"pnpm preview:family-games\" \"pnpm preview:doc-scanner\" \"pnpm preview:hiking\" \"pnpm preview:trip-planner\" \"pnpm preview:poll-system\" \"pnpm preview:radio-station\"",
     "build": "pnpm build:shared && pnpm build:mf",
-    "codegen": "node scripts/extract-schema.mjs && ([ -f schema.graphql ] && graphql-codegen --config codegen.ts || true)",
+    "codegen": "node scripts/extract-schema.mjs && node -e \"var fs=require('fs');if(fs.existsSync('schema.graphql')){require('child_process').execSync('graphql-codegen --config codegen.ts',{stdio:'inherit'})}\"",
     "build:shared": "pnpm codegen && pnpm --filter @mycircle/shared build",
     "build:mf": "pnpm --filter @mycircle/shell build && pnpm --filter '!@mycircle/shell' --filter '!@mycircle/shared' -r --parallel build",
     "start": "cross-env NODE_ENV=production tsx server/index.ts",
