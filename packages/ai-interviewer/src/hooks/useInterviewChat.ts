@@ -377,12 +377,22 @@ export function useInterviewChat() {
     return null;
   }, []);
 
-  // Delete a session from Firebase
+  // Delete a session from Firebase — if it's the active session, reset to fresh state
   const deleteSession = useCallback(async (sessionId: string) => {
     if (!window.__interviewApi) return;
     try {
       await window.__interviewApi.delete(sessionId);
       setSessions(prev => prev.filter(s => s.id !== sessionId));
+      if (sessionId === sessionIdRef.current) {
+        questionRef.current = '';
+        documentRef.current = '';
+        sessionIdRef.current = generateSessionId();
+        sessionNameRef.current = '';
+        lastFailedRef.current = null;
+        setState({ messages: [], loading: false, error: null });
+        clearPersistedState();
+        setSaveStatus('idle');
+      }
     } catch { /* */ }
   }, []);
 

@@ -189,6 +189,9 @@ export default function AiInterviewer() {
   const handleDeleteSession = useCallback(async (sessionId: string) => {
     await deleteSession(sessionId);
     if (sessionId === currentSessionId) {
+      setQuestionLocal('');
+      setDocumentLocal('');
+      setInterviewActive(false);
       setSessionHash('');
     }
   }, [deleteSession, currentSessionId]);
