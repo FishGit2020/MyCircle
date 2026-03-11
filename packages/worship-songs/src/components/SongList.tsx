@@ -180,7 +180,7 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
           <select
             value={filterArtist}
             onChange={e => setFilterArtist(e.target.value)}
-            className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none min-h-[44px]"
+            className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none"
             aria-label={t('worship.filterArtist')}
           >
             <option value="">{t('worship.allArtists')}</option>
@@ -193,7 +193,7 @@ export default function SongList({ songs, loading, isAuthenticated, onSelectSong
           <select
             value={filterTag}
             onChange={e => setFilterTag(e.target.value)}
-            className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none min-h-[44px]"
+            className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none"
             aria-label={t('worship.filterTag')}
           >
             <option value="">{t('worship.allTags')}</option>
