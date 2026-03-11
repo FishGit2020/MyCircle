@@ -59,9 +59,10 @@ describe('SongList', () => {
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
-    expect(screen.getByText('John Newton')).toBeInTheDocument();
-    expect(screen.getByText('Carl Boberg')).toBeInTheDocument();
-    expect(screen.getByText('Matt Redman')).toBeInTheDocument();
+    // Artists appear in both song cards and the artist filter dropdown
+    expect(screen.getAllByText('John Newton').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Carl Boberg').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Matt Redman').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows loading skeletons when loading', () => {
@@ -183,9 +184,10 @@ describe('SongList', () => {
     render(
       <SongList songs={songs} loading={false} isAuthenticated={true} onSelectSong={onSelectSong} onNewSong={onNewSong} />
     );
-    expect(screen.getByText('hymn')).toBeInTheDocument();
-    expect(screen.getByText('classic')).toBeInTheDocument();
-    expect(screen.getByText('worship')).toBeInTheDocument();
+    // Tags appear in both song cards and the tag filter dropdown
+    expect(screen.getAllByText('hymn').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('classic').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('worship').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders original key badges', () => {

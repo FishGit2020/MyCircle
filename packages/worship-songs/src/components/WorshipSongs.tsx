@@ -15,7 +15,7 @@ export default function WorshipSongs() {
   const { songId } = useParams<{ songId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { songs, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong, refresh } = useWorshipSongs();
+  const { songs, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong } = useWorshipSongs();
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [songLoading, setSongLoading] = useState(false);
@@ -126,18 +126,6 @@ export default function WorshipSongs() {
     default:
       return (
         <PageContent>
-          <div className="flex justify-end mb-2">
-            <button
-              type="button"
-              onClick={() => refresh()}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label={t('worship.refresh')}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
-          </div>
           {errorMsg && (
             <div role="alert" className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 flex items-center justify-between">
               <span>{errorMsg}</span>
@@ -152,6 +140,14 @@ export default function WorshipSongs() {
             isAuthenticated={isAuthenticated}
             onSelectSong={handleSelectSong}
             onNewSong={handleNewSong}
+            onDeleteSong={async (id: string) => {
+              if (!window.confirm(t('worship.deleteConfirm'))) return;
+              try {
+                await deleteSong(id);
+              } catch {
+                setErrorMsg(t('worship.deleteFailed'));
+              }
+            }}
           />
         </PageContent>
       );
