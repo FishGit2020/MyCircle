@@ -42,7 +42,9 @@ interface InterviewChatProps {
   loading: boolean;
   error: string | null;
   interviewActive: boolean;
+  modelSelected: boolean;
   onSendMessage: (text: string) => void;
+  onRetry: () => void;
 }
 
 export default function InterviewChat({
@@ -50,7 +52,9 @@ export default function InterviewChat({
   loading,
   error,
   interviewActive,
+  modelSelected,
   onSendMessage,
+  onRetry,
 }: InterviewChatProps) {
   const { t } = useTranslation();
   const [input, setInput] = useState('');
@@ -59,7 +63,8 @@ export default function InterviewChat({
   const [typingDone, setTypingDone] = useState(true);
 
   // Track which message IDs have finished typing (so they render as plain text)
-  const finishedRef = useRef<Set<string>>(new Set());
+  // Pre-populate with all messages present at mount — only new messages animate
+  const finishedRef = useRef<Set<string>>(new Set(messages.map(m => m.id)));
 
   const scrollToBottom = useCallback(() => {
     if (typeof messagesEndRef.current?.scrollIntoView === 'function') {
@@ -90,9 +95,11 @@ export default function InterviewChat({
     if (typingDone) setTypingDone(false);
   }
 
+  const canSend = interviewActive && modelSelected;
+
   const handleSend = () => {
     const trimmed = input.trim();
-    if (!trimmed || loading || !interviewActive) return;
+    if (!trimmed || loading || !canSend) return;
     onSendMessage(trimmed);
     setInput('');
     inputRef.current?.focus();
@@ -105,9 +112,15 @@ export default function InterviewChat({
     }
   };
 
+  const inputPlaceholder = !modelSelected
+    ? t('aiInterviewer.selectModelFirst')
+    : interviewActive
+      ? t('aiInterviewer.inputPlaceholder')
+      : t('aiInterviewer.startFirst');
+
   return (
-    <div className="flex flex-col h-full min-h-0">
-      {/* Messages area */}
+    <div className="flex flex-col h-full min-h-0 overflow-hidden">
+      {/* Messages area — scrollable, won't grow parent */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && !loading && (
           <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm">
@@ -152,8 +165,15 @@ export default function InterviewChat({
         )}
 
         {error && (
-          <div className="text-center text-red-500 dark:text-red-400 text-sm py-1">
-            {error}
+          <div className="flex flex-col items-center gap-1.5 py-1">
+            <span className="text-red-500 dark:text-red-400 text-sm">{error}</span>
+            <button
+              type="button"
+              onClick={onRetry}
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {t('aiInterviewer.retry')}
+            </button>
           </div>
         )}
 
@@ -161,19 +181,15 @@ export default function InterviewChat({
       </div>
 
       {/* Input area */}
-      <div className="border-t border-gray-200 dark:border-gray-700 p-3">
+      <div className="shrink-0 border-t border-gray-200 dark:border-gray-700 p-3">
         <div className="flex gap-2">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={
-              interviewActive
-                ? t('aiInterviewer.inputPlaceholder')
-                : t('aiInterviewer.startFirst')
-            }
-            disabled={!interviewActive || loading}
+            placeholder={inputPlaceholder}
+            disabled={!canSend || loading}
             rows={2}
             className="flex-1 resize-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label={t('aiInterviewer.inputLabel')}
@@ -181,7 +197,7 @@ export default function InterviewChat({
           <button
             type="button"
             onClick={handleSend}
-            disabled={!input.trim() || loading || !interviewActive}
+            disabled={!input.trim() || loading || !canSend}
             className="self-end rounded-lg bg-blue-600 dark:bg-blue-500 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             aria-label={t('aiInterviewer.send')}
           >

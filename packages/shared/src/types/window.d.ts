@@ -139,6 +139,7 @@ declare global {
         question: string;
         document: string;
         messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
+        sessionName?: string;
       }) => Promise<{ ok: boolean; sessionId: string }>;
       list: () => Promise<{
         sessions: Array<{

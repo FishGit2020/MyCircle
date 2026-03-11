@@ -88,8 +88,13 @@ describe('useInterviewChat', () => {
       await new Promise((r) => setTimeout(r, 10));
     });
 
-    expect(mockMutate).toHaveBeenCalledTimes(1);
-    const vars = mockMutate.mock.calls[0][0].variables;
+    // 2 calls: session name generation (immediate) + interview message (via setTimeout)
+    expect(mockMutate).toHaveBeenCalledTimes(2);
+    // Name generation call
+    const nameVars = mockMutate.mock.calls[0][0].variables;
+    expect(nameVars.message).toContain('Summarize');
+    // Interview message call
+    const vars = mockMutate.mock.calls[1][0].variables;
     expect(vars.message).toContain('Two Sum problem');
     expect(vars.message).toContain('[Coding Problem]');
     expect(vars.systemPrompt).toContain('experienced coding interviewer');

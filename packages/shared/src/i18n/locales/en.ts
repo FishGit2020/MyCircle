@@ -2311,6 +2311,8 @@ const en = {
   'aiInterviewer.sessionCount': '{{count}} session(s)',
   'aiInterviewer.continueLastSession': 'Continue last session',
   'aiInterviewer.startFirstInterview': 'Start your first interview',
+  'aiInterviewer.retry': 'Retry',
+  'aiInterviewer.selectModelFirst': 'Select an endpoint and model first',
 
   'widgets.aiAssistant': 'AI Assistant',
   'widgets.aiAssistantDesc': 'Chat with your AI assistant',

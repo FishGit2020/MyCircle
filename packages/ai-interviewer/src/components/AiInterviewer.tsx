@@ -5,14 +5,25 @@ import type { InterviewSession } from '../hooks/useInterviewChat';
 import QuestionPanel from './QuestionPanel';
 import InterviewChat from './InterviewChat';
 
+const ENDPOINT_KEY = 'interview-endpoint';
+const MODEL_KEY = 'interview-model';
+
+function loadPref(key: string): string {
+  try { return localStorage.getItem(key) || ''; } catch { return ''; }
+}
+function savePref(key: string, value: string) {
+  try { localStorage.setItem(key, value); } catch { /* */ }
+}
+
 export default function AiInterviewer() {
   const { t } = useTranslation();
   const [question, setQuestionLocal] = useState('');
   const [document, setDocumentLocal] = useState('');
   const [interviewActive, setInterviewActive] = useState(false);
-  const [endpointId, setEndpointId] = useState('');
-  const [model, setModel] = useState('');
+  const [endpointId, setEndpointIdLocal] = useState(() => loadPref(ENDPOINT_KEY));
+  const [model, setModelLocal] = useState(() => loadPref(MODEL_KEY));
   const [showSessions, setShowSessions] = useState(false);
+  const [lastUserMessage, setLastUserMessage] = useState('');
 
   const {
     messages,
@@ -45,6 +56,18 @@ export default function AiInterviewer() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const setEndpointId = useCallback((id: string) => {
+    setEndpointIdLocal(id);
+    savePref(ENDPOINT_KEY, id);
+  }, []);
+
+  const setModel = useCallback((m: string) => {
+    setModelLocal(m);
+    savePref(MODEL_KEY, m);
+  }, []);
+
+  const modelSelected = !!(endpointId && model);
+
   const handleQuestionChange = useCallback((text: string) => {
     setQuestionLocal(text);
     setQuestion(text);
@@ -75,14 +98,22 @@ export default function AiInterviewer() {
   }, [endpointId, model, endInterview]);
 
   const handleSendMessage = useCallback((text: string) => {
+    setLastUserMessage(text);
     sendMessage(text, endpointId || undefined, model || undefined);
   }, [endpointId, model, sendMessage]);
+
+  const handleRetry = useCallback(() => {
+    if (lastUserMessage) {
+      sendMessage(lastUserMessage, endpointId || undefined, model || undefined);
+    }
+  }, [lastUserMessage, endpointId, model, sendMessage]);
 
   const handleNewInterview = useCallback(() => {
     clearChat();
     setInterviewActive(false);
     setQuestionLocal('');
     setDocumentLocal('');
+    setLastUserMessage('');
   }, [clearChat]);
 
   const handleToggleSessions = useCallback(() => {
@@ -175,7 +206,7 @@ export default function AiInterviewer() {
         )}
 
         {/* Split panel: vertical stack on mobile, side-by-side on desktop */}
-        <div className="flex flex-col md:flex-row flex-1 min-h-0">
+        <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Working document panel — 65% on desktop */}
           <div className="md:w-[65%] border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 min-h-[200px] md:min-h-0 flex flex-col">
             <QuestionPanel
@@ -197,13 +228,15 @@ export default function AiInterviewer() {
           </div>
 
           {/* Chat panel — 35% on desktop */}
-          <div className="flex-1 min-h-0 flex flex-col">
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
             <InterviewChat
               messages={messages}
               loading={loading}
               error={error}
               interviewActive={interviewActive}
+              modelSelected={modelSelected}
               onSendMessage={handleSendMessage}
+              onRetry={handleRetry}
             />
           </div>
         </div>

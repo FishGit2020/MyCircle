@@ -13,6 +13,7 @@ interface PersistedState {
   question: string;
   document: string;
   sessionId: string;
+  sessionName?: string;
 }
 
 const STORAGE_KEY = 'interview-chat-history';
@@ -107,6 +108,7 @@ export function useInterviewChat() {
   const questionRef = useRef<string>(persisted?.question ?? '');
   const documentRef = useRef<string>(persisted?.document ?? '');
   const sessionIdRef = useRef<string>(persisted?.sessionId ?? generateSessionId());
+  const sessionNameRef = useRef<string>(persisted?.sessionName ?? '');
   const abortRef = useRef<AbortController | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
@@ -120,6 +122,7 @@ export function useInterviewChat() {
         question: questionRef.current,
         document: documentRef.current,
         sessionId: sessionIdRef.current,
+        sessionName: sessionNameRef.current,
       });
     }
   }, [state.messages]);
@@ -138,6 +141,7 @@ export function useInterviewChat() {
           question: questionRef.current,
           document: documentRef.current,
           messages: state.messages,
+          sessionName: sessionNameRef.current || undefined,
         });
         setSaveStatus('saved');
       } catch {
@@ -169,6 +173,7 @@ export function useInterviewChat() {
         question: questionRef.current,
         document: documentRef.current,
         sessionId: sessionIdRef.current,
+        sessionName: sessionNameRef.current,
       });
       saveToFirebase();
     }
@@ -247,9 +252,29 @@ export function useInterviewChat() {
     }
   }, [state.messages, aiChatMutation]);
 
+  // Generate a short session name from the question using AI
+  const generateSessionName = useCallback(async (question: string, endpointId?: string, model?: string) => {
+    try {
+      const { data } = await aiChatMutation({
+        variables: {
+          message: `Summarize this coding problem in 5 words or fewer as a short title. Reply with ONLY the title, no quotes or punctuation:\n\n${question}`,
+          history: [],
+          model,
+          endpointId,
+          systemPrompt: 'You are a helpful assistant. Respond with only the requested output.',
+        },
+      });
+      const name = data?.aiChat?.response?.trim();
+      if (name && name.length <= 60) {
+        sessionNameRef.current = name;
+      }
+    } catch { /* non-critical */ }
+  }, [aiChatMutation]);
+
   const startInterview = useCallback((question: string, endpointId?: string, model?: string) => {
     questionRef.current = question;
     sessionIdRef.current = generateSessionId();
+    sessionNameRef.current = '';
     setState({ messages: [], loading: false, error: null });
     setTimeout(() => {
       sendRawMessage(
@@ -258,7 +283,9 @@ export function useInterviewChat() {
         model,
       );
     }, 0);
-  }, [sendRawMessage]);
+    // Fire-and-forget: generate a short name for this session
+    generateSessionName(question, endpointId, model);
+  }, [sendRawMessage, generateSessionName]);
 
   const sendMessage = useCallback((text: string, endpointId?: string, model?: string) => {
     sendRawMessage(text, endpointId, model);
@@ -292,6 +319,7 @@ export function useInterviewChat() {
     questionRef.current = '';
     documentRef.current = '';
     sessionIdRef.current = generateSessionId();
+    sessionNameRef.current = '';
     setState({ messages: [], loading: false, error: null });
     clearPersistedState();
     setSaveStatus('idle');
