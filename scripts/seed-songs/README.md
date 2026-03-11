@@ -86,38 +86,19 @@ All seeded songs have `createdBy: 'seed-script'`, so they can be cleanly separat
 | `casting-crowns.mjs` | 9 | Casting Crowns |
 | `matt-redman.mjs` | 8 | Matt Redman |
 | `mercyme.mjs` | 8 | MercyMe |
-| `keith-and-kristyn-getty.mjs` | 8 | Keith & Kristyn Getty |
+| `mission-house.mjs` | 15 | Mission House |
 | `crowder.mjs` | 7 | Crowder |
-| `tauren-wells.mjs` | 6 | Tauren Wells |
 | `hillsong-young-and-free.mjs` | 6 | Hillsong Young & Free |
-| `rend-collective.mjs` | 6 | Rend Collective |
 | `we-the-kingdom.mjs` | 6 | We The Kingdom |
-| `israel-houghton.mjs` | 6 | Israel Houghton |
-| `todd-dulaney.mjs` | 6 | Todd Dulaney |
-| `planetshakers.mjs` | 6 | Planetshakers |
-| `michael-w-smith.mjs` | 6 | Michael W. Smith |
-| `delirious.mjs` | 6 | Delirious? |
-| `third-day.mjs` | 6 | Third Day |
 | `shane-and-shane.mjs` | 5 | Shane & Shane |
 | `matt-maher.mjs` | 5 | Matt Maher |
 | `housefires.mjs` | 5 | Housefires |
 | `all-sons-and-daughters.mjs` | 5 | All Sons & Daughters |
-| `tasha-cobbs-leonard.mjs` | 5 | Tasha Cobbs Leonard |
-| `william-mcdowell.mjs` | 5 | William McDowell |
 | `gateway-worship.mjs` | 5 | Gateway Worship |
 | `paul-baloche.mjs` | 5 | Paul Baloche |
 | `cody-carnes.mjs` | 5 | Cody Carnes |
 | `pat-barrett.mjs` | 5 | Pat Barrett |
-| `dante-bowe.mjs` | 5 | Dante Bowe |
 | `david-crowder-band.mjs` | 5 | David Crowder Band |
-| `newsboys.mjs` | 5 | Newsboys |
-| `stuart-townend.mjs` | 4 | Stuart Townend |
-| `charity-gayle.mjs` | 4 | Charity Gayle |
-| `naomi-raine.mjs` | 4 | Naomi Raine |
-| `doe.mjs` | 4 | DOE |
-| `forrest-frank.mjs` | 4 | Forrest Frank |
-| `tim-hughes.mjs` | 4 | Tim Hughes |
-| `darlene-zschech.mjs` | 4 | Darlene Zschech |
 | `other-artists.mjs` | 22 | Passion, Anne Wilson, Amanda Cook, Lauren Daigle, CityAlight, and others |
 
-**Total: ~720 songs across 51 scripts**
+**Total: ~622 songs across 32 scripts**
