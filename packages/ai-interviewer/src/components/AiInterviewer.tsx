@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation, PageContent } from '@mycircle/shared';
 import { useInterviewChat } from '../hooks/useInterviewChat';
 import type { InterviewSession } from '../hooks/useInterviewChat';
@@ -15,6 +15,19 @@ function savePref(key: string, value: string) {
   try { localStorage.setItem(key, value); } catch { /* */ }
 }
 
+function getSessionIdFromHash(): string {
+  const hash = window.location.hash.slice(1); // remove '#'
+  return hash || '';
+}
+
+function setSessionHash(sessionId: string) {
+  if (sessionId) {
+    window.history.replaceState(null, '', `#${sessionId}`);
+  } else {
+    window.history.replaceState(null, '', window.location.pathname);
+  }
+}
+
 export default function AiInterviewer() {
   const { t } = useTranslation();
   const [question, setQuestionLocal] = useState('');
@@ -24,6 +37,7 @@ export default function AiInterviewer() {
   const [model, setModelLocal] = useState(() => loadPref(MODEL_KEY));
   const [showSessions, setShowSessions] = useState(false);
   const [lastUserMessage, setLastUserMessage] = useState('');
+  const mountedRef = useRef(false);
 
   const {
     messages,
@@ -34,6 +48,7 @@ export default function AiInterviewer() {
     hasPersistedSession,
     saveStatus,
     sessions,
+    sessionId: currentSessionId,
     setQuestion,
     setDocument,
     sendMessage,
@@ -47,14 +62,39 @@ export default function AiInterviewer() {
     deleteSession,
   } = useInterviewChat();
 
-  // Restore persisted state on mount
+  // On mount: load session from URL hash, or fall back to localStorage persisted session
   useEffect(() => {
-    if (hasPersistedSession) {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+
+    const hashSessionId = getSessionIdFromHash();
+    if (hashSessionId) {
+      // Load from Firebase by session ID in URL
+      loadSession(hashSessionId).then((loaded) => {
+        if (loaded) {
+          setQuestionLocal(loaded.question);
+          setDocumentLocal(loaded.document);
+          setInterviewActive(loaded.messages.length > 0);
+        } else {
+          // Invalid session ID in URL — clear hash
+          setSessionHash('');
+        }
+      });
+    } else if (hasPersistedSession) {
       setQuestionLocal(persistedQuestion);
       setDocumentLocal(persistedDocument);
       setInterviewActive(true);
+      // Sync hash with persisted session
+      setSessionHash(currentSessionId);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep hash in sync when session changes
+  useEffect(() => {
+    if (mountedRef.current && currentSessionId && messages.length > 0) {
+      setSessionHash(currentSessionId);
+    }
+  }, [currentSessionId, messages.length]);
 
   const setEndpointId = useCallback((id: string) => {
     setEndpointIdLocal(id);
@@ -114,6 +154,7 @@ export default function AiInterviewer() {
     setQuestionLocal('');
     setDocumentLocal('');
     setLastUserMessage('');
+    setSessionHash('');
   }, [clearChat]);
 
   const handleToggleSessions = useCallback(() => {
@@ -130,12 +171,17 @@ export default function AiInterviewer() {
       setDocumentLocal(loaded.document);
       setInterviewActive(loaded.messages.length > 0);
       setShowSessions(false);
+      setSessionHash(session.id);
     }
   }, [loadSession]);
 
   const handleDeleteSession = useCallback(async (sessionId: string) => {
     await deleteSession(sessionId);
-  }, [deleteSession]);
+    // If we just deleted the active session, clear the hash
+    if (sessionId === currentSessionId) {
+      setSessionHash('');
+    }
+  }, [deleteSession, currentSessionId]);
 
   return (
     <PageContent fill>
