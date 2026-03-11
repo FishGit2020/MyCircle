@@ -1,16 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useWorshipSongs } from './useWorshipSongs';
+import { useWorshipSongs, PAGE_SIZE } from './useWorshipSongs';
 import type { WorshipSong, WorshipSongListItem } from '../types';
 
 const mockRefetch = vi.fn().mockResolvedValue({});
-const mockFetchMore = vi.fn().mockResolvedValue({});
 const mockAddSongMutation = vi.fn();
 const mockUpdateSongMutation = vi.fn();
 const mockDeleteSongMutation = vi.fn();
 
 let mockSongsData: WorshipSongListItem[] = [];
 let mockTotalCount = 0;
+let mockAllArtists: string[] = [];
+let mockAllTags: string[] = [];
 let mockQueryLoading = false;
 
 vi.mock('@mycircle/shared', () => {
@@ -25,10 +26,9 @@ vi.mock('@mycircle/shared', () => {
       debug: vi.fn(),
     }),
     useQuery: () => ({
-      data: { worshipSongsList: { songs: mockSongsData, totalCount: mockTotalCount } },
+      data: { worshipSongsList: { songs: mockSongsData, totalCount: mockTotalCount, allArtists: mockAllArtists, allTags: mockAllTags } },
       loading: mockQueryLoading,
       refetch: mockRefetch,
-      fetchMore: mockFetchMore,
     }),
     useMutation: (mutation: any) => {
       const opName = mutation?.definitions?.[0]?.name?.value ?? '';
@@ -81,6 +81,8 @@ describe('useWorshipSongs', () => {
     vi.clearAllMocks();
     mockSongsData = listItems;
     mockTotalCount = 2;
+    mockAllArtists = ['John Newton'];
+    mockAllTags = ['hymn', 'classic'];
     mockQueryLoading = false;
     window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
     mockAddSongMutation.mockResolvedValue({ data: { addWorshipSong: { ...makeSong(), id: 'new-id' } } });
@@ -98,17 +100,38 @@ describe('useWorshipSongs', () => {
     expect(result.current.songs[0].title).toBe('Amazing Grace');
   });
 
-  it('returns totalCount and hasMore', () => {
+  it('returns totalCount and totalPages', () => {
     mockTotalCount = 100;
     const { result } = renderHook(() => useWorshipSongs());
     expect(result.current.totalCount).toBe(100);
-    expect(result.current.hasMore).toBe(true);
+    expect(result.current.totalPages).toBe(Math.ceil(100 / PAGE_SIZE));
   });
 
-  it('hasMore is false when all songs loaded', () => {
+  it('returns allArtists and allTags from server', () => {
+    const { result } = renderHook(() => useWorshipSongs());
+    expect(result.current.allArtists).toEqual(['John Newton']);
+    expect(result.current.allTags).toEqual(['hymn', 'classic']);
+  });
+
+  it('starts on page 1', () => {
+    const { result } = renderHook(() => useWorshipSongs());
+    expect(result.current.page).toBe(1);
+  });
+
+  it('goToPage changes page', () => {
+    mockTotalCount = 100;
+    const { result } = renderHook(() => useWorshipSongs());
+    act(() => { result.current.goToPage(3); });
+    expect(result.current.page).toBe(3);
+  });
+
+  it('goToPage clamps to valid range', () => {
     mockTotalCount = 2;
     const { result } = renderHook(() => useWorshipSongs());
-    expect(result.current.hasMore).toBe(false);
+    act(() => { result.current.goToPage(999); });
+    expect(result.current.page).toBe(1);
+    act(() => { result.current.goToPage(0); });
+    expect(result.current.page).toBe(1);
   });
 
   it('returns loading state from Apollo query', () => {
@@ -153,13 +176,6 @@ describe('useWorshipSongs', () => {
     const { result } = renderHook(() => useWorshipSongs());
     await act(async () => { await result.current.refresh(); });
     expect(mockRefetch).toHaveBeenCalled();
-  });
-
-  it('loadMore calls fetchMore', async () => {
-    mockTotalCount = 100;
-    const { result } = renderHook(() => useWorshipSongs());
-    await act(async () => { await result.current.loadMore(); });
-    expect(mockFetchMore).toHaveBeenCalled();
   });
 
   it('returns empty songs when no data', () => {

@@ -107,7 +107,21 @@ export function createWorshipSongResolvers() {
         const cap = limit ? Math.min(limit, 200) : totalCount;
         const paged = allDocs.slice(offset, offset + cap);
         const songs = paged.map(d => docToSongListItem(d.id, d.data()));
-        return { songs, totalCount };
+
+        // Extract unique artists and tags from ALL docs (not just current page)
+        const artistSet = new Set<string>();
+        const tagSet = new Set<string>();
+        for (const d of allDocs) {
+          const data = d.data();
+          if (data.artist) artistSet.add(data.artist);
+          if (Array.isArray(data.tags)) {
+            for (const tag of data.tags) tagSet.add(tag);
+          }
+        }
+        const allArtists = [...artistSet].sort((a, b) => a.localeCompare(b));
+        const allTags = [...tagSet].sort((a, b) => a.localeCompare(b));
+
+        return { songs, totalCount, allArtists, allTags };
       },
 
       worshipSong: async (_: any, { id }: { id: string }) => {

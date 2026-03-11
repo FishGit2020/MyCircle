@@ -660,6 +660,8 @@ export const GET_WORSHIP_SONGS_LIST = gql`
         ...WorshipSongListFields
       }
       totalCount
+      allArtists
+      allTags
     }
   }
 `;

@@ -567,6 +567,8 @@ export const typeDefs = `#graphql
   type WorshipSongsPage {
     songs: [WorshipSongListItem!]!
     totalCount: Int!
+    allArtists: [String!]!
+    allTags: [String!]!
   }
 
   input WorshipSongInput {

@@ -23,16 +23,22 @@ type SortMode = 'alpha' | 'recent';
 interface SongListProps {
   songs: WorshipSongListItem[];
   totalCount: number;
-  hasMore: boolean;
+  totalPages: number;
+  page: number;
+  allArtists: string[];
+  allTags: string[];
   loading: boolean;
   isAuthenticated: boolean;
   onSelectSong: (id: string) => void;
   onNewSong: () => void;
   onDeleteSong?: (id: string) => void;
-  onLoadMore: () => void;
+  onPageChange: (page: number) => void;
 }
 
-export default function SongList({ songs, totalCount, hasMore, loading, isAuthenticated, onSelectSong, onNewSong, onDeleteSong, onLoadMore }: SongListProps) {
+export default function SongList({
+  songs, totalCount, totalPages, page, allArtists, allTags,
+  loading, isAuthenticated, onSelectSong, onNewSong, onDeleteSong, onPageChange,
+}: SongListProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [favorites, setFavorites] = useState(loadFavorites);
@@ -41,19 +47,6 @@ export default function SongList({ songs, totalCount, hasMore, loading, isAuthen
   const [filterFormat, setFilterFormat] = useState<'all' | 'chordpro' | 'text'>('all');
   const [filterArtist, setFilterArtist] = useState('');
   const [filterTag, setFilterTag] = useState('');
-
-  // Build unique artist and tag lists from all songs
-  const allArtists = useMemo(() => {
-    const set = new Set<string>();
-    songs.forEach(s => { if (s.artist) set.add(s.artist); });
-    return [...set].sort((a, b) => a.localeCompare(b));
-  }, [songs]);
-
-  const allTags = useMemo(() => {
-    const set = new Set<string>();
-    songs.forEach(s => s.tags?.forEach(tag => set.add(tag)));
-    return [...set].sort((a, b) => a.localeCompare(b));
-  }, [songs]);
 
   const toggleFavorite = useCallback((e: React.MouseEvent, songId: string) => {
     e.stopPropagation();
@@ -112,6 +105,17 @@ export default function SongList({ songs, totalCount, hasMore, loading, isAuthen
 
     return result;
   }, [songs, search, favorites, showFavoritesOnly, sort, filterFormat, filterArtist, filterTag]);
+
+  // Build visible page numbers: show up to 5 pages around current
+  const pageNumbers = useMemo(() => {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, page - Math.floor(maxVisible / 2));
+    const end = Math.min(totalPages, start + maxVisible - 1);
+    start = Math.max(1, end - maxVisible + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  }, [page, totalPages]);
 
   return (
     <div>
@@ -178,7 +182,7 @@ export default function SongList({ songs, totalCount, hasMore, loading, isAuthen
           ))}
         </div>
 
-        {/* Artist filter */}
+        {/* Artist filter — uses server-provided complete list */}
         {allArtists.length > 1 && (
           <select
             value={filterArtist}
@@ -191,7 +195,7 @@ export default function SongList({ songs, totalCount, hasMore, loading, isAuthen
           </select>
         )}
 
-        {/* Tag filter */}
+        {/* Tag filter — uses server-provided complete list */}
         {allTags.length > 0 && (
           <select
             value={filterTag}
@@ -328,21 +332,87 @@ export default function SongList({ songs, totalCount, hasMore, loading, isAuthen
               </button>
             ))}
           </div>
-          {/* Pagination info + Load More */}
-          <div className="mt-6 flex flex-col items-center gap-2">
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              {t('worship.showingCount', { shown: songs.length, total: totalCount })}
-            </p>
-            {hasMore && (
+
+          {/* Pagination controls */}
+          {totalPages > 1 && (
+            <nav className="mt-6 flex items-center justify-center gap-1" aria-label={t('worship.pagination')}>
+              {/* Previous */}
               <button
                 type="button"
-                onClick={onLoadMore}
-                className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition"
+                onClick={() => onPageChange(page - 1)}
+                disabled={page <= 1}
+                className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-40 disabled:cursor-not-allowed min-h-[36px]"
+                aria-label={t('worship.prevPage')}
               >
-                {t('worship.loadMore')}
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
-            )}
-          </div>
+
+              {/* Page numbers */}
+              {pageNumbers[0] > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onPageChange(1)}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition min-h-[36px]"
+                  >
+                    1
+                  </button>
+                  {pageNumbers[0] > 2 && (
+                    <span className="px-1 text-xs text-gray-400 dark:text-gray-500" aria-hidden="true">&hellip;</span>
+                  )}
+                </>
+              )}
+              {pageNumbers.map(p => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => onPageChange(p)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition min-h-[36px] ${
+                    p === page
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                  aria-current={p === page ? 'page' : undefined}
+                >
+                  {p}
+                </button>
+              ))}
+              {pageNumbers[pageNumbers.length - 1] < totalPages && (
+                <>
+                  {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
+                    <span className="px-1 text-xs text-gray-400 dark:text-gray-500" aria-hidden="true">&hellip;</span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onPageChange(totalPages)}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition min-h-[36px]"
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
+
+              {/* Next */}
+              <button
+                type="button"
+                onClick={() => onPageChange(page + 1)}
+                disabled={page >= totalPages}
+                className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-40 disabled:cursor-not-allowed min-h-[36px]"
+                aria-label={t('worship.nextPage')}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Page info */}
+              <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
+                {t('worship.pageOf', { page: String(page), total: String(totalPages) })}
+              </span>
+            </nav>
+          )}
         </>
       )}
     </div>

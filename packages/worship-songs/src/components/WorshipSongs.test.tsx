@@ -41,12 +41,18 @@ const mockRefresh = vi.fn().mockResolvedValue({});
 vi.mock('../hooks/useWorshipSongs', () => ({
   useWorshipSongs: () => ({
     songs: mockSongs,
+    totalCount: mockSongs.length,
+    totalPages: 1,
+    page: 1,
+    allArtists: ['John Newton', 'Matt Redman'],
+    allTags: [],
     loading: false,
     isAuthenticated: true,
     addSong: mockAddSong,
     updateSong: mockUpdateSong,
     deleteSong: mockDeleteSong,
     getSong: mockGetSong,
+    goToPage: vi.fn(),
     refresh: mockRefresh,
   }),
 }));
