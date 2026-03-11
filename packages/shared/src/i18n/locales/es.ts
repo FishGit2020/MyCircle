@@ -2311,6 +2311,8 @@ const es: Record<TranslationKey, string> = {
   'aiInterviewer.sessionCount': '{{count}} sesi\u00f3n(es)',
   'aiInterviewer.continueLastSession': 'Continuar \u00faltima sesi\u00f3n',
   'aiInterviewer.startFirstInterview': 'Inicia tu primera entrevista',
+  'aiInterviewer.retry': 'Reintentar',
+  'aiInterviewer.selectModelFirst': 'Selecciona un punto de acceso y modelo primero',
 
   'widgets.aiAssistant': 'Asistente IA',
   'widgets.aiAssistantDesc': 'Chatea con tu asistente de IA',

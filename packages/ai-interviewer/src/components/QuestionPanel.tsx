@@ -129,6 +129,20 @@ export default function QuestionPanel({
         <textarea
           value={document}
           onChange={(e) => onDocumentChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              const target = e.currentTarget;
+              const start = target.selectionStart;
+              const end = target.selectionEnd;
+              const val = target.value;
+              onDocumentChange(val.substring(0, start) + '  ' + val.substring(end));
+              // Restore cursor position after React re-render
+              requestAnimationFrame(() => {
+                target.selectionStart = target.selectionEnd = start + 2;
+              });
+            }
+          }}
           placeholder={t('aiInterviewer.documentPlaceholder')}
           className="flex-1 min-h-0 w-full resize-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm font-mono leading-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label={t('aiInterviewer.documentLabel')}

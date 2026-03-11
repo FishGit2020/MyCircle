@@ -12,6 +12,7 @@ interface SessionPayload {
   question: string;
   document: string;
   messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
+  sessionName?: string;
 }
 
 export const interviewSessions = onRequest(
@@ -60,7 +61,7 @@ async function handleSave(uid: string, req: Request, res: Response) {
     return;
   }
 
-  const { sessionId, question, document, messages } = body;
+  const { sessionId, question, document, messages, sessionName } = body;
   const storagePath = `users/${uid}/interview-sessions/${sessionId}.json`;
   const now = new Date().toISOString();
 
@@ -78,7 +79,7 @@ async function handleSave(uid: string, req: Request, res: Response) {
     metadata: { metadata: { uid } },
   });
 
-  const questionPreview = (question || '').slice(0, 100);
+  const questionPreview = sessionName || (question || '').slice(0, 100);
   await db
     .collection('users')
     .doc(uid)

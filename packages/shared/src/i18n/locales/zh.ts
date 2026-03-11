@@ -2311,6 +2311,8 @@ const zh: Record<TranslationKey, string> = {
   'aiInterviewer.sessionCount': '{{count}} \u4e2a\u4f1a\u8bdd',
   'aiInterviewer.continueLastSession': '\u7ee7\u7eed\u4e0a\u6b21\u4f1a\u8bdd',
   'aiInterviewer.startFirstInterview': '\u5f00\u59cb\u4f60\u7684\u7b2c\u4e00\u6b21\u9762\u8bd5',
+  'aiInterviewer.retry': '\u91cd\u8bd5',
+  'aiInterviewer.selectModelFirst': '\u8bf7\u5148\u9009\u62e9\u7aef\u70b9\u548c\u6a21\u578b',
 
   'widgets.aiAssistant': 'AI \u52a9\u624b',
   'widgets.aiAssistantDesc': '\u4e0e\u4f60\u7684 AI \u52a9\u624b\u804a\u5929',
