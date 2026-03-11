@@ -1,11 +1,36 @@
-import { useState, useCallback, useRef } from 'react';
-import { useMutation, AI_CHAT } from '@mycircle/shared';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { useMutation, AI_CHAT, StorageKeys } from '@mycircle/shared';
 
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: number;
+}
+
+interface PersistedState {
+  messages: ChatMessage[];
+  question: string;
+}
+
+const STORAGE_KEY = 'interview-chat-history';
+
+function loadPersistedState(): PersistedState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* */ }
+  return null;
+}
+
+function persistState(state: PersistedState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch { /* */ }
+}
+
+function clearPersistedState() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch { /* */ }
 }
 
 interface InterviewChatState {
@@ -35,19 +60,42 @@ Your role:
 - Probe their understanding: "What's the time complexity?" "What happens with empty input?"
 - If they're stuck, provide incremental hints rather than full solutions
 - Evaluate both their communication skills and technical ability
-- When the interview ends, provide a structured assessment: strengths, areas for improvement, and an overall rating (1-5)
+
+When the candidate asks to end the interview, provide a structured rubric assessment in exactly this format:
+
+**Coding Ability: Score: X/4**
+Justification: [Reference specific lines, variable names, boundary checks, algorithmic correctness, code quality]
+
+**Problem-Solving: Score: X/4**
+Justification: [Evaluate approach exploration, optimization attempts, edge case identification, debugging ability]
+
+**Communication: Score: X/4**
+Justification: [Assess clarity of explanation, ability to walk through examples, complexity analysis accuracy]
+
+**Overall Feedback:**
+[2-4 sentences summarizing performance, key strengths, specific areas for improvement with line references where applicable, and whether hints were needed]
+
+Scores can be integers or half-points (e.g., 3.5/4). Be specific and reference their actual code/responses. Do not inflate scores — be honest and constructive.
 
 Respond naturally and concisely as an interviewer would in a real coding interview. Keep responses focused and under 200 words unless giving an end-of-interview assessment.`;
 }
 
 export function useInterviewChat() {
+  const persisted = loadPersistedState();
   const [state, setState] = useState<InterviewChatState>({
-    messages: [],
+    messages: persisted?.messages ?? [],
     loading: false,
     error: null,
   });
-  const questionRef = useRef<string>('');
+  const questionRef = useRef<string>(persisted?.question ?? '');
   const abortRef = useRef<AbortController | null>(null);
+
+  // Persist messages whenever they change
+  useEffect(() => {
+    if (state.messages.length > 0 && questionRef.current) {
+      persistState({ messages: state.messages, question: questionRef.current });
+    }
+  }, [state.messages]);
 
   const [aiChatMutation] = useMutation(AI_CHAT);
 
@@ -123,7 +171,6 @@ export function useInterviewChat() {
   const startInterview = useCallback((question: string, endpointId?: string, model?: string) => {
     questionRef.current = question;
     setState({ messages: [], loading: false, error: null });
-    // Send an initial greeting to kick off the interview
     setTimeout(() => {
       sendRawMessage(
         "I'm ready to start the interview. Please begin.",
@@ -155,7 +202,7 @@ export function useInterviewChat() {
 
   const endInterview = useCallback((endpointId?: string, model?: string) => {
     sendRawMessage(
-      "Let's end the interview. Please provide your assessment of my performance.",
+      "Let's end the interview. Please provide your detailed rubric assessment of my performance including Coding Ability, Problem-Solving, and Communication scores out of 4, with specific justifications referencing my code and responses.",
       endpointId,
       model,
     );
@@ -164,12 +211,17 @@ export function useInterviewChat() {
   const clearChat = useCallback(() => {
     questionRef.current = '';
     setState({ messages: [], loading: false, error: null });
+    clearPersistedState();
   }, []);
+
+  const hasPersistedSession = persisted !== null && persisted.messages.length > 0;
 
   return {
     messages: state.messages,
     loading: state.loading,
     error: state.error,
+    question: questionRef.current,
+    hasPersistedSession,
     sendMessage,
     startInterview,
     repeatQuestion,

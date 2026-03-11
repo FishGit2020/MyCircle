@@ -309,6 +309,20 @@ Exposes `WorshipSongs` component via Module Federation.
 - Tag-based filtering and full-text search
 - **Paginated lightweight list**: The song list uses `worshipSongsList` GraphQL query which returns `WorshipSongListItem` (no `content`/`notes`) with server-side `limit`/`offset` pagination and `totalCount`. The list fetches 50 songs per page with a "Load More" button. Full song details (including content) are fetched on-demand via `worshipSong(id)` when viewing/editing a song. This reduces the initial payload from ~310 KiB to ~15 KiB.
 
+### AI Interviewer - `packages/ai-interviewer/`
+
+Exposes `AiInterviewer` component via Module Federation.
+
+**Key Behavior:**
+- Split-panel layout: left side for pasting coding questions (plain textarea), right side for chat with AI interviewer
+- Reuses existing `aiChat` GraphQL mutation with custom `systemPrompt` parameter
+- Endpoint/model selector reuses benchmark infrastructure (`GET_BENCHMARK_ENDPOINTS`, `GET_BENCHMARK_ENDPOINT_MODELS`)
+- AI acts as a coding interviewer: guides without giving answers, asks probing questions, evaluates approach
+- **Rubric assessment**: At end of interview, AI provides structured scores (0-4) for Coding Ability, Problem-Solving, and Communication with specific justifications
+- Action buttons: Start Interview, Repeat Question, Hint, End Interview
+- Chat history persisted to localStorage (`interview-chat-history`)
+- No tool calls or MyCircle context — pure interview interaction
+
 ### Notebook - `packages/notebook/`
 
 Exposes `Notebook` component via Module Federation.
