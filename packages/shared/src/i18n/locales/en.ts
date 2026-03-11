@@ -579,6 +579,7 @@ const en = {
   'worship.editSong': 'Edit Song',
   'worship.deleteSong': 'Delete Song',
   'worship.deleteConfirm': 'Are you sure you want to delete this song?',
+  'worship.deleteFailed': 'Failed to delete song. Please try again.',
   'worship.songTitle': 'Song Title',
   'worship.artist': 'Artist / Author',
   'worship.key': 'Key',
