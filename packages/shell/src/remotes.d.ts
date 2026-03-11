@@ -120,3 +120,8 @@ declare module 'radioStation/RadioStation' {
   const RadioStation: React.ComponentType;
   export default RadioStation;
 }
+
+declare module 'aiInterviewer/AiInterviewer' {
+  const AiInterviewer: React.ComponentType;
+  export default AiInterviewer;
+}
