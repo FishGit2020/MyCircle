@@ -45,11 +45,11 @@ Scores can be integers or half-points (e.g., 3.5/4). Be specific and honest.
 Respond concisely (under 200 words) unless giving an end-of-interview assessment.`;
 
 function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return crypto.randomUUID();
 }
 
 function generateSessionId(): string {
-  return `session-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return `session-${crypto.randomUUID()}`;
 }
 
 function loadPersistedState(): PersistedState | null {
