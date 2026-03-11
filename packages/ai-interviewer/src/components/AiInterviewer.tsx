@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslation, PageContent } from '@mycircle/shared';
+import { useTranslation, PageContent, useQuery, useLazyQuery, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
+import type { GetBenchmarkEndpointsQuery, GetBenchmarkEndpointModelsQuery } from '@mycircle/shared';
 import { useInterviewChat } from '../hooks/useInterviewChat';
 import type { InterviewSession } from '../hooks/useInterviewChat';
 import QuestionPanel from './QuestionPanel';
@@ -16,7 +17,7 @@ function savePref(key: string, value: string) {
 }
 
 function getSessionIdFromHash(): string {
-  const hash = window.location.hash.slice(1); // remove '#'
+  const hash = window.location.hash.slice(1);
   return hash || '';
 }
 
@@ -36,8 +37,24 @@ export default function AiInterviewer() {
   const [endpointId, setEndpointIdLocal] = useState(() => loadPref(ENDPOINT_KEY));
   const [model, setModelLocal] = useState(() => loadPref(MODEL_KEY));
   const [showSessions, setShowSessions] = useState(false);
-  const [lastUserMessage, setLastUserMessage] = useState('');
   const mountedRef = useRef(false);
+
+  // Endpoint / model queries
+  const { data: endpointsData } = useQuery<GetBenchmarkEndpointsQuery>(GET_BENCHMARK_ENDPOINTS, {
+    fetchPolicy: 'cache-and-network',
+  });
+  const [fetchModels, { data: modelsData }] = useLazyQuery<GetBenchmarkEndpointModelsQuery>(
+    GET_BENCHMARK_ENDPOINT_MODELS,
+  );
+  const endpoints = endpointsData?.benchmarkEndpoints ?? [];
+  const models = modelsData?.benchmarkEndpointModels ?? [];
+
+  // Fetch models for persisted endpoint on mount
+  useEffect(() => {
+    if (endpointId) {
+      fetchModels({ variables: { endpointId } });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const {
     messages,
@@ -56,27 +73,26 @@ export default function AiInterviewer() {
     repeatQuestion,
     requestHint,
     endInterview,
+    retry,
     clearChat,
     loadSessions,
     loadSession,
     deleteSession,
   } = useInterviewChat();
 
-  // On mount: load session from URL hash, or fall back to localStorage persisted session
+  // On mount: load session from URL hash, or fall back to localStorage
   useEffect(() => {
     if (mountedRef.current) return;
     mountedRef.current = true;
 
     const hashSessionId = getSessionIdFromHash();
     if (hashSessionId) {
-      // Load from Firebase by session ID in URL
       loadSession(hashSessionId).then((loaded) => {
         if (loaded) {
           setQuestionLocal(loaded.question);
           setDocumentLocal(loaded.document);
           setInterviewActive(loaded.messages.length > 0);
         } else {
-          // Invalid session ID in URL — clear hash
           setSessionHash('');
         }
       });
@@ -84,12 +100,10 @@ export default function AiInterviewer() {
       setQuestionLocal(persistedQuestion);
       setDocumentLocal(persistedDocument);
       setInterviewActive(true);
-      // Sync hash with persisted session
       setSessionHash(currentSessionId);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Keep hash in sync when session changes
   useEffect(() => {
     if (mountedRef.current && currentSessionId && messages.length > 0) {
       setSessionHash(currentSessionId);
@@ -99,7 +113,12 @@ export default function AiInterviewer() {
   const setEndpointId = useCallback((id: string) => {
     setEndpointIdLocal(id);
     savePref(ENDPOINT_KEY, id);
-  }, []);
+    setModelLocal('');
+    savePref(MODEL_KEY, '');
+    if (id) {
+      fetchModels({ variables: { endpointId: id } });
+    }
+  }, [fetchModels]);
 
   const setModel = useCallback((m: string) => {
     setModelLocal(m);
@@ -119,10 +138,10 @@ export default function AiInterviewer() {
   }, [setDocument]);
 
   const handleStart = useCallback(() => {
-    if (!question.trim()) return;
+    if (!question.trim() || !modelSelected) return;
     setInterviewActive(true);
     startInterview(question, endpointId || undefined, model || undefined);
-  }, [question, endpointId, model, startInterview]);
+  }, [question, endpointId, model, modelSelected, startInterview]);
 
   const handleRepeat = useCallback(() => {
     repeatQuestion(endpointId || undefined, model || undefined);
@@ -138,22 +157,14 @@ export default function AiInterviewer() {
   }, [endpointId, model, endInterview]);
 
   const handleSendMessage = useCallback((text: string) => {
-    setLastUserMessage(text);
     sendMessage(text, endpointId || undefined, model || undefined);
   }, [endpointId, model, sendMessage]);
-
-  const handleRetry = useCallback(() => {
-    if (lastUserMessage) {
-      sendMessage(lastUserMessage, endpointId || undefined, model || undefined);
-    }
-  }, [lastUserMessage, endpointId, model, sendMessage]);
 
   const handleNewInterview = useCallback(() => {
     clearChat();
     setInterviewActive(false);
     setQuestionLocal('');
     setDocumentLocal('');
-    setLastUserMessage('');
     setSessionHash('');
   }, [clearChat]);
 
@@ -177,7 +188,6 @@ export default function AiInterviewer() {
 
   const handleDeleteSession = useCallback(async (sessionId: string) => {
     await deleteSession(sessionId);
-    // If we just deleted the active session, clear the hash
     if (sessionId === currentSessionId) {
       setSessionHash('');
     }
@@ -192,15 +202,12 @@ export default function AiInterviewer() {
             {t('aiInterviewer.title')}
           </h1>
           <div className="flex items-center gap-2">
-            {/* Save status indicator */}
             {saveStatus === 'saving' && (
               <span className="text-xs text-gray-400 dark:text-gray-500">{t('aiInterviewer.saving')}</span>
             )}
             {saveStatus === 'saved' && (
               <span className="text-xs text-green-500 dark:text-green-400">{t('aiInterviewer.saved')}</span>
             )}
-
-            {/* Sessions button */}
             <button
               type="button"
               onClick={handleToggleSessions}
@@ -208,7 +215,6 @@ export default function AiInterviewer() {
             >
               {t('aiInterviewer.sessions')}
             </button>
-
             {interviewActive && (
               <button
                 type="button"
@@ -251,9 +257,9 @@ export default function AiInterviewer() {
           </div>
         )}
 
-        {/* Split panel: vertical stack on mobile, side-by-side on desktop */}
+        {/* Split panel */}
         <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
-          {/* Working document panel — 65% on desktop */}
+          {/* Working document panel — 65% */}
           <div className="md:w-[65%] border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 min-h-[200px] md:min-h-0 flex flex-col">
             <QuestionPanel
               question={question}
@@ -261,20 +267,44 @@ export default function AiInterviewer() {
               onQuestionChange={handleQuestionChange}
               onDocumentChange={handleDocumentChange}
               interviewActive={interviewActive}
-              endpointId={endpointId}
-              model={model}
-              onEndpointChange={setEndpointId}
-              onModelChange={setModel}
               onStart={handleStart}
               onRepeat={handleRepeat}
               onHint={handleHint}
               onEnd={handleEnd}
               loading={loading}
+              modelSelected={modelSelected}
             />
           </div>
 
-          {/* Chat panel — 35% on desktop */}
+          {/* Chat panel — 35% */}
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            {/* Model selectors — right above chat */}
+            <div className="shrink-0 flex flex-wrap gap-2 px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <select
+                value={endpointId}
+                onChange={(e) => setEndpointId(e.target.value)}
+                className="flex-1 min-w-[120px] rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={t('aiInterviewer.endpoint')}
+              >
+                <option value="">{t('aiInterviewer.selectEndpoint')}</option>
+                {endpoints.map((ep) => (
+                  <option key={ep.id} value={ep.id}>{ep.name}</option>
+                ))}
+              </select>
+              <select
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                disabled={!endpointId}
+                className="flex-1 min-w-[120px] rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                aria-label={t('aiInterviewer.model')}
+              >
+                <option value="">{t('aiInterviewer.selectModel')}</option>
+                {models.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
             <InterviewChat
               messages={messages}
               loading={loading}
@@ -282,7 +312,7 @@ export default function AiInterviewer() {
               interviewActive={interviewActive}
               modelSelected={modelSelected}
               onSendMessage={handleSendMessage}
-              onRetry={handleRetry}
+              onRetry={retry}
             />
           </div>
         </div>

@@ -110,6 +110,7 @@ export function useInterviewChat() {
   const sessionIdRef = useRef<string>(persisted?.sessionId ?? generateSessionId());
   const sessionNameRef = useRef<string>(persisted?.sessionName ?? '');
   const abortRef = useRef<AbortController | null>(null);
+  const lastFailedRef = useRef<{ content: string; endpointId?: string; model?: string } | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
@@ -240,6 +241,7 @@ export function useInterviewChat() {
         timestamp: Date.now(),
       };
 
+      lastFailedRef.current = null;
       setState(prev => ({
         ...prev,
         messages: [...prev.messages, assistantMessage],
@@ -247,6 +249,7 @@ export function useInterviewChat() {
       }));
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
+      lastFailedRef.current = { content, endpointId, model };
       const message = err instanceof Error ? err.message : 'Failed to get response';
       setState(prev => ({ ...prev, loading: false, error: message }));
     }
@@ -313,6 +316,20 @@ export function useInterviewChat() {
       endpointId,
       model,
     );
+  }, [sendRawMessage]);
+
+  const retry = useCallback(() => {
+    if (!lastFailedRef.current) return;
+    const { content, endpointId, model } = lastFailedRef.current;
+    // Remove the failed user message (last one) before resending
+    setState(prev => ({
+      ...prev,
+      messages: prev.messages.slice(0, -1),
+      error: null,
+    }));
+    setTimeout(() => {
+      sendRawMessage(content, endpointId, model);
+    }, 0);
   }, [sendRawMessage]);
 
   const clearChat = useCallback(() => {
@@ -388,6 +405,7 @@ export function useInterviewChat() {
     repeatQuestion,
     requestHint,
     endInterview,
+    retry,
     clearChat,
     loadSessions,
     loadSession,

@@ -21,9 +21,9 @@ describe('AiInterviewer', () => {
     expect(screen.getByText('aiInterviewer.title')).toBeInTheDocument();
   });
 
-  it('shows start interview button', () => {
+  it('shows select model prompt when no model selected', () => {
     render(<AiInterviewer />);
-    expect(screen.getByText('aiInterviewer.startInterview')).toBeInTheDocument();
+    expect(screen.getByText('aiInterviewer.selectModelFirst')).toBeInTheDocument();
   });
 
   it('shows endpoint and model selectors', () => {

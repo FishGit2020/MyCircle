@@ -119,7 +119,7 @@ export default function InterviewChat({
       : t('aiInterviewer.startFirst');
 
   return (
-    <div className="flex flex-col h-full min-h-0 overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* Messages area — scrollable, won't grow parent */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
         {messages.length === 0 && !loading && (
