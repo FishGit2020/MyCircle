@@ -399,6 +399,7 @@ export type MutationAiChatArgs = {
   history?: InputMaybe<Array<AiChatHistoryInput>>;
   message: Scalars['String']['input'];
   model?: InputMaybe<Scalars['String']['input']>;
+  systemPrompt?: InputMaybe<Scalars['String']['input']>;
   toolMode?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1113,6 +1114,7 @@ export type AiChatMutationVariables = Exact<{
   model?: InputMaybe<Scalars['String']['input']>;
   endpointId?: InputMaybe<Scalars['ID']['input']>;
   toolMode?: InputMaybe<Scalars['String']['input']>;
+  systemPrompt?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 

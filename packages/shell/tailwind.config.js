@@ -25,6 +25,7 @@ export default {
     "../trip-planner/src/**/*.{js,ts,jsx,tsx}",
     "../poll-system/src/**/*.{js,ts,jsx,tsx}",
     "../radio-station/src/**/*.{js,ts,jsx,tsx}",
+    "../ai-interviewer/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

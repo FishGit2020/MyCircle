@@ -184,6 +184,10 @@ const radioStationRemote = isProduction
   ? '/radio-station/assets/remoteEntry.js'
   : 'http://localhost:3026/assets/remoteEntry.js';
 
+const aiInterviewerRemote = isProduction
+  ? '/ai-interviewer/assets/remoteEntry.js'
+  : 'http://localhost:3027/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -213,7 +217,8 @@ export default defineConfig({
         hikingMap: hikingMapRemote,
         tripPlanner: tripPlannerRemote,
         pollSystem: pollSystemRemote,
-        radioStation: radioStationRemote
+        radioStation: radioStationRemote,
+        aiInterviewer: aiInterviewerRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

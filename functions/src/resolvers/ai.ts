@@ -263,9 +263,11 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
       model?: string;
       endpointId?: string;
       toolMode?: string;
+      systemPrompt?: string;
     }, ctx: any) => {
       const { message, history, context, model, endpointId } = aiChatSchema.parse(args);
       const useMcp = args.toolMode === 'mcp';
+      const customSystemPrompt = typeof args.systemPrompt === 'string' ? args.systemPrompt : null;
       const uid = ctx?.uid;
       const startTime = Date.now();
       let inputTokens = 0;
@@ -285,9 +287,9 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
       const finnhubKey = getFinnhubKey?.() || '';
 
       // Build context-aware system instruction
-      let systemInstruction = 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, search podcasts, look up Bible verses, manage flashcards, check USCIS case status, create notes, log work entries, set baby due dates, record child milestones, add immigration cases, and navigate users to any page. Be concise and helpful. When users ask about weather, stocks, crypto, or immigration cases, use the tools to get real data. For notes, work entries, baby info, milestones, and immigration tracking, use the frontend action tools.';
+      let systemInstruction = customSystemPrompt || 'You are MyCircle AI, a helpful assistant for the MyCircle personal dashboard app. You can look up weather, stock quotes, crypto prices, search for cities, search podcasts, look up Bible verses, manage flashcards, check USCIS case status, create notes, log work entries, set baby due dates, record child milestones, add immigration cases, and navigate users to any page. Be concise and helpful. When users ask about weather, stocks, crypto, or immigration cases, use the tools to get real data. For notes, work entries, baby info, milestones, and immigration tracking, use the frontend action tools.';
 
-      if (context && typeof context === 'object') {
+      if (!customSystemPrompt && context && typeof context === 'object') {
         const ctxParts: string[] = [];
         if (Array.isArray(context.favoriteCities) && context.favoriteCities.length > 0) ctxParts.push(`Favorite cities: ${(context.favoriteCities as string[]).join(', ')}`);
         if (Array.isArray(context.recentCities) && context.recentCities.length > 0) ctxParts.push(`Recently searched cities: ${(context.recentCities as string[]).join(', ')}`);
