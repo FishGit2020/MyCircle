@@ -395,7 +395,7 @@ export const typeDefs = `#graphql
     transitNearbyStops(lat: Float!, lon: Float!, radius: Int): [TransitStop!]!
 
     # Worship songs
-    worshipSongsList(limit: Int, offset: Int, search: String): WorshipSongsPage!
+    worshipSongsList(limit: Int, offset: Int, search: String, artist: String, tag: String, format: String, favoriteIds: [String!]): WorshipSongsPage!
     worshipSong(id: ID!): WorshipSong
 
     # Cloud Files (auth required)

@@ -96,7 +96,7 @@ function docToSongListItem(id: string, data: FirebaseFirestore.DocumentData) {
 export function createWorshipSongResolvers() {
   return {
     Query: {
-      worshipSongsList: async (_: any, { limit, offset = 0, search }: { limit?: number; offset?: number; search?: string }) => {
+      worshipSongsList: async (_: any, { limit, offset = 0, search, artist, tag, format, favoriteIds }: { limit?: number; offset?: number; search?: string; artist?: string; tag?: string; format?: string; favoriteIds?: string[] }) => {
         const db = getFirestore();
         const snap = await db
           .collection(COLLECTION)
@@ -110,10 +110,34 @@ export function createWorshipSongResolvers() {
           allDocs = allDocs.filter(d => {
             const data = d.data();
             const title = (data.title ?? '').toLowerCase();
-            const artist = (data.artist ?? '').toLowerCase();
+            const docArtist = (data.artist ?? '').toLowerCase();
             const tags: string[] = Array.isArray(data.tags) ? data.tags : [];
-            return title.includes(q) || artist.includes(q) || tags.some(tag => tag.toLowerCase().includes(q));
+            return title.includes(q) || docArtist.includes(q) || tags.some(t => t.toLowerCase().includes(q));
           });
+        }
+
+        // Filter by artist
+        if (artist) {
+          allDocs = allDocs.filter(d => d.data().artist === artist);
+        }
+
+        // Filter by tag
+        if (tag) {
+          allDocs = allDocs.filter(d => {
+            const tags: string[] = Array.isArray(d.data().tags) ? d.data().tags : [];
+            return tags.includes(tag);
+          });
+        }
+
+        // Filter by format
+        if (format) {
+          allDocs = allDocs.filter(d => (d.data().format ?? 'text') === format);
+        }
+
+        // Filter by favorite IDs
+        if (favoriteIds && favoriteIds.length > 0) {
+          const favSet = new Set(favoriteIds);
+          allDocs = allDocs.filter(d => favSet.has(d.id));
         }
 
         const totalCount = allDocs.length;

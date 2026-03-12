@@ -30,7 +30,15 @@ interface SongListProps {
   loading: boolean;
   isAuthenticated: boolean;
   search: string;
+  filterArtist: string;
+  filterTag: string;
+  filterFormat: 'all' | 'chordpro' | 'text';
+  showFavoritesOnly: boolean;
   onSearchChange: (query: string) => void;
+  onFilterArtistChange: (artist: string) => void;
+  onFilterTagChange: (tag: string) => void;
+  onFilterFormatChange: (format: 'all' | 'chordpro' | 'text') => void;
+  onFavoritesToggle: (on: boolean, ids: string[]) => void;
   onSelectSong: (id: string) => void;
   onNewSong: () => void;
   onDeleteSong?: (id: string) => void;
@@ -39,15 +47,13 @@ interface SongListProps {
 
 export default function SongList({
   songs, totalCount, totalPages, page, allArtists, allTags,
-  loading, isAuthenticated, search, onSearchChange, onSelectSong, onNewSong, onDeleteSong, onPageChange,
+  loading, isAuthenticated, search, filterArtist, filterTag, filterFormat, showFavoritesOnly,
+  onSearchChange, onFilterArtistChange, onFilterTagChange, onFilterFormatChange, onFavoritesToggle,
+  onSelectSong, onNewSong, onDeleteSong, onPageChange,
 }: SongListProps) {
   const { t } = useTranslation();
   const [favorites, setFavorites] = useState(loadFavorites);
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sort, setSort] = useState<SortMode>('alpha');
-  const [filterFormat, setFilterFormat] = useState<'all' | 'chordpro' | 'text'>('all');
-  const [filterArtist, setFilterArtist] = useState('');
-  const [filterTag, setFilterTag] = useState('');
 
   const toggleFavorite = useCallback((e: React.MouseEvent, songId: string) => {
     e.stopPropagation();
@@ -61,42 +67,29 @@ export default function SongList({
         if (song) window.__logAnalyticsEvent?.('worship_song_favorite', { song_title: song.title });
       }
       saveFavorites(next);
+      // If favorites filter is active, update server-side filter with new set
+      if (showFavoritesOnly) {
+        onFavoritesToggle(true, [...next]);
+      }
       return next;
     });
-  }, [songs]);
+  }, [songs, showFavoritesOnly, onFavoritesToggle]);
 
+  const handleFavoritesToggle = useCallback(() => {
+    const newVal = !showFavoritesOnly;
+    onFavoritesToggle(newVal, [...favorites]);
+  }, [showFavoritesOnly, favorites, onFavoritesToggle]);
+
+  // Sort is still client-side (only applies to current page)
   const processed = useMemo(() => {
-    let result = songs;
-
-    // Filter by favorites
-    if (showFavoritesOnly) {
-      result = result.filter(s => favorites.has(s.id));
-    }
-
-    // Filter by format
-    if (filterFormat !== 'all') {
-      result = result.filter(s => s.format === filterFormat);
-    }
-
-    // Filter by artist
-    if (filterArtist) {
-      result = result.filter(s => s.artist === filterArtist);
-    }
-
-    // Filter by tag
-    if (filterTag) {
-      result = result.filter(s => s.tags?.includes(filterTag));
-    }
-
-    // Sort
+    const result = [...songs];
     if (sort === 'alpha') {
-      result = [...result].sort((a, b) => a.title.localeCompare(b.title));
+      result.sort((a, b) => a.title.localeCompare(b.title));
     } else {
-      result = [...result].sort((a, b) => new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime());
+      result.sort((a, b) => new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime());
     }
-
     return result;
-  }, [songs, favorites, showFavoritesOnly, sort, filterFormat, filterArtist, filterTag]);
+  }, [songs, sort]);
 
   // Build visible page numbers: show up to 5 pages around current
   const pageNumbers = useMemo(() => {
@@ -144,7 +137,7 @@ export default function SongList({
       <div className="flex flex-wrap items-center gap-2 mb-4">
         {/* Favorites toggle */}
         <button
-          onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+          onClick={handleFavoritesToggle}
           className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition ${
             showFavoritesOnly
               ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-700'
@@ -162,7 +155,7 @@ export default function SongList({
           {(['all', 'chordpro', 'text'] as const).map(fmt => (
             <button
               key={fmt}
-              onClick={() => setFilterFormat(fmt)}
+              onClick={() => onFilterFormatChange(fmt)}
               className={`px-2.5 py-1.5 text-xs font-medium transition ${
                 filterFormat === fmt
                   ? 'bg-blue-600 text-white'
@@ -178,7 +171,7 @@ export default function SongList({
         {allArtists.length > 1 && (
           <select
             value={filterArtist}
-            onChange={e => setFilterArtist(e.target.value)}
+            onChange={e => onFilterArtistChange(e.target.value)}
             className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none"
             aria-label={t('worship.filterArtist')}
           >
@@ -191,7 +184,7 @@ export default function SongList({
         {allTags.length > 0 && (
           <select
             value={filterTag}
-            onChange={e => setFilterTag(e.target.value)}
+            onChange={e => onFilterTagChange(e.target.value)}
             className="px-2 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 focus:ring-1 focus:ring-blue-400 outline-none"
             aria-label={t('worship.filterTag')}
           >

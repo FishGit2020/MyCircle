@@ -758,9 +758,13 @@ export type QueryWorshipSongArgs = {
 
 
 export type QueryWorshipSongsListArgs = {
+  artist?: InputMaybe<Scalars['String']['input']>;
+  favoriteIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  format?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ShareFileResult = {
@@ -1267,6 +1271,10 @@ export type GetWorshipSongsListQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
+  artist?: InputMaybe<Scalars['String']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
+  format?: InputMaybe<Scalars['String']['input']>;
+  favoriteIds?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
 }>;
 
 

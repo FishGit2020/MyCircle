@@ -17,7 +17,13 @@ export default function WorshipSongs() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') ?? '';
-  const { songs, totalCount, totalPages, page, allArtists, allTags, loading, isAuthenticated, search, setSearch: setSearchRaw, addSong, updateSong, deleteSong, getSong, goToPage } = useWorshipSongs(initialQuery);
+  const {
+    songs, totalCount, totalPages, page, allArtists, allTags, loading, isAuthenticated,
+    search, setSearch: setSearchRaw,
+    filterArtist, setFilterArtist, filterTag, setFilterTag, filterFormat, setFilterFormat,
+    favoriteIds, setShowFavoritesOnly,
+    addSong, updateSong, deleteSong, getSong, goToPage,
+  } = useWorshipSongs(initialQuery);
 
   // Sync search state to URL ?q= param
   const setSearch = useCallback((query: string) => {
@@ -166,7 +172,15 @@ export default function WorshipSongs() {
             loading={loading}
             isAuthenticated={isAuthenticated}
             search={search}
+            filterArtist={filterArtist}
+            filterTag={filterTag}
+            filterFormat={filterFormat}
+            showFavoritesOnly={favoriteIds !== null}
             onSearchChange={setSearch}
+            onFilterArtistChange={setFilterArtist}
+            onFilterTagChange={setFilterTag}
+            onFilterFormatChange={setFilterFormat}
+            onFavoritesToggle={setShowFavoritesOnly}
             onSelectSong={handleSelectSong}
             onNewSong={handleNewSong}
             onPageChange={goToPage}

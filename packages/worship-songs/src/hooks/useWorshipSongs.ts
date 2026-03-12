@@ -21,6 +21,10 @@ export function useWorshipSongs(initialSearch = '') {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState(1);
   const [search, setSearchRaw] = useState(initialSearch);
+  const [filterArtist, setFilterArtistRaw] = useState('');
+  const [filterTag, setFilterTagRaw] = useState('');
+  const [filterFormat, setFilterFormatRaw] = useState<'all' | 'chordpro' | 'text'>('all');
+  const [favoriteIds, setFavoriteIds] = useState<string[] | null>(null);
 
   // Track auth state via Firebase token
   useEffect(() => {
@@ -41,13 +45,41 @@ export function useWorshipSongs(initialSearch = '') {
 
   const setSearch = useCallback((q: string) => {
     setSearchRaw(q);
-    setPage(1); // reset to page 1 on search change
+    setPage(1);
+  }, []);
+
+  const setFilterArtist = useCallback((a: string) => {
+    setFilterArtistRaw(a);
+    setPage(1);
+  }, []);
+
+  const setFilterTag = useCallback((t: string) => {
+    setFilterTagRaw(t);
+    setPage(1);
+  }, []);
+
+  const setFilterFormat = useCallback((f: 'all' | 'chordpro' | 'text') => {
+    setFilterFormatRaw(f);
+    setPage(1);
+  }, []);
+
+  const setShowFavoritesOnly = useCallback((on: boolean, ids: string[]) => {
+    setFavoriteIds(on ? ids : null);
+    setPage(1);
   }, []);
 
   const offset = (page - 1) * PAGE_SIZE;
 
   const { data, loading, refetch } = useQuery(GET_WORSHIP_SONGS_LIST, {
-    variables: { limit: PAGE_SIZE, offset, search: search.trim() || undefined },
+    variables: {
+      limit: PAGE_SIZE,
+      offset,
+      search: search.trim() || undefined,
+      artist: filterArtist || undefined,
+      tag: filterTag || undefined,
+      format: filterFormat === 'all' ? undefined : filterFormat,
+      favoriteIds: favoriteIds ?? undefined,
+    },
     fetchPolicy: 'cache-and-network',
   });
 
@@ -121,6 +153,14 @@ export function useWorshipSongs(initialSearch = '') {
     isAuthenticated,
     search,
     setSearch,
+    filterArtist,
+    setFilterArtist,
+    filterTag,
+    setFilterTag,
+    filterFormat,
+    setFilterFormat,
+    favoriteIds,
+    setShowFavoritesOnly,
     addSong,
     updateSong,
     deleteSong,
