@@ -652,6 +652,9 @@ const zh: Record<TranslationKey, string> = {
   'worship.capoEasyKey': '\u7b80\u5355\u8c03\u53f7',
   'worship.capoSuggested': '\u5efa\u8bae',
   'worship.capoInstruction': '\u5c06\u53d8\u8c03\u5939\u653e\u5728\u7b2c {fret} \u54c1\uff0c\u5f39\u594f {shapeKey} \u548c\u5f26\u3002\u6b4c\u66f2\u5c06\u4ee5 {soundingKey} \u8c03\u53d1\u58f0\u3002',
+  'worship.importPro': '\u5bfc\u5165 .pro',
+  'worship.importProHint': '\u5bfc\u5165 ProPresenter \u6587\u4ef6\u4ee5\u9884\u586b\u6b4c\u8bcd',
+  'worship.importError': '\u65e0\u6cd5\u89e3\u6790\u6587\u4ef6\uff0c\u8bf7\u68c0\u67e5\u683c\u5f0f\u3002',
 
   // Notebook
   'nav.notebook': '\u7b14\u8bb0\u672c',
