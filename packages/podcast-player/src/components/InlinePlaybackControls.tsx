@@ -102,7 +102,9 @@ export default function InlinePlaybackControls({ episode, podcast }: InlinePlayb
       .replace('{episode}', episode.title)
       .replace('{podcast}', podcastName)
       .replace('{time}', timeStr);
-    const appLink = podcast ? `${window.location.origin}/podcasts/${podcast.id}` : window.location.origin;
+    const appLink = podcast
+      ? `${window.location.origin}/podcasts/${podcast.id}?autoplay=true&episode=${encodeURIComponent(String(episode.id))}`
+      : window.location.origin;
 
     if (navigator.share) {
       try {
