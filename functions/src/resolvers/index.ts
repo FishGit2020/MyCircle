@@ -10,6 +10,7 @@ import { createWorshipSongResolvers } from './worshipSongs.js';
 import { createCloudFileResolvers } from './cloudFiles.js';
 import { createBabyPhotoResolvers } from './babyPhotos.js';
 import { createDigitalLibraryResolvers } from './digitalLibrary.js';
+import { createTransitQueryResolvers } from './transit.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -46,6 +47,7 @@ export function createResolvers(
       ...cloudFileResolvers.Query,
       ...babyPhotoResolvers.Query,
       ...digitalLibraryResolvers.Query,
+      ...createTransitQueryResolvers(),
     },
   };
 }

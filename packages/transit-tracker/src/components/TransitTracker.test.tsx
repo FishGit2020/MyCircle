@@ -22,6 +22,11 @@ vi.mock('@mycircle/shared', () => ({
     error: vi.fn(),
     debug: vi.fn(),
   }),
+  useQuery: vi.fn(() => ({ data: null, loading: false, error: null, refetch: vi.fn() })),
+  useLazyQuery: vi.fn(() => [vi.fn(), { data: null, loading: false, error: null }]),
+  GET_TRANSIT_ARRIVALS: {},
+  GET_TRANSIT_STOP: {},
+  GET_TRANSIT_NEARBY_STOPS: {},
 }));
 
 vi.mock('../hooks/useTransitArrivals', () => ({

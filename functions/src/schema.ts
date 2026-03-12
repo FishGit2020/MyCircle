@@ -322,6 +322,29 @@ export const typeDefs = `#graphql
     title: String!
   }
 
+  # ─── Transit Types ──────────────────────────────────────────────
+
+  type TransitArrival {
+    routeId: String!
+    routeShortName: String!
+    tripHeadsign: String!
+    scheduledArrival: Float!
+    predictedArrival: Float!
+    minutesUntilArrival: Int!
+    isRealTime: Boolean!
+    status: String!
+    vehicleId: String!
+  }
+
+  type TransitStop {
+    id: String!
+    name: String!
+    direction: String!
+    lat: Float!
+    lon: Float!
+    routeIds: [String!]!
+  }
+
   type Query {
     weather(lat: Float!, lon: Float!): WeatherData!
     currentWeather(lat: Float!, lon: Float!): CurrentWeather!
@@ -365,6 +388,11 @@ export const typeDefs = `#graphql
     benchmarkEndpointModels(endpointId: ID!): [String!]!
     benchmarkHistory(limit: Int = 10): [BenchmarkRun!]!
     benchmarkSummary: BenchmarkSummary!
+
+    # Transit queries
+    transitArrivals(stopId: String!): [TransitArrival!]!
+    transitStop(stopId: String!): TransitStop
+    transitNearbyStops(lat: Float!, lon: Float!, radius: Int): [TransitStop!]!
 
     # Worship songs
     worshipSongsList(limit: Int, offset: Int, search: String): WorshipSongsPage!

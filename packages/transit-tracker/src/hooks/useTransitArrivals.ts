@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo } from 'react';
+import { useQuery, GET_TRANSIT_ARRIVALS, GET_TRANSIT_STOP } from '@mycircle/shared';
 import type { ArrivalDeparture, TransitStop } from '../types';
 
 interface UseTransitArrivalsResult {
@@ -10,68 +11,63 @@ interface UseTransitArrivalsResult {
   lastUpdated: number | null;
 }
 
-function getApiBase(): string {
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return 'http://localhost:5001/mycircle-dash/us-central1/transitProxy';
-  }
-  return '/transit-api';
-}
-
 export function useTransitArrivals(stopId: string | null): UseTransitArrivalsResult {
-  const [arrivals, setArrivals] = useState<ArrivalDeparture[]>([]);
-  const [stop, setStop] = useState<TransitStop | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
-
-  const fetchArrivals = useCallback(async () => {
-    if (!stopId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${getApiBase()}/arrivals/${encodeURIComponent(stopId)}`);
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: 'Failed to fetch arrivals' }));
-        throw new Error(body.error || `HTTP ${res.status}`);
-      }
-      const data = await res.json();
-      setStop(data.stop || null);
-      const now = Date.now();
-      // Filter to upcoming arrivals only
-      const upcoming = (data.arrivalsAndDepartures || [])
-        .filter((a: ArrivalDeparture) => {
-          const arrivalTime = a.predicted ? a.predictedArrivalTime : a.scheduledArrivalTime;
-          return arrivalTime > now;
-        })
-        .sort((a: ArrivalDeparture, b: ArrivalDeparture) => {
-          const timeA = a.predicted ? a.predictedArrivalTime : a.scheduledArrivalTime;
-          const timeB = b.predicted ? b.predictedArrivalTime : b.scheduledArrivalTime;
-          return timeA - timeB;
-        });
-      setArrivals(upcoming);
-      setLastUpdated(now);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
+  const { data: arrivalsData, loading: arrivalsLoading, error: arrivalsError, refetch: refetchArrivals } = useQuery(
+    GET_TRANSIT_ARRIVALS,
+    {
+      variables: { stopId: stopId || '' },
+      skip: !stopId,
+      fetchPolicy: 'cache-and-network',
     }
-  }, [stopId]);
+  );
 
-  const refresh = useCallback(() => {
-    fetchArrivals();
-  }, [fetchArrivals]);
-
-  useEffect(() => {
-    if (!stopId) {
-      setArrivals([]);
-      setStop(null);
-      setError(null);
-      setLastUpdated(null);
-      return;
+  const { data: stopData, loading: stopLoading, error: stopError } = useQuery(
+    GET_TRANSIT_STOP,
+    {
+      variables: { stopId: stopId || '' },
+      skip: !stopId,
+      fetchPolicy: 'cache-and-network',
     }
+  );
 
-    fetchArrivals();
-  }, [stopId, fetchArrivals]);
+  const arrivals = useMemo(() => {
+    const raw = arrivalsData?.transitArrivals || [];
+    const now = Date.now();
+    return raw
+      .filter((a: { isRealTime: boolean; predictedArrival: number; scheduledArrival: number }) => {
+        const arrivalTime = a.isRealTime ? a.predictedArrival : a.scheduledArrival;
+        return arrivalTime > now;
+      })
+      .map((a: { routeId: string; routeShortName: string; tripHeadsign: string; scheduledArrival: number; predictedArrival: number; isRealTime: boolean; status: string; vehicleId: string }) => ({
+        routeId: a.routeId,
+        routeShortName: a.routeShortName,
+        routeLongName: '',
+        tripHeadsign: a.tripHeadsign,
+        scheduledArrivalTime: a.scheduledArrival,
+        predictedArrivalTime: a.predictedArrival,
+        predicted: a.isRealTime,
+        status: a.status,
+        vehicleId: a.vehicleId,
+        distanceFromStop: 0,
+      }))
+      .sort((a: ArrivalDeparture, b: ArrivalDeparture) => {
+        const timeA = a.predicted ? a.predictedArrivalTime : a.scheduledArrivalTime;
+        const timeB = b.predicted ? b.predictedArrivalTime : b.scheduledArrivalTime;
+        return timeA - timeB;
+      });
+  }, [arrivalsData]);
+
+  const stop = stopData?.transitStop || null;
+  const loading = arrivalsLoading || stopLoading;
+  const error = arrivalsError?.message || stopError?.message || null;
+
+  const refresh = () => {
+    if (stopId) {
+      refetchArrivals({ stopId });
+    }
+  };
+
+  const lastUpdated = arrivalsData ? Date.now() : null;
 
   return { arrivals, stop, loading, error, refresh, lastUpdated };
 }
