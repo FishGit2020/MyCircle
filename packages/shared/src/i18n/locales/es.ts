@@ -652,6 +652,9 @@ const es: Record<TranslationKey, string> = {
   'worship.capoEasyKey': 'Tono f\u00e1cil',
   'worship.capoSuggested': 'Sugeridos',
   'worship.capoInstruction': 'Coloca la cejilla en el traste {fret} y toca acordes de {shapeKey}. La canci\u00f3n sonar\u00e1 en {soundingKey}.',
+  'worship.importPro': 'Importar .pro',
+  'worship.importProHint': 'Importa un archivo ProPresenter para prellenar la letra',
+  'worship.importError': 'No se pudo analizar el archivo. Verifica el formato.',
 
   // Notebook
   'nav.notebook': 'Bloc de notas',
