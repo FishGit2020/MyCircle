@@ -64,7 +64,7 @@ jobs:
         run: npx firebase-tools deploy --only hosting --project mycircle-dash
 
       - name: Deploy functions and firestore
-        run: npx firebase-tools deploy --only functions,firestore --project mycircle-dash
+        run: npx firebase-tools deploy --only functions,firestore --project mycircle-dash --force
 
       - name: Create Sentry release and upload source maps
         if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
