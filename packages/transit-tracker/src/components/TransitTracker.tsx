@@ -38,11 +38,9 @@ const TransitTracker: React.FC = () => {
   const { stops: nearbyStops, loading: nearbyLoading, error: nearbyError, findNearby } = useNearbyStops();
   const { favorites, isFavorite, toggleFavorite } = useFavoriteStops();
 
-  // Sync URL param to state on initial load
+  // Sync URL param to state — including clearing when navigating back to /transit
   useEffect(() => {
-    if (routeStopId && routeStopId !== selectedStopId) {
-      setSelectedStopId(routeStopId);
-    }
+    setSelectedStopId(routeStopId || null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeStopId]);
 

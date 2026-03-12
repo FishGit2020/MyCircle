@@ -34,6 +34,8 @@ function resolveDetailLabel(
       };
       return t(gameMap[segments[1]] || 'nav.detail');
     }
+    case 'transit':
+      return segments[1] || t('nav.detail');
     default:
       return t('nav.detail');
   }
