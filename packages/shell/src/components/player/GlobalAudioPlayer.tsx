@@ -53,6 +53,8 @@ function saveSourceProgress(source: AudioSource, position: number, audioDuration
       if (audioDuration > 0 && position >= audioDuration - 5) {
         markChapterPlayed(source.collection.id, source.trackIndex);
       }
+    } else {
+      window.dispatchEvent(new Event('podcast-progress-changed'));
     }
   } catch { /* */ }
 }

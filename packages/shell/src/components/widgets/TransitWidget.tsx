@@ -55,7 +55,7 @@ const TransitWidget = React.memo(function TransitWidget() {
               <li key={fav.stopId}>
                 <button
                   type="button"
-                  onClick={() => navigate(`/transit/${encodeURIComponent(fav.stopId)}`)}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/transit/${encodeURIComponent(fav.stopId)}`); }}
                   className="w-full rounded px-2 py-1 text-left text-xs transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <span className="font-medium text-gray-900 dark:text-white">{fav.stopName}</span>

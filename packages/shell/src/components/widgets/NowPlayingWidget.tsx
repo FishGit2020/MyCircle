@@ -61,6 +61,18 @@ function loadPodcastDisplay(): NowPlayingDisplay | null {
   return null;
 }
 
+function loadProgressPct(episodeId?: string): number {
+  if (!episodeId) return 0;
+  try {
+    const raw = localStorage.getItem(StorageKeys.PODCAST_PROGRESS);
+    if (raw) {
+      const map = JSON.parse(raw) as Record<string, { position: number; duration: number }>;
+      const p = map[episodeId];
+      if (p && p.duration > 0) return Math.round((p.position / p.duration) * 100);
+    }
+  } catch { /* ignore */ }
+  return 0;
+}
 
 const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   const { t } = useTranslation();
@@ -68,6 +80,7 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
   const [display, setDisplay] = React.useState<NowPlayingDisplay | null>(null);
   const [isActivelyPlaying, setIsActivelyPlaying] = React.useState(false);
   const [hasSubscriptions, setHasSubscriptions] = React.useState(false);
+  const [progressPct, setProgressPct] = React.useState(0);
 
   useEffect(() => {
     function loadSubs() {
@@ -88,7 +101,9 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
 
   // Hydrate display from persisted podcast data only
   const hydrateDisplay = React.useCallback(() => {
-    setDisplay(loadPodcastDisplay());
+    const d = loadPodcastDisplay();
+    setDisplay(d);
+    setProgressPct(loadProgressPct(d?.episode?.id));
   }, []);
 
   useEffect(() => {
@@ -118,10 +133,17 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
     function handleLastPlayedChanged() { hydrateDisplay(); }
     window.addEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
 
+    function handleProgressChanged() {
+      const d = loadPodcastDisplay();
+      setProgressPct(loadProgressPct(d?.episode?.id));
+    }
+    window.addEventListener('podcast-progress-changed', handleProgressChanged);
+
     return () => {
       unsubPlay();
       unsubClose();
       window.removeEventListener(WindowEvents.LAST_PLAYED_CHANGED, handleLastPlayedChanged);
+      window.removeEventListener('podcast-progress-changed', handleProgressChanged);
     };
   }, [hydrateDisplay]);
 
@@ -193,6 +215,11 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
               {t('widgets.continueListening')}
             </button>
           </div>
+          {progressPct > 0 && (
+            <div className="mt-2 h-1.5 bg-purple-100 dark:bg-purple-900/40 rounded-full overflow-hidden">
+              <div className="h-full bg-purple-500 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
+            </div>
+          )}
         </div>
       ) : hasSubscriptions ? (
         <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.nothingPlaying')}</p>
