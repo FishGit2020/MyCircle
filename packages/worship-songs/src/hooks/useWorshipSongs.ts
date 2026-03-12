@@ -39,12 +39,12 @@ export function useWorshipSongs() {
     return () => { mounted = false; window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler); };
   }, []);
 
-  const offset = (page - 1) * PAGE_SIZE;
-
   const setSearch = useCallback((q: string) => {
     setSearchRaw(q);
     setPage(1); // reset to page 1 on search change
   }, []);
+
+  const offset = (page - 1) * PAGE_SIZE;
 
   const { data, loading, refetch } = useQuery(GET_WORSHIP_SONGS_LIST, {
     variables: { limit: PAGE_SIZE, offset, search: search.trim() || undefined },
