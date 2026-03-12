@@ -27,6 +27,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/polls': () => import('pollSystem/PollSystem'),
   '/radio': () => import('radioStation/RadioStation'),
   '/interview': () => import('aiInterviewer/AiInterviewer'),
+  '/transit': () => import('transitTracker/TransitTracker'),
 };
 
 export { ROUTE_MODULE_MAP };
@@ -46,6 +47,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/stocks',  labelKey: 'nav.stocks',        icon: 'stocks' },
     { path: '/podcasts', labelKey: 'nav.podcasts',     icon: 'podcasts' },
     { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
+    { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' },
   ]},
   { labelKey: 'nav.group.faith', items: [
     { path: '/bible',   labelKey: 'nav.bible',   icon: 'bible' },
@@ -101,4 +103,5 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' },
   { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
   { path: '/interview', labelKey: 'nav.interview' as any, icon: 'interview' },
+  { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' },
 ];

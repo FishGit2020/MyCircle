@@ -84,6 +84,7 @@ export const WindowEvents = {
   POLL_SYSTEM_CHANGED: 'poll-system-changed',
   RADIO_CHANGED: 'radio-changed',
   TRASH_CHANGED: 'trash-changed',
+  TRANSIT_CHANGED: 'transit-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -150,6 +151,7 @@ export const StorageKeys = {
   CHILDREN_CACHE: 'children-cache',
   SELECTED_CHILD_ID: 'selected-child-id',
   RADIO_FAVORITES: 'radio-favorites',
+  TRANSIT_RECENT_STOPS: 'transit-recent-stops',
 } as const;
 
 export interface CitySelectedEvent {

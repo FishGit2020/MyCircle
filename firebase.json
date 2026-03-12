@@ -47,6 +47,10 @@
         "function": "interviewSessions"
       },
       {
+        "source": "/transit-api/**",
+        "function": "transitProxy"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

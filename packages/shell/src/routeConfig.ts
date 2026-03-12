@@ -25,5 +25,6 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   polls: 'nav.pollSystem',
   radio: 'nav.radio',
   interview: 'nav.interview',
+  transit: 'nav.transit',
   trash: 'nav.recycleBin',
 };

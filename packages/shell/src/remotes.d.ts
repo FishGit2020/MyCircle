@@ -125,3 +125,8 @@ declare module 'aiInterviewer/AiInterviewer' {
   const AiInterviewer: React.ComponentType;
   export default AiInterviewer;
 }
+
+declare module 'transitTracker/TransitTracker' {
+  const TransitTracker: React.ComponentType;
+  export default TransitTracker;
+}

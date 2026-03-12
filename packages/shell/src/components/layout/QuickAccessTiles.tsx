@@ -39,6 +39,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/polls', labelKey: 'nav.pollSystem' as any, color: 'bg-violet-50 text-violet-500', darkColor: 'dark:bg-violet-900/20 dark:text-violet-400', widgetId: 'pollSystem', iconKey: 'poll-system' },
   { path: '/radio', labelKey: 'nav.radio', color: 'bg-amber-50 text-amber-500', darkColor: 'dark:bg-amber-900/20 dark:text-amber-400', widgetId: 'radioStation', iconKey: 'radio' },
   { path: '/interview', labelKey: 'nav.interview', color: 'bg-indigo-50 text-indigo-500', darkColor: 'dark:bg-indigo-900/20 dark:text-indigo-400', widgetId: 'aiInterviewer', iconKey: 'interview' },
+  { path: '/transit', labelKey: 'nav.transit' as any, color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'transitTracker', iconKey: 'transit' },
 ];
 
 function QuickAccessTile({ item }: { item: QuickAccessItem }) {
