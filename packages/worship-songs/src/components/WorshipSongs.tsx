@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router';
 import { useTranslation, PageContent } from '@mycircle/shared';
 import { useWorshipSongs } from '../hooks/useWorshipSongs';
 import type { WorshipSong } from '../types';
@@ -15,7 +15,23 @@ export default function WorshipSongs() {
   const { songId } = useParams<{ songId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { songs, totalCount, totalPages, page, allArtists, allTags, loading, isAuthenticated, search, setSearch, addSong, updateSong, deleteSong, getSong, goToPage } = useWorshipSongs();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q') ?? '';
+  const { songs, totalCount, totalPages, page, allArtists, allTags, loading, isAuthenticated, search, setSearch: setSearchRaw, addSong, updateSong, deleteSong, getSong, goToPage } = useWorshipSongs(initialQuery);
+
+  // Sync search state to URL ?q= param
+  const setSearch = useCallback((query: string) => {
+    setSearchRaw(query);
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (query.trim()) {
+        next.set('q', query);
+      } else {
+        next.delete('q');
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchRaw, setSearchParams]);
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [songLoading, setSongLoading] = useState(false);

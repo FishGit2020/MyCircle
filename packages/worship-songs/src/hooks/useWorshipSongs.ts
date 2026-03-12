@@ -17,10 +17,10 @@ const logger = createLogger('useWorshipSongs');
 
 export const PAGE_SIZE = 24;
 
-export function useWorshipSongs() {
+export function useWorshipSongs(initialSearch = '') {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState(1);
-  const [search, setSearchRaw] = useState('');
+  const [search, setSearchRaw] = useState(initialSearch);
 
   // Track auth state via Firebase token
   useEffect(() => {
