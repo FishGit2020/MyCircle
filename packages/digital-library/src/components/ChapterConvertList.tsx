@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { AudioSource } from '@mycircle/shared';
 
@@ -19,11 +19,14 @@ interface Props {
   chapters: Chapter[];
   voiceName: string;
   onChapterConverted: () => void;
+  autoPlay?: boolean;
+  initialChapter?: number;
 }
 
-export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted }: Props) {
+export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted, autoPlay, initialChapter }: Props) {
   const { t } = useTranslation();
   const [converting, setConverting] = useState<number | null>(null);
+  const autoPlayedRef = useRef(false);
 
   const audioChapters = chapters.filter(ch => ch.audioUrl);
 
@@ -56,6 +59,37 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
     eventBus.publish(MFEvents.AUDIO_PLAY, source);
   }, [chapters, bookId, bookTitle, coverUrl, t]);
+
+  // Auto-play on mount when navigated from widget "Continue listening" button
+  useEffect(() => {
+    if (!autoPlay || autoPlayedRef.current || audioChapters.length === 0) return;
+    autoPlayedRef.current = true;
+
+    // Determine target chapter: URL param > localStorage saved chapter > first chapter
+    let targetChapterIndex = initialChapter;
+    if (targetChapterIndex == null) {
+      try {
+        const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
+        if (raw) {
+          const progress = JSON.parse(raw);
+          const saved = progress[bookId];
+          if (saved?.chapter != null) targetChapterIndex = saved.chapter;
+        }
+      } catch { /* ignore */ }
+    }
+
+    // Find the chapter's original index in the full chapter list
+    const targetOrigIndex = targetChapterIndex != null
+      ? audioChapters[targetChapterIndex]?.index
+      : audioChapters[0]?.index;
+
+    if (targetOrigIndex != null) {
+      // Defer slightly so GlobalAudioPlayer has time to initialize
+      const id = setTimeout(() => handlePlay(targetOrigIndex), 150);
+      return () => clearTimeout(id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioChapters.length]); // mount + when chapters load
 
   const handleConvert = useCallback(async (chapterIndex: number) => {
     setConverting(chapterIndex);

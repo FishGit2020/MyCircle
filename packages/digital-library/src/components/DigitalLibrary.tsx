@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK } from '@mycircle/shared';
 import BookReader from './BookReader';
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate, useSearchParams } from 'react-router';
 
 const logger = createLogger('DigitalLibrary');
 
@@ -231,6 +231,7 @@ export default function DigitalLibrary() {
   const { t } = useTranslation();
   const { bookId: urlBookId } = useParams<{ bookId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const pendingBookIdRef = useRef<string | undefined>(urlBookId);
@@ -270,7 +271,21 @@ export default function DigitalLibrary() {
     }
     setSelectedBook(book);
     window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: book.title }));
-    const url = tab ? `/library/${book.id}?tab=${tab}${tab === 'listen' ? '&autoPlay=1' : ''}` : `/library/${book.id}`;
+    // Preserve chapter + autoPlay params from original URL when auto-selecting from widget nav
+    const currentParams = new URLSearchParams(window.location.search);
+    const chapterParam = currentParams.get('chapter');
+    const autoPlayParam = currentParams.get('autoPlay');
+    let url: string;
+    if (tab) {
+      const params = new URLSearchParams({ tab });
+      if (tab === 'listen') {
+        params.set('autoPlay', autoPlayParam || '1');
+        if (chapterParam) params.set('chapter', chapterParam);
+      }
+      url = `/library/${book.id}?${params.toString()}`;
+    } else {
+      url = `/library/${book.id}`;
+    }
     navigate(url, { replace: true });
   }, [navigate, fetchChapters]);
 
@@ -291,9 +306,10 @@ export default function DigitalLibrary() {
     const book = books.find(b => b.id === targetId);
     if (book) {
       pendingBookIdRef.current = undefined;
-      handleSelect(book);
+      const tab = searchParams.get('tab') === 'listen' ? 'listen' as const : undefined;
+      handleSelect(book, tab);
     }
-  }, [books, selectedBook, handleSelect]);
+  }, [books, selectedBook, handleSelect, searchParams]);
 
   // Listen for breadcrumb "Library" click to navigate back to book list
   useEffect(() => {
