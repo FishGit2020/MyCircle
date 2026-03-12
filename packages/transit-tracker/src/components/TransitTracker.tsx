@@ -171,7 +171,7 @@ const TransitTracker: React.FC = () => {
 
           {/* Arrivals list */}
           {!loading || arrivals.length > 0 ? (
-            <ArrivalsList arrivals={arrivals} lastUpdated={lastUpdated} loading={loading} onRefresh={refresh} />
+            <ArrivalsList arrivals={arrivals} lastUpdated={lastUpdated} />
           ) : null}
         </div>
       ) : (
