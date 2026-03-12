@@ -64,24 +64,28 @@ export default function TripPlanner() {
 
   if (view === 'new') {
     return (
-      <TripForm
-        trip={selectedTrip}
-        onSave={handleSave}
-        onCancel={handleBack}
-      />
+      <PageContent>
+        <TripForm
+          trip={selectedTrip}
+          onSave={handleSave}
+          onCancel={handleBack}
+        />
+      </PageContent>
     );
   }
 
   if (view === 'detail' && selectedTrip) {
     const currentTrip = trips.find(tr => tr.id === selectedTrip.id) || selectedTrip;
     return (
-      <TripDetail
-        trip={currentTrip}
-        onEdit={() => handleEdit(currentTrip)}
-        onDelete={() => handleDelete(currentTrip.id)}
-        onBack={handleBack}
-        onUpdate={updateTrip}
-      />
+      <PageContent>
+        <TripDetail
+          trip={currentTrip}
+          onEdit={() => handleEdit(currentTrip)}
+          onDelete={() => handleDelete(currentTrip.id)}
+          onBack={handleBack}
+          onUpdate={updateTrip}
+        />
+      </PageContent>
     );
   }
 

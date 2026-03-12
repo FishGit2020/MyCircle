@@ -32,7 +32,7 @@ export default function TripForm({ trip, onSave, onCancel }: TripFormProps) {
   }, [destination, startDate, endDate, notes, budget, currency, trip, onSave]);
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
+    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">
           {trip ? t('tripPlanner.editTrip') : t('tripPlanner.newTrip')}

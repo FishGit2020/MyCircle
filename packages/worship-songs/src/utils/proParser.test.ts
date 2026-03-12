@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { stripRtf, decodeRtfBase64, parseProFile } from './proParser';
+import { stripRtf, decodeRtfBase64, parseProFile, extractEmbeddedRtf } from './proParser';
 
 describe('stripRtf', () => {
   it('returns empty string for empty input', () => {
@@ -41,6 +41,12 @@ describe('stripRtf', () => {
   it('strips destination groups', () => {
     const rtf = String.raw`{\rtf1\ansi{\*\generator Riched20;} Hello}`;
     expect(stripRtf(rtf)).toBe('Hello');
+  });
+
+  it('handles backslash-newline as line break (Pro7 RTF)', () => {
+    const rtf = '{\\rtf1\\ansi\\f0\\fs84 \\cf2 Grace upon grace\\\nMorning by morning}';
+    const result = stripRtf(rtf);
+    expect(result).toMatch(/Grace upon grace\nMorning by morning/);
   });
 });
 
@@ -154,5 +160,58 @@ describe('parseProFile', () => {
   it('handles null/undefined xml gracefully', () => {
     expect(parseProFile(null as unknown as string).title).toBe('Untitled');
     expect(parseProFile(undefined as unknown as string).title).toBe('Untitled');
+  });
+
+  it('extracts lyrics from Pro7 binary with embedded RTF (Strategy 4)', () => {
+    // Simulate Pro7 protobuf binary with raw RTF strings embedded
+    const binary = [
+      '\x00\x01\x02 some binary data ',
+      String.raw`{\rtf1\ansi\ansicpg1252{\fonttbl\f0\fnil ITCAvantGardePro-Md;}` +
+        String.raw`{\colortbl;\red255\green255\blue255;}` +
+        String.raw`\f0\fs84 \cf2 Grace upon grace}`,
+      ' \x00\x03 more binary ',
+      String.raw`{\rtf1\ansi\ansicpg1252{\fonttbl\f0\fnil ITCAvantGardePro-Md;}` +
+        String.raw`{\colortbl;\red255\green255\blue255;}` +
+        String.raw`\f0\fs84 \cf2 Morning by morning}`,
+    ].join('');
+
+    const result = parseProFile(binary, 'On Repeat.pro');
+    expect(result.title).toBe('On Repeat');
+    expect(result.content).toContain('Grace upon grace');
+    expect(result.content).toContain('Morning by morning');
+  });
+
+  it('deduplicates slides from Pro7 embedded RTF', () => {
+    const rtfBlock = String.raw`{\rtf1\ansi\f0\fs84 Same verse}`;
+    const binary = `\x00${rtfBlock}\x00${rtfBlock}\x00`;
+
+    const result = parseProFile(binary, 'Test.pro');
+    expect(result.content).toBe('Same verse');
+  });
+});
+
+describe('extractEmbeddedRtf', () => {
+  it('extracts RTF blocks from binary data', () => {
+    const data = [
+      '\x00binary\x00',
+      String.raw`{\rtf1\ansi Hello World}`,
+      '\x00more\x00',
+      String.raw`{\rtf1\ansi Second Slide}`,
+    ].join('');
+
+    const results = extractEmbeddedRtf(data);
+    expect(results).toEqual(['Hello World', 'Second Slide']);
+  });
+
+  it('returns empty array when no RTF found', () => {
+    expect(extractEmbeddedRtf('no rtf here')).toEqual([]);
+    expect(extractEmbeddedRtf('')).toEqual([]);
+  });
+
+  it('handles nested braces in RTF', () => {
+    const rtf = String.raw`{\rtf1\ansi{\fonttbl\f0\fswiss Arial;} Hello}`;
+    const data = `\x00${rtf}\x00`;
+    const results = extractEmbeddedRtf(data);
+    expect(results).toEqual(['Hello']);
   });
 });

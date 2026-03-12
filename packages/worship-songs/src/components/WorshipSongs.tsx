@@ -98,29 +98,35 @@ export default function WorshipSongs() {
   switch (view) {
     case 'view':
       return selectedSong ? (
-        <SongViewer
-          song={selectedSong}
-          isAuthenticated={isAuthenticated}
-          onEdit={handleEdit}
-        />
+        <PageContent>
+          <SongViewer
+            song={selectedSong}
+            isAuthenticated={isAuthenticated}
+            onEdit={handleEdit}
+          />
+        </PageContent>
       ) : null;
 
     case 'new':
       return (
-        <SongEditor
-          onSave={handleSaveNew}
-          onCancel={handleBack}
-        />
+        <PageContent>
+          <SongEditor
+            onSave={handleSaveNew}
+            onCancel={handleBack}
+          />
+        </PageContent>
       );
 
     case 'edit':
       return selectedSong ? (
-        <SongEditor
-          song={selectedSong}
-          onSave={handleSaveEdit}
-          onDelete={handleDelete}
-          onCancel={() => navigate(`/worship/${selectedSong.id}`)}
-        />
+        <PageContent>
+          <SongEditor
+            song={selectedSong}
+            onSave={handleSaveEdit}
+            onDelete={handleDelete}
+            onCancel={() => navigate(`/worship/${selectedSong.id}`)}
+          />
+        </PageContent>
       ) : null;
 
     default:
