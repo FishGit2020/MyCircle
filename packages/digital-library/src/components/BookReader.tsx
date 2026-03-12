@@ -635,6 +635,8 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             bookTitle={title}
             coverUrl={coverUrl}
             chapters={chapters}
+            autoPlay={autoPlayOnMount}
+            initialChapter={searchParams.get('chapter') != null ? Number(searchParams.get('chapter')) : undefined}
             voiceName={(() => {
               const lc = (language || 'en').startsWith('zh') ? 'cmn-CN' : (language || 'en').startsWith('es') ? 'es-US' : 'en-US';
               return `${lc}-Neural2-${lc === 'en-US' ? 'D' : 'A'}`;

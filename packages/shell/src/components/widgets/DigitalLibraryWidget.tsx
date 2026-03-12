@@ -16,6 +16,7 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
   const [audioProgress, setAudioProgress] = React.useState<{
     position: number;
     duration: number;
+    chapter?: number;
   } | null>(null);
 
   useEffect(() => {
@@ -39,7 +40,15 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
       } catch { /* ignore */ }
       try {
         const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
-        if (raw) setAudioProgress(JSON.parse(raw));
+        if (raw) {
+          const all = JSON.parse(raw);
+          // BOOK_AUDIO_PROGRESS is Record<bookId, { position, duration, chapter }>
+          const lastPlayedRaw = localStorage.getItem(StorageKeys.BOOK_LAST_PLAYED);
+          const lp = lastPlayedRaw ? JSON.parse(lastPlayedRaw) : null;
+          const entry = lp?.bookId ? all[lp.bookId] : undefined;
+          if (entry) setAudioProgress(entry);
+          else setAudioProgress(null);
+        }
         else setAudioProgress(null);
       } catch { /* ignore */ }
     }
@@ -107,7 +116,8 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
                 e.preventDefault();
                 e.stopPropagation();
                 setIsNavigating(true);
-                navigate(`/library/${lastPlayed!.bookId}?tab=listen&autoPlay=1`);
+                const chapterParam = audioProgress?.chapter != null ? `&chapter=${audioProgress.chapter}` : '';
+                navigate(`/library/${lastPlayed!.bookId}?tab=listen&autoPlay=1${chapterParam}`);
               }}
               className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-indigo-500 dark:bg-indigo-600 rounded-full hover:bg-indigo-600 dark:hover:bg-indigo-500 transition active:scale-95 flex items-center gap-1.5"
               aria-label={t('widgets.continueListening')}
