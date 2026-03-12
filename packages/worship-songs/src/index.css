@@ -49,4 +49,21 @@
     white-space: pre-wrap !important;
     font-family: 'Courier New', Courier, monospace !important;
   }
+
+  /* Remove all scroll/overflow constraints so full content prints */
+  *,
+  main,
+  [data-print-show] {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex: none !important;
+    position: static !important;
+  }
+
+  /* Break pages between songs if needed */
+  [data-print-show] {
+    page-break-inside: auto;
+  }
 }
