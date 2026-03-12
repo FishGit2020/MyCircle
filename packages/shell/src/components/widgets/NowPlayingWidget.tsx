@@ -34,7 +34,9 @@ function loadPodcastDisplay(): NowPlayingDisplay | null {
           title: data.episode.title,
           subtitle: data.podcast?.title || '',
           artwork: data.episode.image || data.podcast?.artwork,
-          navigateTo: data.podcast ? `/podcasts/${data.podcast.id}` : '/podcasts',
+          navigateTo: data.podcast
+            ? `/podcasts/${data.podcast.id}?autoplay=true&episode=${data.episode.id}`
+            : '/podcasts',
           savedAt: 0, // now-playing has no savedAt; treat as older than last-played
           episode: data.episode,
           podcast: data.podcast,
@@ -50,7 +52,9 @@ function loadPodcastDisplay(): NowPlayingDisplay | null {
           title: data.episode.title,
           subtitle: data.podcast?.title || '',
           artwork: data.episode.image || data.podcast?.artwork,
-          navigateTo: data.podcast ? `/podcasts/${data.podcast.id}` : '/podcasts',
+          navigateTo: data.podcast
+            ? `/podcasts/${data.podcast.id}?autoplay=true&episode=${data.episode.id}`
+            : '/podcasts',
           savedAt: data.savedAt || 0,
           episode: data.episode as Episode,
           podcast: data.podcast as Podcast,
@@ -118,7 +122,9 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
           title: data.episode.title,
           subtitle: data.podcast?.title || '',
           artwork: data.episode.image || data.podcast?.artwork,
-          navigateTo: data.podcast ? `/podcasts/${data.podcast.id}` : '/podcasts',
+          navigateTo: data.podcast
+            ? `/podcasts/${data.podcast.id}?autoplay=true&episode=${data.episode.id}`
+            : '/podcasts',
           savedAt: Date.now(),
           episode: data.episode,
           podcast: data.podcast,
@@ -152,6 +158,8 @@ const NowPlayingWidget = React.memo(function NowPlayingWidget() {
     e.stopPropagation();
     if (!display) return;
 
+    // URL params (?autoplay=true&episode=...) are the primary autoplay mechanism.
+    // The MFE reads them on mount. Keep eventBus as fallback for when the MFE is already mounted.
     navigate(display.navigateTo);
 
     if (display.episode && display.podcast) {
