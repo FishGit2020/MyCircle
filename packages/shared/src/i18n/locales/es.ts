@@ -2349,9 +2349,11 @@ const es: Record<TranslationKey, string> = {
   'bottomNav.transit': 'Transporte',
   'commandPalette.goToTransit': 'Ir a Transporte',
   'widgets.transit': 'Transporte',
-  'widgets.transitDesc': 'Seguimiento de llegadas de autob\u00fas en tiempo real',
+  'widgets.transitDesc': 'Llegadas y paradas favoritas',
   'widgets.transitRecentCount': '{count} paradas recientes',
   'widgets.transitNoRecent': 'Sin paradas recientes',
+  'widgets.transitFavoriteCount': '{count} paradas favoritas',
+  'widgets.transitNoFavorites': 'Sin paradas favoritas a\u00fan',
   'transit.title': 'Seguimiento de Transporte',
   'transit.subtitle': 'Tiempos de llegada de autob\u00fas en tiempo real',
   'transit.search': 'Buscar',
@@ -2370,6 +2372,10 @@ const es: Record<TranslationKey, string> = {
   'transit.refresh': 'Actualizar',
   'transit.stop': 'Parada',
   'transit.loading': 'Cargando llegadas...',
+  'transit.favorite': 'Agregar a favoritos',
+  'transit.unfavorite': 'Eliminar de favoritos',
+  'transit.favorites': 'Paradas Favoritas',
+  'transit.noFavorites': 'Sin paradas favoritas a\u00fan',
 
   // ─── Recycle Bin ────────────────────────────────────────────
   'nav.recycleBin': 'Papelera de reciclaje',

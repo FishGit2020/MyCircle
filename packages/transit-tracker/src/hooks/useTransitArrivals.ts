@@ -1,7 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { ArrivalDeparture, TransitStop } from '../types';
-
-const POLL_INTERVAL = 30_000; // 30 seconds
 
 interface UseTransitArrivalsResult {
   arrivals: ArrivalDeparture[];
@@ -25,7 +23,6 @@ export function useTransitArrivals(stopId: string | null): UseTransitArrivalsRes
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchArrivals = useCallback(async () => {
     if (!stopId) return;
@@ -74,11 +71,6 @@ export function useTransitArrivals(stopId: string | null): UseTransitArrivalsRes
     }
 
     fetchArrivals();
-
-    intervalRef.current = setInterval(fetchArrivals, POLL_INTERVAL);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
   }, [stopId, fetchArrivals]);
 
   return { arrivals, stop, loading, error, refresh, lastUpdated };

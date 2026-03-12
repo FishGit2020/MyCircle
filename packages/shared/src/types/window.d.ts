@@ -161,6 +161,14 @@ declare global {
       delete: (sessionId: string) => Promise<{ ok: boolean }>;
     };
 
+    /* ── Transit Favorites ────────────────────────────────── */
+    __transitFavorites?: {
+      getAll: () => Promise<Array<{ stopId: string; stopName: string; direction: string; routes: string[]; addedAt: number }>>;
+      add: (stop: { stopId: string; stopName: string; direction: string; routes: string[] }) => Promise<void>;
+      remove: (stopId: string) => Promise<void>;
+      subscribe: (callback: (favorites: Array<{ stopId: string; stopName: string; direction: string; routes: string[]; addedAt: number }>) => void) => () => void;
+    };
+
     /* ── Trash / Recycle Bin ───────────────────────────────── */
     __trash?: {
       getAll: () => Promise<Record<string, Array<{ id: string; type: string; name: string; deletedAt: number | null; collectionPath: string }>>>;

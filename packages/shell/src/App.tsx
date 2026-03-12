@@ -136,6 +136,7 @@ export default function App() {
         <Route path="radio" element={<MFEPageWrapper component={RadioStationMF} name="Radio Station" />} />
         <Route path="interview" element={<RequireAuth><MFEPageWrapper component={AiInterviewerMF} name="AI Interviewer" /></RequireAuth>} />
         <Route path="transit" element={<MFEPageWrapper component={TransitTrackerMF} name="Transit Tracker" />} />
+        <Route path="transit/:stopId" element={<MFEPageWrapper component={TransitTrackerMF} name="Transit Tracker" />} />
         <Route path="trash" element={<RequireAuth><RecycleBinPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />

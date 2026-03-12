@@ -4,6 +4,8 @@ import type { ArrivalDeparture } from '../types';
 interface ArrivalsListProps {
   arrivals: ArrivalDeparture[];
   lastUpdated: number | null;
+  loading?: boolean;
+  onRefresh?: () => void;
 }
 
 function formatMinutes(ms: number): string {
@@ -20,7 +22,7 @@ function getStatusColor(predicted: boolean, minutesAway: number): string {
   return 'text-teal-600 dark:text-teal-400';
 }
 
-export default function ArrivalsList({ arrivals, lastUpdated }: ArrivalsListProps) {
+export default function ArrivalsList({ arrivals, lastUpdated, loading, onRefresh }: ArrivalsListProps) {
   const { t } = useTranslation();
   const now = Date.now();
 
@@ -35,9 +37,34 @@ export default function ArrivalsList({ arrivals, lastUpdated }: ArrivalsListProp
   return (
     <div>
       {lastUpdated && (
-        <p className="mb-3 text-xs text-gray-400 dark:text-gray-500">
-          {t('transit.lastUpdated')}: {new Date(lastUpdated).toLocaleTimeString()}
-        </p>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            {t('transit.lastUpdated')}: {new Date(lastUpdated).toLocaleTimeString()}
+          </p>
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={loading}
+              className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50 disabled:opacity-50 dark:text-teal-400 dark:hover:bg-teal-900/30"
+            >
+              <svg
+                className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              {t('transit.refresh')}
+            </button>
+          )}
+        </div>
       )}
       <ul className="space-y-2" role="list" aria-label={t('transit.arrivalsList')}>
         {arrivals.map((arrival, idx) => {
