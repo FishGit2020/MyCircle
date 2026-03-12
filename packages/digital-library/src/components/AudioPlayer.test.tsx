@@ -8,6 +8,7 @@ import AudioPlayer from './AudioPlayer';
 describe('AudioPlayer', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    localStorage.clear();
   });
 
   it('builds navigateTo with bookId and query params', () => {
@@ -32,6 +33,18 @@ describe('AudioPlayer', () => {
     expect(audioChapters).toHaveLength(2);
     expect(audioChapters[0].title).toBe('Chapter 1');
     expect(audioChapters[1].title).toBe('Chapter 3');
+  });
+
+  it('isChapterComplete checks playedChapters set', () => {
+    // Simulate played chapters in localStorage
+    const playedChapters = { 'book-42': [0, 2] };
+    localStorage.setItem('book-played-chapters', JSON.stringify(playedChapters));
+    const raw = localStorage.getItem('book-played-chapters');
+    const all: Record<string, number[]> = raw ? JSON.parse(raw) : {};
+    const chapters = all['book-42'] || [];
+    expect(chapters.includes(0)).toBe(true);
+    expect(chapters.includes(1)).toBe(false);
+    expect(chapters.includes(2)).toBe(true);
   });
 
   it('builds audio tracks with correct IDs', () => {

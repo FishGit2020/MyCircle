@@ -42,6 +42,7 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
   const [sleepRemaining, setSleepRemaining] = useState(0);
   const [showSleepMenu, setShowSleepMenu] = useState(false);
   const [bookProgress, setBookProgress] = useState<Record<string, BookProgress>>({});
+  const [playedChapters, setPlayedChapters] = useState<number[]>([]);
   const sleepMenuRef = useRef<HTMLDivElement>(null);
 
   const audioChapters = chapters.filter(ch => ch.audioUrl);
@@ -66,10 +67,22 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
     } catch { /* ignore */ }
   }, [bookId]);
 
+  // Load played chapters from localStorage
+  const loadPlayedChapters = useCallback(() => {
+    if (!bookId) return;
+    try {
+      const raw = localStorage.getItem(StorageKeys.BOOK_PLAYED_CHAPTERS);
+      if (!raw) { setPlayedChapters([]); return; }
+      const all: Record<string, number[]> = JSON.parse(raw);
+      setPlayedChapters(all[bookId] || []);
+    } catch { setPlayedChapters([]); }
+  }, [bookId]);
+
   // Restore saved chapter + position on mount
   useEffect(() => {
     if (!bookId) return;
     loadBookProgress();
+    loadPlayedChapters();
     try {
       const raw = localStorage.getItem(StorageKeys.BOOK_AUDIO_PROGRESS);
       if (!raw) return;
@@ -79,7 +92,7 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
         setCurrentChapter(saved.chapter);
       }
     } catch { /* ignore */ }
-  }, [bookId, audioChapters.length, loadBookProgress]);
+  }, [bookId, audioChapters.length, loadBookProgress, loadPlayedChapters]);
 
   // Listen for progress updates to refresh chapter progress display
   useEffect(() => {
@@ -87,6 +100,13 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
     window.addEventListener('book-audio-progress-changed', handler);
     return () => window.removeEventListener('book-audio-progress-changed', handler);
   }, [loadBookProgress]);
+
+  // Listen for played-chapters updates
+  useEffect(() => {
+    const handler = () => loadPlayedChapters();
+    window.addEventListener(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED, handler);
+    return () => window.removeEventListener(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED, handler);
+  }, [loadPlayedChapters]);
 
   // Auto-play on mount when requested (e.g. from widget "Continue" button)
   const shouldAutoPlayRef = React.useRef(autoPlay);
@@ -213,11 +233,16 @@ export default function AudioPlayer({ chapters, bookTitle, bookId, coverUrl, aut
   // Get the saved progress for this book (single entry: chapter + position + duration)
   const savedProgress = bookId ? bookProgress[bookId] : undefined;
 
-  // Check if the saved chapter matches and is complete (position near end)
+  // Check if a chapter has been played to completion
   const isChapterComplete = useCallback((chapterIdx: number): boolean => {
-    if (!savedProgress || savedProgress.chapter !== chapterIdx) return false;
-    return savedProgress.duration > 0 && savedProgress.position >= savedProgress.duration - 5;
-  }, [savedProgress]);
+    // First check the persisted played-chapters set (survives across sessions)
+    if (playedChapters.includes(chapterIdx)) return true;
+    // Fallback: check if current progress shows the chapter near the end
+    if (savedProgress && savedProgress.chapter === chapterIdx) {
+      return savedProgress.duration > 0 && savedProgress.position >= savedProgress.duration - 5;
+    }
+    return false;
+  }, [playedChapters, savedProgress]);
 
   // Get chapter progress as fraction (0-1), only for the chapter that has saved progress
   const getChapterProgressFraction = useCallback((chapterIdx: number): number => {

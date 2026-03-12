@@ -15,7 +15,7 @@ export default function WorshipSongs() {
   const { songId } = useParams<{ songId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { songs, totalCount, totalPages, page, allArtists, allTags, loading, isAuthenticated, addSong, updateSong, deleteSong, getSong, goToPage } = useWorshipSongs();
+  const { songs, totalCount, totalPages, page, allArtists, allTags, loading, isAuthenticated, search, setSearch, addSong, updateSong, deleteSong, getSong, goToPage } = useWorshipSongs();
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [songLoading, setSongLoading] = useState(false);
@@ -143,6 +143,8 @@ export default function WorshipSongs() {
             allTags={allTags}
             loading={loading}
             isAuthenticated={isAuthenticated}
+            search={search}
+            onSearchChange={setSearch}
             onSelectSong={handleSelectSong}
             onNewSong={handleNewSong}
             onPageChange={goToPage}

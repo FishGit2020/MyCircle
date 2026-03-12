@@ -11,6 +11,7 @@ import {
   updateWidgetLayout,
   updateBookBookmarks,
   updateBookAudioProgress,
+  updateBookPlayedChapters,
   updateBookLastPlayed,
 } from '../lib/firebase';
 
@@ -154,6 +155,21 @@ export function useFirestoreSync(user: User | null) {
     // Listen for storage changes from the audio player (custom event)
     window.addEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
     return () => window.removeEventListener('book-audio-progress-changed', handleBookAudioProgressChanged);
+  }, [user]);
+
+  // Auto-sync book played chapters from localStorage to Firestore
+  useEffect(() => {
+    function handleBookPlayedChaptersChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.BOOK_PLAYED_CHAPTERS);
+          const playedChapters = stored ? JSON.parse(stored) : null;
+          updateBookPlayedChapters(user.uid, playedChapters);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED, handleBookPlayedChaptersChanged);
+    return () => window.removeEventListener(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED, handleBookPlayedChaptersChanged);
   }, [user]);
 
   // Auto-sync book last-played from localStorage to Firestore

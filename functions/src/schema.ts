@@ -367,7 +367,7 @@ export const typeDefs = `#graphql
     benchmarkSummary: BenchmarkSummary!
 
     # Worship songs
-    worshipSongsList(limit: Int, offset: Int): WorshipSongsPage!
+    worshipSongsList(limit: Int, offset: Int, search: String): WorshipSongsPage!
     worshipSong(id: ID!): WorshipSong
 
     # Cloud Files (auth required)

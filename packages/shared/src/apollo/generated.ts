@@ -740,6 +740,7 @@ export type QueryWorshipSongArgs = {
 export type QueryWorshipSongsListArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ShareFileResult = {
@@ -1199,6 +1200,7 @@ export type WorshipSongListFieldsFragment = { __typename?: 'WorshipSongListItem'
 export type GetWorshipSongsListQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 

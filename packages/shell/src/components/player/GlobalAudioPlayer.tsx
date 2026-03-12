@@ -49,6 +49,24 @@ function saveSourceProgress(source: AudioSource, position: number, audioDuration
     localStorage.setItem(source.progressKey, JSON.stringify(progress));
     if (source.type === 'book') {
       window.dispatchEvent(new Event('book-audio-progress-changed'));
+      // Track chapter completion in played-chapters set
+      if (audioDuration > 0 && position >= audioDuration - 5) {
+        markChapterPlayed(source.collection.id, source.trackIndex);
+      }
+    }
+  } catch { /* */ }
+}
+
+/** Mark a chapter as played (completed) and persist to localStorage */
+function markChapterPlayed(bookId: string, chapterIndex: number) {
+  try {
+    const raw = localStorage.getItem(StorageKeys.BOOK_PLAYED_CHAPTERS);
+    const all: Record<string, number[]> = raw ? JSON.parse(raw) : {};
+    const chapters = all[bookId] || [];
+    if (!chapters.includes(chapterIndex)) {
+      all[bookId] = [...chapters, chapterIndex].sort((a, b) => a - b);
+      localStorage.setItem(StorageKeys.BOOK_PLAYED_CHAPTERS, JSON.stringify(all));
+      window.dispatchEvent(new Event(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED));
     }
   } catch { /* */ }
 }
