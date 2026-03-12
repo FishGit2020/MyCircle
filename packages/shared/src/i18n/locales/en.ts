@@ -2349,9 +2349,11 @@ const en = {
   'bottomNav.transit': 'Transit',
   'commandPalette.goToTransit': 'Go to Transit Tracker',
   'widgets.transit': 'Transit',
-  'widgets.transitDesc': 'Track real-time bus arrivals',
+  'widgets.transitDesc': 'Track arrivals & favorite stops',
   'widgets.transitRecentCount': '{count} recent stops',
   'widgets.transitNoRecent': 'No recent stops',
+  'widgets.transitFavoriteCount': '{count} favorite stops',
+  'widgets.transitNoFavorites': 'No favorite stops yet',
   'transit.title': 'Transit Tracker',
   'transit.subtitle': 'Real-time bus arrival times',
   'transit.search': 'Search',
@@ -2370,6 +2372,10 @@ const en = {
   'transit.refresh': 'Refresh',
   'transit.stop': 'Stop',
   'transit.loading': 'Loading arrivals...',
+  'transit.favorite': 'Add to favorites',
+  'transit.unfavorite': 'Remove from favorites',
+  'transit.favorites': 'Favorite Stops',
+  'transit.noFavorites': 'No favorite stops yet',
 
   // ─── Recycle Bin ────────────────────────────────────────────
   'nav.recycleBin': 'Recycle Bin',

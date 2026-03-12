@@ -1,25 +1,35 @@
 import React, { useEffect } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
+import { useNavigate } from 'react-router';
 
-const RECENT_STOPS_KEY = 'transit-recent-stops';
+interface FavoriteStop {
+  stopId: string;
+  stopName: string;
+  direction: string;
+}
 
 const TransitWidget = React.memo(function TransitWidget() {
   const { t } = useTranslation();
-  const [recentCount, setRecentCount] = React.useState(0);
+  const navigate = useNavigate();
+  const [favorites, setFavorites] = React.useState<FavoriteStop[]>([]);
 
   useEffect(() => {
     function load() {
       try {
-        const stored = localStorage.getItem(RECENT_STOPS_KEY);
+        const stored = localStorage.getItem(StorageKeys.TRANSIT_FAVORITES);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed)) setRecentCount(parsed.length);
+          if (Array.isArray(parsed)) setFavorites(parsed);
         } else {
-          setRecentCount(0);
+          setFavorites([]);
         }
       } catch { /* ignore */ }
     }
     load();
+
+    // Listen for changes
+    window.addEventListener(WindowEvents.TRANSIT_FAVORITES_CHANGED, load);
+    return () => window.removeEventListener(WindowEvents.TRANSIT_FAVORITES_CHANGED, load);
   }, []);
 
   return (
@@ -35,12 +45,30 @@ const TransitWidget = React.memo(function TransitWidget() {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.transitDesc')}</p>
         </div>
       </div>
-      {recentCount > 0 ? (
-        <p className="text-sm text-teal-600 dark:text-teal-400 font-medium">
-          {t('widgets.transitRecentCount' as any).replace('{count}', String(recentCount))}
-        </p>
+      {favorites.length > 0 ? (
+        <div>
+          <p className="text-sm text-teal-600 dark:text-teal-400 font-medium mb-2">
+            {t('widgets.transitFavoriteCount' as any).replace('{count}', String(favorites.length))}
+          </p>
+          <ul className="space-y-1">
+            {favorites.slice(0, 3).map((fav) => (
+              <li key={fav.stopId}>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/transit/${encodeURIComponent(fav.stopId)}`)}
+                  className="w-full rounded px-2 py-1 text-left text-xs transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <span className="font-medium text-gray-900 dark:text-white">{fav.stopName}</span>
+                  {fav.direction && (
+                    <span className="ml-1 text-gray-500 dark:text-gray-400">{fav.direction}</span>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.transitNoRecent' as any)}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.transitNoFavorites' as any)}</p>
       )}
     </div>
   );

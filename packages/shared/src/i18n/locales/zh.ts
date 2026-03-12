@@ -2349,9 +2349,11 @@ const zh: Record<TranslationKey, string> = {
   'bottomNav.transit': '\u516c\u4ea4',
   'commandPalette.goToTransit': '\u524d\u5f80\u516c\u4ea4\u8ffd\u8e2a',
   'widgets.transit': '\u516c\u4ea4',
-  'widgets.transitDesc': '\u5b9e\u65f6\u516c\u4ea4\u5230\u7ad9\u65f6\u95f4',
+  'widgets.transitDesc': '\u5230\u7ad9\u65f6\u95f4\u4e0e\u6536\u85cf\u7ad9\u70b9',
   'widgets.transitRecentCount': '{count} \u4e2a\u6700\u8fd1\u7ad9\u70b9',
   'widgets.transitNoRecent': '\u6ca1\u6709\u6700\u8fd1\u7ad9\u70b9',
+  'widgets.transitFavoriteCount': '{count} \u4e2a\u6536\u85cf\u7ad9\u70b9',
+  'widgets.transitNoFavorites': '\u6682\u65e0\u6536\u85cf\u7ad9\u70b9',
   'transit.title': '\u516c\u4ea4\u8ffd\u8e2a',
   'transit.subtitle': '\u5b9e\u65f6\u516c\u4ea4\u5230\u7ad9\u65f6\u95f4',
   'transit.search': '\u641c\u7d22',
@@ -2370,6 +2372,10 @@ const zh: Record<TranslationKey, string> = {
   'transit.refresh': '\u5237\u65b0',
   'transit.stop': '\u7ad9\u70b9',
   'transit.loading': '\u6b63\u5728\u52a0\u8f7d\u5230\u7ad9\u4fe1\u606f...',
+  'transit.favorite': '\u6dfb\u52a0\u5230\u6536\u85cf',
+  'transit.unfavorite': '\u53d6\u6d88\u6536\u85cf',
+  'transit.favorites': '\u6536\u85cf\u7ad9\u70b9',
+  'transit.noFavorites': '\u6682\u65e0\u6536\u85cf\u7ad9\u70b9',
 
   // ─── Recycle Bin ────────────────────────────────────────────
   'nav.recycleBin': '\u56de\u6536\u7ad9',

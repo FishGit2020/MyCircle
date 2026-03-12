@@ -7,6 +7,7 @@ import {
   updateBibleBookmarks,
   updateWorshipFavorites,
   updateRadioFavorites,
+  updateTransitFavorites,
   updateChildData,
   updateWidgetLayout,
   updateBookBookmarks,
@@ -170,6 +171,21 @@ export function useFirestoreSync(user: User | null) {
     }
     window.addEventListener(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED, handleBookPlayedChaptersChanged);
     return () => window.removeEventListener(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED, handleBookPlayedChaptersChanged);
+  }, [user]);
+
+  // Auto-sync transit favorites from localStorage to Firestore
+  useEffect(() => {
+    function handleTransitFavoritesChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.TRANSIT_FAVORITES);
+          const favorites = stored ? JSON.parse(stored) : [];
+          updateTransitFavorites(user.uid, favorites);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener(WindowEvents.TRANSIT_FAVORITES_CHANGED, handleTransitFavoritesChanged);
+    return () => window.removeEventListener(WindowEvents.TRANSIT_FAVORITES_CHANGED, handleTransitFavoritesChanged);
   }, [user]);
 
   // Auto-sync book last-played from localStorage to Firestore

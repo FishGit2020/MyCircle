@@ -162,6 +162,7 @@ export interface UserProfile {
   bookPlayedChapters?: Record<string, number[]>;
   bookLastPlayed?: BookLastPlayedData;
   radioFavorites?: Array<{ stationuuid: string; name: string; url: string; favicon: string; country: string; language: string; codec: string; bitrate: number }>;
+  transitFavorites?: Array<{ stopId: string; stopName: string; direction: string; routes: string[]; addedAt: number }>;
   isAdmin?: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -1889,6 +1890,66 @@ if (firebaseEnabled) {
         await permanentlyDeleteItem(`users/${uid}/${config.subPath}`, id);
       }
       window.dispatchEvent(new Event(WindowEvents.TRASH_CHANGED));
+    },
+  };
+}
+
+// ─── Transit Favorites CRUD ──────────────────────────────────────────
+export async function updateTransitFavorites(uid: string, favorites: any[]) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    transitFavorites: favorites,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+async function getTransitFavorites(uid: string) {
+  if (!db) return [];
+  const userDoc_ = await getDoc(doc(db, 'users', uid));
+  if (!userDoc_.exists()) return [];
+  return userDoc_.data()?.transitFavorites || [];
+}
+
+async function addTransitFavorite(uid: string, stop: { stopId: string; stopName: string; direction: string; routes: string[] }) {
+  if (!db) throw new Error('Firebase not initialized');
+  const current = await getTransitFavorites(uid);
+  if (current.some((f: any) => f.stopId === stop.stopId)) return;
+  const next = [...current, { ...stop, addedAt: Date.now() }];
+  await updateTransitFavorites(uid, next);
+  window.dispatchEvent(new Event(WindowEvents.TRANSIT_FAVORITES_CHANGED));
+}
+
+async function removeTransitFavorite(uid: string, stopId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  const current = await getTransitFavorites(uid);
+  const next = current.filter((f: any) => f.stopId !== stopId);
+  await updateTransitFavorites(uid, next);
+  window.dispatchEvent(new Event(WindowEvents.TRANSIT_FAVORITES_CHANGED));
+}
+
+function subscribeToTransitFavorites(uid: string, callback: (favorites: any[]) => void) {
+  if (!db) return () => {};
+  return onSnapshot(doc(db, 'users', uid), (snapshot) => {
+    const data = snapshot.data();
+    callback(data?.transitFavorites || []);
+  }, (error) => { handleSnapshotError('Transit favorites', error); });
+}
+
+if (firebaseEnabled) {
+  window.__transitFavorites = {
+    getAll: () => auth?.currentUser ? getTransitFavorites(auth.currentUser.uid) : Promise.resolve([]),
+    add: (stop: { stopId: string; stopName: string; direction: string; routes: string[] }) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addTransitFavorite(auth.currentUser.uid, stop);
+    },
+    remove: (stopId: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return removeTransitFavorite(auth.currentUser.uid, stopId);
+    },
+    subscribe: (callback: (favorites: any[]) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToTransitFavorites(auth.currentUser.uid, callback);
     },
   };
 }

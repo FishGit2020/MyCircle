@@ -85,6 +85,7 @@ export const WindowEvents = {
   RADIO_CHANGED: 'radio-changed',
   TRASH_CHANGED: 'trash-changed',
   TRANSIT_CHANGED: 'transit-changed',
+  TRANSIT_FAVORITES_CHANGED: 'transit-favorites-changed',
 } as const;
 
 // Centralized localStorage keys to avoid typo-prone string literals
@@ -152,6 +153,7 @@ export const StorageKeys = {
   SELECTED_CHILD_ID: 'selected-child-id',
   RADIO_FAVORITES: 'radio-favorites',
   TRANSIT_RECENT_STOPS: 'transit-recent-stops',
+  TRANSIT_FAVORITES: 'transit-favorites',
 } as const;
 
 export interface CitySelectedEvent {

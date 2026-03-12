@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { NearbyStop } from '../types';
+import type { FavoriteStop } from '../hooks/useFavoriteStops';
 
 interface StopSearchProps {
   onSelectStop: (stopId: string) => void;
@@ -9,6 +10,8 @@ interface StopSearchProps {
   nearbyError: string | null;
   onFindNearby: () => void;
   recentStops: string[];
+  favorites: FavoriteStop[];
+  onToggleFavorite: (stop: { stopId: string; stopName: string; direction: string; routes: string[] }) => void;
 }
 
 export default function StopSearch({
@@ -18,6 +21,8 @@ export default function StopSearch({
   nearbyError,
   onFindNearby,
   recentStops,
+  favorites,
+  onToggleFavorite,
 }: StopSearchProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
@@ -83,11 +88,11 @@ export default function StopSearch({
           </h3>
           <ul className="space-y-1">
             {nearbyStops.map((stop) => (
-              <li key={stop.id}>
+              <li key={stop.id} className="flex items-center">
                 <button
                   type="button"
                   onClick={() => onSelectStop(stop.id)}
-                  className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="min-w-0 flex-1 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <span className="font-medium text-gray-900 dark:text-white">{stop.name}</span>
                   {stop.direction && (
@@ -98,6 +103,59 @@ export default function StopSearch({
                   <span className="ml-2 text-xs text-teal-600 dark:text-teal-400">
                     {Math.round(stop.distance)}m
                   </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleFavorite({ stopId: stop.id, stopName: stop.name, direction: stop.direction, routes: [] })}
+                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:text-yellow-500 dark:text-gray-500 dark:hover:text-yellow-400"
+                  aria-label={favorites.some((f) => f.stopId === stop.id) ? t('transit.unfavorite') : t('transit.favorite')}
+                >
+                  {favorites.some((f) => f.stopId === stop.id) ? (
+                    <svg className="h-4 w-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  ) : (
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Favorite stops */}
+      {favorites.length > 0 && (
+        <div>
+          <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t('transit.favorites')}
+          </h3>
+          <ul className="space-y-1">
+            {favorites.map((fav) => (
+              <li key={fav.stopId} className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => onSelectStop(fav.stopId)}
+                  className="min-w-0 flex-1 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <span className="font-medium text-gray-900 dark:text-white">{fav.stopName}</span>
+                  {fav.direction && (
+                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                      {fav.direction}
+                    </span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleFavorite({ stopId: fav.stopId, stopName: fav.stopName, direction: fav.direction, routes: fav.routes })}
+                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-yellow-500 transition-colors hover:text-yellow-600 dark:hover:text-yellow-400"
+                  aria-label={t('transit.unfavorite')}
+                >
+                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
                 </button>
               </li>
             ))}

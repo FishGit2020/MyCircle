@@ -2,11 +2,20 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TransitTracker from './TransitTracker';
 
+const mockNavigate = vi.fn();
+
+vi.mock('react-router', () => ({
+  useParams: () => ({}),
+  useNavigate: () => mockNavigate,
+}));
+
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
   PageContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  StorageKeys: { TRANSIT_FAVORITES: 'transit-favorites' },
+  WindowEvents: { TRANSIT_FAVORITES_CHANGED: 'transit-favorites-changed' },
   createLogger: () => ({
     info: vi.fn(),
     warn: vi.fn(),
@@ -38,6 +47,7 @@ vi.mock('../hooks/useNearbyStops', () => ({
 describe('TransitTracker', () => {
   beforeEach(() => {
     localStorage.clear();
+    mockNavigate.mockClear();
   });
 
   it('renders the title and search form', () => {
@@ -64,9 +74,11 @@ describe('TransitTracker', () => {
     fireEvent.submit(input.closest('form')!);
     // After selecting a stop, the back button should appear
     expect(screen.getByRole('button', { name: /transit\.back/i })).toBeInTheDocument();
+    // Should navigate to stop URL
+    expect(mockNavigate).toHaveBeenCalledWith('/transit/1_75403', { replace: true });
   });
 
-  it('shows recent stops after selecting one', () => {
+  it('shows recent stops after selecting one and going back', () => {
     render(<TransitTracker />);
     const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
     fireEvent.change(input, { target: { value: '1_75403' } });
@@ -77,5 +89,14 @@ describe('TransitTracker', () => {
 
     // Recent stops should show the ID
     expect(screen.getByText('1_75403')).toBeInTheDocument();
+  });
+
+  it('shows favorite toggle button when viewing a stop', () => {
+    render(<TransitTracker />);
+    const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
+    fireEvent.change(input, { target: { value: '1_75403' } });
+    fireEvent.submit(input.closest('form')!);
+    // Favorite button should be present
+    expect(screen.getByRole('button', { name: /transit\.favorite/i })).toBeInTheDocument();
   });
 });
