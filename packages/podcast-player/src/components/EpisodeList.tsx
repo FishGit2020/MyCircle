@@ -105,7 +105,9 @@ export default function EpisodeList({
       .replace('{episode}', episode.title)
       .replace('{podcast}', podcastName)
       .replace('{time}', formatDuration(episode.duration));
-    const appLink = podcast ? `${window.location.origin}/podcasts/${podcast.id}` : window.location.origin;
+    const appLink = podcast
+      ? `${window.location.origin}/podcasts/${podcast.id}?autoplay=true&episode=${encodeURIComponent(String(episode.id))}`
+      : window.location.origin;
 
     if (navigator.share) {
       try {
