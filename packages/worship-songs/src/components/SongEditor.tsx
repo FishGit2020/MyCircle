@@ -103,7 +103,7 @@ export default function SongEditor({ song, onSave, onDelete, onCancel }: SongEdi
       if (result.artist) setArtist(result.artist);
       if (result.content) {
         setContent(result.content);
-        setFormat('text');
+        setFormat('chordpro');
       }
     } catch (err) {
       logger.error('Failed to parse .pro file:', err);
