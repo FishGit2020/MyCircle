@@ -188,6 +188,10 @@ const aiInterviewerRemote = isProduction
   ? '/ai-interviewer/assets/remoteEntry.js'
   : 'http://localhost:3027/assets/remoteEntry.js';
 
+const transitTrackerRemote = isProduction
+  ? '/transit-tracker/assets/remoteEntry.js'
+  : 'http://localhost:3028/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -218,7 +222,8 @@ export default defineConfig({
         tripPlanner: tripPlannerRemote,
         pollSystem: pollSystemRemote,
         radioStation: radioStationRemote,
-        aiInterviewer: aiInterviewerRemote
+        aiInterviewer: aiInterviewerRemote,
+        transitTracker: transitTrackerRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
@@ -290,6 +295,7 @@ export default defineConfig({
           /^\/cloud-files\//,
           /^\/digital-library-api\//,
           /^\/api\//,
+          /^\/transit-api\//,
           /^\/__\//,
         ],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],

@@ -41,6 +41,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/polls': 'commandPalette.goToPollSystem',
   '/radio': 'commandPalette.goToRadio',
   '/interview': 'commandPalette.goToInterview',
+  '/transit': 'commandPalette.goToTransit',
 };
 
 const clockIcon = (
@@ -219,6 +220,11 @@ export default function CommandPalette({ recentPages = [] }: Props) {
       id: 'nav-interview', label: t('commandPalette.goToInterview' as any), description: '/interview',
       icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>,
       action: () => { navigate('/interview'); setOpen(false); }, category: 'navigation',
+    },
+    {
+      id: 'nav-transit', label: t('commandPalette.goToTransit' as any), description: '/transit',
+      icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>,
+      action: () => { navigate('/transit'); setOpen(false); }, category: 'navigation',
     },
   ];
 

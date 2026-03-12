@@ -40,6 +40,7 @@ const TripPlannerMF = tracedLazy('mfe_trip_planner_load', () => import('tripPlan
 const PollSystemMF = tracedLazy('mfe_poll_system_load', () => import('pollSystem/PollSystem'), getPerf);
 const RadioStationMF = tracedLazy('mfe_radio_station_load', () => import('radioStation/RadioStation'), getPerf);
 const AiInterviewerMF = tracedLazy('mfe_ai_interviewer_load', () => import('aiInterviewer/AiInterviewer'), getPerf);
+const TransitTrackerMF = tracedLazy('mfe_transit_tracker_load', () => import('transitTracker/TransitTracker'), getPerf);
 
 // Weather page with full weather display (special case: has FavoriteButton/ShareButton)
 function WeatherPage() {
@@ -134,6 +135,7 @@ export default function App() {
         <Route path="polls" element={<RequireAuth><MFEPageWrapper component={PollSystemMF} name="Poll System" /></RequireAuth>} />
         <Route path="radio" element={<MFEPageWrapper component={RadioStationMF} name="Radio Station" />} />
         <Route path="interview" element={<RequireAuth><MFEPageWrapper component={AiInterviewerMF} name="AI Interviewer" /></RequireAuth>} />
+        <Route path="transit" element={<MFEPageWrapper component={TransitTrackerMF} name="Transit Tracker" />} />
         <Route path="trash" element={<RequireAuth><RecycleBinPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />

@@ -10,6 +10,7 @@ export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';
 
 export { interviewSessions } from './handlers/interviewSessions.js';
+export { transitProxy } from './handlers/transitProxy.js';
 
 // Re-export shared utilities that were previously exported from index.ts
 export { uploadToStorage, getStorageDownloadUrl } from './handlers/shared.js';
