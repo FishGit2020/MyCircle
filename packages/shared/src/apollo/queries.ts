@@ -654,8 +654,8 @@ const WORSHIP_SONG_LIST_FIELDS = gql`
 
 export const GET_WORSHIP_SONGS_LIST = gql`
   ${WORSHIP_SONG_LIST_FIELDS}
-  query GetWorshipSongsList($limit: Int, $offset: Int) {
-    worshipSongsList(limit: $limit, offset: $offset) {
+  query GetWorshipSongsList($limit: Int, $offset: Int, $search: String) {
+    worshipSongsList(limit: $limit, offset: $offset, search: $search) {
       songs {
         ...WorshipSongListFields
       }

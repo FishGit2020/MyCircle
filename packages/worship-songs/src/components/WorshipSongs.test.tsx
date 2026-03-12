@@ -48,6 +48,8 @@ vi.mock('../hooks/useWorshipSongs', () => ({
     allTags: [],
     loading: false,
     isAuthenticated: true,
+    search: '',
+    setSearch: vi.fn(),
     addSong: mockAddSong,
     updateSong: mockUpdateSong,
     deleteSong: mockDeleteSong,

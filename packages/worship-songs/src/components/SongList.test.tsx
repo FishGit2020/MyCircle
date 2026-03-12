@@ -43,6 +43,8 @@ const defaultProps = {
   allTags: ['classic', 'hymn', 'worship'],
   loading: false,
   isAuthenticated: true,
+  search: '',
+  onSearchChange: vi.fn(),
   onSelectSong: vi.fn(),
   onNewSong: vi.fn(),
   onPageChange: vi.fn(),
@@ -80,40 +82,24 @@ describe('SongList', () => {
     expect(screen.getByText('worship.noSongs')).toBeInTheDocument();
   });
 
-  it('shows no-results state when search finds nothing', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<SongList {...defaultProps} />);
-    const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'zzzznonexistent');
+  it('shows no-results state when server returns empty songs for search', () => {
+    render(<SongList {...defaultProps} songs={[]} search="zzzznonexistent" />);
     expect(screen.getByText('worship.noResults')).toBeInTheDocument();
   });
 
-  it('filters songs by search query on title', async () => {
+  it('calls onSearchChange when typing in search input', async () => {
     const user = userEvent.setup({ delay: null });
-    render(<SongList {...defaultProps} />);
+    const onSearchChange = vi.fn();
+    render(<SongList {...defaultProps} onSearchChange={onSearchChange} />);
     const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'Amazing');
-    expect(screen.getByText('Amazing Grace')).toBeInTheDocument();
-    expect(screen.queryByText('How Great Thou Art')).not.toBeInTheDocument();
-    expect(screen.queryByText('10000 Reasons')).not.toBeInTheDocument();
+    await user.type(input, 'A');
+    expect(onSearchChange).toHaveBeenCalled();
   });
 
-  it('filters songs by search query on artist', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<SongList {...defaultProps} />);
-    const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'Matt');
-    expect(screen.getByText('10000 Reasons')).toBeInTheDocument();
-    expect(screen.queryByText('Amazing Grace')).not.toBeInTheDocument();
-  });
-
-  it('filters songs by search query on tags', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<SongList {...defaultProps} />);
-    const input = screen.getByPlaceholderText('worship.searchPlaceholder');
-    await user.type(input, 'classic');
-    expect(screen.getByText('How Great Thou Art')).toBeInTheDocument();
-    expect(screen.queryByText('Amazing Grace')).not.toBeInTheDocument();
+  it('displays search value from prop in input', () => {
+    render(<SongList {...defaultProps} search="Amazing" />);
+    const input = screen.getByPlaceholderText('worship.searchPlaceholder') as HTMLInputElement;
+    expect(input.value).toBe('Amazing');
   });
 
   it('calls onSelectSong when a song is clicked', async () => {

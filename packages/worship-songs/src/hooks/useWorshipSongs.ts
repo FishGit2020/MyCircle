@@ -20,6 +20,7 @@ export const PAGE_SIZE = 24;
 export function useWorshipSongs() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [page, setPage] = useState(1);
+  const [search, setSearchRaw] = useState('');
 
   // Track auth state via Firebase token
   useEffect(() => {
@@ -40,8 +41,13 @@ export function useWorshipSongs() {
 
   const offset = (page - 1) * PAGE_SIZE;
 
+  const setSearch = useCallback((q: string) => {
+    setSearchRaw(q);
+    setPage(1); // reset to page 1 on search change
+  }, []);
+
   const { data, loading, refetch } = useQuery(GET_WORSHIP_SONGS_LIST, {
-    variables: { limit: PAGE_SIZE, offset },
+    variables: { limit: PAGE_SIZE, offset, search: search.trim() || undefined },
     fetchPolicy: 'cache-and-network',
   });
 
@@ -113,6 +119,8 @@ export function useWorshipSongs() {
     allTags,
     loading,
     isAuthenticated,
+    search,
+    setSearch,
     addSong,
     updateSong,
     deleteSong,

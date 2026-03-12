@@ -29,6 +29,8 @@ interface SongListProps {
   allTags: string[];
   loading: boolean;
   isAuthenticated: boolean;
+  search: string;
+  onSearchChange: (query: string) => void;
   onSelectSong: (id: string) => void;
   onNewSong: () => void;
   onDeleteSong?: (id: string) => void;
@@ -37,10 +39,9 @@ interface SongListProps {
 
 export default function SongList({
   songs, totalCount, totalPages, page, allArtists, allTags,
-  loading, isAuthenticated, onSelectSong, onNewSong, onDeleteSong, onPageChange,
+  loading, isAuthenticated, search, onSearchChange, onSelectSong, onNewSong, onDeleteSong, onPageChange,
 }: SongListProps) {
   const { t } = useTranslation();
-  const [search, setSearch] = useState('');
   const [favorites, setFavorites] = useState(loadFavorites);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sort, setSort] = useState<SortMode>('alpha');
@@ -87,15 +88,6 @@ export default function SongList({
       result = result.filter(s => s.tags?.includes(filterTag));
     }
 
-    // Search
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        s => s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q) ||
-             s.tags?.some(tag => tag.toLowerCase().includes(q))
-      );
-    }
-
     // Sort
     if (sort === 'alpha') {
       result = [...result].sort((a, b) => a.title.localeCompare(b.title));
@@ -104,7 +96,7 @@ export default function SongList({
     }
 
     return result;
-  }, [songs, search, favorites, showFavoritesOnly, sort, filterFormat, filterArtist, filterTag]);
+  }, [songs, favorites, showFavoritesOnly, sort, filterFormat, filterArtist, filterTag]);
 
   // Build visible page numbers: show up to 5 pages around current
   const pageNumbers = useMemo(() => {
@@ -142,7 +134,7 @@ export default function SongList({
         <input
           type="text"
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => onSearchChange(e.target.value)}
           placeholder={t('worship.searchPlaceholder')}
           className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
         />
@@ -255,7 +247,7 @@ export default function SongList({
           <svg className="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
           </svg>
-          <p>{songs.length === 0 ? t('worship.noSongs') : t('worship.noResults')}</p>
+          <p>{songs.length === 0 && !search.trim() ? t('worship.noSongs') : t('worship.noResults')}</p>
         </div>
       ) : (
         <>

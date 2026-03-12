@@ -184,4 +184,20 @@ describe('useWorshipSongs', () => {
     const { result } = renderHook(() => useWorshipSongs());
     expect(result.current.songs).toEqual([]);
   });
+
+  it('exposes search and setSearch', () => {
+    const { result } = renderHook(() => useWorshipSongs());
+    expect(result.current.search).toBe('');
+    expect(typeof result.current.setSearch).toBe('function');
+  });
+
+  it('setSearch updates search and resets page to 1', () => {
+    mockTotalCount = 100;
+    const { result } = renderHook(() => useWorshipSongs());
+    act(() => { result.current.goToPage(3); });
+    expect(result.current.page).toBe(3);
+    act(() => { result.current.setSearch('grace'); });
+    expect(result.current.search).toBe('grace');
+    expect(result.current.page).toBe(1);
+  });
 });

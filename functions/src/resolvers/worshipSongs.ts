@@ -96,13 +96,26 @@ function docToSongListItem(id: string, data: FirebaseFirestore.DocumentData) {
 export function createWorshipSongResolvers() {
   return {
     Query: {
-      worshipSongsList: async (_: any, { limit, offset = 0 }: { limit?: number; offset?: number }) => {
+      worshipSongsList: async (_: any, { limit, offset = 0, search }: { limit?: number; offset?: number; search?: string }) => {
         const db = getFirestore();
         const snap = await db
           .collection(COLLECTION)
           .orderBy('createdAt', 'desc')
           .get();
-        const allDocs = snap.docs.filter(d => !d.data().isDeleted);
+        let allDocs = snap.docs.filter(d => !d.data().isDeleted);
+
+        // Server-side search: filter by title, artist, or tags
+        if (search && search.trim()) {
+          const q = search.trim().toLowerCase();
+          allDocs = allDocs.filter(d => {
+            const data = d.data();
+            const title = (data.title ?? '').toLowerCase();
+            const artist = (data.artist ?? '').toLowerCase();
+            const tags: string[] = Array.isArray(data.tags) ? data.tags : [];
+            return title.includes(q) || artist.includes(q) || tags.some(tag => tag.toLowerCase().includes(q));
+          });
+        }
+
         const totalCount = allDocs.length;
         const cap = limit ? Math.min(limit, 200) : totalCount;
         const paged = allDocs.slice(offset, offset + cap);
