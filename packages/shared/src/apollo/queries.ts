@@ -620,6 +620,50 @@ export const SAVE_BENCHMARK_RUN = gql`
   }
 `;
 
+// ─── Transit Queries ────────────────────────────────────────────
+
+export const GET_TRANSIT_ARRIVALS = gql`
+  query GetTransitArrivals($stopId: String!) {
+    transitArrivals(stopId: $stopId) {
+      routeId
+      routeShortName
+      tripHeadsign
+      scheduledArrival
+      predictedArrival
+      minutesUntilArrival
+      isRealTime
+      status
+      vehicleId
+    }
+  }
+`;
+
+export const GET_TRANSIT_STOP = gql`
+  query GetTransitStop($stopId: String!) {
+    transitStop(stopId: $stopId) {
+      id
+      name
+      direction
+      lat
+      lon
+      routeIds
+    }
+  }
+`;
+
+export const GET_TRANSIT_NEARBY_STOPS = gql`
+  query GetTransitNearbyStops($lat: Float!, $lon: Float!, $radius: Int) {
+    transitNearbyStops(lat: $lat, lon: $lon, radius: $radius) {
+      id
+      name
+      direction
+      lat
+      lon
+      routeIds
+    }
+  }
+`;
+
 // ─── Worship Songs ──────────────────────────────────────────────
 
 const WORSHIP_SONG_FIELDS = gql`

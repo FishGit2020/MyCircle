@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useLazyQuery, GET_TRANSIT_NEARBY_STOPS } from '@mycircle/shared';
 import type { NearbyStop } from '../types';
 
 interface UseNearbyStopsResult {
@@ -8,53 +9,47 @@ interface UseNearbyStopsResult {
   findNearby: () => void;
 }
 
-function getApiBase(): string {
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return 'http://localhost:5001/mycircle-dash/us-central1/transitProxy';
-  }
-  return '/transit-api';
-}
-
 export function useNearbyStops(): UseNearbyStopsResult {
-  const [stops, setStops] = useState<NearbyStop[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [geoError, setGeoError] = useState<string | null>(null);
+
+  const [fetchNearby, { data, loading: queryLoading, error: queryError }] = useLazyQuery(
+    GET_TRANSIT_NEARBY_STOPS,
+    { fetchPolicy: 'cache-and-network' }
+  );
+
+  const stops: NearbyStop[] = (data?.transitNearbyStops || []).map(
+    (s: { id: string; name: string; direction: string; lat: number; lon: number }) => ({
+      id: s.id,
+      name: s.name,
+      direction: s.direction,
+      lat: s.lat,
+      lon: s.lon,
+      distance: 0,
+    })
+  );
+
+  const loading = queryLoading;
+  const error = geoError || queryError?.message || null;
 
   const findNearby = useCallback(() => {
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser');
+      setGeoError('Geolocation is not supported by your browser');
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    setGeoError(null);
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          const res = await fetch(
-            `${getApiBase()}/stops-nearby?lat=${latitude}&lon=${longitude}&radius=500`
-          );
-          if (!res.ok) {
-            const body = await res.json().catch(() => ({ error: 'Failed to fetch nearby stops' }));
-            throw new Error(body.error || `HTTP ${res.status}`);
-          }
-          const data = await res.json();
-          setStops(data.stops || []);
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Failed to find nearby stops');
-        } finally {
-          setLoading(false);
-        }
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        fetchNearby({ variables: { lat: latitude, lon: longitude, radius: 500 } });
       },
       (err) => {
-        setLoading(false);
-        setError(err.message || 'Failed to get location');
+        setGeoError(err.message || 'Failed to get location');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
-  }, []);
+  }, [fetchNearby]);
 
   return { stops, loading, error, findNearby };
 }

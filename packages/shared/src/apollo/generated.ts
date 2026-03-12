@@ -578,6 +578,9 @@ export type Query = {
   sharedFiles: Array<SharedFile>;
   stockCandles?: Maybe<StockCandle>;
   stockQuote?: Maybe<StockQuote>;
+  transitArrivals: Array<TransitArrival>;
+  transitNearbyStops: Array<TransitStop>;
+  transitStop?: Maybe<TransitStop>;
   trendingPodcasts: PodcastTrendingResponse;
   ttsQuota: TtsQuota;
   weather: WeatherData;
@@ -726,6 +729,23 @@ export type QueryStockQuoteArgs = {
 };
 
 
+export type QueryTransitArrivalsArgs = {
+  stopId: Scalars['String']['input'];
+};
+
+
+export type QueryTransitNearbyStopsArgs = {
+  lat: Scalars['Float']['input'];
+  lon: Scalars['Float']['input'];
+  radius?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryTransitStopArgs = {
+  stopId: Scalars['String']['input'];
+};
+
+
 export type QueryWeatherArgs = {
   lat: Scalars['Float']['input'];
   lon: Scalars['Float']['input'];
@@ -817,6 +837,29 @@ export type ToolCallResult = {
   args?: Maybe<Scalars['JSON']['output']>;
   name: Scalars['String']['output'];
   result?: Maybe<Scalars['String']['output']>;
+};
+
+export type TransitArrival = {
+  __typename?: 'TransitArrival';
+  isRealTime: Scalars['Boolean']['output'];
+  minutesUntilArrival: Scalars['Int']['output'];
+  predictedArrival: Scalars['Float']['output'];
+  routeId: Scalars['String']['output'];
+  routeShortName: Scalars['String']['output'];
+  scheduledArrival: Scalars['Float']['output'];
+  status: Scalars['String']['output'];
+  tripHeadsign: Scalars['String']['output'];
+  vehicleId: Scalars['String']['output'];
+};
+
+export type TransitStop = {
+  __typename?: 'TransitStop';
+  direction: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  lat: Scalars['Float']['output'];
+  lon: Scalars['Float']['output'];
+  name: Scalars['String']['output'];
+  routeIds: Array<Scalars['String']['output']>;
 };
 
 export type TtsQuota = {
@@ -1192,6 +1235,29 @@ export type SaveBenchmarkRunMutationVariables = Exact<{
 
 
 export type SaveBenchmarkRunMutation = { __typename?: 'Mutation', saveBenchmarkRun: { __typename?: 'BenchmarkRun', id: string, createdAt: string } };
+
+export type GetTransitArrivalsQueryVariables = Exact<{
+  stopId: Scalars['String']['input'];
+}>;
+
+
+export type GetTransitArrivalsQuery = { __typename?: 'Query', transitArrivals: Array<{ __typename?: 'TransitArrival', routeId: string, routeShortName: string, tripHeadsign: string, scheduledArrival: number, predictedArrival: number, minutesUntilArrival: number, isRealTime: boolean, status: string, vehicleId: string }> };
+
+export type GetTransitStopQueryVariables = Exact<{
+  stopId: Scalars['String']['input'];
+}>;
+
+
+export type GetTransitStopQuery = { __typename?: 'Query', transitStop?: { __typename?: 'TransitStop', id: string, name: string, direction: string, lat: number, lon: number, routeIds: Array<string> } | null };
+
+export type GetTransitNearbyStopsQueryVariables = Exact<{
+  lat: Scalars['Float']['input'];
+  lon: Scalars['Float']['input'];
+  radius?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetTransitNearbyStopsQuery = { __typename?: 'Query', transitNearbyStops: Array<{ __typename?: 'TransitStop', id: string, name: string, direction: string, lat: number, lon: number, routeIds: Array<string> }> };
 
 export type WorshipSongFieldsFragment = { __typename?: 'WorshipSong', id: string, title: string, artist: string, originalKey: string, format: string, content: string, notes: string, youtubeUrl?: string | null, bpm?: number | null, tags?: Array<string> | null, createdAt: string, updatedAt: string, createdBy?: string | null };
 
