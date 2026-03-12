@@ -159,6 +159,21 @@ export default function PodcastPlayer() {
     error: episodesError,
   } = usePodcastEpisodes(feedId);
 
+  // URL-based autoplay: read ?autoplay=true&episode=<id> and trigger playback once episodes load
+  useEffect(() => {
+    if (searchParams.get('autoplay') !== 'true') return;
+    const episodeId = searchParams.get('episode');
+    if (!episodeId || !episodes || episodes.length === 0) return;
+
+    const match = episodes.find(ep => String(ep.id) === episodeId);
+    if (match) {
+      handlePlayEpisode(match);
+      // Clear autoplay params from URL to prevent re-triggering on re-render
+      setSearchParams({}, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [episodes, searchParams]);
+
   const handleSelectPodcast = useCallback((podcast: Podcast) => {
     navigate(`/podcasts/${podcast.id}`, { state: { podcast } });
   }, [navigate]);
