@@ -98,16 +98,21 @@ export default function SongList({
     return result;
   }, [songs, favorites, showFavoritesOnly, sort, filterFormat, filterArtist, filterTag]);
 
+  // When client-side filters are active, use filtered count instead of server count
+  const hasClientFilter = showFavoritesOnly || filterFormat !== 'all' || !!filterArtist || !!filterTag;
+  const effectiveCount = hasClientFilter ? processed.length : totalCount;
+  const effectiveTotalPages = hasClientFilter ? 1 : totalPages;
+
   // Build visible page numbers: show up to 5 pages around current
   const pageNumbers = useMemo(() => {
     const pages: number[] = [];
     const maxVisible = 5;
     let start = Math.max(1, page - Math.floor(maxVisible / 2));
-    const end = Math.min(totalPages, start + maxVisible - 1);
+    const end = Math.min(effectiveTotalPages, start + maxVisible - 1);
     start = Math.max(1, end - maxVisible + 1);
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
-  }, [page, totalPages]);
+  }, [page, effectiveTotalPages]);
 
   return (
     <div>
@@ -326,7 +331,15 @@ export default function SongList({
           </div>
 
           {/* Pagination controls */}
-          {totalPages > 1 && (
+          {/* Song count */}
+          {hasClientFilter && (
+            <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500">
+              {effectiveCount} {effectiveCount === 1 ? 'song' : 'songs'}
+            </p>
+          )}
+
+          {/* Pagination controls — hidden when client filters reduce to 1 page */}
+          {effectiveTotalPages > 1 && (
             <nav className="mt-6 flex items-center justify-center gap-1" aria-label={t('worship.pagination')}>
               {/* Previous */}
               <button
@@ -371,17 +384,17 @@ export default function SongList({
                   {p}
                 </button>
               ))}
-              {pageNumbers[pageNumbers.length - 1] < totalPages && (
+              {pageNumbers[pageNumbers.length - 1] < effectiveTotalPages && (
                 <>
-                  {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
+                  {pageNumbers[pageNumbers.length - 1] < effectiveTotalPages - 1 && (
                     <span className="px-1 text-xs text-gray-400 dark:text-gray-500" aria-hidden="true">&hellip;</span>
                   )}
                   <button
                     type="button"
-                    onClick={() => onPageChange(totalPages)}
+                    onClick={() => onPageChange(effectiveTotalPages)}
                     className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition min-h-[36px]"
                   >
-                    {totalPages}
+                    {effectiveTotalPages}
                   </button>
                 </>
               )}
@@ -390,7 +403,7 @@ export default function SongList({
               <button
                 type="button"
                 onClick={() => onPageChange(page + 1)}
-                disabled={page >= totalPages}
+                disabled={page >= effectiveTotalPages}
                 className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-40 disabled:cursor-not-allowed min-h-[36px]"
                 aria-label={t('worship.nextPage')}
               >
@@ -401,7 +414,7 @@ export default function SongList({
 
               {/* Page info */}
               <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
-                {t('worship.pageOf', { page: String(page), total: String(totalPages) })}
+                {t('worship.pageOf', { page: String(page), total: String(effectiveTotalPages) })}
               </span>
             </nav>
           )}
