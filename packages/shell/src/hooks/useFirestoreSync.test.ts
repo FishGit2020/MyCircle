@@ -10,6 +10,7 @@ const mockUpdateChildData = vi.fn();
 const mockUpdateWidgetLayout = vi.fn();
 const mockUpdateBookBookmarks = vi.fn();
 const mockUpdateBookAudioProgress = vi.fn();
+const mockUpdateBookPlayedChapters = vi.fn();
 const mockUpdateBookLastPlayed = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
@@ -21,6 +22,7 @@ vi.mock('@mycircle/shared', () => ({
     CHILD_DATA_CHANGED: 'child-data-changed',
     WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
     BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
+    BOOK_PLAYED_CHAPTERS_CHANGED: 'book-played-chapters-changed',
     BOOK_LAST_PLAYED_CHANGED: 'book-last-played-changed',
   },
   StorageKeys: {
@@ -33,6 +35,7 @@ vi.mock('@mycircle/shared', () => ({
     WIDGET_LAYOUT: 'widget-dashboard-layout',
     BOOK_BOOKMARKS: 'book-bookmarks',
     BOOK_AUDIO_PROGRESS: 'book-audio-progress',
+    BOOK_PLAYED_CHAPTERS: 'book-played-chapters',
     BOOK_LAST_PLAYED: 'book-last-played',
   },
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
@@ -47,6 +50,7 @@ vi.mock('../lib/firebase', () => ({
   updateWidgetLayout: (...args: unknown[]) => mockUpdateWidgetLayout(...args),
   updateBookBookmarks: (...args: unknown[]) => mockUpdateBookBookmarks(...args),
   updateBookAudioProgress: (...args: unknown[]) => mockUpdateBookAudioProgress(...args),
+  updateBookPlayedChapters: (...args: unknown[]) => mockUpdateBookPlayedChapters(...args),
   updateBookLastPlayed: (...args: unknown[]) => mockUpdateBookLastPlayed(...args),
 }));
 
@@ -124,6 +128,13 @@ describe('useFirestoreSync', () => {
     localStorage.setItem('book-audio-progress', JSON.stringify({ b1: { position: 10 } }));
     window.dispatchEvent(new Event('book-audio-progress-changed'));
     expect(mockUpdateBookAudioProgress).toHaveBeenCalledWith('user1', { b1: { position: 10 } });
+  });
+
+  it('syncs book played chapters on event', () => {
+    renderHook(() => useFirestoreSync(makeUser()));
+    localStorage.setItem('book-played-chapters', JSON.stringify({ b1: [0, 2, 3] }));
+    window.dispatchEvent(new Event('book-played-chapters-changed'));
+    expect(mockUpdateBookPlayedChapters).toHaveBeenCalledWith('user1', { b1: [0, 2, 3] });
   });
 
   it('syncs book last played on event', () => {

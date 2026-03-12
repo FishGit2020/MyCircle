@@ -15,6 +15,7 @@ vi.mock('@mycircle/shared', () => ({
     CHILD_DATA_CHANGED: 'child-data-changed',
     WIDGET_LAYOUT_CHANGED: 'widget-layout-changed',
     BOOK_BOOKMARKS_CHANGED: 'book-bookmarks-changed',
+    BOOK_PLAYED_CHAPTERS_CHANGED: 'book-played-chapters-changed',
     BOOK_LAST_PLAYED_CHANGED: 'book-last-played-changed',
     NOTEBOOK_CHANGED: 'notebook-changed',
     DAILY_LOG_CHANGED: 'daily-log-changed',
@@ -41,6 +42,7 @@ vi.mock('@mycircle/shared', () => ({
     WIDGET_LAYOUT: 'widget-dashboard-layout',
     BOOK_BOOKMARKS: 'book-bookmarks',
     BOOK_AUDIO_PROGRESS: 'book-audio-progress',
+    BOOK_PLAYED_CHAPTERS: 'book-played-chapters',
     BOOK_LAST_PLAYED: 'book-last-played',
     DAILY_LOG_CACHE: 'daily-log-cache',
     CLOUD_FILES_CACHE: 'cloud-files-cache',
@@ -227,6 +229,17 @@ describe('restoreUserData', () => {
     const progress = { b1: { position: 10, duration: 100, chapter: 1 } };
     restoreUserData(makeProfile({ bookAudioProgress: progress }) as any, 'user1');
     expect(JSON.parse(localStorage.getItem('book-audio-progress')!)).toEqual(progress);
+  });
+
+  it('restores book played chapters and merges with local', () => {
+    localStorage.setItem('book-played-chapters', JSON.stringify({ b1: [0, 1], b2: [3] }));
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    restoreUserData(makeProfile({ bookPlayedChapters: { b1: [1, 2], b3: [0] } }) as any, 'user1');
+    const stored = JSON.parse(localStorage.getItem('book-played-chapters')!);
+    expect(stored.b1).toEqual([0, 1, 2]); // merged and sorted
+    expect(stored.b2).toEqual([3]); // local-only preserved
+    expect(stored.b3).toEqual([0]); // remote-only added
+    expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'book-played-chapters-changed' }));
   });
 
   it('restores book last played', () => {

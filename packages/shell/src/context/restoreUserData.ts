@@ -153,6 +153,25 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     localStorage.setItem(StorageKeys.BOOK_AUDIO_PROGRESS, JSON.stringify(profile.bookAudioProgress));
   }
 
+  // Restore book played chapters (merge with local to avoid losing offline completions)
+  if (profile.bookPlayedChapters) {
+    try {
+      const localRaw = localStorage.getItem(StorageKeys.BOOK_PLAYED_CHAPTERS);
+      const local: Record<string, number[]> = localRaw ? JSON.parse(localRaw) : {};
+      const remote = profile.bookPlayedChapters;
+      // Merge: union of chapter arrays per book
+      const merged: Record<string, number[]> = { ...local };
+      for (const [bookId, chapters] of Object.entries(remote)) {
+        const existing = merged[bookId] || [];
+        merged[bookId] = [...new Set([...existing, ...chapters])].sort((a, b) => a - b);
+      }
+      localStorage.setItem(StorageKeys.BOOK_PLAYED_CHAPTERS, JSON.stringify(merged));
+    } catch {
+      localStorage.setItem(StorageKeys.BOOK_PLAYED_CHAPTERS, JSON.stringify(profile.bookPlayedChapters));
+    }
+    window.dispatchEvent(new Event(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED));
+  }
+
   // Restore last-played book for cross-device resume
   if (profile.bookLastPlayed?.bookId) {
     localStorage.setItem(StorageKeys.BOOK_LAST_PLAYED, JSON.stringify(profile.bookLastPlayed));
