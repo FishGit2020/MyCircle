@@ -14,6 +14,7 @@ import {
   updateBookAudioProgress,
   updateBookPlayedChapters,
   updateBookLastPlayed,
+  updatePodcastProgress,
 } from '../lib/firebase';
 
 /**
@@ -201,5 +202,20 @@ export function useFirestoreSync(user: User | null) {
     }
     window.addEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleBookLastPlayedChanged);
     return () => window.removeEventListener(WindowEvents.BOOK_LAST_PLAYED_CHANGED, handleBookLastPlayedChanged);
+  }, [user]);
+
+  // Auto-sync podcast progress from localStorage to Firestore
+  useEffect(() => {
+    function handlePodcastProgressChanged() {
+      if (user) {
+        try {
+          const stored = localStorage.getItem(StorageKeys.PODCAST_PROGRESS);
+          const progress = stored ? JSON.parse(stored) : null;
+          updatePodcastProgress(user.uid, progress);
+        } catch { /* ignore parse errors */ }
+      }
+    }
+    window.addEventListener('podcast-progress-changed', handlePodcastProgressChanged);
+    return () => window.removeEventListener('podcast-progress-changed', handlePodcastProgressChanged);
   }, [user]);
 }

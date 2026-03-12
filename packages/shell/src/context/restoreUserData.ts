@@ -178,6 +178,26 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.BOOK_PLAYED_CHAPTERS_CHANGED));
   }
 
+  // Restore podcast progress (merge with local: take the further position per episode)
+  if (profile.podcastProgress) {
+    try {
+      const localRaw = localStorage.getItem(StorageKeys.PODCAST_PROGRESS);
+      const local: Record<string, { position: number; duration: number }> = localRaw ? JSON.parse(localRaw) : {};
+      const remote = profile.podcastProgress;
+      const merged: Record<string, { position: number; duration: number }> = { ...local };
+      for (const [episodeId, remoteEntry] of Object.entries(remote)) {
+        const existing = merged[episodeId];
+        if (!existing || remoteEntry.position > existing.position) {
+          merged[episodeId] = remoteEntry;
+        }
+      }
+      localStorage.setItem(StorageKeys.PODCAST_PROGRESS, JSON.stringify(merged));
+    } catch {
+      localStorage.setItem(StorageKeys.PODCAST_PROGRESS, JSON.stringify(profile.podcastProgress));
+    }
+    window.dispatchEvent(new Event('podcast-progress-changed'));
+  }
+
   // Restore last-played book for cross-device resume
   if (profile.bookLastPlayed?.bookId) {
     localStorage.setItem(StorageKeys.BOOK_LAST_PLAYED, JSON.stringify(profile.bookLastPlayed));

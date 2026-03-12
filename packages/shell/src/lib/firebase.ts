@@ -161,6 +161,7 @@ export interface UserProfile {
   bookAudioProgress?: Record<string, { position: number; duration: number; chapter: number }>;
   bookPlayedChapters?: Record<string, number[]>;
   bookLastPlayed?: BookLastPlayedData;
+  podcastProgress?: Record<string, { position: number; duration: number }>;
   radioFavorites?: Array<{ stationuuid: string; name: string; url: string; favicon: string; country: string; language: string; codec: string; bitrate: number }>;
   transitFavorites?: Array<{ stopId: string; stopName: string; direction: string; routes: string[]; addedAt: number }>;
   isAdmin?: boolean;
@@ -614,6 +615,15 @@ export async function updateBookPlayedChapters(uid: string, playedChapters: Reco
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     bookPlayedChapters: playedChapters || null,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function updatePodcastProgress(uid: string, progress: Record<string, { position: number; duration: number }> | null) {
+  if (!db) return;
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    podcastProgress: progress || null,
     updatedAt: serverTimestamp(),
   });
 }
