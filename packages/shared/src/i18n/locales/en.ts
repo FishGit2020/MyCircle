@@ -650,6 +650,7 @@ const en = {
   'worship.capoEasyKey': 'Easy key',
   'worship.capoSuggested': 'Suggested',
   'worship.capoInstruction': 'Place capo on fret {fret} and play {shapeKey} chord shapes. The song will sound in {soundingKey}.',
+  'worship.resetFilters': 'Reset',
   'worship.importPro': 'Import .pro',
   'worship.importProHint': 'Import a ProPresenter file to pre-fill lyrics',
   'worship.importError': 'Could not parse the file. Please check the format.',
@@ -2405,6 +2406,7 @@ const en = {
   'travelMap.filter': 'Filter',
   'travelMap.filterAll': 'All',
   'travelMap.pinList': 'Places',
+  'travelMap.searchLocation': 'Search location...',
   'travelMap.noPins': 'No pins yet. Tap the map or click Add Pin to get started.',
 
   // ─── Recycle Bin ────────────────────────────────────────────

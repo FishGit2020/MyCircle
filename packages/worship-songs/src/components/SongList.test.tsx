@@ -44,10 +44,19 @@ const defaultProps = {
   loading: false,
   isAuthenticated: true,
   search: '',
+  filterArtist: '',
+  filterTag: '',
+  filterFormat: 'all' as const,
+  showFavoritesOnly: false,
   onSearchChange: vi.fn(),
+  onFilterArtistChange: vi.fn(),
+  onFilterTagChange: vi.fn(),
+  onFilterFormatChange: vi.fn(),
+  onFavoritesToggle: vi.fn(),
   onSelectSong: vi.fn(),
   onNewSong: vi.fn(),
   onPageChange: vi.fn(),
+  onResetFilters: vi.fn(),
 };
 
 describe('SongList', () => {
@@ -190,5 +199,33 @@ describe('SongList', () => {
     render(<SongList {...defaultProps} totalPages={5} page={2} onPageChange={onPageChange} />);
     await user.click(screen.getByLabelText('worship.nextPage'));
     expect(onPageChange).toHaveBeenCalledWith(3);
+  });
+
+  it('shows reset button when a filter is active', () => {
+    render(<SongList {...defaultProps} search="grace" />);
+    expect(screen.getByText('worship.resetFilters')).toBeInTheDocument();
+  });
+
+  it('does not show reset button when no filters active', () => {
+    render(<SongList {...defaultProps} />);
+    expect(screen.queryByText('worship.resetFilters')).not.toBeInTheDocument();
+  });
+
+  it('calls onResetFilters when reset button is clicked', async () => {
+    const user = userEvent.setup({ delay: null });
+    const onResetFilters = vi.fn();
+    render(<SongList {...defaultProps} filterArtist="John Newton" onResetFilters={onResetFilters} />);
+    await user.click(screen.getByText('worship.resetFilters'));
+    expect(onResetFilters).toHaveBeenCalled();
+  });
+
+  it('shows reset button when favorites filter is active', () => {
+    render(<SongList {...defaultProps} showFavoritesOnly={true} />);
+    expect(screen.getByText('worship.resetFilters')).toBeInTheDocument();
+  });
+
+  it('shows reset button when format filter is active', () => {
+    render(<SongList {...defaultProps} filterFormat="chordpro" />);
+    expect(screen.getByText('worship.resetFilters')).toBeInTheDocument();
   });
 });

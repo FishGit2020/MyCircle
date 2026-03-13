@@ -652,6 +652,7 @@ const es: Record<TranslationKey, string> = {
   'worship.capoEasyKey': 'Tono f\u00e1cil',
   'worship.capoSuggested': 'Sugeridos',
   'worship.capoInstruction': 'Coloca la cejilla en el traste {fret} y toca acordes de {shapeKey}. La canci\u00f3n sonar\u00e1 en {soundingKey}.',
+  'worship.resetFilters': 'Restablecer',
   'worship.importPro': 'Importar .pro',
   'worship.importProHint': 'Importa un archivo ProPresenter para prellenar la letra',
   'worship.importError': 'No se pudo analizar el archivo. Verifica el formato.',
@@ -2405,6 +2406,7 @@ const es: Record<TranslationKey, string> = {
   'travelMap.filter': 'Filtrar',
   'travelMap.filterAll': 'Todos',
   'travelMap.pinList': 'Lugares',
+  'travelMap.searchLocation': 'Buscar ubicaci\u00f3n...',
   'travelMap.noPins': 'Sin pines a\u00fan. Toca el mapa o haz clic en Agregar Pin para empezar.',
 
   // ─── Recycle Bin ────────────────────────────────────────────

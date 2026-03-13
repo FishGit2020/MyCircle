@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { PinType, TravelPin } from '../types';
 
@@ -19,6 +19,15 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
   const [notes, setNotes] = useState(editPin?.notes || '');
   const [lat, setLat] = useState(editPin?.lat?.toString() || initialLat?.toString() || '');
   const [lon, setLon] = useState(editPin?.lon?.toString() || initialLon?.toString() || '');
+
+  // Update coordinates when user taps a new location on the map (not in edit mode)
+  useEffect(() => {
+    if (!editPin && initialLat !== undefined && initialLon !== undefined) {
+      setLat(initialLat.toString());
+      setLon(initialLon.toString());
+    }
+  }, [editPin, initialLat, initialLon]);
+
   const [startDate, setStartDate] = useState(editPin?.dateRange?.start || '');
   const [endDate, setEndDate] = useState(editPin?.dateRange?.end || '');
 
