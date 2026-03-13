@@ -37,6 +37,11 @@ import {
   listMfeFeatures,
 } from './mcp-tools/component-explorer.js';
 import {
+  listAllRoutes,
+  routeDetail,
+  findRouteGaps,
+} from './mcp-tools/route-explorer.js';
+import {
   analyzeI18nBundle,
   findUnusedI18nKeys,
   findMissingI18nKeys,
@@ -260,6 +265,37 @@ server.tool(
   {},
   async () => ({
     content: [{ type: 'text', text: findMissingI18nKeys() }],
+  })
+);
+
+// ─── Route Explorer Tools ────────────────────────────────────────────
+
+server.tool(
+  'list_routes',
+  'List all routes defined in App.tsx with path, component, MFE module, auth requirement, and dynamic segment info. Returns a markdown table.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: listAllRoutes() }],
+  })
+);
+
+server.tool(
+  'route_detail',
+  'Get detailed info about a specific route: component, auth, breadcrumb label, widget ID, nav group, and presence in BottomNav/CommandPalette/QuickAccess.',
+  {
+    path: z.string().describe('Route path to inspect (e.g., "/weather", "/stocks", "/ai")'),
+  },
+  async ({ path }) => ({
+    content: [{ type: 'text', text: routeDetail(path) }],
+  })
+);
+
+server.tool(
+  'find_route_gaps',
+  'Audit all routes for integration gaps: missing breadcrumb config, widget config, navigation group, BottomNav, CommandPalette, or QuickAccess entries.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: findRouteGaps() }],
   })
 );
 
