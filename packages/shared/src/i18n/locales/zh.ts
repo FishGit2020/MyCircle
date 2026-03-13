@@ -2224,6 +2224,7 @@ const zh: Record<TranslationKey, string> = {
   'tripPlanner.noTickets': '\u8fd8\u6ca1\u6709\u6dfb\u52a0\u7968\u52a1',
   'tripPlanner.upcomingTrip': '\u4e0b\u4e00\u6b21\u65c5\u884c',
   'tripPlanner.noUpcoming': '\u6ca1\u6709\u5373\u5c06\u5f00\u59cb\u7684\u65c5\u884c',
+  'tripPlanner.searchDestination': '\u641c\u7d22\u76ee\u7684\u5730...',
 
   // ─── Poll System ──────────────────────────────────────────
   'nav.pollSystem': '\u6295\u7968',

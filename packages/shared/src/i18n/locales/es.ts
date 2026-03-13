@@ -2224,6 +2224,7 @@ const es: Record<TranslationKey, string> = {
   'tripPlanner.noTickets': 'A\u00fan no hay boletos',
   'tripPlanner.upcomingTrip': 'Pr\u00f3ximo viaje',
   'tripPlanner.noUpcoming': 'No hay viajes pr\u00f3ximos',
+  'tripPlanner.searchDestination': 'Buscar un destino...',
 
   // ─── Poll System ──────────────────────────────────────────
   'nav.pollSystem': 'Encuestas',
