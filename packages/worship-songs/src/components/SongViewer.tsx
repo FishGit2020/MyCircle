@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation, StorageKeys } from '@mycircle/shared';
+import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 import { transposeContent, transposeChord } from '../utils/transpose';
 import ChordLine from './ChordLine';
@@ -51,8 +51,17 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
   const [autoScroll, setAutoScroll] = useState(false);
   const [scrollSpeed, setScrollSpeed] = useState(loadScrollSpeed);
   const [copied, setCopied] = useState(false);
+  const [showControls, setShowControls] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Broadcast breadcrumb detail to shell
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: song.title }));
+    return () => {
+      window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: null }));
+    };
+  }, [song.title]);
 
   const isChordPro = song.format === 'chordpro';
   // soundingKey = the actual pitch the audience hears (original + transpose)
@@ -148,6 +157,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
           </div>
           {isAuthenticated && (
             <button
+              type="button"
               onClick={onEdit}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
             >
@@ -184,13 +194,13 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700" data-print-hide>
-        {/* Transpose controls — only for ChordPro */}
+      {/* Essential controls — always visible */}
+      <div className="flex flex-wrap items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700" data-print-hide>
         {isChordPro ? (
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-gray-600 dark:text-gray-400">{t('worship.transpose')}:</span>
             <button
+              type="button"
               onClick={() => setSemitones(s => s - 1)}
               className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-bold"
               title={t('worship.semitoneDown')}
@@ -201,6 +211,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
               {semitones > 0 ? `+${semitones}` : semitones}
             </span>
             <button
+              type="button"
               onClick={() => setSemitones(s => s + 1)}
               className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-bold"
               title={t('worship.semitoneUp')}
@@ -209,26 +220,13 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
             </button>
             {semitones !== 0 && (
               <button
+                type="button"
                 onClick={() => setSemitones(0)}
                 className="text-xs text-blue-600 dark:text-blue-400 hover:underline ml-1"
               >
                 {t('worship.resetKey')}
               </button>
             )}
-
-            {/* Direct key picker */}
-            <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-gray-200 dark:border-gray-700">
-              <span className="text-xs text-gray-500 dark:text-gray-400">{t('worship.targetKey')}:</span>
-              <select
-                value={currentKey}
-                onChange={e => handleTargetKeyChange(e.target.value)}
-                className="px-1.5 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-1 focus:ring-blue-500 outline-none"
-              >
-                {ALL_KEYS.map(k => (
-                  <option key={k} value={k}>{k}</option>
-                ))}
-              </select>
-            </div>
           </div>
         ) : (
           <p className="text-xs text-gray-400 dark:text-gray-500 italic">
@@ -236,117 +234,155 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
           </p>
         )}
 
-        {/* Capo calculator — only for ChordPro */}
-        {isChordPro && (
-          <div className="w-full" data-print-hide>
-            <CapoCalculator
-              soundingKey={soundingKey}
-              capoFret={capoFret}
-              onCapoChange={setCapoFret}
-            />
-          </div>
-        )}
-
-        <div className="flex items-center gap-2 ml-auto flex-wrap">
-          {/* Copy lyrics */}
-          <button
-            onClick={handleCopyLyrics}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+        {/* Controls toggle */}
+        <button
+          type="button"
+          onClick={() => setShowControls(c => !c)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition ml-auto"
+        >
+          <svg
+            className={`w-3.5 h-3.5 transition-transform ${showControls ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
           >
-            {copied ? (
-              <>
-                <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                {t('worship.copied')}
-              </>
-            ) : (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                {t('worship.copyLyrics')}
-              </>
-            )}
-          </button>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+          {showControls ? t('worship.hideControls') : t('worship.moreControls')}
+        </button>
+      </div>
 
-          {/* Auto-scroll toggle */}
-          <button
-            onClick={() => setAutoScroll(!autoScroll)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-              autoScroll
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-            }`}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-            {t('worship.autoScroll')}
-          </button>
-
-          {/* Scroll speed (visible when auto-scroll is active) */}
-          {autoScroll && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-gray-500 dark:text-gray-400">{t('worship.scrollSpeed')}:</span>
-              <input
-                type="range"
-                min={0}
-                max={SCROLL_SPEEDS.length - 1}
-                value={SCROLL_SPEEDS.indexOf(scrollSpeed)}
-                onChange={e => handleScrollSpeedChange(SCROLL_SPEEDS[parseInt(e.target.value)])}
-                className="w-16 h-1.5 accent-green-500"
-                aria-label={t('worship.scrollSpeed')}
+      {/* Expanded controls */}
+      {showControls && (
+        <div className="flex flex-col gap-4 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700" data-print-hide>
+          {/* Key picker + Capo calculator — only for ChordPro */}
+          {isChordPro && (
+            <>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('worship.targetKey')}:</span>
+                <select
+                  value={currentKey}
+                  onChange={e => handleTargetKeyChange(e.target.value)}
+                  className="px-1.5 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-1 focus:ring-blue-500 outline-none"
+                >
+                  {ALL_KEYS.map(k => (
+                    <option key={k} value={k}>{k}</option>
+                  ))}
+                </select>
+              </div>
+              <CapoCalculator
+                soundingKey={soundingKey}
+                capoFret={capoFret}
+                onCapoChange={setCapoFret}
               />
-            </div>
+            </>
           )}
 
-          {/* YouTube link */}
-          {song.youtubeUrl && (
-            <a
-              href={song.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition"
+          {/* Auto-scroll + speed */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setAutoScroll(!autoScroll)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                autoScroll
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+              }`}
             >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
-              {t('worship.watchOnYoutube')}
-            </a>
-          )}
+              {t('worship.autoScroll')}
+            </button>
 
-          {/* Download */}
-          <button
-            type="button"
-            onClick={handleDownload}
-            aria-label={t('worship.download')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            {isChordPro ? t('worship.downloadChordPro') : t('worship.downloadText')}
-          </button>
+            {autoScroll && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('worship.scrollSpeed')}:</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={SCROLL_SPEEDS.length - 1}
+                  value={SCROLL_SPEEDS.indexOf(scrollSpeed)}
+                  onChange={e => handleScrollSpeedChange(SCROLL_SPEEDS[parseInt(e.target.value)])}
+                  className="w-16 h-1.5 accent-green-500"
+                  aria-label={t('worship.scrollSpeed')}
+                />
+              </div>
+            )}
+          </div>
 
-          {/* Print */}
-          <button
-            onClick={handlePrint}
-            aria-label={t('worship.print')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
-            {t('worship.print')}
-          </button>
+          {/* Action buttons row */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Copy lyrics */}
+            <button
+              type="button"
+              onClick={handleCopyLyrics}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              {copied ? (
+                <>
+                  <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {t('worship.copied')}
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  {t('worship.copyLyrics')}
+                </>
+              )}
+            </button>
+
+            {/* YouTube link */}
+            {song.youtubeUrl && (
+              <a
+                href={song.youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+                {t('worship.watchOnYoutube')}
+              </a>
+            )}
+
+            {/* Download */}
+            <button
+              type="button"
+              onClick={handleDownload}
+              aria-label={t('worship.download')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              {isChordPro ? t('worship.downloadChordPro') : t('worship.downloadText')}
+            </button>
+
+            {/* Print */}
+            <button
+              type="button"
+              onClick={handlePrint}
+              aria-label={t('worship.print')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              {t('worship.print')}
+            </button>
+          </div>
+
+          {/* Metronome */}
+          <Metronome initialBpm={song.bpm} />
         </div>
-      </div>
-
-      {/* Metronome */}
-      <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700" data-print-hide>
-        <Metronome initialBpm={song.bpm} />
-      </div>
+      )}
 
       {/* Song content */}
       <div ref={contentRef} className="mb-8 overflow-x-auto" data-print-show>
@@ -367,6 +403,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
       {song.notes && (
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
           <button
+            type="button"
             onClick={() => setNotesOpen(!notesOpen)}
             className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition"
           >

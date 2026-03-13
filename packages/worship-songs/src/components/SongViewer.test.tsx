@@ -11,6 +11,9 @@ vi.mock('@mycircle/shared', () => ({
   StorageKeys: {
     WORSHIP_SCROLL_SPEED: 'worship-scroll-speed',
   },
+  WindowEvents: {
+    BREADCRUMB_DETAIL: 'breadcrumb-detail',
+  },
 }));
 
 vi.mock('../utils/transpose', () => ({
@@ -31,6 +34,10 @@ const baseSong: WorshipSong = {
   updatedAt: new Date(1700000000000).toISOString(),
 };
 
+function expandControls() {
+  fireEvent.click(screen.getByText('worship.moreControls'));
+}
+
 describe('SongViewer', () => {
   const onEdit = vi.fn();
 
@@ -41,12 +48,14 @@ describe('SongViewer', () => {
 
   it('does not show YouTube button when song has no YouTube URL', () => {
     render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
     expect(screen.queryByText('worship.watchOnYoutube')).not.toBeInTheDocument();
   });
 
   it('shows YouTube button when song has a YouTube URL', () => {
     const songWithYoutube = { ...baseSong, youtubeUrl: 'https://youtube.com/watch?v=abc123' };
     render(<SongViewer song={songWithYoutube} isAuthenticated onEdit={onEdit} />);
+    expandControls();
 
     const link = screen.getByText('worship.watchOnYoutube');
     expect(link).toBeInTheDocument();
@@ -71,8 +80,21 @@ describe('SongViewer', () => {
     expect(screen.queryByText('worship.editSong')).not.toBeInTheDocument();
   });
 
-  it('renders the metronome section', () => {
+  it('renders controls toggle button', () => {
     render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expect(screen.getByText('worship.moreControls')).toBeInTheDocument();
+  });
+
+  it('shows expanded controls when toggle is clicked', () => {
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
+    expect(screen.getByText('worship.hideControls')).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'worship.metronome' })).toBeInTheDocument();
+  });
+
+  it('renders the metronome section when controls are expanded', () => {
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
     expect(screen.getByRole('group', { name: 'worship.metronome' })).toBeInTheDocument();
     expect(screen.getByLabelText('worship.metronomeStart')).toBeInTheDocument();
   });
@@ -80,12 +102,14 @@ describe('SongViewer', () => {
   it('uses song BPM as initial metronome tempo', () => {
     const songWithBpm = { ...baseSong, bpm: 85 };
     render(<SongViewer song={songWithBpm} isAuthenticated onEdit={onEdit} />);
+    expandControls();
     const bpmInput = screen.getByRole('spinbutton', { name: 'worship.bpm' });
     expect(bpmInput).toHaveValue(85);
   });
 
   it('defaults metronome to 120 BPM when song has no BPM', () => {
     render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
     const bpmInput = screen.getByRole('spinbutton', { name: 'worship.bpm' });
     expect(bpmInput).toHaveValue(120);
   });
@@ -93,6 +117,7 @@ describe('SongViewer', () => {
   it('print button calls window.print()', () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
     render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
 
     const printBtn = screen.getByRole('button', { name: 'worship.print' });
     fireEvent.click(printBtn);
@@ -102,6 +127,7 @@ describe('SongViewer', () => {
 
   it('print button has aria-label', () => {
     render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
     const printBtn = screen.getByRole('button', { name: 'worship.print' });
     expect(printBtn).toHaveAttribute('aria-label', 'worship.print');
   });
@@ -109,7 +135,7 @@ describe('SongViewer', () => {
   it('marks non-printable sections with data-print-hide', () => {
     const { container } = render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
     const hiddenElements = container.querySelectorAll('[data-print-hide]');
-    expect(hiddenElements.length).toBeGreaterThanOrEqual(3);
+    expect(hiddenElements.length).toBeGreaterThanOrEqual(1);
   });
 
   it('marks song content with data-print-show', () => {
@@ -118,14 +144,28 @@ describe('SongViewer', () => {
     expect(showElements.length).toBe(1);
   });
 
-  it('renders capo calculator section for ChordPro songs', () => {
+  it('renders capo calculator section for ChordPro songs when controls expanded', () => {
     render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
     expect(screen.getByText('worship.capoCalculator')).toBeInTheDocument();
   });
 
   it('does not render capo calculator for plain text songs', () => {
     const textSong = { ...baseSong, format: 'text' as const };
     render(<SongViewer song={textSong} isAuthenticated onEdit={onEdit} />);
+    expandControls();
     expect(screen.queryByText('worship.capoCalculator')).not.toBeInTheDocument();
+  });
+
+  it('dispatches breadcrumb detail event with song title', () => {
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    render(<SongViewer song={baseSong} isAuthenticated onEdit={onEdit} />);
+
+    const breadcrumbEvent = dispatchSpy.mock.calls.find(
+      (call) => (call[0] as CustomEvent).type === 'breadcrumb-detail'
+    );
+    expect(breadcrumbEvent).toBeDefined();
+    expect((breadcrumbEvent![0] as CustomEvent).detail).toBe('Amazing Grace');
+    dispatchSpy.mockRestore();
   });
 });
