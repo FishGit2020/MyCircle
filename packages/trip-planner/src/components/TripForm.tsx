@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { Trip } from '../types';
+import DestinationSearch from './DestinationSearch';
 
 interface TripFormProps {
   trip: Trip | null;
@@ -11,11 +12,19 @@ interface TripFormProps {
 export default function TripForm({ trip, onSave, onCancel }: TripFormProps) {
   const { t } = useTranslation();
   const [destination, setDestination] = useState(trip?.destination || '');
+  const [lat, setLat] = useState<number | undefined>(trip?.lat);
+  const [lon, setLon] = useState<number | undefined>(trip?.lon);
   const [startDate, setStartDate] = useState(trip?.startDate || '');
   const [endDate, setEndDate] = useState(trip?.endDate || '');
   const [notes, setNotes] = useState(trip?.notes || '');
   const [budget, setBudget] = useState(trip?.budget || 0);
   const [currency, setCurrency] = useState(trip?.currency || 'USD');
+
+  const handleDestinationSelect = useCallback((result: { displayName: string; lat: number; lon: number }) => {
+    setDestination(result.displayName);
+    setLat(result.lat);
+    setLon(result.lon);
+  }, []);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -27,9 +36,11 @@ export default function TripForm({ trip, onSave, onCancel }: TripFormProps) {
       notes: notes.trim(),
       budget,
       currency,
+      lat,
+      lon,
       itinerary: trip?.itinerary || [],
     });
-  }, [destination, startDate, endDate, notes, budget, currency, trip, onSave]);
+  }, [destination, startDate, endDate, notes, budget, currency, lat, lon, trip, onSave]);
 
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-4">
@@ -46,15 +57,13 @@ export default function TripForm({ trip, onSave, onCancel }: TripFormProps) {
         <label htmlFor="tp-dest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {t('tripPlanner.destination')} *
         </label>
-        <input
+        <DestinationSearch
           id="tp-dest"
-          type="text"
           value={destination}
-          onChange={e => setDestination(e.target.value)}
-          required
-          aria-required="true"
+          onChange={setDestination}
+          onSelect={handleDestinationSelect}
           placeholder={t('tripPlanner.destinationPlaceholder')}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
+          required
         />
       </div>
 

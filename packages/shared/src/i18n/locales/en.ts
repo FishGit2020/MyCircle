@@ -2224,6 +2224,7 @@ const en = {
   'tripPlanner.noTickets': 'No tickets added yet',
   'tripPlanner.upcomingTrip': 'Next trip',
   'tripPlanner.noUpcoming': 'No upcoming trips',
+  'tripPlanner.searchDestination': 'Search for a destination...',
 
   // ─── Poll System ──────────────────────────────────────────
   'nav.pollSystem': 'Polls',

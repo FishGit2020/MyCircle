@@ -13,6 +13,8 @@ export interface Trip {
   notes: string;
   budget: number;
   currency: string;
+  lat?: number;
+  lon?: number;
   itinerary: ItineraryDay[];
   tickets?: Ticket[];
   createdAt: number;

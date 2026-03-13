@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { Trip, Activity, ItineraryDay, Ticket } from '../types';
+import TripMapPreview from './TripMapPreview';
 
 interface TripDetailProps {
   trip: Trip;
@@ -143,6 +144,13 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
           </button>
         </div>
       </div>
+
+      {/* Map preview */}
+      {trip.lat != null && trip.lon != null && (
+        <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+          <TripMapPreview lat={trip.lat} lon={trip.lon} destinationName={trip.destination} />
+        </div>
+      )}
 
       {/* Budget summary */}
       {trip.budget > 0 && (
