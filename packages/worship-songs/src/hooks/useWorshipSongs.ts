@@ -68,6 +68,15 @@ export function useWorshipSongs(initialSearch = '') {
     setPage(1);
   }, []);
 
+  const resetFilters = useCallback(() => {
+    setSearchRaw('');
+    setFilterArtistRaw('');
+    setFilterTagRaw('');
+    setFilterFormatRaw('all');
+    setFavoriteIds(null);
+    setPage(1);
+  }, []);
+
   const offset = (page - 1) * PAGE_SIZE;
 
   const { data, loading, refetch } = useQuery(GET_WORSHIP_SONGS_LIST, {
@@ -166,6 +175,7 @@ export function useWorshipSongs(initialSearch = '') {
     deleteSong,
     getSong,
     goToPage,
+    resetFilters,
     refresh: refetch,
   };
 }

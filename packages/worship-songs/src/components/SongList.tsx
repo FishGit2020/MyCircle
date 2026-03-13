@@ -43,17 +43,20 @@ interface SongListProps {
   onNewSong: () => void;
   onDeleteSong?: (id: string) => void;
   onPageChange: (page: number) => void;
+  onResetFilters?: () => void;
 }
 
 export default function SongList({
   songs, totalCount, totalPages, page, allArtists, allTags,
   loading, isAuthenticated, search, filterArtist, filterTag, filterFormat, showFavoritesOnly,
   onSearchChange, onFilterArtistChange, onFilterTagChange, onFilterFormatChange, onFavoritesToggle,
-  onSelectSong, onNewSong, onDeleteSong, onPageChange,
+  onSelectSong, onNewSong, onDeleteSong, onPageChange, onResetFilters,
 }: SongListProps) {
   const { t } = useTranslation();
   const [favorites, setFavorites] = useState(loadFavorites);
   const [sort, setSort] = useState<SortMode>('alpha');
+
+  const hasActiveFilter = search.trim() !== '' || filterArtist !== '' || filterTag !== '' || filterFormat !== 'all' || showFavoritesOnly;
 
   const toggleFavorite = useCallback((e: React.MouseEvent, songId: string) => {
     e.stopPropagation();
@@ -191,6 +194,20 @@ export default function SongList({
             <option value="">{t('worship.allTags')}</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
+        )}
+
+        {/* Reset filters */}
+        {hasActiveFilter && onResetFilters && (
+          <button
+            type="button"
+            onClick={onResetFilters}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-300 dark:hover:border-red-700 transition"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            {t('worship.resetFilters')}
+          </button>
         )}
 
         {/* Sort */}

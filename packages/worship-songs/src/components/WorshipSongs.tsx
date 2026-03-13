@@ -22,7 +22,7 @@ export default function WorshipSongs() {
     search, setSearch: setSearchRaw,
     filterArtist, setFilterArtist, filterTag, setFilterTag, filterFormat, setFilterFormat,
     favoriteIds, setShowFavoritesOnly,
-    addSong, updateSong, deleteSong, getSong, goToPage,
+    addSong, updateSong, deleteSong, getSong, goToPage, resetFilters: resetFiltersRaw,
   } = useWorshipSongs(initialQuery);
 
   // Sync search state to URL ?q= param
@@ -38,6 +38,16 @@ export default function WorshipSongs() {
       return next;
     }, { replace: true });
   }, [setSearchRaw, setSearchParams]);
+
+  const resetFilters = useCallback(() => {
+    resetFiltersRaw();
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.delete('q');
+      return next;
+    }, { replace: true });
+  }, [resetFiltersRaw, setSearchParams]);
+
   const [selectedSong, setSelectedSong] = useState<WorshipSong | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [songLoading, setSongLoading] = useState(false);
@@ -184,6 +194,7 @@ export default function WorshipSongs() {
             onSelectSong={handleSelectSong}
             onNewSong={handleNewSong}
             onPageChange={goToPage}
+            onResetFilters={resetFilters}
             onDeleteSong={async (id: string) => {
               if (!window.confirm(t('worship.deleteConfirm'))) return;
               try {
