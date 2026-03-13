@@ -15,15 +15,18 @@ const SONGS = [
     artist: "We The Kingdom",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]God I'm on my [Em]knees again
+    content: `{Verse 1}
+[G]God I'm on my [Em]knees again
 [C]God I'm begging [D]please again
 [G]I need You oh [Em]I need You
 [C]Walking down these [D]desert roads
 [G]Water for my [Em]thirsty soul
 
+{Chorus}
 [C]I don't want to [D]walk alone
 [Em]I don't want to [D]walk alone
 
+{Verse 2}
 [G]Your forgiveness is like [Em]sweet sweet honey on my lips
 [C]Like the sound of a [D]symphony to my ears
 [G]Like holy water [Em]on my skin
@@ -37,15 +40,18 @@ const SONGS = [
     artist: "We The Kingdom",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Come all you [Eb]weary
+    content: `{Verse 1}
+[Bb]Come all you [Eb]weary
 [Bb]Come all you [F]thirsty
 [Gm]Come to the [Eb]well that never runs [Bb]dry
 [Bb]Drink of the [Eb]water come and thirst no [F]more
 
+{Chorus}
 [Bb]God so loved the [Eb]world that He gave us
 [Gm]His one and [F]only Son to save [Eb]us
 [Bb]Whoever believes [Eb]in Him will live for[Gm]ever
 
+{Verse 2}
 [Bb]Bring all your [Eb]failures bring your addictions
 [Bb]Come lay them [F]down at the foot of the [Gm]cross
 [Eb]Jesus is [F]waiting [Bb]there`,
@@ -58,11 +64,13 @@ const SONGS = [
     artist: "We The Kingdom",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Faith doesn't always [D]mean you understand
+    content: `{Verse 1}
+[A]Faith doesn't always [D]mean you understand
 [F#m]It doesn't always [E]come the way you planned
 [A]But when the waves are [D]high and the boat is [F#m]rocked
 [E]You find out what you believe in
 
+{Chorus}
 [A]I'm dancing on the [D]waves
 [F#m]I'm singing in the [E]rain
 [A]I'm standing on the [D]rock
@@ -79,16 +87,19 @@ const SONGS = [
     artist: "We The Kingdom",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]The enemy comes like a [B]thief in the night
+    content: `{Verse 1}
+[E]The enemy comes like a [B]thief in the night
 [C#m]But I've got a secret a [A]weapon of light
 [E]The blood of the Lamb and the [B]word of my mouth
 [C#m]I won't be si[A]lenced I won't back down
 
+{Chorus}
 [E]Don't tread on me [B]don't tread on me
 [C#m]I've got the power of [A]heaven backing me
 [E]Don't tread on me [B]don't tread on me
 [C#m]Greater is He that [A]lives in me
 
+{Verse 2}
 [E]So let the redeemed of the [B]Lord say so
 [C#m]Let every chain and every [A]stronghold go`,
     notes: "Driving and intense. Southern rock meets worship. Electric guitar heavy.",
@@ -100,16 +111,19 @@ const SONGS = [
     artist: "We The Kingdom",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I was walking the [G]wrong way
+    content: `{Verse 1}
+[C]I was walking the [G]wrong way
 [Am]Heart closed, [F]head down
 [C]Like a stranger in a [G]strange land
 [Am]You gave me a [F]new heart
 
+{Chorus}
 [C]I'm a child of [G]love
 [Am]I was meant to be [F]right here
 [C]A child of [G]love washed in the [Am]blood
 [F]Born of the Spirit of God
 
+{Verse 2}
 [Am]Not what I've [F]done but who You [C]are
 [G]Not where I've [Am]been but where You [F]bring me
 [C]You've taken my [G]pain and held me up`,
@@ -122,16 +136,19 @@ const SONGS = [
     artist: "We The Kingdom",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Unremarkable it [C]looked so plain
+    content: `{Verse 1}
+[G]Unremarkable it [C]looked so plain
 [Em]Ordinary not the [D]frame I would have chose
 [G]But with Your hands You [C]broke the bread
 [Em]And with Your words You [D]blessed and broke and gave
 
+{Chorus}
 [G]Oh it's the pieces of my [C]broken heart
 [Em]That needed breaking all a[D]long
 [G]So take the pieces of this [C]broken life
 [Em]And make something [D]beautiful with me
 
+{Verse 2}
 [C]Broken to be [G]given
 [D]Spilled out to be [Em]shared
 [C]This is how You [G]loved us [D]from the very start`,

@@ -15,11 +15,13 @@ const SONGS = [
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You were the Word at the [A]beginning
+    content: `{Verse 1}
+[D]You were the Word at the [A]beginning
 [Bm]One with God the Lord Most [G]High
 [D]Your hidden glory in [A]creation
 [Bm]Now revealed in You our [G]Christ
 
+{Chorus}
 [D]What a beautiful [A]Name it is
 [Bm]What a beautiful [G]Name it is
 [D]The Name of [A]Jesus Christ my [Bm]King
@@ -28,6 +30,7 @@ const SONGS = [
 [G]What a beautiful [D]Name it is
 The Name of [A]Jesus
 
+{Verse 2}
 [D]You didn't want heaven with[A]out us
 [Bm]So Jesus, You brought heaven [G]down
 [D]My sin was great, Your love was [A]greater
@@ -41,26 +44,31 @@ The Name of [A]Jesus
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Who am I that the [D]highest King
+    content: `{Verse 1}
+[G]Who am I that the [D]highest King
 [Em]Would welcome [C]me
 [G]I was lost but He [D]brought me in
 [Em]Oh His love for [C]me
 [Em]Oh His [D]love for [C]me
 
+{Pre-Chorus}
 [G]Who the Son sets free
 [D]Oh is free indeed
 [Em]I'm a child of [C]God, yes I am
 
+{Pre-Chorus}
 [G]In my Father's house
 [D]There's a place for me
 [Em]I'm a child of [C]God, yes I am
 
+{Verse 2}
 [G]Free at last, He has [D]ransomed me
 [Em]His grace runs [C]deep
 [G]While I was a slave to [D]sin
 [Em]Jesus died for [C]me
 [Em]Yes He [D]died for [C]me
 
+{Verse 3}
 [Em]I am [D]chosen, not for[C]saken
 [Em]I am [D]who You say I [C]am
 [Em]You are [D]for me, not a[C]gainst me
@@ -74,21 +82,25 @@ The Name of [A]Jesus
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]My hope is built on nothing less
+    content: `{Verse 1}
+[C]My hope is built on nothing less
 Than [Am]Jesus' blood and [F]righteousness
 [C]I dare not trust the sweetest frame
 But [Am]wholly trust in [G]Jesus' name
 
+{Chorus}
 [F]Christ alone, [Am]Cornerstone
 [G]Weak made strong, in the [F]Savior's love
 Through the [Am]storm, He is [G]Lord
 Lord of [C]all
 
+{Verse 2}
 [C]When darkness seems to hide His face
 I [Am]rest on His un[F]changing grace
 [C]In every high and stormy gale
 My [Am]anchor holds with[G]in the veil
 
+{Verse 3}
 [C]When He shall come with trumpet sound
 Oh [Am]may I then in [F]Him be found
 [C]Dressed in His righteousness alone
@@ -102,18 +114,21 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I see the King of Glory
+    content: `{Verse 1}
+[G]I see the King of Glory
 [C]Coming on the clouds with fire
 [Em]The whole earth shakes, [C]the whole earth shakes
 [G]I see His love and mercy
 [C]Washing over all our sin
 [Em]The people sing, [C]the people sing
 
+{Chorus}
 [G]Hosanna, [D]hosanna
 [Em]Hosanna in the [C]highest
 [G]Hosanna, [D]hosanna
 [Em]Hosanna in the [C]highest
 
+{Verse 2}
 [G]I see a generation
 [C]Rising up to take their place
 [Em]With selfless faith, [C]selfless faith
@@ -121,6 +136,7 @@ Oh [Am]may I then in [F]Him be found
 [C]Stirring as we pray and seek
 [Em]We're on our knees, [C]we're on our knees
 
+{Bridge}
 [Em]Heal my heart and [C]make it clean
 [G]Open up my [D]eyes to the things unseen
 [Em]Show me how to [C]love like You have loved me
@@ -134,13 +150,15 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Everyone needs compas[E]sion
+    content: `{Verse 1}
+[A]Everyone needs compas[E]sion
 [F#m]A love that's never [D]failing
 [A]Let mercy [E]fall on [D]me
 [A]Everyone needs for[E]giveness
 [F#m]The kindness of a [D]Savior
 [A]The hope of [E]na[D]tions
 
+{Chorus}
 [A]Savior, He can move the [E]mountains
 [F#m]My God is mighty to [D]save
 [A]He is mighty to [E]save
@@ -148,6 +166,7 @@ Oh [Am]may I then in [F]Him be found
 [F#m]He rose and conquered the [D]grave
 [A]Jesus conquered the [E]grave
 
+{Verse 2}
 [A]So take me as You [E]find me
 [F#m]All my fears and [D]failures
 [A]Fill my life [E]a[D]gain
@@ -163,16 +182,19 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]My Jesus, my [Dm]Savior
+    content: `{Verse 1}
+[Bb]My Jesus, my [Dm]Savior
 [Eb]Lord there is none [Bb]like You
 [Gm]All of my days [Dm]I want to praise
 [Eb]The wonders of Your [F]mighty love
 
+{Verse 2}
 [Bb]My comfort, my [Dm]shelter
 [Eb]Tower of refuge and [Bb]strength
 [Gm]Let every breath, [Dm]all that I am
 [Eb]Never cease to [F]worship You
 
+{Chorus}
 [Bb]Shout to the Lord, [Dm]all the earth, let us sing
 [Eb]Power and majesty, [Bb]praise to the King
 [Gm]Mountains bow down [Dm]and the seas will roar
@@ -190,21 +212,25 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]In the darkness we were [A]waiting
+    content: `{Verse 1}
+[D]In the darkness we were [A]waiting
 [Bm]Without hope, without [G]light
 [D]Till from heaven You [A]came running
 [Bm]There was mercy in Your [G]eyes
 
+{Verse 2}
 [D]To fulfil the law and [A]prophets
 [Bm]To a virgin came the [G]Word
 [D]From a throne of endless [A]glory
 [Bm]To a cradle in the [G]dirt
 
+{Chorus}
 [D]Praise the Father, [A]praise the Son
 [Bm]Praise the Spirit, [G]three in one
 [D]God of glory, [A]majesty
 [Bm]Praise forever to the [G]King of Kings
 
+{Verse 3}
 [D]To reveal the kingdom [A]coming
 [Bm]And to reconcile the [G]lost
 [D]To redeem the whole [A]creation
@@ -218,16 +244,19 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]All these pieces, [D]broken and scattered
+    content: `{Verse 1}
+[G]All these pieces, [D]broken and scattered
 [Em]In mercy [C]gathered, mended and whole
 [G]Empty-handed [D]but not forsaken
 [Em]I've been set [C]free, I've been set free
 
+{Chorus}
 [G]Amazing grace, how [D]sweet the sound
 [Em]That saved a [C]wretch like me
 [G]Oh I once was [D]lost but now I'm found
 [Em]Was blind but [C]now I see
 
+{Bridge}
 [G]Oh I can see You [D]now, oh I can see the [Em]love in Your eyes
 [C]Laying Yourself down, [G]raising up the broken to [D]life`,
     notes: "Modern hymn arrangement with a powerful bridge.",
@@ -239,16 +268,19 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I cast my mind to [A]Calvary
+    content: `{Verse 1}
+[D]I cast my mind to [A]Calvary
 [Bm]Where Jesus bled and [G]died for me
 [D]I see His wounds, His [A]hands, His feet
 [Bm]My Savior on that [G]cursed tree
 
+{Verse 2}
 [D]His body bound and [A]drenched in tears
 [Bm]They laid Him down in [G]Joseph's tomb
 [D]The entrance sealed by [A]heavy stone
 [Bm]Messiah still and [G]all alone
 
+{Chorus}
 [D]O praise the Name of the [A]Lord our God
 [Bm]O praise His Name for[G]evermore
 [D]For endless days we will [A]sing Your praise
@@ -262,11 +294,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Your love is like a [B]river wild
+    content: `{Verse 1}
+[E]Your love is like a [B]river wild
 [C#m]Breaking through at [A]every wall
 [E]Your love is like the [B]wind in my sails
 [C#m]Carry me [A]through
 
+{Chorus}
 [E]Open heaven over [B]me
 [C#m]Your love raining [A]down
 [E]Open heaven over [B]me
@@ -280,11 +314,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]In the beginning [E]You spoke
+    content: `{Verse 1}
+[A]In the beginning [E]You spoke
 [F#m]And chaos turned to [D]order
 [A]In the darkness [E]Your word
 [F#m]Brought life and [D]hope forever
 
+{Chorus}
 [A]Let there be light, [E]let there be light
 [F#m]In every [D]corner of my soul
 [A]Let there be light, [E]let there be light
@@ -298,11 +334,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I surrender [A]all to You
+    content: `{Verse 1}
+[D]I surrender [A]all to You
 [Bm]All I am and [G]all I do
 [D]Every dream I [A]lay it down
 [Bm]At the cross where [G]mercy found me
 
+{Chorus}
 [D]I surrender, [A]I surrender
 [Bm]I want to know [G]You more
 [D]I surrender, [A]I surrender
@@ -316,11 +354,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]In the crushing, [F]in the pressing
+    content: `{Verse 1}
+[Bb]In the crushing, [F]in the pressing
 [Gm]You are making [Eb]new wine
 [Bb]In the soil I [F]now surrender
 [Gm]You are breaking [Eb]new ground
 
+{Chorus}
 [Bb]So I yield to [F]You and to Your
 [Gm]Careful hand, [Eb]make me new
 [Bb]Make me Your [F]vessel
@@ -334,11 +374,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]God of mercy [D]sweet the sound
+    content: `{Verse 1}
+[G]God of mercy [D]sweet the sound
 [Em]Of my Savior's [C]name
 [G]In my darkest [D]hour You found me
 [Em]Lifted me [C]again
 
+{Chorus}
 [G]Awake my soul, [D]awake my soul
 [Em]And sing, [C]sing
 [G]His love is all [D]I need
@@ -352,11 +394,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Our Father ever[D]lasting
+    content: `{Verse 1}
+[G]Our Father ever[D]lasting
 [Em]The all creating [C]One
 [G]God Almighty [D]through Your
 [Em]Holy Spirit con[C]ceiving
 
+{Chorus}
 [G]This I believe, [D]in God the Father
 [Em]I believe in [C]Christ the Son
 [G]I believe in the [D]Holy Spirit
@@ -370,11 +414,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I was a wretch, [G]I remember who I was
+    content: `{Verse 1}
+[C]I was a wretch, [G]I remember who I was
 [Am]I was lost, I was [F]blind, I was running out of time
 [C]Sin separated, [G]the breach was far too wide
 [Am]But from the far side [F]of the chasm You held me in Your sight
 
+{Chorus}
 [C]Thank You Jesus [G]for the blood applied
 [Am]Thank You Jesus, [F]it has washed me white
 [C]Thank You Jesus, [G]You have saved my life
@@ -388,11 +434,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]A thousand times I've [A]failed
+    content: `{Verse 1}
+[D]A thousand times I've [A]failed
 [Bm]Still Your mercy re[G]mains
 [D]And should I stumble a[A]gain
 [Bm]I'm caught in Your [G]grace
 
+{Chorus}
 [D]Everlasting, [A]Your light will shine when
 [Bm]All else [G]fades
 [D]Never ending, [A]Your glory goes be[Bm]yond all [G]fame`,
@@ -405,11 +453,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Oh to see the [G]dawn of the [D]darkest [A]day
+    content: `{Verse 1}
+[D]Oh to see the [G]dawn of the [D]darkest [A]day
 [D]Christ on the [G]road to [A]Calva[D]ry
 [D]Tried by sinful [G]men, [D]torn and [A]beaten then
 [D]Nailed to a [G]cross of [A]wood[D]
 
+{Chorus}
 [D]This the power [G]of the [D]cross
 [Bm]Christ became sin [G]for [A]us
 [D]Took the blame, [G]bore the [D]wrath
@@ -423,11 +473,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You are good, [D]You are good
+    content: `{Verse 1}
+[G]You are good, [D]You are good
 [Em]When there's nothing [C]good in me
 [G]You are love, [D]You are love
 [Em]On display for [C]all to see
 
+{Chorus}
 [G]Oh I'm running to Your [D]arms
 [Em]I'm running to Your [C]arms
 [G]The riches of Your [D]love
@@ -443,11 +495,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]When the sun is [B]shining down on me
+    content: `{Verse 1}
+[E]When the sun is [B]shining down on me
 [C#m]And the world's all [A]as it should be
 [E]Bless Your name [B]I'll sing
 [C#m]Oh when the dark[A]ness closes in
 
+{Chorus}
 [E]Tell the world that [B]Jesus lives
 [C#m]Tell the world that [A]He died for us
 [E]Tell the world that [B]He lives again
@@ -461,11 +515,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Beneath the waters [E]I will go
+    content: `{Verse 1}
+[A]Beneath the waters [E]I will go
 [F#m]Where Your love has [D]called me
 [A]Buried in this [E]living flood
 [F#m]Raised to life with [D]You my God
 
+{Chorus}
 [A]All to You, I'm [E]leaving behind
 [F#m]Stepping into [D]faith
 [A]Beneath the [E]waters
@@ -479,11 +535,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]You outshine the [E]sun
+    content: `{Verse 1}
+[B]You outshine the [E]sun
 [G#m]You outlast the [F#]stars
 [B]Brighter than the [E]brightest morning
 [G#m]Glorious, You [F#]are
 
+{Chorus}
 [B]Transfiguration, [E]full revelation
 [G#m]We can see You [F#]face to face
 [B]You are the wonder, [E]pulling us under
@@ -497,11 +555,13 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You said, ask and you'll re[D]ceive
+    content: `{Verse 1}
+[G]You said, ask and you'll re[D]ceive
 [Em]Anything in [C]My name
 [G]You said, seek and you'll [D]find
 [Em]Knock and the door [C]will open wide
 
+{Chorus}
 [G]So I come before You [D]now
 [Em]With a humble [C]heart
 [G]I reach my hands to [D]heaven
@@ -515,16 +575,19 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I have this [Am]hope
+    content: `{Verse 1}
+[C]I have this [Am]hope
 [F]As an anchor for my [G]soul
 [C]Through every [Am]storm
 [F]I will hold to [G]You
 
+{Pre-Chorus}
 [Am]With every breath [F]I'll praise You
 [C]In every cir[G]cumstance
 [Am]I'll lift my eyes and [F]see beyond
 [C]My anchor [G]holds
 
+{Chorus}
 [C]I will not be [Am]shaken
 [F]My anchor holds for[G]ever
 [C]Built on a firm foun[Am]dation
@@ -538,16 +601,19 @@ Oh [Am]may I then in [F]Him be found
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Death could not hold You, the [A]veil tore before You
+    content: `{Bridge}
+[D]Death could not hold You, the [A]veil tore before You
 [Bm]You silence the boast [G]of sin and grave
 [D]The heavens are roaring the [A]praise of Your glory
 [Bm]For You are raised to [G]life again
 
+{Verse 2}
 [D]You have no rival, You [A]have no equal
 [Bm]Now and forever God [G]You reign
 [D]Yours is the kingdom, [A]Yours is the glory
 [Bm]Yours is the Name a[G]bove all names
 
+{Chorus}
 [D]What a powerful [A]Name it is
 [Bm]What a powerful [G]Name it is
 [D]The Name of [A]Jesus Christ my [Bm]King
@@ -564,16 +630,19 @@ The Name of [A]Jesus`,
     artist: "Hillsong Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Though the seasons [F]change
+    content: `{Verse 1}
+[Bb]Though the seasons [F]change
 [Gm]Your love re[Eb]mains
 [Bb]Though I walk through [F]the valley
 [Gm]You are with [Eb]me still
 
+{Verse 2}
 [Bb]Like the winter turns to [F]spring
 [Gm]Like the dawn replaces [Eb]night
 [Bb]Even when I cannot [F]see
 [Gm]I will trust Your [Eb]faithfulness
 
+{Chorus}
 [Bb]For everything there [F]is a season
 [Gm]A time for joy, a [Eb]time for tears
 [Bb]In every season [F]I will praise You
@@ -587,13 +656,15 @@ The Name of [A]Jesus`,
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Light of the world
+    content: `{Verse 1}
+[D]Light of the world
 [A]You stepped down into darkness
 [Em]Opened my eyes [G]let me see
 [D]Beauty that made
 [A]This heart adore You
 [Em]Hope of a life [G]spent with You
 
+{Chorus}
 [D]Here I am to [A]worship
 [D]Here I am to [G]bow down
 [D]Here I am to [A]say that You're my [G]God
@@ -609,16 +680,19 @@ The Name of [A]Jesus`,
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]More than the air I [D]breathe
+    content: `{Verse 1}
+[G]More than the air I [D]breathe
 [Em]More than the song I [C]sing
 [G]More than the next heart[D]beat
 [Em]More than any[C]thing
 
+{Chorus}
 [G]And Lord I want to [D]be more like You
 [Em]Take this heart and [C]make it new
 [G]More than [D]anything
 [Em]I desire [C]You
 
+{Bridge}
 [Em]There is nothing [D]on this earth
 [C]I desire beside [G]You
 [Em]You are my strength, [D]my shield
@@ -632,11 +706,13 @@ The Name of [A]Jesus`,
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]O how far from [G]home have my footsteps [Am]taken me
+    content: `{Verse 1}
+[C]O how far from [G]home have my footsteps [Am]taken me
 [F]Running from the [C]arms that are [G]wide enough
 [C]How far from [G]home has my restless [Am]heart taken me
 [F]Far from where my [C]home and rest [G]is found
 
+{Chorus}
 [C]I will go [G]to the highlands
 [Am]Where the mountains [F]cry
 [C]The water and the [G]wind
@@ -644,6 +720,7 @@ The Name of [A]Jesus`,
 [C]Oh come what [G]may
 [Am]In the [F]highlands
 
+{Verse 2}
 [C]Whatever I walk [G]through wherever [Am]I am
 [F]Your love has a [C]reach that I [G]cannot outrun
 [C]So in the shadow of [G]the valley I will [Am]not fear
@@ -657,16 +734,19 @@ The Name of [A]Jesus`,
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]In the upper [E]room with You
+    content: `{Verse 1}
+[A]In the upper [E]room with You
 [F#m]Poured out like [D]wine
 [A]I just want to [E]be with You
 [F#m]Here in this [D]moment
 
+{Chorus}
 [A]Send Your fire, [E]send Your rain
 [F#m]Fill this place with [D]heaven's sound
 [A]Upper room, [E]upper room
 [F#m]Let Your Spirit [D]come down
 
+{Bridge}
 [A]Set this heart a[E]blaze again
 [F#m]Like the day of [D]Pentecost
 [A]Tongues of fire and [E]rushing wind
@@ -680,11 +760,13 @@ The Name of [A]Jesus`,
     artist: "Hillsong Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Savior I come, [C]quiet my soul
+    content: `{Verse 1}
+[F]Savior I come, [C]quiet my soul
 [Dm]Remem[Bb]ber redemption's hill
 [F]Where Your blood was [C]spilled
 [Dm]For my [Bb]ransom
 
+{Chorus}
 [F]Lead me to the [C]cross
 [Dm]Where Your love poured [Bb]out
 [F]Bring me to my [C]knees
@@ -692,6 +774,7 @@ The Name of [A]Jesus`,
 [F]Rid me of my[C]self, I belong to [Dm]You
 [Bb]Lead me, lead me to the [F]cross
 
+{Verse 2}
 [F]You were as I, [C]tempted and tried
 [Dm]Hu[Bb]man
 [F]The word became [C]flesh
@@ -706,16 +789,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "Eb",
     format: "chordpro",
-    content: `[Eb]There is none other [Bb]God but You
+    content: `{Verse 1}
+[Eb]There is none other [Bb]God but You
 [Cm]None who can do what [Ab]You can do
 [Eb]From the rising sun [Bb]to the setting same
 [Cm]There is none [Ab]like You
 
+{Chorus}
 [Eb]None other, [Bb]none other
 [Cm]Worthy of all my [Ab]praise
 [Eb]None other, [Bb]none other
 [Cm]Glorious in all Your [Ab]ways
 
+{Bridge}
 [Eb]Mountains bow at Your [Bb]name
 [Cm]Oceans roar Your [Ab]fame
 [Eb]Every knee will bow [Bb]every tongue confess
@@ -729,16 +815,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Oh Your cross, it [E]changes everything
+    content: `{Verse 1}
+[A]Oh Your cross, it [E]changes everything
 [F#m]There You showed me [D]I am loved
 [A]In the midst of [E]pain and suffering
 [F#m]I believe there [D]is still hope
 
+{Chorus}
 [A]We have seen [E]glorious ruins
 [F#m]Where You tore the [D]veil in two
 [A]We have seen [E]glorious ruins
 [F#m]Breathing life where [D]life was through
 
+{Bridge}
 [A]All these broken [E]pieces fit together
 [F#m]To tell a story [D]I could never write myself
 [A]Beauty from [E]ashes
@@ -752,14 +841,17 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Hide me now [Am]under Your wings
+    content: `{Verse 1}
+[C]Hide me now [Am]under Your wings
 [F]Cover me [G]within Your mighty hand
 [C]When the oceans [Am]rise and thunders storm
 [F]I will soar with [G]You above the storm
 
+{Chorus}
 [C]Father You are [Am]King over the flood
 [F]I will be still and [G]know You are God
 
+{Verse 2}
 [C]Find rest my soul [Am]in Christ alone
 [F]Know His power [G]in quietness and trust
 [C]When the oceans [Am]rise and thunders storm
@@ -773,16 +865,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]In the morning [D]light I see You
+    content: `{Verse 1}
+[G]In the morning [D]light I see You
 [Em]In the shadow [C]You are there
 [G]Every moment [D]every heartbeat
 [Em]You are closer [C]than the air
 
+{Chorus}
 [G]I'm running to You, [D]running to You
 [Em]No place I'd rather [C]be
 [G]I'm running to You, [D]running to You
 [Em]Your arms are all [C]I need
 
+{Bridge}
 [Em]When the world grows [D]cold and dark
 [C]Your love is my [G]compass
 [Em]Through the valleys [D]through the night
@@ -796,16 +891,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Christ is my [E]reward and all of my [F#m]devotion
+    content: `{Verse 1}
+[A]Christ is my [E]reward and all of my [F#m]devotion
 [D]Now there's nothing in this [A]world that could ever [E]satisfy
 [F#m]Through every [D]trial my soul will sing
 [A]No turning [E]back I've been set [F#m]free[D]
 
+{Chorus}
 [A]Christ is e[E]nough for me
 [F#m]Christ is e[D]nough for me
 [A]Everything I [E]need is in [F#m]You
 [D]Everything I [A]need
 
+{Bridge}
 [A]I have de[E]cided to follow [F#m]Jesus[D]
 [A]No turning [E]back, no turning [F#m]back[D]`,
     notes: "Declaration of sufficiency in Christ. Rend Collective co-write feel.",
@@ -817,16 +915,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Man of Sorrows, [G]Lamb of God
+    content: `{Verse 1}
+[D]Man of Sorrows, [G]Lamb of God
 [Bm]By His own be[A]trayed
 [D]The sin of man and [G]wrath of God
 [Bm]Has been on Jesus [A]laid
 
+{Verse 2}
 [D]Silent as He [G]stood accused
 [Bm]Beaten, mocked and [A]scorned
 [D]Bowing His head [G]to death on a cross
 [Bm]As helpless ones looked [A]on
 
+{Chorus}
 [D]Oh that rugged [G]cross, my salvation
 [Bm]Where Your love poured [A]out over me
 [D]Now my soul cries [G]out hallelujah
@@ -840,17 +941,20 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Into Your [D]hand I commit again
+    content: `{Verse 1}
+[G]Into Your [D]hand I commit again
 [Em]With all I [C]am for You Lord
 [G]You hold my [D]world in the palm of Your hand
 [Em]And I am [C]Yours forever
 
+{Chorus}
 [G]Jesus I be[D]lieve in You
 [Em]Jesus I be[C]long to You
 [G]You're the reason that I [D]live
 [Em]The reason that I [C]sing
 [G]With all I [D]am
 
+{Bridge}
 [Em]I'll walk with [D]You wherever You [C]lead
 [Em]Through it all [D]I'll cling to [C]You`,
     notes: "Heartfelt commitment song. Acoustic-driven, intimate worship.",
@@ -862,16 +966,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]The world waits for a [E]miracle
+    content: `{Verse 1}
+[A]The world waits for a [E]miracle
 [F#m]The heart longs for a [D]little bit of hope
 [A]O come, O come Em[E]manuel
 [F#m]A child, a son, [D]given to us all
 
+{Chorus}
 [A]Light of the world, [E]You stepped down into darkness
 [F#m]Opened my eyes [D]let me see
 [A]Glory above, [E]revealed in a manger
 [F#m]Here in Your [D]presence
 
+{Bridge}
 [A]Joy to the world, [E]the Lord has come
 [F#m]Hope for the weary, [D]peace for the broken
 [A]Light of the world, [E]shine on us
@@ -885,16 +992,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Let now the [A]weak say I have strength
+    content: `{Verse 1}
+[D]Let now the [A]weak say I have strength
 [Bm]By the Spirit of [G]power that raised Christ from the dead
 [D]Let now the [A]poor stand and confess
 [Bm]That my portion is [G]Him and I'm more than blessed
 
+{Verse 2}
 [D]Let now our [A]hearts burn with a flame
 [Bm]A fire consuming [G]all for Your Son's holy name
 [D]And with the [A]heavens we declare
 [Bm]You are our [G]King
 
+{Chorus}
 [D]We love You Lord, [A]we worship You
 [Bm]You are our God, [G]You alone are good
 [D]You asked Your Son to [A]carry this
@@ -909,16 +1019,19 @@ Now You're ri[F]sen`,
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Breathe on me [G]breath of God
+    content: `{Verse 1}
+[C]Breathe on me [G]breath of God
 [Am]Fill me with [F]life anew
 [C]That I may love the [G]things You love
 [Am]And do what [F]You would do
 
+{Chorus}
 [C]Spirit lead me [G]where my trust is without borders
 [Am]Let me walk upon the [F]waters
 [C]Wherever You would [G]call me
 [Am]Take me deeper than my [F]feet could ever wander
 
+{Verse 2}
 [C]Spirit lead me, [G]Spirit lead me
 [Am]Spirit lead me to the [F]place where I belong
 [C]Where Your power meets my [G]weakness

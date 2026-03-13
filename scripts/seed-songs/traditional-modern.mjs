@@ -15,11 +15,13 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Be Thou my [G]Vision, O [D]Lord of my [A]heart
+    content: `{Verse 1}
+[D]Be Thou my [G]Vision, O [D]Lord of my [A]heart
 [Bm]Naught be all [G]else to me, [A]save that Thou [D]art
 [D]Thou my best [G]thought, by [D]day or by [A]night
 [Bm]Waking or [G]sleeping, Thy [A]presence my [D]light
 
+{Chorus}
 [D]Riches I [G]heed not, nor [D]man's empty [A]praise
 [Bm]Thou mine in[G]heritance, [A]now and al[D]ways
 [D]Thou and Thou [G]only, [D]first in my [A]heart
@@ -33,7 +35,8 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Come Thou fount of [G]every [D]blessing
+    content: `{Verse 1}
+[D]Come Thou fount of [G]every [D]blessing
 [D]Tune my [A]heart to sing Thy [D]grace
 [D]Streams of mercy [G]never [D]ceasing
 [D]Call for [A]songs of loudest [D]praise
@@ -42,6 +45,7 @@ const SONGS = [
 [D]Praise the [G]mount I'm [D]fixed upon it
 [D]Mount of [A]Thy redeeming [D]love
 
+{Chorus}
 [D]Here I raise my [G]Eben[D]ezer
 [D]Hither [A]by Thy help I've [D]come
 [D]And I hope by [G]Thy good [D]pleasure
@@ -55,14 +59,17 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]When peace like a [Eb]river at[Bb]tendeth my way
+    content: `{Verse 1}
+[Bb]When peace like a [Eb]river at[Bb]tendeth my way
 [Eb]When sorrows like [Bb]sea billows [F]roll
 [Bb]Whatever my [Eb]lot Thou hast [Bb]taught me to [F]say
 [Bb]It is well, [Eb]it is [F]well with my [Bb]soul
 
+{Chorus}
 [Bb]It is [Eb]well [Bb]with my [F]soul
 [Bb]It is [Eb]well, it is [F]well with my [Bb]soul
 
+{Verse 2}
 [Bb]My sin oh the [Eb]bliss of this [Bb]glorious thought
 [Eb]My sin not in [Bb]part but the [F]whole
 [Bb]Is nailed to the [Eb]cross and I [Bb]bear it no [F]more
@@ -76,11 +83,13 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]O Lord my [Eb]God, when I in [Bb]awesome wonder
+    content: `{Verse 1}
+[Bb]O Lord my [Eb]God, when I in [Bb]awesome wonder
 [F]Consider all the [Bb]worlds Thy hands have [Eb]made
 [Bb]I see the [Eb]stars, I hear the [Bb]rolling thunder
 [F]Thy power throughout the [Bb]universe dis[Eb]played
 
+{Chorus}
 [Bb]Then sings my [Eb]soul, my [Bb]Savior God to [F]Thee
 [Bb]How great Thou [Eb]art, how [F]great Thou [Bb]art
 [Bb]Then sings my [Eb]soul, my [Bb]Savior God to [F]Thee
@@ -94,11 +103,13 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Great is Thy [G]faithfulness, [D]O God my [A]Father
+    content: `{Verse 1}
+[D]Great is Thy [G]faithfulness, [D]O God my [A]Father
 [D]There is no [G]shadow of [A]turning with [D]Thee
 [D]Thou changest [G]not, Thy com[D]passions they [Bm]fail not
 [G]As Thou hast [D]been, Thou for[A]ever wilt [D]be
 
+{Chorus}
 [D]Great is Thy [G]faithfulness, [D]great is Thy [A]faithfulness
 [Bm]Morning by [G]morning new [A]mercies I [D]see
 [D]All I have [G]needed Thy [D]hand hath pro[Bm]vided
@@ -112,14 +123,17 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "Em",
     format: "chordpro",
-    content: `[Em]O come O come Em[Am]man[D]u[G]el
+    content: `{Verse 1}
+[Em]O come O come Em[Am]man[D]u[G]el
 [C]And ransom captive [Am]Is[Bm]ra[Em]el
 [Em]That mourns in lonely [Am]ex[D]ile [G]here
 [C]Until the Son of [Am]God [Bm]ap[Em]pear
 
+{Chorus}
 [Em]Rejoice, re[D]joice, Em[G]man[C]uel
 [Am]Shall come to [Bm]thee O [Am]Is[Bm]ra[Em]el
 
+{Verse 2}
 [Em]O come Thou Day-spring [Am]come [D]and [G]cheer
 [C]Our spirits [Am]by Thine [Bm]ad[Em]vent here
 [Em]Disperse the gloomy [Am]clouds [D]of [G]night
@@ -133,13 +147,15 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Joy to the world, the [A]Lord is [D]come
+    content: `{Verse 1}
+[D]Joy to the world, the [A]Lord is [D]come
 [G]Let [A]earth re[D]ceive her King
 [D]Let every heart pre[D]pare Him room
 [D]And heaven and nature [A]sing
 [G]And heaven and nature [D]sing
 [D]And [G]heaven and [D]heaven and [A]nature [D]sing
 
+{Chorus}
 [D]He rules the world with [A]truth and [D]grace
 [G]And [A]makes the [D]nations prove
 [D]The glories of His righteousness
@@ -155,13 +171,15 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Silent night, [F]holy night
+    content: `{Verse 1}
+[Bb]Silent night, [F]holy night
 [Bb]All is calm, [Eb]all is bright
 [Eb]Round yon virgin [Bb]mother and child
 [Eb]Holy infant so [Bb]tender and mild
 [F]Sleep in heavenly [Bb]peace
 [F]Sleep in heavenly [Bb]peace
 
+{Chorus}
 [Bb]Silent night, [F]holy night
 [Bb]Son of God, [Eb]love's pure light
 [Eb]Radiant beams from [Bb]Thy holy face
@@ -177,11 +195,13 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]O holy [F]night the [C]stars are brightly [G]shining
+    content: `{Verse 1}
+[C]O holy [F]night the [C]stars are brightly [G]shining
 [C]It is the [F]night of our [C]dear Savior's [G]birth
 [C]Long lay the [F]world in [C]sin and error [Em]pining
 [Am]Till He ap[Em]peared and the [F]soul felt its [G]worth
 
+{Chorus}
 [Am]A thrill of [Em]hope the [F]weary world re[C]joices
 [Am]For yonder [Em]breaks a [F]new and glorious [G]morn
 [C]Fall on your [F]knees, O [Am]hear the angel [C]voices
@@ -196,16 +216,19 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "Em",
     format: "chordpro",
-    content: `[Em]What child is this who [D]laid to rest
+    content: `{Verse 1}
+[Em]What child is this who [D]laid to rest
 [Em]On Mary's lap is [B7]sleeping
 [Em]Whom angels greet with [D]anthems sweet
 [Em]While [B7]shepherds watch are [Em]keeping
 
+{Chorus}
 [G]This, this is [D]Christ the King
 [Em]Whom shepherds guard and [B7]angels sing
 [G]Haste, haste to [D]bring Him laud
 [Em]The [B7]babe the son of [Em]Mary
 
+{Verse 2}
 [Em]So bring Him incense [D]gold and myrrh
 [Em]Come peasant king to [B7]own Him
 [Em]The King of kings sal[D]vation brings
@@ -219,16 +242,19 @@ const SONGS = [
     artist: "Traditional (Modern)",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Angels we have [Dm]heard on [Bb]high
+    content: `{Verse 1}
+[F]Angels we have [Dm]heard on [Bb]high
 [F]Sweetly singing [C]o'er the [F]plains
 [F]And the mountains [Dm]in re[Bb]ply
 [F]Echoing their [C]joyous [F]strains
 
+{Chorus}
 [F]Glo[C]o[Dm]o[C]o[Bb]o[A]o[Bb]o[C]ria
 [Dm]In ex[C]celsis [F]De[Bb]o [F/A] [C]
 [F]Glo[C]o[Dm]o[C]o[Bb]o[A]o[Bb]o[C]ria
 [Dm]In ex[C]celsis [F]De[Bb]o [F]
 
+{Verse 2}
 [F]Come to Bethle[Dm]hem and [Bb]see
 [F]Him whose birth the [C]angels [F]sing
 [F]Come adore on [Dm]bended [Bb]knee

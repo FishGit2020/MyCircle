@@ -15,17 +15,20 @@ const SONGS = [
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I searched the world but it couldn't [Am]fill me
+    content: `{Verse 1}
+[C]I searched the world but it couldn't [Am]fill me
 [F]Man's empty praise and [C]treasures that fade
 [C]Are never enough
 [C]Then You came along and put me [Am]back together
 [F]And every desire is [C]now satisfied here in Your love
 
+{Pre-Chorus}
 [Am]Oh there's [F]nothing better than You
 [C]There's nothing [G]better than You
 [Am]Lord there's [F]nothing
 [C]Nothing is better than [G]You
 
+{Chorus}
 [C]You turn mourning to [Am]dancing
 [F]You give beauty for [C]ashes
 [C]You turn shame into [Am]glory
@@ -43,17 +46,20 @@ const SONGS = [
     artist: "Elevation Worship",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]I'll never be more [G#m]loved than I am right now
+    content: `{Verse 1}
+[B]I'll never be more [G#m]loved than I am right now
 [E]Wasn't holding You up
 So there's nothing I can do to [B]let You down
 [B]It doesn't take a [G#m]trophy to make You proud
 [E]I'll never be more [F#]loved than I am right [B]now
 
+{Chorus}
 [B]Jireh, You are e[G#m]nough
 [E]Jireh, You are e[F#]nough
 [B]And I will be con[G#m]tent in every circum[E]stance
 [F#]You are [B]Jireh, You are enough
 
+{Verse 2}
 [B]I wasn't holding [G#m]You up
 So there's nothing I can do to [E]let You down
 [B]It doesn't take a [G#m]trophy to make You proud
@@ -67,18 +73,21 @@ So there's nothing I can do to [E]let You down
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Are you hurting and [E]broken within
+    content: `{Verse 1}
+[A]Are you hurting and [E]broken within
 [F#m]Overwhelmed by the [D]weight of your sin
 [A]Jesus is [E]calling
 [A]Have you come to the [E]end of yourself
 [F#m]Do you thirst for a [D]drink from the well
 [A]Jesus is [E]calling
 
+{Chorus}
 [A]O come to the [E]altar
 [F#m]The Father's arms are open [D]wide
 [A]Forgiveness was [E]bought with
 [F#m]The precious blood of [D]Jesus Christ
 
+{Verse 2}
 [A]Leave behind your [E]regrets and mistakes
 [F#m]Come today there's no [D]reason to wait
 [A]Jesus is [E]calling
@@ -94,18 +103,21 @@ So there's nothing I can do to [E]let You down
     artist: "Elevation Worship",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]Walking around these walls
+    content: `{Verse 1}
+[B]Walking around these walls
 [G#m]I thought by now they'd fall
 [E]But You have never failed me yet
 [F#]Waiting for change to come
 [B]Knowing the battle's won
 [G#m]For You have never failed me yet
 
+{Pre-Chorus}
 [E]Your promise still [F#]stands
 [G#m]Great is Your faith[B]fulness
 [E]Faithfulness
 [F#]I'm still in Your [B]hands
 
+{Chorus}
 [B]This is my confidence
 [G#m]You've never failed me yet
 [B]I've seen You move, You [E]move the mountains
@@ -121,16 +133,19 @@ And I believe, I'll see You [E]do it again`,
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Saturday was si[Am]lent
+    content: `{Verse 1}
+[F]Saturday was si[Am]lent
 [Bb]Surely it was [F]through
 [F]But since when has [Am]impossible
 [Bb]Ever stopped [C]You
 
+{Chorus}
 [F]This is the sound of [Am]dry bones rattling
 [Bb]This is the praise make a [F]dead man walk again
 [F]Open the grave, I'm [Am]coming out
 [Bb]I'm gonna live, gonna [C]live again
 
+{Verse 2}
 [F]On the third day, [Am]heaven threw a party
 [Bb]The stone was rolled a[C]way
 [F]On the third day, [Am]those walking dead
@@ -146,12 +161,14 @@ And I believe, I'll see You [E]do it again`,
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]The weapon formed against me [B]won't prosper
+    content: `{Verse 1}
+[E]The weapon formed against me [B]won't prosper
 [C#m]Every chain the [A]enemy tries to use
 [E]God has given me [B]authority
 [C#m]What the devil meant for [A]evil
 God will turn it for my [E]good
 
+{Chorus}
 [E]I'm gonna see a [B]victory
 [C#m]I'm gonna see a [A]victory
 [E]For the battle be[B]longs to You, Lord
@@ -167,19 +184,23 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]The head that once was [D]crowned with thorns
+    content: `{Verse 1}
+[G]The head that once was [D]crowned with thorns
 [Em]Is crowned with glory [C]now
 [G]The Savior knelt to [D]wash our feet
 [Em]Now at His feet we [C]bow
 
+{Verse 2}
 [G]The One who wore our [D]sin and shame
 [Em]Now robed in majes[C]ty
 [G]The radiance of [D]perfect love
 [Em]Now shines for all to [C]see
 
+{Chorus}
 [G]Your name, [D]Your name is victo[Em]ry
 [C]All praise will rise to [G]Christ our King
 
+{Verse 3}
 [G]The fear that held us [D]now gives way
 [Em]To Him who is our [C]peace
 [G]His final breath [D]upon the cross
@@ -193,16 +214,19 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Whatever it looks like, [Am]whatever may come
+    content: `{Verse 1}
+[C]Whatever it looks like, [Am]whatever may come
 [F]I will praise through the fire, [G]I will praise through the storm
 [C]I trust Your plan and [Am]purpose, Lord
 [F]You've never let me [G]down
 
+{Chorus}
 [C]You didn't bring me [Am]out this far
 [F]To leave me in the [G]desert
 [C]You didn't fill me [Am]up to empty me
 [F]So I know You [G]won't stop now
 
+{Tag}
 [C]You won't stop [Am]now, You won't stop [F]now
 [G]You won't stop [C]now`,
     notes: "Faith declaration. Medium energy, build on the chorus.",
@@ -214,14 +238,17 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I'll praise in the [F]pain, I'll praise in the [Gm]valley
+    content: `{Verse 1}
+[Bb]I'll praise in the [F]pain, I'll praise in the [Gm]valley
 [Eb]I'll praise when it all falls apart
 [Bb]I'll praise when the [F]walls start closing [Gm]in
 [Eb]Your name is my battle cry
 
+{Chorus}
 [Bb]I'll praise my way [F]out, I'll praise 'til it [Gm]turns around
 [Eb]I'll praise the impossible
 
+{Bridge}
 [Bb]Let it rise [F]up, let it [Gm]overflow
 [Eb]Let it reach what seems impossible
 [Bb]Let it break [F]through every [Gm]barricade
@@ -237,16 +264,19 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I'm calling on the [E]God of Jacob
+    content: `{Verse 1}
+[A]I'm calling on the [E]God of Jacob
 [F#m]Whose power is the [D]same
 [A]If He opened up the [E]Red Sea
 [F#m]He can make a [D]way
 
+{Verse 2}
 [A]I'm calling on the [E]God of mercy
 [F#m]Whose promise still re[D]mains
 [A]He's the same God, [E]same God
 [F#m]He's the same [D]God
 
+{Chorus}
 [A]The God who was, the [E]God who is
 [F#m]The God who is to [D]come
 [A]The God who was, the [E]God who is
@@ -261,11 +291,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Blessed assur[F]ance, Jesus is [Gm]mine
+    content: `{Verse 1}
+[Bb]Blessed assur[F]ance, Jesus is [Gm]mine
 [Eb]Oh what a fore[Bb]taste of glo[F]ry divine
 [Bb]Heir of sal[F]vation, pur[Gm]chase of God
 [Eb]Born of His Spir[Bb]it, washed [F]in His blood
 
+{Chorus}
 [Bb]This is my [F]story, this is my [Gm]song
 [Eb]Praising my [Bb]Savior all [F]the day long
 [Bb]This is my [F]story, this is my [Gm]song
@@ -279,11 +311,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I don't know what [F]tomorrow holds
+    content: `{Verse 1}
+[Bb]I don't know what [F]tomorrow holds
 [Gm]But I know who [Eb]holds tomorrow
 [Bb]And I may not [F]know the way to go
 [Gm]But I know that [Eb]I am not alone
 
+{Chorus}
 [Bb]I will trust in [F]God
 [Gm]I will trust in [Eb]God
 [Bb]My hope is found in [F]nothing less
@@ -297,11 +331,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]If You said it, [G]I believe it
+    content: `{Verse 1}
+[C]If You said it, [G]I believe it
 [Am]God of the im[F]possible
 [C]Even when my [G]eyes can't see it
 [Am]Your love is un[F]stoppable
 
+{Chorus}
 [C]The water is [G]wild but Your love is wilder
 [Am]The storm is [F]strong but the Father is stronger
 [C]The water is [G]wild but I'm not going under
@@ -315,11 +351,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]I believe in the re[C]surrected King
+    content: `{Verse 1}
+[F]I believe in the re[C]surrected King
 [Dm]I believe there is a [Bb]crown for me
 [F]I believe in the God [C]who fights for me
 [Dm]I believe, [Bb]I believe
 
+{Chorus}
 [F]I believe what You [C]say of me
 [Dm]I believe the un[Bb]seen
 [F]And when doubt comes [C]against me
@@ -333,11 +371,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Oh the depth of [G]mercy
+    content: `{Verse 1}
+[C]Oh the depth of [G]mercy
 [Am]Oh the height of [F]grace
 [C]When I'm standing [G]in Your presence
 [Am]Nothing out of [F]place
 
+{Chorus}
 [C]I just wanna [G]be with You
 [Am]Lord I love to [F]be with You
 [C]There's no better [G]place to be
@@ -351,11 +391,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Can't go back to the [F]beginning
+    content: `{Verse 1}
+[Bb]Can't go back to the [F]beginning
 [Gm]Can't control what to[Eb]morrow will bring
 [Bb]But I know here in [F]the middle
 [Gm]Is the place where [Eb]You promise to be
 
+{Chorus}
 [Bb]I'm not afraid, [F]I'm not afraid
 [Gm]Because I know, [Eb]I know
 [Bb]You've never failed, [F]You won't start now
@@ -369,11 +411,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]When the beat of my [D]heart keeps changing
+    content: `{Verse 1}
+[G]When the beat of my [D]heart keeps changing
 [Em]You remain the [C]same
 [G]When the rhythm of [D]life gets crazy
 [Em]Your love is un[C]changed
 
+{Chorus}
 [G]I found my rhythm in [D]You
 [Em]I found my rhythm in [C]You
 [G]Nothing else can [D]satisfy
@@ -387,11 +431,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Our God, a con[E]suming fire
+    content: `{Verse 1}
+[A]Our God, a con[E]suming fire
 [F#m]A burning [D]holy flame with glory and freedom
 [A]Our God is the [E]only King forever
 [F#m]Almighty [D]God
 
+{Chorus}
 [A]Only King for[E]ever
 [F#m]Almighty [D]God
 [A]Only King for[E]ever
@@ -405,13 +451,16 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I searched the world but it [G]couldn't fill me
+    content: `{Verse 1}
+[C]I searched the world but it [G]couldn't fill me
 [Am]Man's empty praise and [F]treasures that fade
 [C]Are never enough
 
+{Verse 2}
 [C]Then You came along and [G]put me back together
 [Am]And every part of me [F]cries out for more
 
+{Chorus}
 [C]You turn mourning to [G]dancing
 [Am]You give beauty for [F]ashes
 [C]You turn graves into [G]gardens
@@ -419,6 +468,7 @@ God will turn it for my [E]good
 [C]You turn seas into [G]highways
 [Am]You're the only one [F]who can
 
+{Tag}
 [C]You turn graves into [G]gardens
 [Am]You turn bones into [F]armies
 [C]You turn seas into [G]highways
@@ -432,11 +482,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]The Lord bless you and [A]keep you
+    content: `{Verse 1}
+[D]The Lord bless you and [A]keep you
 [Bm]Make His face shine up[G]on you
 [D]And be gracious [A]to you
 [Bm]The Lord turn His face toward [G]you
 
+{Chorus}
 [D]And give you [A]peace
 [Bm]Amen, amen [G]amen
 [D]May His favor be up[A]on you
@@ -450,11 +502,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]I need You to [E]soften my heart
+    content: `{Verse 1}
+[B]I need You to [E]soften my heart
 [G#m]And break me a[F#]part
 [B]I need You to [E]open my eyes
 [G#m]To see that You're [F#]shaping my life
 
+{Chorus}
 [B]Give me faith to [E]trust what You say
 [G#m]That You're good and Your [F#]love is great
 [B]Give me faith to be[E]lieve`,
@@ -467,11 +521,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Hear the sound of [B]angel armies
+    content: `{Verse 1}
+[E]Hear the sound of [B]angel armies
 [C#m]Marching to the [A]beat of heaven
 [E]Nothing stands a[B]gainst the power
 [C#m]Of the Lord Al[A]mighty
 
+{Chorus}
 [E]There's no weapon that can [B]stop the hand of God
 [C#m]Angel armies [A]fighting on my [E]behalf`,
     notes: "Triumphant atmosphere. Great for building faith moments.",
@@ -483,11 +539,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Ab",
     format: "chordpro",
-    content: `[Ab]Hallelujah [Eb]here below
+    content: `{Verse 1}
+[Ab]Hallelujah [Eb]here below
 [Fm]In the valley [Db]of my soul
 [Ab]I will sing it [Eb]even so
 [Fm]Hallelujah [Db]here below
 
+{Chorus}
 [Ab]Even when the [Eb]shadows fall
 [Fm]Even when I can't see [Db]it all
 [Ab]I will praise You [Eb]through it [Db]all`,
@@ -500,11 +558,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]When I feel like [G]I'm letting go
+    content: `{Verse 1}
+[C]When I feel like [G]I'm letting go
 [Am]Hold on to [F]me
 [C]When my faith is [G]running low
 [Am]Hold on to [F]me
 
+{Chorus}
 [C]You won't let me [G]fall apart
 [Am]You hold every [F]piece of my heart
 [C]Hold on to [G]me [Am] [F]`,
@@ -517,12 +577,14 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I see the [A]evidence of [Bm]Your goodness
+    content: `{Chorus}
+[D]I see the [A]evidence of [Bm]Your goodness
 [G]All over my [D]life
 [A]All over my [Bm]life
 [G]I see Your [D]promises in ful[A]fillment
 [Bm]All over my [G]life
 
+{Tag}
 [D]Faithful for[A]ever You are [Bm]faithful for[G]ever
 [D]You never have [A]failed me [Bm]yet [G]`,
     notes: "Testimony song. Lead with personal conviction.",
@@ -534,11 +596,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Eb",
     format: "chordpro",
-    content: `[Eb]You never lost a [Bb]battle
+    content: `{Verse 1}
+[Eb]You never lost a [Bb]battle
 [Cm]And I know, I [Ab]know
 [Eb]You never will [Bb]fail me
 [Cm]And I know, I [Ab]know
 
+{Chorus}
 [Eb]Yes and amen [Bb]every promise fulfilled
 [Cm]You never lost [Ab]and You never [Eb]will`,
     notes: "Bold declaration. Tauren Wells collab. Drive hard on chorus.",
@@ -550,11 +614,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]God of the [C]promise
+    content: `{Verse 1}
+[F]God of the [C]promise
 [Dm]You don't speak in [Bb]vain
 [F]No syllable [C]empty or void
 [Dm]Your word is [Bb]faithful
 
+{Chorus}
 [F]I'm standing on the [C]promises of God
 [Dm]Even when I [Bb]can't see past the [F]storm`,
     notes: "Mid-tempo. Emphasize the promises in the lyric.",
@@ -566,11 +632,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I've heard about a [F]Father
+    content: `{Verse 1}
+[Bb]I've heard about a [F]Father
 [Gm]Who holds it all to[Eb]gether
 [Bb]His name is above [F]every name
 [Gm]And mighty in [Eb]power
 
+{Chorus}
 [Bb]You are my [F]Father
 [Gm]I'm in Your [Eb]arms forever
 [Bb]Safe in Your [F]hands [Gm]now [Eb]`,
@@ -583,11 +651,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Your love is [D]wide as the sky
+    content: `{Verse 1}
+[G]Your love is [D]wide as the sky
 [Em]Deep as the [C]ocean
 [G]High as the [D]heavens above
 [Em]Endless de[C]votion
 
+{Chorus}
 [G]Your grace reaches [D]further
 [Em]Further than I [C]could fall
 [G]Your love is [D]wide as the [C]sky`,
@@ -600,11 +670,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I don't need to [E]go far
+    content: `{Verse 1}
+[A]I don't need to [E]go far
 [F#m]I don't need to [D]search wide
 [A]You're as close as [E]my next breath
 [F#m]Right here by [D]my side
 
+{Chorus}
 [A]So let revival [E]start right here
 [F#m]In my heart and [D]in this place
 [A]Lord start right [E]here`,
@@ -617,11 +689,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Speak to me [G]Lord
+    content: `{Verse 1}
+[C]Speak to me [G]Lord
 [Am]I'm listening for [F]Your voice
 [C]In the noise and [G]chaos
 [Am]You're the only [F]sound I want
 
+{Chorus}
 [C]Speak to me [G]like You always have
 [Am]Still small [F]voice, gentle [C]hand`,
     notes: "Quiet, prayerful. Reduce instrumentation to minimum.",
@@ -633,11 +707,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]The battle is al[F]ready won
+    content: `{Verse 1}
+[Bb]The battle is al[F]ready won
 [Gm]We know how this [Eb]story ends
 [Bb]We sing hallelu[F]jah
 [Gm]We sing halle[Eb]lujah
 
+{Chorus}
 [Bb]The chains have al[F]ready been undone
 [Gm]Death has lost and [Eb]love has already [Bb]won`,
     notes: "Victorious song. Full energy from the top.",
@@ -649,11 +725,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I will wait on [D]You Lord
+    content: `{Verse 1}
+[G]I will wait on [D]You Lord
 [Em]You're the author of my [C]story
 [G]You see the end from [D]the beginning
 [Em]My hope is in [C]You alone
 
+{Chorus}
 [G]Waiting, still [D]believing
 [Em]You never stopped [C]working
 [G]I will wait on [D]You`,
@@ -666,11 +744,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]There are greater [B]things in store
+    content: `{Verse 1}
+[E]There are greater [B]things in store
 [C#m]Greater things are [A]yet to come
 [E]Open up the [B]heavens pour it out
 [C#m]Let it rain down [A]on us
 
+{Chorus}
 [E]We believe in [B]greater things
 [C#m]Hope beyond what [A]we can see
 [E]Greater things are [B]coming [A]now`,
@@ -683,11 +763,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Worthy is the [F]Lamb who was slain
+    content: `{Verse 1}
+[Bb]Worthy is the [F]Lamb who was slain
 [Gm]Holy, holy [Eb]is He
 [Bb]Sing a new song [F]to Him who sits on
 [Gm]Heaven's mercy [Eb]seat
 
+{Chorus}
 [Bb]Worthy is the [F]Lamb
 [Gm]Worthy is the [Eb]Lamb
 [Bb]You are holy, [F]holy
@@ -701,11 +783,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]We've been standing on the [D]sidelines
+    content: `{Verse 1}
+[G]We've been standing on the [D]sidelines
 [Em]Watching people pass us [C]by
 [G]We've been walking with our [D]eyes closed
 [Em]Not seeing what's a[C]live
 
+{Chorus}
 [G]Open up our [D]eyes, open up our [Em]eyes
 [C]Lord we want to [G]see You
 [G]Open up our [D]eyes, give us hearts to [Em]find
@@ -719,11 +803,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Christ in me, the [B]hope of glory
+    content: `{Verse 1}
+[E]Christ in me, the [B]hope of glory
 [C#m]Taste and see the [A]living Word
 [E]Holy Spirit [B]breathe upon me
 [C#m]Fill me with the [A]fullness Lord
 
+{Chorus}
 [E]I want the fullness of [B]Your presence
 [C#m]I want it all, [A]I want it all
 [E]Every piece of [B]my existence
@@ -737,11 +823,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]When the darkness [G]closes in
+    content: `{Verse 1}
+[C]When the darkness [G]closes in
 [Am]And the walls are [F]pressing tight
 [C]I will choose to [G]worship Him
 [Am]I will praise at [F]midnight
 
+{Chorus}
 [C]At midnight, [G]at midnight
 [Am]My praise will still be [F]on my lips
 [C]Chains are falling, [G]prison shaking
@@ -755,11 +843,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]From beginning [A]to the end
+    content: `{Verse 1}
+[D]From beginning [A]to the end
 [Bm]You have always [G]been faithful
 [D]And You will be [A]again
 [Bm]You have always [G]been faithful
 
+{Chorus}
 [D]Faithful, [A]faithful
 [Bm]This is who You [G]are
 [D]Faithful, [A]faithful
@@ -773,11 +863,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I was gonna keep it [E]down
+    content: `{Verse 1}
+[A]I was gonna keep it [E]down
 [F#m]I was gonna keep it [D]quiet
 [A]But Your love is just [E]too good
 [F#m]I'm sorry but it [D]might get loud
 
+{Chorus}
 [A]It might get [E]loud in here
 [F#m]It might get [D]loud
 [A]When I think about Your [E]goodness
@@ -791,11 +883,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I find space to [F]face the One
+    content: `{Verse 1}
+[Bb]I find space to [F]face the One
 [Gm]Who made it all and [Eb]makes it new
 [Bb]Shake up my [F]priorities
 [Gm]Clear the way for [Eb]what is true
 
+{Chorus}
 [Bb]Here I am, [F]make room
 [Gm]Lord I'm running [Eb]to You
 [Bb]Here I am, [F]make room
@@ -809,11 +903,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Looking back now [G]it all connects
+    content: `{Verse 1}
+[C]Looking back now [G]it all connects
 [Am]God has been good and [F]He ain't done yet
 [C]Standing here now [G]there's no more doubt
 [Am]There's a million little [F]reasons to shout
 
+{Chorus}
 [C]A million little [G]miracles
 [Am]A million little [F]miracles
 [C]He's done a million [G]little miracles
@@ -827,11 +923,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]This is the [D]kingdom
+    content: `{Verse 1}
+[G]This is the [D]kingdom
 [Em]This is the [C]kingdom of our God
 [G]Where the broken are [D]mended
 [Em]The lost ones are [C]found
 
+{Chorus}
 [G]This is the [D]kingdom, this is the [Em]kingdom
 [C]Where love reigns [G]forever
 [G]And mercy is [D]free
@@ -845,11 +943,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Sing it out [B]let the redeemed
+    content: `{Verse 1}
+[E]Sing it out [B]let the redeemed
 [C#m]Of the Lord say [A]so
 [E]Sing it out and [B]lift His name up
 [C#m]Let the whole world [A]know
 
+{Chorus}
 [E]Be lifted [B]high, be lifted [C#m]high
 [A]Your name be lifted [E]high
 [E]Be lifted [B]high, be lifted [C#m]high
@@ -863,11 +963,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Name above all [E]names
+    content: `{Verse 1}
+[A]Name above all [E]names
 [F#m]Worthy of all [D]praise
 [A]My heart will sing how [E]great is our God
 [F#m]Name above all [D]names
 
+{Chorus}
 [A]You deserve the [E]glory
 [F#m]And the honor [D]Lord
 [A]At the name of [E]Jesus
@@ -881,11 +983,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Who am I to [F]deny what the Lord has said
+    content: `{Verse 1}
+[Bb]Who am I to [F]deny what the Lord has said
 [Gm]Who am I to say [Eb]that He can't do it again
 [Bb]You're the God of [F]miracles
 [Gm]Nothing is im[Eb]possible
 
+{Chorus}
 [Bb]You are more than [F]able
 [Gm]You are more than [Eb]able
 [Bb]Abundantly above [F]all we could ask or think
@@ -899,11 +1003,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]The atmosphere is [D]changing now
+    content: `{Verse 1}
+[G]The atmosphere is [D]changing now
 [Em]For the Spirit of [C]the Lord is here
 [G]The evidence is [D]all around
 [Em]That the Spirit of [C]the Lord is here
 
+{Chorus}
 [G]Here as in [D]heaven
 [Em]Let it be [C]here as in heaven
 [G]Here as in [D]heaven
@@ -918,11 +1024,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Before I bring my [E]need
+    content: `{Verse 1}
+[A]Before I bring my [E]need
 [F#m]I will bring my [D]heart
 [A]Before I lift my [E]cares
 [F#m]I will lift my [D]arms to You
 
+{Chorus}
 [A]First things [E]first
 [F#m]I seek Your [D]face
 [A]First things [E]first
@@ -936,11 +1044,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I don't see what [G]everyone else sees
+    content: `{Verse 1}
+[C]I don't see what [G]everyone else sees
 [Am]Where they see a [F]dead end I see the Red Sea
 [C]I don't see what [G]everyone else sees
 [Am]Where they see [F]impossible I see You
 
+{Chorus}
 [C]What I see is a [G]God who won't give up
 [Am]What I see is a [F]love that never stops
 [C]What I see is [G]victory ahead
@@ -954,11 +1064,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]They laid Him in [C]the ground
+    content: `{Verse 1}
+[F]They laid Him in [C]the ground
 [Dm]They thought it was [Bb]over now
 [F]The stone was sealed, the [C]guards were set
 [Dm]Hope was gone, or [Bb]so they said
 
+{Chorus}
 [F]Then He rose, [C]then He rose
 [Dm]Up from the grave in [Bb]power
 [F]Then He rose, [C]then He rose
@@ -972,11 +1084,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You have searched me [A]and You know me
+    content: `{Verse 1}
+[D]You have searched me [A]and You know me
 [Bm]You know when I [G]sit and when I rise
 [D]You see my thoughts [A]from afar
 [Bm]And every word [G]before it starts
 
+{Chorus}
 [D]I am known, [A]I am known
 [Bm]Fully known and [G]fully loved
 [D]I am known, [A]I am known
@@ -990,11 +1104,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I just want to [D]be available
+    content: `{Verse 1}
+[G]I just want to [D]be available
 [Em]I just want to [C]be where You are
 [G]Not my own a[D]genda
 [Em]But whatever [C]You have for me
 
+{Chorus}
 [G]Here I am, [D]available
 [Em]Use me Lord, [C]I'm available
 [G]Every part of [D]me surrendered
@@ -1008,11 +1124,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]The more I seek [F]the more I find
+    content: `{Verse 1}
+[Bb]The more I seek [F]the more I find
 [Gm]The more I find [Eb]the more I seek You
 [Bb]I lose my life [F]to find it in You
 [Gm]In weakness I [Eb]am strong
 
+{Chorus}
 [Bb]This is the [F]paradox of grace
 [Gm]Losing every[Eb]thing to gain
 [Bb]You give and [F]take away
@@ -1026,11 +1144,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]I could be anywhere [B]doing anything
+    content: `{Verse 1}
+[E]I could be anywhere [B]doing anything
 [C#m]But I got what I [A]got and that's everything
 [E]Every door You [B]opened or closed
 [C#m]Every yes and [A]no brought me here
 
+{Chorus}
 [E]I got what I [B]got because of You
 [C#m]I am what I [A]am because of grace
 [E]Got what I got and [B]I'm grateful
@@ -1044,11 +1164,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]The enemy tried to [E]take me out
+    content: `{Verse 1}
+[A]The enemy tried to [E]take me out
 [F#m]Tried to write [D]my story
 [A]But this is my [E]testimony
 [F#m]Greater is the [D]One in me
 
+{Chorus}
 [A]I've got a testi[E]mony
 [F#m]I've got a testi[D]mony
 [A]Look what the Lord has [E]done
@@ -1062,11 +1184,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Every idol, [D]every lie
+    content: `{Verse 1}
+[G]Every idol, [D]every lie
 [Em]Every weight that [C]holds me down
 [G]I lay them at Your [D]feet right now
 [Em]Lord I bow [C]down
 
+{Chorus}
 [G]I bow down, [D]I bow down
 [Em]At the feet of [C]Jesus
 [G]I bow down, [D]I bow down
@@ -1080,11 +1204,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]I hear the sound of [B]a breakthrough coming
+    content: `{Verse 1}
+[E]I hear the sound of [B]a breakthrough coming
 [C#m]I hear the sound of [A]a breakthrough now
 [E]Chains are breaking, [B]walls are shaking
 [C#m]Heaven's door is [A]opening wide
 
+{Chorus}
 [E]Breakthrough, break[B]through
 [C#m]Let the praise break [A]through
 [E]Breakthrough, break[B]through
@@ -1098,11 +1224,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I've been talking to [D]Jesus
+    content: `{Verse 1}
+[G]I've been talking to [D]Jesus
 [Em]He said everything's gonna [C]be alright
 [G]I've been walking with [D]Jesus
 [Em]He dried the tears [C]from my eyes
 
+{Chorus}
 [G]There's nothing like [D]talking to Jesus
 [Em]There's nobody [C]like Him
 [G]In the morning, in the [D]evening
@@ -1116,11 +1244,13 @@ God will turn it for my [E]good
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Bye bye Baby[B]lon
+    content: `{Verse 1}
+[E]Bye bye Baby[B]lon
 [C#m]I'm leaving you [A]now
 [E]I'm letting go of [B]everything
 [C#m]That's been weighing [A]me down
 
+{Chorus}
 [E]Bye bye Baby[B]lon
 [C#m]There's a better [A]land
 [E]I'm walking out of [B]captivity

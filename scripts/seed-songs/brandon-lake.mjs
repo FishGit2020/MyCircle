@@ -15,17 +15,21 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]All my words fall short, I got [Em]nothing new
+    content: `{Verse 1}
+[G]All my words fall short, I got [Em]nothing new
 [C]How could I express all my [D]gratitude
 
+{Chorus}
 [G]I could sing these songs as I [Em]often do
 [C]But every song must end and [D]You never do
 
+{Verse 2}
 [G]So I throw up my [Em]hands and praise You again and again
 [C]'Cause all that I have is a [D]hallelujah, hallelujah
 [G]And I know it's not [Em]much but I've nothing else
 [C]Fit for a King except for a [D]heart singing hallelujah
 
+{Chorus}
 [G]Come on my soul, oh don't you get [Em]shy on me
 [C]Lift up your song, 'cause you got a [D]lion inside of those lungs
 [G]Get up and praise the [Em]Lord`,
@@ -38,11 +42,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Every color tells a [G]story
+    content: `{Verse 1}
+[C]Every color tells a [G]story
 [Am]Every thread a lesson [F]learned
 [C]Through the tearing and the [G]mending
 [Am]God was making something [F]beautiful
 
+{Chorus}
 [C]He's putting on a [G]coat of many colors
 [Am]He's weaving every [F]heartbreak into gold
 [C]What the enemy meant for [G]evil
@@ -58,11 +64,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I've been running on [D]empty
+    content: `{Verse 1}
+[G]I've been running on [D]empty
 [Em]I've been trying to [C]fill this void
 [G]But nothing in this [D]world
 [Em]Can give me what I [C]need
 
+{Chorus}
 [G]I need a Ghost, the [D]Holy Ghost
 [Em]Come fill me up, I [C]need You most
 [G]More than the air I [D]breathe
@@ -80,11 +88,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Start from the beginning [G]go back to the start
+    content: `{Verse 1}
+[C]Start from the beginning [G]go back to the start
 [Am]Think of all the times He [F]healed your broken heart
 [C]And when you lose your [G]focus and you can't see His hand
 [Am]Count your bless[F]ings one by one
 
+{Chorus}
 [C]Count em, count em, [G]count your blessings
 [Am]One by one and [F]you will see
 [C]Count em, count em, [G]count your blessings
@@ -100,11 +110,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I've tasted and I've [E]seen
+    content: `{Verse 1}
+[A]I've tasted and I've [E]seen
 [F#m]But I want more of [D]You
 [A]There's a longing in my [E]soul
 [F#m]Only You can [D]fill
 
+{Chorus}
 [A]More, I want [E]more
 [F#m]More of Your presence [D]Lord
 [A]More, give me [E]more
@@ -122,14 +134,17 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I searched the world but it [G]couldn't fill me
+    content: `{Verse 1}
+[C]I searched the world but it [G]couldn't fill me
 [Am]Man's empty praise and [F]treasures that fade
 [C]Are never enough [G]
 [Am]Then You came along and [F]put me back together
 
+{Chorus}
 [C]And every part of me [G]cries out
 [Am]More, more, [F]more
 
+{Verse 2}
 [C]You turn mourning to [G]dancing
 [Am]You give beauty for [F]ashes
 [C]You turn graves into [G]gardens
@@ -146,11 +161,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I'm gonna praise through [F]it
+    content: `{Verse 1}
+[Bb]I'm gonna praise through [F]it
 [Gm]I'm gonna praise through [Eb]it
 [Bb]When the night is [F]long
 [Gm]And the battle [Eb]rages on
 
+{Chorus}
 [Bb]I will praise through [F]it
 [Gm]Every wall will [Eb]fall
 [Bb]I'm gonna praise my [F]way [Eb]through`,
@@ -163,11 +180,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]We need the fire [B]falling down
+    content: `{Verse 1}
+[E]We need the fire [B]falling down
 [C#m]Holy Spirit [A]come right now
 [E]Like You did at [B]Pentecost
 [C#m]Send the fire, [A]at any cost
 
+{Chorus}
 [E]We need the [B]fire
 [C#m]We need the [A]fire
 [E]Holy Ghost [B]fire [A]`,
@@ -180,11 +199,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]This is the house of [D]miracles
+    content: `{Verse 1}
+[G]This is the house of [D]miracles
 [Em]This is where You [C]move
 [G]Nothing is impos[D]sible
 [Em]When we call on [C]You
 
+{Chorus}
 [G]Miracles happen [D]here
 [Em]In the presence of the [C]Lord
 [G]This is the house of [D]miracles [C]`,
@@ -197,11 +218,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]We are a household of [A]faith
+    content: `{Verse 1}
+[D]We are a household of [A]faith
 [Bm]Built on the rock that is [G]Jesus
 [D]Standing on promises [A]made
 [Bm]Generation to gener[G]ation
 
+{Chorus}
 [D]The gates of hell shall [A]not prevail
 [Bm]Against the church He [G]built
 [D]A household of [A]faith [G]`,
@@ -214,11 +237,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]We're tearing off the [E]roof
+    content: `{Verse 1}
+[A]We're tearing off the [E]roof
 [F#m]Nothing's gonna stop us [D]now
 [A]We're bringing every[E]thing to Jesus
 [F#m]Laying it all [D]down
 
+{Chorus}
 [A]Like the friends who [E]tore the roof
 [F#m]We will do what[D]ever it takes
 [A]To get to [E]You [D]Lord`,
@@ -231,11 +256,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I'm gonna keep on [D]praising
+    content: `{Verse 1}
+[G]I'm gonna keep on [D]praising
 [Em]Keep on praising Your [C]name
 [G]Even when I [D]can't see it
 [Em]I'll keep on [C]praising
 
+{Chorus}
 [G]Through the storm, through the [D]fire
 [Em]I keep on praising [C]higher
 [G]Never gonna [D]stop, I keep on [C]praising`,
@@ -248,11 +275,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Send Your fire [G]down
+    content: `{Verse 1}
+[C]Send Your fire [G]down
 [Am]Let it burn in [F]us
 [C]Holy fire [G]consume
 [Am]Everything that's [F]not of You
 
+{Chorus}
 [C]Fire, [G]fire
 [Am]Fall on [F]us
 [C]Holy Spirit [G]fire [F]come`,
@@ -265,11 +294,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I believe in the [F]power of God
+    content: `{Verse 1}
+[Bb]I believe in the [F]power of God
 [Gm]I believe in the [Eb]name of Jesus
 [Bb]I believe that the [F]Word is alive
 [Gm]And it cuts like the [Eb]sharpest sword
 
+{Chorus}
 [Bb]I believe, [F]I believe
 [Gm]Lord I be[Eb]lieve
 [Bb]Help my unbe[F]lief [Eb]`,
@@ -282,11 +313,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]I came here [B]ready to praise
+    content: `{Verse 1}
+[E]I came here [B]ready to praise
 [C#m]Ready to give You [A]everything
 [E]Nothing held [B]back
 [C#m]I'm ready to [A]praise
 
+{Chorus}
 [E]With everything I [B]am
 [C#m]Every breath in my [A]lungs
 [E]I came ready to [B]praise [A]`,
@@ -299,11 +332,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Something's waking [A]up inside of me
+    content: `{Verse 1}
+[D]Something's waking [A]up inside of me
 [Bm]Like a fire that [G]will not sleep
 [D]Revival starting [A]in my soul
 [Bm]I'm waking up to [G]who You are
 
+{Chorus}
 [D]Waking up, [A]waking up
 [Bm]To the truth that [G]sets me free
 [D]Waking up [A]again [G]`,
@@ -316,11 +351,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]O little town of [D]Bethlehem
+    content: `{Verse 1}
+[G]O little town of [D]Bethlehem
 [Em]Where the Savior [C]came
 [G]Heaven touched the [D]earth that night
 [Em]Nothing was the [C]same
 
+{Chorus}
 [G]In a manger [D]small and lowly
 [Em]God became a [C]man
 [G]Bethlehem, where [D]it all be[C]gan`,
@@ -333,11 +370,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Rivers of living [C]water
+    content: `{Verse 1}
+[F]Rivers of living [C]water
 [Dm]Flowing from the [Bb]throne
 [F]Streams in the [C]desert
 [Dm]You are never [Bb]done
 
+{Chorus}
 [F]Like a river [C]rushing through
 [Dm]Your Spirit flows and [Bb]makes all new
 [F]Rivers of [C]life [Bb]`,
@@ -350,11 +389,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Pour it out, pour it [E]out
+    content: `{Verse 1}
+[A]Pour it out, pour it [E]out
 [F#m]Like perfume on Your [D]feet
 [A]Pour it out, pour it [E]out
 [F#m]This worship is for [D]You
 
+{Chorus}
 [A]Nothing held [E]back
 [F#m]Nothing too [D]precious
 [A]I pour it [E]out at Your [D]feet`,
@@ -367,11 +408,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Let Your presence over[G]flow
+    content: `{Verse 1}
+[C]Let Your presence over[G]flow
 [Am]Fill every corner [F]of my soul
 [C]More than I can [G]hold
 [Am]Let it over[F]flow
 
+{Chorus}
 [C]Overflow, [G]overflow
 [Am]Let Your love [F]overflow
 [C]From my life to [G]everyone I [F]know`,
@@ -384,11 +427,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Thank You Lord for [D]all You've done
+    content: `{Verse 1}
+[G]Thank You Lord for [D]all You've done
 [Em]Thank You Lord for [C]every one
 [G]Thank You for Your [D]faithful love
 [Em]That never gives [C]up
 
+{Chorus}
 [G]In the morning [D]I will praise
 [Em]Through the night I'll [C]sing Your name
 [G]Thank You [D]Lord [C]`,
@@ -401,11 +446,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]There is healing in Your [D]hands
+    content: `{Verse 1}
+[G]There is healing in Your [D]hands
 [Em]There is power in Your [C]name
 [G]Every sickness has to [D]bow
 [Em]At the sound of Your [C]name
 
+{Chorus}
 [G]You are the God who [D]heals
 [Em]You are the God who [C]restores
 [G]I believe there's [D]healing in Your hands
@@ -419,11 +466,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Your love goes on and [G]on
+    content: `{Verse 1}
+[C]Your love goes on and [G]on
 [Am]It never stops, it [F]never ends
 [C]From the beginning to the [G]end
 [Am]Your faithfulness goes [F]on and on
 
+{Chorus}
 [C]On and on and [G]on
 [Am]Your mercy keeps on [F]running
 [C]On and on and [G]on
@@ -437,11 +486,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Greater still than [E]any mountain
+    content: `{Verse 1}
+[A]Greater still than [E]any mountain
 [F#m]Greater still than [D]any sea
 [A]Greater still than [E]all my failures
 [F#m]Is the One who [D]lives in me
 
+{Chorus}
 [A]Greater still, [E]greater still
 [F#m]Your love is greater [D]still
 [A]Nothing compares to [E]who You are
@@ -455,11 +506,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]You became mind to [B]flesh
+    content: `{Verse 1}
+[E]You became mind to [B]flesh
 [C#m]Heaven's King took human [A]breath
 [E]Wrapped in frailty, [B]full of grace
 [C#m]Love came down to [A]take my place
 
+{Chorus}
 [E]From the throne to a [B]manger
 [C#m]From the glory to the [A]grave
 [E]Mind to flesh, the [B]God who saves
@@ -473,11 +526,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You are my dwelling [A]place
+    content: `{Verse 1}
+[D]You are my dwelling [A]place
 [Bm]My refuge and my [G]strength
 [D]In the shadow of Your [A]wings
 [Bm]I find my hiding [G]place
 
+{Chorus}
 [D]Here in Your [A]presence
 [Bm]I am safe and [G]found
 [D]You are my dwelling [A]place
@@ -491,11 +546,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]You're the One my [F]heart is after
+    content: `{Verse 1}
+[Bb]You're the One my [F]heart is after
 [Gm]You're the One my [Eb]soul adores
 [Bb]Not another, [F]there's no other
 [Gm]You're the One I'm [Eb]living for
 
+{Chorus}
 [Bb]The One who was and [F]is and is to come
 [Gm]The One who holds it [Eb]all together
 [Bb]You are the [F]One [Eb]`,
@@ -508,11 +565,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Break me, mold me, [D]fill me, use me
+    content: `{Verse 1}
+[G]Break me, mold me, [D]fill me, use me
 [Em]These are dangerous [C]prayers
 [G]Search me, know me, [D]try me, lead me
 [Em]Lord, I'm not [C]scared
 
+{Chorus}
 [G]I'll pray the prayers that [D]scare me
 [Em]I'll say the words that [C]break me
 [G]Whatever it costs, [D]I surrender it all
@@ -526,11 +585,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]All hail King [G]Jesus
+    content: `{Verse 1}
+[C]All hail King [G]Jesus
 [Am]All hail the Lord of [F]heaven
 [C]Every throne must [G]bow
 [Am]At the sound of Your [F]name
 
+{Chorus}
 [C]All hail King [G]Jesus
 [Am]We will shout Your [F]praise forever
 [C]Lift your voice and [G]sing
@@ -544,11 +605,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Take me to the [C]throne room
+    content: `{Verse 1}
+[F]Take me to the [C]throne room
 [Dm]Where the angels [Bb]cry
 [F]Holy, holy, [C]holy
 [Dm]Is the Lord Most [Bb]High
 
+{Chorus}
 [F]In the throne room [C]of Your glory
 [Dm]I will bow be[Bb]fore You
 [F]Heaven and earth are [C]filled with Your praise
@@ -562,11 +625,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]For me to live is [A]Christ
+    content: `{Verse 1}
+[D]For me to live is [A]Christ
 [Bm]And to die is [G]gain
 [D]He who began a [A]good work
 [Bm]Will be faithful to com[G]plete it
 
+{Chorus}
 [D]I am confident of [A]this
 [Bm]That He who started [G]it
 [D]Will carry it [A]on
@@ -580,11 +645,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Move mountains, [E]move mountains
+    content: `{Verse 1}
+[A]Move mountains, [E]move mountains
 [F#m]With a word You can [D]move mountains
 [A]Speak and the earth will [E]shake
 [F#m]Nothing stands in [D]Your way
 
+{Chorus}
 [A]I speak to the [E]mountain
 [F#m]In the name of [D]Jesus, move
 [A]My God is bigger than [E]any mountain
@@ -598,11 +665,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I can feel it in the [D]air
+    content: `{Verse 1}
+[G]I can feel it in the [D]air
 [Em]Something new is [C]happening
 [G]The old is gone, the [D]new has come
 [Em]A brand new [C]season
 
+{Chorus}
 [G]New season, [D]new sound
 [Em]New anointing [C]coming down
 [G]I step into the [D]new thing
@@ -616,11 +685,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Let the praise [F]break out
+    content: `{Verse 1}
+[Bb]Let the praise [F]break out
 [Gm]Can't hold it [Eb]in
 [Bb]Every chain is [F]breaking
 [Gm]Let the praise be[Eb]gin
 
+{Chorus}
 [Bb]Praise break, [F]praise break
 [Gm]We give You all the [Eb]glory
 [Bb]When the praises [F]go up
@@ -634,11 +705,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]We are standing on [B]holy ground
+    content: `{Verse 1}
+[E]We are standing on [B]holy ground
 [C#m]And I know that there are [A]angels all around
 [E]Let us praise [B]Jesus now
 [C#m]We are standing in His [A]presence on holy ground
 
+{Chorus}
 [E]This is holy [B]ground
 [C#m]We're standing on [A]holy ground
 [E]For the Lord is [B]here
@@ -652,11 +725,13 @@ const SONGS = [
     artist: "Brandon Lake",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I declare the [G]promises of God
+    content: `{Verse 1}
+[C]I declare the [G]promises of God
 [Am]Over my life, over my [F]home
 [C]What He said He [G]will do
 [Am]Every word is [F]true
 
+{Chorus}
 [C]I declare that [G]I am free
 [Am]I declare His [F]victory
 [C]The Word of the Lord [G]stands forever

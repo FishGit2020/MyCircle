@@ -15,16 +15,19 @@ const SONGS = [
     artist: "Matt Maher",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Lord I come I con[C]fess
+    content: `{Verse 1}
+[G]Lord I come I con[C]fess
 [Em]Bowing here I [D]find my rest
 [G]Without You I [C]fall apart
 [Em]You're the one that [D]guides my heart
 
+{Chorus}
 [C]Lord I [D]need You oh I [G]need You
 [Em]Every [C]hour I [D]need You
 [G]My one de[C]fense my [D]righteousness
 [Em]Oh God how [C]I need [G]You
 
+{Verse 2}
 [G]Where sin runs [C]deep Your grace is more
 [Em]Where grace is [D]found is where You are`,
     notes: "Classic modern hymn. Piano-led with gentle build. Great for communion.",
@@ -36,17 +39,20 @@ const SONGS = [
     artist: "Matt Maher",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]I believe in the [Bb]Son
+    content: `{Verse 1}
+[F]I believe in the [Bb]Son
 [F]I believe in the [C]Risen One
 [Dm]I believe I over[Bb]come
 [F]By the power of [C]His blood
 
+{Chorus}
 [F]Amen [Bb]amen
 [F]I'm alive I'm alive because He [C]lives
 [Dm]Amen [Bb]amen
 [F]Let my song join the [C]one that never [F]ends
 [Bb]Because He [F]lives
 
+{Verse 2}
 [F]I was dead in the [Bb]grave
 [F]I was covered in [C]sin and shame
 [Dm]I heard mercy call my [Bb]name
@@ -60,15 +66,18 @@ const SONGS = [
     artist: "Matt Maher",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Great is Your [C]faithfulness O God
+    content: `{Verse 1}
+[G]Great is Your [C]faithfulness O God
 [Em]You wrestle with the [D]sinner's restless heart
 [G]You lead us by [C]still waters into mercy
 [Em]And nothing can keep [D]us apart
 
+{Chorus}
 [C]So remember Your [G]people
 [D]Remember Your [Em]children
 [C]Remember Your [D]promise O [G]God
 
+{Verse 2}
 [G]Your grace is e[C]nough
 [G]Your grace is e[D]nough
 [Em]Your grace is e[C]nough for [G]me`,
@@ -81,15 +90,18 @@ const SONGS = [
     artist: "Matt Maher",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I woke up in [A]darkness
+    content: `{Verse 1}
+[D]I woke up in [A]darkness
 [Bm]Surrounded by [G]silence
 [D]Oh where were [A]You
 [Bm]Where where were [G]You
 
+{Chorus}
 [D]And as I stumbled [A]searching
 [Bm]Thirsting for [G]truth
 [D]I discovered a [A]grace I never [Bm]knew [G]
 
+{Verse 2}
 [D]I'm alive [A]again
 [Bm]From the dead [G]again
 [D]I'm alive [A]again
@@ -103,16 +115,19 @@ const SONGS = [
     artist: "Matt Maher",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]It don't have a job it [C]don't pay your bills
+    content: `{Verse 1}
+[G]It don't have a job it [C]don't pay your bills
 [Em]Won't fix your life in [D]five easy steps
 [G]Ain't the law of the [C]land or the arm of the law
 [Em]It don't even know [D]what it means to be wrong
 
+{Chorus}
 [C]Love will [D]hold us to[Em]gether
 [C]Make us a [D]shelter to [Em]weather the storm
 [C]And I'll [D]be my brother's [Em]keeper
 [C]So the whole [D]world will [Em]know that we're not alone
 
+{Verse 2}
 [G]It's waiting for [C]you knocking at your door
 [Em]In the moment of [D]truth when your heart hits the floor`,
     notes: "Upbeat and hopeful. Acoustic pop feel. Great for community gatherings.",

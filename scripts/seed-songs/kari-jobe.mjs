@@ -15,16 +15,19 @@ const SONGS = [
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Worthy is the [Am]Lamb who was slain
+    content: `{Verse 1}
+[D]Worthy is the [Am]Lamb who was slain
 [C]Holy, holy is [G]He
 [D]Sing a new song [Am]to Him who sits on
 [C]Heaven's mercy [G]seat
 
+{Chorus}
 [D]Holy, holy, [Am]holy is the Lord God Al[C]mighty
 [G]Who was and is and [D]is to come
 [D]With all creation [Am]I sing praise to the [C]King of kings
 [G]You are my every[D]thing and I will adore You
 
+{Verse 2}
 [D]Clothed in rainbows [Am]of living color
 [C]Flashes of lightning, [G]rolls of thunder
 [D]Blessing and honor, [Am]strength and glory
@@ -38,20 +41,24 @@ const SONGS = [
     artist: "Kari Jobe",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]The Lord bless you and [G]keep you
+    content: `{Verse 1}
+[C]The Lord bless you and [G]keep you
 [Am]Make His face shine upon [F]you
 And be gracious to [C]you
 The Lord turn His [G]face toward you
 [Am]And give you [F]peace
 
+{Chorus}
 [C]Amen, [G]amen, [Am]amen
 [F]Amen, [C]amen, [G]amen
 
+{Verse 2}
 [Am]May His [F]favor be upon you
 [C]And a thousand [G]generations
 [Am]And your [F]family and your children
 [C]And their [G]children and their children
 
+{Chorus}
 [Am]May His [F]presence go before you
 [C]And behind you [G]and beside you
 [Am]All a[F]round you and within you
@@ -65,13 +72,15 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]The moon and stars they [Em]wept
+    content: `{Verse 1}
+[G]The moon and stars they [Em]wept
 [C]The morning sun was [G]dead
 [G]The Savior of the [Em]world was fallen
 [C]His body on the [D]cross
 [C]His blood poured out for [D]us
 [G]The weight of every [Em]curse upon Him
 
+{Chorus}
 [G]One final breath He [Em]gave
 [C]As heaven looked a[G]way
 [G]The Son of God was [Em]laid in darkness
@@ -79,11 +88,13 @@ The Lord turn His [G]face toward you
 [C]The war on death was [D]waged
 [G]The power of hell for[Em]ever broken
 
+{Verse 2}
 [G]The ground began to [Em]shake, the stone was rolled [C]away
 [G]His perfect love could [Em]not be overcome
 [C]Now death where is your [D]sting, our resurrected [Em]King
 [C]Has rendered you de[D]feated
 
+{Chorus}
 [G]Forever He is [Em]glorified, forever He is [C]lifted high
 [G]Forever He is [Em]risen, He is a[C]live, He is a[D]live`,
     notes: "Resurrection anthem. Builds from somber verse to explosive chorus.",
@@ -95,11 +106,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]When I walk through [E]deep waters
+    content: `{Verse 1}
+[B]When I walk through [E]deep waters
 [G#m]I know that You will [F#]be with me
 [B]When I'm standing [E]in the fire
 [G#m]I will not be over[F#]come
 
+{Chorus}
 [B]I am not a[E]lone
 [G#m]I am not a[F#]lone
 [B]You will go be[E]fore me
@@ -113,11 +126,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Speak to me, [E]speak to me
+    content: `{Verse 1}
+[A]Speak to me, [E]speak to me
 [F#m]Holy Spirit [D]come
 [A]Open my ears to [E]hear Your voice
 [F#m]Above the noise of [D]this world
 
+{Chorus}
 [A]Speak, for Your [E]servant hears
 [F#m]Quiet the storm in [D]me
 [A]Speak to me [E]Lord [D]`,
@@ -130,11 +145,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]If My people will [D]humbly pray
+    content: `{Verse 1}
+[G]If My people will [D]humbly pray
 [Em]Turn from their sin and [C]seek My face
 [G]I will hear from [D]heaven
 [Em]And heal their [C]land
 
+{Chorus}
 [G]Heal our land, [D]heal our land
 [Em]Lord we cry [C]out to You
 [G]Heal our [D]land [C]Lord`,
@@ -147,11 +164,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Take me back to my [G]first love
+    content: `{Verse 1}
+[C]Take me back to my [G]first love
 [Am]Where my heart was [F]fully Yours
 [C]Take me back to the [G]beginning
 [Am]When I lived for [F]You alone
 
+{Chorus}
 [C]You're my first [G]love
 [Am]Nothing compares to [F]You
 [C]You're my first [G]love [F]Lord`,
@@ -164,11 +183,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]So I will not [B]fear
+    content: `{Verse 1}
+[E]So I will not [B]fear
 [C#m]You are for [A]me
 [E]So I will not [B]fear
 [C#m]You are for [A]me
 
+{Chorus}
 [E]I know who goes be[B]fore me
 [C#m]I know who stands be[A]hind
 [E]The God of angel [B]armies
@@ -182,11 +203,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]We are the [B]light of the world
+    content: `{Verse 1}
+[E]We are the [B]light of the world
 [C#m]We are a city on a [A]hill
 [E]We are the [B]light of the world
 [C#m]We gotta, we gotta, we gotta let the [A]light shine
 
+{Chorus}
 [E]We are, we [B]are
 [C#m]Called to be [A]Your hands and feet
 [E]We are, we [B]are the body of [A]Christ`,
@@ -199,11 +222,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You are the keeper [A]of my heart
+    content: `{Verse 1}
+[D]You are the keeper [A]of my heart
 [Bm]You hold it all to[G]gether
 [D]When the world is [A]falling apart
 [Bm]You hold me [G]together
 
+{Chorus}
 [D]Keeper of my [A]heart
 [Bm]Nothing can [G]pull me apart from You
 [D]Keeper of my [A]heart [G]`,
@@ -216,11 +241,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Let the heavens [C]open
+    content: `{Verse 1}
+[F]Let the heavens [C]open
 [Dm]Let Your glory [Bb]fall
 [F]Rain down, rain [C]down on us
 [Dm]We need You [Bb]Lord
 
+{Chorus}
 [F]Open up the [C]heavens
 [Dm]We wanna see [Bb]You
 [F]Let the heavens [C]open [Bb]now`,
@@ -233,11 +260,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Breathe on us, [D]breathe on us
+    content: `{Verse 1}
+[G]Breathe on us, [D]breathe on us
 [Em]Holy Spirit [C]come breathe on us
 [G]Like a rushing [D]wind
 [Em]Like a holy [C]flame
 
+{Chorus}
 [G]Breathe on us [D]Lord
 [Em]Bring life where [C]there is none
 [G]Breathe on [D]us [C]Lord`,
@@ -250,12 +279,14 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Wish it could be [E]easy
+    content: `{Verse 1}
+[A]Wish it could be [E]easy
 [F#m]Why is life so [D]messy
 [A]Why is pain a [E]part of us
 [F#m]There are days I [D]feel like
 [A]Nothing ever [E]goes right
 
+{Chorus}
 [A]Steady my heart [E]Lord
 [F#m]Even when I [D]can't see
 [A]I will trust in [E]You [D]Lord`,
@@ -268,11 +299,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Fall afresh on [A]me
+    content: `{Verse 1}
+[D]Fall afresh on [A]me
 [Bm]Spirit of the [G]living God
 [D]Fall afresh on [A]me
 [Bm]Come and fill this [G]place
 
+{Chorus}
 [D]Awaken my [A]soul
 [Bm]Come awaken my [G]soul
 [D]Come and fill this [A]place
@@ -286,11 +319,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]With our hands to the [F]heavens
+    content: `{Verse 1}
+[Bb]With our hands to the [F]heavens
 [Gm]Alive in Your pre[Eb]sence
 [Bb]O God, when You [F]come
 [Gm]Blessed are we who are [Eb]hungry
 
+{Chorus}
 [Bb]Hands to the [F]heavens
 [Gm]We lift our [Eb]voices
 [Bb]Be glorified [F]Lord [Eb]`,
@@ -303,11 +338,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Savior I come, [E]quiet my soul
+    content: `{Verse 1}
+[A]Savior I come, [E]quiet my soul
 [F#m]Remember re[D]demption's hill
 [A]Where Your blood was [E]spilled
 [F#m]For my ran[D]som
 
+{Chorus}
 [A]Lead me to the [E]cross
 [F#m]Where Your love poured [D]out
 [A]Bring me to my [E]knees
@@ -321,11 +358,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "Eb",
     format: "chordpro",
-    content: `[Eb]I see Your face in [Bb]every sunrise
+    content: `{Verse 1}
+[Eb]I see Your face in [Bb]every sunrise
 [Cm]The colors of the [Ab]morning are inside Your eyes
 [Eb]The world awakens [Bb]in the light of the day
 [Cm]I look up to the [Ab]sky and say
 
+{Chorus}
 [Eb]You're beautiful, [Bb]beautiful
 [Cm]God You're beautiful, [Ab]beautiful
 [Eb]Everything You are is [Bb]beautiful [Ab]`,
@@ -338,11 +377,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I had all but [A]given up
+    content: `{Verse 1}
+[D]I had all but [A]given up
 [Bm]Desperate for a [G]sign from love
 [D]Something good, some[A]thing kind
 [Bm]Bringing peace to [G]every corner of my mind
 
+{Chorus}
 [D]Then I saw the [A]garden
 [Bm]You had planted [G]for me
 [D]In the middle of my [A]darkest night
@@ -358,11 +399,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I can hear You [F]calling my name
+    content: `{Verse 1}
+[Bb]I can hear You [F]calling my name
 [Gm]I can feel You [Eb]right here in this place
 [Bb]Every burden is [F]lifted
 [Gm]Every chain falls [Eb]away
 
+{Chorus}
 [Bb]The Savior's [F]here
 [Gm]The Savior's [Eb]here
 [Bb]Open your eyes the [F]Savior's here
@@ -376,11 +419,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Only Your love can [D]satisfy
+    content: `{Verse 1}
+[G]Only Your love can [D]satisfy
 [Em]Only Your love could [C]fill this heart of mine
 [G]I've tried the [D]world and all its ways
 [Em]But only Your love can [C]save
 
+{Chorus}
 [G]Only Your love, [D]only Your grace
 [Em]Could take someone [C]like me
 [G]And make me [D]whole a[C]gain`,
@@ -393,15 +438,18 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Holy Spirit [A]You are welcome here
+    content: `{Verse 1}
+[D]Holy Spirit [A]You are welcome here
 [Bm]Come flood this place and [G]fill the atmosphere
 [D]Your glory God is [A]what our hearts long for
 [Bm]To be overcome by [G]Your presence Lord
 
+{Chorus}
 [D]Holy [A]Spirit
 [Bm]You are welcome [G]here
 [D]Come flood this [A]place and fill the atmo[G]sphere
 
+{Verse 2}
 [D]Let us become more [A]aware of Your presence
 [Bm]Let us experience the [G]glory of Your goodness`,
     notes: "With Bryan & Katie Torwalt. Atmospheric and invitational.",
@@ -413,11 +461,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]No sweeter name than the [E]name of Jesus
+    content: `{Verse 1}
+[A]No sweeter name than the [E]name of Jesus
 [F#m]No sweeter name have I [D]ever known
 [A]No sweeter name than the [E]name of Jesus
 [F#m]You are the [D]risen King
 
+{Chorus}
 [A]You are the [E]Prince of Peace
 [F#m]Wonderful Coun[D]selor
 [A]You are the [E]mighty God [D]`,
@@ -430,11 +480,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Come and be [G]near
+    content: `{Verse 1}
+[C]Come and be [G]near
 [Am]Draw close as we [F]sing
 [C]There's nowhere we'd [G]rather be
 [Am]Than here in Your [F]presence
 
+{Chorus}
 [C]Here, [G]here
 [Am]We are [F]here
 [C]In the place where [G]heaven meets earth
@@ -448,11 +500,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]O Lord our Lord how [A]majestic
+    content: `{Verse 1}
+[D]O Lord our Lord how [A]majestic
 [Bm]Is Your name in [G]all the earth
 [D]You have set Your [A]glory
 [Bm]Above the [G]heavens
 
+{Chorus}
 [D]Majestic, [A]majestic
 [Bm]Your name is [G]high above all
 [D]Majestic [A]Lord [G]`,
@@ -465,11 +519,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Look upon the [B]Lord
+    content: `{Verse 1}
+[E]Look upon the [B]Lord
 [C#m]And be radi[A]ant
 [E]Let no shame cover [B]your face
 [C#m]He's the lifter of [A]your head
 
+{Chorus}
 [E]Look upon the [B]Lord
 [C#m]Gaze into His [A]eyes
 [E]And see the love that [B]never ends
@@ -483,11 +539,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I need You, [D]oh I need You
+    content: `{Verse 1}
+[G]I need You, [D]oh I need You
 [Em]Every hour I [C]need You
 [G]My one defense, my [D]righteousness
 [Em]Oh God how I [C]need You
 
+{Chorus}
 [G]Where sin runs [D]deep Your grace is more
 [Em]Where grace is found is [C]where You are
 [G]And where You are Lord [D]I am free
@@ -501,11 +559,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Breathe in, breathe [F]out
+    content: `{Verse 1}
+[Bb]Breathe in, breathe [F]out
 [Gm]Let the Spirit of [Eb]God breathe through you
 [Bb]Breathe in, breathe [F]out
 [Gm]Let go of every [Eb]worry
 
+{Chorus}
 [Bb]Exhale, [F]exhale
 [Gm]Cast your cares on [Eb]Him
 [Bb]Exhale and [F]breathe Him in [Eb]`,
@@ -518,11 +578,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Fan the flame inside of [A]me
+    content: `{Verse 1}
+[D]Fan the flame inside of [A]me
 [Bm]Don't let this fire burn [G]out
 [D]What was once an [A]ember
 [Bm]Is now a raging [G]fire
 
+{Chorus}
 [D]Let the embers [A]glow
 [Bm]Let the fire [G]grow
 [D]Holy Spirit [A]come
@@ -536,11 +598,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]If my heart is over[B]whelmed
+    content: `{Verse 1}
+[E]If my heart is over[B]whelmed
 [C#m]And I cannot hear Your [A]voice
 [E]I'll hold on to what is [B]true
 [C#m]Though I cannot see [A]
 
+{Chorus}
 [E]Love came [B]down
 [C#m]And rescued [A]me
 [E]Love came [B]down
@@ -555,11 +619,13 @@ The Lord turn His [G]face toward you
     artist: "Kari Jobe",
     originalKey: "Eb",
     format: "chordpro",
-    content: `[Eb]The more I seek [Bb]You
+    content: `{Verse 1}
+[Eb]The more I seek [Bb]You
 [Cm]The more I find [Ab]You
 [Eb]The more I find [Bb]You
 [Cm]The more I love [Ab]You
 
+{Chorus}
 [Eb]I want to sit at Your [Bb]feet
 [Cm]Drink from the cup in Your [Ab]hand
 [Eb]Lay back against [Bb]You and breathe

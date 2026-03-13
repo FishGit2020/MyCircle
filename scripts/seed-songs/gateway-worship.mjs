@@ -15,14 +15,17 @@ const SONGS = [
     artist: "Gateway Worship",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I want to be [Eb]close close to Your side
+    content: `{Verse 1}
+[Bb]I want to be [Eb]close close to Your side
 [Gm]So heaven is [F]real and death is a lie
 [Bb]I want to hear [Eb]voices of angels
 [Gm]Above my crying [F]out
 
+{Chorus}
 [Bb]Oh great I [Eb]Am oh great I [Gm]Am [F]
 [Bb]I bow before the [Eb]holy one and I [Gm]sing oh [F]great I Am
 
+{Verse 2}
 [Bb]I want to be [Eb]near near to Your heart
 [Gm]Loving the [F]world and hating the dark
 [Bb]I want to see [Eb]dry bones living again
@@ -36,16 +39,19 @@ const SONGS = [
     artist: "Gateway Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Spirit of the living [C]God come fall a[G]fresh on me
+    content: `{Verse 1}
+[G]Spirit of the living [C]God come fall a[G]fresh on me
 [Em]Spirit of the living [C]God come fall a[D]fresh on me
 [G]Melt me mold me [C]fill me [G]use me
 [Em]Spirit of the [C]living [D]God come fall afresh on [G]me
 
+{Chorus}
 [C]Come like a [G]rushing wind
 [D]Breathe new [Em]life again
 [C]Come like a [G]burning flame
 [D]Purify my [G]heart
 
+{Verse 2}
 [G]Holy Spirit [C]You are welcome here
 [Em]Come flood this [D]place and fill the atmos[G]phere`,
     notes: "Classic hymn reimagined. Gentle and invitational for the Holy Spirit.",
@@ -57,16 +63,19 @@ const SONGS = [
     artist: "Gateway Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I am forever [D]Yours
+    content: `{Verse 1}
+[A]I am forever [D]Yours
 [F#m]I am forever [E]Yours
 [A]You don't have to [D]worry
 [F#m]My love will not run [E]out
 
+{Chorus}
 [A]Nothing in this [D]world could ever change my mind
 [F#m]I have found what's [E]real since I found You
 [A]God You were [D]faithful through the [F#m]good times and the bad
 [E]I am forever [A]Yours
 
+{Verse 2}
 [D]I'm running to Your [A]arms
 [E]I'm falling at Your [F#m]feet
 [D]I'm living for Your [A]love
@@ -80,16 +89,19 @@ const SONGS = [
     artist: "Gateway Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]The veil is [B]getting thinner
+    content: `{Verse 1}
+[E]The veil is [B]getting thinner
 [C#m]The light is [A]growing strong
 [E]Every eye will [B]see You
 [C#m]And every [A]tongue confess
 
+{Chorus}
 [E]Revelation [B]of the Son of God
 [C#m]Revelation [A]of the Holy One
 [E]All creation [B]bows at Your throne
 [C#m]Heaven and [A]earth proclaim
 
+{Verse 2}
 [A]Holy holy [E]holy
 [B]Is the Lord God [C#m]Almighty
 [A]Who was and is and [E]is to [B]come`,
@@ -102,16 +114,19 @@ const SONGS = [
     artist: "Gateway Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]There is no one [C]like our God
+    content: `{Verse 1}
+[G]There is no one [C]like our God
 [Em]Strong and mighty [D]faithful and true
 [G]There is no one [C]like our God
 [Em]Who loved us [D]first who carries us through
 
+{Chorus}
 [G]Nothing compares to [C]You Lord
 [Em]No one comes [D]close
 [G]You are above all [C]things
 [Em]Worthy of our [D]praise
 
+{Verse 2}
 [C]No one like [G]You Lord
 [D]No one like [Em]You
 [C]You are for[G]ever

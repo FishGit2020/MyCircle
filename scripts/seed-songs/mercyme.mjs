@@ -15,13 +15,15 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]I can only i[A]magine
+    content: `{Verse 1}
+[E]I can only i[A]magine
 [E]What it will be like
 [B]When I walk by Your [A]side
 [E]I can only i[A]magine
 [E]What my eyes will see
 [B]When Your face is be[A]fore me
 
+{Chorus}
 [E]Surrounded by Your [A]glory
 [E]What will my heart [B]feel
 [E]Will I dance for You [A]Jesus
@@ -35,11 +37,13 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "Ab",
     format: "chordpro",
-    content: `[Ab]They say sometimes You [Eb]win some
+    content: `{Verse 1}
+[Ab]They say sometimes You [Eb]win some
 [Fm]Sometimes You [Db]lose some
 [Ab]And right now, right [Eb]now I'm losing bad
 [Fm]I've stood on this [Db]stage night after night
 
+{Chorus}
 [Ab]I know You're able and I [Eb]know You can
 [Fm]Save through the fire with Your [Db]mighty hand
 [Ab]But even if You [Eb]don't
@@ -53,11 +57,13 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Bring your tired and [B]bring your shame
+    content: `{Verse 1}
+[E]Bring your tired and [B]bring your shame
 [C#m]Bring your guilt and [A]bring your pain
 [E]Don't you know that's not your [B]name
 [C#m]You will always [A]be much more to me
 
+{Chorus}
 [E]He's greater, He's [B]greater
 [C#m]Greater is the One [A]living inside of me
 [E]He's greater, He's [B]greater
@@ -71,11 +77,13 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]I'm finding myself at a [F]loss for words
+    content: `{Verse 1}
+[Bb]I'm finding myself at a [F]loss for words
 [Gm]And the funny thing is it's [Eb]okay
 [Bb]The last thing I need is to [F]be heard
 [Gm]But to hear what [Eb]You would say
 
+{Chorus}
 [Bb]Word of God speak
 [F]Would You pour down like rain
 [Gm]Washing my eyes to see
@@ -91,12 +99,14 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]There's got to be more
+    content: `{Verse 1}
+[C]There's got to be more
 [G]Than going back and forth
 [Am]From doing right to [F]doing wrong
 [C]Cause we were taught that's [G]who we are
 [Am]Come on get in [F]line right behind me
 
+{Chorus}
 [C]No matter the bumps, [G]no matter the bruises
 [Am]No matter the scars, [F]still the truth is
 [C]The cross has made, [G]the cross has made you
@@ -110,11 +120,13 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Dear younger me, [D]where do I start
+    content: `{Verse 1}
+[G]Dear younger me, [D]where do I start
 [Em]If I could tell you [C]everything that I have learned so far
 [G]Then you could be [D]one step ahead
 [Em]Of all the painful [C]memories still running through my head
 
+{Chorus}
 [G]Dear younger me, [D]it's not your fault
 [Em]You were never meant to [C]carry this beyond the cross
 [G]Dear younger me, [D]you'll be okay
@@ -128,11 +140,13 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I can see the [D]light at the end of this tunnel
+    content: `{Verse 1}
+[G]I can see the [D]light at the end of this tunnel
 [Em]I know it's bright and [C]I won't stumble
 [G]Through these valleys [D]and these shadows
 [Em]The road less [C]traveled to green meadows
 
+{Chorus}
 [G]We're almost [D]home
 [Em]Brother, it won't be [C]long
 [G]We're almost [D]home
@@ -147,11 +161,13 @@ const SONGS = [
     artist: "MercyMe",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Lay your head [A]down tonight
+    content: `{Verse 1}
+[D]Lay your head [A]down tonight
 [Bm]Take a rest from the [G]fight
 [D]Don't try to figure it [A]all out
 [Bm]Just listen to what [G]I'm whispering to your heart
 
+{Chorus}
 [D]This is going to be a [A]glorious unfolding
 [Bm]Just you wait and see [G]and you will be amazed
 [D]You've just gotta [A]believe the way it's all

@@ -15,16 +15,19 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Holy, holy, [F]holy, [C]Lord God Al[G]mighty
+    content: `{Verse 1}
+[C]Holy, holy, [F]holy, [C]Lord God Al[G]mighty
 [Am]Early in the [F]morning our [C]song shall rise to [G]Thee
 [C]Holy, holy, [F]holy, [C]merciful and [G]mighty
 [F]God in three [C]persons, [G]blessed Trini[C]ty
 
+{Chorus}
 [C]Holy, holy, [F]holy, [C]all the saints a[G]dore Thee
 [Am]Casting down their [F]golden crowns a[C]round the glassy [G]sea
 [C]Cherubim and [F]seraphim [C]falling down be[G]fore Thee
 [F]Which wert and [C]art and [G]evermore shalt [C]be
 
+{Verse 2}
 [Am]You are [F]holy, there is [G]no one like You
 [Am]You are [F]holy, there is [G]no one be[C]side You`,
     notes: "Modern arrangement of the classic hymn. Beautiful and reverent.",
@@ -36,16 +39,19 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Who else would rocks cry [E]out to worship
+    content: `{Verse 1}
+[A]Who else would rocks cry [E]out to worship
 [F#m]Whose glory taught the [D]stars to shine
 [A]Perhaps creation [E]longs to have the
 [F#m]Words to truly prai[D]se You rightly
 
+{Chorus}
 [A]A thousand halle[E]lujahs
 [F#m]And a thousand [D]more
 [A]A thousand halle[E]lujahs
 [F#m]Is not enough for [D]You Lord
 
+{Verse 2}
 [A]Who else would die for [E]our redemption
 [F#m]Whose resurrection [D]means I'm free
 [A]So all creation [E]shouts together
@@ -59,15 +65,18 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Oh God of Abraham [C]God of covenant
+    content: `{Verse 1}
+[F]Oh God of Abraham [C]God of covenant
 [Dm]And faithful promises [Bb]time and time again
 [F]You have proven [C]You'll do just what You said
 
+{Chorus}
 [F]There's honey in the [C]rock
 [Dm]Living water, bread of [Bb]heaven
 [F]Fed by a hand that [C]won't let go and won't forget you
 [Dm]Oh there's honey in the [Bb]rock
 
+{Verse 2}
 [F]There ain't no lack with [C]Jesus
 [Dm]There ain't no loss with [Bb]God
 [F]At the banqueting [C]table
@@ -81,19 +90,23 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]In the quiet, [D]in the stillness
+    content: `{Verse 1}
+[G]In the quiet, [D]in the stillness
 [Em]I know that [C]You are God
 [G]In the secret [D]of Your presence
 [Em]I know there I [C]am restored
 
+{Chorus}
 [G]When You call I won't re[D]fuse
 [Em]Each new day again I'll [C]choose
 
+{Verse 2}
 [G]There is no one [D]else for me
 [Em]None but Jesus [C]
 [G]Crucified to [D]set me free
 [Em]Now I live to [C]bring Him praise
 
+{Chorus}
 [G]In the chaos, [D]in confusion
 [Em]I know You're [C]sovereign still
 [G]In the moment [D]of my weakness
@@ -107,11 +120,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "Eb",
     format: "chordpro",
-    content: `[Eb]This is the body [Bb]broken for you
+    content: `{Verse 1}
+[Eb]This is the body [Bb]broken for you
 [Cm]This is the blood [Ab]shed for you
 [Eb]In remembrance [Bb]of everything
 [Cm]You have [Ab]done
 
+{Chorus}
 [Eb]At this table [Bb]I remember
 [Cm]Grace so free and [Ab]love so tender
 [Eb]Broken bread and [Bb]crimson [Ab]cup`,
@@ -124,11 +139,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]This is my prayer in the [F]desert
+    content: `{Verse 1}
+[Bb]This is my prayer in the [F]desert
 [Gm]When all that's within me feels [Eb]dry
 [Bb]This is my prayer in my [F]hunger and need
 [Gm]My God is the God who pro[Eb]vides
 
+{Chorus}
 [Bb]I will bring praise, I will [F]bring praise
 [Gm]No weapon formed against me shall re[Eb]main
 [Bb]I will re[F]joice, I will de[Gm]clare
@@ -142,11 +159,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]All who are [A]thirsty
+    content: `{Verse 1}
+[D]All who are [A]thirsty
 [Bm]All who are [G]weak
 [D]Come to the [A]fountain
 [Bm]Dip your heart in the [G]stream of life
 
+{Chorus}
 [D]Let the pain and the [A]sorrow
 [Bm]Be washed [G]away
 [D]In the waves of His [A]mercy
@@ -160,11 +179,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "Eb",
     format: "chordpro",
-    content: `[Eb]I see the King of [Bb]Glory
+    content: `{Verse 1}
+[Eb]I see the King of [Bb]Glory
 [Cm]Coming on the clouds with [Ab]fire
 [Eb]The whole earth [Bb]shakes
 [Cm]The whole earth [Ab]shakes
 
+{Chorus}
 [Eb]Hosanna, Ho[Bb]sanna
 [Cm]Hosanna in the [Ab]highest
 [Eb]Hosanna, Ho[Bb]sanna
@@ -178,11 +199,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]What a Savior, what a [E]Friend
+    content: `{Verse 1}
+[A]What a Savior, what a [E]Friend
 [F#m]What a glorious [D]mystery
 [A]That the God of this whole [E]earth
 [F#m]Would come to rescue [D]me
 
+{Chorus}
 [A]He left His throne a[E]bove
 [F#m]Emptied Himself of [D]all but love
 [A]What a Savior [E]He [D]is`,
@@ -195,11 +218,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Hear our prayer, [G]hear our cry
+    content: `{Verse 1}
+[C]Hear our prayer, [G]hear our cry
 [Am]From the depths we [F]call to You
 [C]Hear our prayer, [G]Lord tonight
 [Am]We are [F]desperate for You
 
+{Chorus}
 [C]Come and fill this [G]place
 [Am]Let Your glory [F]fall
 [C]Hear our [G]prayer [F]Lord`,
@@ -212,11 +237,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You are closer than You [D]know
+    content: `{Verse 1}
+[G]You are closer than You [D]know
 [Em]Closer than the [C]air I breathe
 [G]Before I even [D]call Your name
 [Em]You are [C]here
 
+{Chorus}
 [G]Ever present [D]help in trouble
 [Em]You are closer than I [C]know
 [G]Nearer than my [D]next heart[C]beat`,
@@ -229,11 +256,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "Ab",
     format: "chordpro",
-    content: `[Ab]My Jesus, my [Eb]Savior
+    content: `{Verse 1}
+[Ab]My Jesus, my [Eb]Savior
 [Fm]You suffered and [Db]died on a tree
 [Ab]The nails in Your [Eb]hands
 [Fm]The thorns on Your [Db]brow
 
+{Chorus}
 [Ab]What love could be [Eb]greater
 [Fm]What sacrifice [Db]deeper
 [Ab]The passion of [Eb]Christ for [Db]me`,
@@ -246,11 +275,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]The Lord is my [A]Shepherd
+    content: `{Verse 1}
+[D]The Lord is my [A]Shepherd
 [Bm]I shall not [G]want
 [D]He makes me lie [A]down
 [Bm]In green [G]pastures
 
+{Chorus}
 [D]He leads me be[A]side still waters
 [Bm]He restores my [G]soul
 [D]Surely goodness and [A]mercy
@@ -264,11 +295,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Mercy, mercy [F]Lord
+    content: `{Verse 1}
+[Bb]Mercy, mercy [F]Lord
 [Gm]Falling on my [Eb]knees
 [Bb]Mercy, mercy [F]Lord
 [Gm]It's Your mercy [Eb]I need
 
+{Chorus}
 [Bb]Like a flood You [F]come
 [Gm]Washing over [Eb]me
 [Bb]Your mercy is e[F]nough for [Eb]me`,
@@ -281,11 +314,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Amazing grace that [B]won't let go
+    content: `{Verse 1}
+[E]Amazing grace that [B]won't let go
 [C#m]Holding me through [A]every storm
 [E]When I'm weak Your [B]love is strong
 [C#m]Grace that won't let [A]go
 
+{Chorus}
 [E]You pursue me [B]to the end
 [C#m]Nothing separates me [A]from Your love
 [E]Grace that won't let [B]go [A]`,
@@ -298,11 +333,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]This is a holy [D]moment
+    content: `{Verse 1}
+[G]This is a holy [D]moment
 [Em]Heaven touching [C]earth
 [G]The veil is thin and [D]we are standing
 [Em]On holy [C]ground
 
+{Chorus}
 [G]We take off our [D]shoes
 [Em]We bow our [C]hearts
 [G]This is a holy [D]moment [C]Lord`,
@@ -315,11 +352,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]The weight of Your [E]glory
+    content: `{Verse 1}
+[A]The weight of Your [E]glory
 [F#m]Is more than my [D]heart can hold
 [A]Fall on us like [E]rain
 [F#m]Like fire from [D]heaven
 
+{Chorus}
 [A]We want to see Your [E]glory
 [F#m]The weight of Your pre[D]sence here
 [A]Glory of the [E]Lord [D]`,
@@ -332,11 +371,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Born again, [G]born again
+    content: `{Verse 1}
+[C]Born again, [G]born again
 [Am]Something comes a[F]live within
 [C]Born again by the [G]Spirit of God
 [Am]New creation, [F]old has gone
 
+{Chorus}
 [C]From above a [G]second birth
 [Am]Water and the [F]Spirit's work
 [C]Born again, [G]born a[F]gain`,
@@ -349,11 +390,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I am a new cre[A]ation
+    content: `{Verse 1}
+[D]I am a new cre[A]ation
 [Bm]The old has passed a[G]way
 [D]Behold the new has [A]come
 [Bm]I am alive in [G]You today
 
+{Chorus}
 [D]No more condem[A]nation
 [Bm]No more guilt or [G]shame
 [D]I am a new cre[A]ation in [G]Christ`,
@@ -366,11 +409,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You are the defender [D]of the weak
+    content: `{Verse 1}
+[G]You are the defender [D]of the weak
 [Em]Champion of the [C]broken-hearted
 [G]You lift the lowly [D]from the dust
 [Em]And seat them with the [C]princes
 
+{Chorus}
 [G]Defender of the [D]weak
 [Em]Father to the [C]fatherless
 [G]You fight for [D]me [C]Lord`,
@@ -383,11 +428,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]When the night is [E]long
+    content: `{Verse 1}
+[A]When the night is [E]long
 [F#m]And the answers don't [D]come
 [A]Still I will praise, [E]still I will praise
 [F#m]When the tears won't [D]stop
 
+{Chorus}
 [A]Still I will [E]praise You Lord
 [F#m]Still I will [D]praise
 [A]My heart will choose to [E]worship
@@ -401,11 +448,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Rejoice in the [A]Lord always
+    content: `{Verse 1}
+[D]Rejoice in the [A]Lord always
 [Bm]Again I say re[G]joice
 [D]Let your gentle spirit [A]be known to everyone
 [Bm]The Lord is [G]near
 
+{Chorus}
 [D]Rejoice, re[A]joice
 [Bm]Let all the earth re[G]joice
 [D]He has done great [A]things [G]`,
@@ -418,11 +467,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]With open arms You [G]welcome me
+    content: `{Verse 1}
+[C]With open arms You [G]welcome me
 [Am]No shame, no fear, just [F]grace
 [C]Into the place where [G]I belong
 [Am]Held in Your em[F]brace
 
+{Chorus}
 [C]Open arms, [G]open heart
 [Am]You receive me [F]as I am
 [C]Nothing can separate me [G]from Your [F]love`,
@@ -435,11 +486,13 @@ const SONGS = [
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You were the Word at the [A]beginning
+    content: `{Verse 1}
+[D]You were the Word at the [A]beginning
 [Bm]One with God the Lord Most [G]High
 [D]Your hidden glory in cre[A]ation
 [Bm]Now revealed in [G]You our Christ
 
+{Chorus}
 [D]What a beautiful [A]Name it is
 [Bm]What a beautiful [G]Name it is
 [D]The Name of [A]Jesus Christ my [Bm]King
@@ -456,11 +509,13 @@ The Name of [A]Jesus [D]`,
     artist: "Brooke Ligertwood",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]This is where my [B]heart belongs
+    content: `{Verse 1}
+[E]This is where my [B]heart belongs
 [C#m]Right here in Your [A]presence Lord
 [E]Nowhere else I'd [B]rather be
 [C#m]Than at Your [A]feet
 
+{Chorus}
 [E]Where my heart be[B]longs
 [C#m]Is where You [A]are
 [E]You are my [B]home [A]`,
@@ -473,11 +528,13 @@ The Name of [A]Jesus [D]`,
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I will trust in [D]You alone
+    content: `{Verse 1}
+[G]I will trust in [D]You alone
 [Em]When the path is un[C]certain
 [G]I will trust Your [D]sovereign hand
 [Em]Over every sea[C]son
 
+{Chorus}
 [G]Trust, I put my [D]trust in You
 [Em]Hope, my hope is [C]found in You
 [G]Lord of all I [D]trust in [C]You`,
@@ -490,11 +547,13 @@ The Name of [A]Jesus [D]`,
     artist: "Brooke Ligertwood",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Abide in me as [C]I abide in You
+    content: `{Verse 1}
+[F]Abide in me as [C]I abide in You
 [Dm]Let Your Word make [Bb]home in me
 [F]Apart from You I [C]can do nothing
 [Dm]You're the vine and [Bb]I'm the branch
 
+{Chorus}
 [F]Abide in [C]me
 [Dm]Let Your rivers of [Bb]living water flow
 [F]Abide in [C]me [Bb]Lord`,
@@ -507,11 +566,13 @@ The Name of [A]Jesus [D]`,
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Bright Morning [E]Star
+    content: `{Verse 1}
+[A]Bright Morning [E]Star
 [F#m]Your light breaks through the [D]darkness
 [A]Hope of the [E]world
 [F#m]You shine for all to [D]see
 
+{Chorus}
 [A]Jesus, bright Morning [E]Star
 [F#m]Rising with healing [D]in Your wings
 [A]Dawn of redemption's [E]day [D]`,
@@ -524,11 +585,13 @@ The Name of [A]Jesus [D]`,
     artist: "Brooke Ligertwood",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Lead me on, [F]lead me on
+    content: `{Verse 1}
+[Bb]Lead me on, [F]lead me on
 [Gm]Through the valley and the [Eb]shadow
 [Bb]Lead me on, [F]lead me on
 [Gm]I will follow where You [Eb]go
 
+{Chorus}
 [Bb]Your rod and staff they [F]comfort me
 [Gm]You prepare a [Eb]table
 [Bb]Lead me on [F]Lord [Eb]lead me on`,

@@ -15,18 +15,21 @@ const SONGS = [
     artist: "Casting Crowns",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]Who am I, that the [E]Lord of all the earth
+    content: `{Verse 1}
+[B]Who am I, that the [E]Lord of all the earth
 [G#m]Would care to know my [F#]name
 [B]Would care to feel my [E]hurt
 [B]Who am I, that the [E]bright and morning star
 [G#m]Would choose to light the [F#]way
 [B]For my ever wandering [E]heart
 
+{Chorus}
 [B]Not because of [E]who I am
 [G#m]But because of [F#]what You've done
 [B]Not because of [E]what I've done
 [G#m]But because of [F#]who You are
 
+{Verse 2}
 [B]I am a flower quickly [E]fading
 [G#m]Here today and gone to[F#]morrow
 [B]A wave tossed in the [E]ocean
@@ -44,11 +47,13 @@ const SONGS = [
     artist: "Casting Crowns",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I was sure by now, [E]God You would have reached down
+    content: `{Verse 1}
+[A]I was sure by now, [E]God You would have reached down
 [F#m]And wiped our tears a[D]way, stepped in and saved the day
 [A]But once again, I [E]say amen
 [F#m]And it's still [D]raining
 
+{Chorus}
 [A]And I'll praise You [E]in this storm
 [F#m]And I will lift my [D]hands
 [A]For You are who You [E]are
@@ -67,12 +72,14 @@ I will praise You in this [A]storm`,
     artist: "Casting Crowns",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]If I had only [G]known the last time
+    content: `{Verse 1}
+[C]If I had only [G]known the last time
 [Am]Would be the last time
 [F]I would have put off all the things I had to do
 [C]I would have stayed a [G]little longer
 [Am]Held on a little [F]tighter, now what I'd give for one more day with you
 
+{Chorus}
 [C]The only scars in [G]heaven
 [Am]They won't belong to [F]me and you
 [C]There'll be no such thing as [G]broken
@@ -86,11 +93,13 @@ I will praise You in this [A]storm`,
     artist: "Casting Crowns",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Here in this worn and [D]weary land
+    content: `{Verse 1}
+[G]Here in this worn and [D]weary land
 [Em]Where many a dream has [C]died
 [G]Like a tree planted [D]by the water
 [Em]We never will run [C]dry
 
+{Chorus}
 [G]We're gonna thrive, [D]not just survive
 [Em]Oh we're gonna [C]thrive
 [G]Into a life of [D]joy we'll grow
@@ -104,11 +113,13 @@ I will praise You in this [A]storm`,
     artist: "Casting Crowns",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Hold it all to[F]gether
+    content: `{Verse 1}
+[Bb]Hold it all to[F]gether
 [Gm]Everybody needs you [Eb]strong
 [Bb]But life hits you out of [F]nowhere
 [Gm]And barely leaves you [Eb]holding on
 
+{Chorus}
 [Bb]So when you're on your [F]knees and answers
 [Gm]Seem so far a[Eb]way
 [Bb]You're not alone, [F]stop holding on
@@ -122,11 +133,13 @@ I will praise You in this [A]storm`,
     artist: "Casting Crowns",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Maybe you've been [E]walking for days
+    content: `{Verse 1}
+[A]Maybe you've been [E]walking for days
 [F#m]Maybe you've run [D]out of things to say
 [A]Maybe life has [E]taken its toll
 [F#m]Maybe you just [D]need to come back home
 
+{Chorus}
 [A]You're one step [E]away
 [F#m]From surrender, [D]one prayer away
 [A]From the arms of [E]Jesus
@@ -140,11 +153,13 @@ I will praise You in this [A]storm`,
     artist: "Casting Crowns",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Why You ever [G]chose me
+    content: `{Verse 1}
+[C]Why You ever [G]chose me
 [Am]Has always been a [F]mystery
 [C]All my life I've [G]been told I belong
 [Am]At the end of [F]a line
 
+{Chorus}
 [C]I'm just a nobody [G]trying to tell everybody
 [Am]All about Somebody [F]who saved my soul
 [C]Ever since You [G]rescued me
@@ -158,11 +173,13 @@ I will praise You in this [A]storm`,
     artist: "Casting Crowns",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You hold my every [A]moment
+    content: `{Verse 1}
+[D]You hold my every [A]moment
 [Bm]You calm my raging [G]seas
 [D]You walk with me through [A]fire
 [Bm]And heal all my [G]disease
 
+{Chorus}
 [D]I believe You're my [A]healer
 [Bm]I believe You are [G]all I need
 [D]I believe You're my [A]portion
@@ -176,11 +193,13 @@ I will praise You in this [A]storm`,
     artist: "Casting Crowns",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You give life, You are [A]love
+    content: `{Verse 1}
+[D]You give life, You are [A]love
 [Bm]You bring light to the [G]darkness
 [D]You give hope, You re[A]store
 [Bm]Every heart that is [G]broken
 
+{Chorus}
 [D]Great are You [A]Lord
 [Bm]It's Your breath in our [G]lungs
 [D]So we pour out our [A]praise
