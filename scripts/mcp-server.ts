@@ -27,6 +27,10 @@ import {
   readFirestoreStats,
   readUserFeedback,
 } from './mcp-tools/firestore-reader.js';
+import {
+  readSentryIssues,
+  readSentryIssueDetail,
+} from './mcp-tools/sentry-reader.js';
 
 const server = new McpServer({
   name: 'mycircle',
@@ -131,6 +135,32 @@ server.tool(
   },
   async ({ days }) => ({
     content: [{ type: 'text', text: await readUserFeedback(days) }],
+  })
+);
+
+// ─── Sentry Tools ────────────────────────────────────────────
+
+server.tool(
+  'read_sentry_issues',
+  'List recent Sentry error reports for the MyCircle project. Filter by status and search query.',
+  {
+    limit: z.number().optional().default(10).describe('Max issues to return (default 10)'),
+    query: z.string().optional().describe('Search query to filter issues'),
+    status: z.enum(['unresolved', 'resolved', 'ignored']).optional().default('unresolved').describe('Issue status filter (default "unresolved")'),
+  },
+  async ({ limit, query, status }) => ({
+    content: [{ type: 'text', text: await readSentryIssues({ limit, query, status }) }],
+  })
+);
+
+server.tool(
+  'read_sentry_issue_detail',
+  'Get details for a specific Sentry issue including stack trace, tags, and affected users.',
+  {
+    issueId: z.string().describe('Sentry issue ID (numeric string)'),
+  },
+  async ({ issueId }) => ({
+    content: [{ type: 'text', text: await readSentryIssueDetail(issueId) }],
   })
 );
 
