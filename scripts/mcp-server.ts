@@ -36,6 +36,10 @@ import {
   componentDetail,
   listMfeFeatures,
 } from './mcp-tools/component-explorer.js';
+import {
+  checkAccessibility,
+  checkColorContrast,
+} from './mcp-tools/a11y-checker.js';
 
 const server = new McpServer({
   name: 'mycircle',
@@ -200,6 +204,28 @@ server.tool(
   {},
   async () => ({
     content: [{ type: 'text', text: listMfeFeatures() }],
+  })
+);
+
+// ─── Accessibility Tools ──────────────────────────────────────
+
+server.tool(
+  'check_accessibility',
+  'Audit React components for accessibility issues: missing button types, img alt, SVG aria, input labels, non-interactive click handlers, icon-only buttons. Optionally filter to a single package.',
+  {
+    package: z.string().optional().describe('Optional: filter to a specific MFE package name (e.g., "weather-display")'),
+  },
+  async ({ package: pkg }) => ({
+    content: [{ type: 'text', text: checkAccessibility(pkg) }],
+  })
+);
+
+server.tool(
+  'check_color_contrast',
+  'Check Tailwind dark mode coverage across all components. Reports color classes (text-*, bg-*, border-*, etc.) that lack a corresponding dark: variant.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: checkColorContrast() }],
   })
 );
 
