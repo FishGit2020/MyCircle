@@ -15,11 +15,13 @@ const SONGS = [
     artist: "Crowder",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Come out of [B]sadness
+    content: `{Verse 1}
+[E]Come out of [B]sadness
 [C#m]From wherever you've [A]been
 [E]Come broken[B]hearted
 [C#m]Let rescue be[A]gin
 
+{Chorus}
 [E]Come find your mercy, [B]oh sinner come kneel
 [C#m]Earth has no sorrow [A]that heaven can't heal
 [E]So lay down your [B]burdens
@@ -34,11 +36,13 @@ const SONGS = [
     artist: "Crowder",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I've been held by the [C]Savior
+    content: `{Verse 1}
+[G]I've been held by the [C]Savior
 [Em]I've felt fire from [D]above
 [G]I've been down to the [C]river
 [Em]I ain't the same, [D]a prodigal found
 
+{Chorus}
 [G]All my hope is in [C]Jesus
 [Em]Thank God that [D]yesterday's gone
 [G]All my sins are for[C]given
@@ -52,11 +56,13 @@ const SONGS = [
     artist: "Crowder",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]I was blind but [B]now I can see
+    content: `{Verse 1}
+[E]I was blind but [B]now I can see
 [C#m]Once was bound but [A]now I'm free
 [E]You opened up my [B]eyes to see
 [C#m]The good, the good [A]God in me
 
+{Chorus}
 [E]Good God Al[B]mighty
 [C#m]Is there anything [A]You can't do
 [E]Good God Al[B]mighty
@@ -70,11 +76,13 @@ const SONGS = [
     artist: "Crowder",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]There on a hill, [B]there on a cross
+    content: `{Verse 1}
+[E]There on a hill, [B]there on a cross
 [C#m]Is a sacrifice that [A]none could exhaust
 [E]Hands that were nailed [B]to a rugged tree
 [C#m]Are the hands that have [A]set us all free
 
+{Chorus}
 [E]Red letters, [B]red letters
 [C#m]The gospel in [A]red letters
 [E]The story of [B]redemption written
@@ -88,11 +96,13 @@ const SONGS = [
     artist: "Crowder",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Let it rain, [A]let it rain
+    content: `{Verse 1}
+[D]Let it rain, [A]let it rain
 [Bm]Open the flood [G]gates of heaven
 [D]Let it rain, [A]let it rain
 [Bm]Open the flood [G]gates of heaven
 
+{Chorus}
 [D]We need You [A]here
 [Bm]We need Your [G]spirit
 [D]Let it rain, [A]let it rain
@@ -106,11 +116,13 @@ const SONGS = [
     artist: "Crowder",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Singing praise in the [B]house of God
+    content: `{Verse 1}
+[E]Singing praise in the [B]house of God
 [C#m]Dancing free in the [A]house of God
 [E]Every chain is gonna [B]break tonight
 [C#m]In the house, in the [A]house of God
 
+{Chorus}
 [E]There's freedom in the [B]house
 [C#m]There's joy in the [A]house
 [E]There is love, there is [B]grace
@@ -124,11 +136,13 @@ const SONGS = [
     artist: "Crowder",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]You came for criminals [G]and every Pharisee
+    content: `{Verse 1}
+[C]You came for criminals [G]and every Pharisee
 [Am]You came for hypocrites [F]even one like me
 [C]You carried the cross [G]Lord You carried me
 [Am]You were buried in [F]a grave but the grave could not hold Thee
 
+{Chorus}
 [C]My victory, [G]my victory
 [Am]Is in You, is [F]in You
 [C]My defeat was [G]defeated at the cross

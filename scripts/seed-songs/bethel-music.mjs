@@ -15,18 +15,21 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I love You, Lord
+    content: `{Verse 1}
+[A]I love You, Lord
 [D]Oh Your mercy never [A]fails me
 [A]All my days, [E]I've been held in Your [D]hands
 [A]From the moment that I [D]wake up
 [A]Until I lay my [E]head
 [A]Oh, I will sing of the [D]goodness of God
 
+{Chorus}
 [A]All my life You have been [D]faithful
 [A]All my life You have been so, [E]so good
 [D]With every breath that I am able
 [A]Oh, I will sing of the [E]goodness of [A]God
 
+{Verse 2}
 [A]I love Your voice
 [D]You have led me through the [A]fire
 [A]In the darkest night [E]You are close like no [D]other
@@ -42,11 +45,13 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "C",
     format: "chordpro",
-    content: `[Am]Before I spoke a [C]word, You were singing over [G]me
+    content: `{Verse 1}
+[Am]Before I spoke a [C]word, You were singing over [G]me
 [Am]You have been so, so [C]good to [G]me
 [Am]Before I took a [C]breath, You breathed Your life in [G]me
 [Am]You have been so, so [C]kind to [G]me
 
+{Chorus}
 [G]Oh, the overwhelming, [C]never-ending, reckless [Em]love of God
 [D]Oh, it chases me down, fights 'til I'm found, [C]leaves the ninety-nine
 [G]I couldn't earn it, [C]I don't deserve it, still [Em]You give Yourself away
@@ -60,11 +65,13 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]I raise a halle[E]lujah, in the presence of my [B]enemies
+    content: `{Verse 1}
+[B]I raise a halle[E]lujah, in the presence of my [B]enemies
 [B]I raise a halle[F#]lujah, louder than the [E]unbelief
 [B]I raise a halle[E]lujah, my weapon is a [B]melody
 [B]I raise a halle[F#]lujah, heaven comes to [E]fight for me
 
+{Chorus}
 [B]I'm gonna sing, in the [E]middle of the storm
 [B]Louder and louder, you're gonna hear my [F#]praises roar
 [B]Up from the ashes, [E]hope will arise
@@ -78,16 +85,19 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]You unravel me with a [B]melody
+    content: `{Verse 1}
+[E]You unravel me with a [B]melody
 [C#m]You surround me with a [A]song
 [E]Of deliverance from my [B]enemies
 [C#m]Till all my fears are [A]gone
 
+{Chorus}
 [E]I'm no longer a slave to [B]fear
 [C#m]I am a child of [A]God
 [E]I'm no longer a slave to [B]fear
 [C#m]I am a child of [A]God
 
+{Verse 2}
 [E]From my mothers womb [B]You have chosen me
 [C#m]Love has called my [A]name
 [E]I've been born again [B]into Your family
@@ -101,16 +111,19 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]A thousand genera[Em]tions falling [C]down in worship
+    content: `{Verse 1}
+[G]A thousand genera[Em]tions falling [C]down in worship
 [G]To sing the song of [Em]ages to the [D]Lamb
 [G]And all who've gone be[Em]fore us and [C]all who will believe
 [G]Will sing the song of [Em]ages and the [D]whole earth will sing
 
+{Chorus}
 [G]Holy, holy, [Em]holy is the Lord
 [C]Holy, holy, [D]holy is the Lord
 [G]God Almighty, [Em]Who was and is to [C]come
 [D]God Almighty, [G]holy forever
 
+{Bridge}
 [G]Your name is the [Em]highest, Your [C]name is the greatest
 [G]Your name stands a[Em]bove them all
 [G]All thrones and do[Em]minions, all [C]powers and positions
@@ -124,14 +137,17 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Let the King of my heart be the [Em]mountain where I run
+    content: `{Verse 1}
+[G]Let the King of my heart be the [Em]mountain where I run
 [C]The fountain I drink from, oh [D]He is my song
 [G]Let the King of my heart be the [Em]shadow where I hide
 [C]The ransom for my life, oh [D]He is my song
 
+{Chorus}
 [G]You are [Em]good, good, [C]oh [D]
 [G]You are [Em]good, good, [C]oh [D]
 
+{Verse 2}
 [G]Let the King of my heart be the [Em]wind inside my sails
 [C]The anchor in the waves, oh [D]He is my song
 [G]Let the King of my heart be the [Em]fire inside my veins
@@ -145,18 +161,21 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You give life, You are love
+    content: `{Verse 1}
+[D]You give life, You are love
 [F#m]You bring light to the darkness
 [G]You give hope, You restore
 [A]Every heart that is broken
 [D]Great are You, [A]Lord
 
+{Chorus}
 [D]It's Your breath in our lungs
 [F#m]So we pour out our praise
 [G]We pour out our praise
 [D]It's Your breath in our lungs
 [F#m]So we pour out our praise to [G]You only
 
+{Bridge}
 [D]And all the earth will shout Your [F#m]praise
 [G]Our hearts will cry, these bones will say
 [D]Great are You, [A]Lord`,
@@ -169,16 +188,19 @@ const SONGS = [
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Worthy of every [C]song we could ever sing
+    content: `{Verse 1}
+[G]Worthy of every [C]song we could ever sing
 [Em]Worthy of all the [D]praise we could ever bring
 [G]Worthy of every [C]breath we could ever breathe
 [Em]We live for [D]You
 
+{Pre-Chorus}
 [G]Jesus the Name a[C]bove every other name
 [Em]Jesus the only [D]one who could ever save
 [G]Worthy of every [C]breath we could ever breathe
 [Em]We live for [D]You, we live for [G]You
 
+{Chorus}
 [G]Holy, there is no [C]one like You
 [Em]There is none be[D]side You
 [G]Open up my eyes in [C]wonder
@@ -196,16 +218,19 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Jesus, Jesus, [E]You make the darkness tremble
+    content: `{Chorus}
+[A]Jesus, Jesus, [E]You make the darkness tremble
 [F#m]Jesus, Jesus, [D]You silence fear
 [A]Jesus, Jesus, [E]You make the darkness tremble
 [F#m]Jesus, [D]Jesus
 
+{Bridge}
 [A]Your name is a light that the [E]shadows can't deny
 [F#m]Your name is a light that the [D]shadows can't deny
 [A]Your name cannot be over[E]come
 [F#m]Your name cannot be over[D]come
 
+{Verse 1}
 [A]Peace, bring it all to [E]peace
 [F#m]The storms surround[D]ing me
 [A]Let it break at Your [E]name`,
@@ -218,16 +243,19 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]When darkness tries to [E]roll over my bones
+    content: `{Verse 1}
+[A]When darkness tries to [E]roll over my bones
 [F#m]When sorrow comes to [D]steal the joy I own
 [A]When brokenness and [E]pain is all I know
 [F#m]I won't be [D]shaken, I won't be shaken
 
+{Chorus}
 [A]My fear doesn't [E]stand a chance
 [F#m]When I stand in Your [D]love
 [A]My fear doesn't [E]stand a chance
 [F#m]When I stand in Your [D]love
 
+{Verse 2}
 [A]Shame no longer [E]has a place to hide
 [F#m]I am not a [D]captive to the lies
 [A]I'm not afraid to [E]leave my past behind
@@ -241,11 +269,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Are you weary, [A]heavy laden
+    content: `{Verse 1}
+[D]Are you weary, [A]heavy laden
 [Bm]Come and I will [G]give you rest
 [D]Come to Me when [A]hope is fading
 [Bm]Breathe and trust [G]what's coming next
 
+{Chorus}
 [D]Come to Me, [A]come to Me
 [Bm]All who are [G]weary
 [D]Come to Me, [A]come to Me
@@ -259,11 +289,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You make me brave, [C]You make me brave
+    content: `{Verse 1}
+[G]You make me brave, [C]You make me brave
 [Em]You call me out [D]beyond the shore into the waves
 [G]You make me brave, [C]You make me brave
 [Em]No fear can hinder [D]now the love that made a way
 
+{Chorus}
 [G]You make me [C]brave
 [Em]You make me [D]brave
 [G]You call me out [C]beyond the shore
@@ -277,11 +309,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]Grander earth has [E]quaked before
+    content: `{Verse 1}
+[B]Grander earth has [E]quaked before
 [G#m]Moved by the sound [F#]of His voice
 [B]Seas that are [E]shaken and stirred
 [G#m]Can be calmed and [F#]broken for my regard
 
+{Chorus}
 [B]It is well [E]with my soul
 [G#m]It is well, [F#]it is well
 [B]With my [E]soul
@@ -295,11 +329,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I hear the Savior [D]say
+    content: `{Verse 1}
+[G]I hear the Savior [D]say
 [Em]Come and follow [C]Me
 [G]Leave behind the [D]life you know
 [Em]Take My hand and [C]see
 
+{Chorus}
 [G]For the one who's [D]far away
 [Em]For the one who's [C]lost today
 [G]You would leave the [D]ninety-nine
@@ -313,11 +349,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Higher than the [D]mountains that I face
+    content: `{Verse 1}
+[G]Higher than the [D]mountains that I face
 [Em]Stronger than the [C]power of the grave
 [G]Constant in the [D]trial and the change
 [Em]One thing re[C]mains
 
+{Chorus}
 [G]Your love never fails, [D]never gives up
 [Em]Never runs out [C]on me
 [G]Your love never fails, [D]never gives up
@@ -331,11 +369,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You go before [A]me
+    content: `{Verse 1}
+[D]You go before [A]me
 [Bm]You're behind [G]me
 [D]And I'm surrounded [A]by Your love
 [Bm]I have no [G]reason to fear
 
+{Chorus}
 [D]When I thought I lost me, [A]You were there to find me
 [Bm]The fight was fixed and [G]the triumph is Yours
 [D]You are my de[A]fender
@@ -349,11 +389,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]There's a table [A]that You've prepared for me
+    content: `{Verse 1}
+[D]There's a table [A]that You've prepared for me
 [Bm]In the presence [G]of my enemies
 [D]It's Your body [A]and Your blood You shed for me
 [Bm]This is how I [G]fight my battles
 
+{Chorus}
 [D]This is how I fight my [A]battles
 [Bm]This is how I fight my [G]battles
 [D]It may look like I'm sur[A]rounded
@@ -367,11 +409,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Even in the [D]middle of the fire
+    content: `{Verse 1}
+[G]Even in the [D]middle of the fire
 [Em]I'm not gonna [C]worry
 [G]Even when the [D]night is closing in
 [Em]Your love is my [C]shelter
 
+{Chorus}
 [G]It's gonna be al[D]right
 [Em]It's gonna be al[C]right
 [G]I know You hold my [D]life
@@ -385,11 +429,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Out of the [E]darkness
+    content: `{Verse 1}
+[A]Out of the [E]darkness
 [F#m]Into the [D]light
 [A]We lift our [E]voices
 [F#m]You are our [D]God
 
+{Chorus}
 [A]We praise You, [E]we praise You
 [F#m]God of ages, [D]Hallelujah
 [A]We praise You, [E]we praise You
@@ -403,11 +449,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I hear the [D]Savior say
+    content: `{Verse 1}
+[G]I hear the [D]Savior say
 [Em]Peace be [C]still
 [G]And the wind and [D]the waves obey
 [Em]At Your [C]command
 
+{Chorus}
 [G]Peace, be [D]still
 [Em]Peace, be [C]still
 [G]You silence the [D]storm that's raging
@@ -421,10 +469,12 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]I will run after [E]You
+    content: `{Verse 1}
+[B]I will run after [E]You
 [F#]Chasing You with [G#m]all I have
 [B]Nothing can com[E]pare to knowing [F#]You
 
+{Chorus}
 [B]You're the treasure [E]I have found
 [F#]More than all the [G#m]world has known
 [B]I am chasing [E]You with [F#]all my heart`,
@@ -437,11 +487,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Come forth come [B]out of the grave
+    content: `{Verse 1}
+[E]Come forth come [B]out of the grave
 [C#m]You who were [A]dead are alive again
 [E]Lazarus come [B]forth
 [C#m]Raised to life by the [A]King of all
 
+{Chorus}
 [E]He calls us [B]out, He calls us [C#m]up
 [A]From the ashes we will [E]rise`,
     notes: "Build intensity into the chorus. Powerful declaration song.",
@@ -453,11 +505,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]It is no longer [C]I who live
+    content: `{Verse 1}
+[G]It is no longer [C]I who live
 [Em]But Christ who [D]lives in me
 [G]The life I live [C]in the flesh
 [Em]I live by [D]faith in the Son
 
+{Chorus}
 [G]No longer [C]I, no longer [Em]I
 [D]But Christ in [G]me`,
     notes: "Galatians 2:20 theme. Reflective verse, declarative chorus.",
@@ -469,11 +523,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]We will not be [D]shaken
+    content: `{Verse 1}
+[A]We will not be [D]shaken
 [F#m]We will not be [E]moved
 [A]Our God is faithful [D]His promise is true
 [F#m]We will not be [E]shaken
 
+{Chorus}
 [A]Standing on the [D]Rock that never fails
 [F#m]Trusting in the [E]God who will pre[A]vail`,
     notes: "Strong anthem feel. Great for congregational singing.",
@@ -485,11 +541,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You know me, You [C]know me
+    content: `{Verse 1}
+[G]You know me, You [C]know me
 [Em]You searched me and [D]You know me
 [G]Where I go You [C]go with me
 [Em]In Your presence [D]I find rest
 
+{Chorus}
 [G]Nothing is hidden [C]from You
 [Em]Every thought You [D]see it through
 [G]You know me [C]better than I [D]know my[G]self`,
@@ -502,11 +560,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I'm letting go of [A]every fear
+    content: `{Verse 1}
+[D]I'm letting go of [A]every fear
 [Bm]Laying down my [G]doubt right here
 [D]Falling into [A]grace again
 [Bm]Trusting You through [G]thick and thin
 
+{Chorus}
 [D]I surrender [A]all to You
 [Bm]You make all things [G]new
 [D]I'm letting [A]go`,
@@ -519,11 +579,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]You have been [G]faithful to the end
+    content: `{Verse 1}
+[C]You have been [G]faithful to the end
 [Am]Every promise [F]You fulfill
 [C]Through the fire [G]through the storm
 [Am]You are faithful [F]evermore
 
+{Chorus}
 [C]Great is Your [G]faithfulness
 [Am]Morning by [F]morning new mercies I [C]see`,
     notes: "Congregational hymn feel. Can slow down at the bridge.",
@@ -535,11 +597,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Take courage my [F]heart
+    content: `{Verse 1}
+[Bb]Take courage my [F]heart
 [Gm]Stay steadfast my [Eb]soul
 [Bb]He's in the [F]waiting
 [Gm]He's in the [Eb]patience
 
+{Chorus}
 [Bb]Take courage my [F]heart
 [Gm]Stay steadfast my [Eb]soul
 [Bb]Joy comes in the [F]morning
@@ -553,10 +617,12 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Be still my [A]soul
+    content: `{Verse 1}
+[D]Be still my [A]soul
 [Bm]The Lord is [G]on your side
 [D]Bear patiently [A]the cross of [Bm]grief or [G]pain
 
+{Verse 2}
 [D]Be still my [A]soul
 [Bm]Your God will [G]undertake
 [D]To guide the [A]future as [Bm]He has the [G]past`,
@@ -569,11 +635,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Unreserved, [C]unrestrained
+    content: `{Verse 1}
+[G]Unreserved, [C]unrestrained
 [Em]Your love is [D]wild, Your love is plain
 [G]I don't deserve [C]don't need to earn
 [Em]Your wild love [D]found me
 
+{Chorus}
 [G]You don't give Your [C]heart in pieces
 [Em]You don't hide Your[D]self to tease us
 [G]Unreserved, [C]unrestrained [D]love`,
@@ -586,11 +654,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]You can have it [B]all Lord
+    content: `{Verse 1}
+[E]You can have it [B]all Lord
 [C#m]Every part of my [A]world
 [E]Take this life and [B]breathe on
 [C#m]This heart that is [A]now Yours
 
+{Chorus}
 [E]I'm laying [B]everything down
 [C#m]At Your feet the [A]only crown
 [E]You can have it [B]all, have it [A]all`,
@@ -603,11 +673,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Let our praise be [G]Your welcome
+    content: `{Verse 1}
+[C]Let our praise be [G]Your welcome
 [Am]Let our songs be a [F]sign
 [C]We are here for [G]You, here for [Am]You
 [F]Let Your breath come from [C]heaven
 
+{Chorus}
 [C]We welcome [G]You with praise
 [Am]We welcome [F]You here with our [C]hearts open wide`,
     notes: "Matt Redman / Bethel collaboration. Great opener.",
@@ -619,11 +691,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]All my words fall [E]short
+    content: `{Verse 1}
+[A]All my words fall [E]short
 [F#m]I've got nothing [D]new
 [A]How could I ex[E]press
 [F#m]All my gratitude [D]
 
+{Chorus}
 [A]I could sing all [E]day long
 [F#m]But even then the [D]words are not enough
 [A]Without words my [E]soul speaks [D]to You`,
@@ -636,11 +710,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Break out, break [B]out
+    content: `{Verse 1}
+[E]Break out, break [B]out
 [C#m]Let the walls come [A]down
 [E]Break through, break [B]through
 [C#m]There's a new song [A]now
 
+{Chorus}
 [E]Freedom is our [B]anthem
 [C#m]Breaking every [A]chain
 [E]We will break [B]out in [C#m]praise [A]again`,
@@ -653,11 +729,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "Ab",
     format: "chordpro",
-    content: `[Ab]Extravagant it [Eb]never stops
+    content: `{Verse 1}
+[Ab]Extravagant it [Eb]never stops
 [Fm]It never quits [Db]never gives up
 [Ab]Your love ex[Eb]travagant
 [Fm]Pouring from Your [Db]heart to us
 
+{Chorus}
 [Ab]We're overwhelmed by [Eb]mercy
 [Fm]We're overwhelmed by [Db]grace
 [Ab]An extravagant [Eb]love on dis[Db]play`,
@@ -670,11 +748,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]The Lord is my [C]shepherd
+    content: `{Verse 1}
+[G]The Lord is my [C]shepherd
 [Em]I shall not [D]want
 [G]He makes me lie [C]down in green pastures
 [Em]He leads me be[D]side still waters
 
+{Verse 2}
 [G]You restore my [C]soul
 [Em]You guide me in [D]paths of righteousness
 [G]Even in the [C]valley
@@ -689,11 +769,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Come up here, [A]come up here
+    content: `{Verse 1}
+[D]Come up here, [A]come up here
 [Bm]Let Me show you [G]what I see
 [D]From above the [A]noise and fear
 [Bm]There's a higher [G]place to be
 
+{Chorus}
 [D]Eyes have not [A]seen
 [Bm]Ears have not [G]heard
 [D]What You have pre[A]pared for me
@@ -707,11 +789,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Over it all, [B]You are over it all
+    content: `{Verse 1}
+[E]Over it all, [B]You are over it all
 [C#m]The cross before [A]me, the world behind me
 [E]No turning back, [B]no turning back
 [C#m]Your love is o[A]ver it all
 
+{Chorus}
 [E]Your blood still [B]speaks
 [C#m]It will never lose its [A]power
 [E]Over it [B]all, over it [A]all`,
@@ -724,11 +808,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Holy, holy [E]is the Lord
+    content: `{Verse 1}
+[A]Holy, holy [E]is the Lord
 [F#m]Heaven and earth are [D]full of Your glory
 [A]We enter in [E]to the throne room
 [F#m]With praise upon [D]our lips
 
+{Chorus}
 [A]Throne room, [E]we're standing in the throne room
 [F#m]Mercy and grace [D]before Your face
 [A]We've come to seek [E]You here`,
@@ -741,11 +827,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]After all You've [D]done
+    content: `{Verse 1}
+[G]After all You've [D]done
 [Em]I will praise You [C]more
 [G]After all I've [D]seen
 [Em]I believe You [C]still
 
+{Chorus}
 [G]Holy, [D]holy
 [Em]After all, You are [C]holy
 [G]Worthy of it [D]all
@@ -759,11 +847,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Spirit of the [G]living God
+    content: `{Verse 1}
+[C]Spirit of the [G]living God
 [Am]Come and pour [F]over me
 [C]Fill this empty [G]vessel, Lord
 [Am]With Your love so [F]free
 
+{Chorus}
 [C]Pour over me, [G]pour over me
 [Am]Every good and [F]perfect gift
 [C]Lord, pour over [G]me`,
@@ -776,11 +866,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I know the battle [E]isn't over
+    content: `{Verse 1}
+[A]I know the battle [E]isn't over
 [F#m]I know the war [D]isn't won
 [A]But I will praise You [E]in the waiting
 [F#m]I will praise be[D]fore it comes
 
+{Chorus}
 [A]I will praise be[E]fore my breakthrough
 [F#m]I will praise be[D]fore the dawn
 [A]Even in the [E]waiting, Lord
@@ -794,11 +886,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You spoke the words and [A]all was born again
+    content: `{Verse 1}
+[D]You spoke the words and [A]all was born again
 [Bm]New creation [G]now I'm born again
 [D]Dead to this world, [A]alive in You
 [Bm]My old life is [G]gone
 
+{Chorus}
 [D]I've been born a[A]gain
 [Bm]I've been born a[G]gain
 [D]Everything has [A]changed
@@ -812,11 +906,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Deep cries out to [B]deep
+    content: `{Verse 1}
+[E]Deep cries out to [B]deep
 [C#m]At the sound of [A]waterfalls
 [E]All Your waves and [B]breakers
 [C#m]Sweep over [A]me
 
+{Chorus}
 [E]My soul thirsts for [B]the living God
 [C#m]When shall I come and [A]appear before You
 [E]Deep cries out to [B]deep
@@ -830,11 +926,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]In the crushing, [G#m]in the pressing
+    content: `{Verse 1}
+[B]In the crushing, [G#m]in the pressing
 [E]You are making [F#]new wine
 [B]In the soil I [G#m]now surrender
 [E]You are breaking [F#]new ground
 
+{Chorus}
 [B]So I yield to [G#m]You and to Your careful hand
 [E]When I trust You [F#]I don't need to understand
 [B]Make me Your [G#m]vessel
@@ -849,11 +947,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]And I come to the [C]garden alone
+    content: `{Verse 1}
+[G]And I come to the [C]garden alone
 [Em]While the dew is [D]still on the roses
 [G]And the voice I [C]hear falling on my ear
 [Em]The Son of God [D]discloses
 
+{Chorus}
 [G]And He walks with [C]me and He talks with [Em]me
 [D]And He tells me I am His [G]own
 [G]And the joy we [C]share as we tarry [Em]there
@@ -867,11 +967,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]You call me out up[B]on the waters
+    content: `{Verse 1}
+[E]You call me out up[B]on the waters
 [C#m]The great un[A]known where feet may fail
 [E]When the stars light [B]up the heavens
 [C#m]I hear You [A]calling out my name
 
+{Chorus}
 [E]Starlight, star[B]light
 [C#m]Your glory fills [A]the night
 [E]And I will follow [B]You
@@ -885,11 +987,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]We won't be [E]quiet
+    content: `{Verse 1}
+[A]We won't be [E]quiet
 [F#m]We won't be [D]still
 [A]Our God is [E]mighty
 [F#m]And worthy [D]still
 
+{Chorus}
 [A]Every tongue will [E]shout it
 [F#m]All creation [D]sings
 [A]We won't be quiet [E]about our [D]King`,
@@ -902,11 +1006,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]Nothing can stop [E]Your fierce love
+    content: `{Verse 1}
+[B]Nothing can stop [E]Your fierce love
 [G#m]Crashing over [F#]us
 [B]Higher than the [E]highest wave
 [G#m]Deeper than the [F#]deepest sea
 
+{Chorus}
 [B]Your love is [E]fierce
 [G#m]Your love is [F#]wild
 [B]Your love is [E]fire
@@ -920,16 +1026,19 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]How great the chasm that [Am]lay between us
+    content: `{Verse 1}
+[C]How great the chasm that [Am]lay between us
 [F]How high the mountain I [G]could not climb
 [C]In desperation I [Am]turned to heaven
 [F]And spoke Your name [G]into the night
 
+{Verse 2}
 [C]Then through the darkness Your [Am]loving kindness
 [F]Tore through the shadows [G]of my soul
 [C]The work is finished, the [Am]end is written
 [F]Jesus Christ my [G]living hope
 
+{Chorus}
 [C]Hallelujah, [Am]praise the One who set me free
 [F]Hallelujah, [G]death has lost its grip on me
 [C]You have broken every [Am]chain
@@ -944,11 +1053,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Before I call [A]You answer
+    content: `{Verse 1}
+[D]Before I call [A]You answer
 [Bm]Before I speak [G]You know my name
 [D]Where I go You've [A]already been
 [Bm]You're already [G]here
 
+{Chorus}
 [D]Already here, al[A]ready here
 [Bm]In the middle of my [G]fear
 [D]You are already [A]here`,
@@ -961,11 +1072,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Every battle [B]every war
+    content: `{Verse 1}
+[E]Every battle [B]every war
 [C#m]I know You've [A]already won
 [E]So I will sing a [B]victory song
 [C#m]The victory is [A]Yours
 
+{Chorus}
 [E]Nothing stands a[B]gainst Your name
 [C#m]Death and hell have [A]lost their claim
 [E]Victory is [B]Yours
@@ -979,12 +1092,14 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Faithful, [C]You are faithful
+    content: `{Verse 1}
+[G]Faithful, [C]You are faithful
 [Em]In the morning, [D]in the evening
 [G]You are faithful [C]God
 [Em]Through the valley, [D]to the mountain
 [G]You are faithful [C]still
 
+{Verse 2}
 [G]I will hold on [C]to Your promise
 [Em]For Your faithful[D]ness endures
 [G]From beginning [C]to the end
@@ -998,11 +1113,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]When hope was buried [E]in the ground
+    content: `{Verse 1}
+[A]When hope was buried [E]in the ground
 [F#m]When death was all [D]that we could see
 [A]You came and rolled [E]the stone away
 [F#m]You came and set [D]the captives free
 
+{Chorus}
 [A]You came, [E]You came
 [F#m]Into the darkest [D]place
 [A]You came, [E]You came
@@ -1016,11 +1133,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]At the mention of [A]Your name
+    content: `{Verse 1}
+[D]At the mention of [A]Your name
 [Bm]Every knee will [G]bow
 [D]At the mention of [A]Your name
 [Bm]The mountains fall [G]down
 
+{Chorus}
 [D]There is power, [A]power
 [Bm]In the name of [G]Jesus
 [D]There is power, [A]power
@@ -1034,11 +1153,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]You don't miss a [G]thing
+    content: `{Verse 1}
+[C]You don't miss a [G]thing
 [Am]You catch every [F]tear
 [C]When I'm overwhelmed [G]by the weight I carry
 [Am]You don't miss a [F]thing
 
+{Chorus}
 [C]Not a single [G]sparrow falls
 [Am]Without Your [F]knowing
 [C]You don't miss a [G]thing
@@ -1052,11 +1173,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Your love is [Em]holding me
+    content: `{Part 1}
+[G]Your love is [Em]holding me
 [C]It never lets me [D]go
 [G]And I will ever [Em]be
 [C]Undone by [D]You
 
+{Part 2}
 [G]Who breaks the [Em]power of sin and darkness
 [C]Whose love is [D]mighty and so much stronger
 [G]The King of [Em]Glory, the King above all kings
@@ -1072,11 +1195,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Spin me around [E]in circles
+    content: `{Verse 1}
+[A]Spin me around [E]in circles
 [F#m]Lead me into [D]love again
 [A]There is joy in [E]Your presence
 [F#m]And at Your right [D]hand
 
+{Chorus}
 [A]We dance, [E]we dance
 [F#m]In the river of [D]Your grace
 [A]We dance, [E]we dance
@@ -1090,11 +1215,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Spirit of the [A]Living God
+    content: `{Verse 1}
+[D]Spirit of the [A]Living God
 [Bm]Come fall afresh [G]on me
 [D]Come wake me from [A]the dead
 [Bm]Come lead me [G]to life again
 
+{Chorus}
 [D]Holy Spirit [A]rest on us
 [Bm]We wait for [G]You
 [D]Holy Spirit [A]rest on us
@@ -1108,11 +1235,13 @@ It is a firm foun[G]dation`,
     artist: "Bethel Music",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Prepare the way [G]of the Lord
+    content: `{Verse 1}
+[C]Prepare the way [G]of the Lord
 [Am]Make straight a [F]path in the desert
 [C]Every valley [G]lifted up
 [Am]Every mountain [F]brought down low
 
+{Chorus}
 [C]Prepare the [G]way
 [Am]He is [F]coming
 [C]Prepare the [G]way

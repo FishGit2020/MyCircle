@@ -15,16 +15,19 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]It may look like I'm sur[E]rounded
+    content: `{Verse 1}
+[B]It may look like I'm sur[E]rounded
 [B]But I'm surrounded by [F#]You
 [G#m]It may look like I'm sur[E]rounded
 [B]But I'm surrounded by [F#]You
 
+{Chorus}
 [B]This is how I [E]fight my battles
 [B]This is how I [F#]fight my battles
 [G#m]This is how I [E]fight my battles
 [B]This is how I [F#]fight my battles
 
+{Verse 2}
 [E]It may look like I'm sur[B]rounded
 [F#]But I'm surrounded by [G#m]You
 [E]God is on my [B]side`,
@@ -37,16 +40,19 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]All of my hopes [Am]all of my plans
+    content: `{Verse 1}
+[C]All of my hopes [Am]all of my plans
 [F]All of my dreams I [G]place in Your hands
 [C]All of my fears [Am]all of my past
 [F]All of my questions I [G]lay at Your feet
 
+{Chorus}
 [C]Yahweh [Am]Yahweh
 [F]I will trust in You a[G]lone
 [C]Yahweh [Am]Yahweh
 [F]I will follow where You [G]go
 
+{Verse 2}
 [C]All of the earth [Am]all of the sky
 [F]Everything trembles at the [G]sound of Your name`,
     notes: "Simple and devotional. Room for spontaneous worship moments.",
@@ -58,14 +64,17 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]In the crushing in the [A]pressing
+    content: `{Verse 1}
+[D]In the crushing in the [A]pressing
 [Bm]You are making [G]new wine
 [D]In the soil I now [A]surrender
 [Bm]You are breaking [G]new ground
 
+{Chorus}
 [D]So I yield to [A]You and to Your careful [Bm]hand
 [G]When I trust You I don't need to [D]understand
 
+{Verse 2}
 [D]Make me Your [A]vessel
 [Bm]Make me an [G]offering
 [D]Make me what[A]ever You want me to [Bm]be [G]
@@ -81,16 +90,19 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]At the mention of Your [C]name
+    content: `{Verse 1}
+[G]At the mention of Your [C]name
 [Em]Every knee will bow [D]down
 [G]At the mention of Your [C]name
 [Em]Every chain falls to the [D]ground
 
+{Chorus}
 [G]There is power in the [C]name of Jesus
 [Em]There is freedom in the [D]name of Jesus
 [G]There is healing in the [C]name of Jesus
 [Em]At the mention of Your [D]name
 
+{Verse 2}
 [C]Heaven and earth [G]proclaim
 [Em]Nothing is the [D]same
 [C]At the mention of Your [G]name`,
@@ -103,16 +115,19 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Be still and know that [B]I am God
+    content: `{Verse 1}
+[E]Be still and know that [B]I am God
 [C#m]Be still and know that [A]I am good
 [E]Be still and know that [B]I am here
 [C#m]I am right [A]here
 
+{Chorus}
 [E]When the winds are [B]raging
 [C#m]When the waves are [A]crashing
 [E]I will be the [B]anchor
 [C#m]I will hold you [A]fast
 
+{Verse 2}
 [A]Be still my [E]soul
 [B]Be still my [C#m]heart
 [A]Know that He is [E]faithful
@@ -126,11 +141,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I just wanna [G]lean back
+    content: `{Verse 1}
+[C]I just wanna [G]lean back
 [Am]Into Your ever[F]lasting arms
 [C]I just wanna [G]rest here
 [Am]In Your presence [F]Lord
 
+{Chorus}
 [C]You are my [G]peace
 [Am]You are my [F]safe place
 [C]I lean back [G]into Your [F]love`,
@@ -143,11 +160,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Open up the [A]heavens
+    content: `{Verse 1}
+[D]Open up the [A]heavens
 [Bm]Let the glory [G]fall
 [D]Open up the [A]floodgates
 [Bm]Pour out on [G]us all
 
+{Chorus}
 [D]We open up our [A]hearts to You
 [Bm]Come fill this [G]place anew
 [D]Open up [A]Lord [G]`,
@@ -160,11 +179,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You are my one ob[D]session
+    content: `{Verse 1}
+[G]You are my one ob[D]session
 [Em]My heart is fully [C]Yours
 [G]Nothing else could [D]satisfy
 [Em]You are all I'm [C]searching for
 
+{Chorus}
 [G]Obsessed with knowing [D]You
 [Em]Obsessed with seeing [C]You
 [G]My one desire is [D]more of [C]You`,
@@ -177,11 +198,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]I am nothing with[B]out You
+    content: `{Verse 1}
+[E]I am nothing with[B]out You
 [C#m]Nothing without [A]You Lord
 [E]Every breath I [B]breathe
 [C#m]Every step I [A]take
 
+{Chorus}
 [E]You are the source of [B]everything
 [C#m]Without You I have [A]nothing
 [E]With You I have it [B]all [A]`,
@@ -194,11 +217,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I will see the [E]goodness of the Lord
+    content: `{Verse 1}
+[A]I will see the [E]goodness of the Lord
 [F#m]In the land of the [D]living
 [A]I remain con[E]fident in this
 [F#m]I will see His [D]goodness
 
+{Chorus}
 [A]In the land of the [E]living
 [F#m]My hope is [D]found
 [A]I will see Your [E]goodness [D]Lord`,
@@ -211,11 +236,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Spirit lead us [A]now
+    content: `{Verse 1}
+[D]Spirit lead us [A]now
 [Bm]In this holy [G]moment
 [D]We follow where You [A]go
 [Bm]Speak and we will [G]listen
 
+{Chorus}
 [D]Here we are [A]Lord
 [Bm]Open and [G]willing
 [D]Move in this [A]place as only [G]You can`,
@@ -228,11 +255,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You prepare a [D]table
+    content: `{Verse 1}
+[G]You prepare a [D]table
 [Em]In the presence of my [C]enemies
 [G]You anoint my [D]head with oil
 [Em]My cup over[C]flows
 
+{Chorus}
 [G]Surely goodness and [D]mercy
 [Em]Will follow me all the [C]days of my life
 [G]And I will dwell in Your [D]house for[C]ever`,
@@ -245,11 +274,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I will wait upon the [E]Lord
+    content: `{Verse 1}
+[A]I will wait upon the [E]Lord
 [F#m]My strength comes from [D]Him alone
 [A]I will wait upon the [E]Lord
 [F#m]He renews my [D]strength
 
+{Chorus}
 [A]They who wait on the [E]Lord
 [F#m]Shall renew their [D]strength
 [A]Mount up with wings like [E]eagles [D]`,
@@ -262,11 +293,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]In Your presence [G]is fullness of joy
+    content: `{Verse 1}
+[C]In Your presence [G]is fullness of joy
 [Am]At Your right hand [F]are pleasures forever
 [C]In Your presence [G]I find everything
 [Am]I was made to [F]live here
 
+{Chorus}
 [C]Here in Your [G]presence
 [Am]I have found my [F]home
 [C]In Your [G]presence [F]Lord`,
@@ -279,11 +312,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]We worship in the [F]house of the Lord
+    content: `{Verse 1}
+[Bb]We worship in the [F]house of the Lord
 [Gm]There's joy in the [Eb]house of the Lord
 [Bb]There's freedom in the [F]house of the Lord
 [Gm]We come alive in the [Eb]house of the Lord
 
+{Chorus}
 [Bb]This is where the [F]broken are mended
 [Gm]This is where we [Eb]find our home`,
     notes: "Joyful and celebratory. Full band arrangement.",
@@ -295,11 +330,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]You are my [D]anchor
+    content: `{Verse 1}
+[G]You are my [D]anchor
 [Em]In the storms of [C]life
 [G]You hold me [D]steady
 [Em]You are my [C]guide
 
+{Chorus}
 [G]When the waves crash [D]over me
 [Em]I will not be [C]moved
 [G]You are my [D]anchor [C]Lord`,
@@ -312,11 +349,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]At the name of [B]Jesus
+    content: `{Verse 1}
+[E]At the name of [B]Jesus
 [C#m]Every knee shall [A]bow
 [E]Every tongue con[B]fess
 [C#m]That He is [A]Lord
 
+{Chorus}
 [E]The name above all [B]names
 [C#m]The name that saves and [A]heals
 [E]Jesus, there is [B]power in the [A]name`,
@@ -329,11 +368,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You are sov[A]ereign over all
+    content: `{Verse 1}
+[D]You are sov[A]ereign over all
 [Bm]Nothing is beyond Your [G]reach
 [D]Every detail [A]of my life
 [Bm]Is held within Your [G]hands
 
+{Chorus}
 [D]Sovereign [A]God, You reign
 [Bm]Over every[G]thing
 [D]Sovereign [A]Lord, You [G]reign`,
@@ -346,11 +387,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Pour out Your [C]Spirit Lord
+    content: `{Verse 1}
+[F]Pour out Your [C]Spirit Lord
 [Dm]On all [Bb]flesh
 [F]Sons and daughters [C]prophesying
 [Dm]Old men dreaming [Bb]dreams
 
+{Chorus}
 [F]Come Holy [C]Spirit
 [Dm]Fall fresh on [Bb]us
 [F]Pour out Your [C]Spirit [Bb]Lord`,
@@ -363,11 +406,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]To the One who [E]sits on the throne
+    content: `{Verse 1}
+[A]To the One who [E]sits on the throne
 [F#m]And to the Lamb [D]be blessing
 [A]And honor and [E]glory
 [F#m]And power for[D]ever
 
+{Chorus}
 [A]Worthy is the [E]Lamb who was slain
 [F#m]To receive all [D]praise
 [A]To the One [E]forever [D]more`,
@@ -380,11 +425,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]There's always room for [D]more
+    content: `{Verse 1}
+[G]There's always room for [D]more
 [Em]More of Your Spirit, [C]Lord
 [G]We make space in this [D]place
 [Em]For You to move and [C]pour
 
+{Chorus}
 [G]Room for more, [D]room for more
 [Em]We will never say [C]enough
 [G]Come and fill this [D]house
@@ -398,11 +445,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Holy Spirit [A]come
+    content: `{Verse 1}
+[D]Holy Spirit [A]come
 [Bm]Fill this place with Your [G]presence
 [D]Holy Spirit [A]come
 [Bm]We need You [G]now
 
+{Chorus}
 [D]Like a rushing [A]wind
 [Bm]Like a fire with[G]in
 [D]Holy Spirit [A]come
@@ -416,11 +465,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I will abide in [G]You
+    content: `{Verse 1}
+[C]I will abide in [G]You
 [Am]And You will abide in [F]me
 [C]Apart from You I can [G]do nothing
 [Am]So I remain in [F]You
 
+{Chorus}
 [C]Abide, [G]abide
 [Am]In the vine I will [F]stay
 [C]Your word in me, and [G]I in You
@@ -434,11 +485,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I am who He [E]says I am
+    content: `{Verse 1}
+[A]I am who He [E]says I am
 [F#m]I can do what He [D]says I can
 [A]I will go where He [E]says to go
 [F#m]This is what He says a[D]bout me
 
+{Chorus}
 [A]Chosen, called, and [E]set apart
 [F#m]Loved beyond what [D]I deserve
 [A]He says I'm [E]His
@@ -452,11 +505,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Your love never [B]fails
+    content: `{Verse 1}
+[E]Your love never [B]fails
 [C#m]It never gives [A]up
 [E]It never runs [B]out on me
 [C#m]Your love never [A]fails
 
+{Chorus}
 [E]On and on and [B]on and on it goes
 [C#m]It overwhelms and [A]satisfies my soul
 [E]And I never ever [B]have to be afraid
@@ -470,11 +525,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]One encounter with [D]You
+    content: `{Verse 1}
+[G]One encounter with [D]You
 [Em]Changes every[C]thing
 [G]One moment in Your [D]presence
 [Em]And I'll never be the [C]same
 
+{Chorus}
 [G]I came for an en[D]counter
 [Em]Not just a [C]song
 [G]Touch me, change me, [D]God
@@ -488,11 +545,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]We enter the [A]throne room
+    content: `{Verse 1}
+[D]We enter the [A]throne room
 [Bm]By the blood of the [G]Lamb
 [D]Boldly we come [A]before You
 [Bm]Into the holy [G]place
 
+{Chorus}
 [D]Worthy, worthy, [A]worthy
 [Bm]Is the Lamb upon the [G]throne
 [D]We bow before Your [A]majesty
@@ -506,11 +565,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]There's a shift in the [C]atmosphere
+    content: `{Verse 1}
+[F]There's a shift in the [C]atmosphere
 [Dm]Heaven's coming [Bb]down right here
 [F]Can you feel it [C]changing
 [Dm]Something is [Bb]breaking through
 
+{Chorus}
 [F]In this atmo[C]sphere
 [Dm]Miracles are [Bb]happening
 [F]When Your people [C]worship You
@@ -524,11 +585,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Set apart for [E]You
+    content: `{Verse 1}
+[A]Set apart for [E]You
 [F#m]Holy unto the [D]Lord
 [A]Consecrated and [E]called
 [F#m]For such a time as [D]this
 
+{Chorus}
 [A]I am Yours, [E]set apart
 [F#m]Every piece of my [D]heart
 [A]For Your purpose and [E]glory alone
@@ -542,11 +605,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Dry bones come a[G]live
+    content: `{Verse 1}
+[C]Dry bones come a[G]live
 [Am]In the name of [F]Jesus
 [C]Dead things come a[G]live
 [Am]At the sound of Your [F]voice
 
+{Chorus}
 [C]Come alive, [G]come alive
 [Am]Let faith arise [F]in this place
 [C]Breathe on us, [G]breathe on us
@@ -560,11 +625,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Holy Ghost, [B]come and fill this room
+    content: `{Verse 1}
+[E]Holy Ghost, [B]come and fill this room
 [C#m]Holy Ghost, [A]we make room for You
 [E]Move in power, [B]move in fire
 [C#m]Holy Ghost, You're our [A]one desire
 
+{Chorus}
 [E]We want You, [B]Holy Ghost
 [C#m]More than anything we [A]know
 [E]Come and have Your [B]way
@@ -578,11 +645,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Take me to the [D]deep end
+    content: `{Verse 1}
+[G]Take me to the [D]deep end
 [Em]Where my feet can't [C]touch the ground
 [G]I don't want the [D]shallow
 [Em]I want to be where [C]You are found
 
+{Chorus}
 [G]Into the deep, [D]into the deep
 [Em]I'm diving in with [C]all of me
 [G]Over my head in [D]Your love
@@ -596,11 +665,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]There's a new sound [A]rising
+    content: `{Verse 1}
+[D]There's a new sound [A]rising
 [Bm]From the people of [G]God
 [D]A new song is [A]breaking through
 [Bm]A sound of praise and [G]awe
 
+{Chorus}
 [D]Can you hear the [A]new sound
 [Bm]Coming from the [G]ground
 [D]Heaven's frequency is [A]here
@@ -614,11 +685,13 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]There's an awaken[F]ing
+    content: `{Verse 1}
+[Bb]There's an awaken[F]ing
 [Gm]Stirring in the [Eb]land
 [Bb]Hearts are turning [F]back to You
 [Gm]Revival is at [Eb]hand
 
+{Chorus}
 [Bb]Wake up, wake [F]up
 [Gm]O sleeper a[Eb]rise
 [Bb]The light of Christ is [F]shining
@@ -632,16 +705,19 @@ const SONGS = [
     artist: "UPPERROOM",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Let the King of my [G]heart
+    content: `{Verse 1}
+[C]Let the King of my [G]heart
 [Am]Be the mountain where I [F]run
 [C]The fountain I drink [G]from
 [Am]Oh He is my [F]song
 
+{Chorus}
 [C]Let the King of my [G]heart
 [Am]Be the shadow where I [F]hide
 [C]The ransom for my [G]life
 [Am]Oh He is my [F]song
 
+{Verse 2}
 [C]You are [G]good, good, [Am]oh
 [F]You are good, good, [C]oh`,
     notes: "Devotional and personal. Let the chorus ring out.",

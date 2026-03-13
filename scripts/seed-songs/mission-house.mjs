@@ -15,16 +15,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Wouldn't it be [D]like You
+    content: `{Verse 1}
+[G]Wouldn't it be [D]like You
 [Em]To take my broken [C]pieces
 [G]Wouldn't it be [D]like You
 [Em]To turn them into [C]something beautiful
 
+{Chorus}
 [G]Wouldn't it be [D]like You
 [Em]To meet me in this [C]valley
 [G]Wouldn't it be [D]like You
 [Em]To carry me through the [C]night
 
+{Verse 2}
 [C]Oh, it'd be just like [Em]You
 [D]It'd be just like [G]You
 [C]To take the weight I'm [Em]under
@@ -38,16 +41,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Come and listen, [A]come and listen
+    content: `{Verse 1}
+[D]Come and listen, [A]come and listen
 [Bm]To what the Lord [G]has done
 [D]Come and listen, [A]come and listen
 [Bm]He has saved my [G]soul
 
+{Chorus}
 [D]I was lost but [A]now I'm found
 [Bm]Was blind but [G]now I see
 [D]His grace has [A]turned my life around
 [Bm]Come and listen [G]to His song of love
 
+{Verse 2}
 [G]He is faithful, [D]He is able
 [Bm]He is worthy [A]of our praise
 [G]Come and listen, [D]come and listen
@@ -61,16 +67,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]It's already [G]done
+    content: `{Verse 1}
+[C]It's already [G]done
 [Am]It's already [F]done
 [C]The battle is the [G]Lord's
 [Am]It's already [F]done
 
+{Chorus}
 [C]I don't have to [G]worry
 [Am]I don't have to [F]fear
 [C]He goes before me [G]always
 [Am]Victory is [F]here
 
+{Verse 2}
 [F]He who started a [Am]good work
 [G]He will see it [C]through
 [F]What He promised He [Am]will do
@@ -84,16 +93,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]God You are [E]my salvation
+    content: `{Verse 1}
+[A]God You are [E]my salvation
 [F#m]God You are [D]my strength
 [A]God You are [E]my everything
 [F#m]You're more than [D]enough
 
+{Chorus}
 [A]You are faithful [E]and You are true
 [F#m]You are mighty [D]and You are good
 [A]You are worthy [E]of all the praise
 [F#m]God You [D]are
 
+{Verse 2}
 [D]There is none like [A]You
 [E]There is none like [F#m]You
 [D]In the heavens and [A]the earth
@@ -107,16 +119,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Morning by morning [C]new mercies I see
+    content: `{Verse 1}
+[G]Morning by morning [C]new mercies I see
 [Em]All I have needed Thy [D]hand has provided
 [G]Faithful, [C]faithful
 [Em]Great is Thy [D]faithfulness Lord unto me
 
+{Chorus}
 [G]You have been faithful [C]through every season
 [Em]You have been faithful [D]in joy and in pain
 [G]Your word is a [C]lamp unto my feet
 [Em]Faithful, [D]faithful
 
+{Verse 2}
 [C]In every season, [G]in every storm
 [D]You never leave me, [Em]never alone
 [C]Faithful forever, [G]faithful and true
@@ -130,16 +145,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]My soul finds [A]rest in God alone
+    content: `{Verse 1}
+[D]My soul finds [A]rest in God alone
 [Bm]My rock and [G]my salvation
 [D]A fortress [A]strong against my foes
 [Bm]I will not [G]be shaken
 
+{Chorus}
 [D]Though lips may [A]bless but hearts may curse
 [Bm]And trials come [G]in waves
 [D]My soul finds [A]rest, my soul finds rest
 [Bm]In God [G]alone
 
+{Verse 2}
 [G]Rest, my [D]soul
 [A]He is all you [Bm]need
 [G]Wait upon the [D]Lord
@@ -153,16 +171,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]It's Your kindness [G]Lord
+    content: `{Verse 1}
+[C]It's Your kindness [G]Lord
 [Am]That leads us [F]to repentance
 [C]It's Your goodness [G]Lord
 [Am]That breaks the [F]chains of sin
 
+{Chorus}
 [C]Not by power, [G]not by might
 [Am]But by Your [F]Spirit Lord
 [C]Your tender [G]mercies call us home
 [Am]Time after [F]time
 
+{Verse 2}
 [F]Oh Your kindness, [Am]Your kindness
 [G]It's more than I [C]deserve
 [F]Oh Your kindness, [Am]Your kindness
@@ -176,16 +197,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Holy, holy, [B]holy is the Lord
+    content: `{Verse 1}
+[E]Holy, holy, [B]holy is the Lord
 [C#m]God Almighty [A]who was and is to come
 [E]Worthy, worthy, [B]worthy is the Lamb
 [C#m]Who was slain for the [A]sins of man
 
+{Chorus}
 [E]This is the hymn of the [B]ages
 [C#m]Rising from the [A]saints of old
 [E]This is the song of the [B]ransomed
 [C#m]Echoing through [A]streets of gold
 
+{Verse 2}
 [A]Hallelujah, [E]hallelujah
 [B]Forever we will [C#m]sing
 [A]Hallelujah, [E]hallelujah
@@ -199,16 +223,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Let it be done [D]unto me
+    content: `{Verse 1}
+[G]Let it be done [D]unto me
 [Em]According to [C]Your word
 [G]Let it be done [D]unto me
 [Em]I trust in [C]You Lord
 
+{Chorus}
 [G]Not my will [D]but Yours be done
 [Em]I lay it [C]all down
 [G]Take my life and [D]let it be
 [Em]Consecrated [C]Lord to Thee
 
+{Verse 2}
 [C]I surrender [Em]all to You
 [D]Every dream and [G]every plan
 [C]Have Your way in [Em]me today
@@ -222,16 +249,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]You satisfy my [E]soul
+    content: `{Verse 1}
+[A]You satisfy my [E]soul
 [F#m]You satisfy my [D]soul
 [A]Nothing in this [E]world
 [F#m]Could ever take Your [D]place
 
+{Chorus}
 [A]Like a deer that [E]pants for water
 [F#m]So my soul longs [D]after You
 [A]You alone are [E]my heart's desire
 [F#m]You satisfy my [D]soul
 
+{Verse 2}
 [D]More than silver, [A]more than gold
 [E]More than anything [F#m]this world could hold
 [D]You are all I [A]need
@@ -245,16 +275,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]God of the [A]promise
+    content: `{Verse 1}
+[D]God of the [A]promise
 [Bm]You don't speak in [G]vain
 [D]No word is [A]empty
 [Bm]Your word remains [G]the same
 
+{Chorus}
 [D]All Your promises are [A]yes and amen
 [Bm]Every word You speak is [G]faithful to the end
 [D]Standing on the [A]promises of God
 [Bm]I will not be [G]moved
 
+{Verse 2}
 [G]Not one promise [D]has ever failed
 [A]Not one word has [Bm]fallen to the ground
 [G]Through the ages [D]Your truth prevails
@@ -268,16 +301,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Surely goodness and [D]mercy
+    content: `{Verse 1}
+[G]Surely goodness and [D]mercy
 [Em]Shall follow me [C]all my days
 [G]Surely goodness and [D]mercy
 [Em]Shall follow me [C]always
 
+{Chorus}
 [G]I will dwell in the [D]house of the Lord
 [Em]For all of my [C]days
 [G]In the presence of [D]my God
 [Em]Is where I will [C]stay
 
+{Verse 2}
 [C]Even though I walk [Em]through the valley
 [D]I will fear no [G]evil
 [C]For You are with [Em]me
@@ -291,16 +327,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]I found what I've been [G]looking for
+    content: `{Verse 1}
+[C]I found what I've been [G]looking for
 [Am]In Your presence [F]Lord
 [C]I found what I've been [G]searching for
 [Am]You're all I need and [F]more
 
+{Chorus}
 [C]My wandering heart has [G]found its home
 [Am]My restless soul can [F]breathe
 [C]I've chased the world and [G]come up short
 [Am]But here I'm finally [F]free
 
+{Verse 2}
 [F]You are everything I [Am]need
 [G]Everything I've been [C]searching for
 [F]In Your arms I've [Am]found my peace
@@ -314,16 +353,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Your love is like a [B]jealous fire
+    content: `{Verse 1}
+[E]Your love is like a [B]jealous fire
 [C#m]Burning all that's [A]not of You
 [E]Consuming every [B]vain desire
 [C#m]Making all things [A]new
 
+{Chorus}
 [E]You won't let me [B]settle for less
 [C#m]Your heart burns with [A]holy love
 [E]A jealousy that [B]won't relent
 [C#m]Til I'm fully [A]Yours
 
+{Verse 2}
 [A]Set me ablaze with [E]holy fire
 [B]Burn away the [C#m]lesser things
 [A]I want nothing [E]more than You Lord
@@ -337,16 +379,19 @@ const SONGS = [
     artist: "Mission House",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Take my life and [A]let it be
+    content: `{Verse 1}
+[D]Take my life and [A]let it be
 [Bm]Consecrated [G]Lord to Thee
 [D]Take my moments [A]and my days
 [Bm]Let them flow in [G]ceaseless praise
 
+{Chorus}
 [D]Take my hands and [A]let them move
 [Bm]At the impulse [G]of Thy love
 [D]Take my voice and [A]let me sing
 [Bm]Always only [G]for my King
 
+{Verse 2}
 [G]Here I am, [D]all of me
 [A]Take my life, [Bm]take everything
 [G]Every breath and [D]every word

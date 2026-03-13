@@ -15,16 +15,19 @@ const SONGS = [
     artist: "Pat Barrett",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I cast my anchors [C]in
+    content: `{Verse 1}
+[G]I cast my anchors [C]in
 [Em]Deep in the ocean [D]floor
 [G]But Your wind is [C]calling me
 [Em]Out into the [D]unknown
 
+{Chorus}
 [G]So set my [C]sails oh set my [Em]sails
 [D]Into the [G]mystery
 [G]Set my [C]sails oh set my [Em]sails
 [D]I'm trusting [G]You
 
+{Verse 2}
 [C]Take me further [G]than I've been
 [D]Deeper than my [Em]feet could ever wander
 [C]Past the point of [G]no return
@@ -38,16 +41,19 @@ const SONGS = [
     artist: "Pat Barrett",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]You didn't look at me and [D]see a hopeless case
+    content: `{Verse 1}
+[A]You didn't look at me and [D]see a hopeless case
 [F#m]You saw a master[E]piece in a mess of grace
 [A]An empty canvas [D]waiting to be changed
 [F#m]Into something [E]beautiful
 
+{Chorus}
 [A]Oh You're the potter I'm the [D]clay
 [F#m]And You will finish what You've [E]started
 [A]You who began a good [D]work in me
 [F#m]You'll be faithful to com[E]plete it
 
+{Verse 2}
 [D]Canvas and [A]clay before You
 [E]Canvas and [F#m]clay I worship [D]You`,
     notes: "Features Ben Smith. Warm and reassuring. Great for identity themes.",
@@ -59,16 +65,19 @@ const SONGS = [
     artist: "Pat Barrett",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]You're never gonna [G]let me down
+    content: `{Verse 1}
+[C]You're never gonna [G]let me down
 [Am]Never gonna [F]leave this heart alone
 [C]You're never gonna [G]let me down
 [Am]Your love has always [F]been enough
 
+{Chorus}
 [C]God is so [G]good
 [Am]God is so [F]good
 [C]God is so good He's so [G]good to me
 [Am]God is so [F]good
 
+{Verse 2}
 [C]Every morning [G]mercy new
 [Am]Faithfulness in [F]all You do
 [C]I will testify Your [G]love is real
@@ -82,16 +91,19 @@ const SONGS = [
     artist: "Pat Barrett",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]There's no one [A]better
+    content: `{Verse 1}
+[D]There's no one [A]better
 [Bm]There's no one [G]better than You
 [D]There's no one [A]better
 [Bm]There's no one [G]better than You
 
+{Chorus}
 [D]You are the [A]healer You are the [Bm]friend
 [G]Faithful forever [D]until the end
 [D]Alpha O[A]mega the first and [Bm]last
 [G]I'm going to praise You for[D]ever
 
+{Verse 2}
 [G]There's no one [D]better [A]no one better
 [Bm]In all the [G]earth in all the [D]heavens
 [A]No one [Bm]better [G]Lord than You`,
@@ -104,16 +116,19 @@ const SONGS = [
     artist: "Pat Barrett",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Through every [B]battle through every [C#m]heartbreak
+    content: `{Verse 1}
+[E]Through every [B]battle through every [C#m]heartbreak
 [A]Through every circumstance I be[E]lieve
 [E]That You are my [B]fortress oh You are my [C#m]portion
 [A]You are my hiding [E]place
 
+{Chorus}
 [E]I believe You're the [B]way I believe
 [C#m]I believe You're the [A]truth I believe
 [E]You are the way the [B]truth and the [C#m]life
 [A]I believe through every [E]promise
 
+{Verse 2}
 [A]Oh I believe [E]You are the way
 [B]I believe [C#m]through every trial
 [A]I believe You make all things [E]new`,

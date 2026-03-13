@@ -15,11 +15,13 @@ const SONGS = [
     artist: "Hillsong Young & Free",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Christ is my re[A]ward
+    content: `{Verse 1}
+[D]Christ is my re[A]ward
 [Bm]And all of my de[G]votion
 [D]Now there's nothing in this [A]world
 [Bm]That could ever satis[G]fy
 
+{Chorus}
 [D]Christ is e[A]nough for me
 [Bm]Christ is e[G]nough for me
 [D]Everything I [A]need is in You
@@ -33,11 +35,13 @@ const SONGS = [
     artist: "Hillsong Young & Free",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]Standing on the [E]edge of everything
+    content: `{Verse 1}
+[B]Standing on the [E]edge of everything
 [G#m]I've never been be[F#]fore
 [B]And I've been standing in the [E]storm
 [G#m]But I'm learning how to [F#]trust You more
 
+{Chorus}
 [B]I'm sinking deep in [E]oceans of Your love
 [G#m]Crashing over [F#]me
 [B]I'm sinking deep in [E]rivers of Your grace
@@ -51,11 +55,13 @@ const SONGS = [
     artist: "Hillsong Young & Free",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Darkness surrounded [D]me
+    content: `{Verse 1}
+[G]Darkness surrounded [D]me
 [Em]My feet were bound and [C]chained
 [G]A light burst through the [D]night
 [Em]And freedom called my [C]name
 
+{Chorus}
 [G]You brought me back to [D]life
 [Em]I feel alive, I'm [C]alive
 [G]You called me from the [D]grave
@@ -69,11 +75,13 @@ const SONGS = [
     artist: "Hillsong Young & Free",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]We are the free, [E]the free ones
+    content: `{Verse 1}
+[A]We are the free, [E]the free ones
 [F#m]Called to live as [D]children of the light
 [A]We are the saved, [E]the forgiven
 [F#m]Rise up, it's time [D]to come alive
 
+{Chorus}
 [A]Wake, the [E]sun is rising
 [F#m]Wake, His [D]grace is shining
 [A]Wake, and let the [E]whole world know
@@ -87,11 +95,13 @@ const SONGS = [
     artist: "Hillsong Young & Free",
     originalKey: "Eb",
     format: "chordpro",
-    content: `[Eb]I've tasted and I've [Bb]seen
+    content: `{Verse 1}
+[Eb]I've tasted and I've [Bb]seen
 [Cm]The sweetness of Your [Ab]love
 [Eb]Nothing in this [Bb]world
 [Cm]Could take the place [Ab]of what You've done
 
+{Chorus}
 [Eb]This is real love, [Bb]real love
 [Cm]Not the kind that [Ab]fades away
 [Eb]This is real love, [Bb]real love
@@ -105,11 +115,13 @@ const SONGS = [
     artist: "Hillsong Young & Free",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I used to be [D]afraid to let love in
+    content: `{Verse 1}
+[G]I used to be [D]afraid to let love in
 [Em]Then You came [C]along and took me in
 [G]The walls came down [D]this heart that was chained
 [Em]Found its way to [C]freedom again
 
+{Chorus}
 [G]This is living, [D]this is living now
 [Em]My whole world has [C]turned around
 [G]Breathe the air, I'm [D]breathing out

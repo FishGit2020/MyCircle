@@ -15,14 +15,17 @@ const SONGS = [
     artist: "Housefires",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Oh I've heard a [E]thousand stories
+    content: `{Verse 1}
+[A]Oh I've heard a [E]thousand stories
 [F#m]Of what they think You're [D]like
 [A]But I've heard the [E]tender whisper
 [F#m]Of love in the [D]dead of night
 
+{Chorus}
 [A]You tell me that You're [E]pleased
 [F#m]And that I'm never a[D]lone
 
+{Verse 2}
 [A]You're a good good [E]Father
 [F#m]It's who You are it's who You [D]are
 [A]And I'm loved by [E]You
@@ -36,16 +39,19 @@ const SONGS = [
     artist: "Housefires",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]We say yes Lord we say [Bb]yes
+    content: `{Verse 1}
+[F]We say yes Lord we say [Bb]yes
 [Dm]To everything You [C]have for us
 [F]We say yes Lord we say [Bb]yes
 [Dm]You can have it [C]all
 
+{Chorus}
 [Bb]We open up our [F]hearts
 [C]We open up our [Dm]hands
 [Bb]We lay down every[F]thing
 [C]For Your greater [Dm]plan
 
+{Verse 2}
 [F]Whatever You're do[Bb]ing we want in
 [Dm]Wherever You're go[C]ing we'll follow
 [F]Whatever it [Bb]costs whatever it [Dm]takes
@@ -59,16 +65,19 @@ const SONGS = [
     artist: "Housefires",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Let Your waves crash [D]over me
+    content: `{Verse 1}
+[G]Let Your waves crash [D]over me
 [Em]Like a rushing [C]river
 [G]Let Your praise wash [D]over me
 [Em]Spirit I sur[C]render
 
+{Chorus}
 [G]Come and crash like [D]ocean waves
 [Em]Your love is like the [C]sea
 [G]Rising up with [D]every breath
 [Em]Overwhelming [C]me
 
+{Verse 2}
 [C]Spirit come [D]Spirit fall
 [Em]Crash like waves on [G]me
 [C]Spirit rain [D]Spirit move
@@ -82,16 +91,19 @@ const SONGS = [
     artist: "Housefires",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Oh how could it [A]be
+    content: `{Verse 1}
+[D]Oh how could it [A]be
 [Bm]That my God would [G]welcome me
 [D]Into this mys[A]tery
 [Bm]Say take this bread [G]take this wine
 
+{Chorus}
 [D]Now let us [A]take communion
 [Bm]The bread and the [G]wine
 [D]Remember He has [A]won it
 [Bm]He has risen from the [G]grave
 
+{Verse 2}
 [D]And I will [A]remember
 [Bm]This is re[G]membrance
 [D]So do this in re[A]membrance of [Bm]Me [G]`,
@@ -104,15 +116,18 @@ const SONGS = [
     artist: "Housefires",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]We give You [B]glory
+    content: `{Verse 1}
+[E]We give You [B]glory
 [C#m]We give You [A]glory
 [E]We give You [B]glory Lord
 [C#m]All of the [A]glory
 
+{Chorus}
 [E]Everything we [B]have is from Your [C#m]hands
 [A]Everything we [E]are is by Your [B]grace
 [C#m]So we lift our [A]voices high
 
+{Verse 2}
 [A]All the glory [E]all the honor
 [B]All the praise be[C#m]longs to You
 [A]You are worthy [E]You are worthy

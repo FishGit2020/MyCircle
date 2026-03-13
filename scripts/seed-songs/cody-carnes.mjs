@@ -15,11 +15,13 @@ const SONGS = [
     artist: "Cody Carnes",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]I've carried a [E]burden for too [F#m]long on my own
+    content: `{Verse 1}
+[A]I've carried a [E]burden for too [F#m]long on my own
 [D]I wasn't cre[A]ated to bear it a[E]lone
 [A]I hear Your in[E]vitation to [F#m]let it all go
 [D]I see it now I'm [A]laying it [E]down
 
+{Chorus}
 [A]And oh I run to the [E]Father
 [F#m]I fall into [D]grace
 [A]I'm done with the [E]hiding
@@ -36,16 +38,19 @@ const SONGS = [
     artist: "Cody Carnes",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]I'm caught up in Your [B]presence
+    content: `{Verse 1}
+[E]I'm caught up in Your [B]presence
 [C#m]I just want to sit [A]here at Your feet
 [E]I'm caught up in this [B]holy moment
 [C#m]I never want to [A]leave
 
+{Chorus}
 [E]Nothing else [B]nothing else
 [C#m]Nothing else [A]matters
 [E]Just to sit here [B]at Your feet
 [C#m]Nothing else [A]matters
 
+{Verse 2}
 [E]I'm not here for [B]blessing
 [C#m]Jesus You don't owe me [A]anything
 [E]More than anything that [B]You can do
@@ -59,9 +64,11 @@ const SONGS = [
     artist: "Cody Carnes",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]Were creation [E]both creation's [B]mean and end
+    content: `{Verse 1}
+[B]Were creation [E]both creation's [B]mean and end
 [G#m]Ground for demon's [E]terror foun[F#]tain for the faint
 
+{Chorus}
 [B]Oh Christ be magni[E]fied
 [B]Let His praise a[F#]rise
 [G#m]Christ be magni[E]fied in me
@@ -69,6 +76,7 @@ const SONGS = [
 [B]From the altar [F#]of my life
 [G#m]Christ be magni[E]fied in [B]me
 
+{Verse 2}
 [E]I won't bow to [B]idols I'll stand [F#]strong and worship [G#m]You
 [E]And if it puts me [B]in the fire [F#]I'll rejoice cause You're there too`,
     notes: "Bold declaration. Builds from intimate verse to anthemic chorus.",
@@ -80,19 +88,23 @@ const SONGS = [
     artist: "Cody Carnes",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]The cross has the [C]final word
+    content: `{Verse 1}
+[G]The cross has the [C]final word
 [Em]The cross has the [D]final word
 [G]Darkness cannot [C]overcome
 [Em]Shame no longer [D]has a voice
 
+{Chorus}
 [G]He has the [C]final word
 [Em]He has the [D]final word
 
+{Verse 2}
 [C]Fear is a [G]liar [D]death is de[Em]feated
 [C]The cross has the [G]final [D]word
 [C]Love is vic[G]torious [D]heaven is [Em]speaking
 [C]The cross has the [D]final [G]word
 
+{Chorus}
 [G]The tomb where they [C]laid Him has [Em]nothing in[D]side`,
     notes: "Cross-centered anthem. Simple melody with powerful theology.",
     bpm: 78,
@@ -103,15 +115,18 @@ const SONGS = [
     artist: "Cody Carnes",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I will not be [C]shaken
+    content: `{Verse 1}
+[G]I will not be [C]shaken
 [Em]I will not be [D]moved
 [G]My feet are [C]firmly planted
 [Em]My hope is built on [D]You
 
+{Chorus}
 [G]Rain came and [C]wind blew
 [Em]But my house was built on [D]You
 [G]I'm safe with [C]You I'm going to make it [Em]through [D]
 
+{Verse 2}
 [C]Firm founda[G]tion
 [D]You are my firm founda[Em]tion
 [C]I will not be [G]shaken

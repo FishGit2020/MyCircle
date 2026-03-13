@@ -15,13 +15,16 @@ const SONGS = [
     artist: "All Sons & Daughters",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]You give life You are [F#m]love
+    content: `{Verse 1}
+[D]You give life You are [F#m]love
 [A]You bring light to the [G]darkness
 [D]You give hope You re[F#m]store
 [A]Every heart that is [G]broken
 
+{Chorus}
 [D]Great are You [F#m]Lord
 
+{Verse 2}
 [D]It's Your breath in our [F#m]lungs
 [A]So we pour out our [G]praise
 [D]We pour out our [F#m]praise
@@ -36,16 +39,19 @@ const SONGS = [
     artist: "All Sons & Daughters",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Praise Him all you [B]sinners
+    content: `{Verse 1}
+[E]Praise Him all you [B]sinners
 [C#m]For His love pur[A]sues
 [E]Praise Him all you [B]lost ones
 [C#m]He has carried [A]you
 
+{Chorus}
 [E]Lift your weary [B]head it's time to [C#m]rise up
 [A]We are people of the rising [E]sun
 [E]We are fire and [B]we are burn[C#m]ing
 [A]It is who we are
 
+{Verse 2}
 [A]We are people [E]of the rising [B]sun
 [A]Of the rising [E]sun`,
     notes: "Building anthem. Start sparse and let it build to full band declaration.",
@@ -57,15 +63,18 @@ const SONGS = [
     artist: "All Sons & Daughters",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]I could just sit [D]I could just sit and [Em]wait for all Your [C]goodness
+    content: `{Verse 1}
+[G]I could just sit [D]I could just sit and [Em]wait for all Your [C]goodness
 [G]Hope to feel Your [D]presence and I'll [Em]do my best to [C]worship
 
+{Chorus}
 [G]Or I could [D]step out on the [Em]water
 [C]What ever You [G]call me to [D]do
 [Em]Cause You have [C]called me higher
 [G]You have called me [D]deeper
 [Em]Into Your [C]will into Your [G]heart
 
+{Verse 2}
 [G]I will love the [D]ones You love and [Em]serve like You have [C]served me
 [G]I will go and [D]do Your will [Em]Lord You've called me [C]higher`,
     notes: "Moderate tempo with room for reflection. Acoustic guitar driven.",
@@ -77,14 +86,17 @@ const SONGS = [
     artist: "All Sons & Daughters",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Tonight I can [E]see the stars
+    content: `{Verse 1}
+[A]Tonight I can [E]see the stars
 [F#m]Oh they're shining [D]so bright tonight
 [A]And I wonder why [E]this broken world
 [F#m]Is still turning a[D]round
 
+{Chorus}
 [A]Oh how could I [E]have this hope
 [F#m]When everything [D]around me falls
 
+{Verse 2}
 [A]You give me a [E]reason to sing
 [F#m]You give me a [D]reason to sing
 [A]You give me a [E]reason
@@ -98,16 +110,19 @@ const SONGS = [
     artist: "All Sons & Daughters",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]There is strength with[C]in the sorrow
+    content: `{Verse 1}
+[G]There is strength with[C]in the sorrow
 [Em]There is beauty [D]in our tears
 [G]And You meet us [C]in our mourning
 [Em]With a love that [D]casts out fear
 
+{Chorus}
 [G]You are working [C]in our waiting
 [Em]Sanctifying [D]us
 [G]When beyond our [C]understanding
 [Em]You're teaching [D]us to trust
 
+{Verse 2}
 [C]Your plans are [G]still to prosper
 [D]You have not for[Em]gotten us
 [C]You're with us in the [G]fire and the [D]flood

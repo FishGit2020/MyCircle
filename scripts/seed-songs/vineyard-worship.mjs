@@ -15,12 +15,14 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Come, now is the time to [A]worship
+    content: `{Verse 1}
+[D]Come, now is the time to [A]worship
 [Em]Come, now is the time to [G]give your heart
 [D]Come, just as you are to [A]worship
 [Em]Come, just as you are be[G]fore your God
 [D]Come
 
+{Chorus}
 [G]One day every tongue will [D]confess You are God
 [G]One day every knee will [Em]bow
 [G]Still the greatest treasure re[D]mains for those
@@ -34,14 +36,17 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Hungry I come to [D/F#]You
+    content: `{Verse 1}
+[G]Hungry I come to [D/F#]You
 [Em]For I know You satis[C]fy
 [G]I am empty [D/F#]but I know
 [Em]Your love does not run [C]dry
 
+{Chorus}
 [G]So I wait for [D/F#]You
 [Em]So I wait for [C]You
 
+{Verse 2}
 [G]I'm falling on my [D]knees
 [Em]Offering all of [C]me
 [G]Jesus You're all this [D]heart is living for
@@ -57,16 +62,19 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Breathe on me, [G/B]breath of God
+    content: `{Verse 1}
+[C]Breathe on me, [G/B]breath of God
 [Am]Fill me with [F]life anew
 [C]That I may [G/B]love what Thou dost love
 [Am]And do what [F]Thou wouldst [G]do
 
+{Chorus}
 [C]Breathe on me, [G/B]breath of God
 [Am]Until my [F]heart is pure
 [C]Until with [G/B]Thee I will one [Am]will
 [F]To do and [G]to en[C]dure
 
+{Verse 2}
 [F]Holy Spirit [G]breathe on me
 [Am]Set my heart on [F]fire
 [C]Breathe on me [G]breath of God
@@ -80,13 +88,15 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Purify my [D]heart
+    content: `{Verse 1}
+[G]Purify my [D]heart
 [Em]Let me be as [C]gold
 [G]And precious [D]silver
 [Em]Purify my [C]heart
 [G]Let me be as [D]gold
 [Em]Pure [C]gold
 
+{Chorus}
 [C]Refiner's [D]fire
 [G]My heart's one de[Em]sire
 [C]Is to be [D]holy
@@ -103,16 +113,19 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Change my heart oh [F]God
+    content: `{Verse 1}
+[C]Change my heart oh [F]God
 [G]Make it ever [C]true
 [C]Change my heart oh [F]God
 [G]May I be like [C]You
 
+{Chorus}
 [F]You are the [G]potter
 [Am]I am the [F]clay
 [F]Mold me and [G]make me
 [Am]This is what I [G]pray
 
+{Verse 2}
 [C]Change my heart oh [F]God
 [G]Make it ever [C]true
 [C]Change my heart oh [F]God
@@ -126,10 +139,12 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Isn't He [C]beautiful
+    content: `{Verse 1}
+[G]Isn't He [C]beautiful
 [D]Isn't He [G]wonderful
 [G]Isn't He, [C]isn't He, [D]isn't He
 
+{Chorus}
 [G]Beautiful, [C]beautiful
 [D]Lord of [G]all
 [G]Prince of [C]Peace, Son of [D]God isn't [G]He`,
@@ -142,10 +157,12 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Jesus, [A]Jesus
+    content: `{Verse 1}
+[D]Jesus, [A]Jesus
 [Bm]Holy and A[G]nointed One
 [D]Jesus [A] [G]
 
+{Chorus}
 [D]Your name is like [A]honey on my lips
 [Bm]Your Spirit like [G]water to my soul
 [D]Your Word is a [A]lamp unto my [G]feet
@@ -159,11 +176,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]To the cross I [D]look
+    content: `{Verse 1}
+[G]To the cross I [D]look
 [Em]To the cross I [C]cling
 [G]Of its suffering [D]I do drink
 [Em]Of its work I do [C]sing
 
+{Chorus}
 [G]Sweetly broken, [D]wholly surrendered
 [Em]Sweetly broken, [C]wholly given to [G]You`,
     notes: "Jeremy Riddle song. Communion-ready atmosphere.",
@@ -175,11 +194,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]Draw me close to [C]You
+    content: `{Verse 1}
+[F]Draw me close to [C]You
 [Dm]Never let me [Bb]go
 [F]I lay it all down [C]again
 [Dm]To hear You say that [Bb]I'm Your friend
 
+{Chorus}
 [F]You are my de[C]sire
 [Dm]No one else will [Bb]do
 [F]Nothing else could take Your [C]place
@@ -193,11 +214,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Let the glory of the [D]Lord
+    content: `{Verse 1}
+[G]Let the glory of the [D]Lord
 [Em]Rise among [C]us
 [G]Let the glory of the [D]Lord
 [Em]Rise among [C]us
 
+{Chorus}
 [G]Let the praises of the [D]King
 [Em]Rise among [C]us
 [G]Let it [D]rise [Em] [C]`,
@@ -210,11 +233,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "Em",
     format: "chordpro",
-    content: `[Em]More love, more [C]power
+    content: `{Verse 1}
+[Em]More love, more [C]power
 [D]More of You in my [Em]life
 [Em]More love, more [C]power
 [D]More of You in my [Em]life
 
+{Chorus}
 [Em]I will worship [C]You with all of my [D]heart
 [Em]I will worship [C]You with all of my [D]mind
 [Em]I will worship [C]You with all of my [D]strength
@@ -228,11 +253,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Lord You are [E]good
+    content: `{Verse 1}
+[A]Lord You are [E]good
 [F#m]And Your mercy endures for[D]ever
 [A]Lord You are [E]good
 [F#m]And Your mercy endures for[D]ever
 
+{Chorus}
 [A]People from every [E]nation and tongue
 [F#m]From generation to gener[D]ation
 [A]We worship You, halle[E]lujah [D]`,
@@ -245,11 +272,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Your love is a[D]mazing
+    content: `{Verse 1}
+[G]Your love is a[D]mazing
 [Em]Steady and un[C]changing
 [G]Your love is a [D]mountain
 [Em]Firm beneath my [C]feet
 
+{Chorus}
 [G]Hallelujah, halle[D]lujah
 [Em]Hallelujah, Your [C]love makes me sing
 [G]Hallelujah, halle[D]lujah
@@ -263,11 +292,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]We fall down, we [A]lay our crowns
+    content: `{Verse 1}
+[D]We fall down, we [A]lay our crowns
 [Bm]At the feet of [G]Jesus
 [D]The greatness of [A]mercy and love
 [Bm]At the feet of [G]Jesus
 
+{Chorus}
 [D]And we cry holy, holy, [A]holy
 [Bm]And we cry holy, holy, [G]holy
 [D]And we cry holy, holy, [A]holy is the [G]Lamb`,
@@ -280,11 +311,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]O God You are my [C]God
+    content: `{Verse 1}
+[G]O God You are my [C]God
 [D]And I will ever [G]praise You
 [G]O God You are my [C]God
 [D]And I will ever [G]praise You
 
+{Chorus}
 [G]I will seek You in the [C]morning
 [D]And I will learn to walk in Your [G]ways
 [G]And step by step You [C]lead me
@@ -298,11 +331,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Seek ye first the [A]kingdom of God
+    content: `{Verse 1}
+[D]Seek ye first the [A]kingdom of God
 [Bm]And His righteous[G]ness
 [D]And all these things shall be [A]added unto you
 [Bm]Allelu, allelu[G]ia
 
+{Chorus}
 [D]Ask and it shall be [A]given unto you
 [Bm]Seek and ye shall [G]find
 [D]Knock and it shall be [A]opened unto [G]you
@@ -316,11 +351,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Over the mountains and the [B]sea
+    content: `{Verse 1}
+[E]Over the mountains and the [B]sea
 [C#m]Your river runs with love for [A]me
 [E]And I will open up my [B]heart
 [C#m]And let the Healer set me [A]free
 
+{Chorus}
 [E]I could sing of Your love for[B]ever
 [C#m]I could sing of Your love for[A]ever
 [E]I could sing of Your love for[B]ever
@@ -334,11 +371,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Spirit of God fall [G]fresh on me
+    content: `{Verse 1}
+[C]Spirit of God fall [G]fresh on me
 [Am]Fill me anew, fill [F]me anew
 [C]Spirit of God fall [G]fresh on me
 [Am]Melt me, mold me, [F]use me
 
+{Chorus}
 [C]Living breath of [G]God
 [Am]Come breathe on [F]us
 [C]Spirit of [G]God [F]come`,
@@ -351,11 +390,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `[F]I love You [C]Lord
+    content: `{Verse 1}
+[F]I love You [C]Lord
 [Dm]And I lift my [Bb]voice
 [F]To worship [C]You
 [Dm]Oh my soul re[Bb]joice
 
+{Chorus}
 [F]Take joy my [C]King
 [Dm]In what You [Bb]hear
 [F]May it be a [C]sweet sweet [Dm]sound
@@ -369,11 +410,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]All I need is [A]You Lord
+    content: `{Verse 1}
+[D]All I need is [A]You Lord
 [Bm]Is You Lord, is [G]You Lord
 [D]All I need is [A]You Lord
 [Bm]Is You [G]Lord
 
+{Chorus}
 [D]One thing I [A]ask, one thing I [Bm]seek
 [G]To see Your [D]beauty
 [A]To find You in the [Bm]place
@@ -387,11 +430,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Lord have mercy on [D]me
+    content: `{Verse 1}
+[G]Lord have mercy on [D]me
 [Em]A sinner in need of [C]grace
 [G]Lord have mercy on [D]me
 [Em]I fall before Your [C]face
 
+{Chorus}
 [G]Your mercy is [D]new every morning
 [Em]Great is Your faith[C]fulness
 [G]Lord have mercy [D]on [C]me`,
@@ -404,11 +449,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Faithful One, so un[A]changing
+    content: `{Verse 1}
+[D]Faithful One, so un[A]changing
 [Bm]Ageless One, You're my [G]rock of peace
 [D]Lord of all, I de[A]pend on You
 [Bm]I call out to [G]You again and again
 
+{Chorus}
 [D]You are my rock in [A]times of trouble
 [Bm]You lift me up when I [G]fall down
 [D]All through the storm Your [A]love is the anchor
@@ -422,11 +469,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Men of faith rise [C]up and sing
+    content: `{Verse 1}
+[G]Men of faith rise [C]up and sing
 [D]Of the great and [G]glorious King
 [G]You are strong when [C]you feel weak
 [D]In your broken[G]ness complete
 
+{Chorus}
 [G]Shout to the [C]north and the south
 [D]Sing to the [Em]east and the west
 [G]Jesus is [C]Savior to [D]all
@@ -440,11 +489,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]I sing a simple [A]song of love
+    content: `{Verse 1}
+[D]I sing a simple [A]song of love
 [Bm]To my Savior, [G]to my Jesus
 [D]I'm grateful for the [A]things You've done
 [Bm]My loving Savior, [G]precious Jesus
 
+{Chorus}
 [D]My heart is glad that [A]You've called me Your own
 [Bm]There's no place I'd rather [G]be
 [D]Than in Your [A]arms of [G]love`,
@@ -457,11 +508,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]You are here, [G]moving in our midst
+    content: `{Verse 1}
+[C]You are here, [G]moving in our midst
 [Am]I worship [F]You, I worship You
 [C]You are here, [G]working in this place
 [Am]I worship [F]You, I worship You
 
+{Chorus}
 [C]Turn your eyes up[G]on the Lord
 [Am]And the things of earth will [F]grow strangely dim
 [C]In the light of [G]His glory and [F]grace`,
@@ -474,11 +527,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Every move I make I make in [C]You
+    content: `{Verse 1}
+[G]Every move I make I make in [C]You
 [G]You make me move [D]Jesus
 [G]Every breath I take I breathe in [C]You
 [G]Every step I take I take in [D]You
 
+{Chorus}
 [G]Na na na na na na [C]na
 [G]Na na na na na na [D]na
 [G]Waves of mercy, [C]waves of grace
@@ -492,11 +547,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Come and listen, come to the [E]water's edge
+    content: `{Verse 1}
+[A]Come and listen, come to the [E]water's edge
 [F#m]All you who know and [D]fear the Lord
 [A]Come and listen, [E]let me tell you what He's done
 [F#m]Come and [D]listen
 
+{Chorus}
 [A]He has done great [E]things
 [F#m]He has done great [D]things
 [A]Come and [E]listen [D]`,
@@ -509,16 +566,19 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]All who are [A]thirsty
+    content: `{Verse 1}
+[D]All who are [A]thirsty
 [Bm]All who are [G]weak
 [D]Come to the [A]fountain
 [Bm]Dip your heart in the [G]stream of life
 
+{Chorus}
 [D]Let the pain and the [A]sorrow
 [Bm]Be washed a[G]way
 [D]In the waves of His [A]mercy
 [Bm]As deep cries out to [G]deep
 
+{Verse 2}
 [D]Come Lord [A]Jesus come
 [Bm]Come Lord [G]Jesus come`,
     notes: "Brenton Brown & Glenn Robertson. Vineyard classic invitation.",
@@ -530,11 +590,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Dwell in the midst of [B]us
+    content: `{Verse 1}
+[E]Dwell in the midst of [B]us
 [C#m]Come and dwell in the [A]midst of us
 [E]You're worthy, [B]You're worthy
 [C#m]Come and dwell in the [A]midst of us
 
+{Chorus}
 [E]Here among the [B]broken
 [C#m]Here among the [A]weary
 [E]Come and make Your [B]home with us
@@ -548,11 +610,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Over me, over [D]me
+    content: `{Verse 1}
+[G]Over me, over [D]me
 [Em]Let Your anointing [C]fall over me
 [G]Over me, over [D]me
 [Em]Let the glory of the [C]Lord come over me
 
+{Chorus}
 [G]I rest beneath the [D]shadow of Your wings
 [Em]I trust in You, my [C]God and King
 [G]Let Your presence [D]come over [C]me`,
@@ -565,11 +629,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Praise the Lord from the [E]heavens
+    content: `{Verse 1}
+[A]Praise the Lord from the [E]heavens
 [F#m]Praise Him in the [D]heights above
 [A]Praise Him all His [E]angels
 [F#m]Praise Him all His [D]heavenly hosts
 
+{Chorus}
 [A]Let them praise the [E]name of the Lord
 [F#m]For His name a[D]lone is exalted
 [A]His splendor is above the [E]earth and the [D]heavens`,
@@ -582,11 +648,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]Worthy, You are [A]worthy
+    content: `{Verse 1}
+[D]Worthy, You are [A]worthy
 [Bm]King of kings, Lord of [G]lords You are worthy
 [D]Worthy, You are [A]worthy
 [Bm]King of kings, Lord of [G]lords I worship You
 
+{Chorus}
 [D]You paid the [A]price for my sin
 [Bm]Once for all You [G]shed Your blood
 [D]I am redeemed by the [A]Lamb of God
@@ -600,11 +668,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Thank You Lord for Your [G]presence
+    content: `{Verse 1}
+[C]Thank You Lord for Your [G]presence
 [Am]Thank You Lord for this [F]day
 [C]Thank You Lord for Your [G]Spirit
 [Am]That guides me a[F]long the way
 
+{Chorus}
 [C]In Your presence there is [G]fullness of joy
 [Am]At Your right hand [F]pleasures evermore
 [C]Thank You [G]Lord [F]`,
@@ -617,11 +687,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]It's falling, it's [B]falling
+    content: `{Verse 1}
+[E]It's falling, it's [B]falling
 [C#m]The rain of Your [A]love is falling
 [E]My soul cries [B]out
 [C#m]Send Your rain down [A]now
 
+{Chorus}
 [E]Let it fall on [B]us
 [C#m]Let it rain on [A]us
 [E]Open up the [B]heavens Lord
@@ -635,11 +707,13 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "Em",
     format: "chordpro",
-    content: `[Em]Fire of God fall [C]fresh on me
+    content: `{Verse 1}
+[Em]Fire of God fall [C]fresh on me
 [D]Burn away what [Em]shouldn't be
 [Em]Fire of God fall [C]fresh on me
 [D]Purify my [Em]heart
 
+{Chorus}
 [Em]Come and consume [C]every part of me
 [D]Holy flame of [Em]love
 [Em]Fire of God come [C]down

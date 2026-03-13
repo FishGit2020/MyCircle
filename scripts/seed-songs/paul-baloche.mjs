@@ -15,16 +15,19 @@ const SONGS = [
     artist: "Paul Baloche",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]Open the eyes of my heart Lord
-[B]Open the eyes of my heart
-[A]I want to [B]see You
-[A]I want to [B]see You
-
+    content: `{Verse 1}
 [E]Open the eyes of my heart Lord
 [B]Open the eyes of my heart
 [A]I want to [B]see You
 [A]I want to [B]see You
 
+{Chorus}
+[E]Open the eyes of my heart Lord
+[B]Open the eyes of my heart
+[A]I want to [B]see You
+[A]I want to [B]see You
+
+{Verse 2}
 [A]To see You [B]high and lifted [C#m]up
 [A]Shining in the [B]light of Your [C#m]glory
 [A]Pour out Your power and [B]love
@@ -38,14 +41,17 @@ const SONGS = [
     artist: "Paul Baloche",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Praise is [Em]rising eyes are [C]turning to [D]You
+    content: `{Verse 1}
+[G]Praise is [Em]rising eyes are [C]turning to [D]You
 [G]We turn to [Em]You
 [G]Hope is [Em]stirring hearts are [C]yearning for [D]You
 [G]We long for [Em]You
 
+{Chorus}
 [C]Cause when we see [D]You we find [Em]strength to face the [D]day
 [C]In Your pres[D]ence all our fears are washed a[Em]way [D]washed away
 
+{Verse 2}
 [G]Hosanna ho[C]sanna
 [G]You are the God who [D]saves us
 [Em]Worthy of all our [C]praises
@@ -59,16 +65,19 @@ const SONGS = [
     artist: "Paul Baloche",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]As morning [D]dawns and evening [Em]fades
+    content: `{Verse 1}
+[G]As morning [D]dawns and evening [Em]fades
 [C]You inspire [G]songs of [D]praise
 [G]That rise from [D]earth to touch Your [Em]heart
 [C]And glorify Your [D]name
 
+{Chorus}
 [G]Your name [D]is a strong and mighty [Em]tower
 [C]Your name [G]is a [D]shelter like no [Em]other
 [C]Your name [G]let the [D]nations sing it [Em]louder
 [C]Cause nothing has the [D]power to [G]save but Your name
 
+{Verse 2}
 [G]Jesus in Your [D]name we pray
 [Em]Come and fill our [C]hearts today`,
     notes: "Features Paul and Lenny LeBlanc. Strong melody for congregational singing.",
@@ -80,16 +89,19 @@ const SONGS = [
     artist: "Paul Baloche",
     originalKey: "C",
     format: "chordpro",
-    content: `[C]Look what You've done for [G]me
+    content: `{Verse 1}
+[C]Look what You've done for [G]me
 [Am]Gave me a life of [F]freedom
 [C]Who could imagine [G]all the things
 [Am]That You would do through [F]me
 
+{Chorus}
 [C]What a good God [G]what a good God
 [Am]What a good God [F]You are
 [C]What a good God [G]what a good God
 [Am]What a good God [F]You are
 
+{Verse 2}
 [Am]Your goodness [G]follows me
 [F]Your mercy [C]covers me
 [Am]Your love is [G]everything I [F]need`,
@@ -102,15 +114,18 @@ const SONGS = [
     artist: "Paul Baloche",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]The sun cannot [D]compare to the [Em]glory of Your [C]love
+    content: `{Verse 1}
+[G]The sun cannot [D]compare to the [Em]glory of Your [C]love
 [G]There is no [D]shadow in Your [Em]presence [C]
 [G]No mortal man would [D]dare to stand [Em]before Your [C]throne
 [G]Before the Holy [D]One of [Em]heaven [C]
 
+{Chorus}
 [G]It's only by Your [D]blood
 [Em]And it's only through Your [C]mercy
 [G]Lord I come [D]I come
 
+{Verse 2}
 [C]I bring an [G]offering of [D]worship to my [Em]King
 [C]No one on [G]earth de[D]serves the praises that I [Em]sing
 [C]Jesus may [G]You re[D]ceive the honor that You're [Em]due

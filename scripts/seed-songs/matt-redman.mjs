@@ -15,16 +15,19 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Bless the Lord, [Em]oh my soul, [C]oh my soul
+    content: `{Verse 1}
+[G]Bless the Lord, [Em]oh my soul, [C]oh my soul
 [G]Worship His [D]holy name
 [Em]Sing like [C]never before, [G]oh my [D]soul
 [G]I'll worship Your holy name
 
+{Chorus}
 [G]The sun comes up, [Em]it's a new day dawning
 [C]It's time to sing Your [D]song again
 [G]Whatever may pass and [Em]whatever lies before me
 [C]Let me be singing when the [D]evening comes
 
+{Verse 2}
 [G]You're rich in love and [Em]You're slow to anger
 [C]Your name is great and [D]Your heart is kind
 [G]For all Your goodness [Em]I will keep on singing
@@ -38,14 +41,17 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "B",
     format: "chordpro",
-    content: `[B]Blessed be Your name in the [E]land that is plentiful
+    content: `{Verse 1}
+[B]Blessed be Your name in the [E]land that is plentiful
 [B]Where Your streams of a[F#]bundance flow, [E]blessed be Your name
 [B]Blessed be Your name when I'm [E]found in the desert place
 [B]Though I walk through the [F#]wilderness, [E]blessed be Your name
 
+{Chorus}
 [B]Every blessing You [E]pour out I'll turn back to praise
 [B]When the darkness [F#]closes in, Lord, [E]still I will say
 
+{Verse 2}
 [B]Blessed be the name of the [E]Lord, blessed be Your name
 [B]Blessed be the name of the [F#]Lord
 [E]Blessed be Your glorious [B]name`,
@@ -58,16 +64,19 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "D",
     format: "chordpro",
-    content: `[D]When the music [A]fades, all is stripped a[Em]way
+    content: `{Verse 1}
+[D]When the music [A]fades, all is stripped a[Em]way
 [G]And I simply [D]come
 [D]Longing just to [A]bring something that's of [Em]worth
 [G]That will bless Your [A]heart
 
+{Chorus}
 [D]I'll bring You more than a [A]song
 [Em]For a song in itself is [G]not what You have re[D]quired
 [D]You search much deeper with[A]in
 [Em]Through the way things ap[G]pear, You're looking into my [A]heart
 
+{Verse 2}
 [D]I'm coming back to the [A]heart of worship
 [Em]And it's all about [G]You, all about [D]You Jesus
 [D]I'm sorry Lord for the [A]thing I've made it
@@ -81,11 +90,13 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]One day when [F]heaven opens up
+    content: `{Verse 1}
+[Bb]One day when [F]heaven opens up
 [Gm]When we see [Eb]Jesus face to face
 [Bb]When all the [F]shadows flee away
 [Gm]And our eyes be[Eb]hold that day
 
+{Chorus}
 [Bb]One day, [F]one day
 [Gm]Every tongue will [Eb]confess Your name
 [Bb]One day, [F]one day
@@ -99,11 +110,13 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "Bb",
     format: "chordpro",
-    content: `[Bb]Standing on this [F]mountaintop
+    content: `{Verse 1}
+[Bb]Standing on this [F]mountaintop
 [Gm]Looking just how [Eb]far we've come
 [Bb]Knowing that for [F]every step
 [Gm]You were with [Eb]us
 
+{Chorus}
 [Bb]Never once did we [F]ever walk alone
 [Gm]Never once did You [Eb]leave us on our own
 [Bb]You are faithful, [F]God You are faithful
@@ -117,11 +130,13 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "G",
     format: "chordpro",
-    content: `[G]Even though I walk through the [D]valley
+    content: `{Verse 1}
+[G]Even though I walk through the [D]valley
 [Em]Of the shadow of [C]death
 [G]Your perfect love is [D]casting out fear
 [Em]And even when I'm [C]caught in the middle
 
+{Chorus}
 [G]Oh no, You never let [D]go
 [Em]Through the calm and [C]through the storm
 [G]Oh no, You never let [D]go
@@ -137,11 +152,13 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "E",
     format: "chordpro",
-    content: `[E]How lovely is Your [B]dwelling place
+    content: `{Verse 1}
+[E]How lovely is Your [B]dwelling place
 [C#m]O Lord Al[A]mighty
 [E]My soul longs and [B]even faints
 [C#m]For You[A]
 
+{Chorus}
 [E]Better is one day in Your [B]courts
 [C#m]Better is one day in Your [A]house
 [E]Better is one day in Your [B]courts
@@ -155,11 +172,13 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "A",
     format: "chordpro",
-    content: `[A]Let everything that, [E]everything that
+    content: `{Verse 1}
+[A]Let everything that, [E]everything that
 [F#m]Everything that has [D]breath praise the Lord
 [A]Let everything that, [E]everything that
 [F#m]Everything that has [D]breath praise the Lord
 
+{Chorus}
 [A]Praise You in the [E]morning
 [F#m]Praise You in the [D]evening
 [A]Praise You when I'm [E]young and when I'm old
