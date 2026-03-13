@@ -7,7 +7,7 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 vi.mock('./GameOver', () => ({
-  default: ({ score, onPlayAgain, onBack }: any) => (
+  default: ({ score, onPlayAgain, onBack }: { score: number; onPlayAgain: () => void; onBack: () => void }) => (
     <div>
       <span>GameOver</span>
       <span>Score: {score}</span>
@@ -18,7 +18,7 @@ vi.mock('./GameOver', () => ({
 }));
 
 vi.mock('./Timer', () => ({
-  default: ({ durationMs, running }: any) => (
+  default: ({ durationMs, running }: { durationMs: number; running: boolean }) => (
     <div data-testid="timer">Timer: {Math.ceil(durationMs / 1000)}s {running ? 'running' : 'stopped'}</div>
   ),
 }));
