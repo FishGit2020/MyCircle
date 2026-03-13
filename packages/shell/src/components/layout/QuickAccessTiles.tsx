@@ -40,6 +40,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/radio', labelKey: 'nav.radio', color: 'bg-amber-50 text-amber-500', darkColor: 'dark:bg-amber-900/20 dark:text-amber-400', widgetId: 'radioStation', iconKey: 'radio' },
   { path: '/interview', labelKey: 'nav.interview', color: 'bg-indigo-50 text-indigo-500', darkColor: 'dark:bg-indigo-900/20 dark:text-indigo-400', widgetId: 'aiInterviewer', iconKey: 'interview' },
   { path: '/transit', labelKey: 'nav.transit' as any, color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'transitTracker', iconKey: 'transit' },
+  { path: '/travel-map', labelKey: 'nav.travelMap' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'travelMap', iconKey: 'travel-map' },
 ];
 
 function QuickAccessTile({ item }: { item: QuickAccessItem }) {

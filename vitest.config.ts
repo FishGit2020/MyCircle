@@ -32,6 +32,7 @@ export default defineConfig({
       'radioStation/RadioStation': resolve(__dirname, './packages/shell/test/mocks/RadioStationMock.tsx'),
       'aiInterviewer/AiInterviewer': resolve(__dirname, './packages/shell/test/mocks/AiInterviewerMock.tsx'),
       'transitTracker/TransitTracker': resolve(__dirname, './packages/shell/test/mocks/TransitTrackerMock.tsx'),
+      'travelMap/TravelMap': resolve(__dirname, './packages/shell/test/mocks/TravelMapMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/test/mocks/pwaRegisterReactMock.ts'),
       'epubjs': resolve(__dirname, './test/mocks/epubjsMock.ts'),
       '@mycircle/shared': resolve(__dirname, './packages/shared/src'),

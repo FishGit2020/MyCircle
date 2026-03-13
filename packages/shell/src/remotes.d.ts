@@ -130,3 +130,8 @@ declare module 'transitTracker/TransitTracker' {
   const TransitTracker: React.ComponentType;
   export default TransitTracker;
 }
+
+declare module 'travelMap/TravelMap' {
+  const TravelMap: React.ComponentType;
+  export default TravelMap;
+}

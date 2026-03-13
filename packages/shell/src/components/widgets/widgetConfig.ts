@@ -23,10 +23,11 @@ import RadioWidget from './RadioWidget';
 import AiAssistantWidget from './AiAssistantWidget';
 import InterviewWidget from './InterviewWidget';
 import TransitWidget from './TransitWidget';
+import TravelMapWidget from './TravelMapWidget';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'tripPlanner' | 'pollSystem' | 'radioStation' | 'aiAssistant' | 'aiInterviewer' | 'transitTracker';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'tripPlanner' | 'pollSystem' | 'radioStation' | 'aiAssistant' | 'aiInterviewer' | 'transitTracker' | 'travelMap';
 
 export type WidgetSize = 'comfortable' | 'tight';
 
@@ -44,7 +45,7 @@ const DEFAULT_WIDGET_LAYOUT: WidgetLayout = { pinned: [], size: 'comfortable' };
 const ALL_WIDGET_IDS = new Set<string>([
   'weather', 'stocks', 'verse', 'nowPlaying', 'notebook', 'babyTracker',
   'childDev', 'worship', 'flashcards', 'dailyLog', 'cloudFiles', 'benchmark',
-  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'tripPlanner', 'pollSystem', 'radioStation', 'aiAssistant', 'aiInterviewer', 'transitTracker',
+  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'tripPlanner', 'pollSystem', 'radioStation', 'aiAssistant', 'aiInterviewer', 'transitTracker', 'travelMap',
 ]);
 
 export function loadWidgetLayout(): WidgetLayout {
@@ -97,6 +98,7 @@ export const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   aiAssistant: AiAssistantWidget,
   aiInterviewer: InterviewWidget,
   transitTracker: TransitWidget,
+  travelMap: TravelMapWidget,
 };
 
 export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -123,6 +125,7 @@ export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities:
   aiAssistant: '/ai',
   aiInterviewer: '/interview',
   transitTracker: '/transit',
+  travelMap: '/travel-map',
 };
 
 /** Reverse map: first path segment → WidgetType (for pin button lookup by route) */

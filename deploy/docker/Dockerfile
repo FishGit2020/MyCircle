@@ -34,6 +34,7 @@ COPY packages/poll-system/package.json packages/poll-system/
 COPY packages/radio-station/package.json packages/radio-station/
 COPY packages/ai-interviewer/package.json packages/ai-interviewer/
 COPY packages/transit-tracker/package.json packages/transit-tracker/
+COPY packages/travel-map/package.json packages/travel-map/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -95,6 +96,7 @@ COPY --from=builder /app/packages/poll-system/package.json packages/poll-system/
 COPY --from=builder /app/packages/radio-station/package.json packages/radio-station/
 COPY --from=builder /app/packages/ai-interviewer/package.json packages/ai-interviewer/
 COPY --from=builder /app/packages/transit-tracker/package.json packages/transit-tracker/
+COPY --from=builder /app/packages/travel-map/package.json packages/travel-map/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune

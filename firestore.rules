@@ -70,6 +70,11 @@ service cloud.firestore {
       match /trips/{tripId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Travel pins subcollection - private per-user map pins
+      match /travelPins/{pinId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Public hiking routes - authenticated read/create, creator-only delete

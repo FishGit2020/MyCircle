@@ -161,6 +161,15 @@ declare global {
       delete: (sessionId: string) => Promise<{ ok: boolean }>;
     };
 
+    /* ── Travel Pins ────────────────────────────────────────── */
+    __travelPins?: {
+      getAll: () => Promise<Array<{ id: string; type: string; name: string; notes?: string; dateRange?: { start: string; end: string }; lat: number; lon: number; createdAt: number }>>;
+      add: (pin: { type: string; name: string; notes?: string; dateRange?: { start: string; end: string }; lat: number; lon: number }) => Promise<string>;
+      update: (id: string, updates: Record<string, any>) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      subscribe: (callback: (pins: Array<{ id: string; type: string; name: string; notes?: string; dateRange?: { start: string; end: string }; lat: number; lon: number; createdAt: number }>) => void) => () => void;
+    };
+
     /* ── Transit Favorites ────────────────────────────────── */
     __transitFavorites?: {
       getAll: () => Promise<Array<{ stopId: string; stopName: string; direction: string; routes: string[]; addedAt: number }>>;
