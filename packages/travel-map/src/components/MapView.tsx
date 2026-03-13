@@ -39,18 +39,19 @@ export default function MapView({ onMapReady, onMapClick, onStyleLoad }: Props) 
       // Navigation controls (zoom + compass/rotate)
       map.addControl(new ml.NavigationControl({ visualizePitch: true }), 'top-right');
 
-      // Scale bar
-      map.addControl(new ml.ScaleControl({ maxWidth: 150 }), 'bottom-left');
-
-      // Geolocation (fly to user's location)
-      map.addControl(new ml.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: false,
-        showUserLocation: true,
-      }), 'top-right');
-
       // Fullscreen
       map.addControl(new ml.FullscreenControl(), 'top-right');
+
+      // Geolocation (fly to user's location) — bottom-right to avoid overlap
+      map.addControl(new ml.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserLocation: true,
+        showAccuracyCircle: true,
+      }), 'bottom-right');
+
+      // Scale bar
+      map.addControl(new ml.ScaleControl({ maxWidth: 150 }), 'bottom-left');
 
       map.on('load', () => {
         mapRef.current = map;
