@@ -50,6 +50,10 @@ import {
   checkAccessibility,
   checkColorContrast,
 } from './mcp-tools/a11y-checker.js';
+import {
+  auditDependencies,
+  analyzeBundleSizes,
+} from './mcp-tools/dependency-audit.js';
 
 import {
   readAnalyticsSummary,
@@ -270,6 +274,26 @@ server.tool(
   {},
   async () => ({
     content: [{ type: 'text', text: findMissingI18nKeys() }],
+  })
+);
+
+// ─── Dependency Audit Tools ───────────────────────────────────────────
+
+server.tool(
+  'audit_dependencies',
+  'Check for security vulnerabilities (pnpm audit) and outdated packages (pnpm outdated). Returns severity counts, advisory details, and a table of outdated deps with current/latest versions.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: auditDependencies() }],
+  })
+);
+
+server.tool(
+  'analyze_bundle_sizes',
+  'Report per-MFE bundle sizes from dist/ directories. Shows total size per package, file counts, and the top 10 largest files across all MFEs. Requires packages to be built first.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: analyzeBundleSizes() }],
   })
 );
 
