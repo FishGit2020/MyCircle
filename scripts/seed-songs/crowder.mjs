@@ -13,20 +13,20 @@ const SONGS = [
   {
     title: "Come As You Are",
     artist: "Crowder",
-    originalKey: "E",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[E]Come out of [B]sadness
-[C#m]From wherever you've [A]been
-[E]Come broken[B]hearted
-[C#m]Let rescue be[A]gin
+[C]Come out of [G]sadness
+[Am]From wherever you've [F]been
+[C]Come broken[G]hearted
+[Am]Let rescue be[F]gin
 
 {Chorus}
-[E]Come find your mercy, [B]oh sinner come kneel
-[C#m]Earth has no sorrow [A]that heaven can't heal
-[E]So lay down your [B]burdens
-[C#m]Lay down your [A]shame
-[E]Come as you [B]are`,
+[C]Come find your mercy, [G]oh sinner come kneel
+[Am]Earth has no sorrow [F]that heaven can't heal
+[C]So lay down your [G]burdens
+[Am]Lay down your [F]shame
+[C]Come as you [G]are`,
     notes: "Altar call classic. Gentle invitation, builds warmth throughout.",
     bpm: 73,
     tags: ["worship","invitation","grace","mercy"],
@@ -34,19 +34,19 @@ const SONGS = [
   {
     title: "All My Hope",
     artist: "Crowder",
-    originalKey: "G",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[G]I've been held by the [C]Savior
-[Em]I've felt fire from [D]above
-[G]I've been down to the [C]river
-[Em]I ain't the same, [D]a prodigal found
+[Ab]I've been held by the [Db]Savior
+[Fm]I've felt fire from [Eb]above
+[Ab]I've been down to the [Db]river
+[Fm]I ain't the same, [Eb]a prodigal found
 
 {Chorus}
-[G]All my hope is in [C]Jesus
-[Em]Thank God that [D]yesterday's gone
-[G]All my sins are for[C]given
-[Em]I've been washed [D]by the blood`,
+[Ab]All my hope is in [Db]Jesus
+[Fm]Thank God that [Eb]yesterday's gone
+[Ab]All my sins are for[Db]given
+[Fm]I've been washed [Eb]by the blood`,
     notes: "Tauren Wells collab. Southern gospel-meets-modern worship. Foot-stomping.",
     bpm: 130,
     tags: ["worship","hope","salvation","testimony"],
@@ -54,19 +54,19 @@ const SONGS = [
   {
     title: "Good God Almighty",
     artist: "Crowder",
-    originalKey: "E",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[E]I was blind but [B]now I can see
-[C#m]Once was bound but [A]now I'm free
-[E]You opened up my [B]eyes to see
-[C#m]The good, the good [A]God in me
+[D]I was blind but [A]now I can see
+[Bm]Once was bound but [G]now I'm free
+[D]You opened up my [A]eyes to see
+[Bm]The good, the good [G]God in me
 
 {Chorus}
-[E]Good God Al[B]mighty
-[C#m]Is there anything [A]You can't do
-[E]Good God Al[B]mighty
-[C#m]I'm gonna give it [A]all to You`,
+[D]Good God Al[A]mighty
+[Bm]Is there anything [G]You can't do
+[D]Good God Al[A]mighty
+[Bm]I'm gonna give it [G]all to You`,
     notes: "Upbeat, joyful, southern gospel energy. Clap-along, feel-good worship.",
     bpm: 140,
     tags: ["worship","praise","joy","testimony"],
@@ -74,19 +74,19 @@ const SONGS = [
   {
     title: "Red Letters",
     artist: "Crowder",
-    originalKey: "E",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[E]There on a hill, [B]there on a cross
-[C#m]Is a sacrifice that [A]none could exhaust
-[E]Hands that were nailed [B]to a rugged tree
-[C#m]Are the hands that have [A]set us all free
+[B]There on a hill, [F#]there on a cross
+[G#m]Is a sacrifice that [E]none could exhaust
+[B]Hands that were nailed [F#]to a rugged tree
+[G#m]Are the hands that have [E]set us all free
 
 {Chorus}
-[E]Red letters, [B]red letters
-[C#m]The gospel in [A]red letters
-[E]The story of [B]redemption written
-[C#m]In red [A]letters`,
+[B]Red letters, [F#]red letters
+[G#m]The gospel in [E]red letters
+[B]The story of [F#]redemption written
+[G#m]In red [E]letters`,
     notes: "Cross-focused, driving rock worship. Strong electric guitar.",
     bpm: 134,
     tags: ["worship","cross","gospel","salvation"],

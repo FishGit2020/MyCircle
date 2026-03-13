@@ -80,7 +80,7 @@ For I am [D]Yours [A]and You are [Bm]mine
   {
     title: "Even When It Hurts (Praise Song)",
     artist: "Hillsong UNITED",
-    originalKey: "Bb",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
 [Bb]Take this fainted heart
@@ -166,7 +166,7 @@ For I am [D]Yours [A]and You are [Bm]mine
   {
     title: "Another in the Fire",
     artist: "Hillsong UNITED",
-    originalKey: "A",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
 [A]There's a grace when the [E]heart is under fire
@@ -450,7 +450,7 @@ To love You from the [G]inside out`,
   {
     title: "Desert Song (UNITED)",
     artist: "Hillsong UNITED",
-    originalKey: "Bb",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
 [Bb]This is my prayer in the [F]desert
@@ -476,7 +476,7 @@ To love You from the [G]inside out`,
   {
     title: "Scandal of Grace",
     artist: "Hillsong UNITED",
-    originalKey: "E",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
 [E]Grace, what have You [B]done
@@ -553,7 +553,7 @@ To love You from the [G]inside out`,
   {
     title: "Good Grace",
     artist: "Hillsong UNITED",
-    originalKey: "G",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
 [G]People, what a [D]beautiful name

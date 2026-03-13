@@ -13,22 +13,22 @@ const SONGS = [
   {
     title: "Run to the Father",
     artist: "Cody Carnes",
-    originalKey: "A",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[A]I've carried a [E]burden for too [F#m]long on my own
-[D]I wasn't cre[A]ated to bear it a[E]lone
-[A]I hear Your in[E]vitation to [F#m]let it all go
-[D]I see it now I'm [A]laying it [E]down
+[C]I've carried a [G]burden for too [Am]long on my own
+[F]I wasn't cre[C]ated to bear it a[G]lone
+[C]I hear Your in[G]vitation to [Am]let it all go
+[F]I see it now I'm [C]laying it [G]down
 
 {Chorus}
-[A]And oh I run to the [E]Father
-[F#m]I fall into [D]grace
-[A]I'm done with the [E]hiding
-[F#m]No reason to [D]wait
-[A]My heart needs a [E]surgeon
-[F#m]My soul needs a [D]friend
-[A]So I'll run to the [E]Father a[F#m]gain and a[D]gain`,
+[C]And oh I run to the [G]Father
+[Am]I fall into [F]grace
+[C]I'm done with the [G]hiding
+[Am]No reason to [F]wait
+[C]My heart needs a [G]surgeon
+[Am]My soul needs a [F]friend
+[C]So I'll run to the [G]Father a[Am]gain and a[F]gain`,
     notes: "Vulnerable and tender. Piano-driven with emotional build.",
     bpm: 72,
     tags: ["worship","grace","father","return"],
@@ -36,25 +36,25 @@ const SONGS = [
   {
     title: "Nothing Else",
     artist: "Cody Carnes",
-    originalKey: "E",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[E]I'm caught up in Your [B]presence
-[C#m]I just want to sit [A]here at Your feet
-[E]I'm caught up in this [B]holy moment
-[C#m]I never want to [A]leave
+[C]I'm caught up in Your [G]presence
+[Am]I just want to sit [F]here at Your feet
+[C]I'm caught up in this [G]holy moment
+[Am]I never want to [F]leave
 
 {Chorus}
-[E]Nothing else [B]nothing else
-[C#m]Nothing else [A]matters
-[E]Just to sit here [B]at Your feet
-[C#m]Nothing else [A]matters
+[C]Nothing else [G]nothing else
+[Am]Nothing else [F]matters
+[C]Just to sit here [G]at Your feet
+[Am]Nothing else [F]matters
 
 {Verse 2}
-[E]I'm not here for [B]blessing
-[C#m]Jesus You don't owe me [A]anything
-[E]More than anything that [B]You can do
-[C#m]I just want [A]You`,
+[C]I'm not here for [G]blessing
+[Am]Jesus You don't owe me [F]anything
+[C]More than anything that [G]You can do
+[Am]I just want [F]You`,
     notes: "Intimate soaking worship. Let it repeat and build in the Spirit.",
     bpm: 64,
     tags: ["worship","intimacy","presence","devotion"],
@@ -62,23 +62,23 @@ const SONGS = [
   {
     title: "Christ Be Magnified",
     artist: "Cody Carnes",
-    originalKey: "B",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[B]Were creation [E]both creation's [B]mean and end
-[G#m]Ground for demon's [E]terror foun[F#]tain for the faint
+[A]Were creation [D]both creation's [A]mean and end
+[F#m]Ground for demon's [D]terror foun[E]tain for the faint
 
 {Chorus}
-[B]Oh Christ be magni[E]fied
-[B]Let His praise a[F#]rise
-[G#m]Christ be magni[E]fied in me
-[B]Oh Christ be magni[E]fied
-[B]From the altar [F#]of my life
-[G#m]Christ be magni[E]fied in [B]me
+[A]Oh Christ be magni[D]fied
+[A]Let His praise a[E]rise
+[F#m]Christ be magni[D]fied in me
+[A]Oh Christ be magni[D]fied
+[A]From the altar [E]of my life
+[F#m]Christ be magni[D]fied in [A]me
 
 {Verse 2}
-[E]I won't bow to [B]idols I'll stand [F#]strong and worship [G#m]You
-[E]And if it puts me [B]in the fire [F#]I'll rejoice cause You're there too`,
+[D]I won't bow to [A]idols I'll stand [E]strong and worship [F#m]You
+[D]And if it puts me [A]in the fire [E]I'll rejoice cause You're there too`,
     notes: "Bold declaration. Builds from intimate verse to anthemic chorus.",
     bpm: 76,
     tags: ["worship","declaration","surrender","anthem"],

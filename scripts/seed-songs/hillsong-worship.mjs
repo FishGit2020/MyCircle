@@ -51,12 +51,12 @@ The Name of [A]Jesus
 [Em]Oh His love for [C]me
 [Em]Oh His [D]love for [C]me
 
-{Pre-Chorus}
+{Chorus}
 [G]Who the Son sets free
 [D]Oh is free indeed
 [Em]I'm a child of [C]God, yes I am
 
-{Pre-Chorus}
+{Chorus}
 [G]In my Father's house
 [D]There's a place for me
 [Em]I'm a child of [C]God, yes I am
@@ -68,7 +68,7 @@ The Name of [A]Jesus
 [Em]Jesus died for [C]me
 [Em]Yes He [D]died for [C]me
 
-{Verse 3}
+{Bridge}
 [Em]I am [D]chosen, not for[C]saken
 [Em]I am [D]who You say I [C]am
 [Em]You are [D]for me, not a[C]gainst me
@@ -112,7 +112,7 @@ Oh [Am]may I then in [F]Him be found
   {
     title: "Hosanna",
     artist: "Hillsong Worship",
-    originalKey: "G",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
 [G]I see the King of Glory
@@ -148,7 +148,7 @@ Oh [Am]may I then in [F]Him be found
   {
     title: "Mighty to Save",
     artist: "Hillsong Worship",
-    originalKey: "A",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
 [A]Everyone needs compas[E]sion
@@ -392,7 +392,7 @@ Oh [Am]may I then in [F]Him be found
   {
     title: "This I Believe (The Creed)",
     artist: "Hillsong Worship",
-    originalKey: "G",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
 [G]Our Father ever[D]lasting

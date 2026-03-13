@@ -13,26 +13,26 @@ const SONGS = [
   {
     title: "Gratitude",
     artist: "Brandon Lake",
-    originalKey: "G",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[G]All my words fall short, I got [Em]nothing new
-[C]How could I express all my [D]gratitude
+[B]All my words fall short, I got [G#m]nothing new
+[E]How could I express all my [F#]gratitude
 
 {Chorus}
-[G]I could sing these songs as I [Em]often do
-[C]But every song must end and [D]You never do
+[B]I could sing these songs as I [G#m]often do
+[E]But every song must end and [F#]You never do
 
 {Verse 2}
-[G]So I throw up my [Em]hands and praise You again and again
-[C]'Cause all that I have is a [D]hallelujah, hallelujah
-[G]And I know it's not [Em]much but I've nothing else
-[C]Fit for a King except for a [D]heart singing hallelujah
+[B]So I throw up my [G#m]hands and praise You again and again
+[E]'Cause all that I have is a [F#]hallelujah, hallelujah
+[B]And I know it's not [G#m]much but I've nothing else
+[E]Fit for a King except for a [F#]heart singing hallelujah
 
 {Chorus}
-[G]Come on my soul, oh don't you get [Em]shy on me
-[C]Lift up your song, 'cause you got a [D]lion inside of those lungs
-[G]Get up and praise the [Em]Lord`,
+[B]Come on my soul, oh don't you get [G#m]shy on me
+[E]Lift up your song, 'cause you got a [F#]lion inside of those lungs
+[B]Get up and praise the [G#m]Lord`,
     notes: "Joyful praise. Let the gratitude overflow. Full energy.",
     bpm: 81,
     tags: ["praise","gratitude","joy"],
@@ -40,21 +40,21 @@ const SONGS = [
   {
     title: "Coat of Many Colors",
     artist: "Brandon Lake",
-    originalKey: "C",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[C]Every color tells a [G]story
-[Am]Every thread a lesson [F]learned
-[C]Through the tearing and the [G]mending
-[Am]God was making something [F]beautiful
+[D]Every color tells a [A]story
+[Bm]Every thread a lesson [G]learned
+[D]Through the tearing and the [A]mending
+[Bm]God was making something [G]beautiful
 
 {Chorus}
-[C]He's putting on a [G]coat of many colors
-[Am]He's weaving every [F]heartbreak into gold
-[C]What the enemy meant for [G]evil
-[Am]God has turned for [F]good
-[C]A coat of many [G]colors
-[Am]Tells the story of His [F]love`,
+[D]He's putting on a [A]coat of many colors
+[Bm]He's weaving every [G]heartbreak into gold
+[D]What the enemy meant for [A]evil
+[Bm]God has turned for [G]good
+[D]A coat of many [A]colors
+[Bm]Tells the story of His [G]love`,
     notes: "Story-driven worship, vulnerable and personal",
     bpm: 78,
     tags: ["worship","testimony","redemption"],
@@ -62,23 +62,23 @@ const SONGS = [
   {
     title: "I Need a Ghost",
     artist: "Brandon Lake",
-    originalKey: "G",
+    originalKey: "F#m",
     format: "chordpro",
     content: `{Verse 1}
-[G]I've been running on [D]empty
-[Em]I've been trying to [C]fill this void
-[G]But nothing in this [D]world
-[Em]Can give me what I [C]need
+[F#m]I've been running on [A]empty
+[E]I've been trying to [F#m]fill this void
+[F#m]But nothing in this [A]world
+[E]Can give me what I [F#m]need
 
 {Chorus}
-[G]I need a Ghost, the [D]Holy Ghost
-[Em]Come fill me up, I [C]need You most
-[G]More than the air I [D]breathe
-[Em]More than a melody [C]I need
-[G]I need a Ghost, the [D]Holy Ghost
-[Em]Come set a fire [C]in my bones
-[G]Spirit I'm calling [D]out
-[Em]I can't live with[C]out You now`,
+[F#m]I need a Ghost, the [A]Holy Ghost
+[E]Come fill me up, I [F#m]need You most
+[F#m]More than the air I [A]breathe
+[E]More than a melody [F#m]I need
+[F#m]I need a Ghost, the [A]Holy Ghost
+[E]Come set a fire [F#m]in my bones
+[F#m]Spirit I'm calling [A]out
+[E]I can't live with[F#m]out You now`,
     notes: "Passionate cry for the Spirit, dynamic buildup",
     bpm: 124,
     tags: ["worship","holy-spirit","passion"],
@@ -86,21 +86,21 @@ const SONGS = [
   {
     title: "Count 'Em",
     artist: "Brandon Lake",
-    originalKey: "C",
+    originalKey: "Bm",
     format: "chordpro",
     content: `{Verse 1}
-[C]Start from the beginning [G]go back to the start
-[Am]Think of all the times He [F]healed your broken heart
-[C]And when you lose your [G]focus and you can't see His hand
-[Am]Count your bless[F]ings one by one
+[Bm]Start from the beginning [G]go back to the start
+[D]Think of all the times He [A]healed your broken heart
+[Bm]And when you lose your [G]focus and you can't see His hand
+[D]Count your bless[A]ings one by one
 
 {Chorus}
-[C]Count em, count em, [G]count your blessings
-[Am]One by one and [F]you will see
-[C]Count em, count em, [G]count your blessings
-[Am]Name them one by [F]one
-[C]And it will surprise you [G]what the Lord has done
-[Am]Count [F]em`,
+[Bm]Count em, count em, [G]count your blessings
+[D]One by one and [A]you will see
+[Bm]Count em, count em, [G]count your blessings
+[D]Name them one by [A]one
+[Bm]And it will surprise you [G]what the Lord has done
+[D]Count [A]em`,
     notes: "Joyful and grateful, clap-along energy",
     bpm: 126,
     tags: ["worship","gratitude","joy"],
@@ -132,26 +132,26 @@ const SONGS = [
   {
     title: "Graves to Gardens (Brandon Lake)",
     artist: "Brandon Lake",
-    originalKey: "C",
+    originalKey: "Bb",
     format: "chordpro",
     content: `{Verse 1}
-[C]I searched the world but it [G]couldn't fill me
-[Am]Man's empty praise and [F]treasures that fade
-[C]Are never enough [G]
-[Am]Then You came along and [F]put me back together
+[Bb]I searched the world but it [F]couldn't fill me
+[Gm]Man's empty praise and [Eb]treasures that fade
+[Bb]Are never enough [F]
+[Gm]Then You came along and [Eb]put me back together
 
 {Chorus}
-[C]And every part of me [G]cries out
-[Am]More, more, [F]more
+[Bb]And every part of me [F]cries out
+[Gm]More, more, [Eb]more
 
 {Verse 2}
-[C]You turn mourning to [G]dancing
-[Am]You give beauty for [F]ashes
-[C]You turn graves into [G]gardens
-[Am]You turn bones into [F]armies
-[C]You turn seas into [G]highways
-[Am]You're the only one [F]who can
-[C]You're the only one [G]who can`,
+[Bb]You turn mourning to [F]dancing
+[Gm]You give beauty for [Eb]ashes
+[Bb]You turn graves into [F]gardens
+[Gm]You turn bones into [Eb]armies
+[Bb]You turn seas into [F]highways
+[Gm]You're the only one [Eb]who can
+[Bb]You're the only one [F]who can`,
     notes: "Brandon Lake version emphasis, raw worship energy",
     bpm: 72,
     tags: ["worship","transformation","testimony"],
@@ -197,18 +197,18 @@ const SONGS = [
   {
     title: "House of Miracles",
     artist: "Brandon Lake",
-    originalKey: "G",
+    originalKey: "Bb",
     format: "chordpro",
     content: `{Verse 1}
-[G]This is the house of [D]miracles
-[Em]This is where You [C]move
-[G]Nothing is impos[D]sible
-[Em]When we call on [C]You
+[Bb]This is the house of [F]miracles
+[Gm]This is where You [Eb]move
+[Bb]Nothing is impos[F]sible
+[Gm]When we call on [Eb]You
 
 {Chorus}
-[G]Miracles happen [D]here
-[Em]In the presence of the [C]Lord
-[G]This is the house of [D]miracles [C]`,
+[Bb]Miracles happen [F]here
+[Gm]In the presence of the [Eb]Lord
+[Bb]This is the house of [F]miracles [Eb]`,
     notes: "Faith declaration over the house of God. Builds to climax.",
     bpm: 76,
     tags: ["worship","miracles","faith"],

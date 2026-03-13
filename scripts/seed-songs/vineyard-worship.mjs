@@ -42,17 +42,14 @@ const SONGS = [
 [G]I am empty [D/F#]but I know
 [Em]Your love does not run [C]dry
 
-{Chorus}
+{Bridge}
 [G]So I wait for [D/F#]You
 [Em]So I wait for [C]You
 
-{Verse 2}
+{Chorus}
 [G]I'm falling on my [D]knees
 [Em]Offering all of [C]me
-[G]Jesus You're all this [D]heart is living for
-[Em]I'm falling on my [C]knees
-[G]I'm falling on my [D]knees
-[Em]Offering all of [C]me`,
+[G]Jesus You're all this [D]heart is living for`,
     notes: "Reverent and longing, keep volume low",
     bpm: 72,
     tags: ["worship","devotional","intimate"],
@@ -86,24 +83,24 @@ const SONGS = [
   {
     title: "Refiner's Fire",
     artist: "Vineyard Worship",
-    originalKey: "G",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[G]Purify my [D]heart
-[Em]Let me be as [C]gold
-[G]And precious [D]silver
-[Em]Purify my [C]heart
-[G]Let me be as [D]gold
-[Em]Pure [C]gold
+[E]Purify my [B]heart
+[C#m]Let me be as [A]gold
+[E]And precious [B]silver
+[C#m]Purify my [A]heart
+[E]Let me be as [B]gold
+[C#m]Pure [A]gold
 
 {Chorus}
-[C]Refiner's [D]fire
-[G]My heart's one de[Em]sire
-[C]Is to be [D]holy
-[G]Set apart for [Em]You Lord
-[C]I choose to [D]be holy
-[Em]Set apart for [C]You my Master
-[G]Ready to do [D]Your will`,
+[E]Refiner's [A]fire
+[B]My heart's one de[E]sire
+[A]Is to be [B]holy
+[E]Set apart for [C#m]You Lord
+[A]I choose to [B]be holy
+[C#m]Set apart for [A]You my Master
+[E]Ready to do [B]Your will`,
     notes: "Classic Vineyard song, Brian Doerksen, gentle and sincere",
     bpm: 76,
     tags: ["worship","classic","holiness"],
@@ -114,21 +111,21 @@ const SONGS = [
     originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[C]Change my heart oh [F]God
+[C]Change my heart oh [Dm7]God
 [G]Make it ever [C]true
-[C]Change my heart oh [F]God
+[C]Change my heart oh [Dm7]God
 [G]May I be like [C]You
 
 {Chorus}
-[F]You are the [G]potter
-[Am]I am the [F]clay
-[F]Mold me and [G]make me
-[Am]This is what I [G]pray
+[E]You are the [Am]potter
+[Dm7]I am the [G]clay
+[E]Mold me and [Am]make me
+[Dm7]This is what I [G]pray
 
 {Verse 2}
-[C]Change my heart oh [F]God
+[C]Change my heart oh [Dm7]God
 [G]Make it ever [C]true
-[C]Change my heart oh [F]God
+[C]Change my heart oh [Dm7]God
 [G]May I be like [C]You`,
     notes: "Eddie Espinosa classic, simple and singable",
     bpm: 80,
@@ -174,17 +171,21 @@ const SONGS = [
   {
     title: "Sweetly Broken",
     artist: "Vineyard Worship",
-    originalKey: "G",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[G]To the cross I [D]look
-[Em]To the cross I [C]cling
-[G]Of its suffering [D]I do drink
-[Em]Of its work I do [C]sing
+[B]To the cross I [F#]look
+[G#m]To the cross I [E]cling
+[B]Of its suffering [F#]I do drink
+[G#m]Of its work I do [E]sing
+
+{Verse 2}
+[B]For on it my Savior [F#]both bruised and crushed
+[G#m]Showed that God is [E]love and God is just
 
 {Chorus}
-[G]Sweetly broken, [D]wholly surrendered
-[Em]Sweetly broken, [C]wholly given to [G]You`,
+[B]Sweetly broken, [F#]wholly surrendered
+[G#m]Sweetly broken, [E]wholly given to [B]You`,
     notes: "Jeremy Riddle song. Communion-ready atmosphere.",
     bpm: 68,
     tags: ["worship","cross","surrender"],
@@ -192,19 +193,25 @@ const SONGS = [
   {
     title: "Draw Me Close",
     artist: "Vineyard Worship",
-    originalKey: "F",
+    originalKey: "Bb",
     format: "chordpro",
     content: `{Verse 1}
-[F]Draw me close to [C]You
-[Dm]Never let me [Bb]go
-[F]I lay it all down [C]again
-[Dm]To hear You say that [Bb]I'm Your friend
+[Bb]Draw me close to [Eb]You
+[F]Never let me [Bb]go
+[F/A]I lay it all down [Eb/G]again
+[Gm]To hear You say that [F]I'm Your [Eb]friend
+
+{Verse 2}
+[Bb]You are my de[Eb]sire
+[F]No one else will [Bb]do
+[F/A]Nothing else could take Your [Eb/G]place
+[Gm]To feel the warmth of [F]Your em[Eb]brace
 
 {Chorus}
-[F]You are my de[C]sire
-[Dm]No one else will [Bb]do
-[F]Nothing else could take Your [C]place
-[Dm]To feel the warmth of [Bb]Your em[F]brace`,
+[Bb]You're all I [F]want
+[Bb]You're all I've [Eb]ever [F]needed
+[Bb]You're all I [F]want
+[Eb]Help me know You are [Bb]near`,
     notes: "Kelly Carpenter classic. One of Vineyard's most beloved.",
     bpm: 62,
     tags: ["worship","classic","intimacy"],
@@ -235,15 +242,15 @@ const SONGS = [
     format: "chordpro",
     content: `{Verse 1}
 [Em]More love, more [C]power
-[D]More of You in my [Em]life
+[Bm]More of You in my [Em]life
 [Em]More love, more [C]power
-[D]More of You in my [Em]life
+[Bm]More of You in my [Em]life
 
 {Chorus}
-[Em]I will worship [C]You with all of my [D]heart
-[Em]I will worship [C]You with all of my [D]mind
-[Em]I will worship [C]You with all of my [D]strength
-[Em]You are my [C]Lord [D] [Em]`,
+[Am]I will worship [D]You with all of my [Em]heart
+[Am]I will worship [D]You with all of my [Em]mind
+[Am]I will worship [D]You with all of my [Em]strength
+[Am]You are my [D]Lord [Em]`,
     notes: "Jude Del Hierro classic. Simple, powerful prayer.",
     bpm: 70,
     tags: ["worship","prayer","classic"],
@@ -273,10 +280,16 @@ const SONGS = [
     originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
-[G]Your love is a[D]mazing
-[Em]Steady and un[C]changing
-[G]Your love is a [D]mountain
-[Em]Firm beneath my [C]feet
+[G/B]Your love is a[C]mazing
+[D]Steady and un[C]changing
+[G/B]Your love is a [C]mountain
+[D]Firm beneath my [C]feet
+
+{Verse 2}
+[G/B]Your love is a [C]mystery
+[D]How You gently [C]lift me
+[G/B]When I am sur[C]rounded
+[D]Your love carries [C]me
 
 {Chorus}
 [G]Hallelujah, halle[D]lujah
@@ -299,9 +312,9 @@ const SONGS = [
 [Bm]At the feet of [G]Jesus
 
 {Chorus}
-[D]And we cry holy, holy, [A]holy
-[Bm]And we cry holy, holy, [G]holy
-[D]And we cry holy, holy, [A]holy is the [G]Lamb`,
+[D]And we cry holy, holy, [G]holy
+[Bm7]And we cry holy, holy, [A]holy
+[D]And we cry holy, holy, [G]holy is the [A]Lamb`,
     notes: "Chris Tomlin wrote this during Vineyard era. Reverent.",
     bpm: 64,
     tags: ["worship","reverence","classic"],
@@ -332,16 +345,16 @@ const SONGS = [
     originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[D]Seek ye first the [A]kingdom of God
-[Bm]And His righteous[G]ness
-[D]And all these things shall be [A]added unto you
-[Bm]Allelu, allelu[G]ia
+[D]Seek ye first the [F#m]kingdom of [G]God
+[D]And His [Em]righteous[A]ness
+[D]And all these [F#m]things shall be [G]added unto [D]you
+[G]Allelu, [A]allelu[D]ia
 
-{Chorus}
-[D]Ask and it shall be [A]given unto you
-[Bm]Seek and ye shall [G]find
-[D]Knock and it shall be [A]opened unto [G]you
-[Bm]Allelu, allelu[G]ia`,
+{Verse 2}
+[D]Ask and it shall be [F#m]given unto [G]you
+[D]Seek and [Em]ye shall [A]find
+[D]Knock and it shall be [F#m]opened [G]unto [D]you
+[G]Allelu, [A]allelu[D]ia`,
     notes: "Matthew 6:33. Traditional Vineyard arrangement. Timeless.",
     bpm: 70,
     tags: ["worship","scripture","classic"],
@@ -352,16 +365,16 @@ const SONGS = [
     originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[E]Over the mountains and the [B]sea
-[C#m]Your river runs with love for [A]me
-[E]And I will open up my [B]heart
-[C#m]And let the Healer set me [A]free
+[E]Over the mountains and the [F#m]sea
+[A]Your river runs with love for [B]me
+[E]And I will open up my [F#m]heart
+[A]And let the Healer set me [B]free
 
 {Chorus}
-[E]I could sing of Your love for[B]ever
-[C#m]I could sing of Your love for[A]ever
-[E]I could sing of Your love for[B]ever
-[C#m]I could sing of Your love for[A]ever`,
+[E]I could sing of Your love for[F#m]ever
+[A]I could sing of Your love for[B]ever
+[E]I could sing of Your love for[F#m]ever
+[A]I could sing of Your love for[B]ever`,
     notes: "Martin Smith / Delirious classic covered by Vineyard. Iconic.",
     bpm: 118,
     tags: ["worship","love","classic"],
@@ -390,7 +403,7 @@ const SONGS = [
     artist: "Vineyard Worship",
     originalKey: "F",
     format: "chordpro",
-    content: `{Verse 1}
+    content: `{Verse}
 [F]I love You [C]Lord
 [Dm]And I lift my [Bb]voice
 [F]To worship [C]You
@@ -450,10 +463,10 @@ const SONGS = [
     originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[D]Faithful One, so un[A]changing
-[Bm]Ageless One, You're my [G]rock of peace
-[D]Lord of all, I de[A]pend on You
-[Bm]I call out to [G]You again and again
+[D]Faithful One, so un[Em7]changing
+[A/D]Ageless One, You're my [G/D]rock of peace
+[D]Lord of all, I de[D/F#]pend on You
+[G]I call out to [A]You again and again
 
 {Chorus}
 [D]You are my rock in [A]times of trouble
@@ -470,16 +483,16 @@ const SONGS = [
     originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
-[G]Men of faith rise [C]up and sing
-[D]Of the great and [G]glorious King
-[G]You are strong when [C]you feel weak
-[D]In your broken[G]ness complete
+[G]Men of faith rise [D]up and sing
+[C]Of the great and [G]glorious King
+[G]You are strong when [D]you feel weak
+[C]In your broken[G]ness complete
 
 {Chorus}
-[G]Shout to the [C]north and the south
-[D]Sing to the [Em]east and the west
-[G]Jesus is [C]Savior to [D]all
-[Em]Lord of heaven and [C]earth`,
+[Em]Shout to the [D]north and the [C]south
+[Em]Sing to the [D]east and the [C]west
+[Em]Jesus is [D]Savior to [C]all
+[G]Lord of heaven and [D]earth`,
     notes: "Martin Smith / Delirious song, beloved in Vineyard circles. Triumphant.",
     bpm: 126,
     tags: ["worship","praise","declaration"],

@@ -37,26 +37,26 @@ const SONGS = [
   {
     title: "Because He Lives (Amen)",
     artist: "Matt Maher",
-    originalKey: "F",
+    originalKey: "Db",
     format: "chordpro",
     content: `{Verse 1}
-[F]I believe in the [Bb]Son
-[F]I believe in the [C]Risen One
-[Dm]I believe I over[Bb]come
-[F]By the power of [C]His blood
+[Db]I believe in the [Gb]Son
+[Db]I believe in the [Ab]Risen One
+[Bbm]I believe I over[Gb]come
+[Db]By the power of [Ab]His blood
 
 {Chorus}
-[F]Amen [Bb]amen
-[F]I'm alive I'm alive because He [C]lives
-[Dm]Amen [Bb]amen
-[F]Let my song join the [C]one that never [F]ends
-[Bb]Because He [F]lives
+[Db]Amen [Gb]amen
+[Db]I'm alive I'm alive because He [Ab]lives
+[Bbm]Amen [Gb]amen
+[Db]Let my song join the [Ab]one that never [Db]ends
+[Gb]Because He [Db]lives
 
 {Verse 2}
-[F]I was dead in the [Bb]grave
-[F]I was covered in [C]sin and shame
-[Dm]I heard mercy call my [Bb]name
-[F]He rolled the stone a[C]way`,
+[Db]I was dead in the [Gb]grave
+[Db]I was covered in [Ab]sin and shame
+[Bbm]I heard mercy call my [Gb]name
+[Db]He rolled the stone a[Ab]way`,
     notes: "Celebratory Easter anthem. Full band energy on the chorus.",
     bpm: 128,
     tags: ["worship","easter","resurrection","declaration"],
