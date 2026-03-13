@@ -35,20 +35,20 @@ const TravelMapWidget = React.memo(function TravelMapWidget() {
         </div>
         <div>
           <h4 className="font-semibold text-sm text-gray-900 dark:text-white">
-            {t('widgets.travelMap' as any)}
+            {t('widgets.travelMap')}
           </h4>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {t('widgets.travelMapDesc' as any)}
+            {t('widgets.travelMapDesc')}
           </p>
         </div>
       </div>
       {pinCount > 0 ? (
         <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-          {(t('widgets.travelMapPinCount' as any) as string).replace('{count}', String(pinCount))}
+          {t('widgets.travelMapPinCount').replace('{count}', String(pinCount))}
         </p>
       ) : (
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          {t('widgets.travelMapNoPins' as any)}
+          {t('widgets.travelMapNoPins')}
         </p>
       )}
     </div>

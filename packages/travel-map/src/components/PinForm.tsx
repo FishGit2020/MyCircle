@@ -44,15 +44,15 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
   );
 
   const typeOptions: { value: PinType; label: string; color: string }[] = [
-    { value: 'lived', label: t('travelMap.typeLived' as any), color: 'bg-red-500' },
-    { value: 'visited', label: t('travelMap.typeVisited' as any), color: 'bg-blue-500' },
-    { value: 'wishlist', label: t('travelMap.typeWishlist' as any), color: 'bg-yellow-500' },
+    { value: 'lived', label: t('travelMap.typeLived'), color: 'bg-red-500' },
+    { value: 'visited', label: t('travelMap.typeVisited'), color: 'bg-blue-500' },
+    { value: 'wishlist', label: t('travelMap.typeWishlist'), color: 'bg-yellow-500' },
   ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-        {editPin ? t('travelMap.editPin' as any) : t('travelMap.addPin' as any)}
+        {editPin ? t('travelMap.editPin') : t('travelMap.addPin')}
       </h3>
 
       {/* Pin type selector */}
@@ -80,10 +80,10 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={t('travelMap.namePlaceholder' as any)}
+          placeholder={t('travelMap.namePlaceholder')}
           required
           className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-          aria-label={t('travelMap.namePlaceholder' as any)}
+          aria-label={t('travelMap.namePlaceholder')}
         />
       </div>
 
@@ -94,20 +94,20 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
           step="any"
           value={lat}
           onChange={(e) => setLat(e.target.value)}
-          placeholder={t('travelMap.lat' as any)}
+          placeholder={t('travelMap.lat')}
           required
           className="w-1/2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-          aria-label={t('travelMap.lat' as any)}
+          aria-label={t('travelMap.lat')}
         />
         <input
           type="number"
           step="any"
           value={lon}
           onChange={(e) => setLon(e.target.value)}
-          placeholder={t('travelMap.lon' as any)}
+          placeholder={t('travelMap.lon')}
           required
           className="w-1/2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-          aria-label={t('travelMap.lon' as any)}
+          aria-label={t('travelMap.lon')}
         />
       </div>
 
@@ -116,10 +116,10 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder={t('travelMap.notesPlaceholder' as any)}
+          placeholder={t('travelMap.notesPlaceholder')}
           rows={2}
           className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-          aria-label={t('travelMap.notesPlaceholder' as any)}
+          aria-label={t('travelMap.notesPlaceholder')}
         />
       </div>
 
@@ -130,14 +130,14 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
           className="w-1/2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-          aria-label={t('travelMap.startDate' as any)}
+          aria-label={t('travelMap.startDate')}
         />
         <input
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
           className="w-1/2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-          aria-label={t('travelMap.endDate' as any)}
+          aria-label={t('travelMap.endDate')}
         />
       </div>
 
@@ -147,14 +147,14 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
           type="submit"
           className="flex-1 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500"
         >
-          {editPin ? t('travelMap.save' as any) : t('travelMap.addPin' as any)}
+          {editPin ? t('travelMap.save') : t('travelMap.addPin')}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
         >
-          {t('travelMap.cancel' as any)}
+          {t('travelMap.cancel')}
         </button>
       </div>
     </form>

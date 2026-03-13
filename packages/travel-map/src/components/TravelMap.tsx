@@ -92,10 +92,10 @@ export default function TravelMap() {
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {t('travelMap.title' as any)}
+            {t('travelMap.title')}
           </h1>
           <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-            {t('travelMap.subtitle' as any)}
+            {t('travelMap.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium">
@@ -125,7 +125,7 @@ export default function TravelMap() {
           {map && pins.length === 0 && !showForm && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
               <div className="bg-black/50 text-white text-xs rounded-full px-3 py-1 whitespace-nowrap">
-                {t('travelMap.tapToPin' as any)}
+                {t('travelMap.tapToPin')}
               </div>
             </div>
           )}
@@ -151,7 +151,7 @@ export default function TravelMap() {
                   onClick={() => handleDeletePin(editingPin.id)}
                   className="mt-3 w-full rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-950"
                 >
-                  {t('travelMap.deletePin' as any)}
+                  {t('travelMap.deletePin')}
                 </button>
               )}
             </div>
@@ -160,7 +160,7 @@ export default function TravelMap() {
               {/* Filter buttons */}
               <div>
                 <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                  {t('travelMap.filter' as any)}
+                  {t('travelMap.filter')}
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
                   {(['all', 'lived', 'visited', 'wishlist'] as const).map((ft) => (
@@ -180,7 +180,7 @@ export default function TravelMap() {
                           style={{ backgroundColor: PIN_COLORS[ft] }}
                         />
                       )}
-                      {ft === 'all' ? t('travelMap.filterAll' as any) : t(`travelMap.type${ft.charAt(0).toUpperCase() + ft.slice(1)}` as any)}
+                      {ft === 'all' ? t('travelMap.filterAll') : t(`travelMap.type${ft.charAt(0).toUpperCase() + ft.slice(1)}`)}
                     </button>
                   ))}
                 </div>
@@ -195,17 +195,17 @@ export default function TravelMap() {
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                {t('travelMap.addPin' as any)}
+                {t('travelMap.addPin')}
               </button>
 
               {/* Pin list */}
               <div>
                 <h3 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                  {t('travelMap.pinList' as any)} ({filteredPins.length})
+                  {t('travelMap.pinList')} ({filteredPins.length})
                 </h3>
                 {filteredPins.length === 0 ? (
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {t('travelMap.noPins' as any)}
+                    {t('travelMap.noPins')}
                   </p>
                 ) : (
                   <ul className="space-y-1">
