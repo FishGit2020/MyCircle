@@ -1,33 +1,61 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import Widget from './TravelMapWidget';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
+import TravelMapWidget from './TravelMapWidget';
 
 vi.mock('@mycircle/shared', () => ({
-  useTranslation: () => ({ t: (k: string) => k }),
-  WindowEvents: {},
-  StorageKeys: {},
-  useQuery: () => ({ data: undefined, loading: false }),
-  GET_WORSHIP_SONGS_LIST: {},
-  subscribeToMFEvent: () => () => {},
-  MFEvents: {},
-  eventBus: { publish: vi.fn() },
-  createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
+  useTranslation: () => ({ t: (key: string) => key }),
+  createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
+  StorageKeys: { TRAVEL_PINS: 'travel-pins-cache' },
+  WindowEvents: { TRAVEL_PINS_CHANGED: 'travel-pins-changed' },
 }));
-vi.mock('react-router', () => ({
-  useNavigate: () => vi.fn(),
-  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
-}));
-vi.mock('../../context/AuthContext', () => ({
-  useAuth: () => ({ favoriteCities: [] }),
-}));
+
+const getItemSpy = vi.spyOn(Storage.prototype, 'getItem');
+
+beforeEach(() => {
+  getItemSpy.mockReturnValue(null);
+});
 
 describe('TravelMapWidget', () => {
-  it('renders without crashing', () => {
-    render(<Widget />);
+  it('renders travel map title', () => {
+    render(<TravelMapWidget />);
+    expect(screen.getByText('widgets.travelMap')).toBeInTheDocument();
   });
 
-  it('shows widget title', () => {
-    render(<Widget />);
-    expect(screen.getByRole('heading', { level: 4 })).toBeInTheDocument();
+  it('shows no pins message when empty', () => {
+    render(<TravelMapWidget />);
+    expect(screen.getByText('widgets.travelMapNoPins')).toBeInTheDocument();
+  });
+
+  it('shows pin count text when pins exist', () => {
+    getItemSpy.mockImplementation((key: string) => {
+      if (key === 'travel-pins-cache')
+        return JSON.stringify([{ id: 1 }, { id: 2 }, { id: 3 }]);
+      return null;
+    });
+    render(<TravelMapWidget />);
+    expect(screen.getByText('widgets.travelMapPinCount')).toBeInTheDocument();
+  });
+
+  it('updates when pins change via window event', () => {
+    render(<TravelMapWidget />);
+    expect(screen.getByText('widgets.travelMapNoPins')).toBeInTheDocument();
+
+    getItemSpy.mockImplementation((key: string) => {
+      if (key === 'travel-pins-cache') return JSON.stringify([{ id: 1 }]);
+      return null;
+    });
+    act(() => {
+      window.dispatchEvent(new Event('travel-pins-changed'));
+    });
+    expect(screen.getByText('widgets.travelMapPinCount')).toBeInTheDocument();
+  });
+
+  it('handles non-array data gracefully', () => {
+    getItemSpy.mockImplementation((key: string) => {
+      if (key === 'travel-pins-cache') return JSON.stringify({ not: 'array' });
+      return null;
+    });
+    render(<TravelMapWidget />);
+    expect(screen.getByText('widgets.travelMapNoPins')).toBeInTheDocument();
   });
 });
