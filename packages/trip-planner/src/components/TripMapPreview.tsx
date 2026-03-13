@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useMapLibre, setCircleLayer } from '@mycircle/shared';
+import { useMapLibre, setCircleLayer, MapControls } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 
 interface TripMapPreviewProps {
@@ -17,20 +17,6 @@ export default function TripMapPreview({ lat, lon, destinationName }: TripMapPre
     preserveDrawingBuffer: true,
     interactive: true,
   });
-
-  // Add zoom control once when map is ready
-  useEffect(() => {
-    if (!map || !mapReady) return;
-
-    import('maplibre-gl').then(({ default: ml }) => {
-      try {
-        map.addControl(new ml.NavigationControl({ showCompass: false }), 'top-right');
-      } catch {
-        // GL operations may fail if map is destroyed
-      }
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, mapReady]);
 
   // Update marker and position when lat/lon/name change
   useEffect(() => {
@@ -77,11 +63,19 @@ export default function TripMapPreview({ lat, lon, destinationName }: TripMapPre
   }, [map, mapReady, lat, lon, destinationName]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-48"
-      role="img"
-      aria-label={destinationName}
-    />
+    <div className="relative w-full h-48">
+      <div
+        ref={containerRef}
+        className="w-full h-full"
+        role="img"
+        aria-label={destinationName}
+      />
+      <MapControls
+        map={map}
+        showFullscreen={false}
+        showGpsLocate={false}
+        showScale={false}
+      />
+    </div>
   );
 }

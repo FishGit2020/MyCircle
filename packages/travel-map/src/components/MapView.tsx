@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type maplibregl from 'maplibre-gl';
-import { useMapLibre } from '@mycircle/shared';
+import { useMapLibre, MapControls } from '@mycircle/shared';
 
 interface Props {
   onMapReady: (map: maplibregl.Map) => void;
@@ -24,27 +24,10 @@ export default function MapView({ onMapReady, onMapClick, onStyleLoad }: Props) 
     maxPitch: 85,
   });
 
-  // Notify parent and add controls when map is ready
+  // Notify parent when map is ready
   useEffect(() => {
     if (!map || !mapReady) return;
     onMapReadyRef.current(map);
-
-    // Add controls (these are travel-map specific)
-    import('maplibre-gl').then(({ default: ml }) => {
-      try {
-        map.addControl(new ml.NavigationControl({ visualizePitch: true }), 'top-right');
-        map.addControl(new ml.FullscreenControl(), 'top-right');
-        map.addControl(new ml.GeolocateControl({
-          positionOptions: { enableHighAccuracy: true },
-          trackUserLocation: true,
-          showUserLocation: true,
-          showAccuracyCircle: true,
-        }), 'bottom-right');
-        map.addControl(new ml.ScaleControl({ maxWidth: 150 }), 'bottom-left');
-      } catch {
-        // Map may have been destroyed
-      }
-    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, mapReady]);
 
@@ -70,5 +53,10 @@ export default function MapView({ onMapReady, onMapClick, onStyleLoad }: Props) 
     };
   }, [map]);
 
-  return <div ref={containerRef} className="w-full h-full" role="application" aria-label="Map" />;
+  return (
+    <div className="relative w-full h-full">
+      <div ref={containerRef} className="w-full h-full" role="application" aria-label="Map" />
+      <MapControls map={map} />
+    </div>
+  );
 }

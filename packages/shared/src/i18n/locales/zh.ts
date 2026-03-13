@@ -857,6 +857,9 @@ const zh: Record<TranslationKey, string> = {
   'map.waitingForLocation': '\u7b49\u5f85\u4f4d\u7f6e\u4fe1\u606f...',
   'map.loading': '\u52a0\u8f7d\u5730\u56fe...',
   'map.showMap': '\u663e\u793a\u4ea4\u4e92\u5730\u56fe',
+  'map.myLocation': '\u6211\u7684\u4f4d\u7f6e',
+  'map.streetView': '\u8857\u666f',
+  'map.topoView': '\u5730\u5f62',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': '\u7d2b\u5916\u7ebf\u8b66\u62a5',

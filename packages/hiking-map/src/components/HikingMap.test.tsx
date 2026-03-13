@@ -5,6 +5,19 @@ import HikingMap from './HikingMap';
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   PageContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  MapControls: ({ showStyleSwitcher, onLocate }: { map: unknown; showStyleSwitcher?: boolean; onStyleChange?: (style: string) => void; onLocate?: (lngLat: [number, number]) => void }) => (
+    <div data-testid="map-controls">
+      <button type="button" aria-label="map.zoomIn">+</button>
+      <button type="button" aria-label="map.zoomOut">-</button>
+      <button type="button" aria-label="map.fullscreen">FS</button>
+      <button type="button" aria-label="map.myLocation" onClick={() => onLocate?.([0, 0])}>GPS</button>
+      {showStyleSwitcher && (
+        <button type="button" aria-label="map.streetView">Style</button>
+      )}
+    </div>
+  ),
+  setCircleLayer: vi.fn(),
+  removeSourceAndLayers: vi.fn(),
 }));
 
 vi.mock('../config/mapConfig', () => ({
@@ -24,27 +37,6 @@ vi.mock('./MapView', () => ({
     onMapReady(null);
     return <div role="application" aria-label="Map" />;
   },
-}));
-
-vi.mock('./GpsLocateButton', () => ({
-  default: () => <button type="button" aria-label="hiking.locateMe">GPS</button>,
-}));
-
-vi.mock('./ZoomControls', () => ({
-  default: () => <div data-testid="zoom-controls" />,
-}));
-
-vi.mock('./MapStyleSwitcher', () => ({
-  default: ({ providers, onChange }: { providers: Array<{ id: string; labelKey: string; style: string | Record<string, unknown> }>; activeId: string; onChange: (id: string, style: string | Record<string, unknown>) => void }) => (
-    <div>
-      <span>hiking.mapStyle</span>
-      {providers.map(p => (
-        <button key={p.id} type="button" onClick={() => onChange(p.id, p.style)}>
-          {p.labelKey}
-        </button>
-      ))}
-    </div>
-  ),
 }));
 
 vi.mock('./SavedRoutes', () => ({
@@ -90,7 +82,7 @@ describe('HikingMap', () => {
 
   it('renders the GPS locate button', () => {
     render(<HikingMap />);
-    expect(screen.getByRole('button', { name: 'hiking.locateMe' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'map.myLocation' })).toBeInTheDocument();
   });
 
   it('renders the route planner section', () => {
@@ -100,11 +92,10 @@ describe('HikingMap', () => {
     expect(screen.getByPlaceholderText('hiking.endPoint')).toBeInTheDocument();
   });
 
-  it('renders map style switcher with providers', () => {
+  it('renders shared map controls with style switcher', () => {
     render(<HikingMap />);
-    expect(screen.getByText('hiking.mapStyle')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'hiking.styleStreet' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'hiking.styleTopo' })).toBeInTheDocument();
+    expect(screen.getByTestId('map-controls')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'map.streetView' })).toBeInTheDocument();
   });
 
   it('renders plan route button', () => {
