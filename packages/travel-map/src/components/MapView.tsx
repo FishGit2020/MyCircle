@@ -22,15 +22,35 @@ export default function MapView({ onMapReady, onMapClick, onStyleLoad }: Props) 
 
     let map: maplibregl.Map;
     let ro: ResizeObserver | undefined;
-    import('maplibre-gl').then(({ default: maplibregl }) => {
+    import('maplibre-gl').then(({ default: ml }) => {
       import('maplibre-gl/dist/maplibre-gl.css').catch(() => {});
-      map = new maplibregl.Map({
+      map = new ml.Map({
         container: containerRef.current!,
         style: MAP_STYLE,
         center: [0, 20],
         zoom: 2,
         preserveDrawingBuffer: true,
+        pitchWithRotate: true,
+        dragRotate: true,
+        touchPitch: true,
+        maxPitch: 85,
       });
+
+      // Navigation controls (zoom + compass/rotate)
+      map.addControl(new ml.NavigationControl({ visualizePitch: true }), 'top-right');
+
+      // Scale bar
+      map.addControl(new ml.ScaleControl({ maxWidth: 150 }), 'bottom-left');
+
+      // Geolocation (fly to user's location)
+      map.addControl(new ml.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: false,
+        showUserLocation: true,
+      }), 'top-right');
+
+      // Fullscreen
+      map.addControl(new ml.FullscreenControl(), 'top-right');
 
       map.on('load', () => {
         mapRef.current = map;

@@ -35,50 +35,66 @@ export default function PinMarker({ map, pins, styleVersion, onPinClick }: PinMa
   useEffect(() => {
     if (!map) return;
 
+    function addLayers() {
+      try {
+        // Clean up existing layers/source
+        if (map.getLayer(LABEL_LAYER_ID)) map.removeLayer(LABEL_LAYER_ID);
+        if (map.getLayer(CIRCLE_LAYER_ID)) map.removeLayer(CIRCLE_LAYER_ID);
+        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+
+        if (pins.length === 0) return;
+
+        const geojson = buildGeoJSON(pins);
+
+        map.addSource(SOURCE_ID, {
+          type: 'geojson',
+          data: geojson,
+        });
+
+        map.addLayer({
+          id: CIRCLE_LAYER_ID,
+          type: 'circle',
+          source: SOURCE_ID,
+          paint: {
+            'circle-radius': 8,
+            'circle-color': ['get', 'color'],
+            'circle-stroke-width': 2.5,
+            'circle-stroke-color': '#ffffff',
+          },
+        });
+
+        map.addLayer({
+          id: LABEL_LAYER_ID,
+          type: 'symbol',
+          source: SOURCE_ID,
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 11,
+            'text-offset': [0, 1.5],
+            'text-anchor': 'top',
+            'text-optional': true,
+          },
+          paint: {
+            'text-color': '#374151',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 1,
+          },
+        });
+      } catch {
+        // Map may not be ready yet
+      }
+    }
+
+    // If style isn't loaded yet, wait for it
+    if (!map.isStyleLoaded()) {
+      const onLoad = () => { addLayers(); map.off('style.load', onLoad); };
+      map.on('style.load', onLoad);
+      return () => { map.off('style.load', onLoad); };
+    }
+
+    addLayers();
+
     try {
-      // Clean up existing layers/source
-      if (map.getLayer(LABEL_LAYER_ID)) map.removeLayer(LABEL_LAYER_ID);
-      if (map.getLayer(CIRCLE_LAYER_ID)) map.removeLayer(CIRCLE_LAYER_ID);
-      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
-
-      if (pins.length === 0) return;
-
-      const geojson = buildGeoJSON(pins);
-
-      map.addSource(SOURCE_ID, {
-        type: 'geojson',
-        data: geojson,
-      });
-
-      map.addLayer({
-        id: CIRCLE_LAYER_ID,
-        type: 'circle',
-        source: SOURCE_ID,
-        paint: {
-          'circle-radius': 8,
-          'circle-color': ['get', 'color'],
-          'circle-stroke-width': 2.5,
-          'circle-stroke-color': '#ffffff',
-        },
-      });
-
-      map.addLayer({
-        id: LABEL_LAYER_ID,
-        type: 'symbol',
-        source: SOURCE_ID,
-        layout: {
-          'text-field': ['get', 'name'],
-          'text-size': 11,
-          'text-offset': [0, 1.5],
-          'text-anchor': 'top',
-          'text-optional': true,
-        },
-        paint: {
-          'text-color': '#374151',
-          'text-halo-color': '#ffffff',
-          'text-halo-width': 1,
-        },
-      });
 
       // Click handler for pins
       const clickHandler = (e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) => {
