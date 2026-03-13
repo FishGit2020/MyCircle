@@ -50,6 +50,10 @@ import {
   checkAccessibility,
   checkColorContrast,
 } from './mcp-tools/a11y-checker.js';
+import {
+  auditDependencies,
+  analyzeBundleSizes,
+} from './mcp-tools/dependency-audit.js';
 
 const server = new McpServer({
   name: 'mycircle',
