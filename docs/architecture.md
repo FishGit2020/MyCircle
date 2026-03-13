@@ -1429,3 +1429,16 @@ Frontend (useAiChat) ←──────────────────�
 AI chat was migrated from REST (`POST /ai/chat`) to GraphQL (`Mutation.aiChat`). The frontend uses Apollo's `useMutation` hook. Tool declarations are defined once in `mfe-tools.ts` using Zod schemas and converted to Gemini format via `gemini-bridge.ts` or OpenAI format via `openai-bridge.ts` (for Ollama). Both the `graphql` Cloud Function resolver and the `server/graphql/resolvers.ts` dev server implement the full Ollama + Gemini paths. See [Ollama Setup Guide](./ollama-setup.md).
 
 See [docs/mcp.md](./mcp.md) for the full MCP server guide.
+
+### Travel Map - `packages/travel-map/`
+
+Exposes `TravelMap` component via Module Federation. Port **3029**.
+
+Interactive world map (MapLibre GL) where users can pin places they have been, lived at, or want to visit. Each pin has a type (lived/red, visited/blue, wishlist/gold), name, optional notes, and optional date range. Pins are stored per-user in Firestore subcollection `users/{uid}/travelPins/{pinId}`.
+
+- **MapView** — MapLibre GL map with OpenFreeMap tiles, click-to-pin, resize handling
+- **PinMarker** — Manages GeoJSON source + circle/symbol layers colored by pin type
+- **PinForm** — Add/edit pin form with type selector, name, coordinates, notes, date range
+- **useTravelPins** — CRUD hook via `window.__travelPins` bridge (Firestore) with localStorage fallback
+- **TravelMapWidget** — Dashboard widget showing total pin count
+- **Route**: `/travel-map` (RequireAuth)

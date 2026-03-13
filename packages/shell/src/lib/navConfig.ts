@@ -28,6 +28,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/radio': () => import('radioStation/RadioStation'),
   '/interview': () => import('aiInterviewer/AiInterviewer'),
   '/transit': () => import('transitTracker/TransitTracker'),
+  '/travel-map': () => import('travelMap/TravelMap'),
 };
 
 export { ROUTE_MODULE_MAP };
@@ -76,6 +77,7 @@ export const NAV_GROUPS: NavGroup[] = [
   ]},
   { labelKey: 'nav.group.outdoor', items: [
     { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
+    { path: '/travel-map', labelKey: 'nav.travelMap' as any, icon: 'travel-map' },
   ]},
 ];
 
@@ -104,4 +106,5 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
   { path: '/interview', labelKey: 'nav.interview' as any, icon: 'interview' },
   { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' },
+  { path: '/travel-map', labelKey: 'nav.travelMap' as any, icon: 'travel-map' },
 ];

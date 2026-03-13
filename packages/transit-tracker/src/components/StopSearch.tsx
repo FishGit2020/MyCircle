@@ -1,7 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { NearbyStop } from '../types';
 import type { FavoriteStop } from '../hooks/useFavoriteStops';
+
+/** Check if user is logged in at call-time (read from window, not cached) */
+function isLoggedIn(): boolean {
+  return !!window.__currentUid;
+}
 
 interface StopSearchProps {
   onSelectStop: (stopId: string) => void;
@@ -26,6 +31,7 @@ export default function StopSearch({
 }: StopSearchProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
+  const loggedIn = useMemo(() => isLoggedIn(), []);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -104,30 +110,32 @@ export default function StopSearch({
                     {Math.round(stop.distance)}m
                   </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => onToggleFavorite({ stopId: stop.id, stopName: stop.name, direction: stop.direction, routes: [] })}
-                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:text-yellow-500 dark:text-gray-500 dark:hover:text-yellow-400"
-                  aria-label={favorites.some((f) => f.stopId === stop.id) ? t('transit.unfavorite') : t('transit.favorite')}
-                >
-                  {favorites.some((f) => f.stopId === stop.id) ? (
-                    <svg className="h-4 w-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ) : (
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  )}
-                </button>
+                {loggedIn && (
+                  <button
+                    type="button"
+                    onClick={() => onToggleFavorite({ stopId: stop.id, stopName: stop.name, direction: stop.direction, routes: [] })}
+                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:text-yellow-500 dark:text-gray-500 dark:hover:text-yellow-400"
+                    aria-label={favorites.some((f) => f.stopId === stop.id) ? t('transit.unfavorite') : t('transit.favorite')}
+                  >
+                    {favorites.some((f) => f.stopId === stop.id) ? (
+                      <svg className="h-4 w-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    )}
+                  </button>
+                )}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Favorite stops */}
-      {favorites.length > 0 && (
+      {/* Favorite stops — only show when logged in */}
+      {loggedIn && favorites.length > 0 && (
         <div>
           <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('transit.favorites')}

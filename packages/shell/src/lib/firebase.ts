@@ -1964,6 +1964,68 @@ if (firebaseEnabled) {
   };
 }
 
+// ─── Travel Pins CRUD ────────────────────────────────────────────
+async function getTravelPins(uid: string) {
+  if (!db) return [];
+  const q = query(collection(db, 'users', uid, 'travelPins'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+async function addTravelPin(uid: string, pin: Record<string, unknown>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const ref = await addDoc(collection(db, 'users', uid, 'travelPins'), {
+    ...pin,
+    createdAt: Date.now(),
+  });
+  window.dispatchEvent(new Event(WindowEvents.TRAVEL_PINS_CHANGED));
+  return ref.id;
+}
+
+async function updateTravelPin(uid: string, id: string, updates: Record<string, unknown>) {
+  if (!db) throw new Error('Firebase not initialized');
+  const pinRef = doc(db, 'users', uid, 'travelPins', id);
+  await updateDoc(pinRef, updates);
+  window.dispatchEvent(new Event(WindowEvents.TRAVEL_PINS_CHANGED));
+}
+
+async function deleteTravelPin(uid: string, id: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  const pinRef = doc(db, 'users', uid, 'travelPins', id);
+  await deleteDoc(pinRef);
+  window.dispatchEvent(new Event(WindowEvents.TRAVEL_PINS_CHANGED));
+}
+
+function subscribeToTravelPins(uid: string, callback: (pins: any[]) => void) {
+  if (!db) return () => {};
+  const q = query(collection(db, 'users', uid, 'travelPins'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snap) => {
+    callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+  }, (error) => { handleSnapshotError('Travel pins', error); });
+}
+
+if (firebaseEnabled) {
+  window.__travelPins = {
+    getAll: () => auth?.currentUser ? getTravelPins(auth.currentUser.uid) : Promise.resolve([]),
+    add: (pin) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return addTravelPin(auth.currentUser.uid, pin);
+    },
+    update: (id, updates) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return updateTravelPin(auth.currentUser.uid, id, updates);
+    },
+    delete: (id) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return deleteTravelPin(auth.currentUser.uid, id);
+    },
+    subscribe: (callback) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToTravelPins(auth.currentUser.uid, callback);
+    },
+  };
+}
+
 // ─── Interview Sessions API bridge ──────────────────────────────────
 if (firebaseEnabled) {
   const interviewApiCall = async (path: string, method: string, body?: unknown) => {

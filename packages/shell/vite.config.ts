@@ -192,6 +192,10 @@ const transitTrackerRemote = isProduction
   ? '/transit-tracker/assets/remoteEntry.js'
   : 'http://localhost:3028/assets/remoteEntry.js';
 
+const travelMapRemote = isProduction
+  ? '/travel-map/assets/remoteEntry.js'
+  : 'http://localhost:3029/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -223,7 +227,8 @@ export default defineConfig({
         pollSystem: pollSystemRemote,
         radioStation: radioStationRemote,
         aiInterviewer: aiInterviewerRemote,
-        transitTracker: transitTrackerRemote
+        transitTracker: transitTrackerRemote,
+        travelMap: travelMapRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

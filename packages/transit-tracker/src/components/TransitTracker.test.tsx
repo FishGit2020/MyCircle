@@ -96,12 +96,24 @@ describe('TransitTracker', () => {
     expect(screen.getByText('1_75403')).toBeInTheDocument();
   });
 
-  it('shows favorite toggle button when viewing a stop', () => {
+  it('shows favorite toggle button when viewing a stop while logged in', () => {
+    window.__currentUid = 'test-user-123';
     render(<TransitTracker />);
     const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
     fireEvent.change(input, { target: { value: '1_75403' } });
     fireEvent.submit(input.closest('form')!);
-    // Favorite button should be present
+    // Favorite button should be present when logged in
     expect(screen.getByRole('button', { name: /transit\.favorite/i })).toBeInTheDocument();
+    window.__currentUid = undefined;
+  });
+
+  it('hides favorite toggle button when not logged in', () => {
+    window.__currentUid = undefined;
+    render(<TransitTracker />);
+    const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
+    fireEvent.change(input, { target: { value: '1_75403' } });
+    fireEvent.submit(input.closest('form')!);
+    // Favorite button should NOT be present when not logged in
+    expect(screen.queryByRole('button', { name: /transit\.favorite/i })).not.toBeInTheDocument();
   });
 });
