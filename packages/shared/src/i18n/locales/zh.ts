@@ -2225,6 +2225,7 @@ const zh: Record<TranslationKey, string> = {
   'tripPlanner.upcomingTrip': '\u4e0b\u4e00\u6b21\u65c5\u884c',
   'tripPlanner.noUpcoming': '\u6ca1\u6709\u5373\u5c06\u5f00\u59cb\u7684\u65c5\u884c',
   'tripPlanner.searchDestination': '\u641c\u7d22\u76ee\u7684\u5730...',
+  'tripPlanner.viewOnMap': '\u5728\u5730\u56fe\u4e0a\u67e5\u770b',
 
   // ─── Poll System ──────────────────────────────────────────
   'nav.pollSystem': '\u6295\u7968',
@@ -2411,6 +2412,7 @@ const zh: Record<TranslationKey, string> = {
   'travelMap.pinList': '\u5730\u70b9',
   'travelMap.searchLocation': '\u641c\u7d22\u5730\u70b9...',
   'travelMap.noPins': '\u6682\u65e0\u6807\u8bb0\u3002\u70b9\u51fb\u5730\u56fe\u6216\u70b9\u51fb\u6dfb\u52a0\u6807\u8bb0\u5f00\u59cb\u3002',
+  'travelMap.planTrip': '\u8ba1\u5212\u884c\u7a0b',
 
   // ─── Recycle Bin ────────────────────────────────────────────
   'nav.recycleBin': '\u56de\u6536\u7ad9',

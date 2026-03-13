@@ -103,11 +103,26 @@ function setPendingLayer(
   }
 }
 
+/** Parse cross-MFE URL params (e.g. from Trip Planner "View on Map" button). */
+function parseMapUrlParams(): { lat: number; lon: number; zoom?: number } | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const lat = params.get('lat');
+    const lon = params.get('lon');
+    if (!lat || !lon) return null;
+    const zoom = params.get('zoom') ? Number(params.get('zoom')) : undefined;
+    return { lat: Number(lat), lon: Number(lon), zoom };
+  } catch {
+    return null;
+  }
+}
+
 export default function TravelMap() {
   const { t } = useTranslation();
   const [map, setMap] = useState<maplibregl.Map | null>(null);
   const [styleVersion, setStyleVersion] = useState(0);
   const { pins, addPin, updatePin, deletePin } = useTravelPins();
+  const urlFlyConsumed = useRef(false);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -128,6 +143,22 @@ export default function TravelMap() {
   const handleStyleLoad = useCallback(() => {
     setStyleVersion((v) => v + 1);
   }, []);
+
+  // Fly to URL-provided coordinates on mount (cross-MFE navigation from Trip Planner)
+  useEffect(() => {
+    if (!map || urlFlyConsumed.current) return;
+    const urlTarget = parseMapUrlParams();
+    if (urlTarget) {
+      urlFlyConsumed.current = true;
+      map.flyTo({ center: [urlTarget.lon, urlTarget.lat], zoom: urlTarget.zoom ?? 10, duration: 800 });
+      // Clean up URL params without page reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete('lat');
+      url.searchParams.delete('lon');
+      url.searchParams.delete('zoom');
+      window.history.replaceState({}, '', url.pathname);
+    }
+  }, [map]);
 
   // Draw pin layers (same pattern as hiking map's circle layers)
   useEffect(() => {

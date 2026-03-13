@@ -2225,6 +2225,7 @@ const es: Record<TranslationKey, string> = {
   'tripPlanner.upcomingTrip': 'Pr\u00f3ximo viaje',
   'tripPlanner.noUpcoming': 'No hay viajes pr\u00f3ximos',
   'tripPlanner.searchDestination': 'Buscar un destino...',
+  'tripPlanner.viewOnMap': 'Ver en mapa',
 
   // ─── Poll System ──────────────────────────────────────────
   'nav.pollSystem': 'Encuestas',
@@ -2411,6 +2412,7 @@ const es: Record<TranslationKey, string> = {
   'travelMap.pinList': 'Lugares',
   'travelMap.searchLocation': 'Buscar ubicaci\u00f3n...',
   'travelMap.noPins': 'Sin pines a\u00fan. Toca el mapa o haz clic en Agregar Pin para empezar.',
+  'travelMap.planTrip': 'Planificar viaje',
 
   // ─── Recycle Bin ────────────────────────────────────────────
   'nav.recycleBin': 'Papelera de reciclaje',

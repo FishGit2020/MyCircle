@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation, PageContent } from '@mycircle/shared';
 import { useTrips } from '../hooks/useTrips';
 import TripList from './TripList';
@@ -8,11 +8,45 @@ import type { Trip } from '../types';
 
 type View = 'list' | 'new' | 'detail';
 
+/** Parse cross-MFE URL params (e.g. from Travel Map "Plan Trip" button). */
+function parseUrlParams(): { destination?: string; lat?: number; lon?: number } | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const destination = params.get('destination');
+    if (!destination) return null;
+    const lat = params.get('lat') ? Number(params.get('lat')) : undefined;
+    const lon = params.get('lon') ? Number(params.get('lon')) : undefined;
+    return { destination, lat, lon };
+  } catch {
+    return null;
+  }
+}
+
 export default function TripPlanner() {
   const { t } = useTranslation();
   const { trips, loading, error, addTrip, updateTrip, deleteTrip } = useTrips();
   const [view, setView] = useState<View>('list');
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [urlParams, setUrlParams] = useState<{ destination?: string; lat?: number; lon?: number } | null>(null);
+  const urlParamsConsumed = useRef(false);
+
+  // On mount, check for cross-MFE URL params and auto-open the new trip form
+  useEffect(() => {
+    if (urlParamsConsumed.current) return;
+    const parsed = parseUrlParams();
+    if (parsed) {
+      urlParamsConsumed.current = true;
+      setUrlParams(parsed);
+      setSelectedTrip(null);
+      setView('new');
+      // Clean up the URL params without a page reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete('destination');
+      url.searchParams.delete('lat');
+      url.searchParams.delete('lon');
+      window.history.replaceState({}, '', url.pathname);
+    }
+  }, []);
 
   const handleSave = useCallback(async (data: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (selectedTrip) {
@@ -69,6 +103,9 @@ export default function TripPlanner() {
           trip={selectedTrip}
           onSave={handleSave}
           onCancel={handleBack}
+          initialDestination={urlParams?.destination}
+          initialLat={urlParams?.lat}
+          initialLon={urlParams?.lon}
         />
       </PageContent>
     );
