@@ -366,6 +366,13 @@ export type HourlyForecast = {
   wind_speed: Scalars['Float']['output'];
 };
 
+export type LocationSearchResult = {
+  __typename?: 'LocationSearchResult';
+  displayName: Scalars['String']['output'];
+  lat: Scalars['Float']['output'];
+  lon: Scalars['Float']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addWorshipSong: WorshipSong;
@@ -567,6 +574,7 @@ export type Query = {
   forecast: Array<ForecastDay>;
   historicalWeather?: Maybe<HistoricalWeatherDay>;
   hourlyForecast: Array<HourlyForecast>;
+  locationSearch: Array<LocationSearchResult>;
   ollamaModels: Array<Scalars['String']['output']>;
   ollamaStatus: OllamaStatus;
   podcastEpisodes: PodcastEpisodesResponse;
@@ -681,6 +689,12 @@ export type QueryHistoricalWeatherArgs = {
 export type QueryHourlyForecastArgs = {
   lat: Scalars['Float']['input'];
   lon: Scalars['Float']['input'];
+};
+
+
+export type QueryLocationSearchArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
 };
 
 
@@ -1239,6 +1253,14 @@ export type SaveBenchmarkRunMutationVariables = Exact<{
 
 
 export type SaveBenchmarkRunMutation = { __typename?: 'Mutation', saveBenchmarkRun: { __typename?: 'BenchmarkRun', id: string, createdAt: string } };
+
+export type SearchLocationsQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type SearchLocationsQuery = { __typename?: 'Query', locationSearch: Array<{ __typename?: 'LocationSearchResult', displayName: string, lat: number, lon: number }> };
 
 export type GetTransitArrivalsQueryVariables = Exact<{
   stopId: Scalars['String']['input'];

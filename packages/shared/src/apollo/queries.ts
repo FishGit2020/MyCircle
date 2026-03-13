@@ -620,6 +620,18 @@ export const SAVE_BENCHMARK_RUN = gql`
   }
 `;
 
+// ─── Location Search ────────────────────────────────────────────
+
+export const SEARCH_LOCATIONS = gql`
+  query SearchLocations($query: String!, $limit: Int) {
+    locationSearch(query: $query, limit: $limit) {
+      displayName
+      lat
+      lon
+    }
+  }
+`;
+
 // ─── Transit Queries ────────────────────────────────────────────
 
 export const GET_TRANSIT_ARRIVALS = gql`
