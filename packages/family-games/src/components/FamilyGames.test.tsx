@@ -4,7 +4,7 @@ import FamilyGames from './FamilyGames';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
-  PageContent: ({ children, className }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
   WindowEvents: { BREADCRUMB_DETAIL: 'breadcrumb-detail' },
 }));
 
