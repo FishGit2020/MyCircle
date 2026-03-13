@@ -1,23 +1,34 @@
-import { describe, it, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import ThemeSync from './ThemeSync';
 
+const mockSetThemeFromProfile = vi.fn();
+
+vi.mock('@mycircle/shared', () => ({
+  createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
+}));
+
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
-    profile: null,
+    profile: { darkMode: true, theme: 'system' },
     loading: false,
   }),
 }));
 
 vi.mock('../../context/ThemeContext', () => ({
   useTheme: () => ({
-    setThemeFromProfile: vi.fn(),
+    setThemeFromProfile: mockSetThemeFromProfile,
   }),
 }));
 
 describe('ThemeSync', () => {
-  it('renders without crashing', () => {
+  it('renders nothing (returns null)', () => {
     const { container } = render(<ThemeSync />);
     expect(container.innerHTML).toBe('');
+  });
+
+  it('calls setThemeFromProfile when profile is available', () => {
+    render(<ThemeSync />);
+    expect(mockSetThemeFromProfile).toHaveBeenCalledWith(true, 'system');
   });
 });
