@@ -1,11 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation, PageContent, setCircleLayer, removeSourceAndLayers } from '@mycircle/shared';
+import { useTranslation, PageContent, setCircleLayer, removeSourceAndLayers, MapControls } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 import MapView from './MapView';
-import GpsLocateButton from './GpsLocateButton';
-import MapStyleSwitcher from './MapStyleSwitcher';
 import RoutePlanner from './RoutePlanner';
-import ZoomControls from './ZoomControls';
 import SavedRoutes from './SavedRoutes';
 import OfflineTileManager from './OfflineTileManager';
 import RouteDisplay from './RouteDisplay';
@@ -40,7 +37,6 @@ function setPointLayer(
 export default function HikingMap() {
   const { t } = useTranslation();
   const [map, setMap] = useState<maplibregl.Map | null>(null);
-  const [styleId, setStyleId] = useState(MAP_CONFIG.tileProviders[0].id);
   const [mapStyle, setMapStyle] = useState<string | Record<string, unknown>>(MAP_CONFIG.tileProviders[0].style);
   // Incremented on every style.load so circle-layer effects re-run after style switch
   const [styleVersion, setStyleVersion] = useState(0);
@@ -99,10 +95,12 @@ export default function HikingMap() {
     setStyleVersion((v) => v + 1);
   }, []);
 
-  const handleStyleChange = (id: string, style: string | Record<string, unknown>) => {
-    setStyleId(id);
-    setMapStyle(style);
-  };
+  const handleStyleChange = useCallback((style: 'street' | 'topo') => {
+    const provider = MAP_CONFIG.tileProviders.find((p) => p.id === style);
+    if (provider) {
+      setMapStyle(provider.style);
+    }
+  }, []);
 
   // Map click: 1st tap = start, 2nd tap = end, 3rd tap = reset start
   const handleMapClick = useCallback((lngLat: [number, number]) => {
@@ -200,24 +198,13 @@ export default function HikingMap() {
             </div>
           )}
 
-          {/* Zoom controls — right side */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 z-10">
-            <ZoomControls map={map} />
-          </div>
-
-          {/* GPS button — bottom right */}
-          <div className="absolute bottom-4 right-4 z-10">
-            <GpsLocateButton map={map} onLocate={handleLocate} />
-          </div>
-
-          {/* Style switcher — top left */}
-          <div className="absolute top-4 left-4 z-10">
-            <MapStyleSwitcher
-              providers={MAP_CONFIG.tileProviders}
-              activeId={styleId}
-              onChange={handleStyleChange}
-            />
-          </div>
+          {/* Shared map controls */}
+          <MapControls
+            map={map}
+            showStyleSwitcher
+            onStyleChange={handleStyleChange}
+            onLocate={handleLocate}
+          />
 
           {/* Waypoint badge — shows tap state */}
           {startCoords && (

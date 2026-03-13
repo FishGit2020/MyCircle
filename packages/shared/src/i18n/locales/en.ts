@@ -855,6 +855,9 @@ const en = {
   'map.waitingForLocation': 'Waiting for location...',
   'map.loading': 'Loading map...',
   'map.showMap': 'Show Interactive Map',
+  'map.myLocation': 'My location',
+  'map.streetView': 'Street',
+  'map.topoView': 'Topo',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'UV Warning',

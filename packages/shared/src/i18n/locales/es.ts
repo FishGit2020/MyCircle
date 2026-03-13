@@ -857,6 +857,9 @@ const es: Record<TranslationKey, string> = {
   'map.waitingForLocation': 'Esperando ubicaci\u00f3n...',
   'map.loading': 'Cargando mapa...',
   'map.showMap': 'Mostrar mapa interactivo',
+  'map.myLocation': 'Mi ubicaci\u00f3n',
+  'map.streetView': 'Calle',
+  'map.topoView': 'Topo',
 
   // Weather alerts (extra keys)
   'alert.uvWarning': 'Alerta UV',
