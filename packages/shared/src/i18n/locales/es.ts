@@ -656,6 +656,8 @@ const es: Record<TranslationKey, string> = {
   'worship.importPro': 'Importar .pro',
   'worship.importProHint': 'Importa un archivo ProPresenter para prellenar la letra',
   'worship.importError': 'No se pudo analizar el archivo. Verifica el formato.',
+  'worship.moreControls': 'Controles',
+  'worship.hideControls': 'Ocultar controles',
 
   // Notebook
   'nav.notebook': 'Bloc de notas',

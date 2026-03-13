@@ -654,6 +654,8 @@ const en = {
   'worship.importPro': 'Import .pro',
   'worship.importProHint': 'Import a ProPresenter file to pre-fill lyrics',
   'worship.importError': 'Could not parse the file. Please check the format.',
+  'worship.moreControls': 'Controls',
+  'worship.hideControls': 'Hide controls',
 
   // Notebook
   'nav.notebook': 'Notebook',
