@@ -141,7 +141,7 @@ server.tool(
   'Read user feedback and data from Firestore collections. Supports custom collection, ordering, and limit.',
   {
     collection: z.string().default('feedback').describe('Firestore collection name to read'),
-    limit: z.number().default(20).describe('Maximum number of documents to return'),
+    limit: z.coerce.number().default(20).describe('Maximum number of documents to return'),
     orderBy: z.string().default('createdAt').describe('Field to order results by'),
     orderDirection: z.enum(['asc', 'desc']).default('desc').describe('Sort direction'),
   },
@@ -163,7 +163,7 @@ server.tool(
   'read_user_feedback',
   'Read recent feedback and announcements from the last N days.',
   {
-    days: z.number().default(7).describe('Number of days to look back'),
+    days: z.coerce.number().default(7).describe('Number of days to look back'),
   },
   async ({ days }) => ({
     content: [{ type: 'text', text: await readUserFeedback(days) }],
@@ -176,7 +176,7 @@ server.tool(
   'read_sentry_issues',
   'List recent Sentry error reports for the MyCircle project. Filter by status and search query.',
   {
-    limit: z.number().optional().default(10).describe('Max issues to return (default 10)'),
+    limit: z.coerce.number().optional().default(10).describe('Max issues to return (default 10)'),
     query: z.string().optional().describe('Search query to filter issues'),
     status: z.enum(['unresolved', 'resolved', 'ignored']).optional().default('unresolved').describe('Issue status filter (default "unresolved")'),
   },
@@ -373,7 +373,7 @@ server.tool(
   'read_analytics_summary',
   'Get page view and user metrics from GA4. Returns top pages by the selected metric plus total users, sessions, and page views.',
   {
-    days: z.number().default(7).describe('Number of days to look back (default 7)'),
+    days: z.coerce.number().default(7).describe('Number of days to look back (default 7)'),
     metric: z.enum(['pageViews', 'activeUsers', 'sessions']).default('pageViews').describe('Primary metric to rank pages by (default "pageViews")'),
   },
   async ({ days, metric }) => ({
@@ -385,7 +385,7 @@ server.tool(
   'read_feature_usage',
   'Which MFE routes are most used. Groups GA4 page paths by first segment to show ranked MFE feature usage.',
   {
-    days: z.number().default(7).describe('Number of days to look back (default 7)'),
+    days: z.coerce.number().default(7).describe('Number of days to look back (default 7)'),
   },
   async ({ days }) => ({
     content: [{ type: 'text', text: await readFeatureUsage(days) }],
