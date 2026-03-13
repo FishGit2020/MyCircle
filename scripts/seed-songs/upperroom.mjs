@@ -13,24 +13,24 @@ const SONGS = [
   {
     title: "Surrounded (UPPERROOM)",
     artist: "UPPERROOM",
-    originalKey: "B",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
-[B]It may look like I'm sur[E]rounded
-[B]But I'm surrounded by [F#]You
-[G#m]It may look like I'm sur[E]rounded
-[B]But I'm surrounded by [F#]You
+[G]It may look like I'm sur[C]rounded
+[G]But I'm surrounded by [D]You
+[Em]It may look like I'm sur[C]rounded
+[G]But I'm surrounded by [D]You
 
 {Chorus}
-[B]This is how I [E]fight my battles
-[B]This is how I [F#]fight my battles
-[G#m]This is how I [E]fight my battles
-[B]This is how I [F#]fight my battles
+[G]This is how I [C]fight my battles
+[G]This is how I [D]fight my battles
+[Em]This is how I [C]fight my battles
+[G]This is how I [D]fight my battles
 
-{Verse 2}
-[E]It may look like I'm sur[B]rounded
-[F#]But I'm surrounded by [G#m]You
-[E]God is on my [B]side`,
+{Bridge}
+[C]It may look like I'm sur[G]rounded
+[D]But I'm surrounded by [Em]You
+[C]God is on my [G]side`,
     notes: "Spontaneous worship feel. Let the repetition build prophetically.",
     bpm: 72,
     tags: ["worship","spiritual warfare","declaration","spontaneous"],
@@ -60,29 +60,29 @@ const SONGS = [
     tags: ["worship","surrender","trust","devotional"],
   },
   {
-    title: "New Wine (UPPERROOM)",
+    title: "New Wine",
     artist: "UPPERROOM",
-    originalKey: "D",
+    originalKey: "Bb",
     format: "chordpro",
     content: `{Verse 1}
-[D]In the crushing in the [A]pressing
-[Bm]You are making [G]new wine
-[D]In the soil I now [A]surrender
-[Bm]You are breaking [G]new ground
+[Bb]In the crushing in the [F]pressing
+[Gm]You are making [Eb]new wine
+[Bb]In the soil I now [F]surrender
+[Gm]You are breaking [Eb]new ground
+
+{Pre-Chorus}
+[Eb]So I yield to [Gm]You and to Your careful [F]hand
+[Bb/D]When I trust You I don't need to under[Eb]stand
 
 {Chorus}
-[D]So I yield to [A]You and to Your careful [Bm]hand
-[G]When I trust You I don't need to [D]understand
-
-{Verse 2}
-[D]Make me Your [A]vessel
-[Bm]Make me an [G]offering
-[D]Make me what[A]ever You want me to [Bm]be [G]
-[D]I came here with [A]nothing
-[Bm]But all You have [G]given me
-[D]Jesus bring [A]new wine out of [G]me`,
-    notes: "Intimate and surrendered. Let this one breathe. Powerful ministry moment.",
-    bpm: 66,
+[Bb]Make me Your [F]vessel
+[Gm]Make me an [Eb]offering
+[Bb]Make me what[F]ever You want me to [Gm]be [Eb]
+[Bb]I came here with [F]nothing
+[Gm]But all You have [Eb]given me
+[Bb]Jesus bring [F]new wine out of [Eb]me`,
+    notes: "Written by Brooke Ligertwood for Hillsong Worship. Intimate and surrendered.",
+    bpm: 77,
     tags: ["worship","surrender","transformation"],
   },
   {
@@ -703,24 +703,24 @@ const SONGS = [
   {
     title: "King of My Heart (UPPERROOM)",
     artist: "UPPERROOM",
-    originalKey: "C",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[C]Let the King of my [G]heart
-[Am]Be the mountain where I [F]run
-[C]The fountain I drink [G]from
-[Am]Oh He is my [F]song
-
-{Chorus}
-[C]Let the King of my [G]heart
-[Am]Be the shadow where I [F]hide
-[C]The ransom for my [G]life
-[Am]Oh He is my [F]song
+[Ab]Let the King of my [Eb]heart
+[Fm]Be the mountain where I [Db]run
+[Ab]The fountain I drink [Eb]from
+[Fm]Oh He is my [Db]song
 
 {Verse 2}
-[C]You are [G]good, good, [Am]oh
-[F]You are good, good, [C]oh`,
-    notes: "Devotional and personal. Let the chorus ring out.",
+[Ab]Let the King of my [Eb]heart
+[Fm]Be the shadow where I [Db]hide
+[Ab]The ransom for my [Eb]life
+[Fm]Oh He is my [Db]song
+
+{Chorus}
+[Ab]You are [Eb]good, good, [Fm]oh
+[Db]You are good, good, [Ab]oh`,
+    notes: "Written by John Mark & Sarah McMillan. Popularized by Bethel Music. Devotional and personal.",
     bpm: 72,
     tags: ["worship","devotion","goodness"],
   },

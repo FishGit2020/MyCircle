@@ -13,21 +13,21 @@ const SONGS = [
   {
     title: "Furious",
     artist: "Jeremy Riddle",
-    originalKey: "G",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[G]Nothing can stop Your [Em]love for me
-[C]You delight in [D]showing mercy
-[G]Nothing will ever [Em]take Your place
-[C]You've been faithful [D]from the start
+[C]Nothing can stop Your [Am]love for me
+[F]You delight in [G]showing mercy
+[C]Nothing will ever [Am]take Your place
+[F]You've been faithful [G]from the start
 
 {Chorus}
-[G]His love is [Em]furious, His love is [C]furious
-[D]His love is furious for [G]me
-[G]His love is [Em]deep, His love is [C]wide
-[D]And it covers us
-[G]His love is [Em]fierce, His love is [C]strong
-[D]It is furious`,
+[C]His love is [Am]furious, His love is [F]furious
+[G]His love is furious for [C]me
+[C]His love is [Am]deep, His love is [F]wide
+[G]And it covers us
+[C]His love is [Am]fierce, His love is [F]strong
+[G]It is furious`,
     notes: "Passionate declaration of God's fierce love. Medium build.",
     bpm: 80,
     tags: ["worship","love","passion"],
@@ -56,26 +56,26 @@ const SONGS = [
   {
     title: "Sweetly Broken",
     artist: "Jeremy Riddle",
-    originalKey: "G",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[G]To the cross I [D]look, to the cross I [Em]cling
-[C]Of its suffering [D]I do drink
-[G]Of its work I [D]do sing
-[Em]On it my Savior, [C]both bruised and [D]crushed
-[G]Showed that God is [D]love
-[Em]And God is [C]just
+[B]To the cross I [F#]look, to the cross I [G#m]cling
+[E]Of its suffering [F#]I do drink
+[B]Of its work I [F#]do sing
+[G#m]On it my Savior, [E]both bruised and [F#]crushed
+[B]Showed that God is [F#]love
+[G#m]And God is [E]just
 
 {Chorus}
-[G]At the cross You [D]beckon me
-[Em]You draw me [C]gently to my [D]knees and I am
-[G]Lost for words, so [D]lost in love
-[Em]I'm sweetly [C]broken, wholly [D]surrendered
+[B]At the cross You [F#]beckon me
+[G#m]You draw me [E]gently to my [F#]knees and I am
+[B]Lost for words, so [F#]lost in love
+[G#m]I'm sweetly [E]broken, wholly [F#]surrendered
 
 {Verse 2}
-[G]What a priceless [D]gift, undeserved [Em]life
-[C]Have I been [D]given
-[G]Through Christ [D]crucified`,
+[B]What a priceless [F#]gift, undeserved [G#m]life
+[E]Have I been [F#]given
+[B]Through Christ [F#]crucified`,
     notes: "Communion song. Tender and reverent. Acoustic guitar focus.",
     bpm: 70,
     tags: ["worship","communion","cross"],

@@ -16,12 +16,12 @@ const SONGS = [
     originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[E]I can only i[A]magine
+[E]I can only i[B]magine
 [E]What it will be like
-[B]When I walk by Your [A]side
-[E]I can only i[A]magine
+[A]When I walk by Your [B]side
+[E]I can only i[B]magine
 [E]What my eyes will see
-[B]When Your face is be[A]fore me
+[A]When Your face is be[B]fore me
 
 {Chorus}
 [E]Surrounded by Your [A]glory
@@ -35,19 +35,19 @@ const SONGS = [
   {
     title: "Even If",
     artist: "MercyMe",
-    originalKey: "Ab",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[Ab]They say sometimes You [Eb]win some
-[Fm]Sometimes You [Db]lose some
-[Ab]And right now, right [Eb]now I'm losing bad
-[Fm]I've stood on this [Db]stage night after night
+[E]They say sometimes You [B]win some
+[C#m]Sometimes You [A]lose some
+[E]And right now, right [B]now I'm losing bad
+[C#m]I've stood on this [A]stage night after night
 
 {Chorus}
-[Ab]I know You're able and I [Eb]know You can
-[Fm]Save through the fire with Your [Db]mighty hand
-[Ab]But even if You [Eb]don't
-[Fm]My hope is You a[Db]lone`,
+[E]I know You're able and I [B]know You can
+[C#m]Save through the fire with Your [A]mighty hand
+[E]But even if You [B]don't
+[C#m]My hope is You a[A]lone`,
     notes: "Deeply personal faith declaration in suffering. Tender and powerful.",
     bpm: 72,
     tags: ["worship","faith","suffering","trust"],
@@ -55,19 +55,19 @@ const SONGS = [
   {
     title: "Greater",
     artist: "MercyMe",
-    originalKey: "E",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[E]Bring your tired and [B]bring your shame
-[C#m]Bring your guilt and [A]bring your pain
-[E]Don't you know that's not your [B]name
-[C#m]You will always [A]be much more to me
+[D]Bring your tired and [A]bring your shame
+[Bm]Bring your guilt and [G]bring your pain
+[D]Don't you know that's not your [A]name
+[Bm]You will always [G]be much more to me
 
 {Chorus}
-[E]He's greater, He's [B]greater
-[C#m]Greater is the One [A]living inside of me
-[E]He's greater, He's [B]greater
-[C#m]Than he that is [A]in the world`,
+[D]He's greater, He's [A]greater
+[Bm]Greater is the One [G]living inside of me
+[D]He's greater, He's [A]greater
+[Bm]Than he that is [G]in the world`,
     notes: "Upbeat identity anthem. Pop-rock energy, great for encouragement.",
     bpm: 140,
     tags: ["worship","identity","victory","encouragement"],
@@ -97,20 +97,20 @@ const SONGS = [
   {
     title: "Flawless",
     artist: "MercyMe",
-    originalKey: "C",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[C]There's got to be more
-[G]Than going back and forth
-[Am]From doing right to [F]doing wrong
-[C]Cause we were taught that's [G]who we are
-[Am]Come on get in [F]line right behind me
+[A]There's got to be more
+[E]Than going back and forth
+[F#m]From doing right to [D]doing wrong
+[A]Cause we were taught that's [E]who we are
+[F#m]Come on get in [D]line right behind me
 
 {Chorus}
-[C]No matter the bumps, [G]no matter the bruises
-[Am]No matter the scars, [F]still the truth is
-[C]The cross has made, [G]the cross has made you
-[Am]Flaw[F]less`,
+[A]No matter the bumps, [E]no matter the bruises
+[F#m]No matter the scars, [D]still the truth is
+[A]The cross has made, [E]the cross has made you
+[F#m]Flaw[D]less`,
     notes: "Upbeat pop-rock identity anthem. Fun energy, clap-along.",
     bpm: 136,
     tags: ["worship","identity","grace","freedom"],

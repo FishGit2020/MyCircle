@@ -33,7 +33,7 @@ const SONGS = [
   {
     title: "Sinking Deep",
     artist: "Hillsong Young & Free",
-    originalKey: "B",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
 [B]Standing on the [E]edge of everything

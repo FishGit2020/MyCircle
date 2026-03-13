@@ -13,19 +13,19 @@ const SONGS = [
   {
     title: "Your Love Never Fails",
     artist: "Jesus Culture",
-    originalKey: "G",
+    originalKey: "Bb",
     format: "chordpro",
     content: `{Verse 1}
-[G]Nothing can sepa[C]rate
-[Em]Even if I ran [D]away
-[G]Your love never [C]fails
-[Em]I know I still [D]make mistakes but
+[Bb]Nothing can sepa[Eb]rate
+[Gm]Even if I ran [F]away
+[Bb]Your love never [Eb]fails
+[Gm]I know I still [F]make mistakes but
 
 {Chorus}
-[G]You are my [C]hiding place
-[Em]Your love never [D]fails
-[G]Your love never [C]fails
-[Em]Your love never [D]fails`,
+[Bb]You are my [Eb]hiding place
+[Gm]Your love never [F]fails
+[Bb]Your love never [Eb]fails
+[Gm]Your love never [F]fails`,
     notes: "Anthemic, call-and-response friendly. Great for youth and conferences.",
     bpm: 136,
     tags: ["worship","love","faithfulness"],
@@ -53,19 +53,19 @@ const SONGS = [
   {
     title: "Rooftops",
     artist: "Jesus Culture",
-    originalKey: "E",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[E]Here I am be[B]fore You
-[C#m]Falling at Your [A]feet
-[E]All I want is [B]to be with You
-[C#m]Lost in Your [A]glory
+[Ab]Here I am be[Eb]fore You
+[Fm]Falling at Your [Db]feet
+[Ab]All I want is [Eb]to be with You
+[Fm]Lost in Your [Db]glory
 
 {Chorus}
-[E]And I will shout it from the [B]rooftops
-[C#m]Singing Your [A]name
-[E]You're everything to me, [B]Jesus
-[C#m]I'll shout Your [A]name`,
+[Ab]And I will shout it from the [Eb]rooftops
+[Fm]Singing Your [Db]name
+[Ab]You're everything to me, [Eb]Jesus
+[Fm]I'll shout Your [Db]name`,
     notes: "Kim Walker-Smith classic. Passionate and emotive, powerful live song.",
     bpm: 130,
     tags: ["worship","praise","declaration"],
@@ -113,19 +113,19 @@ const SONGS = [
   {
     title: "Show Me Your Glory",
     artist: "Jesus Culture",
-    originalKey: "E",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[E]I see the cloud, [B]I step in
-[C#m]I want to see Your [A]glory
-[E]As Moses did, [B]and I am undone
-[C#m]I want to know [A]Your presence
+[D]I see the cloud, [A]I step in
+[Bm]I want to see Your [G]glory
+[D]As Moses did, [A]and I am undone
+[Bm]I want to know [G]Your presence
 
 {Chorus}
-[E]Show me Your glory, [B]show me Your face
-[C#m]Show me Your glo[A]ry, Lord
-[E]I can't live with[B]out You
-[C#m]Show me Your [A]glory`,
+[D]Show me Your glory, [A]show me Your face
+[Bm]Show me Your glo[G]ry, Lord
+[D]I can't live with[A]out You
+[Bm]Show me Your [G]glory`,
     notes: "Kim Walker-Smith. Deep intercession, extended worship moment.",
     bpm: 70,
     tags: ["worship","glory","presence","prayer"],
@@ -133,19 +133,19 @@ const SONGS = [
   {
     title: "Never Gonna Stop Singing",
     artist: "Jesus Culture",
-    originalKey: "A",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[A]When You opened [E]up the heavens
-[F#m]And stepped down from [D]the throne
-[A]You laid aside [E]Your crown
-[F#m]To make a way [D]back home
+[Ab]When You opened [Eb]up the heavens
+[Fm]And stepped down from [Db]the throne
+[Ab]You laid aside [Eb]Your crown
+[Fm]To make a way [Db]back home
 
 {Chorus}
-[A]I'm never gonna [E]stop singing
-[F#m]I'm never gonna [D]stop praising
-[A]I'm never gonna [E]stop
-[F#m]I love You, [D]Lord`,
+[Ab]I'm never gonna [Eb]stop singing
+[Fm]I'm never gonna [Db]stop praising
+[Ab]I'm never gonna [Eb]stop
+[Fm]I love You, [Db]Lord`,
     notes: "High energy, singable chorus, great for extended praise sets.",
     bpm: 144,
     tags: ["worship","praise","joy"],
@@ -153,19 +153,19 @@ const SONGS = [
   {
     title: "Let It Echo",
     artist: "Jesus Culture",
-    originalKey: "G",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[G]A fire burning [D]in our hearts tonight
-[Em]A holy flame [C]that will not die
-[G]A song within our [D]souls to sing
-[Em]Let it echo [C]through everything
+[Ab]A fire burning [Eb]in our hearts tonight
+[Fm]A holy flame [Db]that will not die
+[Ab]A song within our [Eb]souls to sing
+[Fm]Let it echo [Db]through everything
 
 {Chorus}
-[G]Let it echo, [D]let it echo
-[Em]Oh let it echo [C]through the halls of heaven
-[G]Let it echo, [D]let it echo
-[Em]We won't be [C]silent`,
+[Ab]Let it echo, [Eb]let it echo
+[Fm]Oh let it echo [Db]through the halls of heaven
+[Ab]Let it echo, [Eb]let it echo
+[Fm]We won't be [Db]silent`,
     notes: "Anthemic and driving, great for youth gatherings and conferences.",
     bpm: 138,
     tags: ["worship","declaration","fire"],
@@ -193,18 +193,18 @@ const SONGS = [
   {
     title: "Freedom",
     artist: "Jesus Culture",
-    originalKey: "E",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[E]Where the Spirit of the [B]Lord is
-[C#m]There is free[A]dom
-[E]Where the Spirit of the [B]Lord is
-[C#m]There is free[A]dom
+[Ab]Where the Spirit of the [Eb]Lord is
+[Fm]There is free[Db]dom
+[Ab]Where the Spirit of the [Eb]Lord is
+[Fm]There is free[Db]dom
 
 {Chorus}
-[E]I am free, I am [B]free
-[C#m]In the name of [A]Jesus I am free
-[E]For the Spirit of the [B]Lord is [C#m]here [A]`,
+[Ab]I am free, I am [Eb]free
+[Fm]In the name of [Db]Jesus I am free
+[Ab]For the Spirit of the [Eb]Lord is [Fm]here [Db]`,
     notes: "2 Corinthians 3:17. Build layers as the song progresses.",
     bpm: 80,
     tags: ["worship","freedom","spirit"],
@@ -212,18 +212,18 @@ const SONGS = [
   {
     title: "Love Has a Name",
     artist: "Jesus Culture",
-    originalKey: "A",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[A]Love has a [E]name
-[F#m]He wore my sin and [D]bore my shame
-[A]Love has a [E]name
-[F#m]Jesus, [D]Jesus
+[Ab]Love has a [Eb]name
+[Fm]He wore my sin and [Db]bore my shame
+[Ab]Love has a [Eb]name
+[Fm]Jesus, [Db]Jesus
 
 {Chorus}
-[A]The God of the [E]universe came down
-[F#m]And wrapped Himself in [D]flesh and bone
-[A]Love has a [E]name, and it's [D]Jesus`,
+[Ab]The God of the [Eb]universe came down
+[Fm]And wrapped Himself in [Db]flesh and bone
+[Ab]Love has a [Eb]name, and it's [Db]Jesus`,
     notes: "Kim Walker-Smith vocal. Big dynamic range.",
     bpm: 72,
     tags: ["worship","love","Jesus"],
@@ -458,19 +458,19 @@ const SONGS = [
   {
     title: "Come Away",
     artist: "Jesus Culture",
-    originalKey: "E",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[E]Come away with [B]me
-[C#m]Come away with [A]me
-[E]It's never too [B]late, it's not too [C#m]late
-[A]It's not too late for [E]you
+[A]Come away with [E]me
+[F#m]Come away with [D]me
+[A]It's never too [E]late, it's not too [F#m]late
+[D]It's not too late for [A]you
 
 {Chorus}
-[E]I have a plan for [B]you
-[C#m]I have a plan for [A]you
-[E]It's gonna be [B]wild, it's gonna be [C#m]great
-[A]It's gonna be full of [E]Me`,
+[A]I have a plan for [E]you
+[F#m]I have a plan for [D]you
+[A]It's gonna be [E]wild, it's gonna be [F#m]great
+[D]It's gonna be full of [A]Me`,
     notes: "Joyful invitation. Uptempo with a sense of adventure.",
     bpm: 134,
     tags: ["worship","invitation","joy"],
@@ -557,19 +557,19 @@ const SONGS = [
   {
     title: "One Thing Remains (JC)",
     artist: "Jesus Culture",
-    originalKey: "G",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[G]Higher than the [D]mountains that I face
-[Em]Stronger than the [C]power of the grave
-[G]Constant in the [D]trial and the change
-[Em]One thing re[C]mains
+[B]Higher than the [F#]mountains that I face
+[G#m]Stronger than the [E]power of the grave
+[B]Constant in the [F#]trial and the change
+[G#m]One thing re[E]mains
 
 {Chorus}
-[G]Your love never [D]fails, it never gives [Em]up
-[C]It never runs out on [G]me
-[G]Your love never [D]fails, it never gives [Em]up
-[C]It never runs out on [G]me`,
+[B]Your love never [F#]fails, it never gives [G#m]up
+[E]It never runs out on [B]me
+[B]Your love never [F#]fails, it never gives [G#m]up
+[E]It never runs out on [B]me`,
     notes: "Brian Johnson, Jeremy Riddle, Christa Black. Conference staple.",
     bpm: 130,
     tags: ["worship","love","faithfulness","anthem"],
@@ -577,19 +577,19 @@ const SONGS = [
   {
     title: "How He Loves (JC)",
     artist: "Jesus Culture",
-    originalKey: "C",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[C]He is jealous for [Am]me
-[F]Loves like a hurricane, [G]I am a tree
-[C]Bending beneath the [Am]weight of His wind
-[F]And [G]mercy
+[E]He is jealous for [C#m]me
+[A]Loves like a hurricane, [B]I am a tree
+[E]Bending beneath the [C#m]weight of His wind
+[A]And [B]mercy
 
 {Chorus}
-[C]Oh how He loves us [Am]oh
-[F]Oh how He loves [G]us
-[C]How He loves [Am]us oh
-[F]So how He [G]loves us`,
+[E]Oh how He loves us [C#m]oh
+[A]Oh how He loves [B]us
+[E]How He loves [C#m]us oh
+[A]So how He [B]loves us`,
     notes: "John Mark McMillan cover. Kim Walker-Smith's arrangement is iconic.",
     bpm: 72,
     tags: ["worship","love","grace","classic"],
