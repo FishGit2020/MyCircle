@@ -13,6 +13,7 @@
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { z } from 'zod';
 import {
   validateI18n,
   validateDockerfile,
@@ -21,6 +22,11 @@ import {
   validateAll,
 } from './mcp-tools/validators.js';
 import { ALL_TOOLS } from './mcp-tools/mfe-tools.js';
+import {
+  readFirestoreFeedback,
+  readFirestoreStats,
+  readUserFeedback,
+} from './mcp-tools/firestore-reader.js';
 
 const server = new McpServer({
   name: 'mycircle',
@@ -90,6 +96,42 @@ server.tool(
       content: [{ type: 'text', text: `# AI Assistant Tools (${ALL_TOOLS.length})\n\n${summary}` }],
     };
   }
+);
+
+// ─── Firestore Reader Tools ──────────────────────────────────
+
+server.tool(
+  'read_firestore_feedback',
+  'Read user feedback and data from Firestore collections. Supports custom collection, ordering, and limit.',
+  {
+    collection: z.string().default('feedback').describe('Firestore collection name to read'),
+    limit: z.number().default(20).describe('Maximum number of documents to return'),
+    orderBy: z.string().default('createdAt').describe('Field to order results by'),
+    orderDirection: z.enum(['asc', 'desc']).default('desc').describe('Sort direction'),
+  },
+  async ({ collection, limit, orderBy, orderDirection }) => ({
+    content: [{ type: 'text', text: await readFirestoreFeedback({ collection, limit, orderBy, orderDirection }) }],
+  })
+);
+
+server.tool(
+  'read_firestore_stats',
+  'Get document counts for key Firestore collections (worshipSongs, announcements, users).',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: await readFirestoreStats() }],
+  })
+);
+
+server.tool(
+  'read_user_feedback',
+  'Read recent feedback and announcements from the last N days.',
+  {
+    days: z.number().default(7).describe('Number of days to look back'),
+  },
+  async ({ days }) => ({
+    content: [{ type: 'text', text: await readUserFeedback(days) }],
+  })
 );
 
 // ─── Start ────────────────────────────────────────────────────
