@@ -979,6 +979,86 @@ Than when we [D7]first be[G]gun`,
     bpm: 80,
     tags: ["worship", "hymn", "grace", "salvation", "classic", "ccli-top-100"],
   },
+
+  // 32. The Blood - Bethel Music / Jenn Johnson feat. Mitch Wong (Key: G)
+  // Chords sourced from Ultimate Guitar / GuitarTuna — key G
+  {
+    title: "The Blood",
+    artist: "Bethel Music / Jenn Johnson",
+    originalKey: "G",
+    format: "chordpro",
+    content: `{Verse 1}
+[G]Everything changed it's getting [D]harder to recognize
+[C]Who I was before You [G]opened my eyes
+[G]It had to be You standing [D]right in front of me
+[C]Washing away everything un[G]clean
+
+{Pre-Chorus}
+[Em]I don't deserve it [C]I can't afford it
+[G]But Your blood was e[D]nough
+
+{Chorus}
+[G]Hallelujah halle[D]lujah
+[C]I know it was the blood [G]
+[G]Hallelujah halle[D]lujah
+[C]Could have only been the blood [G]
+
+{Verse 2}
+[G]Grace running down it's getting [D]harder to hold inside
+[C]The wonder of what was done [G]the beauty behind the price
+[G]I cannot contain what Your [D]love has done for me
+[C]Pouring from my heart over[G]flowing endlessly
+
+{Bridge}
+[Em]Does anybody want to be [C]holy
+[G]Righteous purified and [D]spotless
+[Em]Does anybody want to be [C]clean
+[G]Come to the fountain [D]come to the blood`,
+    notes: "Key of G. 76 BPM. Bethel Music feat. Jenn Johnson & Mitch Wong. Simple G-D-C progression throughout.",
+    bpm: 76,
+    tags: ["worship", "blood", "redemption", "grace", "ccli-top-100"],
+  },
+
+  // 82. Jesus Messiah - Chris Tomlin (Key: G)
+  // Chords sourced from Ultimate Guitar / PsalmNote — key G (capo 2 from original B)
+  {
+    title: "Jesus Messiah",
+    artist: "Chris Tomlin",
+    originalKey: "G",
+    format: "chordpro",
+    content: `{Verse 1}
+[G]He became sin who [Am7]knew no sin
+[G/B]That we might be[C2]come His righteousness
+[G]He humbled Himself and [Am7]carried the cross
+[G/D]Love so amazing [C2]love so amazing
+
+{Chorus}
+[G]Jesus Mes[C2]siah Name above all [Dsus]names
+[D]Blessed Re[G]deemer Emman[C2]uel
+[Dsus]The rescue for [D]sinners the ransom from [Em]heaven
+[C2]Jesus Mes[Dsus]siah Lord of [G]all
+
+{Verse 2}
+[G]His body the bread His [Am7]blood the wine
+[G/B]Broken and poured out [C2]all for love
+[G]The whole earth trembled and the [Am7]veil was torn
+[G/D]Love so amazing [C2]love so amazing
+
+{Bridge}
+[Am7]All our hope is [G/B]in You
+[C2]All our hope is [Dsus]in You
+[Am7]All the glory to [G/B]You God
+[C2]The Light of the [Dsus]world
+
+{Tag}
+[G]Jesus Mes[C2]siah
+[Dsus]Lord of [G]all
+[C2]The Lord of [Dsus]all
+The Lord of [G]all`,
+    notes: "Key of G (original B, capo 2). 74 BPM. Songwriters: Chris Tomlin, Daniel Carson, Ed Cash, Jesse Reeves.",
+    bpm: 74,
+    tags: ["worship", "Jesus", "salvation", "atonement", "ccli-top-100"],
+  },
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');
