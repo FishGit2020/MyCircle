@@ -1,6 +1,6 @@
 # MyCircle — Personal Dashboard
 
-A modern personal dashboard built with **micro frontend architecture**, React, GraphQL, and deployed on Firebase. MyCircle brings together weather, stocks, podcasts, AI chat, and multi-city comparison into a single unified experience.
+A modern personal dashboard built with **micro frontend architecture**, React, GraphQL, and deployed on Firebase. MyCircle brings together 25 micro frontends — weather, stocks, podcasts, AI chat, Bible reading, worship songs, digital library, transit tracking, travel maps, coding interviews, and much more — into a single unified experience.
 
 **Live Demo:** https://mycircle-dash.web.app
 
@@ -29,7 +29,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Recent city searches for quick navigation
 - **Customizable bottom navigation** — reorderable nav items with drag-and-drop, persisted per user (Firestore when signed in, localStorage fallback)
 - **PWA Install Prompt** — Add to Home Screen banner with 7-day dismissal memory
-- **PWA Home Screen Shortcuts** — long-press shortcuts to all 12 features from the installed app icon
+- **PWA Home Screen Shortcuts** — long-press shortcuts to top features from the installed app icon (max 10 per browser spec)
 
 ### Weather
 - **Enhanced city autocomplete** — inline recent city matching during search, localStorage fallback for non-auth users, "Clear all" recents
@@ -59,8 +59,9 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Episode playback with built-in audio player and adjustable playback speed
 - **Persistent audio player** — continues playing across all routes (navigate to Stocks, Weather, etc. without interrupting playback)
 - **Category/genre filtering** — browse trending podcasts by genre with filter chips, category badges on cards
-- **Share episode clip** — share currently playing episode with timestamp via Web Share API or clipboard fallback
+- **Share episode clip** — share currently playing episode with timestamp via Web Share API or clipboard fallback; URL-based autoplay and episode share links for deep linking
 - **Offline support** — podcast artwork cached by service worker (CacheFirst, 30-day TTL), playback speed and episode progress persisted to localStorage for seamless resume
+- **Firestore progress persistence** — episode playback progress synced to Firestore for cross-device resume; progress bar on dashboard widget shows listening progress
 - **Mark as played** — toggle episodes as played/unplayed with Firestore sync across devices; merges with auto-complete detection (95%+ progress)
 - **Queue management** — inline queue dropdown on podcast detail page showing queued episode titles with remove buttons
 - **Media Session API** — lock screen / notification media controls with artwork, title, and transport buttons (play, pause, skip forward/back)
@@ -87,6 +88,10 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **YouTube link integration** — optional YouTube URL per song; renders a styled "Watch on YouTube" button in the song viewer that opens in a new tab
 - **Built-in metronome** — Web Audio API-powered metronome with BPM from song metadata (30-240 range), +/- controls, tap tempo (4-tap average), beat indicator flash, always visible in song viewer
 - **Capo calculator** — collapsible panel showing all capo positions with resulting chord shapes, easy guitar keys (C, G, D, A, E) highlighted, one-click capo selection that adjusts displayed chords to shape key
+- **Server-side search & filters** — GraphQL-powered search with server-side filtering by tag, key, and favorites; paginated results with page navigation instead of infinite scroll; Firestore composite indexes for fast queries
+- **ProPresenter import** — import `.pro` files from ProPresenter to bulk-add songs with lyrics, keys, and metadata
+- **CCLI Top 100** — browse and import from the CCLI Top 100 worship songs list
+- **Download as file** — export songs for offline use or sharing
 - Favorites, search, tag filtering
 - **Real-time sync** — Firestore `onSnapshot` pushes changes instantly across devices/tabs; localStorage cache used as initial data
 
@@ -139,6 +144,70 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - Download as JPEG + Web Share API support
 - All image processing runs in a Web Worker for non-blocking UI
 
+### AI Interviewer
+- Coding interview practice with AI-generated questions and real-time evaluation
+- **Working document** — live code editor for writing solutions during the interview
+- **Typewriter effect** — AI responses stream in with a typewriter animation for natural conversation feel
+- **Firebase persistence** — interview sessions and progress saved to Firestore per user
+- Supports multiple programming languages and difficulty levels
+
+### Transit Tracker
+- Real-time bus arrival times via **OneBusAway API** (Puget Sound region)
+- Search for transit stops by name or stop number
+- **Favorite stops** — save frequently used stops for quick access, persisted to Firestore
+- **URL routing** — deep-link to specific stops via `/transit/:stopId` for sharing and bookmarking
+- Live countdown timers for upcoming arrivals
+
+### Travel Map
+- Interactive **world map** with color-coded pins for places lived, visited, and on your wishlist
+- **Per-user Firestore storage** — each user's travel pins are private and synced across devices
+- Add, edit, and remove pins with location search
+- Visual distinction between lived (green), visited (blue), and wishlist (orange) locations
+
+### Digital Library
+- Personal e-book and audiobook library with Firestore-backed collection management
+- **Audiobook chapter progress** — playback position persisted to Firestore per chapter for cross-device resume
+- **Continue/autoplay from widget** — dashboard widget shows current book with resume button; autoplay continues from last position
+- **Download support** — download books for offline reading
+- Table of contents navigation, reader controls (font size, theme)
+- Browser TTS (text-to-speech) fallback for books without audio
+
+### Daily Log
+- Firestore-backed daily journal with timeline view
+- Create timestamped entries with rich text
+- Visual timeline of past entries organized by day
+- Real-time sync across devices
+
+### Immigration Tracker
+- Track immigration case timelines and status updates
+- Add cases with receipt numbers, case types, and filing dates
+- Visual case cards showing processing status and elapsed time
+- Firestore persistence for cross-device access
+
+### Family Games
+- Collection of 12+ multiplayer party games: Memory, Simon Says, Trivia, Math Challenge, Anagram, Color Match, Reaction Time, Sequence, Maze, Word Game, and more
+- **Scoreboard** — track scores across rounds with timer
+- Heads Up-style category guessing game
+- Family-friendly content with i18n support
+
+### Poll System
+- Create and vote on polls with real-time results
+- Multiple poll types with customizable options
+- Live vote tallying via Firestore real-time listeners
+- Poll detail view with result visualization
+
+### Radio Station
+- Internet radio streaming with curated station directory
+- Persistent player bar that continues across route navigation
+- Station cards with genre categorization
+- Background audio playback
+
+### Trip Planner
+- Plan and organize trips with itinerary management
+- Trip detail view with day-by-day planning
+- Create, edit, and delete trip entries
+- Firestore persistence for cross-device access
+
 ### General
 - Dark / light theme with system preference detection
 - Multi-language support (i18n: English, Spanish, Chinese)
@@ -158,7 +227,7 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 - **Navigation & discovery** — breadcrumb trail on all feature pages, recently-visited pages in command palette (Ctrl+K), **cross-package content search** (stocks, Bible bookmarks searchable from Ctrl+K palette), focus management on route change for screen readers
 - **Keyboard shortcuts** — `Ctrl/Cmd+K` command palette, `Ctrl/Cmd+D` dark mode toggle, `g` then letter for quick navigation (e.g., `g w` for Weather), `?` for shortcuts help
 - **Accessibility** — ARIA live regions for loading/offline states, `role="alert"` for toast notifications, `aria-expanded`/`aria-haspopup` on menus, sr-only text for color-dependent stock indicators, `aria-valuetext` on audio progress bars, keyboard-focusable scroll regions, WCAG AA color contrast compliance (≥ 4.5:1 on all text elements including widget placeholders, buttons, and footer badges), 24px minimum touch targets
-- **Performance** — production JS minification via esbuild with `drop: ['console', 'debugger']` and `legalComments: 'none'` (shell host + all 12 remote MFEs), CSS minification via cssnano in PostCSS pipeline, lazy federation shared deps (`eager: false` on `@apollo/client` and `graphql`), CSS code splitting, **code-split i18n** (Spanish/Chinese lazy-loaded, English synchronous fallback), `React.memo` on all dashboard widgets and list item components, `useReducer` for consolidated dashboard state, paginated episode list with "Show more" button, `useCallback` for stable handler references, **safe storage utility** (`safeGetItem`/`safeSetItem`/`safeGetJSON`) for localStorage resilience
+- **Performance** — production JS minification via esbuild with `drop: ['console', 'debugger']` and `legalComments: 'none'` (shell host + all 25 remote MFEs), CSS minification via cssnano in PostCSS pipeline, lazy federation shared deps (`eager: false` on `@apollo/client` and `graphql`), CSS code splitting, **code-split i18n** (Spanish/Chinese lazy-loaded, English synchronous fallback), `React.memo` on all dashboard widgets and list item components, `useReducer` for consolidated dashboard state, paginated episode list with "Show more" button, `useCallback` for stable handler references, **safe storage utility** (`safeGetItem`/`safeSetItem`/`safeGetJSON`) for localStorage resilience
 - **Lighthouse CI** — automated Lighthouse scoring on every PR (accessibility ≥ 90 required, performance/SEO/best-practices ≥ 80-90 warned)
 
 ## Architecture
@@ -166,43 +235,58 @@ A modern personal dashboard built with **micro frontend architecture**, React, G
 MyCircle uses a **micro frontend architecture** with Vite Module Federation. Each area of the app is an independently built and deployed module composed at runtime by the Shell host.
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                          Firebase Hosting                                │
-├──────────────────────────────────────────────────────────────────────────┤
-│  ┌───────────┐ ┌─────────────┐ ┌─────────────────┐ ┌───────────────┐   │
-│  │   Shell   │ │ City Search │ │ Weather Display │ │ Stock Tracker │   │
-│  │  (Host)   │ │    (MFE)    │ │      (MFE)      │ │     (MFE)     │   │
-│  │ Port 3000 │ │  Port 3001  │ │   Port 3002     │ │  Port 3005    │   │
-│  └───────────┘ └─────────────┘ └─────────────────┘ └───────────────┘   │
-│  ┌─────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌────────────┐  │
-│  │ Podcast Player  │ │ AI Assistant │ │ Bible Reader  │ │  Worship   │  │
-│  │     (MFE)       │ │    (MFE)     │ │    (MFE)      │ │   Songs    │  │
-│  │   Port 3006     │ │  Port 3007   │ │  Port 3008    │ │ Port 3009  │  │
-│  └─────────────────┘ └──────────────┘ └───────────────┘ └────────────┘  │
-│  ┌────────────┐ ┌──────────────┐ ┌───────────────────┐ ┌──────────────┐  │
-│  │  Notebook  │ │ Baby Tracker │ │ Child Development │ │  Flashcards  │  │
-│  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │ │    (MFE)     │  │
-│  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │ │  Port 3015   │  │
-│  └────────────┘ └──────────────┘ └───────────────────┘ └──────────────┘  │
-│  ┌──────────────┐                                                           │
-│  │ Work Tracker │                                                           │
-│  │    (MFE)     │                                                           │
-│  │  Port 3016   │                                                           │
-│  └──────────────┘                                                           │
-└──────────────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│                     Firebase Cloud Functions                             │
-│  ┌────────────────────────────────────────────────────────────────────┐  │
-│  │  GraphQL API (Apollo Server) · Stock Proxy · Podcast Proxy · AI  │  │
-│  └────────────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌──────────────────────────────────────────────────────────────────────────┐
-│  OpenWeather API · Finnhub API · CoinGecko API · PodcastIndex API · Gemini │
-└──────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                               Firebase Hosting                                    │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│  ┌───────────┐ ┌─────────────┐ ┌─────────────────┐ ┌───────────────┐             │
+│  │   Shell   │ │ City Search │ │ Weather Display │ │ Stock Tracker │             │
+│  │  (Host)   │ │    (MFE)    │ │      (MFE)      │ │     (MFE)     │             │
+│  │ Port 3000 │ │  Port 3001  │ │   Port 3002     │ │  Port 3005    │             │
+│  └───────────┘ └─────────────┘ └─────────────────┘ └───────────────┘             │
+│  ┌─────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌────────────┐            │
+│  │ Podcast Player  │ │ AI Assistant │ │ Bible Reader  │ │  Worship   │            │
+│  │     (MFE)       │ │    (MFE)     │ │    (MFE)      │ │   Songs    │            │
+│  │   Port 3006     │ │  Port 3007   │ │  Port 3008    │ │ Port 3009  │            │
+│  └─────────────────┘ └──────────────┘ └───────────────┘ └────────────┘            │
+│  ┌────────────┐ ┌──────────────┐ ┌───────────────────┐ ┌──────────────┐           │
+│  │  Notebook  │ │ Baby Tracker │ │ Child Development │ │  Flashcards  │           │
+│  │   (MFE)    │ │    (MFE)     │ │       (MFE)       │ │    (MFE)     │           │
+│  │ Port 3010  │ │  Port 3011   │ │    Port 3012      │ │  Port 3015   │           │
+│  └────────────┘ └──────────────┘ └───────────────────┘ └──────────────┘           │
+│  ┌──────────────┐ ┌─────────────┐ ┌──────────────────┐ ┌───────────────┐          │
+│  │  Daily Log   │ │ Cloud Files │ │  Model Benchmark │ │ Immigration   │          │
+│  │    (MFE)     │ │    (MFE)    │ │      (MFE)       │ │   Tracker     │          │
+│  │  Port 3016   │ │  Port 3017  │ │   Port 3004      │ │  Port 3018    │          │
+│  └──────────────┘ └─────────────┘ └──────────────────┘ └───────────────┘          │
+│  ┌──────────────────┐ ┌──────────────┐ ┌──────────────┐ ┌─────────────────┐       │
+│  │ Digital Library  │ │ Family Games │ │ Doc Scanner  │ │   Hiking Map    │       │
+│  │      (MFE)       │ │    (MFE)     │ │    (MFE)     │ │     (MFE)       │       │
+│  │   Port 3019      │ │  Port 3020   │ │  Port 3021   │ │   Port 3022     │       │
+│  └──────────────────┘ └──────────────┘ └──────────────┘ └─────────────────┘       │
+│  ┌──────────────┐ ┌─────────────┐ ┌──────────────────┐ ┌──────────────────┐       │
+│  │ Trip Planner │ │ Poll System │ │  Radio Station   │ │ AI Interviewer   │       │
+│  │    (MFE)     │ │    (MFE)    │ │      (MFE)       │ │      (MFE)       │       │
+│  │  Port 3024   │ │  Port 3025  │ │   Port 3026      │ │   Port 3027      │       │
+│  └──────────────┘ └─────────────┘ └──────────────────┘ └──────────────────┘       │
+│  ┌─────────────────┐ ┌──────────────┐                                              │
+│  │ Transit Tracker │ │  Travel Map  │                                              │
+│  │      (MFE)      │ │    (MFE)     │                                              │
+│  │   Port 3028     │ │  Port 3029   │                                              │
+│  └─────────────────┘ └──────────────┘                                              │
+└──────────────────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                          Firebase Cloud Functions                                 │
+│  ┌────────────────────────────────────────────────────────────────────────────┐   │
+│  │  GraphQL API (Apollo Server) · Stock Proxy · Podcast Proxy · AI · Transit │   │
+│  └────────────────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│  OpenWeather · Finnhub · CoinGecko · PodcastIndex · Gemini · OneBusAway · OSRM   │
+└──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Micro Frontends
@@ -225,6 +309,17 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Cloud Files** | Upload, share, and download files (images, PDFs, docs) via Cloud Function | `CloudFiles` |
 | **Model Benchmark** | Compare AI model performance across Ollama endpoints (CPU vs GPU), nanosecond-precision timing | `ModelBenchmark` |
 | **Hiking Map** | Interactive trail map with GPS auto-locate, tap-to-place waypoints, foot-routing via OSRM, offline tile cache (IndexedDB), saved routes, and topo/street style switcher | `HikingMap` |
+| **Daily Log** | Firestore-backed daily journal with timeline view and real-time sync | `DailyLog` |
+| **Immigration Tracker** | Immigration case timeline tracker with receipt numbers, status updates, and processing time | `ImmigrationTracker` |
+| **Digital Library** | E-book and audiobook library with chapter progress, TTS fallback, and Firestore persistence | `DigitalLibrary` |
+| **Family Games** | 12+ multiplayer party games (Memory, Simon, Trivia, Math, Anagram, Maze, etc.) with scoreboard | `FamilyGames` |
+| **Doc Scanner** | Canvas-based document scanning with edge detection, perspective correction, and Web Worker processing | `DocScanner` |
+| **Trip Planner** | Trip itinerary management with day-by-day planning and Firestore persistence | `TripPlanner` |
+| **Poll System** | Create and vote on polls with real-time Firestore results | `PollSystem` |
+| **Radio Station** | Internet radio streaming with curated station directory and persistent player bar | `RadioStation` |
+| **AI Interviewer** | Coding interview practice with AI evaluation, working document, typewriter effect, and Firebase persistence | `AiInterviewer` |
+| **Transit Tracker** | Real-time bus arrivals via OneBusAway API (Puget Sound), favorite stops, URL routing | `TransitTracker` |
+| **Travel Map** | World map with color-coded pins (lived/visited/wishlist) and per-user Firestore storage | `TravelMap` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
@@ -263,6 +358,19 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/child-dev` | Child development milestone tracker (birth–5 years) |
 | `/flashcards` | Flashcards — quiz mode, handwriting practice, character editor, English phrases |
 | `/hiking` | Hiking Map — GPS locate, tap-to-set waypoints, route planning, offline tiles |
+| `/daily-log` | Daily Log — journal with timeline view |
+| `/immigration` | Immigration Tracker — case timelines and status |
+| `/library` | Digital Library — e-books and audiobooks |
+| `/library/:bookId` | Book reader / audiobook player |
+| `/family-games` | Family Games — 12+ party games |
+| `/family-games/:gameType` | Individual game session |
+| `/trips` | Trip Planner — itinerary management |
+| `/polls` | Poll System — create and vote on polls |
+| `/radio` | Radio Station — internet radio streaming |
+| `/interview` | AI Interviewer — coding interview practice |
+| `/transit` | Transit Tracker — real-time bus arrivals |
+| `/transit/:stopId` | Transit stop detail with live arrivals |
+| `/travel-map` | Travel Map — world map with travel pins |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack
@@ -270,7 +378,7 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 - **Frontend:** React 18, TypeScript, Tailwind CSS
 - **Build:** Vite 5, Module Federation
 - **API:** Apollo Server 5, GraphQL
-- **Data Sources:** OpenWeather API, Finnhub API, CoinGecko API, PodcastIndex API, Google Gemini
+- **Data Sources:** OpenWeather API, Finnhub API, CoinGecko API, PodcastIndex API, Google Gemini, OneBusAway API, OSRM
 - **Auth:** Firebase Auth (Google OAuth + email/password)
 - **Database:** Cloud Firestore (user profiles, favorites, preferences)
 - **Hosting:** Firebase Hosting + Cloud Functions
@@ -344,11 +452,24 @@ mycircle/
 │   │       ├── components/      # WorshipSongs, SongViewer, SongEditor, Metronome
 │   │       ├── hooks/
 │   │       └── test/
-│   └── notebook/                # Notebook MFE
-│       └── src/
-│           ├── components/      # Notebook, NoteList, NoteEditor, NoteCard
-│           ├── hooks/
-│           └── test/
+│   ├── notebook/                # Notebook MFE
+│   ├── baby-tracker/            # Baby growth tracker MFE
+│   ├── child-development/       # Child development guide MFE
+│   ├── flashcards/              # Flashcards learning hub MFE
+│   ├── daily-log/               # Daily journal MFE
+│   ├── cloud-files/             # Cloud file storage MFE
+│   ├── model-benchmark/         # AI model benchmark MFE
+│   ├── immigration-tracker/     # Immigration case tracker MFE
+│   ├── digital-library/         # E-book & audiobook library MFE
+│   ├── family-games/            # Multiplayer party games MFE
+│   ├── doc-scanner/             # Document scanner MFE
+│   ├── hiking-map/              # Hiking trail map MFE
+│   ├── trip-planner/            # Trip itinerary planner MFE
+│   ├── poll-system/             # Poll creation & voting MFE
+│   ├── radio-station/           # Internet radio streaming MFE
+│   ├── ai-interviewer/          # Coding interview practice MFE
+│   ├── transit-tracker/         # Real-time bus arrivals MFE
+│   └── travel-map/              # World travel map MFE
 ├── server/                      # Local development Express server
 │   ├── index.ts                 # Entry point — Apollo, REST proxies, AI endpoint
 │   ├── api/                     # OpenWeather & geocoding API clients
@@ -439,15 +560,7 @@ mycircle/
    This starts all services concurrently:
    - Express server (GraphQL + proxies): http://localhost:3000
    - Shell (host): http://localhost:3000
-   - City Search MFE preview
-   - Weather Display MFE preview
-   - Stock Tracker MFE preview
-   - Podcast Player MFE preview
-   - AI Assistant MFE preview
-   - Bible Reader MFE preview
-   - Worship Songs MFE preview
-   - Notebook MFE preview
-   - Baby Tracker MFE preview
+   - All 25 MFE preview servers (City Search, Weather, Stocks, Podcasts, AI Assistant, Bible Reader, Worship Songs, Notebook, Baby Tracker, Child Development, Flashcards, Daily Log, Cloud Files, Model Benchmark, Immigration Tracker, Digital Library, Family Games, Doc Scanner, Hiking Map, Trip Planner, Poll System, Radio Station, AI Interviewer, Transit Tracker, Travel Map)
 
 ### Available Scripts
 
@@ -634,7 +747,7 @@ query SearchCities($query: String!) {
 
 ### How It Works
 
-1. **Shell (Host)** loads 12 remote modules at runtime via `remoteEntry.js`
+1. **Shell (Host)** loads 25 remote modules at runtime via `remoteEntry.js`
 2. Each **remote MFE** exposes its root component
 3. **Shared dependencies** (React, React DOM, Apollo Client) are deduplicated at runtime via `singleton: true` and `requiredVersion` constraints
 4. **pnpm catalogs** centralise version specifiers so all packages resolve the same version from a single source of truth in `pnpm-workspace.yaml`
