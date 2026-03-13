@@ -15,13 +15,13 @@ const SONGS = [
     artist: "Matt Redman",
     originalKey: "G",
     format: "chordpro",
-    content: `{Verse 1}
+    content: `{Chorus}
 [G]Bless the Lord, [Em]oh my soul, [C]oh my soul
 [G]Worship His [D]holy name
 [Em]Sing like [C]never before, [G]oh my [D]soul
 [G]I'll worship Your holy name
 
-{Chorus}
+{Verse 1}
 [G]The sun comes up, [Em]it's a new day dawning
 [C]It's time to sing Your [D]song again
 [G]Whatever may pass and [Em]whatever lies before me
@@ -39,22 +39,22 @@ const SONGS = [
   {
     title: "Blessed Be Your Name",
     artist: "Matt Redman",
-    originalKey: "B",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[B]Blessed be Your name in the [E]land that is plentiful
-[B]Where Your streams of a[F#]bundance flow, [E]blessed be Your name
-[B]Blessed be Your name when I'm [E]found in the desert place
-[B]Though I walk through the [F#]wilderness, [E]blessed be Your name
+[A]Blessed be Your name in the [D]land that is plentiful
+[A]Where Your streams of a[E]bundance flow, [D]blessed be Your name
+[A]Blessed be Your name when I'm [D]found in the desert place
+[A]Though I walk through the [E]wilderness, [D]blessed be Your name
 
 {Chorus}
-[B]Every blessing You [E]pour out I'll turn back to praise
-[B]When the darkness [F#]closes in, Lord, [E]still I will say
+[A]Every blessing You [D]pour out I'll turn back to praise
+[A]When the darkness [E]closes in, Lord, [D]still I will say
 
 {Verse 2}
-[B]Blessed be the name of the [E]Lord, blessed be Your name
-[B]Blessed be the name of the [F#]Lord
-[E]Blessed be Your glorious [B]name`,
+[A]Blessed be the name of the [D]Lord, blessed be Your name
+[A]Blessed be the name of the [E]Lord
+[D]Blessed be Your glorious [A]name`,
     notes: "Classic worship anthem for all seasons. Easy to lead.",
     bpm: 128,
     tags: ["worship","praise","all seasons"],
@@ -108,19 +108,19 @@ const SONGS = [
   {
     title: "Never Once",
     artist: "Matt Redman",
-    originalKey: "Bb",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[Bb]Standing on this [F]mountaintop
-[Gm]Looking just how [Eb]far we've come
-[Bb]Knowing that for [F]every step
-[Gm]You were with [Eb]us
+[A]Standing on this [E]mountaintop
+[F#m]Looking just how [D]far we've come
+[A]Knowing that for [E]every step
+[F#m]You were with [D]us
 
 {Chorus}
-[Bb]Never once did we [F]ever walk alone
-[Gm]Never once did You [Eb]leave us on our own
-[Bb]You are faithful, [F]God You are faithful
-[Gm]You are [Eb]faithful`,
+[A]Never once did we [E]ever walk alone
+[F#m]Never once did You [D]leave us on our own
+[A]You are faithful, [E]God You are faithful
+[F#m]You are [D]faithful`,
     notes: "Testimony of faithfulness. Reflective verse, powerful chorus declaration.",
     bpm: 72,
     tags: ["worship","faithfulness","testimony"],

@@ -13,26 +13,26 @@ const SONGS = [
   {
     title: "Promises",
     artist: "Maverick City Music",
-    originalKey: "C",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[C]God of Abraham, [Am]You're the God of covenant
-[F]And of faithful [G]promises
-[C]Time and time again [Am]You have proven
-[F]You'll do just what [G]You said
+[Ab]God of Abraham, [Fm]You're the God of covenant
+[Db]And of faithful [Eb]promises
+[Ab]Time and time again [Fm]You have proven
+[Db]You'll do just what [Eb]You said
 
 {Chorus}
-[C]Though the storms may come and the [Am]winds may blow
-[F]I'll remain stead[G]fast
-[C]And let my heart learn when [Am]You speak a word
-[F]It will come to [G]pass
+[Ab]Though the storms may come and the [Fm]winds may blow
+[Db]I'll remain stead[Eb]fast
+[Ab]And let my heart learn when [Fm]You speak a word
+[Db]It will come to [Eb]pass
 
 {Verse 2}
-[C]Great is Your faith[Am]fulness to me
-[F]Great is Your faith[G]fulness to me
-[C]From the rising [Am]sun to the setting same
-[F]I will praise Your [G]name
-[C]Great is Your faith[Am]fulness to me`,
+[Ab]Great is Your faith[Fm]fulness to me
+[Db]Great is Your faith[Eb]fulness to me
+[Ab]From the rising [Fm]sun to the setting same
+[Db]I will praise Your [Eb]name
+[Ab]Great is Your faith[Fm]fulness to me`,
     notes: "Declaration of faithfulness. Steady build throughout.",
     bpm: 71,
     tags: ["worship","faithfulness","promise"],
@@ -40,26 +40,26 @@ const SONGS = [
   {
     title: "Breathe",
     artist: "Maverick City Music",
-    originalKey: "E",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
+[A]This is the air I breathe
 [E]This is the air I breathe
-[B]This is the air I breathe
-[C#m]Your holy presence [A]living in me
+[F#m]Your holy presence [D]living in me
 
 {Chorus}
+[A]This is my daily bread
 [E]This is my daily bread
-[B]This is my daily bread
-[C#m]Your very word [A]spoken to me
+[F#m]Your very word [D]spoken to me
 
 {Verse 2}
-[E]And I, [B]I'm desperate for You
-[C#m]And I, [A]I'm lost without You
+[A]And I, [E]I'm desperate for You
+[F#m]And I, [D]I'm lost without You
 
 {Chorus}
+[A]This is the air I breathe
 [E]This is the air I breathe
-[B]This is the air I breathe
-[C#m]Your holy presence [A]living in me`,
+[F#m]Your holy presence [D]living in me`,
     notes: "Intimate worship. Acoustic, gentle, prayerful.",
     bpm: 60,
     tags: ["worship","intimacy","prayer"],
@@ -118,29 +118,29 @@ I choose to be [C#m]holy
   {
     title: "Man of Your Word",
     artist: "Maverick City Music",
-    originalKey: "G",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[G]Miracle worker, [Em]promise keeper
-[C]Light in the darkness, [D]my God
-[G]That is who You are [Em]
-[C]That is who You are [D]
+[B]Miracle worker, [G#m]promise keeper
+[E]Light in the darkness, [F#]my God
+[B]That is who You are [G#m]
+[E]That is who You are [F#]
 
 {Chorus}
-[G]Way maker, [Em]chain breaker
-[C]That is who You [D]are
+[B]Way maker, [G#m]chain breaker
+[E]That is who You [F#]are
 
 {Verse 2}
-[G]This mountain, it may [Em]look so big
-[C]But God we know that [D]You are bigger
-[G]This sickness, it may [Em]look so big
-[C]But God we know that [D]You are bigger
+[B]This mountain, it may [G#m]look so big
+[E]But God we know that [F#]You are bigger
+[B]This sickness, it may [G#m]look so big
+[E]But God we know that [F#]You are bigger
 
 {Chorus}
-[G]You're the man of Your [Em]word
-[C]You never have and never [D]will
-[G]Change Your mind, You're [Em]faithful
-[C]You have been and always [D]will be good`,
+[B]You're the man of Your [G#m]word
+[E]You never have and never [F#]will
+[B]Change Your mind, You're [G#m]faithful
+[E]You have been and always [F#]will be good`,
     notes: "Declaration anthem. Works great with a worship team.",
     bpm: 82,
     tags: ["praise","faithfulness","declaration"],
@@ -208,19 +208,19 @@ I choose to be [C#m]holy
   {
     title: "Move Your Heart",
     artist: "Maverick City Music",
-    originalKey: "G",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[G]I don't want to [D]do a thing
-[Em]If You're not in [C]it
-[G]I don't want to [D]go somewhere
-[Em]If You're not [C]there
+[B]I don't want to [F#]do a thing
+[G#m]If You're not in [E]it
+[B]I don't want to [F#]go somewhere
+[G#m]If You're not [E]there
 
 {Chorus}
-[G]Move my heart [D]to move Your heart
-[Em]Let me not be [C]satisfied
-[G]Moving through this [D]world without You
-[Em]Move Your [C]heart`,
+[B]Move my heart [F#]to move Your heart
+[G#m]Let me not be [E]satisfied
+[B]Moving through this [F#]world without You
+[G#m]Move Your [E]heart`,
     notes: "UPPERROOM collab. Tender and devotional, spontaneous worship feel.",
     bpm: 66,
     tags: ["worship","surrender","devotion","prayer"],
@@ -228,19 +228,19 @@ I choose to be [C#m]holy
   {
     title: "Wait on You",
     artist: "Maverick City Music",
-    originalKey: "Ab",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[Ab]I'm gonna wait on [Eb]You
-[Fm]I know You're never [Db]late
-[Ab]I'm gonna worship [Eb]while I wait
-[Fm]I'm not gonna [Db]move ahead of You
+[D]I'm gonna wait on [A]You
+[Bm]I know You're never [G]late
+[D]I'm gonna worship [A]while I wait
+[Bm]I'm not gonna [G]move ahead of You
 
 {Chorus}
-[Ab]Wait on You, [Eb]Lord
-[Fm]I'll wait on [Db]You
-[Ab]My help comes [Eb]from You
-[Fm]So I will wait on [Db]You`,
+[D]Wait on You, [A]Lord
+[Bm]I'll wait on [G]You
+[D]My help comes [A]from You
+[Bm]So I will wait on [G]You`,
     notes: "Elevation collab. Patient and faith-filled. Gradual build, powerful bridge.",
     bpm: 68,
     tags: ["worship","patience","trust","waiting"],
@@ -248,19 +248,19 @@ I choose to be [C#m]holy
   {
     title: "Talking to Jesus",
     artist: "Maverick City Music",
-    originalKey: "G",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[G]I've been talking to [D]Jesus
-[Em]He said it's gonna [C]be alright
-[G]I've been talking to [D]Jesus
-[Em]And He said everything's [C]gonna be fine
+[B]I've been talking to [F#]Jesus
+[G#m]He said it's gonna [E]be alright
+[B]I've been talking to [F#]Jesus
+[G#m]And He said everything's [E]gonna be fine
 
 {Chorus}
-[G]Even when the [D]world seems out of control
-[Em]Even when the [C]storms are raging
-[G]I've been talking to [D]Jesus
-[Em]He said it's gonna [C]be alright`,
+[B]Even when the [F#]world seems out of control
+[G#m]Even when the [E]storms are raging
+[B]I've been talking to [F#]Jesus
+[G#m]He said it's gonna [E]be alright`,
     notes: "Maverick City x Elevation. Comforting and simple, prayer anthem.",
     bpm: 72,
     tags: ["worship","prayer","comfort"],
@@ -268,19 +268,19 @@ I choose to be [C#m]holy
   {
     title: "Fear Is Not My Future",
     artist: "Maverick City Music",
-    originalKey: "C",
+    originalKey: "Eb",
     format: "chordpro",
     content: `{Verse 1}
-[C]Fear is not my [G]future
-[Am]You are, You [F]are
-[C]Sickness is not [G]my story
-[Am]You are, You [F]are
+[Eb]Fear is not my [Bb]future
+[Cm]You are, You [Ab]are
+[Eb]Sickness is not [Bb]my story
+[Cm]You are, You [Ab]are
 
 {Chorus}
-[C]You are my [G]future
-[Am]You are my [F]joy
-[C]You are my [G]comfort
-[Am]My hope is [F]found in You`,
+[Eb]You are my [Bb]future
+[Cm]You are my [Ab]joy
+[Eb]You are my [Bb]comfort
+[Cm]My hope is [Ab]found in You`,
     notes: "Brandon Lake x Chandler Moore. Bold declaration, stadium-ready anthem.",
     bpm: 134,
     tags: ["worship","hope","declaration","freedom"],

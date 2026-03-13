@@ -30,7 +30,12 @@ const SONGS = [
 [C]Age to age He stands, [Am]and time is in His hands
 [F]Beginning and the end, [C]beginning and the end
 [C]The Godhead three in one, [Am]Father Spirit Son
-[F]The Lion and the Lamb, [C]the Lion and the Lamb`,
+[F]The Lion and the Lamb, [C]the Lion and the Lamb
+
+{Bridge}
+[Am]Name above all [G]names
+[F]Worthy of all [C]praise
+[Am]My heart will sing, how [G]great [F]is our God`,
     notes: "One of the most sung worship songs ever. Simple and singable.",
     bpm: 78,
     tags: ["praise","worship","classic"],
@@ -127,6 +132,9 @@ But I know we're all [D]searching for answers only You provide
 [Em]There's no one like [C]You
 [G]None like [D]You
 
+{Pre-Chorus}
+[Am]Into all the world You [C]sent Your only Son
+
 {Chorus}
 [C]Our God is greater, [D]our God is stronger
 [Em]God You are higher than [C]any other
@@ -145,7 +153,7 @@ Our [Em]God, our [C]God
   {
     title: "Is He Worthy",
     artist: "Chris Tomlin",
-    originalKey: "A",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
 [A]Do you feel the [E]world is broken?
@@ -184,11 +192,25 @@ Our [Em]God, our [C]God
 [A]Though darkness fills the [E]night
 [F#m]It cannot hide the [D]light
 
+{Pre-Chorus}
+[A]Whom shall I [E]fear
+[F#m]Whom shall I [D]fear
+
 {Chorus}
 [A]I know who goes be[E]fore me
 [F#m]I know who stands be[D]hind
 [A]The God of angel [E]armies
-[F#m]Is always by my [D]side`,
+[F#m]Is always by my [D]side
+[A]The One who reigns for[E]ever
+[F#m]He is a friend of [D]mine
+[A]The God of angel [E]armies
+[F#m]Is always by my [D]side
+
+{Bridge}
+[A]And nothing formed a[E]gainst me shall stand
+[F#m]You hold the whole world [D]in Your hands
+[A]I'm holding on to [E]Your promises
+[F#m]You are [D]faithful`,
     notes: "Powerful declaration of God as protector. Great opener.",
     bpm: 78,
     tags: ["worship","courage","protection"],
@@ -235,7 +257,7 @@ Our [Em]God, our [C]God
   {
     title: "At the Cross (Love Ran Red)",
     artist: "Chris Tomlin",
-    originalKey: "A",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
 [A]There's a place where [E]mercy reigns
@@ -461,19 +483,25 @@ Our [Em]God, our [C]God
 [B]Strength will rise as we [E]wait upon the Lord
 [B]Wait upon the Lord, we will [E]wait upon the Lord
 
-{Chorus}
+{Pre-Chorus}
 [B]Our God, You reign for[E]ever
 [G#m]Our hope, our strong de[F#]liverer
+
+{Chorus}
 [B]You are the ever[E]lasting God
-[G#m]The everlasting [F#]God`,
-    notes: "Isaiah 40:28-31 anthem. Drive the rhythm on the chorus.",
+[G#m]The everlasting [F#]God
+[B]You do not faint, You [E]won't grow weary
+[B]You're the defender [E]of the weak
+[G#m]You comfort those in [F#]need
+[B]You lift us up on [E]wings like eagles`,
+    notes: "Isaiah 40:28-31 anthem. Brenton Brown co-write.",
     bpm: 124,
     tags: ["worship","strength","waiting"],
   },
   {
     title: "We Fall Down (Tomlin)",
     artist: "Chris Tomlin",
-    originalKey: "E",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
 [E]We fall down, we [B]lay our crowns
@@ -923,7 +951,7 @@ Our [Em]God, our [C]God
   {
     title: "Noel (Tomlin)",
     artist: "Chris Tomlin",
-    originalKey: "D",
+    originalKey: "Db",
     format: "chordpro",
     content: `{Verse 1}
 [D]Love incarnate, [A]love divine
@@ -945,7 +973,7 @@ Our [Em]God, our [C]God
   {
     title: "Famous One",
     artist: "Chris Tomlin",
-    originalKey: "A",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
 [A]You are the [E]Lord, the famous [F#m]One, famous [D]One

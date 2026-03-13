@@ -16,20 +16,20 @@ const SONGS = [
     originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[D]You give life You are [F#m]love
-[A]You bring light to the [G]darkness
-[D]You give hope You re[F#m]store
-[A]Every heart that is [G]broken
+[D]You give life You are [Em]love
+[A]You bring light to the [D]darkness
+[D]You give hope You re[Em]store
+[A]Every heart that is [D]broken
 
 {Chorus}
-[D]Great are You [F#m]Lord
+[D]Great are You [Em]Lord
 
 {Verse 2}
-[D]It's Your breath in our [F#m]lungs
-[A]So we pour out our [G]praise
-[D]We pour out our [F#m]praise
-[A]It's Your breath in our [G]lungs
-[D]So we pour out our [F#m]praise to [A]You on[G]ly`,
+[D]It's Your breath in our [Em]lungs
+[A]So we pour out our [D]praise
+[D]We pour out our [Em]praise
+[A]It's Your breath in our [D]lungs
+[D]So we pour out our [Em]praise to [A]You on[D]ly`,
     notes: "The original All Sons & Daughters version. Intimate duo arrangement.",
     bpm: 70,
     tags: ["worship","praise","breath prayer","intimate"],

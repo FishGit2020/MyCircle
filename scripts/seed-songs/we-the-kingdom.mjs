@@ -13,24 +13,24 @@ const SONGS = [
   {
     title: "Holy Water",
     artist: "We The Kingdom",
-    originalKey: "G",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[G]God I'm on my [Em]knees again
-[C]God I'm begging [D]please again
-[G]I need You oh [Em]I need You
-[C]Walking down these [D]desert roads
-[G]Water for my [Em]thirsty soul
+[D]God I'm on my [Bm]knees again
+[G]God I'm begging [A]please again
+[D]I need You oh [Bm]I need You
+[G]Walking down these [A]desert roads
+[D]Water for my [Bm]thirsty soul
 
 {Chorus}
-[C]I don't want to [D]walk alone
-[Em]I don't want to [D]walk alone
+[G]I don't want to [A]walk alone
+[Bm]I don't want to [A]walk alone
 
 {Verse 2}
-[G]Your forgiveness is like [Em]sweet sweet honey on my lips
-[C]Like the sound of a [D]symphony to my ears
-[G]Like holy water [Em]on my skin
-[C]Dead man walking [D]come alive again`,
+[D]Your forgiveness is like [Bm]sweet sweet honey on my lips
+[G]Like the sound of a [A]symphony to my ears
+[D]Like holy water [Bm]on my skin
+[G]Dead man walking [A]come alive again`,
     notes: "Raw and emotional. Sparse verse building to powerful chorus. Southern gospel influence.",
     bpm: 74,
     tags: ["worship","repentance","grace","healing"],
@@ -62,22 +62,22 @@ const SONGS = [
   {
     title: "Dancing on the Waves",
     artist: "We The Kingdom",
-    originalKey: "A",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[A]Faith doesn't always [D]mean you understand
-[F#m]It doesn't always [E]come the way you planned
-[A]But when the waves are [D]high and the boat is [F#m]rocked
-[E]You find out what you believe in
+[E]Faith doesn't always [A]mean you understand
+[C#m]It doesn't always [B]come the way you planned
+[E]But when the waves are [A]high and the boat is [C#m]rocked
+[B]You find out what you believe in
 
 {Chorus}
-[A]I'm dancing on the [D]waves
-[F#m]I'm singing in the [E]rain
-[A]I'm standing on the [D]rock
-[F#m]When everything a[E]round me falls apart
-[A]I'm walking on the [D]water
-[F#m]Even if the [E]storms get harder
-[D]I know I'll be [E]fine with You [A]Lord`,
+[E]I'm dancing on the [A]waves
+[C#m]I'm singing in the [B]rain
+[E]I'm standing on the [A]rock
+[C#m]When everything a[B]round me falls apart
+[E]I'm walking on the [A]water
+[C#m]Even if the [B]storms get harder
+[A]I know I'll be [B]fine with You [E]Lord`,
     notes: "Upbeat faith declaration. Build energy through the choruses.",
     bpm: 126,
     tags: ["worship","faith","trust","joy"],

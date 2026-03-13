@@ -14,23 +14,23 @@ const SONGS = [
   {
     title: "Glorious Day",
     artist: "Passion",
-    originalKey: "G",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[G]I was buried beneath my [C]shame
-[Em]Who could carry that [D]kind of weight
-[G]It was my tomb, 'til [C]I met You
+[D]I was buried beneath my [G]shame
+[Bm]Who could carry that [A]kind of weight
+[D]It was my tomb, 'til [G]I met You
 
 {Chorus}
-[G]I was breathing but [C]wasn't alive
-[Em]All my failures I [D]tried to hide
-[G]It was my tomb, 'til [C]I met You
+[D]I was breathing but [G]wasn't alive
+[Bm]All my failures I [A]tried to hide
+[D]It was my tomb, 'til [G]I met You
 
 {Verse 2}
-[G]You called my name and [C]I ran out of that grave
-[Em]Out of the darkness [D]into the glorious day
-[G]You called my name and [C]I ran out of that grave
-[Em]Out of the darkness [D]into the glorious [G]day`,
+[D]You called my name and [G]I ran out of that grave
+[Bm]Out of the darkness [A]into the glorious day
+[D]You called my name and [G]I ran out of that grave
+[Bm]Out of the darkness [A]into the glorious [D]day`,
     notes: "Celebration of new life. Energetic chorus, full band.",
     bpm: 76,
     tags: ["praise","resurrection","freedom"],
@@ -38,27 +38,27 @@ const SONGS = [
   {
     title: "God You're So Good",
     artist: "Passion",
-    originalKey: "B",
+    originalKey: "Bb",
     format: "chordpro",
     content: `{Verse 1}
-[B]Amazing, [G#m]so amazing, [E]how can it be
-[F#]True that You'd love me
+[Bb]Amazing, [Gm]so amazing, [Eb]how can it be
+[F]True that You'd love me
 
 {Pre-Chorus}
-[B]God You're so good, [G#m]God You're so good
-[E]God You're so good, [F#]You're so good to me
+[Bb]God You're so good, [Gm]God You're so good
+[Eb]God You're so good, [F]You're so good to me
 
 {Pre-Chorus}
-[B]Faithful, [G#m]so faithful, [E]is Your love for me
-[F#]For all my days
+[Bb]Faithful, [Gm]so faithful, [Eb]is Your love for me
+[F]For all my days
 
 {Pre-Chorus}
-[B]Beautiful, [G#m]beautiful, [E]there is nothing that
-[F#]Compares to You
+[Bb]Beautiful, [Gm]beautiful, [Eb]there is nothing that
+[F]Compares to You
 
 {Verse 2}
-[B]Healing, [G#m]forgiving, [E]Your love never ends
-[F#]You are so good`,
+[Bb]Healing, [Gm]forgiving, [Eb]Your love never ends
+[F]You are so good`,
     notes: "Simple chorus. Great for congregational worship.",
     bpm: 74,
     tags: ["worship","goodness","praise"],
@@ -90,29 +90,29 @@ const SONGS = [
   {
     title: "My Jesus",
     artist: "Anne Wilson",
-    originalKey: "C",
+    originalKey: "Gb",
     format: "chordpro",
     content: `{Verse 1}
-[C]Are you past the point of [G]weary
-[Am]Is your burden weighing [F]heavy
-[C]Is it all too much to [G]carry
-[Am]Let me tell you bout my [F]Jesus
+[Gb]Are you past the point of [Db]weary
+[Ebm]Is your burden weighing [Cb]heavy
+[Gb]Is it all too much to [Db]carry
+[Ebm]Let me tell you bout my [Cb]Jesus
 
 {Chorus}
-[C]Do you feel that empty [G]feeling
-[Am]Cause shame's done all its [F]stealing
-[C]And you're desperate for some [G]healing
-[Am]Let me tell you bout my [F]Jesus
+[Gb]Do you feel that empty [Db]feeling
+[Ebm]Cause shame's done all its [Cb]stealing
+[Gb]And you're desperate for some [Db]healing
+[Ebm]Let me tell you bout my [Cb]Jesus
 
 {Verse 2}
-[C]He makes a way where there [G]ain't no way
-[Am]Rises up from an [F]empty grave
-[C]Ain't no sinner that He [G]can't save
-[Am]Let me tell you bout my [F]Jesus
-[C]His love is strong and His [G]grace is free
-[Am]And the good news is I [F]know that He
-[C]Can do for you what He's [G]done for me
-[Am]Let me tell you bout my [F]Je[C]sus`,
+[Gb]He makes a way where there [Db]ain't no way
+[Ebm]Rises up from an [Cb]empty grave
+[Gb]Ain't no sinner that He [Db]can't save
+[Ebm]Let me tell you bout my [Cb]Jesus
+[Gb]His love is strong and His [Db]grace is free
+[Ebm]And the good news is I [Cb]know that He
+[Gb]Can do for you what He's [Db]done for me
+[Ebm]Let me tell you bout my [Cb]Je[Gb]sus`,
     notes: "Country-gospel crossover, heartfelt testimony",
     bpm: 84,
     tags: ["worship","testimony","country-gospel"],
@@ -272,26 +272,26 @@ const SONGS = [
   {
     title: "Rescue",
     artist: "Lauren Daigle",
-    originalKey: "Bb",
+    originalKey: "Gb",
     format: "chordpro",
     content: `{Verse 1}
-[Bb]You are not hidden, [F]there's never been a moment
-[Gm]You were forgotten, [Eb]You are not hopeless
-[Bb]Though you have been broken, [F]Your innocence stolen
-[Gm]I hear you whisper under[Eb]neath your breath
+[Gb]You are not hidden, [Db]there's never been a moment
+[Ebm]You were forgotten, [Cb]You are not hopeless
+[Gb]Though you have been broken, [Db]Your innocence stolen
+[Ebm]I hear you whisper under[Cb]neath your breath
 
 {Chorus}
-[Bb]I hear you whisper, [F]you have nothing left
+[Gb]I hear you whisper, [Db]you have nothing left
 
 {Verse 2}
-[Bb]I will send out an [F]army to find you
-[Gm]In the middle of the [Eb]darkest night, it's true
-[Bb]I will rescue [F]you
+[Gb]I will send out an [Db]army to find you
+[Ebm]In the middle of the [Cb]darkest night, it's true
+[Gb]I will rescue [Db]you
 
 {Bridge}
-[Bb]There is no distance [F]that cannot be covered
-[Gm]Over and over, [Eb]You're not defenseless
-[Bb]I'll be Your shelter, [F]I'll be Your armor`,
+[Gb]There is no distance [Db]that cannot be covered
+[Ebm]Over and over, [Cb]You're not defenseless
+[Gb]I'll be Your shelter, [Db]I'll be Your armor`,
     notes: "Comforting song. Good for moments of ministry.",
     bpm: 65,
     tags: ["worship","comfort","rescue"],
@@ -351,27 +351,27 @@ const SONGS = [
   {
     title: "The Father's House",
     artist: "Cory Asbury",
-    originalKey: "Ab",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[Ab]Sometimes on this journey I get [Eb]lost in my mistakes
-[Fm]What looks to me like [Db]a dead end
+[C]Sometimes on this journey I get [G]lost in my mistakes
+[Am]What looks to me like [F]a dead end
 Is just a new beginning
 
 {Chorus}
-[Ab]Fear is just a shadow but [Eb]it's nothing in the light
-[Fm]I don't have to see the [Db]ending
+[C]Fear is just a shadow but [G]it's nothing in the light
+[Am]I don't have to see the [F]ending
 As long as God is in it
 
 {Verse 2}
-[Ab]Lay down what I want and [Eb]find what I need
-[Fm]There is freedom [Db]in surrender
+[C]Lay down what I want and [G]find what I need
+[Am]There is freedom [F]in surrender
 
 {Chorus}
-[Ab]Welcome home, [Eb]set a place at the table
-[Fm]There's no darkness [Db]in the Father's house
-[Ab]There's singing and [Eb]dancing
-[Fm]I've come back to the [Db]Father's house`,
+[C]Welcome home, [G]set a place at the table
+[Am]There's no darkness [F]in the Father's house
+[C]There's singing and [G]dancing
+[Am]I've come back to the [F]Father's house`,
     notes: "Prodigal son theme. Joyful and welcoming. Capo 1 play G shapes.",
     bpm: 114,
     tags: ["worship","home","grace"],
@@ -407,27 +407,27 @@ As long as God is in it
   {
     title: "Yes I Will",
     artist: "Vertical Worship",
-    originalKey: "Bb",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[Bb]I count on one thing
-[F]The same God that never fails
-[Gm]Will not fail me now
-[Eb]You won't fail me now
+[C]I count on one thing
+[G]The same God that never fails
+[Am]Will not fail me now
+[F]You won't fail me now
 
 {Chorus}
-[Bb]In the waiting, the [F]same God who's never late
-[Gm]Is working all things [Eb]out
+[C]In the waiting, the [G]same God who's never late
+[Am]Is working all things [F]out
 
 {Verse 2}
-[Bb]Yes I will, lift You [F]high in the lowest valley
-[Gm]Yes I will, bless Your [Eb]name
-[Bb]Yes I will, sing for [F]joy when my heart is heavy
-[Gm]All my days, yes I [Eb]will
+[C]Yes I will, lift You [G]high in the lowest valley
+[Am]Yes I will, bless Your [F]name
+[C]Yes I will, sing for [G]joy when my heart is heavy
+[Am]All my days, yes I [F]will
 
 {Chorus}
-[Bb]I choose to praise, to [F]give You my best in trial
-[Gm]Through fire or rain, [Eb]yes I will`,
+[C]I choose to praise, to [G]give You my best in trial
+[Am]Through fire or rain, [F]yes I will`,
     notes: "Declaration of praise. Great for building faith.",
     bpm: 73,
     tags: ["worship","praise","faith"],

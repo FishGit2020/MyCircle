@@ -13,25 +13,25 @@ const SONGS = [
   {
     title: "Battle Belongs",
     artist: "Phil Wickham",
-    originalKey: "C",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[C]When all I see is the battle
-[G]You see my victory
-[Am]When all I see is a mountain
-[F]You see a mountain moved
-[C]And as I walk through the shadow
-[G]Your love surrounds me
-[Am]There's nothing to fear now
-[F]For I am safe with You
+[D]When all I see is the battle
+[A]You see my victory
+[Bm]When all I see is a mountain
+[G]You see a mountain moved
+[D]And as I walk through the shadow
+[A]Your love surrounds me
+[Bm]There's nothing to fear now
+[G]For I am safe with You
 
 {Chorus}
-[C]So when I fight I'll fight on my knees
-[G]With my hands lifted high
-[Am]Oh God the battle belongs to You
-[F]And every fear I lay at Your feet
-[C]I'll sing through the night
-[G]Oh God the battle be[Am]longs to [F]You`,
+[D]So when I fight I'll fight on my knees
+[A]With my hands lifted high
+[Bm]Oh God the battle belongs to You
+[G]And every fear I lay at Your feet
+[D]I'll sing through the night
+[A]Oh God the battle be[Bm]longs to [G]You`,
     notes: "Declarative anthem. Great for spiritual warfare sets.",
     bpm: 144,
     tags: ["praise","warfare","anthem"],
@@ -39,25 +39,25 @@ const SONGS = [
   {
     title: "House of the Lord",
     artist: "Phil Wickham",
-    originalKey: "G",
+    originalKey: "Bb",
     format: "chordpro",
     content: `{Verse 1}
-[G]We worship the God who was
-[Bm]We worship the God who is
-[C]We worship the God who ever[D]more will be
-[G]He opened the prison doors
-[Bm]He parted the raging sea
-[C]My God, He holds the vic[D]tory
+[Bb]We worship the God who was
+[Dm]We worship the God who is
+[Eb]We worship the God who ever[F]more will be
+[Bb]He opened the prison doors
+[Dm]He parted the raging sea
+[Eb]My God, He holds the vic[F]tory
 
 {Chorus}
-[G]There's joy in the [Bm]house of the Lord
-[C]There's joy in the [D]house of the Lord today
-[G]And we won't be [Bm]quiet
-[C]We shout out Your [D]praise
-[G]There's joy in the [Bm]house of the Lord
-[C]Our God is [D]surely in this [G]place
+[Bb]There's joy in the [Dm]house of the Lord
+[Eb]There's joy in the [F]house of the Lord today
+[Bb]And we won't be [Dm]quiet
+[Eb]We shout out Your [F]praise
+[Bb]There's joy in the [Dm]house of the Lord
+[Eb]Our God is [F]surely in this [Bb]place
 And we won't be quiet
-[C]We shout out Your [D]praise`,
+[Eb]We shout out Your [F]praise`,
     notes: "Joyful and energetic. Great opener or closer.",
     bpm: 128,
     tags: ["praise","joy","celebration"],
@@ -65,26 +65,26 @@ And we won't be quiet
   {
     title: "Great Things",
     artist: "Phil Wickham",
-    originalKey: "D",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[D]Come let us worship our [A]King
-[Bm]Come let us bow at His [G]feet
-[D]He has done great [A]things
-[D]See what our Savior has [A]done
-[Bm]See how the victory's [G]won
-[D]He has done great [A]things
+[B]Come let us worship our [F#]King
+[G#m]Come let us bow at His [E]feet
+[B]He has done great [F#]things
+[B]See what our Savior has [F#]done
+[G#m]See how the victory's [E]won
+[B]He has done great [F#]things
 
 {Chorus}
-[D]He has done great [A]things
-[Bm]Oh, hero of [G]heaven You conquered the grave
-[D]You free every [A]captive and break every chain
-[Bm]Oh God, You have done [G]great things
+[B]He has done great [F#]things
+[G#m]Oh, hero of [E]heaven You conquered the grave
+[B]You free every [F#]captive and break every chain
+[G#m]Oh God, You have done [E]great things
 
 {Verse 2}
-[D]We dance in Your [A]freedom, awake and alive
-[Bm]Oh Jesus, our [G]Savior, Your name lifted high
-[D]Oh God, You have done [A]great things`,
+[B]We dance in Your [F#]freedom, awake and alive
+[G#m]Oh Jesus, our [E]Savior, Your name lifted high
+[B]Oh God, You have done [F#]great things`,
     notes: "Celebration song. Full band, big energy.",
     bpm: 100,
     tags: ["praise","celebration","victory"],
@@ -119,23 +119,23 @@ There's salvation in Your [C]name
   {
     title: "This Is Amazing Grace",
     artist: "Phil Wickham",
-    originalKey: "B",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[B]Who breaks the power of sin and darkness
-[G#m]Whose love is mighty and so much stronger
-[E]The King of Glory, the King above all kings
+[C]Who breaks the power of sin and darkness
+[Am]Whose love is mighty and so much stronger
+[F]The King of Glory, the King above all kings
 
 {Chorus}
-[B]Who shakes the whole earth with holy thunder
-[G#m]And leaves us breathless in awe and wonder
-[E]The King of Glory, the King above all kings
+[C]Who shakes the whole earth with holy thunder
+[Am]And leaves us breathless in awe and wonder
+[F]The King of Glory, the King above all kings
 
 {Verse 2}
-[B]This is amazing grace, [G#m]this is unfailing love
-[E]That You would take my place, [F#]that You would bear my cross
-[B]You laid down Your life, [G#m]that I would be set free
-[E]Oh, Jesus, I sing for [F#]all that You've done for me`,
+[C]This is amazing grace, [Am]this is unfailing love
+[F]That You would take my place, [G]that You would bear my cross
+[C]You laid down Your life, [Am]that I would be set free
+[F]Oh, Jesus, I sing for [G]all that You've done for me`,
     notes: "Anthem of grace. Big, bold chorus. Play in A with capo 2.",
     bpm: 100,
     tags: ["praise","grace","anthem"],
@@ -184,21 +184,21 @@ There's salvation in Your [C]name
   {
     title: "Your Love Awakens Me",
     artist: "Phil Wickham",
-    originalKey: "A",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[A]There were walls be[E]tween us
-[F#m]By the cross You came and [D]broke them down
-[A]You broke them [E]down
-[F#m]And there were chains a[D]round us
+[B]There were walls be[F#]tween us
+[G#m]By the cross You came and [E]broke them down
+[B]You broke them [F#]down
+[G#m]And there were chains a[E]round us
 
 {Chorus}
-[A]Your love a[E]wakens me
-[F#m]Awakens [D]me
-[A]Your love lifts me [E]up
-[F#m]Your love a[D]wakens me
-[A]From the dark[E]ness
-[F#m]Into the [D]light`,
+[B]Your love a[F#]wakens me
+[G#m]Awakens [E]me
+[B]Your love lifts me [F#]up
+[G#m]Your love a[E]wakens me
+[B]From the dark[F#]ness
+[G#m]Into the [E]light`,
     notes: "Bright and uplifting, builds from gentle verse to soaring chorus.",
     bpm: 130,
     tags: ["worship","love","awakening","freedom"],

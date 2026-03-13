@@ -39,30 +39,30 @@ const SONGS = [
   {
     title: "The Blessing",
     artist: "Kari Jobe",
-    originalKey: "C",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[C]The Lord bless you and [G]keep you
-[Am]Make His face shine upon [F]you
-And be gracious to [C]you
-The Lord turn His [G]face toward you
-[Am]And give you [F]peace
+[B]The Lord bless you and [F#]keep you
+[G#m]Make His face shine upon [E]you
+And be gracious to [B]you
+The Lord turn His [F#]face toward you
+[G#m]And give you [E]peace
 
 {Chorus}
-[C]Amen, [G]amen, [Am]amen
-[F]Amen, [C]amen, [G]amen
+[B]Amen, [F#]amen, [G#m]amen
+[E]Amen, [B]amen, [F#]amen
 
 {Verse 2}
-[Am]May His [F]favor be upon you
-[C]And a thousand [G]generations
-[Am]And your [F]family and your children
-[C]And their [G]children and their children
+[G#m]May His [E]favor be upon you
+[B]And a thousand [F#]generations
+[G#m]And your [E]family and your children
+[B]And their [F#]children and their children
 
 {Chorus}
-[Am]May His [F]presence go before you
-[C]And behind you [G]and beside you
-[Am]All a[F]round you and within you
-[C]He is [G]with you, He is with you`,
+[G#m]May His [E]presence go before you
+[B]And behind you [F#]and beside you
+[G#m]All a[E]round you and within you
+[B]He is [F#]with you, He is with you`,
     notes: "Benediction song. Powerful extended worship. Based on Numbers 6:24-26.",
     bpm: 72,
     tags: ["worship","blessing","prayer"],
@@ -70,33 +70,33 @@ The Lord turn His [G]face toward you
   {
     title: "Forever (We Sing Hallelujah)",
     artist: "Kari Jobe",
-    originalKey: "G",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[G]The moon and stars they [Em]wept
-[C]The morning sun was [G]dead
-[G]The Savior of the [Em]world was fallen
-[C]His body on the [D]cross
-[C]His blood poured out for [D]us
-[G]The weight of every [Em]curse upon Him
+[Ab]The moon and stars they [Fm]wept
+[Db]The morning sun was [Ab]dead
+[Ab]The Savior of the [Fm]world was fallen
+[Db]His body on the [Eb]cross
+[Db]His blood poured out for [Eb]us
+[Ab]The weight of every [Fm]curse upon Him
 
 {Chorus}
-[G]One final breath He [Em]gave
-[C]As heaven looked a[G]way
-[G]The Son of God was [Em]laid in darkness
-[C]A battle in the [D]grave
-[C]The war on death was [D]waged
-[G]The power of hell for[Em]ever broken
+[Ab]One final breath He [Fm]gave
+[Db]As heaven looked a[Ab]way
+[Ab]The Son of God was [Fm]laid in darkness
+[Db]A battle in the [Eb]grave
+[Db]The war on death was [Eb]waged
+[Ab]The power of hell for[Fm]ever broken
 
 {Verse 2}
-[G]The ground began to [Em]shake, the stone was rolled [C]away
-[G]His perfect love could [Em]not be overcome
-[C]Now death where is your [D]sting, our resurrected [Em]King
-[C]Has rendered you de[D]feated
+[Ab]The ground began to [Fm]shake, the stone was rolled [Db]away
+[Ab]His perfect love could [Fm]not be overcome
+[Db]Now death where is your [Eb]sting, our resurrected [Fm]King
+[Db]Has rendered you de[Eb]feated
 
 {Chorus}
-[G]Forever He is [Em]glorified, forever He is [C]lifted high
-[G]Forever He is [Em]risen, He is a[C]live, He is a[D]live`,
+[Ab]Forever He is [Fm]glorified, forever He is [Db]lifted high
+[Ab]Forever He is [Fm]risen, He is a[Db]live, He is a[Eb]live`,
     notes: "Resurrection anthem. Builds from somber verse to explosive chorus.",
     bpm: 74,
     tags: ["worship","resurrection","victory"],
@@ -104,19 +104,19 @@ The Lord turn His [G]face toward you
   {
     title: "I Am Not Alone",
     artist: "Kari Jobe",
-    originalKey: "B",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[B]When I walk through [E]deep waters
-[G#m]I know that You will [F#]be with me
-[B]When I'm standing [E]in the fire
-[G#m]I will not be over[F#]come
+[E]When I walk through [A]deep waters
+[C#m]I know that You will [B]be with me
+[E]When I'm standing [A]in the fire
+[C#m]I will not be over[B]come
 
 {Chorus}
-[B]I am not a[E]lone
-[G#m]I am not a[F#]lone
-[B]You will go be[E]fore me
-[G#m]You will never [F#]leave me`,
+[E]I am not a[A]lone
+[C#m]I am not a[B]lone
+[E]You will go be[A]fore me
+[C#m]You will never [B]leave me`,
     notes: "Isaiah 43:2. Powerful reassurance anthem.",
     bpm: 72,
     tags: ["worship","comfort","promise"],
@@ -181,19 +181,19 @@ The Lord turn His [G]face toward you
   {
     title: "You Are for Me",
     artist: "Kari Jobe",
-    originalKey: "E",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[E]So I will not [B]fear
-[C#m]You are for [A]me
-[E]So I will not [B]fear
-[C#m]You are for [A]me
+[A]So I will not [E]fear
+[F#m]You are for [D]me
+[A]So I will not [E]fear
+[F#m]You are for [D]me
 
 {Chorus}
-[E]I know who goes be[B]fore me
-[C#m]I know who stands be[A]hind
-[E]The God of angel [B]armies
-[C#m]Is always by my [A]side`,
+[A]I know who goes be[E]fore me
+[F#m]I know who stands be[D]hind
+[A]The God of angel [E]armies
+[F#m]Is always by my [D]side`,
     notes: "Romans 8:31 declaration. Builds in confidence.",
     bpm: 74,
     tags: ["worship","courage","assurance"],
@@ -201,18 +201,18 @@ The Lord turn His [G]face toward you
   {
     title: "We Are",
     artist: "Kari Jobe",
-    originalKey: "E",
+    originalKey: "F",
     format: "chordpro",
     content: `{Verse 1}
-[E]We are the [B]light of the world
-[C#m]We are a city on a [A]hill
-[E]We are the [B]light of the world
-[C#m]We gotta, we gotta, we gotta let the [A]light shine
+[F]We are the [C]light of the world
+[Dm]We are a city on a [Bb]hill
+[F]We are the [C]light of the world
+[Dm]We gotta, we gotta, we gotta let the [Bb]light shine
 
 {Chorus}
-[E]We are, we [B]are
-[C#m]Called to be [A]Your hands and feet
-[E]We are, we [B]are the body of [A]Christ`,
+[F]We are, we [C]are
+[Dm]Called to be [Bb]Your hands and feet
+[F]We are, we [C]are the body of [Bb]Christ`,
     notes: "Matthew 5:14. Mission and identity anthem.",
     bpm: 128,
     tags: ["worship","mission","identity"],
@@ -277,19 +277,19 @@ The Lord turn His [G]face toward you
   {
     title: "Steady My Heart",
     artist: "Kari Jobe",
-    originalKey: "A",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[A]Wish it could be [E]easy
-[F#m]Why is life so [D]messy
-[A]Why is pain a [E]part of us
-[F#m]There are days I [D]feel like
-[A]Nothing ever [E]goes right
+[Ab]Wish it could be [Eb]easy
+[Fm]Why is life so [Db]messy
+[Ab]Why is pain a [Eb]part of us
+[Fm]There are days I [Db]feel like
+[Ab]Nothing ever [Eb]goes right
 
 {Chorus}
-[A]Steady my heart [E]Lord
-[F#m]Even when I [D]can't see
-[A]I will trust in [E]You [D]Lord`,
+[Ab]Steady my heart [Eb]Lord
+[Fm]Even when I [Db]can't see
+[Ab]I will trust in [Eb]You [Db]Lord`,
     notes: "Honest vulnerability. Women's ministry favorite.",
     bpm: 68,
     tags: ["worship","trust","honesty"],
@@ -356,18 +356,18 @@ The Lord turn His [G]face toward you
   {
     title: "Beautiful",
     artist: "Kari Jobe",
-    originalKey: "Eb",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[Eb]I see Your face in [Bb]every sunrise
-[Cm]The colors of the [Ab]morning are inside Your eyes
-[Eb]The world awakens [Bb]in the light of the day
-[Cm]I look up to the [Ab]sky and say
+[D]I see Your face in [A]every sunrise
+[Bm]The colors of the [G]morning are inside Your eyes
+[D]The world awakens [A]in the light of the day
+[Bm]I look up to the [G]sky and say
 
 {Chorus}
-[Eb]You're beautiful, [Bb]beautiful
-[Cm]God You're beautiful, [Ab]beautiful
-[Eb]Everything You are is [Bb]beautiful [Ab]`,
+[D]You're beautiful, [A]beautiful
+[Bm]God You're beautiful, [G]beautiful
+[D]Everything You are is [A]beautiful [G]`,
     notes: "From her debut album. Simple adoration of God's beauty.",
     bpm: 70,
     tags: ["worship","beauty","creation"],
@@ -375,21 +375,21 @@ The Lord turn His [G]face toward you
   {
     title: "The Garden",
     artist: "Kari Jobe",
-    originalKey: "D",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[D]I had all but [A]given up
-[Bm]Desperate for a [G]sign from love
-[D]Something good, some[A]thing kind
-[Bm]Bringing peace to [G]every corner of my mind
+[C]I had all but [G]given up
+[Am]Desperate for a [F]sign from love
+[C]Something good, some[G]thing kind
+[Am]Bringing peace to [F]every corner of my mind
 
 {Chorus}
-[D]Then I saw the [A]garden
-[Bm]You had planted [G]for me
-[D]In the middle of my [A]darkest night
-[Bm]It was blooming [G]beautifully
-[D]Faith was the evi[A]dence
-[Bm]Of what only [G]You could do`,
+[C]Then I saw the [G]garden
+[Am]You had planted [F]for me
+[C]In the middle of my [G]darkest night
+[Am]It was blooming [F]beautifully
+[C]Faith was the evi[G]dence
+[Am]Of what only [F]You could do`,
     notes: "From the Garden album. Personal testimony of hope in grief.",
     bpm: 64,
     tags: ["worship","hope","healing","testimony"],
@@ -436,22 +436,22 @@ The Lord turn His [G]face toward you
   {
     title: "Holy Spirit (Kari Jobe)",
     artist: "Kari Jobe",
-    originalKey: "D",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[D]Holy Spirit [A]You are welcome here
-[Bm]Come flood this place and [G]fill the atmosphere
-[D]Your glory God is [A]what our hearts long for
-[Bm]To be overcome by [G]Your presence Lord
+[Ab]Holy Spirit [Eb]You are welcome here
+[Fm]Come flood this place and [Db]fill the atmosphere
+[Ab]Your glory God is [Eb]what our hearts long for
+[Fm]To be overcome by [Db]Your presence Lord
 
 {Chorus}
-[D]Holy [A]Spirit
-[Bm]You are welcome [G]here
-[D]Come flood this [A]place and fill the atmo[G]sphere
+[Ab]Holy [Eb]Spirit
+[Fm]You are welcome [Db]here
+[Ab]Come flood this [Eb]place and fill the atmo[Db]sphere
 
 {Verse 2}
-[D]Let us become more [A]aware of Your presence
-[Bm]Let us experience the [G]glory of Your goodness`,
+[Ab]Let us become more [Eb]aware of Your presence
+[Fm]Let us experience the [Db]glory of Your goodness`,
     notes: "With Bryan & Katie Torwalt. Atmospheric and invitational.",
     bpm: 66,
     tags: ["worship","spirit","presence"],
@@ -459,18 +459,18 @@ The Lord turn His [G]face toward you
   {
     title: "No Sweeter Name",
     artist: "Kari Jobe",
-    originalKey: "A",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
-[A]No sweeter name than the [E]name of Jesus
-[F#m]No sweeter name have I [D]ever known
-[A]No sweeter name than the [E]name of Jesus
-[F#m]You are the [D]risen King
+[G]No sweeter name than the [D]name of Jesus
+[Em]No sweeter name have I [C]ever known
+[G]No sweeter name than the [D]name of Jesus
+[Em]You are the [C]risen King
 
 {Chorus}
-[A]You are the [E]Prince of Peace
-[F#m]Wonderful Coun[D]selor
-[A]You are the [E]mighty God [D]`,
+[G]You are the [D]Prince of Peace
+[Em]Wonderful Coun[C]selor
+[G]You are the [D]mighty God [C]`,
     notes: "Early Kari Jobe worship classic. Adoration of the name.",
     bpm: 72,
     tags: ["worship","name","adoration"],
@@ -498,18 +498,18 @@ The Lord turn His [G]face toward you
   {
     title: "Majestic (Kari Jobe)",
     artist: "Kari Jobe",
-    originalKey: "D",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[D]O Lord our Lord how [A]majestic
-[Bm]Is Your name in [G]all the earth
-[D]You have set Your [A]glory
-[Bm]Above the [G]heavens
+[E]O Lord our Lord how [B]majestic
+[C#m]Is Your name in [A]all the earth
+[E]You have set Your [B]glory
+[C#m]Above the [A]heavens
 
 {Chorus}
-[D]Majestic, [A]majestic
-[Bm]Your name is [G]high above all
-[D]Majestic [A]Lord [G]`,
+[E]Majestic, [B]majestic
+[C#m]Your name is [A]high above all
+[E]Majestic [B]Lord [A]`,
     notes: "Psalm 8:1. Grand and declarative. Full band arrangement.",
     bpm: 76,
     tags: ["worship","majesty","psalm"],
@@ -537,19 +537,19 @@ The Lord turn His [G]face toward you
   {
     title: "I Need You (Kari Jobe)",
     artist: "Kari Jobe",
-    originalKey: "G",
+    originalKey: "F#",
     format: "chordpro",
     content: `{Verse 1}
-[G]I need You, [D]oh I need You
-[Em]Every hour I [C]need You
-[G]My one defense, my [D]righteousness
-[Em]Oh God how I [C]need You
+[F#]I need You, [C#]oh I need You
+[Ebm]Every hour I [B]need You
+[F#]My one defense, my [C#]righteousness
+[Ebm]Oh God how I [B]need You
 
 {Chorus}
-[G]Where sin runs [D]deep Your grace is more
-[Em]Where grace is found is [C]where You are
-[G]And where You are Lord [D]I am free
-[Em]Holiness is [C]Christ in me`,
+[F#]Where sin runs [C#]deep Your grace is more
+[Ebm]Where grace is found is [B]where You are
+[F#]And where You are Lord [C#]I am free
+[Ebm]Holiness is [B]Christ in me`,
     notes: "Hymn meets modern worship. Matt Maher co-write.",
     bpm: 70,
     tags: ["worship","need","grace"],
@@ -596,20 +596,20 @@ The Lord turn His [G]face toward you
   {
     title: "Love Came Down",
     artist: "Kari Jobe",
-    originalKey: "E",
+    originalKey: "Ab",
     format: "chordpro",
     content: `{Verse 1}
-[E]If my heart is over[B]whelmed
-[C#m]And I cannot hear Your [A]voice
-[E]I'll hold on to what is [B]true
-[C#m]Though I cannot see [A]
+[Ab]If my heart is over[Eb]whelmed
+[Fm]And I cannot hear Your [Db]voice
+[Ab]I'll hold on to what is [Eb]true
+[Fm]Though I cannot see [Db]
 
 {Chorus}
-[E]Love came [B]down
-[C#m]And rescued [A]me
-[E]Love came [B]down
-[C#m]And set me [A]free
-[E]I am Yours, [B]Lord [A]forever I am Yours`,
+[Ab]Love came [Eb]down
+[Fm]And rescued [Db]me
+[Ab]Love came [Eb]down
+[Fm]And set me [Db]free
+[Ab]I am Yours, [Eb]Lord [Db]forever I am Yours`,
     notes: "Brian Johnson co-write. Bethel meets Kari. Anthem of rescue.",
     bpm: 72,
     tags: ["worship","love","rescue"],
@@ -617,20 +617,20 @@ The Lord turn His [G]face toward you
   {
     title: "The More I Seek You",
     artist: "Kari Jobe",
-    originalKey: "Eb",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[Eb]The more I seek [Bb]You
-[Cm]The more I find [Ab]You
-[Eb]The more I find [Bb]You
-[Cm]The more I love [Ab]You
+[E]The more I seek [B]You
+[C#m]The more I find [A]You
+[E]The more I find [B]You
+[C#m]The more I love [A]You
 
 {Chorus}
-[Eb]I want to sit at Your [Bb]feet
-[Cm]Drink from the cup in Your [Ab]hand
-[Eb]Lay back against [Bb]You and breathe
-[Cm]Feel Your heart[Ab]beat
-[Eb]This love is so [Bb]deep it's more than [Ab]I can stand`,
+[E]I want to sit at Your [B]feet
+[C#m]Drink from the cup in Your [A]hand
+[E]Lay back against [B]You and breathe
+[C#m]Feel Your heart[A]beat
+[E]This love is so [B]deep it's more than [A]I can stand`,
     notes: "Gateway classic. Intimate soaking worship. Let it breathe.",
     bpm: 58,
     tags: ["worship","intimacy","seeking"],

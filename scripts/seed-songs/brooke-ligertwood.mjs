@@ -37,25 +37,25 @@ const SONGS = [
   {
     title: "A Thousand Hallelujahs",
     artist: "Brooke Ligertwood",
-    originalKey: "A",
+    originalKey: "Db",
     format: "chordpro",
     content: `{Verse 1}
-[A]Who else would rocks cry [E]out to worship
-[F#m]Whose glory taught the [D]stars to shine
-[A]Perhaps creation [E]longs to have the
-[F#m]Words to truly prai[D]se You rightly
+[Db]Who else would rocks cry [Ab]out to worship
+[Bbm]Whose glory taught the [Gb]stars to shine
+[Db]Perhaps creation [Ab]longs to have the
+[Bbm]Words to truly prai[Gb]se You rightly
 
 {Chorus}
-[A]A thousand halle[E]lujahs
-[F#m]And a thousand [D]more
-[A]A thousand halle[E]lujahs
-[F#m]Is not enough for [D]You Lord
+[Db]A thousand halle[Ab]lujahs
+[Bbm]And a thousand [Gb]more
+[Db]A thousand halle[Ab]lujahs
+[Bbm]Is not enough for [Gb]You Lord
 
 {Verse 2}
-[A]Who else would die for [E]our redemption
-[F#m]Whose resurrection [D]means I'm free
-[A]So all creation [E]shouts together
-[F#m]A thousand halle[D]lujahs and a thousand [A]more`,
+[Db]Who else would die for [Ab]our redemption
+[Bbm]Whose resurrection [Gb]means I'm free
+[Db]So all creation [Ab]shouts together
+[Bbm]A thousand halle[Gb]lujahs and a thousand [Db]more`,
     notes: "Majestic and sweeping, builds to a huge ending",
     bpm: 76,
     tags: ["worship","praise","majesty"],
@@ -63,24 +63,24 @@ const SONGS = [
   {
     title: "Honey in the Rock",
     artist: "Brooke Ligertwood",
-    originalKey: "F",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[F]Oh God of Abraham [C]God of covenant
-[Dm]And faithful promises [Bb]time and time again
-[F]You have proven [C]You'll do just what You said
+[D]Oh God of Abraham [Bm]God of covenant
+[A]And faithful promises [G]time and time again
+[D]You have proven [Bm]You'll do just what You said
 
 {Chorus}
-[F]There's honey in the [C]rock
-[Dm]Living water, bread of [Bb]heaven
-[F]Fed by a hand that [C]won't let go and won't forget you
-[Dm]Oh there's honey in the [Bb]rock
+[D]There's honey in the [Bm]rock
+[A]Living water, bread of [G]heaven
+[D]Fed by a hand that [Bm]won't let go and won't forget you
+[A]Oh there's honey in the [G]rock
 
 {Verse 2}
-[F]There ain't no lack with [C]Jesus
-[Dm]There ain't no loss with [Bb]God
-[F]At the banqueting [C]table
-[Dm]Sit down beside [Bb]the Lord`,
+[D]There ain't no lack with [Bm]Jesus
+[A]There ain't no loss with [G]God
+[D]At the banqueting [Bm]table
+[A]Sit down beside [G]the Lord`,
     notes: "With Brandon Lake, gospel-influenced groove",
     bpm: 105,
     tags: ["worship","provision","gospel"],
@@ -88,29 +88,29 @@ const SONGS = [
   {
     title: "None but Jesus",
     artist: "Brooke Ligertwood",
-    originalKey: "G",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[G]In the quiet, [D]in the stillness
-[Em]I know that [C]You are God
-[G]In the secret [D]of Your presence
-[Em]I know there I [C]am restored
+[A]In the quiet, [D]in the stillness
+[Bm7]I know that [E]You are God
+[A]In the secret [D]of Your presence
+[Bm7]I know there I [E]am restored
+
+{Pre-Chorus}
+[F#m]When You call I won't re[D]fuse
+[A]Each new day again I'll [E]choose
 
 {Chorus}
-[G]When You call I won't re[D]fuse
-[Em]Each new day again I'll [C]choose
+[F#m]There is no one [D]else for me
+[A]None but Jesus [E]
+[F#m]Crucified to [D]set me free
+[A]Now I live to [E]bring Him praise
 
 {Verse 2}
-[G]There is no one [D]else for me
-[Em]None but Jesus [C]
-[G]Crucified to [D]set me free
-[Em]Now I live to [C]bring Him praise
-
-{Chorus}
-[G]In the chaos, [D]in confusion
-[Em]I know You're [C]sovereign still
-[G]In the moment [D]of my weakness
-[Em]You give me [C]grace to do Your will`,
+[A]In the chaos, [D]in confusion
+[Bm7]I know You're [E]sovereign still
+[A]In the moment [D]of my weakness
+[Bm7]You give me [E]grace to do Your will`,
     notes: "Brooke Fraser original, contemplative and pure",
     bpm: 74,
     tags: ["worship","devotional","surrender"],
@@ -118,18 +118,18 @@ const SONGS = [
   {
     title: "Communion",
     artist: "Brooke Ligertwood",
-    originalKey: "Eb",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
-[Eb]This is the body [Bb]broken for you
-[Cm]This is the blood [Ab]shed for you
-[Eb]In remembrance [Bb]of everything
-[Cm]You have [Ab]done
+[F]This is the body [C]broken for you
+[Am]This is the blood [G]shed for you
+[F]In remembrance [C]of everything
+[Am]You have [G]done
 
 {Chorus}
-[Eb]At this table [Bb]I remember
-[Cm]Grace so free and [Ab]love so tender
-[Eb]Broken bread and [Bb]crimson [Ab]cup`,
+[F]At this table [C]I remember
+[Am]Grace so free and [G]love so tender
+[F]Broken bread and [C]crimson [G]cup`,
     notes: "Communion service song. Reverent and unhurried.",
     bpm: 60,
     tags: ["worship","communion","remembrance"],
@@ -137,19 +137,19 @@ const SONGS = [
   {
     title: "Desert Song",
     artist: "Brooke Ligertwood",
-    originalKey: "Bb",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[Bb]This is my prayer in the [F]desert
-[Gm]When all that's within me feels [Eb]dry
-[Bb]This is my prayer in my [F]hunger and need
-[Gm]My God is the God who pro[Eb]vides
+[Bm]This is my prayer in the [A]desert
+[G]When all that's within me feels [D]dry
+[Bm]This is my prayer in my [A]hunger and need
+[G]My God is the God who pro[D]vides
 
 {Chorus}
-[Bb]I will bring praise, I will [F]bring praise
-[Gm]No weapon formed against me shall re[Eb]main
-[Bb]I will re[F]joice, I will de[Gm]clare
-[Eb]God is my victory and He is [Bb]here`,
+[D]I will bring praise, I will [A]bring praise
+[Bm]No weapon formed against me shall re[G]main
+[D]I will re[A]joice, I will de[Bm]clare
+[G]God is my victory and He is [D]here`,
     notes: "Hillsong classic by Brooke. Build from desert to victory.",
     bpm: 70,
     tags: ["worship","perseverance","seasons"],
@@ -157,39 +157,39 @@ const SONGS = [
   {
     title: "All Who Are Thirsty",
     artist: "Brooke Ligertwood",
-    originalKey: "D",
+    originalKey: "F",
     format: "chordpro",
     content: `{Verse 1}
-[D]All who are [A]thirsty
-[Bm]All who are [G]weak
-[D]Come to the [A]fountain
-[Bm]Dip your heart in the [G]stream of life
+[F]All who are [Am]thirsty
+[Bb]All who are [C]weak
+[F]Come to the [Am]fountain
+[Bb]Dip your heart in the [C]stream of life
 
 {Chorus}
-[D]Let the pain and the [A]sorrow
-[Bm]Be washed [G]away
-[D]In the waves of His [A]mercy
-[Bm]As deep cries out to [G]deep`,
-    notes: "Brenton Brown / early Brooke Fraser era. Flowing dynamics.",
+[F]Let the pain and the [Am]sorrow
+[Bb]Be washed [C]away
+[F]In the waves of His [Am]mercy
+[Bb]As deep cries out to [C]deep`,
+    notes: "Written by Brenton Brown & Glenn Robertson. Flowing dynamics.",
     bpm: 68,
     tags: ["worship","thirst","refreshing"],
   },
   {
     title: "Hosanna (Brooke)",
     artist: "Brooke Ligertwood",
-    originalKey: "Eb",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[Eb]I see the King of [Bb]Glory
-[Cm]Coming on the clouds with [Ab]fire
-[Eb]The whole earth [Bb]shakes
-[Cm]The whole earth [Ab]shakes
+[E]I see the King of [B]Glory
+[C#m]Coming on the clouds with [A]fire
+[E]The whole earth [B]shakes
+[C#m]The whole earth [A]shakes
 
 {Chorus}
-[Eb]Hosanna, Ho[Bb]sanna
-[Cm]Hosanna in the [Ab]highest
-[Eb]Hosanna, Ho[Bb]sanna
-[Cm]Hosanna in the [Ab]highest`,
+[E]Hosanna, Ho[B]sanna
+[C#m]Hosanna in the [A]highest
+[E]Hosanna, Ho[B]sanna
+[C#m]Hosanna in the [A]highest`,
     notes: "Hillsong United classic. Brooke wrote it. Powerful anthem.",
     bpm: 74,
     tags: ["worship","praise","anthem"],
@@ -487,10 +487,10 @@ const SONGS = [
     originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[D]You were the Word at the [A]beginning
-[Bm]One with God the Lord Most [G]High
-[D]Your hidden glory in cre[A]ation
-[Bm]Now revealed in [G]You our Christ
+[D]You were the Word at the [G]beginning
+[Bm]One with God the Lord Most [A]High
+[D]Your hidden glory in cre[G]ation
+[Bm]Now revealed in [A]You our Christ
 
 {Chorus}
 [D]What a beautiful [A]Name it is

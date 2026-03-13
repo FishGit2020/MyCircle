@@ -39,23 +39,23 @@ const SONGS = [
   {
     title: "Canvas and Clay",
     artist: "Pat Barrett",
-    originalKey: "A",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
-[A]You didn't look at me and [D]see a hopeless case
-[F#m]You saw a master[E]piece in a mess of grace
-[A]An empty canvas [D]waiting to be changed
-[F#m]Into something [E]beautiful
+[B]You didn't look at me and [E]see a hopeless case
+[G#m]You saw a master[F#]piece in a mess of grace
+[B]An empty canvas [E]waiting to be changed
+[G#m]Into something [F#]beautiful
 
 {Chorus}
-[A]Oh You're the potter I'm the [D]clay
-[F#m]And You will finish what You've [E]started
-[A]You who began a good [D]work in me
-[F#m]You'll be faithful to com[E]plete it
+[B]Oh You're the potter I'm the [E]clay
+[G#m]And You will finish what You've [F#]started
+[B]You who began a good [E]work in me
+[G#m]You'll be faithful to com[F#]plete it
 
 {Verse 2}
-[D]Canvas and [A]clay before You
-[E]Canvas and [F#m]clay I worship [D]You`,
+[E]Canvas and [B]clay before You
+[F#]Canvas and [G#m]clay I worship [E]You`,
     notes: "Features Ben Smith. Warm and reassuring. Great for identity themes.",
     bpm: 76,
     tags: ["worship","identity","creation","grace"],

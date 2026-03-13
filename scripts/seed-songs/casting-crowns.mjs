@@ -13,31 +13,31 @@ const SONGS = [
   {
     title: "Who Am I",
     artist: "Casting Crowns",
-    originalKey: "B",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
-[B]Who am I, that the [E]Lord of all the earth
-[G#m]Would care to know my [F#]name
-[B]Would care to feel my [E]hurt
-[B]Who am I, that the [E]bright and morning star
-[G#m]Would choose to light the [F#]way
-[B]For my ever wandering [E]heart
+[A]Who am I, that the [D]Lord of all the earth
+[F#m]Would care to know my [E]name
+[A]Would care to feel my [D]hurt
+[A]Who am I, that the [D]bright and morning star
+[F#m]Would choose to light the [E]way
+[A]For my ever wandering [D]heart
 
 {Chorus}
-[B]Not because of [E]who I am
-[G#m]But because of [F#]what You've done
-[B]Not because of [E]what I've done
-[G#m]But because of [F#]who You are
+[A]Not because of [D]who I am
+[F#m]But because of [E]what You've done
+[A]Not because of [D]what I've done
+[F#m]But because of [E]who You are
 
 {Verse 2}
-[B]I am a flower quickly [E]fading
-[G#m]Here today and gone to[F#]morrow
-[B]A wave tossed in the [E]ocean
-[G#m]A vapor in the [F#]wind
-[B]Still You hear me when I'm [E]calling
-[G#m]Lord You catch me when I'm [F#]falling
-[B]And You've told me who I [E]am
-[G#m]I am [F#]Yours, I am [B]Yours`,
+[A]I am a flower quickly [D]fading
+[F#m]Here today and gone to[E]morrow
+[A]A wave tossed in the [D]ocean
+[F#m]A vapor in the [E]wind
+[A]Still You hear me when I'm [D]calling
+[F#m]Lord You catch me when I'm [E]falling
+[A]And You've told me who I [D]am
+[F#m]I am [E]Yours, I am [A]Yours`,
     notes: "Classic CCM worship song. Very singable.",
     bpm: 68,
     tags: ["worship","identity","classic"],
@@ -45,24 +45,24 @@ const SONGS = [
   {
     title: "Praise You in This Storm",
     artist: "Casting Crowns",
-    originalKey: "A",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
-[A]I was sure by now, [E]God You would have reached down
-[F#m]And wiped our tears a[D]way, stepped in and saved the day
-[A]But once again, I [E]say amen
-[F#m]And it's still [D]raining
+[E]I was sure by now, [B]God You would have reached down
+[C#m]And wiped our tears a[A]way, stepped in and saved the day
+[E]But once again, I [B]say amen
+[C#m]And it's still [A]raining
 
 {Chorus}
-[A]And I'll praise You [E]in this storm
-[F#m]And I will lift my [D]hands
-[A]For You are who You [E]are
-[F#m]No matter where I [D]am
-[A]And every tear I've [E]cried
-[F#m]You hold in Your [D]hand
-[A]You never left my [E]side
-[F#m]And though my heart is [D]torn
-I will praise You in this [A]storm`,
+[E]And I'll praise You [B]in this storm
+[C#m]And I will lift my [A]hands
+[E]For You are who You [B]are
+[C#m]No matter where I [A]am
+[E]And every tear I've [B]cried
+[C#m]You hold in Your [A]hand
+[E]You never left my [B]side
+[C#m]And though my heart is [A]torn
+I will praise You in this [E]storm`,
     notes: "Song for the hard seasons. Comforting and honest.",
     bpm: 66,
     tags: ["worship","storm","perseverance"],
@@ -70,20 +70,20 @@ I will praise You in this [A]storm`,
   {
     title: "Scars in Heaven",
     artist: "Casting Crowns",
-    originalKey: "C",
+    originalKey: "F",
     format: "chordpro",
     content: `{Verse 1}
-[C]If I had only [G]known the last time
-[Am]Would be the last time
-[F]I would have put off all the things I had to do
-[C]I would have stayed a [G]little longer
-[Am]Held on a little [F]tighter, now what I'd give for one more day with you
+[F]If I had only [C]known the last time
+[Dm]Would be the last time
+[Bb]I would have put off all the things I had to do
+[F]I would have stayed a [C]little longer
+[Dm]Held on a little [Bb]tighter, now what I'd give for one more day with you
 
 {Chorus}
-[C]The only scars in [G]heaven
-[Am]They won't belong to [F]me and you
-[C]There'll be no such thing as [G]broken
-[Am]And all the old made [F]new`,
+[F]The only scars in [C]heaven
+[Dm]They won't belong to [Bb]me and you
+[F]There'll be no such thing as [C]broken
+[Dm]And all the old made [Bb]new`,
     notes: "Tender grief song offering hope. Gentle throughout, piano-led.",
     bpm: 66,
     tags: ["worship","hope","grief","heaven"],
@@ -194,18 +194,18 @@ I will praise You in this [A]storm`,
     originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
-[D]You give life, You are [A]love
-[Bm]You bring light to the [G]darkness
-[D]You give hope, You re[A]store
-[Bm]Every heart that is [G]broken
+[D]You give life, You are [Em]love
+[A]You bring light to the [D]darkness
+[D]You give hope, You re[Em]store
+[A]Every heart that is [D]broken
 
 {Chorus}
-[D]Great are You [A]Lord
-[Bm]It's Your breath in our [G]lungs
-[D]So we pour out our [A]praise
-[Bm]We pour out our [G]praise
-[D]It's Your breath in our [A]lungs
-[Bm]So we pour out our [G]praise to You only`,
+[D]Great are You [Em]Lord
+[A]It's Your breath in our [D]lungs
+[D]So we pour out our [Em]praise
+[A]We pour out our [D]praise
+[D]It's Your breath in our [Em]lungs
+[A]So we pour out our [D]praise to You only`,
     notes: "Casting Crowns arrangement, distinct from All Sons & Daughters version. Powerful live.",
     bpm: 70,
     tags: ["worship","praise","adoration"],
