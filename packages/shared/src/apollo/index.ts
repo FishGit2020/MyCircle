@@ -35,6 +35,7 @@ export type {
   GetBenchmarkEndpointModelsQuery,
   GetBenchmarkHistoryQuery,
   GetBenchmarkSummaryQuery,
+  SearchLocationsQuery,
   GetWorshipSongsListQuery,
   GetWorshipSongsListQueryVariables,
   GetWorshipSongQuery,

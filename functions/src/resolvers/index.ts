@@ -11,6 +11,7 @@ import { createCloudFileResolvers } from './cloudFiles.js';
 import { createBabyPhotoResolvers } from './babyPhotos.js';
 import { createDigitalLibraryResolvers } from './digitalLibrary.js';
 import { createTransitQueryResolvers } from './transit.js';
+import { createLocationSearchQueryResolvers } from './locationSearch.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -48,6 +49,7 @@ export function createResolvers(
       ...babyPhotoResolvers.Query,
       ...digitalLibraryResolvers.Query,
       ...createTransitQueryResolvers(),
+      ...createLocationSearchQueryResolvers(),
     },
   };
 }
