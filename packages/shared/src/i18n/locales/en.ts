@@ -2225,6 +2225,7 @@ const en = {
   'tripPlanner.upcomingTrip': 'Next trip',
   'tripPlanner.noUpcoming': 'No upcoming trips',
   'tripPlanner.searchDestination': 'Search for a destination...',
+  'tripPlanner.viewOnMap': 'View on Map',
 
   // ─── Poll System ──────────────────────────────────────────
   'nav.pollSystem': 'Polls',
@@ -2411,6 +2412,7 @@ const en = {
   'travelMap.pinList': 'Places',
   'travelMap.searchLocation': 'Search location...',
   'travelMap.noPins': 'No pins yet. Tap the map or click Add Pin to get started.',
+  'travelMap.planTrip': 'Plan Trip',
 
   // ─── Recycle Bin ────────────────────────────────────────────
   'nav.recycleBin': 'Recycle Bin',

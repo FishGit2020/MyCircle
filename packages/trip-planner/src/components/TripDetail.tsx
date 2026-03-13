@@ -128,7 +128,29 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
           <button type="button" onClick={onBack} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-2">
             &larr; {t('tripPlanner.back')}
           </button>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{trip.destination}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{trip.destination}</h2>
+            {trip.lat != null && trip.lon != null && (
+              <button
+                type="button"
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  params.set('lat', String(trip.lat));
+                  params.set('lon', String(trip.lon));
+                  params.set('zoom', '10');
+                  window.location.href = `/travel-map?${params.toString()}`;
+                }}
+                className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
+                aria-label={t('tripPlanner.viewOnMap')}
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {t('tripPlanner.viewOnMap')}
+              </button>
+            )}
+          </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {new Date(trip.startDate).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
             {' – '}

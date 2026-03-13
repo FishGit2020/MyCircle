@@ -7,13 +7,16 @@ interface TripFormProps {
   trip: Trip | null;
   onSave: (data: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
+  initialDestination?: string;
+  initialLat?: number;
+  initialLon?: number;
 }
 
-export default function TripForm({ trip, onSave, onCancel }: TripFormProps) {
+export default function TripForm({ trip, onSave, onCancel, initialDestination, initialLat, initialLon }: TripFormProps) {
   const { t } = useTranslation();
-  const [destination, setDestination] = useState(trip?.destination || '');
-  const [lat, setLat] = useState<number | undefined>(trip?.lat);
-  const [lon, setLon] = useState<number | undefined>(trip?.lon);
+  const [destination, setDestination] = useState(trip?.destination || initialDestination || '');
+  const [lat, setLat] = useState<number | undefined>(trip?.lat ?? initialLat);
+  const [lon, setLon] = useState<number | undefined>(trip?.lon ?? initialLon);
   const [startDate, setStartDate] = useState(trip?.startDate || '');
   const [endDate, setEndDate] = useState(trip?.endDate || '');
   const [notes, setNotes] = useState(trip?.notes || '');

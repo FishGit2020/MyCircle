@@ -166,6 +166,27 @@ export default function PinForm({ initialLat, initialLon, editPin, onSubmit, onC
           {t('travelMap.cancel')}
         </button>
       </div>
+
+      {/* Plan Trip — only for existing pins */}
+      {editPin && (
+        <button
+          type="button"
+          onClick={() => {
+            const params = new URLSearchParams();
+            params.set('destination', editPin.name);
+            params.set('lat', String(editPin.lat));
+            params.set('lon', String(editPin.lon));
+            window.location.href = `/trip-planner?${params.toString()}`;
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-cyan-300 bg-cyan-50 px-4 py-2 text-sm font-medium text-cyan-700 transition-colors hover:bg-cyan-100 dark:border-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300 dark:hover:bg-cyan-900/50"
+          aria-label={t('travelMap.planTrip')}
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          {t('travelMap.planTrip')}
+        </button>
+      )}
     </form>
   );
 }
