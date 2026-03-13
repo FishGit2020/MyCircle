@@ -31,6 +31,11 @@ import {
   readSentryIssues,
   readSentryIssueDetail,
 } from './mcp-tools/sentry-reader.js';
+import {
+  exploreComponents,
+  componentDetail,
+  listMfeFeatures,
+} from './mcp-tools/component-explorer.js';
 
 const server = new McpServer({
   name: 'mycircle',
@@ -161,6 +166,40 @@ server.tool(
   },
   async ({ issueId }) => ({
     content: [{ type: 'text', text: await readSentryIssueDetail(issueId) }],
+  })
+);
+
+// ─── Component Explorer Tools ─────────────────────────────────
+
+server.tool(
+  'explore_components',
+  'Search for React components and hooks across all MFE packages by name, props, or feature keywords (e.g., "map", "pagination", "form", "audio").',
+  {
+    query: z.string().describe('Search term — component name, prop name, hook name, or feature keyword'),
+    package: z.string().optional().describe('Optional: filter to a specific MFE package name (e.g., "weather-display")'),
+  },
+  async ({ query, package: pkg }) => ({
+    content: [{ type: 'text', text: exploreComponents(query, pkg) }],
+  })
+);
+
+server.tool(
+  'component_detail',
+  'Get detailed info about a specific component or hook file: props, hooks used, imports, i18n keys, ARIA attributes, and child components.',
+  {
+    filePath: z.string().describe('File path relative to project root (e.g., "packages/hiking-map/src/components/MapView.tsx")'),
+  },
+  async ({ filePath }) => ({
+    content: [{ type: 'text', text: componentDetail(filePath) }],
+  })
+);
+
+server.tool(
+  'list_mfe_features',
+  'Overview of all MFE packages: main component, route, hooks, and key features for each package.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: listMfeFeatures() }],
   })
 );
 
