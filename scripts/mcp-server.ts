@@ -54,11 +54,15 @@ import {
   auditDependencies,
   analyzeBundleSizes,
 } from './mcp-tools/dependency-audit.js';
-
 import {
   readAnalyticsSummary,
   readFeatureUsage,
 } from './mcp-tools/analytics-reader.js';
+import { exploreDesignTokens } from './mcp-tools/design-tokens.js';
+import {
+  getTestCoverage,
+  findUntestedFiles,
+} from './mcp-tools/test-coverage.js';
 
 const server = new McpServer({
   name: 'mycircle',
@@ -294,6 +298,41 @@ server.tool(
   {},
   async () => ({
     content: [{ type: 'text', text: analyzeBundleSizes() }],
+  })
+);
+
+// ─── Design Token Tools ──────────────────────────────────────
+
+server.tool(
+  'explore_design_tokens',
+  'Extract Tailwind design system info from packages/shell/tailwind.config.js. Returns colors, spacing, breakpoints, fonts, animations, dark mode strategy, and content paths. Optionally filter by category.',
+  {
+    category: z.string().optional().describe('Optional category: "colors", "spacing", "breakpoints", "fonts", "animations", "darkMode", "content". Omit for overview.'),
+  },
+  async ({ category }) => ({
+    content: [{ type: 'text', text: exploreDesignTokens(category) }],
+  })
+);
+
+// ─── Test Coverage Tools ─────────────────────────────────────
+
+server.tool(
+  'get_test_coverage',
+  'Scan test files and count test cases per MFE package. Shows test file counts, test case counts, source files with/without tests. Optionally filter to a single package for detailed report.',
+  {
+    package: z.string().optional().describe('Optional: package name (e.g., "weather-display") for detailed report. Omit for summary of all packages.'),
+  },
+  async ({ package: pkg }) => ({
+    content: [{ type: 'text', text: getTestCoverage(pkg) }],
+  })
+);
+
+server.tool(
+  'find_untested_files',
+  'List source files (components and hooks) that have no corresponding test file. Grouped by package, sorted by most untested first.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: findUntestedFiles() }],
   })
 );
 
