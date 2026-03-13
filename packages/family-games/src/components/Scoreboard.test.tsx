@@ -8,7 +8,7 @@ vi.mock('@mycircle/shared', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (window as any).__familyGames = undefined;
+  window.__familyGames = undefined;
 });
 
 describe('Scoreboard', () => {
@@ -45,7 +45,7 @@ describe('Scoreboard', () => {
     const mockScores = [
       { id: '1', gameType: 'trivia', score: 500, timeMs: 30000, difficulty: 'mixed', playedBy: { uid: 'u1', displayName: 'Alice' }, playedAt: '2025-01-01T12:00:00Z' },
     ];
-    (window as any).__familyGames = {
+    window.__familyGames = {
       getScores: vi.fn().mockResolvedValue(mockScores),
       subscribe: vi.fn().mockReturnValue(() => {}),
     };

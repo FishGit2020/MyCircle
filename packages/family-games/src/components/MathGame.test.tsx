@@ -7,7 +7,7 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 vi.mock('./GameOver', () => ({
-  default: ({ score, onPlayAgain, onBack }: any) => (
+  default: ({ score, onPlayAgain, onBack }: { score: number; onPlayAgain: () => void; onBack: () => void }) => (
     <div>
       <span>GameOver</span>
       <span>Score: {score}</span>

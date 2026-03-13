@@ -8,7 +8,7 @@ vi.mock('@mycircle/shared', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (window as any).__familyGames = undefined;
+  window.__familyGames = undefined;
 });
 
 describe('GameOver', () => {
@@ -61,7 +61,7 @@ describe('GameOver', () => {
 
   it('auto-saves score when window.__familyGames is available', async () => {
     const saveScore = vi.fn().mockResolvedValue(undefined);
-    (window as any).__familyGames = { saveScore };
+    window.__familyGames = { saveScore };
     render(<GameOver {...defaultProps} />);
     await vi.waitFor(() => {
       expect(saveScore).toHaveBeenCalledWith({
@@ -78,7 +78,7 @@ describe('GameOver', () => {
 
   it('shows error when save fails', async () => {
     const saveScore = vi.fn().mockRejectedValue(new Error('fail'));
-    (window as any).__familyGames = { saveScore };
+    window.__familyGames = { saveScore };
     render(<GameOver {...defaultProps} />);
     await vi.waitFor(() => {
       expect(screen.getByText('games.submitFailed')).toBeInTheDocument();
