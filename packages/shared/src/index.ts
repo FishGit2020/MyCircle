@@ -6,3 +6,4 @@ export * from './hooks';
 export * from './i18n';
 export * from './data';
 export * from './components';
+export * from './map';
