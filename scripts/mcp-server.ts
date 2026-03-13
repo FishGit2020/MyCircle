@@ -51,6 +51,11 @@ import {
   checkColorContrast,
 } from './mcp-tools/a11y-checker.js';
 
+import {
+  readAnalyticsSummary,
+  readFeatureUsage,
+} from './mcp-tools/analytics-reader.js';
+
 const server = new McpServer({
   name: 'mycircle',
   version: '1.0.0',
@@ -296,6 +301,31 @@ server.tool(
   {},
   async () => ({
     content: [{ type: 'text', text: findRouteGaps() }],
+  })
+);
+
+// ─── Analytics Tools ──────────────────────────────────────────────────────
+
+server.tool(
+  'read_analytics_summary',
+  'Get page view and user metrics from GA4. Returns top pages by the selected metric plus total users, sessions, and page views.',
+  {
+    days: z.number().default(7).describe('Number of days to look back (default 7)'),
+    metric: z.enum(['pageViews', 'activeUsers', 'sessions']).default('pageViews').describe('Primary metric to rank pages by (default "pageViews")'),
+  },
+  async ({ days, metric }) => ({
+    content: [{ type: 'text', text: await readAnalyticsSummary({ days, metric }) }],
+  })
+);
+
+server.tool(
+  'read_feature_usage',
+  'Which MFE routes are most used. Groups GA4 page paths by first segment to show ranked MFE feature usage.',
+  {
+    days: z.number().default(7).describe('Number of days to look back (default 7)'),
+  },
+  async ({ days }) => ({
+    content: [{ type: 'text', text: await readFeatureUsage(days) }],
   })
 );
 
