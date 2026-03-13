@@ -220,6 +220,9 @@ importers:
       globals:
         specifier: ^17.4.0
         version: 17.4.0
+      google-auth-library:
+        specifier: ^10.6.1
+        version: 10.6.1
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -14222,7 +14225,7 @@ snapshots:
 
   gcp-metadata@8.1.2:
     dependencies:
-      gaxios: 7.1.3
+      gaxios: 7.1.4
       google-logging-utils: 1.1.3
       json-bigint: 1.0.0
     transitivePeerDependencies:
