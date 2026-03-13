@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type maplibregl from 'maplibre-gl';
+import { useMapLibre } from '@mycircle/shared';
 
 interface Props {
   onMapReady: (map: maplibregl.Map) => void;
@@ -7,81 +8,67 @@ interface Props {
   onStyleLoad?: () => void;
 }
 
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
-
 export default function MapView({ onMapReady, onMapClick, onStyleLoad }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
   const onMapClickRef = useRef(onMapClick);
   const onStyleLoadRef = useRef(onStyleLoad);
+  const onMapReadyRef = useRef(onMapReady);
   onMapClickRef.current = onMapClick;
   onStyleLoadRef.current = onStyleLoad;
+  onMapReadyRef.current = onMapReady;
 
+  const { map, mapReady } = useMapLibre(containerRef, {
+    center: [0, 20],
+    zoom: 2,
+    preserveDrawingBuffer: true,
+    maxPitch: 85,
+  });
+
+  // Notify parent and add controls when map is ready
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!map || !mapReady) return;
+    onMapReadyRef.current(map);
 
-    let map: maplibregl.Map;
-    let ro: ResizeObserver | undefined;
+    // Add controls (these are travel-map specific)
     import('maplibre-gl').then(({ default: ml }) => {
-      import('maplibre-gl/dist/maplibre-gl.css').catch(() => {});
-      map = new ml.Map({
-        container: containerRef.current!,
-        style: MAP_STYLE,
-        center: [0, 20],
-        zoom: 2,
-        preserveDrawingBuffer: true,
-        pitchWithRotate: true,
-        dragRotate: true,
-        touchPitch: true,
-        maxPitch: 85,
-      });
-
-      // Navigation controls (zoom + compass/rotate)
-      map.addControl(new ml.NavigationControl({ visualizePitch: true }), 'top-right');
-
-      // Fullscreen
-      map.addControl(new ml.FullscreenControl(), 'top-right');
-
-      // Geolocation (fly to user's location) — bottom-right to avoid overlap
-      map.addControl(new ml.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-        showUserLocation: true,
-        showAccuracyCircle: true,
-      }), 'bottom-right');
-
-      // Scale bar
-      map.addControl(new ml.ScaleControl({ maxWidth: 150 }), 'bottom-left');
-
-      map.on('load', () => {
-        mapRef.current = map;
-        onMapReady(map);
-        map.resize();
-      });
-
-      ro = new ResizeObserver(() => { mapRef.current?.resize(); });
-      if (containerRef.current) ro.observe(containerRef.current);
-
-      map.on('style.load', () => {
-        onStyleLoadRef.current?.();
-      });
-
-      map.on('click', (e) => {
-        onMapClickRef.current?.([e.lngLat.lng, e.lngLat.lat]);
-      });
-    });
-
-    return () => {
-      ro?.disconnect();
-      mapRef.current = null;
       try {
-        map?.remove();
+        map.addControl(new ml.NavigationControl({ visualizePitch: true }), 'top-right');
+        map.addControl(new ml.FullscreenControl(), 'top-right');
+        map.addControl(new ml.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          trackUserLocation: true,
+          showUserLocation: true,
+          showAccuracyCircle: true,
+        }), 'bottom-right');
+        map.addControl(new ml.ScaleControl({ maxWidth: 150 }), 'bottom-left');
       } catch {
-        // Map may have been destroyed during navigation
+        // Map may have been destroyed
       }
-    };
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [map, mapReady]);
+
+  // Style load handler
+  useEffect(() => {
+    if (!map) return;
+    const handler = () => { onStyleLoadRef.current?.(); };
+    map.on('style.load', handler);
+    return () => {
+      try { map.off('style.load', handler); } catch { /* destroyed */ }
+    };
+  }, [map]);
+
+  // Click handler
+  useEffect(() => {
+    if (!map) return;
+    const handler = (e: maplibregl.MapMouseEvent) => {
+      onMapClickRef.current?.([e.lngLat.lng, e.lngLat.lat]);
+    };
+    map.on('click', handler);
+    return () => {
+      try { map.off('click', handler); } catch { /* destroyed */ }
+    };
+  }, [map]);
 
   return <div ref={containerRef} className="w-full h-full" role="application" aria-label="Map" />;
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useMapLibre, setCircleLayer } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 
 interface TripMapPreviewProps {
@@ -7,74 +8,73 @@ interface TripMapPreviewProps {
   destinationName: string;
 }
 
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
-
 export default function TripMapPreview({ lat, lon, destinationName }: TripMapPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
+  const markerRef = useRef<maplibregl.Marker | null>(null);
+  const { map, mapReady } = useMapLibre(containerRef, {
+    center: [lon, lat],
+    zoom: 10,
+    preserveDrawingBuffer: true,
+    interactive: true,
+  });
 
+  // Add zoom control once when map is ready
   useEffect(() => {
-    if (!containerRef.current) return;
-
-    let map: maplibregl.Map;
-    let ro: ResizeObserver | undefined;
+    if (!map || !mapReady) return;
 
     import('maplibre-gl').then(({ default: ml }) => {
-      import('maplibre-gl/dist/maplibre-gl.css').catch(() => {});
+      try {
+        map.addControl(new ml.NavigationControl({ showCompass: false }), 'top-right');
+      } catch {
+        // GL operations may fail if map is destroyed
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, mapReady]);
 
-      if (!containerRef.current) return;
+  // Update marker and position when lat/lon/name change
+  useEffect(() => {
+    if (!map || !mapReady) return;
 
-      map = new ml.Map({
-        container: containerRef.current,
-        style: MAP_STYLE,
-        center: [lon, lat],
-        zoom: 10,
-        preserveDrawingBuffer: true,
-        interactive: true,
-      });
+    // Remove old marker
+    try {
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
+      }
+    } catch {
+      // Marker may have been destroyed
+    }
 
-      // Only zoom control
-      map.addControl(new ml.NavigationControl({ showCompass: false }), 'top-right');
+    // Fly to new location
+    try {
+      map.flyTo({ center: [lon, lat], zoom: 10, duration: 800 });
+    } catch {
+      // Map may have been destroyed
+    }
 
-      map.on('load', () => {
-        mapRef.current = map;
-        map.resize();
-
-        // Add destination marker
-        try {
-          const popup = new ml.Popup({ offset: 25, closeButton: false })
-            .setText(destinationName);
-          new ml.Marker({ color: '#06b6d4' })
-            .setLngLat([lon, lat])
-            .setPopup(popup)
-            .addTo(map);
-          popup.addTo(map);
-        } catch {
-          // GL operations may fail if map is destroyed
-        }
-      });
-
-      ro = new ResizeObserver(() => {
-        try {
-          mapRef.current?.resize();
-        } catch {
-          // Map may have been destroyed
-        }
-      });
-      if (containerRef.current) ro.observe(containerRef.current);
+    // Add destination marker + popup
+    import('maplibre-gl').then(({ default: ml }) => {
+      try {
+        const popup = new ml.Popup({ offset: 25, closeButton: false })
+          .setText(destinationName);
+        const marker = new ml.Marker({ color: '#06b6d4' })
+          .setLngLat([lon, lat])
+          .setPopup(popup)
+          .addTo(map);
+        popup.addTo(map);
+        markerRef.current = marker;
+      } catch {
+        // GL operations may fail if map is destroyed
+      }
     });
 
-    return () => {
-      ro?.disconnect();
-      mapRef.current = null;
-      try {
-        map?.remove();
-      } catch {
-        // Map may have been destroyed during navigation
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lat, lon, destinationName]);
+    // Add a circle layer for the destination point
+    setCircleLayer(map, 'dest-source', 'dest-circle',
+      [{ lon, lat, color: '#06b6d4' }],
+      { radius: 6, color: '#06b6d4', strokeWidth: 2, strokeColor: '#ffffff' },
+    );
+  }, [map, mapReady, lat, lon, destinationName]);
 
   return (
     <div

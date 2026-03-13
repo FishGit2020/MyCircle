@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation, PageContent } from '@mycircle/shared';
+import { useTranslation, PageContent, setCircleLayer, removeSourceAndLayers } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 import MapView from './MapView';
 import GpsLocateButton from './GpsLocateButton';
@@ -19,7 +19,7 @@ function lngLatToString([lng, lat]: [number, number]) {
   return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 }
 
-/** Draw or update a circle source+layer on the map. Replaces HTML Marker for reliability. */
+/** Draw or update a single waypoint circle on the map using shared utility. */
 function setPointLayer(
   map: maplibregl.Map,
   sourceId: string,
@@ -27,28 +27,14 @@ function setPointLayer(
   coords: [number, number] | null,
   color: string
 ) {
-  try {
-    if (map.getLayer(layerId)) map.removeLayer(layerId);
-    if (map.getSource(sourceId)) map.removeSource(sourceId);
-    if (!coords) return;
-    map.addSource(sourceId, {
-      type: 'geojson',
-      data: { type: 'Feature', geometry: { type: 'Point', coordinates: coords }, properties: {} },
-    });
-    map.addLayer({
-      id: layerId,
-      type: 'circle',
-      source: sourceId,
-      paint: {
-        'circle-radius': 9,
-        'circle-color': color,
-        'circle-stroke-width': 2.5,
-        'circle-stroke-color': '#ffffff',
-      },
-    });
-  } catch {
-    // Map may have been destroyed during navigation — ignore
+  if (!coords) {
+    removeSourceAndLayers(map, sourceId, [layerId]);
+    return;
   }
+  setCircleLayer(map, sourceId, layerId,
+    [{ lon: coords[0], lat: coords[1] }],
+    { radius: 9, color, strokeWidth: 2.5, strokeColor: '#ffffff' },
+  );
 }
 
 export default function HikingMap() {
