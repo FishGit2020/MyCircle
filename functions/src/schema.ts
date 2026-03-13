@@ -322,6 +322,12 @@ export const typeDefs = `#graphql
     title: String!
   }
 
+  type LocationSearchResult {
+    displayName: String!
+    lat: Float!
+    lon: Float!
+  }
+
   # ─── Transit Types ──────────────────────────────────────────────
 
   type TransitArrival {
@@ -388,6 +394,9 @@ export const typeDefs = `#graphql
     benchmarkEndpointModels(endpointId: ID!): [String!]!
     benchmarkHistory(limit: Int = 10): [BenchmarkRun!]!
     benchmarkSummary: BenchmarkSummary!
+
+    # Location search (Nominatim)
+    locationSearch(query: String!, limit: Int = 5): [LocationSearchResult!]!
 
     # Transit queries
     transitArrivals(stopId: String!): [TransitArrival!]!

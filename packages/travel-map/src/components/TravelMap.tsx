@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation, PageContent } from '@mycircle/shared';
+import { useTranslation, PageContent, useLazyQuery, SEARCH_LOCATIONS } from '@mycircle/shared';
+import type { SearchLocationsQuery } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
 import MapView from './MapView';
 import PinForm from './PinForm';
@@ -102,12 +103,6 @@ function setPendingLayer(
   }
 }
 
-interface NominatimResult {
-  display_name: string;
-  lat: string;
-  lon: string;
-}
-
 export default function TravelMap() {
   const { t } = useTranslation();
   const [map, setMap] = useState<maplibregl.Map | null>(null);
@@ -124,9 +119,9 @@ export default function TravelMap() {
 
   // Location search state
   const [locationQuery, setLocationQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<NominatimResult[]>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const [searchLocations, { loading: searchLoading, data: searchData }] = useLazyQuery<SearchLocationsQuery>(SEARCH_LOCATIONS);
+  const searchResults = locationQuery.trim() ? (searchData?.locationSearch ?? []) : [];
 
   const filteredPins = filterType === 'all' ? pins : pins.filter((p) => p.type === filterType);
 
@@ -232,38 +227,18 @@ export default function TravelMap() {
     [map],
   );
 
-  // Location search with Nominatim
+  // Location search via GraphQL
   const handleLocationSearch = useCallback((query: string) => {
     setLocationQuery(query);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    searchTimerRef.current = setTimeout(async () => {
-      setSearchLoading(true);
-      try {
-        const resp = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`,
-          { headers: { 'Accept-Language': 'en' } },
-        );
-        const data = await resp.json() as NominatimResult[];
-        setSearchResults(data);
-      } catch {
-        setSearchResults([]);
-      } finally {
-        setSearchLoading(false);
-      }
+    if (!query.trim()) return;
+    searchTimerRef.current = setTimeout(() => {
+      searchLocations({ variables: { query: query.trim(), limit: 5 } });
     }, 400);
-  }, []);
+  }, [searchLocations]);
 
-  const handleSelectSearchResult = useCallback((result: NominatimResult) => {
-    const lat = parseFloat(result.lat);
-    const lon = parseFloat(result.lon);
-    const lngLat: [number, number] = [lon, lat];
-
+  const handleSelectSearchResult = useCallback((result: { lat: number; lon: number }) => {
+    const lngLat: [number, number] = [result.lon, result.lat];
     if (map) {
       map.flyTo({ center: lngLat, zoom: 10, duration: 800 });
     }
@@ -271,7 +246,6 @@ export default function TravelMap() {
     setEditingPin(null);
     setShowForm(true);
     setLocationQuery('');
-    setSearchResults([]);
   }, [map]);
 
   const counts = {
@@ -332,7 +306,7 @@ export default function TravelMap() {
                   onClick={() => handleSelectSearchResult(result)}
                   className="w-full px-3 py-2 text-left text-sm text-gray-900 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
-                  {result.display_name}
+                  {result.displayName}
                 </button>
               </li>
             ))}
