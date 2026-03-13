@@ -47,7 +47,7 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
   const { t } = useTranslation();
   const [semitones, setSemitones] = useState(0);
   const [capoFret, setCapoFret] = useState(0);
-  const [notesOpen, setNotesOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(true);
   const [autoScroll, setAutoScroll] = useState(false);
   const [scrollSpeed, setScrollSpeed] = useState(loadScrollSpeed);
   const [copied, setCopied] = useState(false);
