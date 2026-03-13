@@ -37,6 +37,11 @@ import {
   listMfeFeatures,
 } from './mcp-tools/component-explorer.js';
 import {
+  analyzeI18nBundle,
+  findUnusedI18nKeys,
+  findMissingI18nKeys,
+} from './mcp-tools/i18n-analyzer.js';
+import {
   checkAccessibility,
   checkColorContrast,
 } from './mcp-tools/a11y-checker.js';
@@ -226,6 +231,35 @@ server.tool(
   {},
   async () => ({
     content: [{ type: 'text', text: checkColorContrast() }],
+  })
+);
+
+// ─── i18n Analyzer Tools ─────────────────────────────────────
+
+server.tool(
+  'analyze_i18n_bundle',
+  'Comprehensive i18n analysis: total keys per locale, keys per namespace, largest namespaces with examples. Useful for understanding localization scope and balance.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: analyzeI18nBundle() }],
+  })
+);
+
+server.tool(
+  'find_unused_i18n_keys',
+  'Find i18n keys defined in locale files but not referenced in any source code. May have false negatives for dynamically constructed keys.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: findUnusedI18nKeys() }],
+  })
+);
+
+server.tool(
+  'find_missing_i18n_keys',
+  'Find t() calls in source code that reference keys not defined in en.ts. Helps catch typos and forgotten key additions.',
+  {},
+  async () => ({
+    content: [{ type: 'text', text: findMissingI18nKeys() }],
   })
 );
 
