@@ -570,7 +570,7 @@ To his [G]children so He [D]loves us`,
   {
     title: "Mighty Name Of Jesus",
     artist: "The Belonging Co / Hope Darst",
-    originalKey: "Ab",
+    originalKey: "Eb",
     format: "chordpro",
     content: `{Verse 1}
 [Ab]I pray into the atmos[Cm]phere [Bb]

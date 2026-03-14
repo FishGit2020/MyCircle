@@ -47,16 +47,16 @@ const SONGS = [
 [E]This is the air I breathe
 [F#m]Your holy presence [D]living in me
 
-{Chorus}
+{Verse 2}
 [A]This is my daily bread
 [E]This is my daily bread
 [F#m]Your very word [D]spoken to me
 
-{Verse 2}
+{Bridge}
 [A]And I, [E]I'm desperate for You
 [F#m]And I, [D]I'm lost without You
 
-{Chorus}
+{Tag}
 [A]This is the air I breathe
 [E]This is the air I breathe
 [F#m]Your holy presence [D]living in me`,
@@ -83,7 +83,7 @@ const SONGS = [
 [B]I will be con[G#m]tent in every circum[E]stance
 You are [F#]Jireh, You are e[B]nough
 
-{Chorus}
+{Bridge}
 [B]Already [G#m]enough, already [E]enough, already [F#]enough`,
     notes: "Same song as Elevation version but with Chandler Moore ad-libs. Gentle and free.",
     bpm: 69,
@@ -126,7 +126,7 @@ I choose to be [C#m]holy
 [B]That is who You are [G#m]
 [E]That is who You are [F#]
 
-{Chorus}
+{Pre-Chorus}
 [B]Way maker, [G#m]chain breaker
 [E]That is who You [F#]are
 

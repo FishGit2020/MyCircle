@@ -357,7 +357,7 @@ We're singing [E]for the glory of the risen King`,
   {
     title: "Death Was Arrested",
     artist: "North Point Worship / Seth Condrey",
-    originalKey: "B",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
 [G]Alone in my sorrow and [C]dead in my sin
@@ -399,7 +399,7 @@ When [Em]death was arrested and [D]my life began`,
     artist: "Chris Tomlin",
     originalKey: "D",
     format: "chordpro",
-    content: `{Verse}
+    content: `{Verse 1}
 [D]We fall down we [A]lay our crowns
 At the [Bm]feet of [G]Jesus
 The [Em]greatness of [D]mercy and love
@@ -911,7 +911,7 @@ To [Bm]You alone may my [G]spirit [Em]yield
   {
     title: "Our God",
     artist: "Chris Tomlin",
-    originalKey: "B",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
 [Em]Water You turned into [C]wine

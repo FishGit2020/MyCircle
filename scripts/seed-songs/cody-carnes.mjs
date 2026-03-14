@@ -104,7 +104,7 @@ const SONGS = [
 [C]Love is vic[G]torious [D]heaven is [Em]speaking
 [C]The cross has the [D]final [G]word
 
-{Chorus}
+{Bridge}
 [G]The tomb where they [C]laid Him has [Em]nothing in[D]side`,
     notes: "Cross-centered anthem. Simple melody with powerful theology.",
     bpm: 78,
@@ -126,7 +126,7 @@ const SONGS = [
 [Em]But my house was built on [D]You
 [G]I'm safe with [C]You I'm going to make it [Em]through [D]
 
-{Verse 2}
+{Bridge}
 [C]Firm founda[G]tion
 [D]You are my firm founda[Em]tion
 [C]I will not be [G]shaken

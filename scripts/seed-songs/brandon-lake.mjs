@@ -19,17 +19,17 @@ const SONGS = [
 [B]All my words fall short, I got [G#m]nothing new
 [E]How could I express all my [F#]gratitude
 
-{Chorus}
+{Pre-Chorus}
 [B]I could sing these songs as I [G#m]often do
 [E]But every song must end and [F#]You never do
 
-{Verse 2}
+{Chorus}
 [B]So I throw up my [G#m]hands and praise You again and again
 [E]'Cause all that I have is a [F#]hallelujah, hallelujah
 [B]And I know it's not [G#m]much but I've nothing else
 [E]Fit for a King except for a [F#]heart singing hallelujah
 
-{Chorus}
+{Bridge}
 [B]Come on my soul, oh don't you get [G#m]shy on me
 [E]Lift up your song, 'cause you got a [F#]lion inside of those lungs
 [B]Get up and praise the [G#m]Lord`,

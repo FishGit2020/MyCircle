@@ -13,7 +13,7 @@ const SONGS = [
   {
     title: "Never Walk Alone",
     artist: "Hillsong Worship",
-    originalKey: "B",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
 [G]You're my deli[C]verer
@@ -55,7 +55,7 @@ const SONGS = [
   {
     title: "On Repeat",
     artist: "Elevation Worship",
-    originalKey: "B",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
 [G]You welcome me with [D]open arms

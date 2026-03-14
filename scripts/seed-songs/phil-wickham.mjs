@@ -126,12 +126,12 @@ There's salvation in Your [C]name
 [Am]Whose love is mighty and so much stronger
 [F]The King of Glory, the King above all kings
 
-{Chorus}
+{Pre-Chorus}
 [C]Who shakes the whole earth with holy thunder
 [Am]And leaves us breathless in awe and wonder
 [F]The King of Glory, the King above all kings
 
-{Verse 2}
+{Chorus}
 [C]This is amazing grace, [Am]this is unfailing love
 [F]That You would take my place, [G]that You would bear my cross
 [C]You laid down Your life, [Am]that I would be set free
