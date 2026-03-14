@@ -424,7 +424,7 @@ export default function GlobalAudioPlayer({ onPlayerStateChange, onPlayerVisibil
       audio.removeEventListener('pause', onPause);
       audio.removeEventListener('play', onPlay);
     };
-  }, [source?.track.id, source?.trackIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [source?.track.id, source?.trackIndex]);  
 
   // Close menus on outside click
   useEffect(() => {
