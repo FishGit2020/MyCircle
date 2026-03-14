@@ -58,7 +58,7 @@ The Lord turn His [F#]face toward you
 [G#m]And your [E]family and your children
 [B]And their [F#]children and their children
 
-{Chorus}
+{Bridge}
 [G#m]May His [E]presence go before you
 [B]And behind you [F#]and beside you
 [G#m]All a[E]round you and within you
@@ -80,7 +80,7 @@ The Lord turn His [F#]face toward you
 [Db]His blood poured out for [Eb]us
 [Ab]The weight of every [Fm]curse upon Him
 
-{Chorus}
+{Verse 2}
 [Ab]One final breath He [Fm]gave
 [Db]As heaven looked a[Ab]way
 [Ab]The Son of God was [Fm]laid in darkness
@@ -88,7 +88,7 @@ The Lord turn His [F#]face toward you
 [Db]The war on death was [Eb]waged
 [Ab]The power of hell for[Fm]ever broken
 
-{Verse 2}
+{Verse 3}
 [Ab]The ground began to [Fm]shake, the stone was rolled [Db]away
 [Ab]His perfect love could [Fm]not be overcome
 [Db]Now death where is your [Eb]sting, our resurrected [Fm]King

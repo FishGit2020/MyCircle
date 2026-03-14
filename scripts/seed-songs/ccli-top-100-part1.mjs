@@ -97,7 +97,7 @@ Holy for[E]ever
   {
     title: "Gratitude",
     artist: "Brandon Lake",
-    originalKey: "B",
+    originalKey: "C",
     format: "chordpro",
     content: `{Verse 1}
 [C]All my words fall short

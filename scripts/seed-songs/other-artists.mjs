@@ -21,12 +21,12 @@ const SONGS = [
 [Bm]Who could carry that [A]kind of weight
 [D]It was my tomb, 'til [G]I met You
 
-{Chorus}
+{Verse 2}
 [D]I was breathing but [G]wasn't alive
 [Bm]All my failures I [A]tried to hide
 [D]It was my tomb, 'til [G]I met You
 
-{Verse 2}
+{Chorus}
 [D]You called my name and [G]I ran out of that grave
 [Bm]Out of the darkness [A]into the glorious day
 [D]You called my name and [G]I ran out of that grave
@@ -44,19 +44,19 @@ const SONGS = [
 [Bb]Amazing, [Gm]so amazing, [Eb]how can it be
 [F]True that You'd love me
 
-{Pre-Chorus}
+{Chorus}
 [Bb]God You're so good, [Gm]God You're so good
 [Eb]God You're so good, [F]You're so good to me
 
-{Pre-Chorus}
+{Verse 2}
 [Bb]Faithful, [Gm]so faithful, [Eb]is Your love for me
 [F]For all my days
 
-{Pre-Chorus}
+{Verse 3}
 [Bb]Beautiful, [Gm]beautiful, [Eb]there is nothing that
 [F]Compares to You
 
-{Verse 2}
+{Verse 4}
 [Bb]Healing, [Gm]forgiving, [Eb]Your love never ends
 [F]You are so good`,
     notes: "Simple chorus. Great for congregational worship.",
@@ -280,10 +280,10 @@ const SONGS = [
 [Gb]Though you have been broken, [Db]Your innocence stolen
 [Ebm]I hear you whisper under[Cb]neath your breath
 
-{Chorus}
+{Pre-Chorus}
 [Gb]I hear you whisper, [Db]you have nothing left
 
-{Verse 2}
+{Chorus}
 [Gb]I will send out an [Db]army to find you
 [Ebm]In the middle of the [Cb]darkest night, it's true
 [Gb]I will rescue [Db]you
@@ -358,12 +358,12 @@ const SONGS = [
 [Am]What looks to me like [F]a dead end
 Is just a new beginning
 
-{Chorus}
+{Verse 2}
 [C]Fear is just a shadow but [G]it's nothing in the light
 [Am]I don't have to see the [F]ending
 As long as God is in it
 
-{Verse 2}
+{Pre-Chorus}
 [C]Lay down what I want and [G]find what I need
 [Am]There is freedom [F]in surrender
 
@@ -415,17 +415,17 @@ As long as God is in it
 [Am]Will not fail me now
 [F]You won't fail me now
 
-{Chorus}
+{Pre-Chorus}
 [C]In the waiting, the [G]same God who's never late
 [Am]Is working all things [F]out
 
-{Verse 2}
+{Chorus}
 [C]Yes I will, lift You [G]high in the lowest valley
 [Am]Yes I will, bless Your [F]name
 [C]Yes I will, sing for [G]joy when my heart is heavy
 [Am]All my days, yes I [F]will
 
-{Chorus}
+{Bridge}
 [C]I choose to praise, to [G]give You my best in trial
 [Am]Through fire or rain, [F]yes I will`,
     notes: "Declaration of praise. Great for building faith.",

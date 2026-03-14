@@ -52,7 +52,7 @@ To be over[D]come by Your [A]presence [D]Lord
   {
     title: "The Joy",
     artist: "Elevation Worship",
-    originalKey: "Bb",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
 [G]I've got the joy joy [C]joy joy
@@ -527,7 +527,7 @@ God You do great things
   {
     title: "Same God",
     artist: "Elevation Worship",
-    originalKey: "Ab",
+    originalKey: "Db",
     format: "chordpro",
     content: `{Verse 1}
 [Db]I'm calling on the God of [Gb/Db]Jacob

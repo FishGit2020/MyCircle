@@ -153,7 +153,7 @@ Our [Em]God, our [C]God
   {
     title: "Is He Worthy",
     artist: "Chris Tomlin",
-    originalKey: "E",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
 [A]Do you feel the [E]world is broken?
@@ -257,7 +257,7 @@ Our [Em]God, our [C]God
   {
     title: "At the Cross (Love Ran Red)",
     artist: "Chris Tomlin",
-    originalKey: "Ab",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
 [A]There's a place where [E]mercy reigns
@@ -501,7 +501,7 @@ Our [Em]God, our [C]God
   {
     title: "We Fall Down (Tomlin)",
     artist: "Chris Tomlin",
-    originalKey: "D",
+    originalKey: "E",
     format: "chordpro",
     content: `{Verse 1}
 [E]We fall down, we [B]lay our crowns
@@ -951,7 +951,7 @@ Our [Em]God, our [C]God
   {
     title: "Noel (Tomlin)",
     artist: "Chris Tomlin",
-    originalKey: "Db",
+    originalKey: "D",
     format: "chordpro",
     content: `{Verse 1}
 [D]Love incarnate, [A]love divine
@@ -973,7 +973,7 @@ Our [Em]God, our [C]God
   {
     title: "Famous One",
     artist: "Chris Tomlin",
-    originalKey: "G",
+    originalKey: "A",
     format: "chordpro",
     content: `{Verse 1}
 [A]You are the [E]Lord, the famous [F#m]One, famous [D]One
