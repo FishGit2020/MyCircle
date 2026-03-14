@@ -41,7 +41,7 @@ const TransitTracker: React.FC = () => {
   // Sync URL param to state — including clearing when navigating back to /transit
   useEffect(() => {
     setSelectedStopId(routeStopId || null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [routeStopId]);
 
   const handleSelectStop = useCallback((stopId: string) => {

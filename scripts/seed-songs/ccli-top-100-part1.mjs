@@ -754,7 +754,7 @@ Still [G]my soul will sing Your [D/F#]praise un[Em]ending
   {
     title: "Graves Into Gardens",
     artist: "Elevation Worship",
-    originalKey: "C",
+    originalKey: "G",
     format: "chordpro",
     content: `{Verse 1}
 [C]I searched the world but it [G]couldn't fill me
@@ -875,7 +875,7 @@ To [Em]see my sin upon that [G]cross`,
   {
     title: "Way Maker",
     artist: "Sinach",
-    originalKey: "E",
+    originalKey: "B",
     format: "chordpro",
     content: `{Verse 1}
 You are [E]here, moving in our [B]midst

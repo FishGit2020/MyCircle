@@ -28,7 +28,7 @@ export default function MapView({ onMapReady, onMapClick, onStyleLoad }: Props) 
   useEffect(() => {
     if (!map || !mapReady) return;
     onMapReadyRef.current(map);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [map, mapReady]);
 
   // Style load handler
