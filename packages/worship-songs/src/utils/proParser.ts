@@ -110,9 +110,9 @@ export function stripRtf(rtf: string): string {
       }
 
       // Consume optional numeric parameter
-      let param = '';
+      let _param = '';
       while (i < cleaned.length && /[\d-]/.test(cleaned[i])) {
-        param += cleaned[i];
+        _param += cleaned[i];
         i++;
       }
 
