@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "How He Loves",
+    title: "How He Loves [INCOMPLETE - needs Bridge]",
     artist: "David Crowder Band",
     originalKey: "C",
     format: "chordpro",
@@ -36,7 +36,7 @@ const SONGS = [
     tags: ["worship","love","anthem"],
   },
   {
-    title: "Wholly Yours",
+    title: "Wholly Yours [INCOMPLETE - needs Bridge]",
     artist: "David Crowder Band",
     originalKey: "D",
     format: "chordpro",
@@ -62,7 +62,7 @@ const SONGS = [
     tags: ["worship","devotional","surrender"],
   },
   {
-    title: "No One Like You (Crowder)",
+    title: "No One Like You (Crowder) [INCOMPLETE - needs V2+Bridge]",
     artist: "David Crowder Band",
     originalKey: "E",
     format: "chordpro",
@@ -82,7 +82,7 @@ const SONGS = [
     tags: ["worship","rock","praise"],
   },
   {
-    title: "Everything Glorious",
+    title: "Everything Glorious [INCOMPLETE - needs V2+Bridge]",
     artist: "David Crowder Band",
     originalKey: "A",
     format: "chordpro",
@@ -104,7 +104,7 @@ const SONGS = [
     tags: ["worship","celebration","praise"],
   },
   {
-    title: "SMS (Shine)",
+    title: "SMS (Shine) [INCOMPLETE - needs Bridge]",
     artist: "David Crowder Band",
     originalKey: "G",
     format: "chordpro",

@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Good Good Father (Housefires)",
+    title: "Good Good Father (Housefires) [INCOMPLETE - needs Bridge]",
     artist: "Housefires",
     originalKey: "A",
     format: "chordpro",
@@ -35,7 +35,7 @@ const SONGS = [
     tags: ["worship","identity","father","intimacy"],
   },
   {
-    title: "We Say Yes",
+    title: "We Say Yes [INCOMPLETE - needs Bridge]",
     artist: "Housefires",
     originalKey: "F",
     format: "chordpro",
@@ -61,7 +61,7 @@ const SONGS = [
     tags: ["worship","surrender","obedience","spontaneous"],
   },
   {
-    title: "Crash",
+    title: "Crash [INCOMPLETE - needs Bridge]",
     artist: "Housefires",
     originalKey: "G",
     format: "chordpro",
@@ -87,7 +87,7 @@ const SONGS = [
     tags: ["worship","Holy Spirit","presence","spontaneous"],
   },
   {
-    title: "Remembrance",
+    title: "Remembrance [INCOMPLETE - needs Bridge]",
     artist: "Housefires",
     originalKey: "D",
     format: "chordpro",
@@ -112,7 +112,7 @@ const SONGS = [
     tags: ["worship","communion","remembrance","intimate"],
   },
   {
-    title: "We Give You Glory",
+    title: "We Give You Glory [INCOMPLETE - needs Bridge]",
     artist: "Housefires",
     originalKey: "E",
     format: "chordpro",

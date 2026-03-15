@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Open the Eyes of My Heart",
+    title: "Open the Eyes of My Heart [INCOMPLETE - needs Bridge]",
     artist: "Paul Baloche",
     originalKey: "E",
     format: "chordpro",
@@ -37,7 +37,7 @@ const SONGS = [
     tags: ["worship","prayer","vision","classic"],
   },
   {
-    title: "Hosanna (Praise Is Rising)",
+    title: "Hosanna (Praise Is Rising) [INCOMPLETE - needs Bridge]",
     artist: "Paul Baloche",
     originalKey: "G",
     format: "chordpro",
@@ -61,7 +61,7 @@ const SONGS = [
     tags: ["worship","praise","hosanna","classic"],
   },
   {
-    title: "Your Name",
+    title: "Your Name [INCOMPLETE - needs Bridge]",
     artist: "Paul Baloche",
     originalKey: "G",
     format: "chordpro",
@@ -85,7 +85,7 @@ const SONGS = [
     tags: ["worship","name of Jesus","praise","classic"],
   },
   {
-    title: "What a Good God",
+    title: "What a Good God [INCOMPLETE - needs Bridge]",
     artist: "Paul Baloche",
     originalKey: "C",
     format: "chordpro",
@@ -110,7 +110,7 @@ const SONGS = [
     tags: ["worship","goodness","gratitude","praise"],
   },
   {
-    title: "Offering",
+    title: "Offering [INCOMPLETE - needs Bridge]",
     artist: "Paul Baloche",
     originalKey: "G",
     format: "chordpro",

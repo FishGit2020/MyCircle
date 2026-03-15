@@ -36,7 +36,7 @@ const SONGS = [
     tags: ["worship","spiritual warfare","declaration","spontaneous"],
   },
   {
-    title: "Yahweh",
+    title: "Yahweh [INCOMPLETE - needs Bridge]",
     artist: "UPPERROOM",
     originalKey: "C",
     format: "chordpro",

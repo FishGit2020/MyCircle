@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Great I Am",
+    title: "Great I Am [INCOMPLETE - needs Bridge]",
     artist: "Gateway Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -35,7 +35,7 @@ const SONGS = [
     tags: ["worship","reverence","awe","declaration"],
   },
   {
-    title: "Spirit of the Living God",
+    title: "Spirit of the Living God [INCOMPLETE - needs Bridge]",
     artist: "Gateway Worship",
     originalKey: "G",
     format: "chordpro",
@@ -59,7 +59,7 @@ const SONGS = [
     tags: ["worship","Holy Spirit","prayer","hymn"],
   },
   {
-    title: "Forever Yours",
+    title: "Forever Yours [INCOMPLETE - needs Bridge]",
     artist: "Gateway Worship",
     originalKey: "A",
     format: "chordpro",
@@ -85,7 +85,7 @@ const SONGS = [
     tags: ["worship","devotion","commitment","love"],
   },
   {
-    title: "Revelation",
+    title: "Revelation [INCOMPLETE - needs Bridge]",
     artist: "Gateway Worship",
     originalKey: "E",
     format: "chordpro",
@@ -110,7 +110,7 @@ const SONGS = [
     tags: ["worship","revelation","holiness","declaration"],
   },
   {
-    title: "No One Like Our God",
+    title: "No One Like Our God [INCOMPLETE - needs Bridge]",
     artist: "Gateway Worship",
     originalKey: "G",
     format: "chordpro",

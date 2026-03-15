@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Come As You Are",
+    title: "Come As You Are [INCOMPLETE - needs V2+Bridge]",
     artist: "Crowder",
     originalKey: "C",
     format: "chordpro",
@@ -32,7 +32,7 @@ const SONGS = [
     tags: ["worship","invitation","grace","mercy"],
   },
   {
-    title: "All My Hope",
+    title: "All My Hope [INCOMPLETE - needs V2+Bridge]",
     artist: "Crowder",
     originalKey: "Ab",
     format: "chordpro",
@@ -52,7 +52,7 @@ const SONGS = [
     tags: ["worship","hope","salvation","testimony"],
   },
   {
-    title: "Good God Almighty",
+    title: "Good God Almighty [INCOMPLETE - needs V2+Bridge]",
     artist: "Crowder",
     originalKey: "D",
     format: "chordpro",
@@ -72,7 +72,7 @@ const SONGS = [
     tags: ["worship","praise","joy","testimony"],
   },
   {
-    title: "Red Letters",
+    title: "Red Letters [INCOMPLETE - needs V2+Bridge]",
     artist: "Crowder",
     originalKey: "B",
     format: "chordpro",
@@ -92,7 +92,7 @@ const SONGS = [
     tags: ["worship","cross","gospel","salvation"],
   },
   {
-    title: "Let It Rain",
+    title: "Let It Rain [INCOMPLETE - needs V2+Bridge]",
     artist: "Crowder",
     originalKey: "D",
     format: "chordpro",
@@ -112,7 +112,7 @@ const SONGS = [
     tags: ["worship","Holy Spirit","revival","prayer"],
   },
   {
-    title: "In the House",
+    title: "In the House [INCOMPLETE - needs V2+Bridge]",
     artist: "Crowder",
     originalKey: "E",
     format: "chordpro",
@@ -132,7 +132,7 @@ const SONGS = [
     tags: ["worship","praise","celebration","joy"],
   },
   {
-    title: "My Victory",
+    title: "My Victory [INCOMPLETE - needs V2+Bridge]",
     artist: "Crowder",
     originalKey: "C",
     format: "chordpro",

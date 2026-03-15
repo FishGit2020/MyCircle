@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Great Are You Lord (All Sons & Daughters)",
+    title: "Great Are You Lord (All Sons & Daughters) [INCOMPLETE - needs Bridge]",
     artist: "All Sons & Daughters",
     originalKey: "D",
     format: "chordpro",
@@ -35,7 +35,7 @@ const SONGS = [
     tags: ["worship","praise","breath prayer","intimate"],
   },
   {
-    title: "Rising Sun",
+    title: "Rising Sun [INCOMPLETE - needs Bridge]",
     artist: "All Sons & Daughters",
     originalKey: "E",
     format: "chordpro",
@@ -59,7 +59,7 @@ const SONGS = [
     tags: ["worship","declaration","hope","anthem"],
   },
   {
-    title: "Called Me Higher",
+    title: "Called Me Higher [INCOMPLETE - needs Bridge]",
     artist: "All Sons & Daughters",
     originalKey: "G",
     format: "chordpro",
@@ -82,7 +82,7 @@ const SONGS = [
     tags: ["worship","calling","obedience","acoustic"],
   },
   {
-    title: "Reason to Sing",
+    title: "Reason to Sing [INCOMPLETE - needs Bridge]",
     artist: "All Sons & Daughters",
     originalKey: "A",
     format: "chordpro",
@@ -106,7 +106,7 @@ const SONGS = [
     tags: ["worship","hope","purpose","acoustic"],
   },
   {
-    title: "Sovereign Over Us",
+    title: "Sovereign Over Us [INCOMPLETE - needs Bridge]",
     artist: "All Sons & Daughters",
     originalKey: "G",
     format: "chordpro",

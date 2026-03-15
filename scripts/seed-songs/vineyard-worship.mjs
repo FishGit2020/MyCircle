@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Come Now Is the Time to Worship",
+    title: "Come Now Is the Time to Worship [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
@@ -55,7 +55,7 @@ const SONGS = [
     tags: ["worship","devotional","intimate"],
   },
   {
-    title: "Refiner's Fire",
+    title: "Refiner's Fire [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "E",
     format: "chordpro",
@@ -80,7 +80,7 @@ const SONGS = [
     tags: ["worship","classic","holiness"],
   },
   {
-    title: "Change My Heart Oh God",
+    title: "Change My Heart Oh God [INCOMPLETE - needs Bridge]",
     artist: "Vineyard Worship",
     originalKey: "C",
     format: "chordpro",
@@ -106,7 +106,7 @@ const SONGS = [
     tags: ["worship","classic","prayer"],
   },
   {
-    title: "Isn't He",
+    title: "Isn't He [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
@@ -124,7 +124,7 @@ const SONGS = [
     tags: ["worship","adoration","classic"],
   },
   {
-    title: "Holy and Anointed One",
+    title: "Holy and Anointed One [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
@@ -143,7 +143,7 @@ const SONGS = [
     tags: ["worship","classic","intimacy"],
   },
   {
-    title: "Sweetly Broken",
+    title: "Sweetly Broken [INCOMPLETE - needs Bridge]",
     artist: "Vineyard Worship",
     originalKey: "B",
     format: "chordpro",
@@ -165,7 +165,7 @@ const SONGS = [
     tags: ["worship","cross","surrender"],
   },
   {
-    title: "Draw Me Close",
+    title: "Draw Me Close [INCOMPLETE - needs Bridge]",
     artist: "Vineyard Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -191,7 +191,7 @@ const SONGS = [
     tags: ["worship","classic","intimacy"],
   },
   {
-    title: "Let It Rise",
+    title: "Let It Rise [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
@@ -210,7 +210,7 @@ const SONGS = [
     tags: ["worship","glory","praise"],
   },
   {
-    title: "More Love More Power",
+    title: "More Love More Power [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "Em",
     format: "chordpro",
@@ -230,7 +230,7 @@ const SONGS = [
     tags: ["worship","prayer","classic"],
   },
   {
-    title: "You Are Good (Vineyard)",
+    title: "You Are Good (Vineyard) [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "A",
     format: "chordpro",
@@ -249,7 +249,7 @@ const SONGS = [
     tags: ["worship","goodness","celebration"],
   },
   {
-    title: "Hallelujah Your Love Is Amazing",
+    title: "Hallelujah Your Love Is Amazing [INCOMPLETE - needs Bridge]",
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
@@ -275,7 +275,7 @@ const SONGS = [
     tags: ["worship","love","joy"],
   },
   {
-    title: "We Fall Down",
+    title: "We Fall Down [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
@@ -294,7 +294,7 @@ const SONGS = [
     tags: ["worship","reverence","classic"],
   },
   {
-    title: "Step by Step",
+    title: "Step by Step [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
@@ -334,7 +334,7 @@ const SONGS = [
     tags: ["worship","scripture","classic"],
   },
   {
-    title: "I Could Sing of Your Love Forever",
+    title: "I Could Sing of Your Love Forever [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "E",
     format: "chordpro",
@@ -374,7 +374,7 @@ const SONGS = [
     tags: ["worship","love","classic"],
   },
   {
-    title: "All I Need Is You",
+    title: "All I Need Is You [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
@@ -394,7 +394,7 @@ const SONGS = [
     tags: ["worship","simplicity","devotion"],
   },
   {
-    title: "Faithful One",
+    title: "Faithful One [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
@@ -414,7 +414,7 @@ const SONGS = [
     tags: ["worship","faithfulness","classic"],
   },
   {
-    title: "Shout to the North",
+    title: "Shout to the North [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
@@ -434,7 +434,7 @@ const SONGS = [
     tags: ["worship","praise","declaration"],
   },
   {
-    title: "Arms of Love",
+    title: "Arms of Love [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
@@ -453,7 +453,7 @@ const SONGS = [
     tags: ["worship","love","classic"],
   },
   {
-    title: "You Are Here (Turn Your Eyes)",
+    title: "You Are Here (Turn Your Eyes) [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "C",
     format: "chordpro",
@@ -472,7 +472,7 @@ const SONGS = [
     tags: ["worship","presence","classic"],
   },
   {
-    title: "Every Move I Make",
+    title: "Every Move I Make [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "G",
     format: "chordpro",
@@ -492,7 +492,7 @@ const SONGS = [
     tags: ["worship","joy","kids"],
   },
   {
-    title: "All Who Are Thirsty (Vineyard)",
+    title: "All Who Are Thirsty (Vineyard) [INCOMPLETE - needs Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",
@@ -516,7 +516,7 @@ const SONGS = [
     tags: ["worship","thirst","invitation"],
   },
   {
-    title: "Worthy (Vineyard)",
+    title: "Worthy (Vineyard) [INCOMPLETE - needs V2+Bridge]",
     artist: "Vineyard Worship",
     originalKey: "D",
     format: "chordpro",

@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Revelation Song",
+    title: "Revelation Song [INCOMPLETE - needs Bridge]",
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
@@ -102,7 +102,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","resurrection","victory"],
   },
   {
-    title: "I Am Not Alone",
+    title: "I Am Not Alone [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",
@@ -122,7 +122,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","comfort","promise"],
   },
   {
-    title: "Speak to Me (Kari Jobe)",
+    title: "Speak to Me (Kari Jobe) [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "A",
     format: "chordpro",
@@ -141,7 +141,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","listening","prayer"],
   },
   {
-    title: "Heal Our Land",
+    title: "Heal Our Land [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
@@ -160,7 +160,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","prayer","nation"],
   },
   {
-    title: "First Love",
+    title: "First Love [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "C",
     format: "chordpro",
@@ -179,7 +179,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","devotion","return"],
   },
   {
-    title: "You Are for Me",
+    title: "You Are for Me [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "A",
     format: "chordpro",
@@ -199,7 +199,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","courage","assurance"],
   },
   {
-    title: "We Are",
+    title: "We Are [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "F",
     format: "chordpro",
@@ -218,7 +218,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","mission","identity"],
   },
   {
-    title: "Keeper of My Heart",
+    title: "Keeper of My Heart [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
@@ -237,7 +237,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","love","intimacy"],
   },
   {
-    title: "Let the Heavens Open",
+    title: "Let the Heavens Open [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "F",
     format: "chordpro",
@@ -256,7 +256,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","heaven","prayer"],
   },
   {
-    title: "Breathe on Us",
+    title: "Breathe on Us [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
@@ -275,7 +275,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","spirit","prayer"],
   },
   {
-    title: "Steady My Heart",
+    title: "Steady My Heart [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "Ab",
     format: "chordpro",
@@ -295,7 +295,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","trust","honesty"],
   },
   {
-    title: "Fall Afresh",
+    title: "Fall Afresh [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
@@ -315,7 +315,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","spirit","renewal"],
   },
   {
-    title: "Hands to the Heavens",
+    title: "Hands to the Heavens [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "Bb",
     format: "chordpro",
@@ -334,7 +334,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","praise","expression"],
   },
   {
-    title: "Lead Me to the Cross",
+    title: "Lead Me to the Cross [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "A",
     format: "chordpro",
@@ -354,7 +354,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","cross","surrender"],
   },
   {
-    title: "Beautiful",
+    title: "Beautiful [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
@@ -373,7 +373,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","beauty","creation"],
   },
   {
-    title: "The Garden",
+    title: "The Garden [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "C",
     format: "chordpro",
@@ -395,7 +395,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","hope","healing","testimony"],
   },
   {
-    title: "Savior's Here",
+    title: "Savior's Here [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "Bb",
     format: "chordpro",
@@ -415,7 +415,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","presence","savior"],
   },
   {
-    title: "Only Your Love",
+    title: "Only Your Love [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
@@ -434,7 +434,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","love","sufficiency"],
   },
   {
-    title: "Holy Spirit (Kari Jobe)",
+    title: "Holy Spirit (Kari Jobe) [INCOMPLETE - needs Bridge]",
     artist: "Kari Jobe",
     originalKey: "Ab",
     format: "chordpro",
@@ -457,7 +457,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","spirit","presence"],
   },
   {
-    title: "No Sweeter Name",
+    title: "No Sweeter Name [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "G",
     format: "chordpro",
@@ -476,7 +476,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","name","adoration"],
   },
   {
-    title: "Here (Kari Jobe)",
+    title: "Here (Kari Jobe) [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "C",
     format: "chordpro",
@@ -496,7 +496,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","presence","gathering"],
   },
   {
-    title: "Majestic (Kari Jobe)",
+    title: "Majestic (Kari Jobe) [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",
@@ -515,7 +515,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","majesty","psalm"],
   },
   {
-    title: "Look Upon the Lord",
+    title: "Look Upon the Lord [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",
@@ -535,7 +535,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","gaze","encounter"],
   },
   {
-    title: "I Need You (Kari Jobe)",
+    title: "I Need You (Kari Jobe) [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "F#",
     format: "chordpro",
@@ -555,7 +555,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","need","grace"],
   },
   {
-    title: "Exhale",
+    title: "Exhale [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "Bb",
     format: "chordpro",
@@ -574,7 +574,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","rest","peace"],
   },
   {
-    title: "Embers",
+    title: "Embers [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "D",
     format: "chordpro",
@@ -594,7 +594,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","fire","revival"],
   },
   {
-    title: "Love Came Down",
+    title: "Love Came Down [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "Ab",
     format: "chordpro",
@@ -615,7 +615,7 @@ The Lord turn His [F#]face toward you
     tags: ["worship","love","rescue"],
   },
   {
-    title: "The More I Seek You",
+    title: "The More I Seek You [INCOMPLETE - needs V2+Bridge]",
     artist: "Kari Jobe",
     originalKey: "E",
     format: "chordpro",

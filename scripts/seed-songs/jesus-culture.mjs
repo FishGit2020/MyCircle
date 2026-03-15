@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Your Love Never Fails",
+    title: "Your Love Never Fails [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "Bb",
     format: "chordpro",
@@ -31,7 +31,7 @@ const SONGS = [
     tags: ["worship","love","faithfulness"],
   },
   {
-    title: "Break Every Chain",
+    title: "Break Every Chain [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "Bb",
     format: "chordpro",
@@ -51,7 +51,7 @@ const SONGS = [
     tags: ["worship","spiritual warfare","freedom","prayer"],
   },
   {
-    title: "Rooftops",
+    title: "Rooftops [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "Ab",
     format: "chordpro",
@@ -71,7 +71,7 @@ const SONGS = [
     tags: ["worship","praise","declaration"],
   },
   {
-    title: "Fierce",
+    title: "Fierce [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "G",
     format: "chordpro",
@@ -91,7 +91,7 @@ const SONGS = [
     tags: ["worship","love","pursuit"],
   },
   {
-    title: "Never Gonna Stop Singing",
+    title: "Never Gonna Stop Singing [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "Ab",
     format: "chordpro",
@@ -111,7 +111,7 @@ const SONGS = [
     tags: ["worship","praise","joy"],
   },
   {
-    title: "Freedom",
+    title: "Freedom [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "Ab",
     format: "chordpro",
@@ -130,7 +130,7 @@ const SONGS = [
     tags: ["worship","freedom","spirit"],
   },
   {
-    title: "Love Has a Name",
+    title: "Love Has a Name [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "Ab",
     format: "chordpro",
@@ -149,7 +149,7 @@ const SONGS = [
     tags: ["worship","love","Jesus"],
   },
   {
-    title: "Where You Go I Go",
+    title: "Where You Go I Go [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "D",
     format: "chordpro",
@@ -168,7 +168,7 @@ const SONGS = [
     tags: ["worship","commitment","following"],
   },
   {
-    title: "Come Away",
+    title: "Come Away [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "A",
     format: "chordpro",
@@ -188,7 +188,7 @@ const SONGS = [
     tags: ["worship","invitation","joy"],
   },
   {
-    title: "Holding Nothing Back",
+    title: "Holding Nothing Back [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "E",
     format: "chordpro",
@@ -208,7 +208,7 @@ const SONGS = [
     tags: ["worship","surrender","commitment"],
   },
   {
-    title: "One Thing Remains (JC)",
+    title: "One Thing Remains (JC) [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "B",
     format: "chordpro",
@@ -228,7 +228,7 @@ const SONGS = [
     tags: ["worship","love","faithfulness","anthem"],
   },
   {
-    title: "How He Loves (JC)",
+    title: "How He Loves (JC) [INCOMPLETE - needs V2+Bridge]",
     artist: "Jesus Culture",
     originalKey: "E",
     format: "chordpro",

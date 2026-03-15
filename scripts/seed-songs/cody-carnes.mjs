@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Run to the Father",
+    title: "Run to the Father [INCOMPLETE - needs V2+Bridge]",
     artist: "Cody Carnes",
     originalKey: "C",
     format: "chordpro",
@@ -34,7 +34,7 @@ const SONGS = [
     tags: ["worship","grace","father","return"],
   },
   {
-    title: "Nothing Else",
+    title: "Nothing Else [INCOMPLETE - needs Bridge]",
     artist: "Cody Carnes",
     originalKey: "C",
     format: "chordpro",
@@ -60,7 +60,7 @@ const SONGS = [
     tags: ["worship","intimacy","presence","devotion"],
   },
   {
-    title: "Christ Be Magnified",
+    title: "Christ Be Magnified [INCOMPLETE - needs Bridge]",
     artist: "Cody Carnes",
     originalKey: "A",
     format: "chordpro",

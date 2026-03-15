@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Psalm 23 (The Lord Is My Shepherd)",
+    title: "Psalm 23 (The Lord Is My Shepherd) [INCOMPLETE - needs Bridge]",
     artist: "Shane & Shane",
     originalKey: "G",
     format: "chordpro",
@@ -36,7 +36,7 @@ const SONGS = [
     tags: ["worship","psalm","peace","acoustic"],
   },
   {
-    title: "Though You Slay Me",
+    title: "Though You Slay Me [INCOMPLETE - needs Bridge]",
     artist: "Shane & Shane",
     originalKey: "E",
     format: "chordpro",
@@ -61,7 +61,7 @@ const SONGS = [
     tags: ["worship","lament","trust","suffering"],
   },
   {
-    title: "Yearn",
+    title: "Yearn [INCOMPLETE - needs Bridge]",
     artist: "Shane & Shane",
     originalKey: "D",
     format: "chordpro",
@@ -86,7 +86,7 @@ const SONGS = [
     tags: ["worship","intimacy","longing"],
   },
   {
-    title: "The One You Love",
+    title: "The One You Love [INCOMPLETE - needs Bridge]",
     artist: "Shane & Shane",
     originalKey: "C",
     format: "chordpro",
@@ -110,7 +110,7 @@ const SONGS = [
     tags: ["worship","love","identity","acoustic"],
   },
   {
-    title: "Seas of Crimson",
+    title: "Seas of Crimson [INCOMPLETE - needs Bridge]",
     artist: "Shane & Shane",
     originalKey: "A",
     format: "chordpro",

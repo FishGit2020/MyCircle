@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "I Can Only Imagine",
+    title: "I Can Only Imagine [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "E",
     format: "chordpro",
@@ -33,7 +33,7 @@ const SONGS = [
     tags: ["worship","heaven","hope","classic"],
   },
   {
-    title: "Even If",
+    title: "Even If [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "E",
     format: "chordpro",
@@ -53,7 +53,7 @@ const SONGS = [
     tags: ["worship","faith","suffering","trust"],
   },
   {
-    title: "Greater",
+    title: "Greater [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "D",
     format: "chordpro",
@@ -73,7 +73,7 @@ const SONGS = [
     tags: ["worship","identity","victory","encouragement"],
   },
   {
-    title: "Word of God Speak",
+    title: "Word of God Speak [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "Bb",
     format: "chordpro",
@@ -95,7 +95,7 @@ const SONGS = [
     tags: ["worship","prayer","stillness","devotion"],
   },
   {
-    title: "Flawless",
+    title: "Flawless [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "A",
     format: "chordpro",
@@ -116,7 +116,7 @@ const SONGS = [
     tags: ["worship","identity","grace","freedom"],
   },
   {
-    title: "Dear Younger Me",
+    title: "Dear Younger Me [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "G",
     format: "chordpro",
@@ -136,7 +136,7 @@ const SONGS = [
     tags: ["worship","healing","reflection","grace"],
   },
   {
-    title: "Almost Home",
+    title: "Almost Home [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "G",
     format: "chordpro",
@@ -157,7 +157,7 @@ const SONGS = [
     tags: ["worship","hope","heaven","perseverance"],
   },
   {
-    title: "Glorious Unfolding",
+    title: "Glorious Unfolding [INCOMPLETE - needs V2+Bridge]",
     artist: "MercyMe",
     originalKey: "D",
     format: "chordpro",

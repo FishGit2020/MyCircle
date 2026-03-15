@@ -456,7 +456,7 @@ Give me [G]Je[D]sus [G]`,
 
   // 74. Give Thanks - Henry Smith (Key: G)
   {
-    title: "Give Thanks",
+    title: "Give Thanks [INCOMPLETE - needs Bridge]",
     artist: "Henry Smith",
     originalKey: "G",
     format: "chordpro",
@@ -672,7 +672,7 @@ The [F]Lion of [G]Judah who [Am]conquered the [G]grave
 
   // 81. Shout To The Lord - Darlene Zschech (Key: A)
   {
-    title: "Shout To The Lord",
+    title: "Shout To The Lord [INCOMPLETE - needs Bridge]",
     artist: "Darlene Zschech",
     originalKey: "A",
     format: "chordpro",

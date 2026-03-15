@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "10,000 Reasons (Bless the Lord)",
+    title: "10,000 Reasons (Bless the Lord) [INCOMPLETE - needs Bridge]",
     artist: "Matt Redman",
     originalKey: "G",
     format: "chordpro",
@@ -37,7 +37,7 @@ const SONGS = [
     tags: ["worship","praise","classic"],
   },
   {
-    title: "Blessed Be Your Name",
+    title: "Blessed Be Your Name [INCOMPLETE - needs Bridge]",
     artist: "Matt Redman",
     originalKey: "A",
     format: "chordpro",
@@ -60,7 +60,7 @@ const SONGS = [
     tags: ["worship","praise","all seasons"],
   },
   {
-    title: "Heart of Worship",
+    title: "Heart of Worship [INCOMPLETE - needs Bridge]",
     artist: "Matt Redman",
     originalKey: "D",
     format: "chordpro",
@@ -86,7 +86,7 @@ const SONGS = [
     tags: ["worship","intimacy","classic"],
   },
   {
-    title: "One Day",
+    title: "One Day [INCOMPLETE - needs V2+Bridge]",
     artist: "Matt Redman",
     originalKey: "Bb",
     format: "chordpro",
@@ -106,7 +106,7 @@ const SONGS = [
     tags: ["worship","hope","heaven","return"],
   },
   {
-    title: "Never Once",
+    title: "Never Once [INCOMPLETE - needs V2+Bridge]",
     artist: "Matt Redman",
     originalKey: "A",
     format: "chordpro",
@@ -126,7 +126,7 @@ const SONGS = [
     tags: ["worship","faithfulness","testimony"],
   },
   {
-    title: "You Never Let Go",
+    title: "You Never Let Go [INCOMPLETE - needs V2+Bridge]",
     artist: "Matt Redman",
     originalKey: "G",
     format: "chordpro",
@@ -148,7 +148,7 @@ const SONGS = [
     tags: ["worship","comfort","faithfulness","trust"],
   },
   {
-    title: "Better Is One Day",
+    title: "Better Is One Day [INCOMPLETE - needs V2+Bridge]",
     artist: "Matt Redman",
     originalKey: "E",
     format: "chordpro",
@@ -168,7 +168,7 @@ const SONGS = [
     tags: ["worship","devotion","psalm","classic"],
   },
   {
-    title: "Let Everything That Has Breath",
+    title: "Let Everything That Has Breath [INCOMPLETE - needs V2+Bridge]",
     artist: "Matt Redman",
     originalKey: "A",
     format: "chordpro",

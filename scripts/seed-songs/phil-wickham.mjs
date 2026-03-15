@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Battle Belongs",
+    title: "Battle Belongs [INCOMPLETE - needs V2+Bridge]",
     artist: "Phil Wickham",
     originalKey: "D",
     format: "chordpro",
@@ -37,7 +37,7 @@ const SONGS = [
     tags: ["praise","warfare","anthem"],
   },
   {
-    title: "House of the Lord",
+    title: "House of the Lord [INCOMPLETE - needs V2+Bridge]",
     artist: "Phil Wickham",
     originalKey: "Bb",
     format: "chordpro",
@@ -63,7 +63,7 @@ And we won't be quiet
     tags: ["praise","joy","celebration"],
   },
   {
-    title: "Great Things",
+    title: "Great Things [INCOMPLETE - needs Bridge]",
     artist: "Phil Wickham",
     originalKey: "B",
     format: "chordpro",
@@ -90,7 +90,7 @@ And we won't be quiet
     tags: ["praise","celebration","victory"],
   },
   {
-    title: "Living Hope",
+    title: "Living Hope [INCOMPLETE - needs Bridge]",
     artist: "Phil Wickham",
     originalKey: "C",
     format: "chordpro",
@@ -141,7 +141,7 @@ There's salvation in Your [C]name
     tags: ["praise","grace","anthem"],
   },
   {
-    title: "Hymn of Heaven",
+    title: "Hymn of Heaven [INCOMPLETE - needs V2+Bridge]",
     artist: "Phil Wickham",
     originalKey: "C",
     format: "chordpro",
@@ -162,7 +162,7 @@ There's salvation in Your [C]name
     tags: ["worship","heaven","hope","hymn"],
   },
   {
-    title: "Sunday Is Coming",
+    title: "Sunday Is Coming [INCOMPLETE - needs V2+Bridge]",
     artist: "Phil Wickham",
     originalKey: "A",
     format: "chordpro",
@@ -182,7 +182,7 @@ There's salvation in Your [C]name
     tags: ["worship","Easter","resurrection","cross"],
   },
   {
-    title: "Your Love Awakens Me",
+    title: "Your Love Awakens Me [INCOMPLETE - needs V2+Bridge]",
     artist: "Phil Wickham",
     originalKey: "B",
     format: "chordpro",
@@ -204,7 +204,7 @@ There's salvation in Your [C]name
     tags: ["worship","love","awakening","freedom"],
   },
   {
-    title: "Divine Exchange",
+    title: "Divine Exchange [INCOMPLETE - needs V2+Bridge]",
     artist: "Phil Wickham",
     originalKey: "G",
     format: "chordpro",
