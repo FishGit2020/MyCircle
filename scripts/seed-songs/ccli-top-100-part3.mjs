@@ -529,42 +529,6 @@ Is running to [C]life from death`,
   },
 
   // 76. Bless God - Brooke Ligertwood (Key: D)
-  {
-    title: "Bless God",
-    artist: "Brooke Ligertwood",
-    originalKey: "D",
-    format: "chordpro",
-    content: `{Verse 1}
-[D]Blessed are those who run to [A/C#]Him
-[Bm7]He is a shield for [G]all who look to Him
-
-{Verse 2}
-[D]Blessed are those who mourn and [A/C#]grieve
-[Bm7]He can restore the [G]joy they need to see
-
-{Pre-Chorus}
-[Bm7]Oh bless God [A]all that is with[G]in me
-[Bm7]Oh bless [A]God and never for[G]get
-
-{Chorus}
-[D]Bless God oh my [A]soul
-[Bm7]Oh bless [G]God
-[D]Bless God oh my [A]soul
-[Bm7]Oh bless [G]God
-
-{Verse 3}
-[D]Blessed are those who dream and [A/C#]pray
-[Bm7]He fills the hungry [G]soul along the way
-
-{Bridge}
-[Bm7]As far as east from [A]west
-He's [G]taken our trans[D]gressions
-[Bm7]As a father shows com[A]passion
-To his [G]children so He [D]loves us`,
-    notes: "Key of D. From the album 'EIGHT'. Written by Brandon Lake, Brooke Ligertwood, and Cody Carnes.",
-    bpm: 130,
-    tags: ["worship", "praise", "blessing", "Psalms", "ccli-top-100"],
-  },
 
   // 77. Mighty Name Of Jesus - Hope Darst / The Belonging Co (Key: Ab)
   {
@@ -816,7 +780,7 @@ When I think about His love`,
     notes: "Key of C. 49 BPM in 6/8 time. Deeply emotional, passionate worship.",
     bpm: 49,
     tags: ["worship", "love", "grace", "devotion", "ccli-top-100"],
-  },
+  }
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');

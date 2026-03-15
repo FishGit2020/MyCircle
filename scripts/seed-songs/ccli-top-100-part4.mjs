@@ -614,42 +614,6 @@ And [Em]I I'm lost with[D]out You
   },
 
   // 86. Center - Bethel Music / Abbie Gamboa (Key: A)
-  {
-    title: "Center",
-    artist: "Bethel Music / Abbie Gamboa",
-    originalKey: "A",
-    format: "chordpro",
-    content: `{Verse 1}
-[A]Christ be the center of [E]everything
-[F#m]All that I am and all [D]that I bring
-[A]In my surrendered [E]life I will find
-[F#m]You are enough You are [D]mine
-
-{Pre-Chorus}
-[D]So I will [E]not be moved
-[F#m]I will not be [D]shaken
-
-{Chorus}
-[A]You are the center of it [E]all
-[F#m]You are the center of it [D]all
-[A]Everything revolves a[E]round You
-[F#m]Everything I am is [D]found in You
-
-{Verse 2}
-[A]Christ be the joy that [E]overflows
-[F#m]Your peace within me wher[D]ever I go
-[A]All that I need is [E]all You are
-[F#m]Jesus the center of my [D]heart
-
-{Bridge}
-[D]And I have found all I [E]need
-[F#m]You're all I need [D]
-[D]And I have found all I [E]need
-[F#m]You're all I [D]need You're all I need`,
-    notes: "Key of A. 67 BPM. Songwriters: Brian Johnson, Abbie Gamboa, Gabriel Gamboa.",
-    bpm: 67,
-    tags: ["worship", "devotion", "surrender", "Jesus", "ccli-top-100"],
-  },
 
   // 88. You Are My King (Amazing Love) - Billy Foote (Key: D)
   {
@@ -1058,7 +1022,7 @@ The Lord of [G]all`,
     notes: "Key of G (original B, capo 2). 74 BPM. Songwriters: Chris Tomlin, Daniel Carson, Ed Cash, Jesse Reeves.",
     bpm: 74,
     tags: ["worship", "Jesus", "salvation", "atonement", "ccli-top-100"],
-  },
+  }
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');

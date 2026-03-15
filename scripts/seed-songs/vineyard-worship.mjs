@@ -55,32 +55,6 @@ const SONGS = [
     tags: ["worship","devotional","intimate"],
   },
   {
-    title: "Breathe on Me",
-    artist: "Vineyard Worship",
-    originalKey: "C",
-    format: "chordpro",
-    content: `{Verse 1}
-[C]Breathe on me, [G/B]breath of God
-[Am]Fill me with [F]life anew
-[C]That I may [G/B]love what Thou dost love
-[Am]And do what [F]Thou wouldst [G]do
-
-{Chorus}
-[C]Breathe on me, [G/B]breath of God
-[Am]Until my [F]heart is pure
-[C]Until with [G/B]Thee I will one [Am]will
-[F]To do and [G]to en[C]dure
-
-{Verse 2}
-[F]Holy Spirit [G]breathe on me
-[Am]Set my heart on [F]fire
-[C]Breathe on me [G]breath of God
-[Am]You are my [F]one de[C]sire`,
-    notes: "Prayerful and gentle, great for prayer ministry",
-    bpm: 68,
-    tags: ["worship","prayer","holy-spirit"],
-  },
-  {
     title: "Refiner's Fire",
     artist: "Vineyard Worship",
     originalKey: "E",
@@ -380,25 +354,6 @@ const SONGS = [
     tags: ["worship","love","classic"],
   },
   {
-    title: "Spirit of God",
-    artist: "Vineyard Worship",
-    originalKey: "C",
-    format: "chordpro",
-    content: `{Verse 1}
-[C]Spirit of God fall [G]fresh on me
-[Am]Fill me anew, fill [F]me anew
-[C]Spirit of God fall [G]fresh on me
-[Am]Melt me, mold me, [F]use me
-
-{Chorus}
-[C]Living breath of [G]God
-[Am]Come breathe on [F]us
-[C]Spirit of [G]God [F]come`,
-    notes: "Vineyard intimacy at its best. Soft, expectant.",
-    bpm: 62,
-    tags: ["worship","spirit","prayer"],
-  },
-  {
     title: "I Love You Lord (Vineyard)",
     artist: "Vineyard Worship",
     originalKey: "F",
@@ -437,25 +392,6 @@ const SONGS = [
     notes: "Brian Johnson / early Bethel meets Vineyard. Minimal arrangement.",
     bpm: 68,
     tags: ["worship","simplicity","devotion"],
-  },
-  {
-    title: "Mercy (Vineyard)",
-    artist: "Vineyard Worship",
-    originalKey: "G",
-    format: "chordpro",
-    content: `{Verse 1}
-[G]Lord have mercy on [D]me
-[Em]A sinner in need of [C]grace
-[G]Lord have mercy on [D]me
-[Em]I fall before Your [C]face
-
-{Chorus}
-[G]Your mercy is [D]new every morning
-[Em]Great is Your faith[C]fulness
-[G]Lord have mercy [D]on [C]me`,
-    notes: "Vineyard mercy prayer. Lamentations 3:22-23 theme.",
-    bpm: 64,
-    tags: ["worship","mercy","prayer"],
   },
   {
     title: "Faithful One",
@@ -556,25 +492,6 @@ const SONGS = [
     tags: ["worship","joy","kids"],
   },
   {
-    title: "Come and Listen",
-    artist: "Vineyard Worship",
-    originalKey: "A",
-    format: "chordpro",
-    content: `{Verse 1}
-[A]Come and listen, come to the [E]water's edge
-[F#m]All you who know and [D]fear the Lord
-[A]Come and listen, [E]let me tell you what He's done
-[F#m]Come and [D]listen
-
-{Chorus}
-[A]He has done great [E]things
-[F#m]He has done great [D]things
-[A]Come and [E]listen [D]`,
-    notes: "Psalm 66:16. Testimony and invitation song.",
-    bpm: 78,
-    tags: ["worship","invitation","testimony"],
-  },
-  {
     title: "All Who Are Thirsty (Vineyard)",
     artist: "Vineyard Worship",
     originalKey: "D",
@@ -599,64 +516,6 @@ const SONGS = [
     tags: ["worship","thirst","invitation"],
   },
   {
-    title: "Dwell",
-    artist: "Vineyard Worship",
-    originalKey: "E",
-    format: "chordpro",
-    content: `{Verse 1}
-[E]Dwell in the midst of [B]us
-[C#m]Come and dwell in the [A]midst of us
-[E]You're worthy, [B]You're worthy
-[C#m]Come and dwell in the [A]midst of us
-
-{Chorus}
-[E]Here among the [B]broken
-[C#m]Here among the [A]weary
-[E]Come and make Your [B]home with us
-[C#m]Come and dwell in [A]us`,
-    notes: "Psalm 22:3 inhabiting our praise. Intimate and expectant.",
-    bpm: 62,
-    tags: ["worship","presence","dwelling"],
-  },
-  {
-    title: "Over Me",
-    artist: "Vineyard Worship",
-    originalKey: "G",
-    format: "chordpro",
-    content: `{Verse 1}
-[G]Over me, over [D]me
-[Em]Let Your anointing [C]fall over me
-[G]Over me, over [D]me
-[Em]Let the glory of the [C]Lord come over me
-
-{Chorus}
-[G]I rest beneath the [D]shadow of Your wings
-[Em]I trust in You, my [C]God and King
-[G]Let Your presence [D]come over [C]me`,
-    notes: "Psalm 91:4 imagery. Gentle soaking worship.",
-    bpm: 60,
-    tags: ["worship","anointing","rest"],
-  },
-  {
-    title: "Praise the Lord (Vineyard)",
-    artist: "Vineyard Worship",
-    originalKey: "A",
-    format: "chordpro",
-    content: `{Verse 1}
-[A]Praise the Lord from the [E]heavens
-[F#m]Praise Him in the [D]heights above
-[A]Praise Him all His [E]angels
-[F#m]Praise Him all His [D]heavenly hosts
-
-{Chorus}
-[A]Let them praise the [E]name of the Lord
-[F#m]For His name a[D]lone is exalted
-[A]His splendor is above the [E]earth and the [D]heavens`,
-    notes: "Psalm 148 setting. Celebratory and majestic.",
-    bpm: 118,
-    tags: ["worship","praise","psalm"],
-  },
-  {
     title: "Worthy (Vineyard)",
     artist: "Vineyard Worship",
     originalKey: "D",
@@ -675,66 +534,7 @@ const SONGS = [
     notes: "Revelation 5 theme. Simple and powerful declaration.",
     bpm: 72,
     tags: ["worship","worthy","adoration"],
-  },
-  {
-    title: "Thank You Lord for Your Presence",
-    artist: "Vineyard Worship",
-    originalKey: "C",
-    format: "chordpro",
-    content: `{Verse 1}
-[C]Thank You Lord for Your [G]presence
-[Am]Thank You Lord for this [F]day
-[C]Thank You Lord for Your [G]Spirit
-[Am]That guides me a[F]long the way
-
-{Chorus}
-[C]In Your presence there is [G]fullness of joy
-[Am]At Your right hand [F]pleasures evermore
-[C]Thank You [G]Lord [F]`,
-    notes: "Psalm 16:11. Simple gratitude worship song.",
-    bpm: 68,
-    tags: ["worship","gratitude","presence"],
-  },
-  {
-    title: "It's Falling",
-    artist: "Vineyard Worship",
-    originalKey: "E",
-    format: "chordpro",
-    content: `{Verse 1}
-[E]It's falling, it's [B]falling
-[C#m]The rain of Your [A]love is falling
-[E]My soul cries [B]out
-[C#m]Send Your rain down [A]now
-
-{Chorus}
-[E]Let it fall on [B]us
-[C#m]Let it rain on [A]us
-[E]Open up the [B]heavens Lord
-[C#m]Let it fall, let it [A]fall`,
-    notes: "Rain metaphor for anointing. Expectant worship prayer.",
-    bpm: 74,
-    tags: ["worship","anointing","prayer"],
-  },
-  {
-    title: "Fire of God",
-    artist: "Vineyard Worship",
-    originalKey: "Em",
-    format: "chordpro",
-    content: `{Verse 1}
-[Em]Fire of God fall [C]fresh on me
-[D]Burn away what [Em]shouldn't be
-[Em]Fire of God fall [C]fresh on me
-[D]Purify my [Em]heart
-
-{Chorus}
-[Em]Come and consume [C]every part of me
-[D]Holy flame of [Em]love
-[Em]Fire of God come [C]down
-[D]Set this place a[Em]blaze`,
-    notes: "Holy Spirit fire prayer. Acts 2 imagery. Passionate.",
-    bpm: 80,
-    tags: ["worship","fire","holy-spirit"],
-  },
+  }
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');

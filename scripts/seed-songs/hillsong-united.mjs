@@ -678,32 +678,6 @@ To love You from the [G]inside out`,
     tags: ["worship","faith","trust","hope"],
   },
   {
-    title: "Of Dirt and Grace",
-    artist: "Hillsong UNITED",
-    originalKey: "Bb",
-    format: "chordpro",
-    content: `{Verse 1}
-[Bb]We are the people of [F]dirt and grace
-[Gm]Called from the ashes to [Eb]walk in light
-[Bb]Named by the God of [F]second chances
-[Gm]Held in the arms of [Eb]love tonight
-
-{Chorus}
-[Bb]Of dirt and [F]grace
-[Gm]Of wind and [Eb]flame
-[Bb]Marked by Your [F]love
-[Gm]Saved by Your [Eb]name
-
-{Bridge}
-[Bb]From the dust You [F]raised us
-[Gm]From the ashes You have [Eb]called
-[Bb]All Your children [F]running
-[Gm]To the arms of a [Eb]faithful God`,
-    notes: "Title track from live album filmed in Israel. Earthy and raw.",
-    bpm: 68,
-    tags: ["worship","grace","redemption","identity"],
-  },
-  {
     title: "People",
     artist: "Hillsong UNITED",
     originalKey: "E",
@@ -858,33 +832,7 @@ To love You from the [G]inside out`,
     notes: "Ezekiel 37 inspired. Builds from whisper to roar. Festival anthem.",
     bpm: 138,
     tags: ["worship","resurrection","Holy Spirit","revival"],
-  },
-  {
-    title: "Welcome to the Fire",
-    artist: "Hillsong UNITED",
-    originalKey: "G",
-    format: "chordpro",
-    content: `{Verse 1}
-[G]Step into the [D]blaze with me
-[Em]Feel the heat that [C]sets us free
-[G]All consuming, [D]all refining
-[Em]Burn away what's [C]left of me
-
-{Chorus}
-[G]Welcome to the fire, [D]welcome to the fire
-[Em]This is where the [C]real begins
-[G]Welcome to the fire, [D]welcome to the fire
-[Em]Lose your life and [C]find it here
-
-{Bridge}
-[Em]We are not a[D]fraid of the flames
-[C]Purify our [G]hearts, Lord
-[Em]In the furnace [D]of Your love
-[C]We come a[G]live`,
-    notes: "Bold and aggressive worship. Driving rhythm, full production.",
-    bpm: 144,
-    tags: ["worship","fire","purification","boldness"],
-  },
+  }
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');
