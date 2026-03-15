@@ -655,6 +655,8 @@ const zh: Record<TranslationKey, string> = {
   'worship.resetFilters': '\u91cd\u7f6e',
   'worship.importPro': '\u5bfc\u5165 .pro',
   'worship.importProHint': '\u5bfc\u5165 ProPresenter \u6587\u4ef6\u4ee5\u9884\u586b\u6b4c\u8bcd',
+  'worship.importFile': '\u5bfc\u5165\u6587\u4ef6',
+  'worship.importFileHint': '\u5bfc\u5165 ChordPro (.cho) \u6216 ProPresenter (.pro) \u6587\u4ef6',
   'worship.importError': '\u65e0\u6cd5\u89e3\u6790\u6587\u4ef6\uff0c\u8bf7\u68c0\u67e5\u683c\u5f0f\u3002',
   'worship.moreControls': '\u63a7\u5236',
   'worship.hideControls': '\u9690\u85cf\u63a7\u5236',
