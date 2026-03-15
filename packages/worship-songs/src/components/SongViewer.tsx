@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { WorshipSong } from '../types';
 import { transposeContent, transposeChord } from '../utils/transpose';
+import { toChordProString } from '../utils/chordproIO';
 import ChordLine from './ChordLine';
 import Metronome from './Metronome';
 import CapoCalculator from './CapoCalculator';
@@ -110,18 +111,39 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
     window.print();
   }, []);
 
-  const handleDownload = useCallback(() => {
-    const content = isChordPro ? transposedContent : song.content;
-    const ext = isChordPro ? 'cho' : 'txt';
-    const mime = 'text/plain;charset=utf-8';
-    const blob = new Blob([content], { type: mime });
+  const handleDownloadChordPro = useCallback(() => {
+    const exportContent = isChordPro ? transposedContent : song.content;
+    const exportKey = isChordPro ? currentKey : song.originalKey;
+    const choString = toChordProString({
+      title: song.title,
+      artist: song.artist,
+      originalKey: exportKey,
+      content: exportContent,
+      bpm: song.bpm,
+      notes: song.notes,
+    });
+    const blob = new Blob([choString], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${song.title}.${ext}`;
+    a.download = `${song.title}.cho`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [song.title, song.content, transposedContent, isChordPro]);
+  }, [song, transposedContent, isChordPro, currentKey]);
+
+  const handleDownloadText = useCallback(() => {
+    const clean = isChordPro
+      ? transposedContent.replace(/\[([^\]]+)\]/g, '').replace(/\n{3,}/g, '\n\n')
+      : song.content;
+    const text = `${song.title}\n${song.artist ? `${song.artist}\n` : ''}Key: ${currentKey}\n\n${clean}`;
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${song.title}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [song, transposedContent, isChordPro, currentKey]);
 
   const handleCopyLyrics = useCallback(async () => {
     try {
@@ -352,17 +374,30 @@ export default function SongViewer({ song, isAuthenticated, onEdit }: SongViewer
               </a>
             )}
 
-            {/* Download */}
+            {/* Download .cho */}
             <button
               type="button"
-              onClick={handleDownload}
-              aria-label={t('worship.download')}
+              onClick={handleDownloadChordPro}
+              aria-label={t('worship.downloadChordPro')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              {isChordPro ? t('worship.downloadChordPro') : t('worship.downloadText')}
+              {t('worship.downloadChordPro')}
+            </button>
+
+            {/* Download .txt */}
+            <button
+              type="button"
+              onClick={handleDownloadText}
+              aria-label={t('worship.downloadText')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              {t('worship.downloadText')}
             </button>
 
             {/* Print */}

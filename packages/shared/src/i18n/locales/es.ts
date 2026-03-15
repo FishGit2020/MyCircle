@@ -655,6 +655,8 @@ const es: Record<TranslationKey, string> = {
   'worship.resetFilters': 'Restablecer',
   'worship.importPro': 'Importar .pro',
   'worship.importProHint': 'Importa un archivo ProPresenter para prellenar la letra',
+  'worship.importFile': 'Importar archivo',
+  'worship.importFileHint': 'Importa un archivo ChordPro (.cho) o ProPresenter (.pro)',
   'worship.importError': 'No se pudo analizar el archivo. Verifica el formato.',
   'worship.moreControls': 'Controles',
   'worship.hideControls': 'Ocultar controles',

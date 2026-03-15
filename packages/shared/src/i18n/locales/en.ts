@@ -653,6 +653,8 @@ const en = {
   'worship.resetFilters': 'Reset',
   'worship.importPro': 'Import .pro',
   'worship.importProHint': 'Import a ProPresenter file to pre-fill lyrics',
+  'worship.importFile': 'Import File',
+  'worship.importFileHint': 'Import a ChordPro (.cho) or ProPresenter (.pro) file',
   'worship.importError': 'Could not parse the file. Please check the format.',
   'worship.moreControls': 'Controls',
   'worship.hideControls': 'Hide controls',
