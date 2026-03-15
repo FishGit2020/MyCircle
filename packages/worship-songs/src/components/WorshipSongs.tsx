@@ -6,6 +6,7 @@ import type { WorshipSong } from '../types';
 import SongList from './SongList';
 import SongViewer from './SongViewer';
 import SongEditor from './SongEditor';
+import { toChordProString } from '../utils/chordproIO';
 import '../index.css';
 
 type View = 'list' | 'view' | 'edit' | 'new';
@@ -119,6 +120,30 @@ export default function WorshipSongs() {
     navigate('/worship');
   }, [selectedSong, deleteSong, navigate]);
 
+  const handleDownloadSong = useCallback(async (id: string) => {
+    try {
+      const song = await getSong(id);
+      if (!song) return;
+      const choString = toChordProString({
+        title: song.title,
+        artist: song.artist,
+        originalKey: song.originalKey,
+        content: song.content,
+        bpm: song.bpm,
+        notes: song.notes,
+      });
+      const blob = new Blob([choString], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${song.title}.cho`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      /* silently fail */
+    }
+  }, [getSong]);
+
   if (songLoading && (view === 'view' || view === 'edit')) {
     return (
       <div className="flex items-center justify-center py-16" role="status">
@@ -195,6 +220,7 @@ export default function WorshipSongs() {
             onNewSong={handleNewSong}
             onPageChange={goToPage}
             onResetFilters={resetFilters}
+            onDownloadSong={handleDownloadSong}
             onDeleteSong={async (id: string) => {
               if (!window.confirm(t('worship.deleteConfirm'))) return;
               try {
