@@ -785,32 +785,6 @@ Now You're ri[F]sen`,
     tags: ["worship","cross","surrender","communion"],
   },
   {
-    title: "None Other",
-    artist: "Hillsong Worship",
-    originalKey: "Eb",
-    format: "chordpro",
-    content: `{Verse 1}
-[Eb]There is none other [Bb]God but You
-[Cm]None who can do what [Ab]You can do
-[Eb]From the rising sun [Bb]to the setting same
-[Cm]There is none [Ab]like You
-
-{Chorus}
-[Eb]None other, [Bb]none other
-[Cm]Worthy of all my [Ab]praise
-[Eb]None other, [Bb]none other
-[Cm]Glorious in all Your [Ab]ways
-
-{Bridge}
-[Eb]Mountains bow at Your [Bb]name
-[Cm]Oceans roar Your [Ab]fame
-[Eb]Every knee will bow [Bb]every tongue confess
-[Cm]Jesus, You are [Ab]Lord`,
-    notes: "Declarative anthem, full band from chorus. Strong opener.",
-    bpm: 76,
-    tags: ["worship","declaration","sovereignty"],
-  },
-  {
     title: "Glorious Ruins",
     artist: "Hillsong Worship",
     originalKey: "A",
@@ -859,32 +833,6 @@ Now You're ri[F]sen`,
     notes: "Reuben Morgan classic. Peaceful and meditative. Great for prayer.",
     bpm: 63,
     tags: ["worship","peace","trust","psalm"],
-  },
-  {
-    title: "Running to You",
-    artist: "Hillsong Worship",
-    originalKey: "G",
-    format: "chordpro",
-    content: `{Verse 1}
-[G]In the morning [D]light I see You
-[Em]In the shadow [C]You are there
-[G]Every moment [D]every heartbeat
-[Em]You are closer [C]than the air
-
-{Chorus}
-[G]I'm running to You, [D]running to You
-[Em]No place I'd rather [C]be
-[G]I'm running to You, [D]running to You
-[Em]Your arms are all [C]I need
-
-{Bridge}
-[Em]When the world grows [D]cold and dark
-[C]Your love is my [G]compass
-[Em]Through the valleys [D]through the night
-[C]I will run to [G]You`,
-    notes: "Energetic pursuit anthem, driving beat, good for opening worship.",
-    bpm: 138,
-    tags: ["worship","pursuit","devotion","joy"],
   },
   {
     title: "Christ Is Enough",
@@ -962,32 +910,6 @@ Now You're ri[F]sen`,
     tags: ["worship","commitment","devotion"],
   },
   {
-    title: "Light of the World",
-    artist: "Hillsong Worship",
-    originalKey: "A",
-    format: "chordpro",
-    content: `{Verse 1}
-[A]The world waits for a [E]miracle
-[F#m]The heart longs for a [D]little bit of hope
-[A]O come, O come Em[E]manuel
-[F#m]A child, a son, [D]given to us all
-
-{Chorus}
-[A]Light of the world, [E]You stepped down into darkness
-[F#m]Opened my eyes [D]let me see
-[A]Glory above, [E]revealed in a manger
-[F#m]Here in Your [D]presence
-
-{Bridge}
-[A]Joy to the world, [E]the Lord has come
-[F#m]Hope for the weary, [D]peace for the broken
-[A]Light of the world, [E]shine on us
-[F#m]You are the Light [D]of the world`,
-    notes: "Advent/Christmas theme, warm and inviting, orchestral arrangement.",
-    bpm: 72,
-    tags: ["worship","advent","light","Christmas"],
-  },
-  {
     title: "Saviour King",
     artist: "Hillsong Worship",
     originalKey: "D",
@@ -1013,33 +935,7 @@ Now You're ri[F]sen`,
     notes: "Marty Sampson classic. Strong declaration, great for full worship set.",
     bpm: 76,
     tags: ["worship","declaration","kingship"],
-  },
-  {
-    title: "Spirit Lead Me",
-    artist: "Hillsong Worship",
-    originalKey: "C",
-    format: "chordpro",
-    content: `{Verse 1}
-[C]Breathe on me [G]breath of God
-[Am]Fill me with [F]life anew
-[C]That I may love the [G]things You love
-[Am]And do what [F]You would do
-
-{Chorus}
-[C]Spirit lead me [G]where my trust is without borders
-[Am]Let me walk upon the [F]waters
-[C]Wherever You would [G]call me
-[Am]Take me deeper than my [F]feet could ever wander
-
-{Verse 2}
-[C]Spirit lead me, [G]Spirit lead me
-[Am]Spirit lead me to the [F]place where I belong
-[C]Where Your power meets my [G]weakness
-[Am]I find my [F]strength in You alone`,
-    notes: "Prayer for Holy Spirit guidance, gentle build, atmospheric pads.",
-    bpm: 66,
-    tags: ["worship","Holy Spirit","guidance","prayer"],
-  },
+  }
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');

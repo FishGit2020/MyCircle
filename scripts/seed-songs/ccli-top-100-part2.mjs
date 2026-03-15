@@ -358,38 +358,6 @@ My [G]gaze trans[D]fixed on [G]Jesus' face`,
 
   // 40. Abide - Aaron Williams (Key: G)
   // Chords sourced from Ultimate Guitar (Dwell Songs / Aaron Williams)
-  {
-    title: "Abide",
-    artist: "Aaron Williams",
-    originalKey: "G",
-    format: "chordpro",
-    content: `{Verse 1}
-[G]Abide with me [D]abide with me
-[Em]Don't let me fall and [C]don't let go
-[G]Walk with me and [D]never leave
-[Em]Ever close God [C]ever close
-
-{Chorus}
-[G]Won't You come and [D]pour out Your spirit
-[Em]Now we're longing [C]for your presence
-[G]So abide with [D]me here in this moment
-[Em]I know You will [C]I know You will
-
-{Verse 2}
-[G]There's nowhere else that [D]I'd rather be
-Than [Em]here in Your arms [C]of peace
-[G]Even the winds and [D]the waves obey
-[Em]Every word that [C]You speak
-
-{Bridge}
-[Em]Let Your glory [C]fall in this place
-[G]Let Your presence [D]fill this space
-[Em]Holy Spirit [C]come and take over
-[G]We are [D]Yours`,
-    notes: "Key of G. Originally in B, commonly played in G. Intimate worship song about God's nearness.",
-    bpm: 72,
-    tags: ["worship", "presence", "intimacy", "peace", "ccli-top-100"],
-  },
 
   // 41. Who You Say I Am - Hillsong Worship (Key: G)
   // Chords sourced from Ultimate Guitar / Worship Together
@@ -1180,7 +1148,7 @@ It's [A]all about You [D]Jesus`,
     notes: "Key of D. Classic worship song by Matt Redman. Story of Redman's church stripping back all music to focus on worship.",
     bpm: 76,
     tags: ["worship", "heart", "devotion", "classic", "ccli-top-100"],
-  },
+  }
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');

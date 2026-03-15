@@ -733,26 +733,6 @@ Our [Em]God, our [C]God
     tags: ["worship","Jesus","salvation"],
   },
   {
-    title: "Good to Be Alive (Today)",
-    artist: "Chris Tomlin",
-    originalKey: "E",
-    format: "chordpro",
-    content: `{Verse 1}
-[E]I know a God who [B]can
-[C#m]I know a God who [A]can
-[E]He rolled the stone a[B]way
-[C#m]He has made a way [A]for us
-
-{Chorus}
-[E]It's a good day to be a[B]live
-[C#m]It's a good day to be a[A]live
-[E]Oh what a day, [B]what a day
-[C#m]It's a good good day to be a[A]live`,
-    notes: "Celebratory anthem. High energy, great for opening sets.",
-    bpm: 138,
-    tags: ["worship","celebration","joy","life"],
-  },
-  {
     title: "Greater",
     artist: "Chris Tomlin",
     originalKey: "G",
@@ -848,45 +828,6 @@ Our [Em]God, our [C]God
     notes: "Classic hymn with Tomlin bridge. Full band singalong.",
     bpm: 76,
     tags: ["worship","hymn","love","classic"],
-  },
-  {
-    title: "How Sweet the Sound",
-    artist: "Chris Tomlin",
-    originalKey: "D",
-    format: "chordpro",
-    content: `{Verse 1}
-[D]Oh how sweet the [A]sound of mercy
-[Bm]Calling out to [G]me
-[D]Oh how sweet the [A]grace of Jesus
-[Bm]Covering every[G]thing
-
-{Chorus}
-[D]How sweet the [A]sound
-[Bm]That saved a [G]wretch like me
-[D]I once was [A]lost but now I'm [G]found`,
-    notes: "Grace-centered anthem with hymn echoes. Tender and powerful.",
-    bpm: 70,
-    tags: ["worship","grace","mercy"],
-  },
-  {
-    title: "Boundless",
-    artist: "Chris Tomlin",
-    originalKey: "Bb",
-    format: "chordpro",
-    content: `{Verse 1}
-[Bb]Your love goes [F]further than I can see
-[Gm]Higher than the [Eb]heavens can reach
-[Bb]Deeper than the [F]deepest sea
-[Gm]Your love is [Eb]boundless
-
-{Chorus}
-[Bb]Boundless, [F]boundless
-[Gm]Your love is bound[Eb]less
-[Bb]From here to for[F]ever
-[Gm]Your love is bound[Eb]less`,
-    notes: "From Holy Roar album. Spacious and expansive sound.",
-    bpm: 72,
-    tags: ["worship","love","infinity"],
   },
   {
     title: "Always",
@@ -1070,7 +1011,7 @@ Our [Em]God, our [C]God
     notes: "Christmas anthem. Builds from quiet verse to triumphant chorus.",
     bpm: 76,
     tags: ["worship","Christmas","reign","advent"],
-  },
+  }
 ];
 
 const skipExisting = process.argv.includes('--skip-existing');
