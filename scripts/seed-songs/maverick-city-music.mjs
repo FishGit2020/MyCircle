@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Promises",
+    title: "Promises [INCOMPLETE - needs Bridge]",
     artist: "Maverick City Music",
     originalKey: "Ab",
     format: "chordpro",
@@ -90,7 +90,7 @@ You are [F#]Jireh, You are e[B]nough
     tags: ["worship","provision","contentment"],
   },
   {
-    title: "Refiner",
+    title: "Refiner [INCOMPLETE - needs Bridge]",
     artist: "Maverick City Music",
     originalKey: "E",
     format: "chordpro",
@@ -146,7 +146,7 @@ I choose to be [C#m]holy
     tags: ["praise","faithfulness","declaration"],
   },
   {
-    title: "Thank You",
+    title: "Thank You [INCOMPLETE - needs V2+Bridge]",
     artist: "Maverick City Music",
     originalKey: "C",
     format: "chordpro",
@@ -166,7 +166,7 @@ I choose to be [C#m]holy
     tags: ["worship","gratitude","cross"],
   },
   {
-    title: "Fresh Wind",
+    title: "Fresh Wind [INCOMPLETE - needs V2+Bridge]",
     artist: "Maverick City Music",
     originalKey: "G",
     format: "chordpro",
@@ -186,7 +186,7 @@ I choose to be [C#m]holy
     tags: ["worship","Holy Spirit","prayer","revival"],
   },
   {
-    title: "Firm Foundation",
+    title: "Firm Foundation [INCOMPLETE - needs V2+Bridge]",
     artist: "Maverick City Music",
     originalKey: "C",
     format: "chordpro",
@@ -206,7 +206,7 @@ I choose to be [C#m]holy
     tags: ["worship","faith","foundation"],
   },
   {
-    title: "Move Your Heart",
+    title: "Move Your Heart [INCOMPLETE - needs V2+Bridge]",
     artist: "Maverick City Music",
     originalKey: "B",
     format: "chordpro",
@@ -226,7 +226,7 @@ I choose to be [C#m]holy
     tags: ["worship","surrender","devotion","prayer"],
   },
   {
-    title: "Wait on You",
+    title: "Wait on You [INCOMPLETE - needs V2+Bridge]",
     artist: "Maverick City Music",
     originalKey: "D",
     format: "chordpro",
@@ -246,7 +246,7 @@ I choose to be [C#m]holy
     tags: ["worship","patience","trust","waiting"],
   },
   {
-    title: "Talking to Jesus",
+    title: "Talking to Jesus [INCOMPLETE - needs V2+Bridge]",
     artist: "Maverick City Music",
     originalKey: "B",
     format: "chordpro",
@@ -266,7 +266,7 @@ I choose to be [C#m]holy
     tags: ["worship","prayer","comfort"],
   },
   {
-    title: "Fear Is Not My Future",
+    title: "Fear Is Not My Future [INCOMPLETE - needs V2+Bridge]",
     artist: "Maverick City Music",
     originalKey: "Eb",
     format: "chordpro",

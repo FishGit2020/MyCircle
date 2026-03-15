@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Christ Is Enough",
+    title: "Christ Is Enough [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Young & Free",
     originalKey: "D",
     format: "chordpro",
@@ -31,7 +31,7 @@ const SONGS = [
     tags: ["worship","devotion","contentment"],
   },
   {
-    title: "Sinking Deep",
+    title: "Sinking Deep [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Young & Free",
     originalKey: "B",
     format: "chordpro",
@@ -51,7 +51,7 @@ const SONGS = [
     tags: ["worship","trust","intimacy"],
   },
   {
-    title: "Alive (Y&F)",
+    title: "Alive (Y&F) [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Young & Free",
     originalKey: "G",
     format: "chordpro",
@@ -71,7 +71,7 @@ const SONGS = [
     tags: ["worship","resurrection","freedom","youth"],
   },
   {
-    title: "Wake",
+    title: "Wake [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Young & Free",
     originalKey: "A",
     format: "chordpro",
@@ -91,7 +91,7 @@ const SONGS = [
     tags: ["worship","youth","awakening"],
   },
   {
-    title: "Real Love",
+    title: "Real Love [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Young & Free",
     originalKey: "Eb",
     format: "chordpro",
@@ -111,7 +111,7 @@ const SONGS = [
     tags: ["worship","love","youth"],
   },
   {
-    title: "This Is Living",
+    title: "This Is Living [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Young & Free",
     originalKey: "G",
     format: "chordpro",

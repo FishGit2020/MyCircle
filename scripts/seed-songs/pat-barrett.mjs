@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Sails",
+    title: "Sails [INCOMPLETE - needs Bridge]",
     artist: "Pat Barrett",
     originalKey: "G",
     format: "chordpro",
@@ -37,7 +37,7 @@ const SONGS = [
     tags: ["worship","faith","trust","adventure"],
   },
   {
-    title: "Canvas and Clay",
+    title: "Canvas and Clay [INCOMPLETE - needs Bridge]",
     artist: "Pat Barrett",
     originalKey: "B",
     format: "chordpro",
@@ -61,7 +61,7 @@ const SONGS = [
     tags: ["worship","identity","creation","grace"],
   },
   {
-    title: "God Is So Good",
+    title: "God Is So Good [INCOMPLETE - needs Bridge]",
     artist: "Pat Barrett",
     originalKey: "C",
     format: "chordpro",
@@ -87,7 +87,7 @@ const SONGS = [
     tags: ["worship","goodness","joy","praise"],
   },
   {
-    title: "Better",
+    title: "Better [INCOMPLETE - needs Bridge]",
     artist: "Pat Barrett",
     originalKey: "D",
     format: "chordpro",
@@ -112,7 +112,7 @@ const SONGS = [
     tags: ["worship","praise","declaration","joy"],
   },
   {
-    title: "The Way (New Horizon)",
+    title: "The Way (New Horizon) [INCOMPLETE - needs Bridge]",
     artist: "Pat Barrett",
     originalKey: "E",
     format: "chordpro",

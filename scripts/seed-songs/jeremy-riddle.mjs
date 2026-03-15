@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Furious",
+    title: "Furious [INCOMPLETE - needs V2+Bridge]",
     artist: "Jeremy Riddle",
     originalKey: "C",
     format: "chordpro",
@@ -33,7 +33,7 @@ const SONGS = [
     tags: ["worship","love","passion"],
   },
   {
-    title: "Fall Afresh",
+    title: "Fall Afresh [INCOMPLETE - needs V2+Bridge]",
     artist: "Jeremy Riddle",
     originalKey: "E",
     format: "chordpro",
@@ -54,7 +54,7 @@ const SONGS = [
     tags: ["worship","prayer","Holy Spirit"],
   },
   {
-    title: "Sweetly Broken",
+    title: "Sweetly Broken [INCOMPLETE - needs Bridge]",
     artist: "Jeremy Riddle",
     originalKey: "B",
     format: "chordpro",
@@ -81,7 +81,7 @@ const SONGS = [
     tags: ["worship","communion","cross"],
   },
   {
-    title: "Prepare the Way",
+    title: "Prepare the Way [INCOMPLETE - needs Bridge]",
     artist: "Jeremy Riddle",
     originalKey: "Em",
     format: "chordpro",
@@ -107,7 +107,7 @@ const SONGS = [
     tags: ["worship","prophetic","preparation"],
   },
   {
-    title: "Worthy",
+    title: "Worthy [INCOMPLETE - needs Bridge]",
     artist: "Jeremy Riddle",
     originalKey: "D",
     format: "chordpro",

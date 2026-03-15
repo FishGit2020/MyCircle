@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "What a Beautiful Name",
+    title: "What a Beautiful Name [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
@@ -146,7 +146,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["praise","anthem","declaration"],
   },
   {
-    title: "Mighty to Save",
+    title: "Mighty to Save [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
@@ -178,7 +178,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","salvation","congregational"],
   },
   {
-    title: "Shout to the Lord",
+    title: "Shout to the Lord [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -264,7 +264,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","grace","restoration"],
   },
   {
-    title: "O Praise the Name (Anastasis)",
+    title: "O Praise the Name (Anastasis) [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
@@ -290,7 +290,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["hymn","worship","resurrection"],
   },
   {
-    title: "Open Heaven/River Wild",
+    title: "Open Heaven/River Wild [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "E",
     format: "chordpro",
@@ -310,7 +310,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","revival","Holy Spirit"],
   },
   {
-    title: "Let There Be Light",
+    title: "Let There Be Light [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
@@ -330,7 +330,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","light","creation"],
   },
   {
-    title: "I Surrender",
+    title: "I Surrender [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
@@ -350,7 +350,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","surrender","devotion"],
   },
   {
-    title: "New Wine",
+    title: "New Wine [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -370,7 +370,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","surrender","transformation"],
   },
   {
-    title: "Awake My Soul",
+    title: "Awake My Soul [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
@@ -390,7 +390,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","praise","joy"],
   },
   {
-    title: "This I Believe (The Creed)",
+    title: "This I Believe (The Creed) [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
@@ -410,7 +410,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","creed","declaration"],
   },
   {
-    title: "Thank You Jesus For the Blood",
+    title: "Thank You Jesus For the Blood [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
@@ -430,7 +430,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","blood","salvation","testimony"],
   },
   {
-    title: "From the Inside Out",
+    title: "From the Inside Out [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
@@ -449,7 +449,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","grace","devotion"],
   },
   {
-    title: "The Power of the Cross",
+    title: "The Power of the Cross [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
@@ -469,7 +469,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","cross","communion","hymn"],
   },
   {
-    title: "Forever Reign",
+    title: "Forever Reign [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
@@ -491,7 +491,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","praise","joy","declaration"],
   },
   {
-    title: "Tell the World",
+    title: "Tell the World [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "E",
     format: "chordpro",
@@ -511,7 +511,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","missions","evangelism"],
   },
   {
-    title: "Beneath the Waters",
+    title: "Beneath the Waters [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "A",
     format: "chordpro",
@@ -531,7 +531,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","baptism","new life"],
   },
   {
-    title: "Transfiguration",
+    title: "Transfiguration [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "B",
     format: "chordpro",
@@ -551,7 +551,7 @@ Oh [Am]may I then in [F]Him be found
     tags: ["worship","glory","revelation"],
   },
   {
-    title: "You Said",
+    title: "You Said [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "G",
     format: "chordpro",
@@ -626,7 +626,7 @@ The Name of [A]Jesus`,
     tags: ["worship","Jesus","name","victory"],
   },
   {
-    title: "Seasons",
+    title: "Seasons [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -652,7 +652,7 @@ The Name of [A]Jesus`,
     tags: ["worship","seasons","trust","faithfulness"],
   },
   {
-    title: "Here I Am to Worship",
+    title: "Here I Am to Worship [INCOMPLETE - needs V2+Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
@@ -702,7 +702,7 @@ The Name of [A]Jesus`,
     tags: ["worship","devotion","desire"],
   },
   {
-    title: "Highlands (Song of Ascent)",
+    title: "Highlands (Song of Ascent) [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
@@ -756,7 +756,7 @@ The Name of [A]Jesus`,
     tags: ["worship","Holy Spirit","prayer","fire"],
   },
   {
-    title: "Lead Me to the Cross",
+    title: "Lead Me to the Cross [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "F",
     format: "chordpro",
@@ -811,7 +811,7 @@ Now You're ri[F]sen`,
     tags: ["worship","restoration","cross","hope"],
   },
   {
-    title: "Still",
+    title: "Still [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "C",
     format: "chordpro",
@@ -859,7 +859,7 @@ Now You're ri[F]sen`,
     tags: ["worship","contentment","devotion","declaration"],
   },
   {
-    title: "Man of Sorrows",
+    title: "Man of Sorrows [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",
@@ -910,7 +910,7 @@ Now You're ri[F]sen`,
     tags: ["worship","commitment","devotion"],
   },
   {
-    title: "Saviour King",
+    title: "Saviour King [INCOMPLETE - needs Bridge]",
     artist: "Hillsong Worship",
     originalKey: "D",
     format: "chordpro",

@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Holy Water",
+    title: "Holy Water [INCOMPLETE - needs Bridge]",
     artist: "We The Kingdom",
     originalKey: "D",
     format: "chordpro",
@@ -36,7 +36,7 @@ const SONGS = [
     tags: ["worship","repentance","grace","healing"],
   },
   {
-    title: "God So Loved",
+    title: "God So Loved [INCOMPLETE - needs Bridge]",
     artist: "We The Kingdom",
     originalKey: "Bb",
     format: "chordpro",
@@ -60,7 +60,7 @@ const SONGS = [
     tags: ["worship","gospel","invitation","love"],
   },
   {
-    title: "Dancing on the Waves",
+    title: "Dancing on the Waves [INCOMPLETE - needs V2+Bridge]",
     artist: "We The Kingdom",
     originalKey: "E",
     format: "chordpro",
@@ -83,7 +83,7 @@ const SONGS = [
     tags: ["worship","faith","trust","joy"],
   },
   {
-    title: "Don't Tread on Me",
+    title: "Don't Tread on Me [INCOMPLETE - needs Bridge]",
     artist: "We The Kingdom",
     originalKey: "E",
     format: "chordpro",
@@ -107,7 +107,7 @@ const SONGS = [
     tags: ["worship","spiritual warfare","declaration","power"],
   },
   {
-    title: "Child of Love",
+    title: "Child of Love [INCOMPLETE - needs Bridge]",
     artist: "We The Kingdom",
     originalKey: "C",
     format: "chordpro",
@@ -132,7 +132,7 @@ const SONGS = [
     tags: ["worship","identity","love","testimony"],
   },
   {
-    title: "Pieces",
+    title: "Pieces [INCOMPLETE - needs Bridge]",
     artist: "We The Kingdom",
     originalKey: "G",
     format: "chordpro",

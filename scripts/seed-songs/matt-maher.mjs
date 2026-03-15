@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Lord I Need You",
+    title: "Lord I Need You [INCOMPLETE - needs Bridge]",
     artist: "Matt Maher",
     originalKey: "G",
     format: "chordpro",
@@ -35,7 +35,7 @@ const SONGS = [
     tags: ["worship","dependence","grace","hymn"],
   },
   {
-    title: "Because He Lives (Amen)",
+    title: "Because He Lives (Amen) [INCOMPLETE - needs Bridge]",
     artist: "Matt Maher",
     originalKey: "Db",
     format: "chordpro",
@@ -62,7 +62,7 @@ const SONGS = [
     tags: ["worship","easter","resurrection","declaration"],
   },
   {
-    title: "Your Grace Is Enough",
+    title: "Your Grace Is Enough [INCOMPLETE - needs Bridge]",
     artist: "Matt Maher",
     originalKey: "G",
     format: "chordpro",
@@ -86,7 +86,7 @@ const SONGS = [
     tags: ["worship","grace","anthem"],
   },
   {
-    title: "Alive Again",
+    title: "Alive Again [INCOMPLETE - needs Bridge]",
     artist: "Matt Maher",
     originalKey: "D",
     format: "chordpro",
@@ -111,7 +111,7 @@ const SONGS = [
     tags: ["worship","testimony","resurrection","new life"],
   },
   {
-    title: "Hold Us Together",
+    title: "Hold Us Together [INCOMPLETE - needs Bridge]",
     artist: "Matt Maher",
     originalKey: "G",
     format: "chordpro",

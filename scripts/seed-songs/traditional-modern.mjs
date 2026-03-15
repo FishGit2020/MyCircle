@@ -55,7 +55,7 @@ const SONGS = [
     tags: ["worship","hymn","traditional"],
   },
   {
-    title: "It Is Well with My Soul",
+    title: "It Is Well with My Soul [INCOMPLETE - needs Bridge]",
     artist: "Traditional (Modern)",
     originalKey: "Bb",
     format: "chordpro",
@@ -79,7 +79,7 @@ const SONGS = [
     tags: ["worship","hymn","peace"],
   },
   {
-    title: "How Great Thou Art",
+    title: "How Great Thou Art [INCOMPLETE - needs V2+Bridge]",
     artist: "Traditional (Modern)",
     originalKey: "Bb",
     format: "chordpro",
@@ -99,7 +99,7 @@ const SONGS = [
     tags: ["worship","hymn","majesty"],
   },
   {
-    title: "Great Is Thy Faithfulness",
+    title: "Great Is Thy Faithfulness [INCOMPLETE - needs V2+Bridge]",
     artist: "Traditional (Modern)",
     originalKey: "D",
     format: "chordpro",
@@ -191,7 +191,7 @@ const SONGS = [
     tags: ["worship","hymn","christmas"],
   },
   {
-    title: "O Holy Night",
+    title: "O Holy Night [INCOMPLETE - needs V2+Bridge]",
     artist: "Traditional (Modern)",
     originalKey: "C",
     format: "chordpro",
@@ -212,7 +212,7 @@ const SONGS = [
     tags: ["worship","hymn","christmas"],
   },
   {
-    title: "What Child Is This",
+    title: "What Child Is This [INCOMPLETE - needs Bridge]",
     artist: "Traditional (Modern)",
     originalKey: "Em",
     format: "chordpro",
@@ -238,7 +238,7 @@ const SONGS = [
     tags: ["worship","hymn","christmas"],
   },
   {
-    title: "Angels We Have Heard on High",
+    title: "Angels We Have Heard on High [INCOMPLETE - needs Bridge]",
     artist: "Traditional (Modern)",
     originalKey: "F",
     format: "chordpro",

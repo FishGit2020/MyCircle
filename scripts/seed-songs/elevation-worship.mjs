@@ -42,7 +42,7 @@ const SONGS = [
     tags: ["worship","testimony","transformation"],
   },
   {
-    title: "Jireh",
+    title: "Jireh [INCOMPLETE - needs Bridge]",
     artist: "Elevation Worship",
     originalKey: "B",
     format: "chordpro",
@@ -69,7 +69,7 @@ So there's nothing I can do to [E]let You down
     tags: ["worship","provision","peace"],
   },
   {
-    title: "O Come to the Altar",
+    title: "O Come to the Altar [INCOMPLETE - needs Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -129,7 +129,7 @@ And I believe, I'll see You [E]do it again`,
     tags: ["praise","faith","testimony"],
   },
   {
-    title: "RATTLE!",
+    title: "RATTLE! [INCOMPLETE - needs Bridge]",
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
@@ -157,7 +157,7 @@ And I believe, I'll see You [E]do it again`,
     tags: ["praise","anthem","resurrection"],
   },
   {
-    title: "See A Victory",
+    title: "See A Victory [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
@@ -210,7 +210,7 @@ God will turn it for my [E]good
     tags: ["worship","resurrection","majesty"],
   },
   {
-    title: "Won't Stop Now",
+    title: "Won't Stop Now [INCOMPLETE - needs Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -260,7 +260,7 @@ God will turn it for my [E]good
     tags: ["praise","anthem","breakthrough"],
   },
   {
-    title: "Same God",
+    title: "Same God [INCOMPLETE - needs Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -287,7 +287,7 @@ God will turn it for my [E]good
     tags: ["worship","faithfulness","declaration"],
   },
   {
-    title: "Blessed Assurance",
+    title: "Blessed Assurance [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -307,7 +307,7 @@ God will turn it for my [E]good
     tags: ["worship","hymn","assurance"],
   },
   {
-    title: "Trust in God",
+    title: "Trust in God [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -327,7 +327,7 @@ God will turn it for my [E]good
     tags: ["worship","trust","faith"],
   },
   {
-    title: "Water Is Wild",
+    title: "Water Is Wild [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -347,7 +347,7 @@ God will turn it for my [E]good
     tags: ["worship","faith","trust"],
   },
   {
-    title: "I Believe",
+    title: "I Believe [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
@@ -367,7 +367,7 @@ God will turn it for my [E]good
     tags: ["worship","faith","declaration"],
   },
   {
-    title: "With You",
+    title: "With You [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -387,7 +387,7 @@ God will turn it for my [E]good
     tags: ["worship","intimacy","presence"],
   },
   {
-    title: "Here Again",
+    title: "Here Again [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -407,7 +407,7 @@ God will turn it for my [E]good
     tags: ["worship","faithfulness","trust"],
   },
   {
-    title: "Rhythm",
+    title: "Rhythm [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -427,7 +427,7 @@ God will turn it for my [E]good
     tags: ["worship","joy","devotion"],
   },
   {
-    title: "Only King Forever",
+    title: "Only King Forever [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -478,7 +478,7 @@ God will turn it for my [E]good
     tags: ["worship","transformation","live"],
   },
   {
-    title: "The Blessing (Elevation version)",
+    title: "The Blessing (Elevation version) [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
@@ -498,7 +498,7 @@ God will turn it for my [E]good
     tags: ["worship","blessing","scripture"],
   },
   {
-    title: "Give Me Faith",
+    title: "Give Me Faith [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "B",
     format: "chordpro",
@@ -517,7 +517,7 @@ God will turn it for my [E]good
     tags: ["worship","faith","prayer"],
   },
   {
-    title: "Angel Armies",
+    title: "Angel Armies [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
@@ -535,7 +535,7 @@ God will turn it for my [E]good
     tags: ["worship","victory","anthem"],
   },
   {
-    title: "Hallelujah Here Below",
+    title: "Hallelujah Here Below [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Ab",
     format: "chordpro",
@@ -554,7 +554,7 @@ God will turn it for my [E]good
     tags: ["worship","valley","praise"],
   },
   {
-    title: "Hold On to Me",
+    title: "Hold On to Me [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -573,7 +573,7 @@ God will turn it for my [E]good
     tags: ["worship","comfort","trust"],
   },
   {
-    title: "Evidence",
+    title: "Evidence [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
@@ -592,7 +592,7 @@ God will turn it for my [E]good
     tags: ["worship","testimony","faithfulness"],
   },
   {
-    title: "Never Lost (Elevation)",
+    title: "Never Lost (Elevation) [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Eb",
     format: "chordpro",
@@ -610,7 +610,7 @@ God will turn it for my [E]good
     tags: ["worship","victory","declaration"],
   },
   {
-    title: "God of the Promise",
+    title: "God of the Promise [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
@@ -628,7 +628,7 @@ God will turn it for my [E]good
     tags: ["worship","promises","faith"],
   },
   {
-    title: "The Father",
+    title: "The Father [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -647,7 +647,7 @@ God will turn it for my [E]good
     tags: ["worship","father","identity"],
   },
   {
-    title: "Wide as the Sky",
+    title: "Wide as the Sky [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -666,7 +666,7 @@ God will turn it for my [E]good
     tags: ["worship","love","grace"],
   },
   {
-    title: "Start Right Here",
+    title: "Start Right Here [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -685,7 +685,7 @@ God will turn it for my [E]good
     tags: ["worship","revival","nearness"],
   },
   {
-    title: "Speak to Me",
+    title: "Speak to Me [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -703,7 +703,7 @@ God will turn it for my [E]good
     tags: ["worship","prayer","listening"],
   },
   {
-    title: "Already Won",
+    title: "Already Won [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -721,7 +721,7 @@ God will turn it for my [E]good
     tags: ["worship","victory","celebration"],
   },
   {
-    title: "Wait on You (Elevation)",
+    title: "Wait on You (Elevation) [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -740,7 +740,7 @@ God will turn it for my [E]good
     tags: ["worship","patience","trust"],
   },
   {
-    title: "Greater Things",
+    title: "Greater Things [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
@@ -759,7 +759,7 @@ God will turn it for my [E]good
     tags: ["worship","hope","expectation"],
   },
   {
-    title: "Worthy",
+    title: "Worthy [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -779,7 +779,7 @@ God will turn it for my [E]good
     tags: ["worship","holiness","adoration"],
   },
   {
-    title: "Open Up Our Eyes",
+    title: "Open Up Our Eyes [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -799,7 +799,7 @@ God will turn it for my [E]good
     tags: ["worship","missions","compassion"],
   },
   {
-    title: "Fullness",
+    title: "Fullness [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
@@ -819,7 +819,7 @@ God will turn it for my [E]good
     tags: ["worship","holy spirit","fullness"],
   },
   {
-    title: "At Midnight",
+    title: "At Midnight [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -839,7 +839,7 @@ God will turn it for my [E]good
     tags: ["worship","faith","breakthrough"],
   },
   {
-    title: "Faithful (Elevation Worship)",
+    title: "Faithful (Elevation Worship) [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
@@ -859,7 +859,7 @@ God will turn it for my [E]good
     tags: ["worship","faithfulness","testimony"],
   },
   {
-    title: "Might Get Loud",
+    title: "Might Get Loud [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -879,7 +879,7 @@ God will turn it for my [E]good
     tags: ["praise","celebration","joy"],
   },
   {
-    title: "Make Room",
+    title: "Make Room [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -899,7 +899,7 @@ God will turn it for my [E]good
     tags: ["worship","prayer","surrender"],
   },
   {
-    title: "Million Little Miracles",
+    title: "Million Little Miracles [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -919,7 +919,7 @@ God will turn it for my [E]good
     tags: ["praise","testimony","gratitude"],
   },
   {
-    title: "This Is the Kingdom",
+    title: "This Is the Kingdom [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -939,7 +939,7 @@ God will turn it for my [E]good
     tags: ["worship","kingdom","love"],
   },
   {
-    title: "Be Lifted High",
+    title: "Be Lifted High [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
@@ -959,7 +959,7 @@ God will turn it for my [E]good
     tags: ["praise","exaltation","anthem"],
   },
   {
-    title: "Name Above All Names",
+    title: "Name Above All Names [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -979,7 +979,7 @@ God will turn it for my [E]good
     tags: ["worship","name of Jesus","adoration"],
   },
   {
-    title: "More Than Able",
+    title: "More Than Able [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -999,7 +999,7 @@ God will turn it for my [E]good
     tags: ["worship","faith","declaration"],
   },
   {
-    title: "Here As in Heaven",
+    title: "Here As in Heaven [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -1020,7 +1020,7 @@ God will turn it for my [E]good
     tags: ["worship","presence","kingdom"],
   },
   {
-    title: "First Things First",
+    title: "First Things First [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -1040,7 +1040,7 @@ God will turn it for my [E]good
     tags: ["worship","devotion","priority"],
   },
   {
-    title: "What I See",
+    title: "What I See [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "C",
     format: "chordpro",
@@ -1060,7 +1060,7 @@ God will turn it for my [E]good
     tags: ["worship","faith","perspective"],
   },
   {
-    title: "Then He Rose",
+    title: "Then He Rose [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "F",
     format: "chordpro",
@@ -1080,7 +1080,7 @@ God will turn it for my [E]good
     tags: ["worship","resurrection","Easter"],
   },
   {
-    title: "Known",
+    title: "Known [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "D",
     format: "chordpro",
@@ -1100,7 +1100,7 @@ God will turn it for my [E]good
     tags: ["worship","identity","intimacy"],
   },
   {
-    title: "Available",
+    title: "Available [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -1120,7 +1120,7 @@ God will turn it for my [E]good
     tags: ["worship","surrender","service"],
   },
   {
-    title: "Paradoxology",
+    title: "Paradoxology [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "Bb",
     format: "chordpro",
@@ -1140,7 +1140,7 @@ God will turn it for my [E]good
     tags: ["worship","theology","grace"],
   },
   {
-    title: "Got What I Got",
+    title: "Got What I Got [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
@@ -1160,7 +1160,7 @@ God will turn it for my [E]good
     tags: ["praise","gratitude","testimony"],
   },
   {
-    title: "My Testimony",
+    title: "My Testimony [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "A",
     format: "chordpro",
@@ -1180,7 +1180,7 @@ God will turn it for my [E]good
     tags: ["worship","testimony","victory"],
   },
   {
-    title: "Bow Down",
+    title: "Bow Down [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -1200,7 +1200,7 @@ God will turn it for my [E]good
     tags: ["worship","surrender","humility"],
   },
   {
-    title: "Breakthrough",
+    title: "Breakthrough [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",
@@ -1220,7 +1220,7 @@ God will turn it for my [E]good
     tags: ["praise","breakthrough","declaration"],
   },
   {
-    title: "Talking to Jesus",
+    title: "Talking to Jesus [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "G",
     format: "chordpro",
@@ -1240,7 +1240,7 @@ God will turn it for my [E]good
     tags: ["worship","prayer","intimacy"],
   },
   {
-    title: "Bye Bye Babylon",
+    title: "Bye Bye Babylon [INCOMPLETE - needs V2+Bridge]",
     artist: "Elevation Worship",
     originalKey: "E",
     format: "chordpro",

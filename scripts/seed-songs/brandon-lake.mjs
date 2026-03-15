@@ -38,7 +38,7 @@ const SONGS = [
     tags: ["praise","gratitude","joy"],
   },
   {
-    title: "Coat of Many Colors",
+    title: "Coat of Many Colors [INCOMPLETE - needs V2+Bridge]",
     artist: "Brandon Lake",
     originalKey: "D",
     format: "chordpro",
@@ -60,7 +60,7 @@ const SONGS = [
     tags: ["worship","testimony","redemption"],
   },
   {
-    title: "I Need a Ghost",
+    title: "I Need a Ghost [INCOMPLETE - needs V2+Bridge]",
     artist: "Brandon Lake",
     originalKey: "F#m",
     format: "chordpro",
@@ -84,7 +84,7 @@ const SONGS = [
     tags: ["worship","holy-spirit","passion"],
   },
   {
-    title: "Count 'Em",
+    title: "Count 'Em [INCOMPLETE - needs V2+Bridge]",
     artist: "Brandon Lake",
     originalKey: "Bm",
     format: "chordpro",
@@ -106,7 +106,7 @@ const SONGS = [
     tags: ["worship","gratitude","joy"],
   },
   {
-    title: "More (Brandon Lake)",
+    title: "More (Brandon Lake) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",
@@ -130,7 +130,7 @@ const SONGS = [
     tags: ["worship","prayer","hunger"],
   },
   {
-    title: "Graves to Gardens (Brandon Lake)",
+    title: "Graves to Gardens (Brandon Lake) [INCOMPLETE - needs Bridge]",
     artist: "Brandon Lake",
     originalKey: "Bb",
     format: "chordpro",
@@ -157,7 +157,7 @@ const SONGS = [
     tags: ["worship","transformation","testimony"],
   },
   {
-    title: "House of Miracles",
+    title: "House of Miracles [INCOMPLETE - needs V2+Bridge]",
     artist: "Brandon Lake",
     originalKey: "Bb",
     format: "chordpro",
@@ -176,7 +176,7 @@ const SONGS = [
     tags: ["worship","miracles","faith"],
   },
   {
-    title: "Tear Off the Roof",
+    title: "Tear Off the Roof [INCOMPLETE - needs V2+Bridge]",
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",
@@ -195,7 +195,7 @@ const SONGS = [
     tags: ["worship","faith","scripture"],
   },
   {
-    title: "Greater Still",
+    title: "Greater Still [INCOMPLETE - needs V2+Bridge]",
     artist: "Brandon Lake",
     originalKey: "A",
     format: "chordpro",

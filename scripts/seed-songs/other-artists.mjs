@@ -12,7 +12,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Glorious Day",
+    title: "Glorious Day [INCOMPLETE - needs Bridge]",
     artist: "Passion",
     originalKey: "D",
     format: "chordpro",
@@ -64,7 +64,7 @@ const SONGS = [
     tags: ["worship","goodness","praise"],
   },
   {
-    title: "Worthy of Your Name",
+    title: "Worthy of Your Name [INCOMPLETE - needs Bridge]",
     artist: "Passion",
     originalKey: "A",
     format: "chordpro",
@@ -88,7 +88,7 @@ const SONGS = [
     tags: ["worship","worthy","declaration"],
   },
   {
-    title: "My Jesus",
+    title: "My Jesus [INCOMPLETE - needs Bridge]",
     artist: "Anne Wilson",
     originalKey: "Gb",
     format: "chordpro",
@@ -118,7 +118,7 @@ const SONGS = [
     tags: ["worship","testimony","country-gospel"],
   },
   {
-    title: "Sunday Sermons",
+    title: "Sunday Sermons [INCOMPLETE - needs Bridge]",
     artist: "Anne Wilson",
     originalKey: "G",
     format: "chordpro",
@@ -144,7 +144,7 @@ const SONGS = [
     tags: ["worship","testimony","country"],
   },
   {
-    title: "Rain in the Rearview",
+    title: "Rain in the Rearview [INCOMPLETE - needs V2+Bridge]",
     artist: "Anne Wilson",
     originalKey: "A",
     format: "chordpro",
@@ -168,7 +168,7 @@ const SONGS = [
     tags: ["worship","hope","country-pop"],
   },
   {
-    title: "Shepherd",
+    title: "Shepherd [INCOMPLETE - needs Bridge]",
     artist: "Amanda Cook",
     originalKey: "G",
     format: "chordpro",
@@ -196,7 +196,7 @@ const SONGS = [
     tags: ["worship","psalm","intimate"],
   },
   {
-    title: "Closer (Amanda Cook)",
+    title: "Closer (Amanda Cook) [INCOMPLETE - needs Bridge]",
     artist: "Amanda Cook",
     originalKey: "D",
     format: "chordpro",
@@ -222,7 +222,7 @@ const SONGS = [
     tags: ["worship","intimate","devotional"],
   },
   {
-    title: "You Make Me Brave (Amanda Cook)",
+    title: "You Make Me Brave (Amanda Cook) [INCOMPLETE - needs Bridge]",
     artist: "Amanda Cook",
     originalKey: "G",
     format: "chordpro",
@@ -248,7 +248,7 @@ const SONGS = [
     tags: ["worship","courage","anthem"],
   },
   {
-    title: "You Say",
+    title: "You Say [INCOMPLETE - needs V2+Bridge]",
     artist: "Lauren Daigle",
     originalKey: "Bb",
     format: "chordpro",
@@ -297,7 +297,7 @@ const SONGS = [
     tags: ["worship","comfort","rescue"],
   },
   {
-    title: "Yet Not I But Through Christ in Me",
+    title: "Yet Not I But Through Christ in Me [INCOMPLETE - needs Bridge]",
     artist: "CityAlight",
     originalKey: "D",
     format: "chordpro",
@@ -323,7 +323,7 @@ const SONGS = [
     tags: ["hymn","worship","grace"],
   },
   {
-    title: "Christ Is Mine Forevermore",
+    title: "Christ Is Mine Forevermore [INCOMPLETE - needs Bridge]",
     artist: "CityAlight",
     originalKey: "G",
     format: "chordpro",
@@ -377,7 +377,7 @@ As long as God is in it
     tags: ["worship","home","grace"],
   },
   {
-    title: "Way Maker",
+    title: "Way Maker [INCOMPLETE - needs Bridge]",
     artist: "Leeland",
     originalKey: "E",
     format: "chordpro",
@@ -433,7 +433,7 @@ As long as God is in it
     tags: ["worship","praise","faith"],
   },
   {
-    title: "Chain Breaker",
+    title: "Chain Breaker [INCOMPLETE - needs V2+Bridge]",
     artist: "Zach Williams",
     originalKey: "Am",
     format: "chordpro",
@@ -454,7 +454,7 @@ As long as God is in it
     tags: ["praise","freedom","chains"],
   },
   {
-    title: "Let Us Worship (No Weapon)",
+    title: "Let Us Worship (No Weapon) [INCOMPLETE - needs Bridge]",
     artist: "Sean Feucht",
     originalKey: "G",
     format: "chordpro",
@@ -479,7 +479,7 @@ As long as God is in it
     tags: ["praise","warfare","declaration"],
   },
   {
-    title: "Way Maker (Spanish Influence)",
+    title: "Way Maker (Spanish Influence) [INCOMPLETE - needs V2+Bridge]",
     artist: "Various (Spanish)",
     originalKey: "E",
     format: "chordpro",
@@ -501,7 +501,7 @@ As long as God is in it
     tags: ["worship","bilingual","spanish"],
   },
   {
-    title: "Tu Fidelidad",
+    title: "Tu Fidelidad [INCOMPLETE - needs Bridge]",
     artist: "Marcos Witt",
     originalKey: "G",
     format: "chordpro",
@@ -527,7 +527,7 @@ As long as God is in it
     tags: ["worship","spanish","faithfulness"],
   },
   {
-    title: "Abre Mis Ojos",
+    title: "Abre Mis Ojos [INCOMPLETE - needs Bridge]",
     artist: "Danilo Montero",
     originalKey: "D",
     format: "chordpro",
@@ -553,7 +553,7 @@ As long as God is in it
     tags: ["worship","spanish","prayer"],
   },
   {
-    title: "My Victory (Crowder)",
+    title: "My Victory (Crowder) [INCOMPLETE - needs V2+Bridge]",
     artist: "David Crowder",
     originalKey: "E",
     format: "chordpro",

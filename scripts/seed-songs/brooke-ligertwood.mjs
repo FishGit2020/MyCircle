@@ -11,7 +11,7 @@ const db = getFirestore();
 
 const SONGS = [
   {
-    title: "Nicea (Holy, Holy, Holy)",
+    title: "Nicea (Holy, Holy, Holy) [INCOMPLETE - needs Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
@@ -35,7 +35,7 @@ const SONGS = [
     tags: ["hymn","holiness","worship"],
   },
   {
-    title: "A Thousand Hallelujahs",
+    title: "A Thousand Hallelujahs [INCOMPLETE - needs Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "Db",
     format: "chordpro",
@@ -61,7 +61,7 @@ const SONGS = [
     tags: ["worship","praise","majesty"],
   },
   {
-    title: "Honey in the Rock",
+    title: "Honey in the Rock [INCOMPLETE - needs Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
@@ -116,7 +116,7 @@ const SONGS = [
     tags: ["worship","devotional","surrender"],
   },
   {
-    title: "Communion",
+    title: "Communion [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
@@ -135,7 +135,7 @@ const SONGS = [
     tags: ["worship","communion","remembrance"],
   },
   {
-    title: "Desert Song",
+    title: "Desert Song [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
@@ -155,7 +155,7 @@ const SONGS = [
     tags: ["worship","perseverance","seasons"],
   },
   {
-    title: "All Who Are Thirsty",
+    title: "All Who Are Thirsty [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "F",
     format: "chordpro",
@@ -175,7 +175,7 @@ const SONGS = [
     tags: ["worship","thirst","refreshing"],
   },
   {
-    title: "Hosanna (Brooke)",
+    title: "Hosanna (Brooke) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "E",
     format: "chordpro",
@@ -195,7 +195,7 @@ const SONGS = [
     tags: ["worship","praise","anthem"],
   },
   {
-    title: "What a Savior",
+    title: "What a Savior [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
@@ -214,7 +214,7 @@ const SONGS = [
     tags: ["worship","savior","hymn"],
   },
   {
-    title: "Hear Our Prayer",
+    title: "Hear Our Prayer [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
@@ -233,7 +233,7 @@ const SONGS = [
     tags: ["worship","prayer","corporate"],
   },
   {
-    title: "Closer Than You Know",
+    title: "Closer Than You Know [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
@@ -252,7 +252,7 @@ const SONGS = [
     tags: ["worship","nearness","comfort"],
   },
   {
-    title: "The Passion",
+    title: "The Passion [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "Ab",
     format: "chordpro",
@@ -271,7 +271,7 @@ const SONGS = [
     tags: ["worship","cross","passion"],
   },
   {
-    title: "Psalm 23 (Brooke)",
+    title: "Psalm 23 (Brooke) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
@@ -291,7 +291,7 @@ const SONGS = [
     tags: ["worship","psalm","peace"],
   },
   {
-    title: "Mercy",
+    title: "Mercy [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "Bb",
     format: "chordpro",
@@ -310,7 +310,7 @@ const SONGS = [
     tags: ["worship","mercy","grace"],
   },
   {
-    title: "Grace That Won't Let Go",
+    title: "Grace That Won't Let Go [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "E",
     format: "chordpro",
@@ -329,7 +329,7 @@ const SONGS = [
     tags: ["worship","grace","assurance"],
   },
   {
-    title: "A Holy Moment",
+    title: "A Holy Moment [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
@@ -348,7 +348,7 @@ const SONGS = [
     tags: ["worship","holiness","reverence"],
   },
   {
-    title: "Weight of Your Glory",
+    title: "Weight of Your Glory [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
@@ -367,7 +367,7 @@ const SONGS = [
     tags: ["worship","glory","presence"],
   },
   {
-    title: "Born Again (Brooke)",
+    title: "Born Again (Brooke) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
@@ -386,7 +386,7 @@ const SONGS = [
     tags: ["worship","salvation","new life"],
   },
   {
-    title: "New Creation",
+    title: "New Creation [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
@@ -405,7 +405,7 @@ const SONGS = [
     tags: ["worship","identity","new creation"],
   },
   {
-    title: "Defender of the Weak",
+    title: "Defender of the Weak [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
@@ -424,7 +424,7 @@ const SONGS = [
     tags: ["worship","justice","defender"],
   },
   {
-    title: "Still I Will Praise",
+    title: "Still I Will Praise [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
@@ -444,7 +444,7 @@ const SONGS = [
     tags: ["worship","perseverance","faith"],
   },
   {
-    title: "Rejoice (Brooke)",
+    title: "Rejoice (Brooke) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
@@ -463,7 +463,7 @@ const SONGS = [
     tags: ["worship","joy","declaration"],
   },
   {
-    title: "Open Arms (Brooke)",
+    title: "Open Arms (Brooke) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "C",
     format: "chordpro",
@@ -482,7 +482,7 @@ const SONGS = [
     tags: ["worship","grace","acceptance"],
   },
   {
-    title: "What a Beautiful Name (Brooke Solo)",
+    title: "What a Beautiful Name (Brooke Solo) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "D",
     format: "chordpro",
@@ -505,7 +505,7 @@ The Name of [A]Jesus [D]`,
     tags: ["worship","name","Jesus"],
   },
   {
-    title: "Where My Heart Belongs",
+    title: "Where My Heart Belongs [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "E",
     format: "chordpro",
@@ -524,7 +524,7 @@ The Name of [A]Jesus [D]`,
     tags: ["worship","devotion","home"],
   },
   {
-    title: "Trust (Brooke)",
+    title: "Trust (Brooke) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "G",
     format: "chordpro",
@@ -543,7 +543,7 @@ The Name of [A]Jesus [D]`,
     tags: ["worship","trust","faith"],
   },
   {
-    title: "Abide in Me",
+    title: "Abide in Me [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "F",
     format: "chordpro",
@@ -562,7 +562,7 @@ The Name of [A]Jesus [D]`,
     tags: ["worship","abiding","intimacy"],
   },
   {
-    title: "Morning Star",
+    title: "Morning Star [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "A",
     format: "chordpro",
@@ -581,7 +581,7 @@ The Name of [A]Jesus [D]`,
     tags: ["worship","hope","light"],
   },
   {
-    title: "Lead Me On (Brooke)",
+    title: "Lead Me On (Brooke) [INCOMPLETE - needs V2+Bridge]",
     artist: "Brooke Ligertwood",
     originalKey: "Bb",
     format: "chordpro",
