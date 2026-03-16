@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AiInterviewer from './AiInterviewer';
 
@@ -15,15 +15,25 @@ vi.mock('@mycircle/shared', () => ({
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
 }));
 
+// Mock fetch for question bank
+const mockFetch = vi.fn();
+beforeEach(() => {
+  mockFetch.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      chapters: ['Dynamic Arrays', 'Binary Search'],
+      questions: [
+        { id: 'q1', chapter: 'Dynamic Arrays', chapterSlug: 'dynamic-arrays', difficulty: 'medium', title: 'Two Sum', description: 'Find two numbers.', tags: [] },
+      ],
+    }),
+  });
+  vi.stubGlobal('fetch', mockFetch);
+});
+
 describe('AiInterviewer', () => {
   it('renders the title', () => {
     render(<AiInterviewer />);
     expect(screen.getByText('aiInterviewer.title')).toBeInTheDocument();
-  });
-
-  it('shows select model prompt when no model selected', () => {
-    render(<AiInterviewer />);
-    expect(screen.getByText('aiInterviewer.selectModelFirst')).toBeInTheDocument();
   });
 
   it('shows endpoint and model selectors', () => {
@@ -32,18 +42,40 @@ describe('AiInterviewer', () => {
     expect(screen.getByRole('combobox', { name: /aiInterviewer.model/ })).toBeInTheDocument();
   });
 
-  it('shows question textarea', () => {
-    render(<AiInterviewer />);
-    expect(screen.getByRole('textbox', { name: /aiInterviewer.questionLabel/ })).toBeInTheDocument();
-  });
-
-  it('shows working document textarea', () => {
-    render(<AiInterviewer />);
-    expect(screen.getByRole('textbox', { name: /aiInterviewer.documentLabel/ })).toBeInTheDocument();
-  });
-
   it('shows sessions button', () => {
     render(<AiInterviewer />);
     expect(screen.getByText('aiInterviewer.sessions')).toBeInTheDocument();
+  });
+
+  it('renders interview setup with mode toggle', () => {
+    render(<AiInterviewer />);
+    expect(screen.getByText('aiInterviewer.questionBankMode')).toBeInTheDocument();
+    expect(screen.getByText('aiInterviewer.customMode')).toBeInTheDocument();
+  });
+
+  it('shows start button', () => {
+    render(<AiInterviewer />);
+    // Start button shows "select model first" when no model is selected
+    expect(screen.getByText('aiInterviewer.selectModelFirst')).toBeInTheDocument();
+  });
+
+  it('shows chapter selection pills', () => {
+    render(<AiInterviewer />);
+    expect(screen.getByText('aiInterviewer.chapter.dynamic-arrays')).toBeInTheDocument();
+    expect(screen.getByText('aiInterviewer.chapter.binary-search')).toBeInTheDocument();
+    expect(screen.getByText('aiInterviewer.chapter.trees')).toBeInTheDocument();
+  });
+
+  it('shows difficulty selector', () => {
+    render(<AiInterviewer />);
+    expect(screen.getByText('aiInterviewer.easy')).toBeInTheDocument();
+    expect(screen.getByText('aiInterviewer.medium')).toBeInTheDocument();
+    expect(screen.getByText('aiInterviewer.hard')).toBeInTheDocument();
+  });
+
+  it('shows select all and deselect all buttons', () => {
+    render(<AiInterviewer />);
+    expect(screen.getByText('aiInterviewer.selectAll')).toBeInTheDocument();
+    expect(screen.getByText('aiInterviewer.deselectAll')).toBeInTheDocument();
   });
 });
