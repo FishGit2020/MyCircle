@@ -35,6 +35,7 @@ COPY packages/radio-station/package.json packages/radio-station/
 COPY packages/ai-interviewer/package.json packages/ai-interviewer/
 COPY packages/transit-tracker/package.json packages/transit-tracker/
 COPY packages/travel-map/package.json packages/travel-map/
+COPY packages/deal-finder/package.json packages/deal-finder/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -97,6 +98,7 @@ COPY --from=builder /app/packages/radio-station/package.json packages/radio-stat
 COPY --from=builder /app/packages/ai-interviewer/package.json packages/ai-interviewer/
 COPY --from=builder /app/packages/transit-tracker/package.json packages/transit-tracker/
 COPY --from=builder /app/packages/travel-map/package.json packages/travel-map/
+COPY --from=builder /app/packages/deal-finder/package.json packages/deal-finder/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune

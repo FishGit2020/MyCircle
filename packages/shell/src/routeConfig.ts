@@ -27,5 +27,6 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   interview: 'nav.interview',
   transit: 'nav.transit',
   'travel-map': 'nav.travelMap',
+  deals: 'nav.dealFinder',
   trash: 'nav.recycleBin',
 };

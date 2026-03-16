@@ -28,6 +28,7 @@ export default {
     "../ai-interviewer/src/**/*.{js,ts,jsx,tsx}",
     "../transit-tracker/src/**/*.{js,ts,jsx,tsx}",
     "../travel-map/src/**/*.{js,ts,jsx,tsx}",
+    "../deal-finder/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

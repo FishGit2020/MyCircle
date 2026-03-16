@@ -43,6 +43,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/interview': 'commandPalette.goToInterview',
   '/transit': 'commandPalette.goToTransit',
   '/travel-map': 'commandPalette.goToTravelMap',
+  '/deals': 'commandPalette.goToDeals',
 };
 
 const clockIcon = (

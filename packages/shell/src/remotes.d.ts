@@ -135,3 +135,8 @@ declare module 'travelMap/TravelMap' {
   const TravelMap: React.ComponentType;
   export default TravelMap;
 }
+
+declare module 'dealFinder/DealFinder' {
+  const DealFinder: React.ComponentType;
+  export default DealFinder;
+}

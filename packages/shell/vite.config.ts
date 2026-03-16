@@ -196,6 +196,10 @@ const travelMapRemote = isProduction
   ? '/travel-map/assets/remoteEntry.js'
   : 'http://localhost:3029/assets/remoteEntry.js';
 
+const dealFinderRemote = isProduction
+  ? '/deal-finder/assets/remoteEntry.js'
+  : 'http://localhost:3030/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -228,7 +232,8 @@ export default defineConfig({
         radioStation: radioStationRemote,
         aiInterviewer: aiInterviewerRemote,
         transitTracker: transitTrackerRemote,
-        travelMap: travelMapRemote
+        travelMap: travelMapRemote,
+        dealFinder: dealFinderRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
