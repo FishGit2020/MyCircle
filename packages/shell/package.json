@@ -18,7 +18,7 @@
     "graphql": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "@sentry/react": "^10.42.0",
+    "@sentry/react": "^10.43.0",
     "react-router": "catalog:",
     "workbox-window": "^7.4.0"
   },
@@ -39,6 +39,6 @@
     "typescript": "^5.3.3",
     "vite": "^5.0.11",
     "vite-plugin-pwa": "^1.2.0",
-    "vitest": "^4.0.17"
+    "vitest": "~4.0.18"
   }
 }
