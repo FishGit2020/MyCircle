@@ -28,10 +28,10 @@ export function useDocumentTitle() {
     } else {
       const firstSegment = pathname.split('/').filter(Boolean)[0];
       const labelKey = firstSegment ? ROUTE_LABEL_KEYS[firstSegment] : undefined;
-      const pageName = labelKey ? t(labelKey as any) : t('app.pageNotFound' as any);
+      const pageName = labelKey ? t(labelKey as any) : t('app.pageNotFound' as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
       if (tabParam && firstSegment) {
-        const tabLabel = t(`${firstSegment}.tabs.${tabParam}` as any);
+        const tabLabel = t(`${firstSegment}.tabs.${tabParam}` as any); // eslint-disable-line @typescript-eslint/no-explicit-any
         title = `${tabLabel} - ${pageName} - ${APP_NAME}`;
       } else {
         title = `${pageName} - ${APP_NAME}`;
@@ -49,5 +49,6 @@ export function useDocumentTitle() {
       page_path: pathname + location.search,
       page_title: title,
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, tabParam, t]);
 }

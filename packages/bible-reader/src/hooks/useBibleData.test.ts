@@ -9,8 +9,8 @@ vi.mock('@mycircle/shared', () => {
   const t = (key: string) => key;
   return {
     useTranslation: () => ({ t }),
-    useQuery: (...args: any[]) => mockUseQuery(...args),
-    useLazyQuery: (...args: any[]) => mockUseLazyQuery(...args),
+    useQuery: (...args: any[]) => mockUseQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
+    useLazyQuery: (...args: any[]) => mockUseLazyQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
     GET_BIBLE_VOTD_API: 'GET_BIBLE_VOTD_API',
     GET_BIBLE_PASSAGE: 'GET_BIBLE_PASSAGE',
     GET_BIBLE_VERSIONS: 'GET_BIBLE_VERSIONS',

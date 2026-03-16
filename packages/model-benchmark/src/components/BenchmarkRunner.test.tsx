@@ -10,7 +10,7 @@ const mockFetchModels = vi.fn().mockResolvedValue({
 // Mock @mycircle/shared (includes Apollo hooks)
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: any) => opts?.endpoint ? `${key} ${opts.endpoint}` : key,
+    t: (key: string, opts?: any) => opts?.endpoint ? `${key} ${opts.endpoint}` : key, // eslint-disable-line @typescript-eslint/no-explicit-any
   }),
   useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
   useLazyQuery: vi.fn(() => [mockFetchModels, { data: null }]),
@@ -41,7 +41,7 @@ const mockBenchmark = {
   results: [],
   runBenchmark: vi.fn(async () => []),
   saveRun: vi.fn(),
-  scoreResults: vi.fn(async (results: any) => results),
+  scoreResults: vi.fn(async (results: any) => results), // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 describe('BenchmarkRunner', () => {

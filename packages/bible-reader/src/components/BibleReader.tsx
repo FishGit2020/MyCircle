@@ -343,7 +343,7 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
     let mounted = true;
     const check = async () => {
       try {
-        const token = await (window as any).__getFirebaseIdToken?.();
+        const token = await (window as any).__getFirebaseIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
         if (mounted) setIsAuthenticated(!!token);
       } catch { if (mounted) setIsAuthenticated(false); }
     };

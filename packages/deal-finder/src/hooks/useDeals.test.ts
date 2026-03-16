@@ -9,7 +9,7 @@ vi.mock('@mycircle/shared', () => ({
 describe('useDeals', () => {
   beforeEach(() => {
     localStorage.clear();
-    (window as any).__getFirebaseIdToken = undefined;
+    (window as any).__getFirebaseIdToken = undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
     vi.spyOn(global, 'fetch').mockResolvedValue({
       ok: false,
       status: 404,

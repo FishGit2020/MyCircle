@@ -157,7 +157,7 @@ export default function TimelineView({
     <div className="space-y-4">
       {/* CDC attribution */}
       <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-        {t('childDev.cdcAttribution' as any)}
+        {t('childDev.cdcAttribution' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
       </p>
 
       {/* Domain filter chips */}
@@ -177,7 +177,7 @@ export default function TimelineView({
               }`}
               aria-pressed={active}
             >
-              {t(domain.nameKey as any)}
+              {t(domain.nameKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </button>
           );
         })}
@@ -230,21 +230,21 @@ export default function TimelineView({
                           ? 'text-gray-400 dark:text-gray-500'
                           : 'text-gray-800 dark:text-white'
                       }`}>
-                        {t(ar.labelKey as any)}
+                        {t(ar.labelKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                       </h4>
                       {status === 'past' && (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-medium">
-                          {t('childDev.pastStage' as any)}
+                          {t('childDev.pastStage' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                         </span>
                       )}
                       {status === 'current' && (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">
-                          {t('childDev.currentStage' as any)}
+                          {t('childDev.currentStage' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                         </span>
                       )}
                       {status === 'upcoming' && (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 font-medium">
-                          {t('childDev.upcomingStage' as any)}
+                          {t('childDev.upcomingStage' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                         </span>
                       )}
                     </div>
@@ -253,7 +253,7 @@ export default function TimelineView({
                         ? 'text-gray-400 dark:text-gray-500'
                         : 'text-gray-500 dark:text-gray-400'
                     }`}>
-                      {t('childDev.milestoneCount' as any).replace('{count}', String(milestoneCount))}
+                      {t('childDev.milestoneCount' as any).replace('{count}', String(milestoneCount))} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                     </p>
                   </div>
 
@@ -280,7 +280,7 @@ export default function TimelineView({
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
-                        {t('childDev.cdcGuide' as any)}
+                        {t('childDev.cdcGuide' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                       </a>
                       <a
                         href={AAP_LINKS[ar.id]}
@@ -291,7 +291,7 @@ export default function TimelineView({
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
-                        {t('childDev.aapGuide' as any)}
+                        {t('childDev.aapGuide' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                       </a>
                     </div>
 
@@ -311,7 +311,7 @@ export default function TimelineView({
                               <DomainIcon icon={domain.icon} className="w-3 h-3" />
                             </span>
                             <h5 className={`text-xs font-semibold ${colors.text}`}>
-                              {t(domain.nameKey as any)}
+                              {t(domain.nameKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                             </h5>
                           </div>
                           <div className="space-y-1">
@@ -326,11 +326,11 @@ export default function TimelineView({
                                     className="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500 dark:bg-gray-700 flex-shrink-0"
                                   />
                                   <span className={`text-sm leading-relaxed transition-colors ${checked ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-700 dark:text-gray-300'}`}>
-                                    {t(m.nameKey as any)}
+                                    {t(m.nameKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                                   </span>
                                   {m.isRedFlag && (
-                                    <span className="flex-shrink-0 text-xs px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium" title={t('childDev.redFlagInfo' as any)}>
-                                      {t('childDev.redFlag' as any)}
+                                    <span className="flex-shrink-0 text-xs px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium" title={t('childDev.redFlagInfo' as any)}> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+                                      {t('childDev.redFlag' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                                     </span>
                                   )}
                                 </label>

@@ -5,8 +5,8 @@ const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
 
 vi.mock('@apollo/client/react', () => ({
-  useQuery: (...args: any[]) => mockUseQuery(...args),
-  useMutation: (...args: any[]) => mockUseMutation(...args),
+  useQuery: (...args: any[]) => mockUseQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
+  useMutation: (...args: any[]) => mockUseMutation(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 vi.mock('../utils/logger', () => ({

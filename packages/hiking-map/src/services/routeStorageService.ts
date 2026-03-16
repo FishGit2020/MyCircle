@@ -41,7 +41,7 @@ let dbPromise: Promise<RouteDb> | null = null;
 
 function getDb(): Promise<RouteDb> {
   if (!dbPromise) {
-    dbPromise = openDB<any>(DB_NAME, DB_VERSION, {
+    dbPromise = openDB<any>(DB_NAME, DB_VERSION, { // eslint-disable-line @typescript-eslint/no-explicit-any
       upgrade(db) {
         if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'id' });
       },
@@ -50,14 +50,14 @@ function getDb(): Promise<RouteDb> {
   return dbPromise;
 }
 
-function parseGeometry(raw: any): GeoJSON.LineString {
+function parseGeometry(raw: any): GeoJSON.LineString { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (typeof raw === 'string') {
     try { return JSON.parse(raw) as GeoJSON.LineString; } catch { /* fall through */ }
   }
   return raw as GeoJSON.LineString;
 }
 
-function normalizeRoute(raw: Record<string, any>): SavedRoute {
+function normalizeRoute(raw: Record<string, any>): SavedRoute { // eslint-disable-line @typescript-eslint/no-explicit-any
   return {
     id: raw.id,
     name: raw.name ?? 'Route',
@@ -71,7 +71,7 @@ function normalizeRoute(raw: Record<string, any>): SavedRoute {
   };
 }
 
-function normalizePublicRoute(raw: Record<string, any>): PublicRoute {
+function normalizePublicRoute(raw: Record<string, any>): PublicRoute { // eslint-disable-line @typescript-eslint/no-explicit-any
   return {
     id: raw.id,
     name: raw.name ?? 'Route',

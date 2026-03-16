@@ -1,11 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import DailyLog from './DailyLog';
 
 // Mock @mycircle/shared
 vi.mock('@mycircle/shared', () => ({
-  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: { language: 'en' },

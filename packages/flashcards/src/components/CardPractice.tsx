@@ -73,7 +73,7 @@ export default function CardPractice({ cards, masteredIds, onToggleMastered, onC
     character: card.front,
     pinyin: card.meta?.pinyin || '',
     meaning: card.back,
-    category: card.category as any,
+    category: card.category as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   } : null;
 
   if (showWritingPractice && chineseCharForCanvas) {

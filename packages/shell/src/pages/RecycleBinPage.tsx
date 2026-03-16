@@ -28,7 +28,7 @@ function TypeBadge({ type, t }: { type: string; t: (key: string) => string }) {
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
-      {t(`recycleBin.type.${type}` as any)}
+      {t(`recycleBin.type.${type}` as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
     </span>
   );
 }

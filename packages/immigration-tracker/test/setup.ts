@@ -11,7 +11,7 @@ vi.mock('@mycircle/shared', () => ({
   StorageKeys: {
     IMMIGRATION_CASES_CACHE: 'immigration-cases-cache',
   },
-  createLogger: (ns: string) => ({
+  createLogger: (_ns: string) => ({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),

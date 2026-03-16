@@ -4,7 +4,7 @@ import Watchlist from './Watchlist';
 
 // Mock the child component StockCard
 vi.mock('./StockCard', () => ({
-  default: ({ symbol, companyName, isInWatchlist, onToggleWatchlist, onClick }: any) => (
+  default: ({ symbol, companyName, isInWatchlist, onToggleWatchlist, onClick }: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid={`stock-card-${symbol}`}>
       <span>{symbol}</span>
       <span>{companyName}</span>

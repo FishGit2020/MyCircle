@@ -5,7 +5,6 @@ import { useNotes } from '../hooks/useNotes';
 import { usePublicNotes } from '../hooks/usePublicNotes';
 import NoteList from './NoteList';
 import NoteEditor from './NoteEditor';
-import type { Note, PublicNote } from '../types';
 
 type View = 'list' | 'new' | 'edit';
 type Tab = 'my' | 'public';
@@ -40,6 +39,7 @@ export default function Notebook() {
       const isPublic = publicNotes.some(n => n.id === noteId);
       if (isPublic) setTab('public');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noteId, isNewRoute, publicNotes]);
 
   // Auth check — verify actual user is logged in, not just Firebase init

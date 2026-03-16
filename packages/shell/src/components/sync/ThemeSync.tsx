@@ -8,7 +8,7 @@ export default function ThemeSync() {
 
   useEffect(() => {
     if (!loading && profile) {
-      setThemeFromProfile(profile.darkMode, (profile as any).theme);
+      setThemeFromProfile(profile.darkMode, (profile as any).theme); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
   }, [profile, loading, setThemeFromProfile]);
 

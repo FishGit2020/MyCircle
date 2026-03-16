@@ -73,13 +73,13 @@ export default function WorshipSongs() {
       if (song) {
         setSelectedSong(song);
       } else {
-        setErrorMsg(t('worship.loadError' as any));
+        setErrorMsg(t('worship.loadError' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
         navigate('/worship', { replace: true });
       }
     }).catch(() => {
       if (cancelled) return;
       setSongLoading(false);
-      setErrorMsg(t('worship.loadError' as any));
+      setErrorMsg(t('worship.loadError' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
     });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -35,8 +35,8 @@ const YouthTrackerWidget = React.memo(function YouthTrackerWidget() {
           </svg>
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.youthTracker' as any)}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.youthTrackerDesc' as any)}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.youthTracker' as any)}</h4> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.youthTrackerDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
       </div>
       {children.length > 0 ? (
@@ -46,13 +46,13 @@ const YouthTrackerWidget = React.memo(function YouthTrackerWidget() {
             const years = Math.floor(months / 12);
             return (
               <p key={child.id} className="text-sm text-indigo-700 dark:text-indigo-300">
-                {child.name} — {years} {t('childDev.yearsMonthsOld' as any).replace('{years}', String(years)).replace('{months}', String(months % 12)).split(',')[0]}
+                {child.name} — {years} {t('childDev.yearsMonthsOld' as any).replace('{years}', String(years)).replace('{months}', String(months % 12)).split(',')[0]} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </p>
             );
           })}
         </div>
       ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('children.noChildren' as any)}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('children.noChildren' as any)}</p> // eslint-disable-line @typescript-eslint/no-explicit-any
       )}
     </div>
   );

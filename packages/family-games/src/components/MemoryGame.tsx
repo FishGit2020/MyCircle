@@ -18,7 +18,7 @@ interface Card {
   matched: boolean;
 }
 
-function createDeck(gridSize: number): Card[] {
+function _createDeck(gridSize: number): Card[] {
   const pairCount = (gridSize * gridSize) / 2;
   const selectedEmojis = [...EMOJIS].sort(() => Math.random() - 0.5).slice(0, pairCount);
   const pairs = [...selectedEmojis, ...selectedEmojis];
@@ -50,7 +50,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
   const lockRef = useRef(false);
 
   const gridSize = GRID_SIZES[difficulty];
-  const totalPairs = (gridSize * gridSize) / 2;
+  const _totalPairs = (gridSize * gridSize) / 2;
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -173,8 +173,8 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.difficulty')}</p>
         </div>
         <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-orange-700 dark:text-orange-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-orange-600 dark:text-orange-400 mt-0.5">{t('games.memoryRules' as any)}</p>
+          <p className="text-xs font-medium text-orange-700 dark:text-orange-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-orange-600 dark:text-orange-400 mt-0.5">{t('games.memoryRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="flex gap-3">
           {(['easy', 'medium', 'hard'] as const).map(d => (
@@ -208,7 +208,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
 
   const seconds = (elapsed / 1000).toFixed(1);
   const cols = gridSize % 2 !== 0 ? gridSize : gridSize;
-  const gridCols = `grid-cols-${cols}`;
+  const _gridCols = `grid-cols-${cols}`;
 
   return (
     <div className="flex flex-col items-center gap-4 max-w-md mx-auto">

@@ -5,7 +5,7 @@ import FavoriteCities from './FavoriteCities';
 const mockNavigate = vi.fn();
 vi.mock('react-router', () => ({
   useNavigate: () => mockNavigate,
-  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>,
+  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>, // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 vi.mock('../../context/AuthContext', () => ({

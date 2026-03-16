@@ -1,4 +1,3 @@
-import React from 'react';
 import { getIcon } from './iconRegistry';
 
 export function NavIcon({ icon, className }: { icon: string; className?: string }) {

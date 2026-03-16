@@ -56,12 +56,12 @@ export function ChildSelector({ children: childList, selectedId, onSelect, onAdd
           type="button"
           onClick={onAdd}
           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors border border-dashed border-blue-300 dark:border-blue-700"
-          aria-label={t('children.addChild' as any)}
+          aria-label={t('children.addChild' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          {t('children.add' as any)}
+          {t('children.add' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </button>
       )}
     </div>

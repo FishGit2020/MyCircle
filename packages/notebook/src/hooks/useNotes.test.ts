@@ -59,7 +59,7 @@ describe('useNotes', () => {
       update: vi.fn(),
       delete: vi.fn(),
       get: vi.fn(),
-      subscribe: vi.fn((cb: any) => {
+      subscribe: vi.fn((cb: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setTimeout(() => cb(mockNotes), 10);
         return unsubscribe;
       }),

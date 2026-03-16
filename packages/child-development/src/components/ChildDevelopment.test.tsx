@@ -22,7 +22,7 @@ const mockUseChildren = vi.fn(() => ({
 
 // Mock @mycircle/shared
 vi.mock('@mycircle/shared', () => ({
-  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
   useTranslation: () => ({
     t: (key: string) => key,
   }),
@@ -45,14 +45,14 @@ vi.mock('@mycircle/shared', () => ({
     if (!match) return null;
     return { book: match[1].trim(), chapter: parseInt(match[2], 10) };
   },
-  useChildren: (...args: any[]) => mockUseChildren(...args),
+  useChildren: (...args: any[]) => mockUseChildren(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
   getAgeInMonths: vi.fn(() => 12),
   getAgeRemainingDays: vi.fn(() => 5),
-  ChildSelector: ({ children: kids }: any) => <div data-testid="child-selector">{kids?.length ?? 0} children</div>,
+  ChildSelector: ({ children: kids }: any) => <div data-testid="child-selector">{kids?.length ?? 0} children</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 vi.mock('react-router', () => ({
-  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>,
+  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>, // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 describe('ChildDevelopment', () => {

@@ -1,4 +1,4 @@
-import { ForecastDay, getWeatherIconUrl, useUnits, convertTemp, tempUnitSymbol, useTranslation } from '@mycircle/shared';
+import { ForecastDay, getWeatherIconUrl, useUnits, convertTemp, useTranslation } from '@mycircle/shared';
 
 interface Props {
   data: ForecastDay[];

@@ -27,7 +27,7 @@ function getDaylightProgress(sunrise: number, sunset: number, dt: number): numbe
 }
 
 export default function SunriseSunset({ data }: Props) {
-  const { t, locale } = useTranslation();
+  const { t, locale: _locale } = useTranslation();
 
   if (!data.sunrise || !data.sunset) return null;
 

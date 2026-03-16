@@ -4,7 +4,7 @@ import InlinePlaybackControls from './InlinePlaybackControls';
 import type { Episode, Podcast } from '@mycircle/shared';
 
 // Track the subscribeToMFEvent callback so we can trigger playback state changes
-let playbackStateCallback: ((data: any) => void) | null = null;
+let playbackStateCallback: ((data: any) => void) | null = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 const mockEventBusPublish = vi.fn();
 
@@ -32,11 +32,11 @@ vi.mock('@mycircle/shared', () => {
   };
   return {
     useTranslation: () => ({ t, locale: 'en-US' }),
-    subscribeToMFEvent: vi.fn((_event: string, callback: (data: any) => void) => {
+    subscribeToMFEvent: vi.fn((_event: string, callback: (data: any) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       playbackStateCallback = callback;
       return () => { playbackStateCallback = null; };
     }),
-    eventBus: { publish: (...args: any[]) => mockEventBusPublish(...args) },
+    eventBus: { publish: (...args: any[]) => mockEventBusPublish(...args) }, // eslint-disable-line @typescript-eslint/no-explicit-any
     MFEvents: {
       AUDIO_PLAYBACK_STATE: 'mf:audio-playback-state',
       AUDIO_TOGGLE_PLAY: 'mf:audio-toggle-play',

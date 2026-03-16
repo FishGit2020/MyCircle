@@ -53,7 +53,7 @@ export default function PodcastPlayer() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const VALID_TABS = new Set(['discover', 'subscribed']);
-  const activeTab: 'discover' | 'subscribed' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'discover';
+  const activeTab: 'discover' | 'subscribed' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'discover'; // eslint-disable-line @typescript-eslint/no-explicit-any
   const setActiveTab = useCallback((tab: 'discover' | 'subscribed') => {
     setSearchParams(tab === 'discover' ? {} : { tab }, { replace: true });
   }, [setSearchParams]);
@@ -128,7 +128,7 @@ export default function PodcastPlayer() {
   }, []);
 
   // Fetch podcast data when navigating directly via URL (no route state)
-  const needsFetch = !!podcastId && !(location.state as any)?.podcast;
+  const needsFetch = !!podcastId && !(location.state as any)?.podcast; // eslint-disable-line @typescript-eslint/no-explicit-any
   const { data: feedData } = useQuery(GET_PODCAST_FEED, {
     variables: { feedId: podcastId },
     skip: !needsFetch,
@@ -138,8 +138,8 @@ export default function PodcastPlayer() {
   useEffect(() => {
     if (!podcastId) {
       setSelectedPodcast(null);
-    } else if ((location.state as any)?.podcast) {
-      setSelectedPodcast((location.state as any).podcast);
+    } else if ((location.state as any)?.podcast) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      setSelectedPodcast((location.state as any).podcast); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
     // Direct URL without state — wait for feedData query instead of redirecting
     // eslint-disable-next-line react-hooks/exhaustive-deps

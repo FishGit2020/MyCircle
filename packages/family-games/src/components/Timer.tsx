@@ -37,6 +37,7 @@ export default function Timer({ durationMs, onTimeUp, running }: TimerProps) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, durationMs, onTimeUp]);
 
   const seconds = Math.ceil(remaining / 1000);

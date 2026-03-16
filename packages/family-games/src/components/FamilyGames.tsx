@@ -23,7 +23,7 @@ export default function FamilyGames() {
   // Broadcast game name as breadcrumb detail
   useEffect(() => {
     if (gameType && VALID_GAMES.has(gameType)) {
-      const label = t(GAME_TITLE_KEYS[gameType] as any) || gameType;
+      const label = t(GAME_TITLE_KEYS[gameType] as any) || gameType; // eslint-disable-line @typescript-eslint/no-explicit-any
       window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: label }));
     } else {
       window.dispatchEvent(new CustomEvent(WindowEvents.BREADCRUMB_DETAIL, { detail: null }));
@@ -180,22 +180,22 @@ export default function FamilyGames() {
             </svg>
           }
         />
-        <GameCard type="reaction" titleKey={'games.reactionTime' as any} descKey={'games.reactionDesc' as any} color="red" onSelect={handleSelectGame}
+        <GameCard type="reaction" titleKey={'games.reactionTime' as any} descKey={'games.reactionDesc' as any} color="red" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
         />
-        <GameCard type="simon" titleKey={'games.simonSays' as any} descKey={'games.simonDesc' as any} color="yellow" onSelect={handleSelectGame}
+        <GameCard type="simon" titleKey={'games.simonSays' as any} descKey={'games.simonDesc' as any} color="yellow" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>}
         />
-        <GameCard type="sequence" titleKey={'games.numberSequence' as any} descKey={'games.sequenceDesc' as any} color="teal" onSelect={handleSelectGame}
+        <GameCard type="sequence" titleKey={'games.numberSequence' as any} descKey={'games.sequenceDesc' as any} color="teal" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>}
         />
-        <GameCard type="colormatch" titleKey={'games.colorMatch' as any} descKey={'games.colorMatchDesc' as any} color="rose" onSelect={handleSelectGame}
+        <GameCard type="colormatch" titleKey={'games.colorMatch' as any} descKey={'games.colorMatchDesc' as any} color="rose" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>}
         />
-        <GameCard type="maze" titleKey={'games.mazeRunner' as any} descKey={'games.mazeDesc' as any} color="emerald" onSelect={handleSelectGame}
+        <GameCard type="maze" titleKey={'games.mazeRunner' as any} descKey={'games.mazeDesc' as any} color="emerald" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>}
         />
-        <GameCard type="anagram" titleKey={'games.anagram' as any} descKey={'games.anagramDesc' as any} color="sky" onSelect={handleSelectGame}
+        <GameCard type="anagram" titleKey={'games.anagram' as any} descKey={'games.anagramDesc' as any} color="sky" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>}
         />
       </div>

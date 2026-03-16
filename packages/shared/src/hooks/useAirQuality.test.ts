@@ -4,7 +4,7 @@ import { renderHook } from '@testing-library/react';
 const mockUseQuery = vi.fn();
 
 vi.mock('@apollo/client/react', () => ({
-  useQuery: (...args: any[]) => mockUseQuery(...args),
+  useQuery: (...args: any[]) => mockUseQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 vi.mock('../utils/logger', () => ({

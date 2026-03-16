@@ -3,7 +3,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useBabyPhotos } from './useBabyPhotos';
 
 // Apollo mock state
-let mockBabyPhotosData: any = undefined;
+let mockBabyPhotosData: any = undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
 let mockQueryLoading = false;
 const mockRefetch = vi.fn().mockResolvedValue({});
 const mockDeleteMutation = vi.fn().mockResolvedValue({});

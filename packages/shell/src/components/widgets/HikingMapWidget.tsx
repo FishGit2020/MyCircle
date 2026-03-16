@@ -14,17 +14,17 @@ const HikingMapWidget = React.memo(function HikingMapWidget() {
     let unsubPublic: (() => void) | undefined;
 
     function subscribe() {
-      const hr = (window as any).__hikingRoutes;
+      const hr = (window as any).__hikingRoutes; // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!hr) return;
       // Personal routes (only when signed in)
       if (uid && hr.subscribe) {
-        unsubMy = hr.subscribe((routes: any[]) => setMyCount(routes.length));
+        unsubMy = hr.subscribe((routes: any[]) => setMyCount(routes.length)); // eslint-disable-line @typescript-eslint/no-explicit-any
       } else {
         setMyCount(null);
       }
       // Public routes (always visible)
       if (hr.subscribePublic) {
-        unsubPublic = hr.subscribePublic((routes: any[]) => setPublicCount(routes.length));
+        unsubPublic = hr.subscribePublic((routes: any[]) => setPublicCount(routes.length)); // eslint-disable-line @typescript-eslint/no-explicit-any
       }
     }
 

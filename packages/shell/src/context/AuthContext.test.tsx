@@ -3,7 +3,7 @@ import { render, act, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuth } from './AuthContext';
 
 // Capture the subscribeToAuthChanges callback so tests can trigger it
-let authChangeCallback: ((user: any) => void) | null = null;
+let authChangeCallback: ((user: any) => void) | null = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 const mockLogEvent = vi.fn();
 const mockIdentifyUser = vi.fn();
 const mockClearUserIdentity = vi.fn();
@@ -11,7 +11,7 @@ const mockGetUserProfile = vi.fn().mockResolvedValue(null);
 const mockRestoreUserData = vi.fn().mockReturnValue({ favoriteCities: [] });
 
 vi.mock('../lib/firebase', () => ({
-  subscribeToAuthChanges: (cb: (user: any) => void) => {
+  subscribeToAuthChanges: (cb: (user: any) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     authChangeCallback = cb;
     return () => {};
   },
@@ -21,17 +21,17 @@ vi.mock('../lib/firebase', () => ({
   signUpWithEmail: vi.fn(),
   resetPassword: vi.fn(),
   logOut: vi.fn(),
-  getUserProfile: (...args: any[]) => mockGetUserProfile(...args),
+  getUserProfile: (...args: any[]) => mockGetUserProfile(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
   updateStockWatchlist: vi.fn(),
   updatePodcastSubscriptions: vi.fn(),
   updateUserBabyDueDate: vi.fn(),
-  identifyUser: (...args: any[]) => mockIdentifyUser(...args),
-  clearUserIdentity: (...args: any[]) => mockClearUserIdentity(...args),
-  logEvent: (...args: any[]) => mockLogEvent(...args),
+  identifyUser: (...args: any[]) => mockIdentifyUser(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
+  clearUserIdentity: (...args: any[]) => mockClearUserIdentity(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
+  logEvent: (...args: any[]) => mockLogEvent(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 vi.mock('../context/restoreUserData', () => ({
-  restoreUserData: (...args: any[]) => mockRestoreUserData(...args),
+  restoreUserData: (...args: any[]) => mockRestoreUserData(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 vi.mock('../hooks/useKnownAccounts', () => ({

@@ -113,11 +113,11 @@ export default function GameOver({ gameType, score, timeMs, difficulty, onPlayAg
           <svg className={`w-3.5 h-3.5 transition-transform ${showRules ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
-          {t('games.howScoringWorks' as any)}
+          {t('games.howScoringWorks' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </button>
         {showRules && (
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center leading-relaxed">
-            {t(SCORING_RULES[gameType] as any)}
+            {t(SCORING_RULES[gameType] as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </p>
         )}
       </div>

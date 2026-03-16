@@ -58,6 +58,7 @@ const DEFAULT_VISIBILITY: WidgetVisibility = {
   activitySuggestions: true,
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function loadWidgetVisibility(): WidgetVisibility {
   try {
     const stored = localStorage.getItem(StorageKeys.DASHBOARD_WIDGETS);

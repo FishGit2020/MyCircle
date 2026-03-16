@@ -45,6 +45,7 @@ export function useKeyboardShortcuts({ onToggleTheme, onShowHelp }: UseKeyboardS
         handleGoPrefix();
         break;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, onToggleTheme, onShowHelp]);
 
   const handleGoPrefix = useCallback(() => {

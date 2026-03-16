@@ -13,7 +13,7 @@ vi.mock('./Loading', () => ({
   default: () => <div data-testid="loading">Loading...</div>,
 }));
 
-let mockAuthState = { user: null as any, loading: false, signIn: mockSignIn };
+let mockAuthState = { user: null as any, loading: false, signIn: mockSignIn }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => mockAuthState,

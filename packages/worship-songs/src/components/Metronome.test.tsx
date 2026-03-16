@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Metronome from './Metronome';
 
@@ -37,7 +37,7 @@ class MockAudioContext {
 
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
-  (globalThis as any).AudioContext = MockAudioContext;
+  (globalThis as any).AudioContext = MockAudioContext; // eslint-disable-line @typescript-eslint/no-explicit-any
 });
 
 afterEach(() => {

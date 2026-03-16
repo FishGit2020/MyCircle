@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { MockedProvider } from '@apollo/client/testing/react';
-import { GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS } from '@mycircle/shared';
+import { GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS } from '@mycircle/shared';
 import AiAssistant from './AiAssistant';
 
 // Mock fetch globally

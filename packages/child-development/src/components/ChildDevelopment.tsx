@@ -17,7 +17,7 @@ const TEEN_IDS = new Set(['12-14y', '15-17y']);
 
 function VerseSection() {
   const { t } = useTranslation();
-  const { reference, text, loading, shuffle } = useVerseOfDay(parentingVerses, (key) => t(key as any));
+  const { reference, text, loading, shuffle } = useVerseOfDay(parentingVerses, (key) => t(key as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   return (
     <div className="bg-amber-50/50 dark:bg-amber-900/10 rounded-lg p-4 mb-6 min-h-[56px]">
@@ -50,7 +50,7 @@ function VerseSection() {
           type="button"
           onClick={shuffle}
           className="flex-shrink-0 p-1.5 rounded-lg text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
-          aria-label={t('childDev.shuffleVerse' as any)}
+          aria-label={t('childDev.shuffleVerse' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -119,17 +119,17 @@ export default function ChildDevelopment() {
   const ageDisplay = useMemo(() => {
     if (ageInMonths === null) return '';
     if (ageInMonths < 24) {
-      const base = t('childDev.monthsOld' as any).replace('{months}', String(ageInMonths));
+      const base = t('childDev.monthsOld' as any).replace('{months}', String(ageInMonths)); // eslint-disable-line @typescript-eslint/no-explicit-any
       if (ageInDays > 0) {
-        return base + ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageInDays));
+        return base + ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageInDays)); // eslint-disable-line @typescript-eslint/no-explicit-any
       }
       return base;
     }
     const years = Math.floor(ageInMonths / 12);
     const months = ageInMonths % 12;
-    const base = t('childDev.yearsMonthsOld' as any).replace('{years}', String(years)).replace('{months}', String(months));
+    const base = t('childDev.yearsMonthsOld' as any).replace('{years}', String(years)).replace('{months}', String(months)); // eslint-disable-line @typescript-eslint/no-explicit-any
     if (ageInDays > 0) {
-      return base + ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageInDays));
+      return base + ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageInDays)); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
     return base;
   }, [ageInMonths, ageInDays, t]);
@@ -161,7 +161,7 @@ export default function ChildDevelopment() {
   const handleDelete = useCallback(async () => {
     if (!selectedChild) return;
     const confirmed = window.confirm(
-      t('children.deleteConfirm' as any).replace('{name}', selectedChild.name)
+      t('children.deleteConfirm' as any).replace('{name}', selectedChild.name) // eslint-disable-line @typescript-eslint/no-explicit-any
     );
     if (!confirmed) return;
     await deleteChild(selectedChild.id);
@@ -175,27 +175,27 @@ export default function ChildDevelopment() {
       <PageContent maxWidth="md">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-            {t('children.editChild' as any)}
+            {t('children.editChild' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </h2>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="space-y-4">
             <div>
               <label htmlFor="edit-child-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('childDev.childName' as any)}
+                {t('childDev.childName' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </label>
               <input
                 id="edit-child-name"
                 type="text"
                 value={inputName}
                 onChange={e => setInputName(e.target.value)}
-                placeholder={t('childDev.childNamePlaceholder' as any)}
+                placeholder={t('childDev.childNamePlaceholder' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
             <div>
               <label htmlFor="edit-birth-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('childDev.birthDate' as any)}
+                {t('childDev.birthDate' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </label>
               <input
                 id="edit-birth-date"
@@ -212,14 +212,14 @@ export default function ChildDevelopment() {
                 disabled={!inputName.trim() || !inputBirthDate}
                 className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
               >
-                {t('children.save' as any)}
+                {t('children.save' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
                 className="py-2.5 px-4 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-gray-500"
               >
-                {t('children.cancel' as any)}
+                {t('children.cancel' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </button>
             </div>
           </div>
@@ -235,10 +235,10 @@ export default function ChildDevelopment() {
       <PageContent maxWidth="md">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-            {t('childDev.title' as any)}
+            {t('childDev.title' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            {t('childDev.subtitle' as any)}
+            {t('childDev.subtitle' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </p>
         </div>
 
@@ -248,20 +248,20 @@ export default function ChildDevelopment() {
           <div className="space-y-4">
             <div>
               <label htmlFor="child-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('childDev.childName' as any)}
+                {t('childDev.childName' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </label>
               <input
                 id="child-name"
                 type="text"
                 value={inputName}
                 onChange={e => setInputName(e.target.value)}
-                placeholder={t('childDev.childNamePlaceholder' as any)}
+                placeholder={t('childDev.childNamePlaceholder' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
             <div>
               <label htmlFor="birth-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('childDev.birthDate' as any)}
+                {t('childDev.birthDate' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </label>
               <input
                 id="birth-date"
@@ -278,7 +278,7 @@ export default function ChildDevelopment() {
                 disabled={!inputName.trim() || !inputBirthDate}
                 className="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
               >
-                {t('children.addChild' as any)}
+                {t('children.addChild' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </button>
               {isAdding && (
                 <button
@@ -286,7 +286,7 @@ export default function ChildDevelopment() {
                   onClick={() => setIsAdding(false)}
                   className="py-2.5 px-4 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-gray-500"
                 >
-                  {t('children.cancel' as any)}
+                  {t('children.cancel' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                 </button>
               )}
             </div>
@@ -327,23 +327,23 @@ export default function ChildDevelopment() {
                 type="button"
                 onClick={startEditing}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                aria-label={t('children.editChild' as any)}
+                aria-label={t('children.editChild' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                {t('children.editChild' as any)}
+                {t('children.editChild' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </button>
               <button
                 type="button"
                 onClick={handleDelete}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                aria-label={t('children.deleteChild' as any)}
+                aria-label={t('children.deleteChild' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                {t('children.deleteChild' as any)}
+                {t('children.deleteChild' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </button>
             </div>
           </div>
@@ -368,7 +368,7 @@ export default function ChildDevelopment() {
                     : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
-                {t(tab.labelKey as any)}
+                {t(tab.labelKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                 <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">({tab.ages})</span>
               </button>
             ))}

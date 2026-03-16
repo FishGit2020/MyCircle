@@ -128,7 +128,7 @@ describe('useInterviewChat', () => {
     const mockList = vi.fn().mockResolvedValue({
       sessions: [{ id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: 1000, createdAt: 1000 }],
     });
-    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: vi.fn() };
+    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: vi.fn() }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const { result } = renderHook(() => useInterviewChat());
 
@@ -149,7 +149,7 @@ describe('useInterviewChat', () => {
         { id: 's2', questionPreview: 'Merge Sort', messageCount: 3, updatedAt: 900, createdAt: 900 },
       ],
     });
-    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: mockDelete };
+    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: mockDelete }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const { result } = renderHook(() => useInterviewChat());
 
@@ -314,7 +314,7 @@ describe('useInterviewChat', () => {
         messages: [{ id: 'm1', role: 'user', content: 'Hello', timestamp: 1000 }],
       },
     });
-    (window as any).__interviewApi = { list: vi.fn(), save: vi.fn(), load: mockLoad, delete: vi.fn() };
+    (window as any).__interviewApi = { list: vi.fn(), save: vi.fn(), load: mockLoad, delete: vi.fn() }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const { result } = renderHook(() => useInterviewChat());
 

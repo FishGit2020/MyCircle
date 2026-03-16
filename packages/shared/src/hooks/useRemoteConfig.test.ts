@@ -11,7 +11,7 @@ describe('useRemoteConfig', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     // Clear any previous config
-    delete (window as any).__REMOTE_CONFIG__;
+    delete (window as any).__REMOTE_CONFIG__; // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   afterEach(() => {
@@ -25,7 +25,7 @@ describe('useRemoteConfig', () => {
   });
 
   it('returns config values when window.__REMOTE_CONFIG__ is set before mount', () => {
-    (window as any).__REMOTE_CONFIG__ = { feature_flag: 'true', max_items: '10' };
+    (window as any).__REMOTE_CONFIG__ = { feature_flag: 'true', max_items: '10' }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const { result } = renderHook(() => useRemoteConfig());
 
@@ -38,7 +38,7 @@ describe('useRemoteConfig', () => {
     expect(result.current).toEqual({});
 
     // Set config after mount
-    (window as any).__REMOTE_CONFIG__ = { late_flag: 'yes' };
+    (window as any).__REMOTE_CONFIG__ = { late_flag: 'yes' }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // Advance past one polling interval, wrapped in act to handle state update
     await act(async () => {

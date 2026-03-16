@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, createLogger } from '@mycircle/shared';
+import { createLogger } from '@mycircle/shared';
 import type { Trip } from '../types';
 
 const logger = createLogger('useTrips');
@@ -11,7 +11,7 @@ export function useTrips() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const api = window.__tripPlanner as any;
+    const api = window.__tripPlanner as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // Prefer real-time subscription
     if (api?.subscribe) {
@@ -46,7 +46,7 @@ export function useTrips() {
   }, []);
 
   const addTrip = useCallback(async (trip: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const api = window.__tripPlanner as any;
+    const api = window.__tripPlanner as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (api?.add) {
       await api.add(trip);
       return;
@@ -66,7 +66,7 @@ export function useTrips() {
   }, []);
 
   const updateTrip = useCallback(async (id: string, data: Partial<Trip>) => {
-    const api = window.__tripPlanner as any;
+    const api = window.__tripPlanner as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (api?.update) {
       await api.update(id, data);
       return;
@@ -79,7 +79,7 @@ export function useTrips() {
   }, []);
 
   const deleteTrip = useCallback(async (id: string) => {
-    const api = window.__tripPlanner as any;
+    const api = window.__tripPlanner as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (api?.delete) {
       await api.delete(id);
       return;
