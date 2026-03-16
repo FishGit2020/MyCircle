@@ -18,6 +18,21 @@ interface SessionPayload {
   config?: Record<string, unknown>;
 }
 
+interface BankQuestion {
+  id: string;
+  chapter: string;
+  chapterSlug: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+interface QuestionBankData {
+  chapters: string[];
+  questions: BankQuestion[];
+}
+
 // In-memory cache for question bank
 let questionBankCache: { data: string; fetchedAt: number } | null = null;
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
@@ -50,7 +65,17 @@ export const interviewSessions = onRequest(
       return;
     }
 
-    if (path === 'save' && req.method === 'POST') {
+    if (path === 'questions' && req.method === 'GET') {
+      await handleQuestionBank(res);
+    } else if (path === 'questions' && req.method === 'POST') {
+      await handleCreateQuestion(req, res);
+    } else if (path.startsWith('questions/') && req.method === 'PUT') {
+      const questionId = path.replace('questions/', '');
+      await handleUpdateQuestion(questionId, req, res);
+    } else if (path.startsWith('questions/') && req.method === 'DELETE') {
+      const questionId = path.replace('questions/', '');
+      await handleDeleteQuestion(questionId, res);
+    } else if (path === 'save' && req.method === 'POST') {
       await handleSave(uid, req, res);
     } else if (path === 'sessions' && req.method === 'GET') {
       await handleList(uid, res);
@@ -89,6 +114,124 @@ async function handleQuestionBank(res: Response) {
     res.send(data);
   } catch {
     res.status(500).json({ error: 'Failed to load question bank' });
+  }
+}
+
+async function loadQuestionBankFromStorage(): Promise<QuestionBankData> {
+  const file = bucket.file('question-bank/questions.json');
+  const [contents] = await file.download();
+  return JSON.parse(contents.toString('utf-8')) as QuestionBankData;
+}
+
+async function saveQuestionBankToStorage(data: QuestionBankData): Promise<void> {
+  const file = bucket.file('question-bank/questions.json');
+  await file.save(Buffer.from(JSON.stringify(data, null, 2), 'utf-8'), {
+    contentType: 'application/json',
+  });
+  // Invalidate cache so next GET fetches fresh data
+  questionBankCache = null;
+}
+
+async function handleCreateQuestion(req: Request, res: Response) {
+  try {
+    const body = req.body as Partial<BankQuestion>;
+    if (!body.chapter || !body.chapterSlug || !body.difficulty || !body.title || !body.description) {
+      res.status(400).json({ error: 'Missing required fields: chapter, chapterSlug, difficulty, title, description' });
+      return;
+    }
+
+    const validDifficulties = ['easy', 'medium', 'hard'];
+    if (!validDifficulties.includes(body.difficulty)) {
+      res.status(400).json({ error: 'Invalid difficulty. Must be easy, medium, or hard' });
+      return;
+    }
+
+    const bankData = await loadQuestionBankFromStorage();
+    const newQuestion: BankQuestion = {
+      id: `${body.chapterSlug}-${body.difficulty}-${Date.now()}`,
+      chapter: body.chapter,
+      chapterSlug: body.chapterSlug,
+      difficulty: body.difficulty,
+      title: body.title,
+      description: body.description,
+      tags: body.tags ?? [],
+    };
+
+    bankData.questions.push(newQuestion);
+
+    // Add chapter to chapters list if not present
+    if (!bankData.chapters.includes(newQuestion.chapter)) {
+      bankData.chapters.push(newQuestion.chapter);
+    }
+
+    await saveQuestionBankToStorage(bankData);
+    res.json({ question: newQuestion });
+  } catch {
+    res.status(500).json({ error: 'Failed to create question' });
+  }
+}
+
+async function handleUpdateQuestion(questionId: string, req: Request, res: Response) {
+  try {
+    if (!questionId) {
+      res.status(400).json({ error: 'Question ID required' });
+      return;
+    }
+
+    const updates = req.body as Partial<BankQuestion>;
+    const bankData = await loadQuestionBankFromStorage();
+    const index = bankData.questions.findIndex((q) => q.id === questionId);
+
+    if (index === -1) {
+      res.status(404).json({ error: 'Question not found' });
+      return;
+    }
+
+    // Merge updates
+    const existing = bankData.questions[index];
+    const updated: BankQuestion = {
+      ...existing,
+      ...(updates.chapter !== undefined ? { chapter: updates.chapter } : {}),
+      ...(updates.chapterSlug !== undefined ? { chapterSlug: updates.chapterSlug } : {}),
+      ...(updates.difficulty !== undefined ? { difficulty: updates.difficulty } : {}),
+      ...(updates.title !== undefined ? { title: updates.title } : {}),
+      ...(updates.description !== undefined ? { description: updates.description } : {}),
+      ...(updates.tags !== undefined ? { tags: updates.tags } : {}),
+    };
+
+    if (updated.difficulty && !['easy', 'medium', 'hard'].includes(updated.difficulty)) {
+      res.status(400).json({ error: 'Invalid difficulty. Must be easy, medium, or hard' });
+      return;
+    }
+
+    bankData.questions[index] = updated;
+    await saveQuestionBankToStorage(bankData);
+    res.json({ question: updated });
+  } catch {
+    res.status(500).json({ error: 'Failed to update question' });
+  }
+}
+
+async function handleDeleteQuestion(questionId: string, res: Response) {
+  try {
+    if (!questionId) {
+      res.status(400).json({ error: 'Question ID required' });
+      return;
+    }
+
+    const bankData = await loadQuestionBankFromStorage();
+    const before = bankData.questions.length;
+    bankData.questions = bankData.questions.filter((q) => q.id !== questionId);
+
+    if (bankData.questions.length === before) {
+      res.status(404).json({ error: 'Question not found' });
+      return;
+    }
+
+    await saveQuestionBankToStorage(bankData);
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: 'Failed to delete question' });
   }
 }
 

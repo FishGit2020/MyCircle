@@ -78,4 +78,9 @@ describe('AiInterviewer', () => {
     expect(screen.getByText('aiInterviewer.selectAll')).toBeInTheDocument();
     expect(screen.getByText('aiInterviewer.deselectAll')).toBeInTheDocument();
   });
+
+  it('shows manage questions link', () => {
+    render(<AiInterviewer />);
+    expect(screen.getByText('aiInterviewer.manageQuestions')).toBeInTheDocument();
+  });
 });

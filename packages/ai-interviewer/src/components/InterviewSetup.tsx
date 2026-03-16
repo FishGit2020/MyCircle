@@ -6,6 +6,7 @@ import type { InterviewConfig, Difficulty } from '../hooks/useInterviewStateMach
 interface InterviewSetupProps {
   onStartStructured: (config: InterviewConfig) => void;
   onStartCustom: (question: string) => void;
+  onManageQuestions: () => void;
   loading: boolean;
   modelSelected: boolean;
   questionBankLoading: boolean;
@@ -19,6 +20,7 @@ const QUESTION_COUNTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export default function InterviewSetup({
   onStartStructured,
   onStartCustom,
+  onManageQuestions,
   loading,
   modelSelected,
   questionBankLoading,
@@ -115,6 +117,13 @@ export default function InterviewSetup({
                 {t('aiInterviewer.selectChapters')}
               </span>
               <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={onManageQuestions}
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {t('aiInterviewer.manageQuestions')}
+                </button>
                 <button
                   type="button"
                   onClick={selectAll}
