@@ -166,7 +166,7 @@
     "@types/react-dom": "^18.3.7",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^5.1.4",
-    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/coverage-v8": "~4.0.18",
     "autoprefixer": "^10.4.27",
     "concurrently": "^9.2.1",
     "eslint": "9",
@@ -184,7 +184,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.1",
     "vite": "^5.4.21",
-    "vitest": "^4.1.0",
+    "vitest": "~4.0.18",
     "zod": "^4.3.6"
   },
   "pnpm": {
