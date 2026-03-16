@@ -306,6 +306,7 @@ export default defineConfig({
           /^\/digital-library-api\//,
           /^\/api\//,
           /^\/transit-api\//,
+          /^\/deals-api\//,
           /^\/__\//,
         ],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],

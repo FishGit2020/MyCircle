@@ -19,17 +19,18 @@
     "@apollo/server": "^5.2.0",
     "@as-integrations/express4": "^1.1.2",
     "@google-cloud/functions-framework": "^5.0.1",
-    "@google/genai": "^1.44.0",
+    "@google/genai": "^1.45.0",
     "@graphql-tools/schema": "^10.0.31",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "axios": "^1.13.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "firebase-admin": "^13.7.0",
-    "firebase-functions": "^7.1.0",
+    "firebase-functions": "^7.1.1",
     "graphql": "^16.13.1",
     "graphql-depth-limit": "^1.1.0",
     "graphql-subscriptions": "^3.0.0",
+    "fast-xml-parser": "^5.3.6",
     "node-cache": "^5.1.2",
     "openai": "^4.73.0",
     "epub2": "^3.0.2",
@@ -41,7 +42,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.5",
     "typescript": "^5.3.3",
-    "vitest": "^4.0.17"
+    "vitest": "^4.1.0"
   },
   "pnpm": {
     "overrides": {
