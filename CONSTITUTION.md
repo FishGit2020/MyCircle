@@ -93,7 +93,7 @@ All code changes must pass the following gates before merge:
 
 ## Development Workflow
 
-1. **Spec** (for new MFEs/large features): Create or update spec in `docs/specs/`
+1. **Spec** (required for new MFEs): Run `pnpm new-spec <name>`, fill out spec.md, plan.md, tasks.md. CI blocks PRs for new MFEs without specs.
 2. **Branch**: Create feature branch (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`)
 3. **Implement**: Write code following constitution principles
 4. **Test**: Ensure all test categories pass locally
