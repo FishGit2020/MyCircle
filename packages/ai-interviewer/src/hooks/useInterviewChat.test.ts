@@ -14,6 +14,7 @@ describe('useInterviewChat', () => {
   beforeEach(() => {
     localStorage.clear();
     mockMutate.mockReset();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (window as any).__interviewApi;
   });
 

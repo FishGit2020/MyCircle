@@ -73,7 +73,7 @@ export default function AiInterviewer() {
     sessions,
     sessionId: currentSessionId,
     // V2 structured mode
-    interviewState,
+    interviewState: _interviewState,
     evaluating,
     progress,
     currentBankQuestion,

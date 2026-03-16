@@ -4,7 +4,7 @@ import AiInterviewer from './AiInterviewer';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string, opts?: Record<string, unknown>) => opts ? `${key} ${JSON.stringify(opts)}` : key }),
-  PageContent: ({ children, className }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
   useQuery: () => ({ data: undefined, loading: false }),
   useLazyQuery: () => [vi.fn(), { data: undefined, loading: false }],
   useMutation: () => [vi.fn(), { loading: false }],
