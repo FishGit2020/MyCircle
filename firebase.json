@@ -47,6 +47,10 @@
         "function": "interviewSessions"
       },
       {
+        "source": "/deals-api/**",
+        "function": "dealsProxy"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
