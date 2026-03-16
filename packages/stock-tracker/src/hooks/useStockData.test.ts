@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 
 // Create stable mock functions for Apollo hooks
 const mockUseQuery = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
-  useQuery: (...args: any[]) => mockUseQuery(...args),
+  useQuery: (...args: any[]) => mockUseQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
   SEARCH_STOCKS: 'SEARCH_STOCKS_QUERY',
   GET_STOCK_QUOTE: 'GET_STOCK_QUOTE_QUERY',
   GET_STOCK_CANDLES: 'GET_STOCK_CANDLES_QUERY',
@@ -42,7 +42,7 @@ describe('useStockSearch', () => {
       error: undefined,
     });
 
-    const { result, rerender } = renderHook(
+    const { result, rerender: _rerender } = renderHook(
       ({ query }) => useStockSearch(query),
       { initialProps: { query: 'AAPL' } }
     );

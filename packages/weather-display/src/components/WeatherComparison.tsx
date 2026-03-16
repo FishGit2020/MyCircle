@@ -248,9 +248,9 @@ function CitySearchInline({ onSelect }: { onSelect: (city: City) => void }) {
         type="text"
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
-        placeholder={t('compare.searchCity' as any)}
+        placeholder={t('compare.searchCity' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
         className="w-full sm:w-64 px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        aria-label={t('compare.searchCity' as any)}
+        aria-label={t('compare.searchCity' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
       />
       {query.trim().length >= 2 && (
         <div className="absolute z-10 mt-1 w-full sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
@@ -358,7 +358,7 @@ export default function WeatherComparison({ currentCity, availableCities }: Weat
           {/* Inline city search — always available */}
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5">
-              {otherCities.length === 0 ? t('compare.searchCity' as any) : t('compare.addCity' as any)}
+              {otherCities.length === 0 ? t('compare.searchCity' as any) : t('compare.addCity' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </p>
             <CitySearchInline onSelect={handleAddCity} />
           </div>

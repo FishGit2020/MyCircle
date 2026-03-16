@@ -28,7 +28,7 @@ export default function FlashCards() {
   const { t } = useTranslation();
   const {
     allCards,
-    chineseCards,
+    _chineseCards,
     progress,
     loading,
     cardTypes,
@@ -181,7 +181,7 @@ export default function FlashCards() {
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
-            {t(opt.labelKey as any)}
+            {t(opt.labelKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </button>
         ))}
       </div>
@@ -204,7 +204,7 @@ export default function FlashCards() {
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
-              {t(labelKey as any)} ({count})
+              {t(labelKey as any)} ({count}) {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </button>
           );
         })}

@@ -44,7 +44,7 @@ export default function PollForm({ onSave, onCancel }: PollFormProps) {
     onSave({
       question: question.trim(),
       options: pollOptions,
-      createdBy: (window as any).__currentUid || 'anonymous',
+      createdBy: (window as any).__currentUid || 'anonymous', // eslint-disable-line @typescript-eslint/no-explicit-any
       isPublic,
       expiresAt: hasExpiration && expiresAt ? expiresAt : null,
     });

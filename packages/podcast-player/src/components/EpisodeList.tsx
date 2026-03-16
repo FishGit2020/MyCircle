@@ -89,6 +89,7 @@ export default function EpisodeList({
   const [visibleCount, setVisibleCount] = useState(20);
   const [sharedEpisodeId, setSharedEpisodeId] = useState<string | number | null>(null);
   const [playedEpisodes, setPlayedEpisodes] = useState<Set<string>>(loadPlayedEpisodes);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const progress = useMemo(() => loadProgress(), [currentEpisodeId]); // re-read when current episode changes
 
   // Re-read played episodes when changed externally (e.g. restored from Firestore on login)

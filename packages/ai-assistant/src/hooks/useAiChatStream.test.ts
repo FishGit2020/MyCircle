@@ -41,7 +41,7 @@ describe('useAiChatStream', () => {
 
     const { result } = renderHook(() => useAiChatStream());
 
-    let streamResult: any;
+    let streamResult: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       streamResult = await result.current.sendStream('Hi', [], {});
     });
@@ -66,7 +66,7 @@ describe('useAiChatStream', () => {
 
     const { result } = renderHook(() => useAiChatStream());
 
-    let streamResult: any;
+    let streamResult: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       streamResult = await result.current.sendStream('Weather?', [], {});
     });

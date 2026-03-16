@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useBenchmark, BENCHMARK_PROMPTS } from './useBenchmark';
 
 const mockRunMutation = vi.fn();
@@ -11,7 +11,7 @@ vi.mock('@mycircle/shared', () => {
   const t = (key: string) => key;
   return {
     useTranslation: () => ({ t }),
-    useMutation: vi.fn((query: any) => {
+    useMutation: vi.fn((query: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       // Return different mutation fns based on query
       if (query === 'RUN_BENCHMARK') return [mockRunMutation, { loading: false }];
       if (query === 'SAVE_BENCHMARK_RUN') return [mockSaveMutation, { loading: false }];
@@ -84,7 +84,7 @@ describe('useBenchmark', () => {
 
     const { result } = renderHook(() => useBenchmark());
 
-    let runPromise: Promise<any>;
+    let runPromise: Promise<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     act(() => {
       runPromise = result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
@@ -135,7 +135,7 @@ describe('useBenchmark', () => {
 
     const { result } = renderHook(() => useBenchmark());
 
-    let returnedResults: any;
+    let returnedResults: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'gemma2:2b' }],
@@ -154,7 +154,7 @@ describe('useBenchmark', () => {
 
     const { result } = renderHook(() => useBenchmark());
 
-    let returnedResults: any;
+    let returnedResults: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
@@ -174,7 +174,7 @@ describe('useBenchmark', () => {
 
     const { result } = renderHook(() => useBenchmark());
 
-    let returnedResults: any;
+    let returnedResults: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
@@ -263,7 +263,7 @@ describe('useBenchmark', () => {
   });
 
   it('runBenchmark sets currentEndpoint for each iteration', async () => {
-    mockRunMutation.mockImplementation(async ({ variables }: any) => {
+    mockRunMutation.mockImplementation(async ({ variables }: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       return {
         data: {
           runBenchmark: {
@@ -298,7 +298,7 @@ describe('useBenchmark', () => {
 
     const { result } = renderHook(() => useBenchmark());
 
-    let returnedResults: any;
+    let returnedResults: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
@@ -343,7 +343,7 @@ describe('useBenchmark', () => {
 
     const { result } = renderHook(() => useBenchmark());
 
-    let returnedResults: any;
+    let returnedResults: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'llama3:8b' }],
@@ -371,7 +371,7 @@ describe('useBenchmark', () => {
         model: 'gemma2:2b',
         prompt: 'test',
         response: 'r',
-        timing: { tokensPerSecond: 25 } as any,
+        timing: { tokensPerSecond: 25 } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         error: null,
         timestamp: '2026-01-15T10:00:00Z',
       },

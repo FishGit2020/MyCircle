@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('@mycircle/shared', () => ({
-  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 

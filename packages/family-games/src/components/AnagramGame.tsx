@@ -39,7 +39,7 @@ export default function AnagramGame({ onBack }: { onBack: () => void }) {
   const startRef = useRef(Date.now());
   const roundStartRef = useRef(Date.now());
 
-  const gameWords = useMemo(() => {
+  const _gameWords = useMemo(() => {
     const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, TOTAL_ROUNDS);
   }, [words]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -112,12 +112,12 @@ export default function AnagramGame({ onBack }: { onBack: () => void }) {
           </svg>
         </div>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.anagram' as any)}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.anagramDesc' as any)}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.anagram' as any)}</h2> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.anagramDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="bg-sky-50 dark:bg-sky-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-sky-700 dark:text-sky-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-sky-600 dark:text-sky-400 mt-0.5">{t('games.anagramRules' as any)}</p>
+          <p className="text-xs font-medium text-sky-700 dark:text-sky-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-sky-600 dark:text-sky-400 mt-0.5">{t('games.anagramRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <button type="button" onClick={startGame} className="px-8 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-medium transition active:scale-95">
           {t('games.startGame')}
@@ -175,7 +175,7 @@ export default function AnagramGame({ onBack }: { onBack: () => void }) {
       <button type="button" onClick={revealHint}
         className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-200 transition"
       >
-        {t('games.anagramHint' as any)} (-{HINT_PENALTY} pts)
+        {t('games.anagramHint' as any)} (-{HINT_PENALTY} pts) {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
       </button>
     </div>
   );

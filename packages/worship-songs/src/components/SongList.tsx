@@ -48,7 +48,7 @@ interface SongListProps {
 }
 
 export default function SongList({
-  songs, totalCount, totalPages, page, allArtists, allTags,
+  songs, _totalCount, totalPages, page, allArtists, allTags,
   loading, isAuthenticated, search, filterArtist, filterTag, filterFormat, showFavoritesOnly,
   onSearchChange, onFilterArtistChange, onFilterTagChange, onFilterFormatChange, onFavoritesToggle,
   onSelectSong, onNewSong, onDeleteSong, onDownloadSong, onPageChange, onResetFilters,

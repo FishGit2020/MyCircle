@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing/react';
 import { GET_AI_USAGE_SUMMARY, GET_OLLAMA_STATUS, GET_AI_RECENT_LOGS } from '@mycircle/shared';

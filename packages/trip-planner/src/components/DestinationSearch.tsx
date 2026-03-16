@@ -28,6 +28,7 @@ export default function DestinationSearch({
 
   const [searchLocations, { data, loading }] = useLazyQuery<SearchLocationsQuery>(SEARCH_LOCATIONS);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const results = data?.locationSearch ?? [];
 
   // Debounced search

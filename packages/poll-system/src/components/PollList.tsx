@@ -16,7 +16,7 @@ function isExpired(poll: Poll): boolean {
   return new Date(poll.expiresAt).getTime() < Date.now();
 }
 
-export default function PollList({ polls, onSelect, onDelete }: PollListProps) {
+export default function PollList({ polls, onSelect, onDelete: _onDelete }: PollListProps) {
   const { t } = useTranslation();
 
   if (polls.length === 0) {

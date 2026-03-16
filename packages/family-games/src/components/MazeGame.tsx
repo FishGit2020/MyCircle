@@ -116,12 +116,12 @@ export default function MazeGame({ onBack }: { onBack: () => void }) {
           </svg>
         </div>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.mazeRunner' as any)}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.mazeDesc' as any)}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.mazeRunner' as any)}</h2> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.mazeDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">{t('games.mazeRules' as any)}</p>
+          <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">{t('games.mazeRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="flex gap-3">
           {(['easy', 'medium', 'hard'] as const).map(d => (
@@ -131,7 +131,7 @@ export default function MazeGame({ onBack }: { onBack: () => void }) {
                 d === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
                 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
               }`}>
-              {t(`games.${d}` as any)}
+              {t(`games.${d}` as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </button>
           ))}
         </div>

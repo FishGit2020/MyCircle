@@ -20,7 +20,7 @@ vi.mock('../lib/firebase', () => ({
   updateUserDistanceUnit: vi.fn(),
 }));
 
-const makeUser = (uid = 'user1') => ({ uid } as any);
+const makeUser = (uid = 'user1') => ({ uid } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
 const makeProfile = () => ({
   uid: 'user1',

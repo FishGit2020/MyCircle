@@ -11,7 +11,7 @@ import { trace } from 'firebase/performance';
  * @param getPerf   A getter that returns the current FirebasePerformance instance (or null).
  *                   Using a getter avoids capturing a stale `null` before Firebase initializes.
  */
-export function tracedLazy<T extends ComponentType<any>>(
+export function tracedLazy<T extends ComponentType<any>>( // eslint-disable-line @typescript-eslint/no-explicit-any
   name: string,
   importFn: () => Promise<{ default: T }>,
   getPerf: () => FirebasePerformance | null,

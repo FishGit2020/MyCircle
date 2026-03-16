@@ -11,7 +11,7 @@ export function usePolls() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const api = (window as any).__pollSystem;
+    const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // Prefer real-time subscription (polls are public — all users see updates)
     if (api?.subscribe) {
@@ -46,7 +46,7 @@ export function usePolls() {
   }, []);
 
   const addPoll = useCallback(async (poll: Omit<Poll, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const api = (window as any).__pollSystem;
+    const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (api?.add) {
       await api.add(poll);
       return;
@@ -65,7 +65,7 @@ export function usePolls() {
   }, []);
 
   const deletePoll = useCallback(async (id: string) => {
-    const api = (window as any).__pollSystem;
+    const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (api?.delete) {
       await api.delete(id);
       return;
@@ -78,7 +78,7 @@ export function usePolls() {
   }, []);
 
   const vote = useCallback(async (pollId: string, optionId: string) => {
-    const api = (window as any).__pollSystem;
+    const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (api?.vote) {
       await api.vote(pollId, optionId);
       return;

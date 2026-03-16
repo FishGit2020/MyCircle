@@ -7,7 +7,7 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 vi.mock('./NoteCard', () => ({
-  default: ({ note, onClick, onDelete }: any) => (
+  default: ({ note, onClick, onDelete }: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid={`note-card-${note.id}`} onClick={onClick}>
       <span>{note.title}</span>
       <button onClick={(e) => { e.stopPropagation(); onDelete(); }}>delete</button>

@@ -35,12 +35,12 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/doc-scanner', labelKey: 'nav.docScanner', color: 'bg-sky-50 text-sky-500', darkColor: 'dark:bg-sky-900/20 dark:text-sky-400', widgetId: 'docScanner', iconKey: 'doc-scanner' },
   { path: '/benchmark', labelKey: 'nav.benchmark', color: 'bg-orange-50 text-orange-500', darkColor: 'dark:bg-orange-900/20 dark:text-orange-400', widgetId: 'benchmark', iconKey: 'benchmark' },
   { path: '/immigration', labelKey: 'nav.immigration', color: 'bg-sky-50 text-sky-500', darkColor: 'dark:bg-sky-900/20 dark:text-sky-400', widgetId: 'immigration', iconKey: 'immigration' },
-  { path: '/trips', labelKey: 'nav.tripPlanner' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'tripPlanner', iconKey: 'trip-planner' },
-  { path: '/polls', labelKey: 'nav.pollSystem' as any, color: 'bg-violet-50 text-violet-500', darkColor: 'dark:bg-violet-900/20 dark:text-violet-400', widgetId: 'pollSystem', iconKey: 'poll-system' },
+  { path: '/trips', labelKey: 'nav.tripPlanner' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'tripPlanner', iconKey: 'trip-planner' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/polls', labelKey: 'nav.pollSystem' as any, color: 'bg-violet-50 text-violet-500', darkColor: 'dark:bg-violet-900/20 dark:text-violet-400', widgetId: 'pollSystem', iconKey: 'poll-system' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   { path: '/radio', labelKey: 'nav.radio', color: 'bg-amber-50 text-amber-500', darkColor: 'dark:bg-amber-900/20 dark:text-amber-400', widgetId: 'radioStation', iconKey: 'radio' },
   { path: '/interview', labelKey: 'nav.interview', color: 'bg-indigo-50 text-indigo-500', darkColor: 'dark:bg-indigo-900/20 dark:text-indigo-400', widgetId: 'aiInterviewer', iconKey: 'interview' },
-  { path: '/transit', labelKey: 'nav.transit' as any, color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'transitTracker', iconKey: 'transit' },
-  { path: '/travel-map', labelKey: 'nav.travelMap' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'travelMap', iconKey: 'travel-map' },
+  { path: '/transit', labelKey: 'nav.transit' as any, color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'transitTracker', iconKey: 'transit' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/travel-map', labelKey: 'nav.travelMap' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'travelMap', iconKey: 'travel-map' }, // eslint-disable-line @typescript-eslint/no-explicit-any
 ];
 
 function QuickAccessTile({ item }: { item: QuickAccessItem }) {

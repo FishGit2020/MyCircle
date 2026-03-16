@@ -7,7 +7,6 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 function createMockMap() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return {
     flyTo: vi.fn(),
     on: vi.fn(),
@@ -16,7 +15,7 @@ function createMockMap() {
     resize: vi.fn(),
     zoomIn: vi.fn(),
     zoomOut: vi.fn(),
-  } as any;
+  } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 describe('GpsLocateButton', () => {

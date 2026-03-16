@@ -84,7 +84,7 @@ describe('useDailyLogEntries', () => {
       add: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      subscribe: vi.fn((cb: any) => {
+      subscribe: vi.fn((cb: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setTimeout(() => cb(mockEntries), 10);
         return unsubscribe;
       }),

@@ -49,7 +49,7 @@ export default function HeadsUpGame({ onBack }: HeadsUpGameProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [skipped, setSkipped] = useState(0);
-  const [startTime, setStartTime] = useState(0);
+  const [_startTime, setStartTime] = useState(0);
   const [timeLeft, setTimeLeft] = useState(ROUND_DURATION_MS);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -205,8 +205,8 @@ export default function HeadsUpGame({ onBack }: HeadsUpGameProps) {
         <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">{t('games.headsUpDesc')}</p>
       </div>
       <div className="bg-fuchsia-50 dark:bg-fuchsia-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-        <p className="text-xs font-medium text-fuchsia-700 dark:text-fuchsia-300">{t('games.scoringRules' as any)}</p>
-        <p className="text-xs text-fuchsia-600 dark:text-fuchsia-400 mt-0.5">{t('games.headsUpRules' as any)}</p>
+        <p className="text-xs font-medium text-fuchsia-700 dark:text-fuchsia-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+        <p className="text-xs text-fuchsia-600 dark:text-fuchsia-400 mt-0.5">{t('games.headsUpRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
       </div>
       <button
         type="button"

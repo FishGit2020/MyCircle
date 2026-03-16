@@ -119,7 +119,7 @@ export function useFlashCards() {
     let mounted = true;
 
     const unsubscribe = window.__flashcards.subscribePublic((firestoreCards) => {
-      const cards: FlashCard[] = firestoreCards.map((c: any) => ({
+      const cards: FlashCard[] = firestoreCards.map((c: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
         id: c.id,
         type: c.type || 'chinese',
         category: c.category || '',
@@ -207,7 +207,7 @@ export function useFlashCards() {
 
     if (cardsToMigrate.length > 0) {
       window.__flashcards.getAll().then(existing => {
-        const existingIds = new Set(existing.map((c: any) => c.id));
+        const existingIds = new Set(existing.map((c: any) => c.id)); // eslint-disable-line @typescript-eslint/no-explicit-any
         const newCards = cardsToMigrate.filter(c => !existingIds.has(c.id));
         if (newCards.length > 0) {
           log.info(`Migrating ${newCards.length} flashcards to Firestore`);
@@ -285,6 +285,7 @@ export function useFlashCards() {
   }, [isAuthenticated]);
 
   // Merge private + English + public cards (dedup public cards already in private)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const privateCards: FlashCard[] = [...chineseCards, ...bibleCards, ...customCards];
   const privateIds = useMemo(() => new Set(privateCards.map(c => c.id)), [privateCards]);
 

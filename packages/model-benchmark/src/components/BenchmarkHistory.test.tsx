@@ -12,7 +12,7 @@ vi.mock('@mycircle/shared', () => ({
 
 const mockUseBenchmarkHistory = vi.fn();
 vi.mock('../hooks/useBenchmarkHistory', () => ({
-  useBenchmarkHistory: (...args: any[]) => mockUseBenchmarkHistory(...args),
+  useBenchmarkHistory: (...args: any[]) => mockUseBenchmarkHistory(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 describe('BenchmarkHistory', () => {

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import type { ChatMessage, ToolCall, AiAction } from './useAiChat';
+import type { ToolCall, AiAction } from './useAiChat';
 
 interface StreamEvent {
   type: 'text' | 'thinking' | 'tool_start' | 'tool_result' | 'done' | 'error';

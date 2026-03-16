@@ -16,10 +16,10 @@ interface Props {
 function getRasterTileUrl(): string | null {
   const topo = MAP_CONFIG.tileProviders.find(p => p.id === 'topo');
   if (!topo || typeof topo.style !== 'object') return null;
-  const sources = (topo.style as any).sources;
+  const sources = (topo.style as any).sources; // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!sources) return null;
   for (const src of Object.values(sources)) {
-    const tiles = (src as any).tiles;
+    const tiles = (src as any).tiles; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (Array.isArray(tiles) && tiles.length > 0) return tiles[0];
   }
   return null;

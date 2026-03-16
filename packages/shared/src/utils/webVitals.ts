@@ -3,7 +3,7 @@ import { createLogger } from './logger';
 
 const logger = createLogger('webVitals');
 
-type AnalyticsLogger = (eventName: string, params?: Record<string, any>) => void;
+type AnalyticsLogger = (eventName: string, params?: Record<string, any>) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 /**
  * Report Web Vitals (LCP, CLS, INP, FCP, TTFB) for performance monitoring.

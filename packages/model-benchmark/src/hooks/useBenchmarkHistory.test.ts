@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useBenchmarkHistory } from './useBenchmarkHistory';
 
 const mockUseQuery = vi.fn();
@@ -8,7 +8,7 @@ vi.mock('@mycircle/shared', () => {
   const t = (key: string) => key;
   return {
     useTranslation: () => ({ t }),
-    useQuery: (...args: any[]) => mockUseQuery(...args),
+    useQuery: (...args: any[]) => mockUseQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
     useMutation: vi.fn(() => [vi.fn(), { loading: false }]),
     GET_BENCHMARK_HISTORY: 'GET_BENCHMARK_HISTORY',
     DELETE_BENCHMARK_RUN: 'DELETE_BENCHMARK_RUN',

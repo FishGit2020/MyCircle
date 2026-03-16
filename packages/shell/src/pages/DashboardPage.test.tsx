@@ -5,7 +5,7 @@ import DashboardPage from './DashboardPage';
 
 // Mock @mycircle/shared
 vi.mock('@mycircle/shared', () => ({
-  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
   useTranslation: () => ({
     t: (key: string) => key,
   }),

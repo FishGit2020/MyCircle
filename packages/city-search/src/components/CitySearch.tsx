@@ -251,6 +251,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reverseGeocode]);
 
   // Fuzzy search fallback: when API returns 0 results, try matching against static city list

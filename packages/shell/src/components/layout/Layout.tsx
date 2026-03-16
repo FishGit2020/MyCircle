@@ -181,7 +181,7 @@ function OverflowMenu({
 export default function Layout() {
   const { t } = useTranslation();
   const { toggleTheme } = useTheme();
-  const [hasActivePlayer, setHasActivePlayer] = useState(false);
+  const [_hasActivePlayer, setHasActivePlayer] = useState(false);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);

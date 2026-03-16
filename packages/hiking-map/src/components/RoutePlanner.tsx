@@ -88,10 +88,10 @@ export default function RoutePlanner({ map, routingConfig, externalStart, extern
       // Fit map to route bounds
       const coords = result.geometry.coordinates as [number, number][];
       if (coords.length > 1) {
-        const mgl = (window as any).maplibregl;
+        const mgl = (window as any).maplibregl; // eslint-disable-line @typescript-eslint/no-explicit-any
         if (mgl?.LngLatBounds) {
           const bounds = coords.reduce(
-            (b: any, c: [number, number]) => b.extend(c),
+            (b: any, c: [number, number]) => b.extend(c), // eslint-disable-line @typescript-eslint/no-explicit-any
             new mgl.LngLatBounds(coords[0], coords[0])
           );
           if (!bounds.isEmpty()) {

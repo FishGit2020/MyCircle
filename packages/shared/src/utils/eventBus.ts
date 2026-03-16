@@ -3,11 +3,11 @@ import { createLogger } from './logger';
 const logger = createLogger('eventBus');
 
 // Event bus for micro frontend communication
-type EventCallback = (data: any) => void;
+type EventCallback = (data: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 interface EventBus {
   subscribe: (event: string, callback: EventCallback) => () => void;
-  publish: (event: string, data?: any) => void;
+  publish: (event: string, data?: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 // Event types for type safety
@@ -252,7 +252,7 @@ class EventBusImpl implements EventBus {
     };
   }
 
-  publish(event: string, data?: any): void {
+  publish(event: string, data?: any): void { // eslint-disable-line @typescript-eslint/no-explicit-any
     // Emit custom DOM event for cross-microfrontend communication
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(event, { detail: data }));
@@ -278,7 +278,7 @@ export function useEventBus() {
 }
 
 // Helper to listen to DOM events from other micro frontends
-export function subscribeToMFEvent<T = any>(
+export function subscribeToMFEvent<T = any>( // eslint-disable-line @typescript-eslint/no-explicit-any
   event: string,
   callback: (data: T) => void
 ): () => void {

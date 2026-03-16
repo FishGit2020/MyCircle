@@ -57,7 +57,7 @@ async function dispatchCloseEvent() {
   });
 }
 
-async function dispatchAudioPlay(detail: any) {
+async function dispatchAudioPlay(detail: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
   await act(async () => {
     window.dispatchEvent(new CustomEvent(MFEvents.AUDIO_PLAY, { detail }));
     await Promise.resolve();

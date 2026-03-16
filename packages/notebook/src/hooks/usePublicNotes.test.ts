@@ -43,7 +43,7 @@ describe('usePublicNotes', () => {
     const unsub = vi.fn();
     window.__notebook = {
       getAllPublic: vi.fn(),
-      subscribePublic: vi.fn((cb: any) => {
+      subscribePublic: vi.fn((cb: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setTimeout(() => cb(mockPublicNotes), 10);
         return unsub;
       }),

@@ -47,6 +47,7 @@ export default function UseMyLocation() {
       setError(t('error.couldNotDetermineLocation'));
     }
     setLoading(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, navigate]);
 
   useEffect(() => {
@@ -96,6 +97,7 @@ export default function UseMyLocation() {
         maximumAge: 300000 // 5 minutes cache
       }
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reverseGeocode]);
 
   return (

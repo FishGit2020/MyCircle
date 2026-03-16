@@ -1,4 +1,4 @@
-import { CurrentWeather as CurrentWeatherType, getWeatherIconUrl, getWindDirection, getWeatherDescription, useUnits, formatTemperature, formatWindSpeed, useTranslation } from '@mycircle/shared';
+import { CurrentWeather as CurrentWeatherType, getWeatherIconUrl, getWindDirection, useUnits, formatTemperature, formatWindSpeed, useTranslation } from '@mycircle/shared';
 
 interface Props {
   data: CurrentWeatherType;

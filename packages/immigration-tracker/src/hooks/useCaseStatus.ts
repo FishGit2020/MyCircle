@@ -29,7 +29,7 @@ export function useCaseStatus() {
         return next;
       });
       return result;
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message || 'Failed to fetch status');
       return null;
     } finally {

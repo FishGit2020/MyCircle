@@ -112,12 +112,12 @@ export default function ColorMatchGame({ onBack }: { onBack: () => void }) {
           </svg>
         </div>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.colorMatch' as any)}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.colorMatchDesc' as any)}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.colorMatch' as any)}</h2> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.colorMatchDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="bg-rose-50 dark:bg-rose-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-rose-700 dark:text-rose-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">{t('games.colorMatchRules' as any)}</p>
+          <p className="text-xs font-medium text-rose-700 dark:text-rose-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">{t('games.colorMatchRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <button type="button" onClick={startGame} className="px-8 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-medium transition active:scale-95">
           {t('games.startGame')}
@@ -143,9 +143,9 @@ export default function ColorMatchGame({ onBack }: { onBack: () => void }) {
           'bg-gray-50 dark:bg-gray-800'
         }`}>
           <p className="text-5xl font-black uppercase select-none" style={{ color: COLOR_DISPLAY[challenge.displayColor] }}>
-            {t(COLOR_LABEL_KEYS[challenge.word] as any)}
+            {t(COLOR_LABEL_KEYS[challenge.word] as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t('games.colorMatchHint' as any)}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t('games.colorMatchHint' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
       )}
 
@@ -158,7 +158,7 @@ export default function ColorMatchGame({ onBack }: { onBack: () => void }) {
             className="py-4 rounded-xl text-white font-bold text-sm transition active:scale-95"
             style={{ backgroundColor: COLOR_DISPLAY[color] }}
           >
-            {t(COLOR_LABEL_KEYS[color] as any)}
+            {t(COLOR_LABEL_KEYS[color] as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </button>
         ))}
       </div>

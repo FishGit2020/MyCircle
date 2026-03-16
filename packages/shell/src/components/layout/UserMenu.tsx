@@ -88,7 +88,7 @@ export default function UserMenu() {
   const { t } = useTranslation();
   const { user, loading, signOut, updateTheme, updateUnitSystem, knownAccounts, switchToAccount, removeKnownAccount } = useAuth();
   const { theme, setThemeMode } = useTheme();
-  const { tempUnit, speedUnit, distanceUnit, setTempUnit, setSpeedUnit, setDistanceUnit } = useUnits();
+  const { tempUnit, speedUnit: _speedUnit, distanceUnit, setTempUnit, setSpeedUnit, setDistanceUnit } = useUnits();
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [switchingUid, setSwitchingUid] = useState<string | null>(null);
@@ -393,7 +393,7 @@ export default function UserMenu() {
                   onClick={() => handleThemeChange(mode)}
                   className={`flex-1 px-2 py-1 font-medium transition-colors ${theme === mode ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                 >
-                  {t(`theme.${mode}` as any)}
+                  {t(`theme.${mode}` as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                 </button>
               ))}
             </div>

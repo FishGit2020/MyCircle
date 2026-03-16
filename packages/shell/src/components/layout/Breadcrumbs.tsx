@@ -143,7 +143,7 @@ export default function Breadcrumbs() {
                     to={`/${firstSegment}${resolvedTab !== 'my' ? `?tab=${resolvedTab}` : ''}`}
                     className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                   >
-                    {t(`${firstSegment}.tabs.${resolvedTab}` as any)}
+                    {t(`${firstSegment}.tabs.${resolvedTab}` as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                   </Link>
                 </li>
               </>
@@ -165,7 +165,7 @@ export default function Breadcrumbs() {
             </li>
             <li aria-hidden="true" className="select-none">/</li>
             <li aria-current="page" className="font-medium text-gray-700 dark:text-gray-200">
-              {t(`${firstSegment}.tabs.${tabParam}` as any)}
+              {t(`${firstSegment}.tabs.${tabParam}` as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </li>
           </>
         ) : mfeDetail ? (
