@@ -13,7 +13,14 @@ interface SessionPayload {
   document: string;
   messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
   sessionName?: string;
+  interviewState?: Record<string, unknown>;
+  scores?: Array<Record<string, unknown>>;
+  config?: Record<string, unknown>;
 }
+
+// In-memory cache for question bank
+let questionBankCache: { data: string; fetchedAt: number } | null = null;
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 export const interviewSessions = onRequest(
   {
@@ -38,6 +45,11 @@ export const interviewSessions = onRequest(
 
     const path = req.path.replace(/^\/interview-api\/?/, '').replace(/^\/+/, '');
 
+    if (path === 'question-bank' && req.method === 'GET') {
+      await handleQuestionBank(res);
+      return;
+    }
+
     if (path === 'save' && req.method === 'POST') {
       await handleSave(uid, req, res);
     } else if (path === 'sessions' && req.method === 'GET') {
@@ -54,6 +66,32 @@ export const interviewSessions = onRequest(
   },
 );
 
+async function handleQuestionBank(res: Response) {
+  try {
+    const now = Date.now();
+    if (questionBankCache && now - questionBankCache.fetchedAt < CACHE_TTL_MS) {
+      res.set('Content-Type', 'application/json');
+      res.send(questionBankCache.data);
+      return;
+    }
+
+    const file = bucket.file('question-bank/questions.json');
+    const [exists] = await file.exists();
+    if (!exists) {
+      res.status(404).json({ error: 'Question bank not found' });
+      return;
+    }
+
+    const [contents] = await file.download();
+    const data = contents.toString('utf-8');
+    questionBankCache = { data, fetchedAt: now };
+    res.set('Content-Type', 'application/json');
+    res.send(data);
+  } catch {
+    res.status(500).json({ error: 'Failed to load question bank' });
+  }
+}
+
 async function handleSave(uid: string, req: Request, res: Response) {
   const body = req.body as SessionPayload;
   if (!body.sessionId || !Array.isArray(body.messages)) {
@@ -61,7 +99,7 @@ async function handleSave(uid: string, req: Request, res: Response) {
     return;
   }
 
-  const { sessionId, question, document, messages, sessionName } = body;
+  const { sessionId, question, document, messages, sessionName, interviewState, scores, config } = body;
   const storagePath = `users/${uid}/interview-sessions/${sessionId}.json`;
   const now = new Date().toISOString();
 
@@ -69,6 +107,9 @@ async function handleSave(uid: string, req: Request, res: Response) {
     question: question || '',
     document: document || '',
     messages,
+    ...(interviewState ? { interviewState } : {}),
+    ...(scores ? { scores } : {}),
+    ...(config ? { config } : {}),
     createdAt: now,
     updatedAt: now,
   });
@@ -90,6 +131,7 @@ async function handleSave(uid: string, req: Request, res: Response) {
         questionPreview,
         messageCount: messages.length,
         storageRef: storagePath,
+        mode: config?.mode || 'custom',
         updatedAt: FieldValue.serverTimestamp(),
         createdAt: FieldValue.serverTimestamp(),
       },

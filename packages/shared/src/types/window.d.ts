@@ -140,6 +140,9 @@ declare global {
         document: string;
         messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
         sessionName?: string;
+        interviewState?: Record<string, unknown>;
+        scores?: Array<Record<string, unknown>>;
+        config?: Record<string, unknown>;
       }) => Promise<{ ok: boolean; sessionId: string }>;
       list: () => Promise<{
         sessions: Array<{
