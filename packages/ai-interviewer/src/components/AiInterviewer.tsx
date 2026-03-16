@@ -8,6 +8,7 @@ import type { InterviewConfig } from '../hooks/useInterviewStateMachine';
 import InterviewSetup from './InterviewSetup';
 import QuestionPanel from './QuestionPanel';
 import InterviewChat from './InterviewChat';
+import QuestionManager from './QuestionManager';
 
 const ENDPOINT_KEY = 'interview-endpoint';
 const MODEL_KEY = 'interview-model';
@@ -42,8 +43,17 @@ export default function AiInterviewer() {
   const [showSessions, setShowSessions] = useState(false);
   const mountedRef = useRef(false);
 
+  const [showQuestionManager, setShowQuestionManager] = useState(false);
+
   // Question bank
-  const { data: questionBankData, loading: questionBankLoading, error: questionBankError } = useQuestionBank();
+  const {
+    data: questionBankData,
+    loading: questionBankLoading,
+    error: questionBankError,
+    createQuestion,
+    updateQuestion,
+    deleteQuestion: deleteQuestionFromBank,
+  } = useQuestionBank();
 
   // Endpoint / model queries
   const { data: endpointsData } = useQuery<GetBenchmarkEndpointsQuery>(GET_BENCHMARK_ENDPOINTS, {
@@ -305,10 +315,19 @@ export default function AiInterviewer() {
         <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Working document panel — 65% */}
           <div className="md:w-[65%] border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 min-h-[200px] md:min-h-0 flex flex-col">
-            {!interviewActive ? (
+            {!interviewActive && showQuestionManager && questionBankData ? (
+              <QuestionManager
+                questions={questionBankData.questions}
+                onBack={() => setShowQuestionManager(false)}
+                onCreateQuestion={createQuestion}
+                onUpdateQuestion={updateQuestion}
+                onDeleteQuestion={deleteQuestionFromBank}
+              />
+            ) : !interviewActive ? (
               <InterviewSetup
                 onStartStructured={handleStartStructured}
                 onStartCustom={handleStartCustom}
+                onManageQuestions={() => setShowQuestionManager(true)}
                 loading={loading}
                 modelSelected={modelSelected}
                 questionBankLoading={questionBankLoading}
