@@ -103,6 +103,7 @@
     "cap:sync": "npx cap sync",
     "cap:open": "npx cap open ios",
     "analyze": "cross-env ANALYZE=true pnpm --filter @mycircle/shell build",
+    "changelog": "node scripts/generate-changelogs.mjs",
     "check:shared-versions": "node scripts/check-shared-versions.mjs",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist dist functions/node_modules functions/lib",
     "clean:install": "pnpm clean && pnpm install",
