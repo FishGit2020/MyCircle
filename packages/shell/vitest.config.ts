@@ -49,6 +49,7 @@ export default defineConfig({
       'aiInterviewer/AiInterviewer': resolve(__dirname, './test/mocks/AiInterviewerMock.tsx'),
       'transitTracker/TransitTracker': resolve(__dirname, './test/mocks/TransitTrackerMock.tsx'),
       'travelMap/TravelMap': resolve(__dirname, './test/mocks/TravelMapMock.tsx'),
+      'dealFinder/DealFinder': resolve(__dirname, './test/mocks/DealFinderMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

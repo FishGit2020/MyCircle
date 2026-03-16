@@ -29,6 +29,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/interview': () => import('aiInterviewer/AiInterviewer'),
   '/transit': () => import('transitTracker/TransitTracker'),
   '/travel-map': () => import('travelMap/TravelMap'),
+  '/deals': () => import('dealFinder/DealFinder'),
 };
 
 export { ROUTE_MODULE_MAP };
@@ -49,6 +50,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/podcasts', labelKey: 'nav.podcasts',     icon: 'podcasts' },
     { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
     { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' },
+    { path: '/deals', labelKey: 'nav.dealFinder' as any, icon: 'deals' },
   ]},
   { labelKey: 'nav.group.faith', items: [
     { path: '/bible',   labelKey: 'nav.bible',   icon: 'bible' },
@@ -107,4 +109,5 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/interview', labelKey: 'nav.interview' as any, icon: 'interview' },
   { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' },
   { path: '/travel-map', labelKey: 'nav.travelMap' as any, icon: 'travel-map' },
+  { path: '/deals', labelKey: 'nav.dealFinder' as any, icon: 'deals' },
 ];

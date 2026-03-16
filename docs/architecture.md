@@ -1430,6 +1430,17 @@ AI chat was migrated from REST (`POST /ai/chat`) to GraphQL (`Mutation.aiChat`).
 
 See [docs/mcp.md](./mcp.md) for the full MCP server guide.
 
+### Deal Finder - `packages/deal-finder/`
+
+Exposes `DealFinder` component via Module Federation. Port **3030**.
+
+Aggregates deals from free online sources (SlickDeals RSS, DealNews RSS, Reddit r/deals). Features source & category filtering, keyword search, discount percentage calculation, and responsive deal card grid. Falls back to demo data when API is unavailable. Designed for future Cloud Function backend integration.
+
+- **DealFinder** — Main component with source/category filters, search, and responsive grid
+- **DealCard** — Individual deal card with price, discount %, store badge, source badge, and time ago
+- **useDeals** — Hook for fetching/caching deals with localStorage cache and demo data fallback
+- **Route**: `/deals`
+
 ### Travel Map - `packages/travel-map/`
 
 Exposes `TravelMap` component via Module Federation. Port **3029**.
