@@ -3,6 +3,21 @@ import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..');
 
+// ─── Types ───────────────────────────────────────────────────
+
+export interface ValidatorResult {
+  name: string;
+  status: 'pass' | 'warn' | 'fail';
+  summary: string;
+  details?: {
+    missing?: string[];
+    extra?: string[];
+    warnings?: string[];
+  };
+  count?: number;
+  limit?: number;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────
 
 function readFile(relPath: string): string {
@@ -15,9 +30,17 @@ function listDirs(relPath: string): string[] {
     .map(d => d.name);
 }
 
+function statusEmoji(status: ValidatorResult['status']): string {
+  switch (status) {
+    case 'pass': return '\u2705';
+    case 'warn': return '\u26a0\ufe0f';
+    case 'fail': return '\u274c';
+  }
+}
+
 // ─── Validator: i18n key sync ─────────────────────────────────
 
-export function validateI18n(): string {
+export function validateI18nStructured(): ValidatorResult {
   const localeDir = 'packages/shared/src/i18n/locales';
   const localeFiles = { en: 'en.ts', es: 'es.ts', zh: 'zh.ts' };
 
@@ -26,7 +49,6 @@ export function validateI18n(): string {
   for (const [locale, file] of Object.entries(localeFiles)) {
     const content = readFile(path.join(localeDir, file));
     const keys = new Set<string>();
-    // Match keys like 'some.key': or "some.key":
     const regex = /['"]([a-zA-Z][a-zA-Z0-9_.]+)['"]\s*:/g;
     let match: RegExpExecArray | null;
     while ((match = regex.exec(content)) !== null) {
@@ -40,27 +62,56 @@ export function validateI18n(): string {
     for (const k of keys) allKeys.add(k);
   }
 
-  const issues: string[] = [];
+  const missingEntries: string[] = [];
+  let totalMissing = 0;
+
   for (const [locale, keys] of Object.entries(keysByLocale)) {
     const missing = [...allKeys].filter(k => !keys.has(k));
-    if (missing.length > 0) {
-      issues.push(`${locale}: missing ${missing.length} key(s):\n  ${missing.join('\n  ')}`);
+    totalMissing += missing.length;
+    for (const k of missing) {
+      missingEntries.push(`${locale}: ${k}`);
     }
   }
 
-  if (issues.length === 0) {
-    return `All 3 locales are in sync (${allKeys.size} keys each).`;
+  if (totalMissing === 0) {
+    return {
+      name: 'i18n Sync',
+      status: 'pass',
+      summary: `All 3 locales are in sync (${allKeys.size} keys each).`,
+      count: allKeys.size,
+    };
   }
-  return `i18n sync issues found:\n\n${issues.join('\n\n')}`;
+
+  if (totalMissing <= 2) {
+    return {
+      name: 'i18n Sync',
+      status: 'warn',
+      summary: `${totalMissing} missing key(s) across locales (likely typo).`,
+      details: { missing: missingEntries },
+      count: allKeys.size,
+    };
+  }
+
+  return {
+    name: 'i18n Sync',
+    status: 'fail',
+    summary: `${totalMissing} missing key(s) across locales.`,
+    details: { missing: missingEntries },
+    count: allKeys.size,
+  };
+}
+
+/** @deprecated Use validateI18nStructured() for structured results */
+export function validateI18n(): string {
+  return formatResult(validateI18nStructured());
 }
 
 // ─── Validator: Dockerfile packages ───────────────────────────
 
-export function validateDockerfile(): string {
+export function validateDockerfileStructured(): ValidatorResult {
   const dockerfile = readFile('deploy/docker/Dockerfile');
   const actualPackages = new Set(listDirs('packages'));
 
-  // Build stage: COPY packages/<name>/package.json
   const buildCopies = new Set<string>();
   const buildRegex = /COPY\s+packages\/([a-z-]+)\/package\.json/g;
   let match: RegExpExecArray | null;
@@ -68,74 +119,130 @@ export function validateDockerfile(): string {
     buildCopies.add(match[1]);
   }
 
-  // Runtime stage: COPY --from=builder ... packages/<name>/dist
   const runtimeCopies = new Set<string>();
   const runtimeRegex = /COPY\s+--from=builder.*?packages\/([a-z-]+)\/dist/g;
   while ((match = runtimeRegex.exec(dockerfile)) !== null) {
     runtimeCopies.add(match[1]);
   }
 
-  const issues: string[] = [];
+  const missingEntries: string[] = [];
+  const extraEntries: string[] = [];
 
-  // Check for packages missing from build stage
   const missingBuild = [...actualPackages].filter(p => !buildCopies.has(p));
-  if (missingBuild.length > 0) {
-    issues.push(`Build stage: missing COPY for: ${missingBuild.join(', ')}`);
+  for (const p of missingBuild) {
+    missingEntries.push(`Build stage: ${p}`);
   }
 
-  // Check for packages in Dockerfile but not in packages/
   const extraBuild = [...buildCopies].filter(p => !actualPackages.has(p));
-  if (extraBuild.length > 0) {
-    issues.push(`Build stage: references removed package(s): ${extraBuild.join(', ')}`);
+  for (const p of extraBuild) {
+    extraEntries.push(`Build stage: ${p}`);
   }
 
-  // Check runtime stage
   const missingRuntime = [...actualPackages].filter(p => !runtimeCopies.has(p) && p !== 'shared');
-  if (missingRuntime.length > 0) {
-    issues.push(`Runtime stage: missing COPY --from=builder for: ${missingRuntime.join(', ')}`);
+  for (const p of missingRuntime) {
+    missingEntries.push(`Runtime stage: ${p}`);
   }
 
   const extraRuntime = [...runtimeCopies].filter(p => !actualPackages.has(p));
-  if (extraRuntime.length > 0) {
-    issues.push(`Runtime stage: references removed package(s): ${extraRuntime.join(', ')}`);
+  for (const p of extraRuntime) {
+    extraEntries.push(`Runtime stage: ${p}`);
   }
 
-  if (issues.length === 0) {
-    return `Dockerfile is in sync with packages/ (${actualPackages.size} packages).`;
+  const hasMissing = missingEntries.length > 0;
+  const hasExtra = extraEntries.length > 0;
+
+  if (!hasMissing && !hasExtra) {
+    return {
+      name: 'Dockerfile',
+      status: 'pass',
+      summary: `Dockerfile is in sync with packages/ (${actualPackages.size} packages).`,
+    };
   }
-  return `Dockerfile sync issues:\n\n${issues.join('\n')}`;
+
+  if (!hasMissing && hasExtra) {
+    return {
+      name: 'Dockerfile',
+      status: 'warn',
+      summary: `Dockerfile has stale references to removed packages.`,
+      details: { extra: extraEntries },
+    };
+  }
+
+  return {
+    name: 'Dockerfile',
+    status: 'fail',
+    summary: `Dockerfile is out of sync with packages/.`,
+    details: {
+      ...(hasMissing ? { missing: missingEntries } : {}),
+      ...(hasExtra ? { extra: extraEntries } : {}),
+    },
+  };
+}
+
+/** @deprecated Use validateDockerfileStructured() for structured results */
+export function validateDockerfile(): string {
+  return formatResult(validateDockerfileStructured());
 }
 
 // ─── Validator: PWA shortcuts count ───────────────────────────
 
-export function validatePwaShortcuts(): string {
+export function validatePwaShortcutsStructured(): ValidatorResult {
   const viteConfig = readFile('packages/shell/vite.config.ts');
 
-  // Count shortcut objects in the shortcuts array
-  // Look for { name: ..., url: ... } patterns inside shortcuts: [...]
   const shortcutsMatch = viteConfig.match(/shortcuts\s*:\s*\[([\s\S]*?)\]/);
   if (!shortcutsMatch) {
-    return 'No PWA shortcuts array found in packages/shell/vite.config.ts.';
+    return {
+      name: 'PWA Shortcuts',
+      status: 'warn',
+      summary: 'No PWA shortcuts array found in packages/shell/vite.config.ts.',
+      count: 0,
+      limit: 10,
+      details: { warnings: ['No shortcuts array found in vite.config.ts'] },
+    };
   }
 
   const shortcutsBlock = shortcutsMatch[1];
   const count = (shortcutsBlock.match(/\{\s*name\s*:/g) || []).length;
 
   if (count > 10) {
-    return `PWA shortcuts: ${count} found (max 10). Browser will ignore extras with a warning. Remove ${count - 10} shortcut(s).`;
+    return {
+      name: 'PWA Shortcuts',
+      status: 'fail',
+      summary: `PWA shortcuts: ${count} found (max 10). Browser will ignore extras. Remove ${count - 10} shortcut(s).`,
+      count,
+      limit: 10,
+    };
   }
+
   if (count === 10) {
-    return `PWA shortcuts: ${count}/10 (at maximum). No room for more.`;
+    return {
+      name: 'PWA Shortcuts',
+      status: 'warn',
+      summary: `PWA shortcuts: ${count}/10 (at maximum). No room for more.`,
+      count,
+      limit: 10,
+    };
   }
-  return `PWA shortcuts: ${count}/10. ${10 - count} slot(s) available.`;
+
+  return {
+    name: 'PWA Shortcuts',
+    status: 'pass',
+    summary: `PWA shortcuts: ${count}/10. ${10 - count} slot(s) available.`,
+    count,
+    limit: 10,
+  };
+}
+
+/** @deprecated Use validatePwaShortcutsStructured() for structured results */
+export function validatePwaShortcuts(): string {
+  return formatResult(validatePwaShortcutsStructured());
 }
 
 // ─── Validator: Widget registry consistency ───────────────────
 
-export function validateWidgetRegistry(): string {
+export function validateWidgetRegistryStructured(): ValidatorResult {
   const dashboardFile = readFile('packages/shell/src/components/widgets/widgetConfig.ts');
 
-  // Extract WidgetType union: type WidgetType = 'weather' | 'stocks' | ...
   const typeMatch = dashboardFile.match(/type\s+WidgetType\s*=\s*([^;]+)/);
   const widgetTypes = new Set<string>();
   if (typeMatch) {
@@ -145,7 +252,6 @@ export function validateWidgetRegistry(): string {
     }
   }
 
-  // Extract DEFAULT_LAYOUT IDs
   const defaultLayoutIds = new Set<string>();
   const layoutMatch = dashboardFile.match(/DEFAULT_LAYOUT[\s\S]*?=\s*\[([\s\S]*?)\];/);
   if (layoutMatch) {
@@ -158,7 +264,6 @@ export function validateWidgetRegistry(): string {
     }
   }
 
-  // Extract WIDGET_COMPONENTS keys
   const componentKeys = new Set<string>();
   const compMatch = dashboardFile.match(/WIDGET_COMPONENTS[\s\S]*?=\s*\{([\s\S]*?)\}/);
   if (compMatch) {
@@ -171,7 +276,6 @@ export function validateWidgetRegistry(): string {
     }
   }
 
-  // Extract WIDGET_ROUTES keys if present
   const routeKeys = new Set<string>();
   const routeMatch = dashboardFile.match(/WIDGET_ROUTES[\s\S]*?=\s*\{([\s\S]*?)\}/);
   if (routeMatch) {
@@ -184,14 +288,16 @@ export function validateWidgetRegistry(): string {
     }
   }
 
-  const issues: string[] = [];
+  const missingEntries: string[] = [];
+  const warningEntries: string[] = [];
   const allIds = new Set([...widgetTypes, ...defaultLayoutIds, ...componentKeys, ...routeKeys]);
+  let hasCriticalMissing = false;
 
   for (const id of allIds) {
     const inType = widgetTypes.has(id);
     const inLayout = defaultLayoutIds.has(id);
     const inComponents = componentKeys.has(id);
-    const inRoutes = routeKeys.size > 0 ? routeKeys.has(id) : true; // skip if no WIDGET_ROUTES found
+    const inRoutes = routeKeys.size > 0 ? routeKeys.has(id) : true;
 
     const missing: string[] = [];
     if (!inType) missing.push('WidgetType');
@@ -200,27 +306,120 @@ export function validateWidgetRegistry(): string {
     if (routeKeys.size > 0 && !inRoutes) missing.push('WIDGET_ROUTES');
 
     if (missing.length > 0) {
-      issues.push(`'${id}' missing from: ${missing.join(', ')}`);
+      const entry = `'${id}' missing from: ${missing.join(', ')}`;
+      // Missing only from DEFAULT_LAYOUT is a warning (optional widget)
+      if (missing.length === 1 && missing[0] === 'DEFAULT_LAYOUT') {
+        warningEntries.push(entry);
+      } else {
+        missingEntries.push(entry);
+        hasCriticalMissing = true;
+      }
     }
   }
 
-  if (issues.length === 0) {
-    return `Widget registry is consistent (${allIds.size} widgets across WidgetType, DEFAULT_LAYOUT, WIDGET_COMPONENTS${routeKeys.size > 0 ? ', WIDGET_ROUTES' : ''}).`;
+  if (!hasCriticalMissing && warningEntries.length === 0) {
+    return {
+      name: 'Widget Registry',
+      status: 'pass',
+      summary: `Widget registry is consistent (${allIds.size} widgets across WidgetType, DEFAULT_LAYOUT, WIDGET_COMPONENTS${routeKeys.size > 0 ? ', WIDGET_ROUTES' : ''}).`,
+    };
   }
-  return `Widget registry mismatches:\n\n${issues.join('\n')}`;
+
+  if (!hasCriticalMissing && warningEntries.length > 0) {
+    return {
+      name: 'Widget Registry',
+      status: 'warn',
+      summary: `Widget registry has optional mismatches.`,
+      details: { warnings: warningEntries },
+    };
+  }
+
+  return {
+    name: 'Widget Registry',
+    status: 'fail',
+    summary: `Widget registry mismatches found.`,
+    details: {
+      missing: missingEntries,
+      ...(warningEntries.length > 0 ? { warnings: warningEntries } : {}),
+    },
+  };
+}
+
+/** @deprecated Use validateWidgetRegistryStructured() for structured results */
+export function validateWidgetRegistry(): string {
+  return formatResult(validateWidgetRegistryStructured());
+}
+
+// ─── Format helper ────────────────────────────────────────────
+
+function formatResult(result: ValidatorResult): string {
+  const lines: string[] = [result.summary];
+
+  if (result.details?.missing && result.details.missing.length > 0) {
+    lines.push('');
+    lines.push('Missing:');
+    for (const m of result.details.missing) {
+      lines.push(`  - ${m}`);
+    }
+  }
+
+  if (result.details?.extra && result.details.extra.length > 0) {
+    lines.push('');
+    lines.push('Stale references:');
+    for (const e of result.details.extra) {
+      lines.push(`  - ${e}`);
+    }
+  }
+
+  if (result.details?.warnings && result.details.warnings.length > 0) {
+    lines.push('');
+    lines.push('Warnings:');
+    for (const w of result.details.warnings) {
+      lines.push(`  - ${w}`);
+    }
+  }
+
+  return lines.join('\n');
 }
 
 // ─── Validator: Run all ───────────────────────────────────────
 
-export function validateAll(): string {
-  const sections = [
-    { title: 'i18n Sync', result: validateI18n() },
-    { title: 'Dockerfile', result: validateDockerfile() },
-    { title: 'PWA Shortcuts', result: validatePwaShortcuts() },
-    { title: 'Widget Registry', result: validateWidgetRegistry() },
+export function validateAllStructured(): ValidatorResult[] {
+  return [
+    validateI18nStructured(),
+    validateDockerfileStructured(),
+    validatePwaShortcutsStructured(),
+    validateWidgetRegistryStructured(),
   ];
+}
 
-  return sections
-    .map(s => `## ${s.title}\n${s.result}`)
+export function validateAll(): string {
+  const results = validateAllStructured();
+
+  return results
+    .map(r => {
+      const emoji = statusEmoji(r.status);
+      const lines: string[] = [`## ${emoji} ${r.name}`, r.summary];
+
+      if (r.details?.missing && r.details.missing.length > 0) {
+        for (const m of r.details.missing) {
+          lines.push(`- ${m}`);
+        }
+      }
+
+      if (r.details?.extra && r.details.extra.length > 0) {
+        for (const e of r.details.extra) {
+          lines.push(`- (stale) ${e}`);
+        }
+      }
+
+      if (r.details?.warnings && r.details.warnings.length > 0) {
+        for (const w of r.details.warnings) {
+          lines.push(`- ${w}`);
+        }
+      }
+
+      return lines.join('\n');
+    })
     .join('\n\n');
 }
