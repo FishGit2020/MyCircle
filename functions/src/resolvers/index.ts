@@ -16,6 +16,7 @@ import { createInterviewSessionResolvers } from './interviewSessions.js';
 import { createBabyInfoResolvers } from './babyInfo.js';
 import { createNotesResolvers } from './notes.js';
 import { createDailyLogResolvers } from './dailyLog.js';
+import { createDealsResolvers } from './deals.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -32,6 +33,7 @@ export function createResolvers(
   const babyInfoResolvers = createBabyInfoResolvers();
   const notesResolvers = createNotesResolvers();
   const dailyLogResolvers = createDailyLogResolvers();
+  const dealsResolvers = createDealsResolvers();
 
   return {
     JSON: JSONScalar,
@@ -63,6 +65,7 @@ export function createResolvers(
       ...interviewSessionResolvers.Query,
       ...babyInfoResolvers.Query,
       ...notesResolvers.Query,
+      ...dealsResolvers.Query,
     },
   };
 }

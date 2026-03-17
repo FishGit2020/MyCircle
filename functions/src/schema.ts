@@ -93,6 +93,22 @@ export const typeDefs = `#graphql
     lon: Float!
   }
 
+  # ─── Deal Finder Types ─────────────────────────────────────────
+
+  type Deal {
+    id: ID!
+    title: String!
+    url: String!
+    source: String!
+    price: String
+    originalPrice: String
+    store: String
+    category: String
+    thumbnail: String
+    postedAt: String!
+    score: Int
+  }
+
   # ─── Cloud Files Types ─────────────────────────────────────────
 
   type CloudFile {
@@ -450,6 +466,9 @@ export const typeDefs = `#graphql
     # Cloud Files (auth required)
     cloudFiles: [CloudFile!]!
     sharedFiles: [SharedFile!]!
+
+    # Deals (auth required)
+    deals: [Deal!]!
 
     # Baby Info (auth required — supports API key auth for OpenClaw)
     babyInfo: BabyInfo!

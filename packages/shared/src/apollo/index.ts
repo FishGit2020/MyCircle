@@ -124,6 +124,9 @@ export type {
   QuestionBank as GqlQuestionBank,
   InterviewSessionSummary as GqlInterviewSessionSummary,
   InterviewSessionDetail as GqlInterviewSessionDetail,
+  // Deals
+  GetDealsQuery,
+  Deal as GqlDeal,
   // Digital Library
   GetBooksQuery,
   GetBookChaptersQuery,

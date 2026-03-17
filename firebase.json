@@ -43,10 +43,6 @@
         "function": "digitalLibrary"
       },
       {
-        "source": "/deals-api/**",
-        "function": "dealsProxy"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }

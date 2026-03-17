@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery, GET_DEALS } from '@mycircle/shared';
+import type { GetDealsQuery } from '@mycircle/shared';
 import type { Deal } from '../types';
 
 const CACHE_KEY = 'mycircle_deals_cache';
@@ -127,45 +129,54 @@ const DEMO_DEALS: Deal[] = [
   },
 ];
 
+function mapGqlDeals(data: GetDealsQuery): Deal[] {
+  return data.deals.map(d => ({
+    id: d.id,
+    title: d.title,
+    url: d.url,
+    source: d.source as Deal['source'],
+    price: d.price ?? undefined,
+    originalPrice: d.originalPrice ?? undefined,
+    store: d.store ?? undefined,
+    category: d.category ?? undefined,
+    thumbnail: d.thumbnail ?? undefined,
+    postedAt: d.postedAt,
+    score: d.score ?? undefined,
+  }));
+}
+
 export function useDeals() {
   const [deals, setDeals] = useState<Deal[]>(() => loadCache() || DEMO_DEALS);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDeals = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) {
-        // Not signed in — use demo data
-        setDeals(DEMO_DEALS);
-        return;
-      }
-      const res = await fetch('/deals-api/deals', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: Deal[] = await res.json();
-      setDeals(data);
-      saveCache(data);
-    } catch (err) {
-      // If API not available, fall back to demo deals
+  const { loading, refetch } = useQuery<GetDealsQuery>(GET_DEALS, {
+    fetchPolicy: 'cache-and-network',
+    onCompleted: (data) => {
+      const mapped = mapGqlDeals(data);
+      setDeals(mapped);
+      saveCache(mapped);
+      setError(null);
+    },
+    onError: (err) => {
+      // If GraphQL fails, fall back to cache or demo deals
       const cached = loadCache();
       if (cached) {
         setDeals(cached);
       } else {
         setDeals(DEMO_DEALS);
       }
-      setError(err instanceof Error ? err.message : 'Failed to load deals');
-    } finally {
-      setLoading(false);
-    }
+      setError(err.message);
+    },
+  });
+
+  const refresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  // Keep deals up to date on mount (cache-and-network handles this, but for explicit refresh)
+  useEffect(() => {
+    // Initial load handled by useQuery
   }, []);
 
-  useEffect(() => {
-    fetchDeals();
-  }, [fetchDeals]);
-
-  return { deals, loading, error, refresh: fetchDeals };
+  return { deals, loading, error, refresh };
 }

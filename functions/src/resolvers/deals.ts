@@ -1,10 +1,12 @@
-import { onRequest } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions';
-import type { Request, Response } from 'express';
 import axios from 'axios';
 import NodeCache from 'node-cache';
 import { XMLParser } from 'fast-xml-parser';
-import { ALLOWED_ORIGINS, checkRateLimit, verifyAuthToken } from './shared.js';
+import { GraphQLError } from 'graphql';
+
+interface ResolverContext {
+  uid: string | null;
+}
 
 interface Deal {
   id: string;
@@ -167,40 +169,19 @@ function categorize(title: string): string {
   return 'other';
 }
 
-// ─── Main Handler ───────────────────────────────────────────────
-export const dealsProxy = onRequest(
-  {
-    cors: ALLOWED_ORIGINS,
-    invoker: 'public',
-    maxInstances: 5,
-    memory: '256MiB',
-    timeoutSeconds: 30,
-  },
-  async (req: Request, res: Response) => {
-    // Auth check
-    const uid = await verifyAuthToken(req);
-    if (!uid) {
-      res.status(401).json({ error: 'Authentication required' });
-      return;
-    }
+export function createDealsResolvers() {
+  return {
+    Query: {
+      deals: async (_: unknown, __: unknown, context: ResolverContext) => {
+        if (!context.uid) {
+          throw new GraphQLError('Authentication required', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          });
+        }
 
-    // Rate limit: 20 req/min per IP (generous since data is cached)
-    const ip = req.ip || (req.headers['x-forwarded-for'] as string) || 'unknown';
-    if (checkRateLimit(ip, 20, 60)) {
-      res.status(429).json({ error: 'Rate limit exceeded' });
-      return;
-    }
-
-    const path = req.path.replace(/^\/deals-api\//, '');
-
-    switch (path) {
-      case 'deals': {
         // Check cache first
         const cached = dealsCache.get<Deal[]>('all-deals');
-        if (cached) {
-          res.status(200).json(cached);
-          return;
-        }
+        if (cached) return cached;
 
         // Fetch from all sources in parallel
         const [slickdeals, dealnews, reddit] = await Promise.all([
@@ -220,12 +201,8 @@ export const dealsProxy = onRequest(
           total: allDeals.length,
         });
 
-        res.status(200).json(allDeals);
-        return;
-      }
-      default:
-        res.status(404).json({ error: `Unknown deals route: ${path}` });
-        return;
-    }
-  }
-);
+        return allDeals;
+      },
+    },
+  };
+}

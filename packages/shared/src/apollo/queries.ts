@@ -1052,3 +1052,22 @@ export const WEATHER_UPDATES = gql`
     }
   }
 `;
+
+// ─── Deals ──────────────────────────────────────────────────────
+export const GET_DEALS = gql`
+  query GetDeals {
+    deals {
+      id
+      title
+      url
+      source
+      price
+      originalPrice
+      store
+      category
+      thumbnail
+      postedAt
+      score
+    }
+  }
+`;
