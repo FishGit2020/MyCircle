@@ -407,6 +407,11 @@ export const typeDefs = `#graphql
     worshipSongsList(limit: Int, offset: Int, search: String, artist: String, tag: String, format: String, favoriteIds: [String!]): WorshipSongsPage!
     worshipSong(id: ID!): WorshipSong
 
+    # Interview (question bank is public, sessions require auth)
+    questionBank: QuestionBank!
+    interviewSessions: [InterviewSessionSummary!]!
+    interviewSession(id: ID!): InterviewSessionDetail
+
     # Cloud Files (auth required)
     cloudFiles: [CloudFile!]!
     sharedFiles: [SharedFile!]!
@@ -573,6 +578,88 @@ export const typeDefs = `#graphql
     fastestTps: Float
   }
 
+  # ─── Interview Types ──────────────────────────────────────
+
+  type InterviewQuestion {
+    id: ID!
+    chapter: String!
+    chapterSlug: String!
+    difficulty: String!
+    title: String!
+    description: String!
+    tags: [String!]!
+  }
+
+  type QuestionBank {
+    chapters: [String!]!
+    questions: [InterviewQuestion!]!
+  }
+
+  type InterviewSessionSummary {
+    id: ID!
+    questionPreview: String!
+    messageCount: Int!
+    mode: String
+    updatedAt: String
+    createdAt: String
+  }
+
+  type SessionMessage {
+    id: String!
+    role: String!
+    content: String!
+    timestamp: Float!
+  }
+
+  type InterviewSessionDetail {
+    id: ID!
+    question: String!
+    document: String!
+    messages: [SessionMessage!]!
+    sessionName: String
+    interviewState: JSON
+    scores: JSON
+    config: JSON
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  input CreateInterviewQuestionInput {
+    chapter: String!
+    chapterSlug: String!
+    difficulty: String!
+    title: String!
+    description: String!
+    tags: [String!]
+  }
+
+  input UpdateInterviewQuestionInput {
+    chapter: String
+    chapterSlug: String
+    difficulty: String
+    title: String
+    description: String
+    tags: [String!]
+  }
+
+  input SessionMessageInput {
+    id: String!
+    role: String!
+    content: String!
+    timestamp: Float!
+  }
+
+  input SaveInterviewSessionInput {
+    sessionId: String!
+    question: String!
+    document: String!
+    messages: [SessionMessageInput!]!
+    sessionName: String
+    interviewState: JSON
+    scores: JSON
+    config: JSON
+  }
+
   # ─── Worship Songs Types ──────────────────────────────────────
 
   type WorshipSong {
@@ -653,6 +740,13 @@ export const typeDefs = `#graphql
 
     # Baby Photos (auth required)
     deleteBabyPhoto(stageId: Int!): Boolean!
+
+    # Interview (auth required for mutations)
+    createInterviewQuestion(input: CreateInterviewQuestionInput!): InterviewQuestion!
+    updateInterviewQuestion(id: ID!, input: UpdateInterviewQuestionInput!): InterviewQuestion!
+    deleteInterviewQuestion(id: ID!): Boolean!
+    saveInterviewSession(input: SaveInterviewSessionInput!): InterviewSessionDetail!
+    deleteInterviewSession(id: ID!): Boolean!
 
     # Digital Library (auth required)
     deleteBook(id: ID!): Boolean!

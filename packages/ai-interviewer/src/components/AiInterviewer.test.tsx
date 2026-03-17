@@ -1,34 +1,39 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AiInterviewer from './AiInterviewer';
+
+const mockQuestionBank = {
+  chapters: ['Dynamic Arrays', 'Binary Search'],
+  questions: [
+    { id: 'q1', chapter: 'Dynamic Arrays', chapterSlug: 'dynamic-arrays', difficulty: 'medium', title: 'Two Sum', description: 'Find two numbers.', tags: [] },
+  ],
+};
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string, opts?: Record<string, unknown>) => opts ? `${key} ${JSON.stringify(opts)}` : key }),
   PageContent: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className}>{children}</div>,
-  useQuery: () => ({ data: undefined, loading: false }),
+  useQuery: (query: unknown) => {
+    if (query === 'GET_QUESTION_BANK') {
+      return { data: { questionBank: mockQuestionBank }, loading: false, error: undefined, refetch: vi.fn() };
+    }
+    return { data: undefined, loading: false, refetch: vi.fn() };
+  },
   useLazyQuery: () => [vi.fn(), { data: undefined, loading: false }],
   useMutation: () => [vi.fn(), { loading: false }],
-  AI_CHAT: {},
-  GET_BENCHMARK_ENDPOINTS: {},
-  GET_BENCHMARK_ENDPOINT_MODELS: {},
+  AI_CHAT: 'AI_CHAT',
+  GET_QUESTION_BANK: 'GET_QUESTION_BANK',
+  CREATE_INTERVIEW_QUESTION: 'CREATE_INTERVIEW_QUESTION',
+  UPDATE_INTERVIEW_QUESTION: 'UPDATE_INTERVIEW_QUESTION',
+  DELETE_INTERVIEW_QUESTION: 'DELETE_INTERVIEW_QUESTION',
+  SAVE_INTERVIEW_SESSION: 'SAVE_INTERVIEW_SESSION',
+  DELETE_INTERVIEW_SESSION: 'DELETE_INTERVIEW_SESSION',
+  GET_INTERVIEW_SESSIONS: 'GET_INTERVIEW_SESSIONS',
+  GET_INTERVIEW_SESSION: 'GET_INTERVIEW_SESSION',
+  GET_BENCHMARK_ENDPOINTS: 'GET_BENCHMARK_ENDPOINTS',
+  GET_BENCHMARK_ENDPOINT_MODELS: 'GET_BENCHMARK_ENDPOINT_MODELS',
   WindowEvents: { AUTH_STATE_CHANGED: 'auth-state-changed' },
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
 }));
-
-// Mock fetch for question bank
-const mockFetch = vi.fn();
-beforeEach(() => {
-  mockFetch.mockResolvedValue({
-    ok: true,
-    json: async () => ({
-      chapters: ['Dynamic Arrays', 'Binary Search'],
-      questions: [
-        { id: 'q1', chapter: 'Dynamic Arrays', chapterSlug: 'dynamic-arrays', difficulty: 'medium', title: 'Two Sum', description: 'Find two numbers.', tags: [] },
-      ],
-    }),
-  });
-  vi.stubGlobal('fetch', mockFetch);
-});
 
 describe('AiInterviewer', () => {
   it('renders the title', () => {

@@ -1,4 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import {
+  useQuery,
+  useMutation,
+  GET_QUESTION_BANK,
+  CREATE_INTERVIEW_QUESTION,
+  UPDATE_INTERVIEW_QUESTION,
+  DELETE_INTERVIEW_QUESTION,
+} from '@mycircle/shared';
 import type { BankQuestion } from './useInterviewStateMachine';
 
 export interface QuestionBankData {
@@ -6,115 +14,78 @@ export interface QuestionBankData {
   questions: BankQuestion[];
 }
 
-let cachedData: QuestionBankData | null = null;
-
-/** Reset cached data (for testing). */
-export function _resetCache() {
-  cachedData = null;
-}
-
 export function useQuestionBank() {
-  const [data, setData] = useState<QuestionBankData | null>(cachedData);
-  const [loading, setLoading] = useState(!cachedData);
-  const [error, setError] = useState<string | null>(null);
+  const { data: queryData, loading, error: queryError, refetch } = useQuery(GET_QUESTION_BANK);
+  const [createMutation] = useMutation(CREATE_INTERVIEW_QUESTION);
+  const [updateMutation] = useMutation(UPDATE_INTERVIEW_QUESTION);
+  const [deleteMutation] = useMutation(DELETE_INTERVIEW_QUESTION);
 
-  const fetchBank = useCallback(async () => {
-    if (cachedData) {
-      setData(cachedData);
-      setLoading(false);
-      return;
-    }
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch('/interview-api/question-bank');
-      if (!res.ok) throw new Error(`Failed to load question bank: ${res.status}`);
-      const json: QuestionBankData = await res.json();
-      cachedData = json;
-      setData(json);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load questions');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const data: QuestionBankData | null = queryData?.questionBank
+    ? {
+        chapters: queryData.questionBank.chapters,
+        questions: queryData.questionBank.questions as BankQuestion[],
+      }
+    : null;
 
-  const refetch = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch('/interview-api/questions');
-      if (!res.ok) throw new Error(`Failed to load question bank: ${res.status}`);
-      const json: QuestionBankData = await res.json();
-      cachedData = json;
-      setData(json);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load questions');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const error = queryError ? queryError.message : null;
 
-  const createQuestion = useCallback(async (question: Omit<BankQuestion, 'id'>): Promise<BankQuestion | null> => {
-    try {
-      const res = await fetch('/interview-api/questions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(question),
-      });
-      if (!res.ok) throw new Error(`Failed to create question: ${res.status}`);
-      const json = await res.json();
-      const created = json.question as BankQuestion;
-      // Invalidate cache and refetch
-      cachedData = null;
-      await refetch();
-      return created;
-    } catch {
-      return null;
-    }
-  }, [refetch]);
+  const createQuestion = useCallback(
+    async (question: Omit<BankQuestion, 'id'>): Promise<BankQuestion | null> => {
+      try {
+        const { data: result } = await createMutation({
+          variables: {
+            input: {
+              chapter: question.chapter,
+              chapterSlug: question.chapterSlug,
+              difficulty: question.difficulty,
+              title: question.title,
+              description: question.description,
+              tags: question.tags,
+            },
+          },
+        });
+        await refetch();
+        return (result?.createInterviewQuestion as BankQuestion) ?? null;
+      } catch {
+        return null;
+      }
+    },
+    [createMutation, refetch],
+  );
 
-  const updateQuestion = useCallback(async (id: string, updates: Partial<BankQuestion>): Promise<BankQuestion | null> => {
-    try {
-      const res = await fetch(`/interview-api/questions/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
-      if (!res.ok) throw new Error(`Failed to update question: ${res.status}`);
-      const json = await res.json();
-      const updated = json.question as BankQuestion;
-      cachedData = null;
-      await refetch();
-      return updated;
-    } catch {
-      return null;
-    }
-  }, [refetch]);
+  const updateQuestion = useCallback(
+    async (id: string, updates: Partial<BankQuestion>): Promise<BankQuestion | null> => {
+      try {
+        const { data: result } = await updateMutation({
+          variables: { id, input: updates },
+        });
+        await refetch();
+        return (result?.updateInterviewQuestion as BankQuestion) ?? null;
+      } catch {
+        return null;
+      }
+    },
+    [updateMutation, refetch],
+  );
 
-  const deleteQuestion = useCallback(async (id: string): Promise<boolean> => {
-    try {
-      const res = await fetch(`/interview-api/questions/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error(`Failed to delete question: ${res.status}`);
-      cachedData = null;
-      await refetch();
-      return true;
-    } catch {
-      return false;
-    }
-  }, [refetch]);
-
-  useEffect(() => {
-    fetchBank();
-  }, [fetchBank]);
+  const deleteQuestion = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        await deleteMutation({ variables: { id } });
+        await refetch();
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [deleteMutation, refetch],
+  );
 
   return {
     data,
     loading,
     error,
-    retry: fetchBank,
+    retry: refetch,
     createQuestion,
     updateQuestion,
     deleteQuestion,
