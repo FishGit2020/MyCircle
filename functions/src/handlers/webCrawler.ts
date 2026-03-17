@@ -2,6 +2,7 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 /**
  * Firestore trigger: when a new crawl job is created, start crawling.
@@ -84,17 +85,13 @@ export const crawlWorker = onDocumentCreated(
           const html: string =
             typeof response.data === 'string' ? response.data : '';
 
-          // Extract title
-          const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/is);
-          const title = titleMatch ? titleMatch[1].trim().substring(0, 500) : null;
+          // Parse HTML with cheerio for safe content extraction
+          const $ = cheerio.load(html);
+          const title = $('title').first().text().trim().substring(0, 500) || null;
 
-          // Extract text preview (strip tags, first 500 chars)
-          const textContent = html
-            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-            .replace(/<[^>]+>/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
+          // Extract text preview (strip script/style, first 500 chars)
+          $('script, style').remove();
+          const textContent = $.root().text().replace(/\s+/g, ' ').trim();
           const contentPreview = textContent.substring(0, 500);
 
           // Store document
