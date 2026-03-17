@@ -23,6 +23,7 @@
     "@graphql-tools/schema": "^10.0.31",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "axios": "^1.13.6",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "firebase-admin": "^13.7.0",
