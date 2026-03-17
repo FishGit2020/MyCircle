@@ -13,7 +13,7 @@ git add <files> && git commit --no-verify -m "feat: description"
 git push -u origin HEAD
 gh pr create --title "feat: description" --body "summary"
 gh pr checks <PR#> --watch          # wait for ALL checks to pass
-gh pr merge <PR#> --squash --admin  # ONLY after ci, e2e, and e2e-emulator all pass
+gh pr merge <PR#> --squash --admin  # ONLY after ci, e2e-gate, and spec-check all pass
 git checkout main && git pull origin main
 ```
 
@@ -51,7 +51,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 - **Responsive**: Mobile-first (`md:` = main breakpoint). Wrap MFE page content in `<PageContent>` from `@mycircle/shared` — Layout.tsx handles BottomNav padding.
 - **No `100vh` calculations in MFEs**: Never use `h-[calc(100vh-...)]` or `min-h-[calc(100vh-...)]` inside MFE pages. The `<main>` element is a flex scroll container smaller than the viewport (header, breadcrumbs, padding consume space). To fill available space, use `<PageContent fill>` which provides `flex flex-col min-h-0`, then use `flex-1 min-h-0` on the child that should expand. See AI Assistant for the reference pattern.
 - **Spanish i18n**: File uses Unicode escapes (`\u00f3`). Always read the exact line before editing.
-- **PR merge**: Always run `gh pr checks <PR#> --watch` and confirm **all** checks (ci, e2e, e2e-emulator) pass before merging. Never merge with failing or pending checks.
+- **PR merge**: Always run `gh pr checks <PR#> --watch` and confirm **all** required checks (`ci`, `e2e-gate`, `spec-check`) pass before merging. Never merge with failing or pending checks. `spec-check` enforces that new MFEs have a spec in `docs/specs/`.
 - **Firebase secrets**: Use `printf` not `echo` when piping values — `echo` appends a trailing newline (`\n`) that corrupts URLs and tokens. Always: `printf "value" | npx firebase functions:secrets:set SECRET_NAME`. PodcastIndex uses a combined JSON secret (`PODCASTINDEX_CREDS`). After creating a new secret, grant the compute SA access: `gcloud secrets add-iam-policy-binding SECRET_NAME --project=mycircle-dash --member="serviceAccount:441498720264-compute@developer.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"`. Without this, deploy fails with `secretmanager.secrets.setIamPolicy` denied.
 - **GraphQL codegen**: When the schema changes (`functions/src/schema.ts`) or queries change (`packages/shared/src/apollo/queries.ts`), run `pnpm codegen` to regenerate `packages/shared/src/apollo/generated.ts`. Always commit the regenerated file. Auto-runs on `pnpm install` via `postinstall` hook.
 - **Unit system**: Distance/temperature/speed preferences live in `@mycircle/shared` (`useUnits()`, `formatDistance()`, `StorageKeys.DISTANCE_UNIT`). All MFEs must use these shared utilities — never define local `formatDistance` helpers. Preferences are persisted to Firestore `UserProfile` and restored via `restoreUserData` on sign-in. The central toggle is in `UserMenu` (profile avatar dropdown), not in individual MFE headers.
@@ -100,6 +100,7 @@ When adding a new micro frontend, update ALL of these integration points:
 5. **AI Tools**: Update `navigateTo` page list in `scripts/mcp-tools/mfe-tools.ts` to include the new route. If the MFE has AI-callable actions, add new tool definitions to `ALL_TOOLS` array.
 6. **Cloud Function endpoints**: If the MFE has its own Cloud Function (REST API), add a `firebase.json` hosting rewrite **before** the catch-all `** → /index.html` rule: `{ "source": "/your-api-path/**", "function": "yourFunction" }`. Missing this causes the API to return HTML (index.html) instead of JSON in production.
 7. **functions/ has separate strict tsconfig**: `noUnusedLocals: true` — root `pnpm typecheck` doesn't catch it. Always verify with `cd functions && npx tsc --noEmit` before pushing backend changes.
+8. **Spec required**: New MFEs must have a spec file at `docs/specs/NNN-<mfe-name>/spec.md`. The `spec-check` CI job (`.github/workflows/spec-guard.yml`) blocks merge if missing. Create one with `pnpm new-spec <name>` before opening the PR.
 
 ## Removing Features
 
