@@ -13,6 +13,9 @@ import { createDigitalLibraryResolvers } from './digitalLibrary.js';
 import { createTransitQueryResolvers } from './transit.js';
 import { createLocationSearchQueryResolvers } from './locationSearch.js';
 import { createInterviewSessionResolvers } from './interviewSessions.js';
+import { createBabyInfoResolvers } from './babyInfo.js';
+import { createNotesResolvers } from './notes.js';
+import { createDailyLogResolvers } from './dailyLog.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -26,6 +29,9 @@ export function createResolvers(
   const babyPhotoResolvers = createBabyPhotoResolvers();
   const digitalLibraryResolvers = createDigitalLibraryResolvers();
   const interviewSessionResolvers = createInterviewSessionResolvers();
+  const babyInfoResolvers = createBabyInfoResolvers();
+  const notesResolvers = createNotesResolvers();
+  const dailyLogResolvers = createDailyLogResolvers();
 
   return {
     JSON: JSONScalar,
@@ -37,6 +43,7 @@ export function createResolvers(
       ...babyPhotoResolvers.Mutation,
       ...digitalLibraryResolvers.Mutation,
       ...interviewSessionResolvers.Mutation,
+      ...dailyLogResolvers.Mutation,
     },
 
     Query: {
@@ -54,6 +61,8 @@ export function createResolvers(
       ...createTransitQueryResolvers(),
       ...createLocationSearchQueryResolvers(),
       ...interviewSessionResolvers.Query,
+      ...babyInfoResolvers.Query,
+      ...notesResolvers.Query,
     },
   };
 }

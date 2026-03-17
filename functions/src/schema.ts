@@ -330,6 +330,41 @@ export const typeDefs = `#graphql
 
   # ─── Transit Types ──────────────────────────────────────────────
 
+  # ─── OpenClaw Types ──────────────────────────────────────────────
+
+  type BabyInfo {
+    dueDate: String!
+    currentWeek: Int!
+    currentDay: Int!
+    weeksRemaining: Int!
+    fruit: String!
+    animal: String!
+    vegetable: String!
+    length: String!
+    weight: String!
+  }
+
+  type Note {
+    id: ID!
+    title: String!
+    content: String!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  type DailyLogEntry {
+    id: ID!
+    content: String!
+    date: String!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  input DailyLogInput {
+    content: String!
+    date: String
+  }
+
   type TransitArrival {
     routeId: String!
     routeShortName: String!
@@ -415,6 +450,12 @@ export const typeDefs = `#graphql
     # Cloud Files (auth required)
     cloudFiles: [CloudFile!]!
     sharedFiles: [SharedFile!]!
+
+    # Baby Info (auth required — supports API key auth for OpenClaw)
+    babyInfo: BabyInfo!
+
+    # Notes (auth required — supports API key auth for OpenClaw)
+    notes(limit: Int, search: String): [Note!]!
 
     # Baby Photos (auth required)
     babyPhotos: [BabyPhoto!]!
@@ -747,6 +788,9 @@ export const typeDefs = `#graphql
     deleteInterviewQuestion(id: ID!): Boolean!
     saveInterviewSession(input: SaveInterviewSessionInput!): InterviewSessionDetail!
     deleteInterviewSession(id: ID!): Boolean!
+
+    # Daily Log (auth required — supports API key auth for OpenClaw)
+    createDailyLog(input: DailyLogInput!): DailyLogEntry!
 
     # Digital Library (auth required)
     deleteBook(id: ID!): Boolean!

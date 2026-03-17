@@ -71,6 +71,33 @@ export async function verifyAuthToken(req: Request): Promise<string | null> {
   }
 }
 
+// ─── API Key Auth (for server-to-server / OpenClaw) ─────────────────
+const apiKeyCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
+
+/** Verify X-API-Key header: SHA-256 hash → Firestore apiKeys/{hash} → uid. */
+export async function verifyApiKey(req: Request): Promise<string | null> {
+  const apiKey = req.headers['x-api-key'] as string | undefined;
+  if (!apiKey) return null;
+
+  const hash = crypto.createHash('sha256').update(apiKey).digest('hex');
+
+  // Check cache first
+  const cached = apiKeyCache.get<string>(hash);
+  if (cached) return cached;
+
+  try {
+    const { getFirestore } = await import('firebase-admin/firestore');
+    const doc = await getFirestore().collection('apiKeys').doc(hash).get();
+    if (!doc.exists) return null;
+    const uid = doc.data()?.uid as string | undefined;
+    if (!uid) return null;
+    apiKeyCache.set(hash, uid);
+    return uid;
+  } catch {
+    return null;
+  }
+}
+
 // ─── Storage Upload Helpers ─────────────────────────────────────────
 /** Upload a buffer to Firebase Storage with a download token, return the public URL. */
 export async function uploadToStorage(

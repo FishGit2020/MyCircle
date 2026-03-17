@@ -130,6 +130,11 @@ service cloud.firestore {
       allow read: if true;
     }
 
+    // API Keys - server-only (Cloud Functions access via Admin SDK, deny all client access)
+    match /apiKeys/{keyHash} {
+      allow read, write: if false;
+    }
+
     // Game scores - shared scoreboard, any authenticated user can read/write
     // Scores stored as games/scores/{gameType}/{scoreId} (subcollection per game type)
     match /games/scores/{gameType}/{scoreId} {
