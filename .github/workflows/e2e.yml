@@ -3,19 +3,33 @@ name: E2E Tests
 on:
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'LICENSE'
-      - '.gitignore'
-      - '.vscode/**'
 
 permissions:
   contents: read
 
 jobs:
+  # ── Detect whether source code changed (skip expensive jobs for docs-only PRs)
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - '!**.md'
+              - '!docs/**'
+              - '!LICENSE'
+              - '!.gitignore'
+              - '!.vscode/**'
+
   # ── Shared setup: install + build once, cache for both test jobs ──────
   setup:
+    needs: changes
+    if: needs.changes.outputs.src == 'true'
     runs-on: ubuntu-latest
     # Cancel older setup runs for the same branch to save minutes
     concurrency:
@@ -182,13 +196,19 @@ jobs:
           retention-days: 14
 
   # ── Gate job for branch protection (single "e2e-gate" check) ─────────
+  # Always runs so the required "e2e-gate" status check is reported even for docs-only PRs
   e2e-gate:
     if: always()
-    needs: [e2e, e2e-emulator]
+    needs: [changes, e2e, e2e-emulator]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
+          # If no source changes, all jobs were skipped — that's OK
+          if [ "${{ needs.changes.outputs.src }}" != "true" ]; then
+            echo "No source changes — skipping E2E (docs/config-only PR)"
+            exit 0
+          fi
           if [ "${{ needs.e2e.result }}" != "success" ] || [ "${{ needs.e2e-emulator.result }}" != "success" ]; then
             echo "Required jobs failed: e2e=${{ needs.e2e.result }}, e2e-emulator=${{ needs.e2e-emulator.result }}"
             exit 1

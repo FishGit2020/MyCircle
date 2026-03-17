@@ -3,19 +3,33 @@ name: CI
 on:
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'LICENSE'
-      - '.gitignore'
-      - '.vscode/**'
 
 permissions:
   contents: read
 
 jobs:
+  # ── Detect whether source code changed (skip expensive jobs for docs-only PRs)
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - '!**.md'
+              - '!docs/**'
+              - '!LICENSE'
+              - '!.gitignore'
+              - '!.vscode/**'
+
   # ── Shared setup: install, check versions, build shared ────────────────
   setup:
+    needs: changes
+    if: needs.changes.outputs.src == 'true'
     runs-on: ubuntu-latest
     concurrency:
       group: ci-setup-${{ github.ref }}
@@ -320,13 +334,19 @@ jobs:
           retention-days: 30
 
   # ── Gate job for branch protection (preserves "ci" check name) ─────────
+  # Always runs so the required "ci" status check is reported even for docs-only PRs
   ci:
     if: always()
-    needs: [lint, typecheck, test-root, test-mfe]
+    needs: [changes, lint, typecheck, test-root, test-mfe]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
+          # If no source changes, all jobs were skipped — that's OK
+          if [ "${{ needs.changes.outputs.src }}" != "true" ]; then
+            echo "No source changes — skipping CI (docs/config-only PR)"
+            exit 0
+          fi
           # Lint is non-blocking for now (continue-on-error) — tracked separately
           if [ "${{ needs.typecheck.result }}" != "success" ] || \
              [ "${{ needs.test-root.result }}" != "success" ] || \
