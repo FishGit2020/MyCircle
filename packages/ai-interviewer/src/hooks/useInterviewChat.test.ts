@@ -3,10 +3,27 @@ import { renderHook, act } from '@testing-library/react';
 import { useInterviewChat } from './useInterviewChat';
 
 const mockMutate = vi.fn();
+const mockSaveSession = vi.fn();
+const mockDeleteSession = vi.fn();
+const mockFetchSessions = vi.fn();
+const mockFetchSession = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
-  useMutation: () => [mockMutate, { loading: false }],
-  AI_CHAT: {},
+  useMutation: (query: unknown) => {
+    if (query === 'SAVE_INTERVIEW_SESSION') return [mockSaveSession, { loading: false }];
+    if (query === 'DELETE_INTERVIEW_SESSION') return [mockDeleteSession, { loading: false }];
+    return [mockMutate, { loading: false }];
+  },
+  useLazyQuery: (query: unknown) => {
+    if (query === 'GET_INTERVIEW_SESSIONS') return [mockFetchSessions, { data: undefined, loading: false }];
+    if (query === 'GET_INTERVIEW_SESSION') return [mockFetchSession, { data: undefined, loading: false }];
+    return [vi.fn(), { data: undefined, loading: false }];
+  },
+  AI_CHAT: 'AI_CHAT',
+  SAVE_INTERVIEW_SESSION: 'SAVE_INTERVIEW_SESSION',
+  DELETE_INTERVIEW_SESSION: 'DELETE_INTERVIEW_SESSION',
+  GET_INTERVIEW_SESSIONS: 'GET_INTERVIEW_SESSIONS',
+  GET_INTERVIEW_SESSION: 'GET_INTERVIEW_SESSION',
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
 }));
 
@@ -14,8 +31,10 @@ describe('useInterviewChat', () => {
   beforeEach(() => {
     localStorage.clear();
     mockMutate.mockReset();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (window as any).__interviewApi;
+    mockSaveSession.mockReset();
+    mockDeleteSession.mockReset();
+    mockFetchSessions.mockReset();
+    mockFetchSession.mockReset();
   });
 
   afterEach(() => {
@@ -124,11 +143,14 @@ describe('useInterviewChat', () => {
     expect(vars.message).toContain('Here is my approach');
   });
 
-  it('loads sessions from Firebase API', async () => {
-    const mockList = vi.fn().mockResolvedValue({
-      sessions: [{ id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: 1000, createdAt: 1000 }],
+  it('loads sessions via GraphQL', async () => {
+    mockFetchSessions.mockResolvedValue({
+      data: {
+        interviewSessions: [
+          { id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: '2026-01-01T00:00:00Z', createdAt: '2026-01-01T00:00:00Z' },
+        ],
+      },
     });
-    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: vi.fn() }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const { result } = renderHook(() => useInterviewChat());
 
@@ -136,20 +158,21 @@ describe('useInterviewChat', () => {
       await result.current.loadSessions();
     });
 
-    expect(mockList).toHaveBeenCalledTimes(1);
+    expect(mockFetchSessions).toHaveBeenCalledTimes(1);
     expect(result.current.sessions).toHaveLength(1);
     expect(result.current.sessions[0].questionPreview).toBe('Two Sum');
   });
 
   it('deletes a session and removes it from state', async () => {
-    const mockDelete = vi.fn().mockResolvedValue({ ok: true });
-    const mockList = vi.fn().mockResolvedValue({
-      sessions: [
-        { id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: 1000, createdAt: 1000 },
-        { id: 's2', questionPreview: 'Merge Sort', messageCount: 3, updatedAt: 900, createdAt: 900 },
-      ],
+    mockFetchSessions.mockResolvedValue({
+      data: {
+        interviewSessions: [
+          { id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: '2026-01-01T00:00:00Z', createdAt: '2026-01-01T00:00:00Z' },
+          { id: 's2', questionPreview: 'Merge Sort', messageCount: 3, updatedAt: '2025-12-31T00:00:00Z', createdAt: '2025-12-31T00:00:00Z' },
+        ],
+      },
     });
-    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: mockDelete }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    mockDeleteSession.mockResolvedValue({ data: { deleteInterviewSession: true } });
 
     const { result } = renderHook(() => useInterviewChat());
 
@@ -162,7 +185,7 @@ describe('useInterviewChat', () => {
       await result.current.deleteSession('s1');
     });
 
-    expect(mockDelete).toHaveBeenCalledWith('s1');
+    expect(mockDeleteSession).toHaveBeenCalledWith({ variables: { id: 's1' } });
     expect(result.current.sessions).toHaveLength(1);
     expect(result.current.sessions[0].id).toBe('s2');
   });
@@ -306,15 +329,22 @@ describe('useInterviewChat', () => {
   });
 
   it('old sessions without interviewState load as custom mode', async () => {
-    const mockLoad = vi.fn().mockResolvedValue({
-      session: {
-        id: 'old-session',
-        question: 'Two Sum',
-        document: 'def twoSum...',
-        messages: [{ id: 'm1', role: 'user', content: 'Hello', timestamp: 1000 }],
+    mockFetchSession.mockResolvedValue({
+      data: {
+        interviewSession: {
+          id: 'old-session',
+          question: 'Two Sum',
+          document: 'def twoSum...',
+          messages: [{ id: 'm1', role: 'user', content: 'Hello', timestamp: 1000 }],
+          sessionName: null,
+          interviewState: null,
+          scores: null,
+          config: null,
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
       },
     });
-    (window as any).__interviewApi = { list: vi.fn(), save: vi.fn(), load: mockLoad, delete: vi.fn() }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const { result } = renderHook(() => useInterviewChat());
 

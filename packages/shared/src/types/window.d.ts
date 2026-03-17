@@ -132,38 +132,6 @@ declare global {
       subscribe: (callback: (polls: any[]) => void) => () => void; // eslint-disable-line @typescript-eslint/no-explicit-any
     };
 
-    /* ── Interview Sessions ──────────────────────────────────── */
-    __interviewApi?: {
-      save: (session: {
-        sessionId: string;
-        question: string;
-        document: string;
-        messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
-        sessionName?: string;
-        interviewState?: Record<string, unknown>;
-        scores?: Array<Record<string, unknown>>;
-        config?: Record<string, unknown>;
-      }) => Promise<{ ok: boolean; sessionId: string }>;
-      list: () => Promise<{
-        sessions: Array<{
-          id: string;
-          questionPreview: string;
-          messageCount: number;
-          updatedAt: number | null;
-          createdAt: number | null;
-        }>;
-      }>;
-      load: (sessionId: string) => Promise<{
-        session: {
-          id: string;
-          question: string;
-          document: string;
-          messages: Array<{ id: string; role: string; content: string; timestamp: number }>;
-        };
-      }>;
-      delete: (sessionId: string) => Promise<{ ok: boolean }>;
-    };
-
     /* ── Travel Pins ────────────────────────────────────────── */
     __travelPins?: {
       getAll: () => Promise<Array<{ id: string; type: string; name: string; notes?: string; dateRange?: { start: string; end: string }; lat: number; lon: number; createdAt: number }>>;

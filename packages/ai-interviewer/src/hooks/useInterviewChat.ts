@@ -1,5 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useMutation, AI_CHAT } from '@mycircle/shared';
+import {
+  useMutation,
+  useLazyQuery,
+  AI_CHAT,
+  SAVE_INTERVIEW_SESSION,
+  DELETE_INTERVIEW_SESSION,
+  GET_INTERVIEW_SESSIONS,
+  GET_INTERVIEW_SESSION,
+} from '@mycircle/shared';
 import type {
   InterviewConfig,
   InterviewState,
@@ -152,8 +160,8 @@ export interface InterviewSession {
   id: string;
   questionPreview: string;
   messageCount: number;
-  updatedAt: number | null;
-  createdAt: number | null;
+  updatedAt: string | null;
+  createdAt: string | null;
 }
 
 export function useInterviewChat() {
@@ -200,36 +208,49 @@ export function useInterviewChat() {
   }, [state.messages]);
 
   const [aiChatMutation] = useMutation(AI_CHAT);
+  const [saveSessionMutation] = useMutation(SAVE_INTERVIEW_SESSION);
+  const [deleteSessionMutation] = useMutation(DELETE_INTERVIEW_SESSION);
+  const [fetchSessions] = useLazyQuery(GET_INTERVIEW_SESSIONS, { fetchPolicy: 'network-only' });
+  const [fetchSession] = useLazyQuery(GET_INTERVIEW_SESSION, { fetchPolicy: 'network-only' });
 
-  // Debounced save to Firebase
+  // Debounced save to Firebase via GraphQL
   const saveToFirebase = useCallback(() => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(async () => {
-      if (!window.__interviewApi || state.messages.length === 0) return;
+      if (state.messages.length === 0) return;
       try {
         setSaveStatus('saving');
-        await window.__interviewApi.save({
-          sessionId: sessionIdRef.current,
-          question: questionRef.current,
-          document: documentRef.current,
-          messages: state.messages,
-          sessionName: sessionNameRef.current || undefined,
-          interviewState: interviewStateRef.current
-            ? (interviewStateRef.current as unknown as Record<string, unknown>)
-            : undefined,
-          scores: interviewStateRef.current?.scores
-            ? (interviewStateRef.current.scores as unknown as Array<Record<string, unknown>>)
-            : undefined,
-          config: interviewStateRef.current?.config
-            ? (interviewStateRef.current.config as unknown as Record<string, unknown>)
-            : undefined,
+        await saveSessionMutation({
+          variables: {
+            input: {
+              sessionId: sessionIdRef.current,
+              question: questionRef.current,
+              document: documentRef.current,
+              messages: state.messages.map((m) => ({
+                id: m.id,
+                role: m.role,
+                content: m.content,
+                timestamp: m.timestamp,
+              })),
+              sessionName: sessionNameRef.current || undefined,
+              interviewState: interviewStateRef.current
+                ? (interviewStateRef.current as unknown as Record<string, unknown>)
+                : undefined,
+              scores: interviewStateRef.current?.scores
+                ? (interviewStateRef.current.scores as unknown as Record<string, unknown>)
+                : undefined,
+              config: interviewStateRef.current?.config
+                ? (interviewStateRef.current.config as unknown as Record<string, unknown>)
+                : undefined,
+            },
+          },
         });
         setSaveStatus('saved');
       } catch {
         setSaveStatus('error');
       }
     }, 2000);
-  }, [state.messages]);
+  }, [state.messages, saveSessionMutation]);
 
   // Auto-save to Firebase on message changes
   useEffect(() => {
@@ -586,29 +607,30 @@ export function useInterviewChat() {
     interviewStateRef.current = null;
   }, []);
 
-  // Load sessions list from Firebase
+  // Load sessions list via GraphQL
   const loadSessions = useCallback(async () => {
-    if (!window.__interviewApi) return;
     try {
-      const result = await window.__interviewApi.list();
-      setSessions(result.sessions);
+      const { data } = await fetchSessions();
+      if (data?.interviewSessions) {
+        setSessions(data.interviewSessions as InterviewSession[]);
+      }
     } catch { /* */ }
-  }, []);
+  }, [fetchSessions]);
 
-  // Load a specific session from Firebase
+  // Load a specific session via GraphQL
   const loadSession = useCallback(async (sessionId: string) => {
-    if (!window.__interviewApi) return;
     try {
-      const result = await window.__interviewApi.load(sessionId);
-      const { session } = result;
+      const { data } = await fetchSession({ variables: { id: sessionId } });
+      const session = data?.interviewSession;
+      if (!session) return null;
+
       questionRef.current = session.question;
       documentRef.current = session.document;
       sessionIdRef.current = sessionId;
 
       // Restore V2 interview state if present
-      const rawSession = session as Record<string, unknown>;
-      if (rawSession.interviewState) {
-        const restored = rawSession.interviewState as InterviewState;
+      if (session.interviewState) {
+        const restored = session.interviewState as unknown as InterviewState;
         setInterviewState(restored);
         interviewStateRef.current = restored;
       } else {
@@ -616,13 +638,14 @@ export function useInterviewChat() {
         interviewStateRef.current = null;
       }
 
+      const messages = session.messages as ChatMessage[];
       setState({
-        messages: session.messages as ChatMessage[],
+        messages,
         loading: false,
         error: null,
       });
       persistState({
-        messages: session.messages as ChatMessage[],
+        messages,
         question: session.question,
         document: session.document,
         sessionId,
@@ -632,13 +655,12 @@ export function useInterviewChat() {
       return session;
     } catch { /* */ }
     return null;
-  }, []);
+  }, [fetchSession]);
 
-  // Delete a session from Firebase — if it's the active session, reset to fresh state
+  // Delete a session via GraphQL — if it's the active session, reset to fresh state
   const deleteSession = useCallback(async (sessionId: string) => {
-    if (!window.__interviewApi) return;
     try {
-      await window.__interviewApi.delete(sessionId);
+      await deleteSessionMutation({ variables: { id: sessionId } });
       setSessions(prev => prev.filter(s => s.id !== sessionId));
       if (sessionId === sessionIdRef.current) {
         questionRef.current = '';
@@ -653,7 +675,7 @@ export function useInterviewChat() {
         interviewStateRef.current = null;
       }
     } catch { /* */ }
-  }, []);
+  }, [deleteSessionMutation]);
 
   const hasPersistedSession = persisted !== null && persisted.messages.length > 0;
 

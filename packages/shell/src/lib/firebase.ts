@@ -2026,30 +2026,4 @@ if (firebaseEnabled) {
   };
 }
 
-// ─── Interview Sessions API bridge ──────────────────────────────────
-if (firebaseEnabled) {
-  const interviewApiCall = async (path: string, method: string, body?: unknown) => {
-    if (!auth?.currentUser) throw new Error('Not authenticated');
-    const token = await auth.currentUser.getIdToken();
-    const opts: RequestInit = {
-      method,
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    };
-    if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(`/interview-api/${path}`, opts);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err.error || res.statusText);
-    }
-    return res.json();
-  };
-
-  window.__interviewApi = {
-    save: (session) => interviewApiCall('save', 'POST', session),
-    list: () => interviewApiCall('sessions', 'GET'),
-    load: (sessionId) => interviewApiCall(`load/${sessionId}`, 'GET'),
-    delete: (sessionId) => interviewApiCall(`delete/${sessionId}`, 'DELETE'),
-  };
-}
-
 export { app, auth, db, perf, analytics, firebaseEnabled };
