@@ -31,7 +31,6 @@ function formatTime(iso: string): string {
 }
 
 export default function WebCrawler() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation() as { t: (key: string) => string };
   const [url, setUrl] = useState('');
   const [maxDepth, setMaxDepth] = useState(2);
