@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useQuestionBank } from './useQuestionBank';
 
 const mockQuestionBank = {
@@ -74,7 +74,7 @@ describe('useQuestionBank', () => {
   });
 
   it('returns loading state', () => {
-    mockQueryResult = { data: undefined as any, loading: true, error: undefined };
+    mockQueryResult = { data: undefined as unknown, loading: true, error: undefined };
 
     const { result } = renderHook(() => useQuestionBank());
 
@@ -83,7 +83,7 @@ describe('useQuestionBank', () => {
   });
 
   it('returns error from query', () => {
-    mockQueryResult = { data: undefined as any, loading: false, error: new Error('Failed to load question bank') };
+    mockQueryResult = { data: undefined as unknown, loading: false, error: new Error('Failed to load question bank') };
 
     const { result } = renderHook(() => useQuestionBank());
 
