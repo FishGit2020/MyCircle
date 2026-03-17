@@ -317,6 +317,50 @@ export type CompanyNews = {
   url: Scalars['String']['output'];
 };
 
+export type CrawlJob = {
+  __typename?: 'CrawlJob';
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  maxDepth: Scalars['Int']['output'];
+  maxPages: Scalars['Int']['output'];
+  pagesVisited: Scalars['Int']['output'];
+  status: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
+export type CrawlJobDetail = {
+  __typename?: 'CrawlJobDetail';
+  documents: Array<CrawledDocument>;
+  job: CrawlJob;
+  traces: Array<CrawlTrace>;
+};
+
+export type CrawlTrace = {
+  __typename?: 'CrawlTrace';
+  durationMs?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  jobId: Scalars['String']['output'];
+  level: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  timestamp: Scalars['String']['output'];
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type CrawledDocument = {
+  __typename?: 'CrawledDocument';
+  contentPreview?: Maybe<Scalars['String']['output']>;
+  contentType?: Maybe<Scalars['String']['output']>;
+  crawledAt: Scalars['String']['output'];
+  depth: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  jobId: Scalars['String']['output'];
+  size: Scalars['Int']['output'];
+  statusCode: Scalars['Int']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+  url: Scalars['String']['output'];
+};
+
 export type CreateInterviewQuestionInput = {
   chapter: Scalars['String']['input'];
   chapterSlug: Scalars['String']['input'];
@@ -469,6 +513,7 @@ export type Mutation = {
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
   deleteBenchmarkRun: Scalars['Boolean']['output'];
   deleteBook: Scalars['Boolean']['output'];
+  deleteCrawlJob: Scalars['Boolean']['output'];
   deleteFile: Scalars['Boolean']['output'];
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
@@ -482,6 +527,8 @@ export type Mutation = {
   saveInterviewSession: InterviewSessionDetail;
   scoreBenchmarkResponse: BenchmarkQualityResult;
   shareFile: ShareFileResult;
+  startCrawl: CrawlJob;
+  stopCrawl: CrawlJob;
   updateInterviewQuestion: InterviewQuestion;
   updateWorshipSong: WorshipSong;
 };
@@ -529,6 +576,11 @@ export type MutationDeleteBenchmarkRunArgs = {
 
 
 export type MutationDeleteBookArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteCrawlJobArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -601,6 +653,16 @@ export type MutationScoreBenchmarkResponseArgs = {
 
 export type MutationShareFileArgs = {
   fileId: Scalars['ID']['input'];
+};
+
+
+export type MutationStartCrawlArgs = {
+  input: StartCrawlInput;
+};
+
+
+export type MutationStopCrawlArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -702,6 +764,8 @@ export type Query = {
   checkCaseStatus: CaseStatus;
   cloudFiles: Array<CloudFile>;
   companyNews: Array<CompanyNews>;
+  crawlJobDetail?: Maybe<CrawlJobDetail>;
+  crawlJobs: Array<CrawlJob>;
   cryptoPrices: Array<CryptoPrice>;
   currentWeather: CurrentWeather;
   deals: Array<Deal>;
@@ -796,6 +860,11 @@ export type QueryCompanyNewsArgs = {
   from: Scalars['String']['input'];
   symbol: Scalars['String']['input'];
   to: Scalars['String']['input'];
+};
+
+
+export type QueryCrawlJobDetailArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -979,6 +1048,12 @@ export type SharedFile = {
   sharedByUid: Scalars['String']['output'];
   size: Scalars['Int']['output'];
   storagePath: Scalars['String']['output'];
+};
+
+export type StartCrawlInput = {
+  maxDepth?: InputMaybe<Scalars['Int']['input']>;
+  maxPages?: InputMaybe<Scalars['Int']['input']>;
+  url: Scalars['String']['input'];
 };
 
 export type StockCandle = {
@@ -1671,6 +1746,39 @@ export type WeatherUpdatesSubscriptionVariables = Exact<{
 
 
 export type WeatherUpdatesSubscription = { __typename?: 'Subscription', weatherUpdates: { __typename?: 'WeatherUpdate', lat: number, lon: number, timestamp: string, current: { __typename?: 'CurrentWeather', temp: number, feels_like: number, temp_min: number, temp_max: number, pressure: number, humidity: number, dt: number, timezone: number, sunrise?: number | null, sunset?: number | null, visibility?: number | null, weather: Array<{ __typename?: 'WeatherCondition', id: number, main: string, description: string, icon: string }>, wind: { __typename?: 'Wind', speed: number, deg: number, gust?: number | null }, clouds: { __typename?: 'Clouds', all: number } } } };
+
+export type GetCrawlJobsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCrawlJobsQuery = { __typename?: 'Query', crawlJobs: Array<{ __typename?: 'CrawlJob', id: string, url: string, status: string, maxDepth: number, maxPages: number, pagesVisited: number, createdAt: string, updatedAt: string }> };
+
+export type GetCrawlJobDetailQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetCrawlJobDetailQuery = { __typename?: 'Query', crawlJobDetail?: { __typename?: 'CrawlJobDetail', job: { __typename?: 'CrawlJob', id: string, url: string, status: string, maxDepth: number, maxPages: number, pagesVisited: number, createdAt: string, updatedAt: string }, documents: Array<{ __typename?: 'CrawledDocument', id: string, jobId: string, url: string, title?: string | null, contentPreview?: string | null, statusCode: number, contentType?: string | null, crawledAt: string, size: number, depth: number }>, traces: Array<{ __typename?: 'CrawlTrace', id: string, jobId: string, timestamp: string, level: string, message: string, url?: string | null, durationMs?: number | null }> } | null };
+
+export type StartCrawlMutationVariables = Exact<{
+  input: StartCrawlInput;
+}>;
+
+
+export type StartCrawlMutation = { __typename?: 'Mutation', startCrawl: { __typename?: 'CrawlJob', id: string, url: string, status: string, maxDepth: number, maxPages: number, pagesVisited: number, createdAt: string, updatedAt: string } };
+
+export type StopCrawlMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type StopCrawlMutation = { __typename?: 'Mutation', stopCrawl: { __typename?: 'CrawlJob', id: string, url: string, status: string, maxDepth: number, maxPages: number, pagesVisited: number, createdAt: string, updatedAt: string } };
+
+export type DeleteCrawlJobMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteCrawlJobMutation = { __typename?: 'Mutation', deleteCrawlJob: boolean };
 
 export type GetDealsQueryVariables = Exact<{ [key: string]: never; }>;
 

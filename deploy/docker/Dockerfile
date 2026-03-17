@@ -36,6 +36,7 @@ COPY packages/ai-interviewer/package.json packages/ai-interviewer/
 COPY packages/transit-tracker/package.json packages/transit-tracker/
 COPY packages/travel-map/package.json packages/travel-map/
 COPY packages/deal-finder/package.json packages/deal-finder/
+COPY packages/web-crawler/package.json packages/web-crawler/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -99,6 +100,7 @@ COPY --from=builder /app/packages/ai-interviewer/package.json packages/ai-interv
 COPY --from=builder /app/packages/transit-tracker/package.json packages/transit-tracker/
 COPY --from=builder /app/packages/travel-map/package.json packages/travel-map/
 COPY --from=builder /app/packages/deal-finder/package.json packages/deal-finder/
+COPY --from=builder /app/packages/web-crawler/package.json packages/web-crawler/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune

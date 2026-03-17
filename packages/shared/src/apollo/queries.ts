@@ -1053,6 +1053,97 @@ export const WEATHER_UPDATES = gql`
   }
 `;
 
+// ─── Web Crawler ────────────────────────────────────────────────
+
+export const GET_CRAWL_JOBS = gql`
+  query GetCrawlJobs {
+    crawlJobs {
+      id
+      url
+      status
+      maxDepth
+      maxPages
+      pagesVisited
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_CRAWL_JOB_DETAIL = gql`
+  query GetCrawlJobDetail($id: ID!) {
+    crawlJobDetail(id: $id) {
+      job {
+        id
+        url
+        status
+        maxDepth
+        maxPages
+        pagesVisited
+        createdAt
+        updatedAt
+      }
+      documents {
+        id
+        jobId
+        url
+        title
+        contentPreview
+        statusCode
+        contentType
+        crawledAt
+        size
+        depth
+      }
+      traces {
+        id
+        jobId
+        timestamp
+        level
+        message
+        url
+        durationMs
+      }
+    }
+  }
+`;
+
+export const START_CRAWL = gql`
+  mutation StartCrawl($input: StartCrawlInput!) {
+    startCrawl(input: $input) {
+      id
+      url
+      status
+      maxDepth
+      maxPages
+      pagesVisited
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const STOP_CRAWL = gql`
+  mutation StopCrawl($id: ID!) {
+    stopCrawl(id: $id) {
+      id
+      url
+      status
+      maxDepth
+      maxPages
+      pagesVisited
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_CRAWL_JOB = gql`
+  mutation DeleteCrawlJob($id: ID!) {
+    deleteCrawlJob(id: $id)
+  }
+`;
+
 // ─── Deals ──────────────────────────────────────────────────────
 export const GET_DEALS = gql`
   query GetDeals {

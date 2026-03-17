@@ -29,6 +29,7 @@ export default {
     "../transit-tracker/src/**/*.{js,ts,jsx,tsx}",
     "../travel-map/src/**/*.{js,ts,jsx,tsx}",
     "../deal-finder/src/**/*.{js,ts,jsx,tsx}",
+    "../web-crawler/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

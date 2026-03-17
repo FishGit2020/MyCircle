@@ -127,6 +127,22 @@ export type {
   // Deals
   GetDealsQuery,
   Deal as GqlDeal,
+  // Web Crawler
+  GetCrawlJobsQuery,
+  GetCrawlJobsQueryVariables,
+  GetCrawlJobDetailQuery,
+  GetCrawlJobDetailQueryVariables,
+  StartCrawlMutation,
+  StartCrawlMutationVariables,
+  StopCrawlMutation,
+  StopCrawlMutationVariables,
+  DeleteCrawlJobMutation,
+  DeleteCrawlJobMutationVariables,
+  CrawlJob as GqlCrawlJob,
+  CrawlJobDetail as GqlCrawlJobDetail,
+  CrawledDocument as GqlCrawledDocument,
+  CrawlTrace as GqlCrawlTrace,
+  StartCrawlInput,
   // Digital Library
   GetBooksQuery,
   GetBookChaptersQuery,
