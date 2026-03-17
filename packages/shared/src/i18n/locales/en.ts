@@ -2384,6 +2384,8 @@ const en = {
   'aiInterviewer.questionDeleted': 'Question deleted',
   'aiInterviewer.allChapters': 'All Chapters',
   'aiInterviewer.allDifficulties': 'All Difficulties',
+  'aiInterviewer.noQuestionsInBank': 'No questions in the bank yet. Click "Manage Questions" to add some.',
+  'aiInterviewer.addQuestionsFirst': 'Add questions to the bank first',
 
   'widgets.aiAssistant': 'AI Assistant',
   'widgets.aiAssistantDesc': 'Chat with your AI assistant',
