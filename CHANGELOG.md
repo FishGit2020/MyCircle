@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.3...mycircle-v1.2.0) (2026-03-17)
+
+
+### Features
+
+* add a11y-fixer, test-gap-filler, and route-validator agents ([#775](https://github.com/FishGit2020/MyCircle/issues/775)) ([5dfff2f](https://github.com/FishGit2020/MyCircle/commit/5dfff2f15e41ad29891d59644c15bead9caf62ec))
+
+
+### Bug Fixes
+
+* **ci:** add workflow to post required status checks for Release Please PRs ([#772](https://github.com/FishGit2020/MyCircle/issues/772)) ([9a7a7a1](https://github.com/FishGit2020/MyCircle/commit/9a7a7a10adcbf8bc7e827372920eae92b13064a9))
+
 ## [1.1.3](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.2...mycircle-v1.1.3) (2026-03-17)
 
 
