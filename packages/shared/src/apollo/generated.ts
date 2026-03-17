@@ -95,6 +95,19 @@ export type AirQuality = {
   so2: Scalars['Float']['output'];
 };
 
+export type BabyInfo = {
+  __typename?: 'BabyInfo';
+  animal: Scalars['String']['output'];
+  currentDay: Scalars['Int']['output'];
+  currentWeek: Scalars['Int']['output'];
+  dueDate: Scalars['String']['output'];
+  fruit: Scalars['String']['output'];
+  length: Scalars['String']['output'];
+  vegetable: Scalars['String']['output'];
+  weeksRemaining: Scalars['Int']['output'];
+  weight: Scalars['String']['output'];
+};
+
 export type BabyPhoto = {
   __typename?: 'BabyPhoto';
   caption?: Maybe<Scalars['String']['output']>;
@@ -345,6 +358,35 @@ export type CurrentWeather = {
   wind: Wind;
 };
 
+export type DailyLogEntry = {
+  __typename?: 'DailyLogEntry';
+  content: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  date: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
+export type DailyLogInput = {
+  content: Scalars['String']['input'];
+  date?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Deal = {
+  __typename?: 'Deal';
+  category?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  originalPrice?: Maybe<Scalars['String']['output']>;
+  postedAt: Scalars['String']['output'];
+  price?: Maybe<Scalars['String']['output']>;
+  score?: Maybe<Scalars['Int']['output']>;
+  source: Scalars['String']['output'];
+  store?: Maybe<Scalars['String']['output']>;
+  thumbnail?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
 export type ForecastDay = {
   __typename?: 'ForecastDay';
   dt: Scalars['Int']['output'];
@@ -421,6 +463,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
+  createDailyLog: DailyLogEntry;
   createInterviewQuestion: InterviewQuestion;
   deleteBabyPhoto: Scalars['Boolean']['output'];
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
@@ -457,6 +500,11 @@ export type MutationAiChatArgs = {
   model?: InputMaybe<Scalars['String']['input']>;
   systemPrompt?: InputMaybe<Scalars['String']['input']>;
   toolMode?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateDailyLogArgs = {
+  input: DailyLogInput;
 };
 
 
@@ -567,6 +615,15 @@ export type MutationUpdateWorshipSongArgs = {
   input: WorshipSongUpdateInput;
 };
 
+export type Note = {
+  __typename?: 'Note';
+  content: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
 export type OllamaRunningModel = {
   __typename?: 'OllamaRunningModel';
   expiresAt: Scalars['String']['output'];
@@ -629,6 +686,7 @@ export type Query = {
   aiRecentLogs: Array<AiChatLogEntry>;
   aiUsageSummary: AiUsageSummary;
   airQuality?: Maybe<AirQuality>;
+  babyInfo: BabyInfo;
   babyPhotos: Array<BabyPhoto>;
   benchmarkEndpointModels: Array<Scalars['String']['output']>;
   benchmarkEndpoints: Array<BenchmarkEndpoint>;
@@ -646,12 +704,14 @@ export type Query = {
   companyNews: Array<CompanyNews>;
   cryptoPrices: Array<CryptoPrice>;
   currentWeather: CurrentWeather;
+  deals: Array<Deal>;
   forecast: Array<ForecastDay>;
   historicalWeather?: Maybe<HistoricalWeatherDay>;
   hourlyForecast: Array<HourlyForecast>;
   interviewSession?: Maybe<InterviewSessionDetail>;
   interviewSessions: Array<InterviewSessionSummary>;
   locationSearch: Array<LocationSearchResult>;
+  notes: Array<Note>;
   ollamaModels: Array<Scalars['String']['output']>;
   ollamaStatus: OllamaStatus;
   podcastEpisodes: PodcastEpisodesResponse;
@@ -778,6 +838,12 @@ export type QueryInterviewSessionArgs = {
 export type QueryLocationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
+};
+
+
+export type QueryNotesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1605,3 +1671,8 @@ export type WeatherUpdatesSubscriptionVariables = Exact<{
 
 
 export type WeatherUpdatesSubscription = { __typename?: 'Subscription', weatherUpdates: { __typename?: 'WeatherUpdate', lat: number, lon: number, timestamp: string, current: { __typename?: 'CurrentWeather', temp: number, feels_like: number, temp_min: number, temp_max: number, pressure: number, humidity: number, dt: number, timezone: number, sunrise?: number | null, sunset?: number | null, visibility?: number | null, weather: Array<{ __typename?: 'WeatherCondition', id: number, main: string, description: string, icon: string }>, wind: { __typename?: 'Wind', speed: number, deg: number, gust?: number | null }, clouds: { __typename?: 'Clouds', all: number } } } };
+
+export type GetDealsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDealsQuery = { __typename?: 'Query', deals: Array<{ __typename?: 'Deal', id: string, title: string, url: string, source: string, price?: string | null, originalPrice?: string | null, store?: string | null, category?: string | null, thumbnail?: string | null, postedAt: string, score?: number | null }> };

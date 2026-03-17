@@ -1,29 +1,27 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useDeals } from './useDeals';
 
+const mockRefetch = vi.fn();
+
 vi.mock('@mycircle/shared', () => ({
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
+  useQuery: vi.fn(() => ({
+    loading: false,
+    refetch: mockRefetch,
+  })),
+  GET_DEALS: { kind: 'Document', definitions: [] },
 }));
 
 describe('useDeals', () => {
   beforeEach(() => {
     localStorage.clear();
-    (window as any).__getFirebaseIdToken = undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
-    vi.spyOn(global, 'fetch').mockResolvedValue({
-      ok: false,
-      status: 404,
-    } as Response);
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('returns demo deals when not authenticated', async () => {
+  it('returns demo deals when GraphQL has no data yet', () => {
     const { result } = renderHook(() => useDeals());
 
-    // Should have initial demo deals
+    // Should have initial demo deals (cache empty, no GraphQL response yet)
     expect(result.current.deals.length).toBeGreaterThan(0);
     expect(result.current.deals[0].title).toContain('Sony');
   });
