@@ -2384,6 +2384,8 @@ const zh: Record<TranslationKey, string> = {
   'aiInterviewer.questionDeleted': '\u9898\u76ee\u5df2\u5220\u9664',
   'aiInterviewer.allChapters': '\u6240\u6709\u7ae0\u8282',
   'aiInterviewer.allDifficulties': '\u6240\u6709\u96be\u5ea6',
+  'aiInterviewer.noQuestionsInBank': '\u9898\u5e93\u5c1a\u65e0\u9898\u76ee\uff0c\u8bf7\u70b9\u51fb\u201c\u7ba1\u7406\u9898\u76ee\u201d\u6dfb\u52a0\u3002',
+  'aiInterviewer.addQuestionsFirst': '\u8bf7\u5148\u5411\u9898\u5e93\u6dfb\u52a0\u9898\u76ee',
 
   'widgets.aiAssistant': 'AI \u52a9\u624b',
   'widgets.aiAssistantDesc': '\u4e0e\u4f60\u7684 AI \u52a9\u624b\u804a\u5929',
