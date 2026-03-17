@@ -484,6 +484,10 @@ export const typeDefs = `#graphql
     bookChapters(bookId: ID!): [BookChapter!]!
     bookConversionProgress(bookId: ID!): BookConversionProgress!
     ttsQuota: TtsQuota!
+
+    # Web Crawler (auth required)
+    crawlJobs: [CrawlJob!]!
+    crawlJobDetail(id: ID!): CrawlJobDetail
   }
 
   # ─── AI Usage & Monitoring Types ──────────────────────────────
@@ -779,6 +783,54 @@ export const typeDefs = `#graphql
     tags: [String!]
   }
 
+  # ─── Web Crawler Types ──────────────────────────────────────
+
+  type CrawlJob {
+    id: ID!
+    url: String!
+    status: String!
+    maxDepth: Int!
+    maxPages: Int!
+    pagesVisited: Int!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  type CrawledDocument {
+    id: ID!
+    jobId: String!
+    url: String!
+    title: String
+    contentPreview: String
+    statusCode: Int!
+    contentType: String
+    crawledAt: String!
+    size: Int!
+    depth: Int!
+  }
+
+  type CrawlTrace {
+    id: ID!
+    jobId: String!
+    timestamp: String!
+    level: String!
+    message: String!
+    url: String
+    durationMs: Int
+  }
+
+  type CrawlJobDetail {
+    job: CrawlJob!
+    documents: [CrawledDocument!]!
+    traces: [CrawlTrace!]!
+  }
+
+  input StartCrawlInput {
+    url: String!
+    maxDepth: Int
+    maxPages: Int
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String, systemPrompt: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
@@ -815,6 +867,11 @@ export const typeDefs = `#graphql
     deleteBook(id: ID!): Boolean!
     restoreBook(id: ID!): Boolean!
     permanentDeleteBook(id: ID!): Boolean!
+
+    # Web Crawler (auth required)
+    startCrawl(input: StartCrawlInput!): CrawlJob!
+    stopCrawl(id: ID!): CrawlJob!
+    deleteCrawlJob(id: ID!): Boolean!
   }
 
   schema {

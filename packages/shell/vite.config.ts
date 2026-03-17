@@ -200,6 +200,10 @@ const dealFinderRemote = isProduction
   ? '/deal-finder/assets/remoteEntry.js'
   : 'http://localhost:3030/assets/remoteEntry.js';
 
+const webCrawlerRemote = isProduction
+  ? '/web-crawler/assets/remoteEntry.js'
+  : 'http://localhost:3031/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -233,7 +237,8 @@ export default defineConfig({
         aiInterviewer: aiInterviewerRemote,
         transitTracker: transitTrackerRemote,
         travelMap: travelMapRemote,
-        dealFinder: dealFinderRemote
+        dealFinder: dealFinderRemote,
+        webCrawler: webCrawlerRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

@@ -50,6 +50,7 @@ export default defineConfig({
       'transitTracker/TransitTracker': resolve(__dirname, './test/mocks/TransitTrackerMock.tsx'),
       'travelMap/TravelMap': resolve(__dirname, './test/mocks/TravelMapMock.tsx'),
       'dealFinder/DealFinder': resolve(__dirname, './test/mocks/DealFinderMock.tsx'),
+      'webCrawler/WebCrawler': resolve(__dirname, './test/mocks/WebCrawlerMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

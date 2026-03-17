@@ -7,5 +7,8 @@ export { digitalLibrary } from './handlers/digitalLibrary.js';
 export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.js';
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';
 
+// Web Crawler — Firestore-triggered crawl worker
+export { crawlWorker } from './handlers/webCrawler.js';
+
 // Re-export shared utilities that were previously exported from index.ts
 export { uploadToStorage, getStorageDownloadUrl } from './handlers/shared.js';

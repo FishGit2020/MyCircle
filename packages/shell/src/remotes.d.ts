@@ -140,3 +140,8 @@ declare module 'dealFinder/DealFinder' {
   const DealFinder: React.ComponentType;
   export default DealFinder;
 }
+
+declare module 'webCrawler/WebCrawler' {
+  const WebCrawler: React.ComponentType;
+  export default WebCrawler;
+}
