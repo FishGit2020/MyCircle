@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.1...mycircle-v1.1.2) (2026-03-17)
+
+
+### Code Refactoring
+
+* remove stockProxy and podcastProxy REST Cloud Functions ([#768](https://github.com/FishGit2020/MyCircle/issues/768)) ([6db2548](https://github.com/FishGit2020/MyCircle/commit/6db2548394c34171b8c86287a7ae6ce8eee5a20e))
+
 ## [1.1.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.0...mycircle-v1.1.1) (2026-03-17)
 
 
