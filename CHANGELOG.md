@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.0...mycircle-v1.1.1) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** ensure gate checks report on docs-only PRs ([#766](https://github.com/FishGit2020/MyCircle/issues/766)) ([d2ef4d2](https://github.com/FishGit2020/MyCircle/commit/d2ef4d2d9363d803c264278e79447f471bbde25f))
+
 ## [1.1.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.0.0...mycircle-v1.1.0) (2026-03-17)
 
 
