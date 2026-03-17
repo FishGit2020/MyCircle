@@ -10,7 +10,7 @@ The `main` branch is protected with the following rules configured via GitHub:
 
 | Rule | Setting | Why |
 |------|---------|-----|
-| **Required status checks** | `ci`, `e2e` | PRs cannot merge until unit tests/typecheck AND E2E tests pass |
+| **Required status checks** | `ci`, `e2e-gate`, `spec-check` | PRs cannot merge until unit tests/typecheck, E2E gate, AND spec guard pass |
 | **Require up-to-date branch** | Enabled | PR must be rebased on latest `main` before merging — prevents "works on my branch" failures |
 | **Enforce for admins** | Enabled | Even repository admins cannot bypass required checks |
 | **Force pushes** | Blocked | No `git push --force` to `main` |
@@ -37,6 +37,8 @@ Either ❌ →  PR is blocked
 ```
 
 > **Note:** The `e2e-emulator` job (full-stack Firebase emulator tests) runs in parallel but is **not** a required check. It provides extra confidence but won't block a merge if it fails.
+
+> **Note:** The `spec-check` job (`.github/workflows/spec-guard.yml`) verifies that new MFE packages have a spec file in `docs/specs/`. It is a **required** check — PRs adding new MFEs will be blocked until a spec exists.
 
 ---
 
@@ -170,7 +172,7 @@ git push
 
 ### 7. Merge
 
-Once both `ci` and `e2e` checks pass:
+Once all required checks (`ci`, `e2e-gate`, `spec-check`) pass:
 
 ```bash
 gh pr merge --squash
@@ -247,18 +249,18 @@ gh api repos/FishGit2020/MyCircle/branches/main/protection \
   }'
 ```
 
-To add a new required check (e.g., making `e2e-emulator` required):
+To add a new required check:
 
 ```bash
 gh api repos/FishGit2020/MyCircle/branches/main/protection/required_status_checks \
-  --method PATCH --input - <<< '{"contexts": ["ci", "e2e", "e2e-emulator"], "strict": true}'
+  --method PATCH --input - <<< '{"contexts": ["ci", "e2e-gate", "spec-check", "NEW_CHECK"], "strict": true}'
 ```
 
-To remove a check:
+To remove one (keep the others):
 
 ```bash
 gh api repos/FishGit2020/MyCircle/branches/main/protection/required_status_checks \
-  --method PATCH --input - <<< '{"contexts": ["ci", "e2e"], "strict": true}'
+  --method PATCH --input - <<< '{"contexts": ["ci", "e2e-gate", "spec-check"], "strict": true}'
 ```
 
 ---
