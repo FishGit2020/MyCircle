@@ -10,7 +10,7 @@ import { useChildren, getAgeInMonths, getAgeRemainingDays } from './useChildren'
 describe('useChildren', () => {
   beforeEach(() => {
     localStorage.clear();
-    delete (window as any).__children;
+    delete (window as any).__children; // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   it('returns empty children list when nothing is cached', () => {

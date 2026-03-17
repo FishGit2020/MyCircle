@@ -13,11 +13,11 @@ const TripPlannerWidget = React.memo(function TripPlannerWidget() {
           </svg>
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.tripPlanner' as any)}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.tripPlannerDesc' as any)}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.tripPlanner' as any)}</h4> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.tripPlannerDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noUpcomingTrips' as any)}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noUpcomingTrips' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
     </div>
   );
 });

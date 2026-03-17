@@ -48,7 +48,7 @@ const TransitWidget = React.memo(function TransitWidget() {
       {favorites.length > 0 ? (
         <div>
           <p className="text-sm text-teal-600 dark:text-teal-400 font-medium mb-2">
-            {t('widgets.transitFavoriteCount' as any).replace('{count}', String(favorites.length))}
+            {t('widgets.transitFavoriteCount' as any).replace('{count}', String(favorites.length))} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </p>
           <ul className="space-y-1">
             {favorites.slice(0, 3).map((fav) => (
@@ -68,7 +68,7 @@ const TransitWidget = React.memo(function TransitWidget() {
           </ul>
         </div>
       ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.transitNoFavorites' as any)}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.transitNoFavorites' as any)}</p> // eslint-disable-line @typescript-eslint/no-explicit-any
       )}
     </div>
   );

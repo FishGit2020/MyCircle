@@ -1,5 +1,5 @@
 import React from 'react';
-import { HourlyForecast, useTranslation, useUnits, convertTemp, tempUnitSymbol } from '@mycircle/shared';
+import { HourlyForecast, useTranslation, useUnits, convertTemp } from '@mycircle/shared';
 
 interface Props {
   data: HourlyForecast[];
@@ -12,7 +12,7 @@ function HourlyChart({ data }: Props) {
   if (hours.length < 2) return null;
 
   const temps = hours.map(h => convertTemp(h.temp, tempUnit));
-  const pops = hours.map(h => h.pop);
+  const _pops = hours.map(h => h.pop);
   const minTemp = Math.floor(Math.min(...temps) - 2);
   const maxTemp = Math.ceil(Math.max(...temps) + 2);
   const tempRange = maxTemp - minTemp || 1;

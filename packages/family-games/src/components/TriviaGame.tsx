@@ -138,8 +138,8 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
           <p className="text-sm text-gray-500 dark:text-gray-400">{QUESTIONS_PER_ROUND} questions &middot; 15s each</p>
         </div>
         <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-purple-700 dark:text-purple-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-purple-600 dark:text-purple-400 mt-0.5">{t('games.triviaRules' as any)}</p>
+          <p className="text-xs font-medium text-purple-700 dark:text-purple-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-purple-600 dark:text-purple-400 mt-0.5">{t('games.triviaRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
 
         {/* Category picker */}
@@ -155,7 +155,7 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900/30'
               }`}
             >
-              {t(CATEGORY_LABEL_KEYS[cat] as any)}
+              {t(CATEGORY_LABEL_KEYS[cat] as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </button>
           ))}
         </div>

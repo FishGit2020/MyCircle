@@ -304,6 +304,15 @@ export type CompanyNews = {
   url: Scalars['String']['output'];
 };
 
+export type CreateInterviewQuestionInput = {
+  chapter: Scalars['String']['input'];
+  chapterSlug: Scalars['String']['input'];
+  description: Scalars['String']['input'];
+  difficulty: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  title: Scalars['String']['input'];
+};
+
 export type CryptoPrice = {
   __typename?: 'CryptoPrice';
   current_price: Scalars['Float']['output'];
@@ -366,6 +375,41 @@ export type HourlyForecast = {
   wind_speed: Scalars['Float']['output'];
 };
 
+export type InterviewQuestion = {
+  __typename?: 'InterviewQuestion';
+  chapter: Scalars['String']['output'];
+  chapterSlug: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  difficulty: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  tags: Array<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
+};
+
+export type InterviewSessionDetail = {
+  __typename?: 'InterviewSessionDetail';
+  config?: Maybe<Scalars['JSON']['output']>;
+  createdAt: Scalars['String']['output'];
+  document: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  interviewState?: Maybe<Scalars['JSON']['output']>;
+  messages: Array<SessionMessage>;
+  question: Scalars['String']['output'];
+  scores?: Maybe<Scalars['JSON']['output']>;
+  sessionName?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['String']['output'];
+};
+
+export type InterviewSessionSummary = {
+  __typename?: 'InterviewSessionSummary';
+  createdAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  messageCount: Scalars['Int']['output'];
+  mode?: Maybe<Scalars['String']['output']>;
+  questionPreview: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['String']['output']>;
+};
+
 export type LocationSearchResult = {
   __typename?: 'LocationSearchResult';
   displayName: Scalars['String']['output'];
@@ -377,11 +421,14 @@ export type Mutation = {
   __typename?: 'Mutation';
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
+  createInterviewQuestion: InterviewQuestion;
   deleteBabyPhoto: Scalars['Boolean']['output'];
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
   deleteBenchmarkRun: Scalars['Boolean']['output'];
   deleteBook: Scalars['Boolean']['output'];
   deleteFile: Scalars['Boolean']['output'];
+  deleteInterviewQuestion: Scalars['Boolean']['output'];
+  deleteInterviewSession: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
   permanentDeleteBook: Scalars['Boolean']['output'];
@@ -389,8 +436,10 @@ export type Mutation = {
   runBenchmark: BenchmarkRunResult;
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
+  saveInterviewSession: InterviewSessionDetail;
   scoreBenchmarkResponse: BenchmarkQualityResult;
   shareFile: ShareFileResult;
+  updateInterviewQuestion: InterviewQuestion;
   updateWorshipSong: WorshipSong;
 };
 
@@ -408,6 +457,11 @@ export type MutationAiChatArgs = {
   model?: InputMaybe<Scalars['String']['input']>;
   systemPrompt?: InputMaybe<Scalars['String']['input']>;
   toolMode?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationCreateInterviewQuestionArgs = {
+  input: CreateInterviewQuestionInput;
 };
 
 
@@ -433,6 +487,16 @@ export type MutationDeleteBookArgs = {
 
 export type MutationDeleteFileArgs = {
   fileId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteInterviewQuestionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteInterviewSessionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -473,6 +537,11 @@ export type MutationSaveBenchmarkRunArgs = {
 };
 
 
+export type MutationSaveInterviewSessionArgs = {
+  input: SaveInterviewSessionInput;
+};
+
+
 export type MutationScoreBenchmarkResponseArgs = {
   judgeEndpointId?: InputMaybe<Scalars['String']['input']>;
   judgeModel?: InputMaybe<Scalars['String']['input']>;
@@ -484,6 +553,12 @@ export type MutationScoreBenchmarkResponseArgs = {
 
 export type MutationShareFileArgs = {
   fileId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateInterviewQuestionArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateInterviewQuestionInput;
 };
 
 
@@ -574,11 +649,14 @@ export type Query = {
   forecast: Array<ForecastDay>;
   historicalWeather?: Maybe<HistoricalWeatherDay>;
   hourlyForecast: Array<HourlyForecast>;
+  interviewSession?: Maybe<InterviewSessionDetail>;
+  interviewSessions: Array<InterviewSessionSummary>;
   locationSearch: Array<LocationSearchResult>;
   ollamaModels: Array<Scalars['String']['output']>;
   ollamaStatus: OllamaStatus;
   podcastEpisodes: PodcastEpisodesResponse;
   podcastFeed?: Maybe<PodcastFeed>;
+  questionBank: QuestionBank;
   reverseGeocode?: Maybe<City>;
   searchCities: Array<City>;
   searchPodcasts: PodcastSearchResponse;
@@ -692,6 +770,11 @@ export type QueryHourlyForecastArgs = {
 };
 
 
+export type QueryInterviewSessionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryLocationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
@@ -779,6 +862,38 @@ export type QueryWorshipSongsListArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
   tag?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QuestionBank = {
+  __typename?: 'QuestionBank';
+  chapters: Array<Scalars['String']['output']>;
+  questions: Array<InterviewQuestion>;
+};
+
+export type SaveInterviewSessionInput = {
+  config?: InputMaybe<Scalars['JSON']['input']>;
+  document: Scalars['String']['input'];
+  interviewState?: InputMaybe<Scalars['JSON']['input']>;
+  messages: Array<SessionMessageInput>;
+  question: Scalars['String']['input'];
+  scores?: InputMaybe<Scalars['JSON']['input']>;
+  sessionId: Scalars['String']['input'];
+  sessionName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SessionMessage = {
+  __typename?: 'SessionMessage';
+  content: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  role: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SessionMessageInput = {
+  content: Scalars['String']['input'];
+  id: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+  timestamp: Scalars['Float']['input'];
 };
 
 export type ShareFileResult = {
@@ -885,6 +1000,15 @@ export type TtsQuota = {
   limit: Scalars['Int']['output'];
   remaining: Scalars['Int']['output'];
   used: Scalars['Int']['output'];
+};
+
+export type UpdateInterviewQuestionInput = {
+  chapter?: InputMaybe<Scalars['String']['input']>;
+  chapterSlug?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  difficulty?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type WeatherCondition = {
@@ -1420,6 +1544,59 @@ export type PermanentDeleteBookMutationVariables = Exact<{
 
 
 export type PermanentDeleteBookMutation = { __typename?: 'Mutation', permanentDeleteBook: boolean };
+
+export type GetQuestionBankQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetQuestionBankQuery = { __typename?: 'Query', questionBank: { __typename?: 'QuestionBank', chapters: Array<string>, questions: Array<{ __typename?: 'InterviewQuestion', id: string, chapter: string, chapterSlug: string, difficulty: string, title: string, description: string, tags: Array<string> }> } };
+
+export type GetInterviewSessionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetInterviewSessionsQuery = { __typename?: 'Query', interviewSessions: Array<{ __typename?: 'InterviewSessionSummary', id: string, questionPreview: string, messageCount: number, mode?: string | null, updatedAt?: string | null, createdAt?: string | null }> };
+
+export type GetInterviewSessionQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetInterviewSessionQuery = { __typename?: 'Query', interviewSession?: { __typename?: 'InterviewSessionDetail', id: string, question: string, document: string, sessionName?: string | null, interviewState?: Record<string, unknown> | null, scores?: Record<string, unknown> | null, config?: Record<string, unknown> | null, createdAt: string, updatedAt: string, messages: Array<{ __typename?: 'SessionMessage', id: string, role: string, content: string, timestamp: number }> } | null };
+
+export type CreateInterviewQuestionMutationVariables = Exact<{
+  input: CreateInterviewQuestionInput;
+}>;
+
+
+export type CreateInterviewQuestionMutation = { __typename?: 'Mutation', createInterviewQuestion: { __typename?: 'InterviewQuestion', id: string, chapter: string, chapterSlug: string, difficulty: string, title: string, description: string, tags: Array<string> } };
+
+export type UpdateInterviewQuestionMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateInterviewQuestionInput;
+}>;
+
+
+export type UpdateInterviewQuestionMutation = { __typename?: 'Mutation', updateInterviewQuestion: { __typename?: 'InterviewQuestion', id: string, chapter: string, chapterSlug: string, difficulty: string, title: string, description: string, tags: Array<string> } };
+
+export type DeleteInterviewQuestionMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteInterviewQuestionMutation = { __typename?: 'Mutation', deleteInterviewQuestion: boolean };
+
+export type SaveInterviewSessionMutationVariables = Exact<{
+  input: SaveInterviewSessionInput;
+}>;
+
+
+export type SaveInterviewSessionMutation = { __typename?: 'Mutation', saveInterviewSession: { __typename?: 'InterviewSessionDetail', id: string, createdAt: string, updatedAt: string } };
+
+export type DeleteInterviewSessionMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteInterviewSessionMutation = { __typename?: 'Mutation', deleteInterviewSession: boolean };
 
 export type WeatherUpdatesSubscriptionVariables = Exact<{
   lat: Scalars['Float']['input'];

@@ -4,7 +4,7 @@ import PollSystem from './PollSystem';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
-  PageContent: ({ children, className }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
   WindowEvents: { POLL_SYSTEM_CHANGED: 'poll-system-changed' },
   StorageKeys: {},
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
@@ -19,7 +19,7 @@ vi.mock('react-router', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (window as any).__pollSystem = undefined;
+  (window as any).__pollSystem = undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
 });
 
 describe('PollSystem', () => {

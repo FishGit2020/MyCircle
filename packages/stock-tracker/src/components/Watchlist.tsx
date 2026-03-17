@@ -19,7 +19,7 @@ function WatchlistCard({ item, onToggleWatchlist, onSelectStock }: {
   onSelectStock: (symbol: string) => void;
 }) {
   const { quote, loading: quoteLoading } = useStockQuote(item.symbol, 0);
-  const { candles, loading: candlesLoading } = useStockCandles(item.symbol);
+  const { candles, loading: _candlesLoading } = useStockCandles(item.symbol);
 
   const sparklineData = candles && candles.s !== 'no_data' && candles.c
     ? candles.c

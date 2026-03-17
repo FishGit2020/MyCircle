@@ -1,0 +1,72 @@
+name: Spec Guard
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  spec-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check spec requirement
+        run: |
+          # Get list of changed files
+          CHANGED=$(git diff --name-only origin/main...HEAD)
+
+          # Check if any new MFE package is being added
+          NEW_PACKAGES=$(echo "$CHANGED" | grep -oP 'packages/([a-z-]+)/' | sort -u | sed 's|packages/||;s|/||' || true)
+
+          if [ -z "$NEW_PACKAGES" ]; then
+            echo "No package changes detected — spec check skipped"
+            exit 0
+          fi
+
+          FAIL=0
+          for pkg in $NEW_PACKAGES; do
+            # Skip shared and shell — they're not MFEs
+            [ "$pkg" = "shared" ] || [ "$pkg" = "shell" ] && continue
+
+            # Check if this is a NEW package (not just modifications to existing)
+            if ! git show origin/main:packages/$pkg/package.json > /dev/null 2>&1; then
+              echo "New MFE detected: $pkg"
+
+              # Check for spec folder
+              SPEC_FOUND=false
+              for spec_dir in docs/specs/*/; do
+                if [[ "$spec_dir" == *"-$pkg/"* ]] || [[ "$spec_dir" == *"-${pkg//-/_}/"* ]]; then
+                  if [ -f "${spec_dir}spec.md" ]; then
+                    SPEC_FOUND=true
+                    echo "  Spec found: ${spec_dir}spec.md"
+
+                    # Check spec status is not Draft
+                    if grep -q "Status.*Draft" "${spec_dir}spec.md"; then
+                      echo "  Warning: Spec status is still Draft"
+                    fi
+                  fi
+                fi
+              done
+
+              if [ "$SPEC_FOUND" = false ]; then
+                echo "  ERROR: No spec found for new MFE '$pkg'"
+                echo "     Run: pnpm new-spec $pkg"
+                echo "     Then fill out docs/specs/NNN-$pkg/spec.md before merging"
+                FAIL=1
+              fi
+            fi
+          done
+
+          if [ "$FAIL" -eq 1 ]; then
+            echo ""
+            echo "::error::New MFE(s) detected without specs. Create a spec folder first: pnpm new-spec <name>"
+            exit 1
+          fi
+
+          echo "All new MFEs have specs"

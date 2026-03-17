@@ -3,10 +3,27 @@ import { renderHook, act } from '@testing-library/react';
 import { useInterviewChat } from './useInterviewChat';
 
 const mockMutate = vi.fn();
+const mockSaveSession = vi.fn();
+const mockDeleteSession = vi.fn();
+const mockFetchSessions = vi.fn();
+const mockFetchSession = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
-  useMutation: () => [mockMutate, { loading: false }],
-  AI_CHAT: {},
+  useMutation: (query: unknown) => {
+    if (query === 'SAVE_INTERVIEW_SESSION') return [mockSaveSession, { loading: false }];
+    if (query === 'DELETE_INTERVIEW_SESSION') return [mockDeleteSession, { loading: false }];
+    return [mockMutate, { loading: false }];
+  },
+  useLazyQuery: (query: unknown) => {
+    if (query === 'GET_INTERVIEW_SESSIONS') return [mockFetchSessions, { data: undefined, loading: false }];
+    if (query === 'GET_INTERVIEW_SESSION') return [mockFetchSession, { data: undefined, loading: false }];
+    return [vi.fn(), { data: undefined, loading: false }];
+  },
+  AI_CHAT: 'AI_CHAT',
+  SAVE_INTERVIEW_SESSION: 'SAVE_INTERVIEW_SESSION',
+  DELETE_INTERVIEW_SESSION: 'DELETE_INTERVIEW_SESSION',
+  GET_INTERVIEW_SESSIONS: 'GET_INTERVIEW_SESSIONS',
+  GET_INTERVIEW_SESSION: 'GET_INTERVIEW_SESSION',
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
 }));
 
@@ -14,7 +31,10 @@ describe('useInterviewChat', () => {
   beforeEach(() => {
     localStorage.clear();
     mockMutate.mockReset();
-    delete (window as any).__interviewApi;
+    mockSaveSession.mockReset();
+    mockDeleteSession.mockReset();
+    mockFetchSessions.mockReset();
+    mockFetchSession.mockReset();
   });
 
   afterEach(() => {
@@ -123,11 +143,14 @@ describe('useInterviewChat', () => {
     expect(vars.message).toContain('Here is my approach');
   });
 
-  it('loads sessions from Firebase API', async () => {
-    const mockList = vi.fn().mockResolvedValue({
-      sessions: [{ id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: 1000, createdAt: 1000 }],
+  it('loads sessions via GraphQL', async () => {
+    mockFetchSessions.mockResolvedValue({
+      data: {
+        interviewSessions: [
+          { id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: '2026-01-01T00:00:00Z', createdAt: '2026-01-01T00:00:00Z' },
+        ],
+      },
     });
-    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: vi.fn() };
 
     const { result } = renderHook(() => useInterviewChat());
 
@@ -135,20 +158,21 @@ describe('useInterviewChat', () => {
       await result.current.loadSessions();
     });
 
-    expect(mockList).toHaveBeenCalledTimes(1);
+    expect(mockFetchSessions).toHaveBeenCalledTimes(1);
     expect(result.current.sessions).toHaveLength(1);
     expect(result.current.sessions[0].questionPreview).toBe('Two Sum');
   });
 
   it('deletes a session and removes it from state', async () => {
-    const mockDelete = vi.fn().mockResolvedValue({ ok: true });
-    const mockList = vi.fn().mockResolvedValue({
-      sessions: [
-        { id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: 1000, createdAt: 1000 },
-        { id: 's2', questionPreview: 'Merge Sort', messageCount: 3, updatedAt: 900, createdAt: 900 },
-      ],
+    mockFetchSessions.mockResolvedValue({
+      data: {
+        interviewSessions: [
+          { id: 's1', questionPreview: 'Two Sum', messageCount: 5, updatedAt: '2026-01-01T00:00:00Z', createdAt: '2026-01-01T00:00:00Z' },
+          { id: 's2', questionPreview: 'Merge Sort', messageCount: 3, updatedAt: '2025-12-31T00:00:00Z', createdAt: '2025-12-31T00:00:00Z' },
+        ],
+      },
     });
-    (window as any).__interviewApi = { list: mockList, save: vi.fn(), load: vi.fn(), delete: mockDelete };
+    mockDeleteSession.mockResolvedValue({ data: { deleteInterviewSession: true } });
 
     const { result } = renderHook(() => useInterviewChat());
 
@@ -161,7 +185,7 @@ describe('useInterviewChat', () => {
       await result.current.deleteSession('s1');
     });
 
-    expect(mockDelete).toHaveBeenCalledWith('s1');
+    expect(mockDeleteSession).toHaveBeenCalledWith({ variables: { id: 's1' } });
     expect(result.current.sessions).toHaveLength(1);
     expect(result.current.sessions[0].id).toBe('s2');
   });
@@ -169,5 +193,166 @@ describe('useInterviewChat', () => {
   it('hasPersistedSession is false when no localStorage data', () => {
     const { result } = renderHook(() => useInterviewChat());
     expect(result.current.hasPersistedSession).toBe(false);
+  });
+
+  it('clearChat also resets interviewState and isStructuredMode', () => {
+    const { result } = renderHook(() => useInterviewChat());
+    act(() => {
+      result.current.clearChat();
+    });
+    expect(result.current.interviewState).toBeNull();
+    expect(result.current.isStructuredMode).toBe(false);
+  });
+
+  it('startStructuredInterview initializes interview state', async () => {
+    mockMutate.mockResolvedValue({
+      data: { aiChat: { response: 'Let us begin with the first question.' } },
+    });
+
+    const { result } = renderHook(() => useInterviewChat());
+
+    const config = {
+      mode: 'question-bank' as const,
+      chapters: ['Dynamic Arrays'],
+      difficulty: 'medium' as const,
+      questionCount: 2,
+    };
+
+    const questions = [
+      {
+        id: 'q1',
+        chapter: 'Dynamic Arrays',
+        chapterSlug: 'dynamic-arrays',
+        difficulty: 'medium' as const,
+        title: 'Two Sum',
+        description: 'Find two numbers that add up to target.',
+        tags: ['arrays'],
+      },
+      {
+        id: 'q2',
+        chapter: 'Dynamic Arrays',
+        chapterSlug: 'dynamic-arrays',
+        difficulty: 'medium' as const,
+        title: 'Max Subarray',
+        description: 'Find the contiguous subarray with largest sum.',
+        tags: ['arrays'],
+      },
+    ];
+
+    act(() => {
+      result.current.startStructuredInterview(config, questions);
+    });
+
+    // Wait for setTimeout(0) to fire
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    expect(result.current.interviewState).not.toBeNull();
+    expect(result.current.isStructuredMode).toBe(true);
+    expect(result.current.interviewState?.phase).toBe('active');
+    expect(result.current.interviewState?.selectedQuestions).toHaveLength(2);
+  });
+
+  it('exposes progress in structured mode', async () => {
+    mockMutate.mockResolvedValue({
+      data: { aiChat: { response: 'Starting.' } },
+    });
+
+    const { result } = renderHook(() => useInterviewChat());
+
+    const config = {
+      mode: 'question-bank' as const,
+      chapters: ['Trees'],
+      difficulty: 'easy' as const,
+      questionCount: 3,
+    };
+
+    const questions = [
+      { id: 'q1', chapter: 'Trees', chapterSlug: 'trees', difficulty: 'easy' as const, title: 'T1', description: 'D1', tags: [] },
+      { id: 'q2', chapter: 'Trees', chapterSlug: 'trees', difficulty: 'easy' as const, title: 'T2', description: 'D2', tags: [] },
+      { id: 'q3', chapter: 'Trees', chapterSlug: 'trees', difficulty: 'easy' as const, title: 'T3', description: 'D3', tags: [] },
+    ];
+
+    act(() => {
+      result.current.startStructuredInterview(config, questions);
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    expect(result.current.progress).toEqual({ current: 1, total: 3 });
+  });
+
+  it('hint still works in structured mode', async () => {
+    mockMutate.mockResolvedValue({
+      data: { aiChat: { response: 'Here is a hint.' } },
+    });
+
+    const { result } = renderHook(() => useInterviewChat());
+
+    const config = {
+      mode: 'question-bank' as const,
+      chapters: ['Graphs'],
+      difficulty: 'medium' as const,
+      questionCount: 1,
+    };
+
+    const questions = [
+      { id: 'q1', chapter: 'Graphs', chapterSlug: 'graphs', difficulty: 'medium' as const, title: 'BFS Shortest Path', description: 'Find shortest path using BFS.', tags: [] },
+    ];
+
+    act(() => {
+      result.current.startStructuredInterview(config, questions);
+    });
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    // Reset mock to capture hint call
+    mockMutate.mockClear();
+    mockMutate.mockResolvedValue({
+      data: { aiChat: { response: 'Consider using a queue.' } },
+    });
+
+    await act(async () => {
+      result.current.requestHint();
+      await new Promise((r) => setTimeout(r, 10));
+    });
+
+    expect(mockMutate).toHaveBeenCalled();
+    // The system prompt should contain the question title since it's structured mode
+    const vars = mockMutate.mock.calls[0][0].variables;
+    expect(vars.systemPrompt).toContain('BFS Shortest Path');
+  });
+
+  it('old sessions without interviewState load as custom mode', async () => {
+    mockFetchSession.mockResolvedValue({
+      data: {
+        interviewSession: {
+          id: 'old-session',
+          question: 'Two Sum',
+          document: 'def twoSum...',
+          messages: [{ id: 'm1', role: 'user', content: 'Hello', timestamp: 1000 }],
+          sessionName: null,
+          interviewState: null,
+          scores: null,
+          config: null,
+          createdAt: '2026-01-01T00:00:00Z',
+          updatedAt: '2026-01-01T00:00:00Z',
+        },
+      },
+    });
+
+    const { result } = renderHook(() => useInterviewChat());
+
+    await act(async () => {
+      await result.current.loadSession('old-session');
+    });
+
+    expect(result.current.isStructuredMode).toBe(false);
+    expect(result.current.interviewState).toBeNull();
   });
 });

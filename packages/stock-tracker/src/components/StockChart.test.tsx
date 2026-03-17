@@ -93,7 +93,7 @@ describe('StockChart', () => {
     render(<StockChart symbol="AAPL" candles={mockCandles} />);
 
     // TIMEFRAMES buttons should not be present (no callback = no buttons)
-    for (const tf of TIMEFRAMES) {
+    for (const _tf of TIMEFRAMES) {
       // The labels are short strings like "1W", "1M" etc.
       // They might appear in price text, so check specifically for button role
       const buttons = screen.queryAllByRole('button');

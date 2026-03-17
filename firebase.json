@@ -43,10 +43,6 @@
         "function": "digitalLibrary"
       },
       {
-        "source": "/interview-api/**",
-        "function": "interviewSessions"
-      },
-      {
         "source": "/deals-api/**",
         "function": "dealsProxy"
       },

@@ -10,7 +10,7 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 vi.mock('./VersePicker', () => ({
-  default: ({ onAddCards, onBack }: any) => (
+  default: ({ onAddCards, onBack }: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid="verse-picker">
       <button onClick={onBack}>back</button>
       <button onClick={() => onAddCards([{ front: 'F', back: 'B', reference: 'Gen 1:1', verseRange: '1', type: 'bible-full' }])}>add</button>

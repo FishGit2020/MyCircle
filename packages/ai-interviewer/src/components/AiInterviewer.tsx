@@ -3,8 +3,12 @@ import { useTranslation, PageContent, useQuery, useLazyQuery, GET_BENCHMARK_ENDP
 import type { GetBenchmarkEndpointsQuery, GetBenchmarkEndpointModelsQuery } from '@mycircle/shared';
 import { useInterviewChat } from '../hooks/useInterviewChat';
 import type { InterviewSession } from '../hooks/useInterviewChat';
+import { useQuestionBank } from '../hooks/useQuestionBank';
+import type { InterviewConfig } from '../hooks/useInterviewStateMachine';
+import InterviewSetup from './InterviewSetup';
 import QuestionPanel from './QuestionPanel';
 import InterviewChat from './InterviewChat';
+import QuestionManager from './QuestionManager';
 
 const ENDPOINT_KEY = 'interview-endpoint';
 const MODEL_KEY = 'interview-model';
@@ -39,6 +43,18 @@ export default function AiInterviewer() {
   const [showSessions, setShowSessions] = useState(false);
   const mountedRef = useRef(false);
 
+  const [showQuestionManager, setShowQuestionManager] = useState(false);
+
+  // Question bank
+  const {
+    data: questionBankData,
+    loading: questionBankLoading,
+    error: questionBankError,
+    createQuestion,
+    updateQuestion,
+    deleteQuestion: deleteQuestionFromBank,
+  } = useQuestionBank();
+
   // Endpoint / model queries
   const { data: endpointsData } = useQuery<GetBenchmarkEndpointsQuery>(GET_BENCHMARK_ENDPOINTS, {
     fetchPolicy: 'cache-and-network',
@@ -66,13 +82,24 @@ export default function AiInterviewer() {
     saveStatus,
     sessions,
     sessionId: currentSessionId,
+    // V2 structured mode
+    interviewState: _interviewState,
+    evaluating,
+    progress,
+    currentBankQuestion,
+    isStructuredMode,
+    scores,
+    isLastQuestion,
+    // Actions
     setQuestion,
     setDocument,
     sendMessage,
     startInterview,
+    startStructuredInterview,
     repeatQuestion,
     requestHint,
     endInterview,
+    nextQuestion,
     retry,
     clearChat,
     loadSessions,
@@ -137,6 +164,24 @@ export default function AiInterviewer() {
     setDocument(text);
   }, [setDocument]);
 
+  const handleStartStructured = useCallback((config: InterviewConfig) => {
+    if (!modelSelected || !questionBankData) return;
+    setInterviewActive(true);
+    startStructuredInterview(
+      config,
+      questionBankData.questions,
+      endpointId || undefined,
+      model || undefined,
+    );
+  }, [modelSelected, questionBankData, endpointId, model, startStructuredInterview]);
+
+  const handleStartCustom = useCallback((customQuestion: string) => {
+    if (!customQuestion.trim() || !modelSelected) return;
+    setQuestionLocal(customQuestion);
+    setInterviewActive(true);
+    startInterview(customQuestion, endpointId || undefined, model || undefined);
+  }, [endpointId, model, modelSelected, startInterview]);
+
   const handleStart = useCallback(() => {
     if (!question.trim() || !modelSelected) return;
     setInterviewActive(true);
@@ -153,8 +198,14 @@ export default function AiInterviewer() {
 
   const handleEnd = useCallback(() => {
     endInterview(endpointId || undefined, model || undefined);
-    setInterviewActive(false);
-  }, [endpointId, model, endInterview]);
+    if (!isStructuredMode) {
+      setInterviewActive(false);
+    }
+  }, [endpointId, model, endInterview, isStructuredMode]);
+
+  const handleNextQuestion = useCallback(() => {
+    nextQuestion(endpointId || undefined, model || undefined);
+  }, [endpointId, model, nextQuestion]);
 
   const handleSendMessage = useCallback((text: string) => {
     sendMessage(text, endpointId || undefined, model || undefined);
@@ -264,19 +315,47 @@ export default function AiInterviewer() {
         <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Working document panel — 65% */}
           <div className="md:w-[65%] border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 min-h-[200px] md:min-h-0 flex flex-col">
-            <QuestionPanel
-              question={question}
-              document={document}
-              onQuestionChange={handleQuestionChange}
-              onDocumentChange={handleDocumentChange}
-              interviewActive={interviewActive}
-              onStart={handleStart}
-              onRepeat={handleRepeat}
-              onHint={handleHint}
-              onEnd={handleEnd}
-              loading={loading}
-              modelSelected={modelSelected}
-            />
+            {!interviewActive && showQuestionManager && questionBankData ? (
+              <QuestionManager
+                questions={questionBankData.questions}
+                onBack={() => setShowQuestionManager(false)}
+                onCreateQuestion={createQuestion}
+                onUpdateQuestion={updateQuestion}
+                onDeleteQuestion={deleteQuestionFromBank}
+              />
+            ) : !interviewActive ? (
+              <InterviewSetup
+                onStartStructured={handleStartStructured}
+                onStartCustom={handleStartCustom}
+                onManageQuestions={() => setShowQuestionManager(true)}
+                loading={loading}
+                modelSelected={modelSelected}
+                questionBankLoading={questionBankLoading}
+                questionBankError={questionBankError}
+                questionBankAvailable={!!(questionBankData && questionBankData.questions.length > 0)}
+              />
+            ) : (
+              <QuestionPanel
+                question={question}
+                document={document}
+                onQuestionChange={handleQuestionChange}
+                onDocumentChange={handleDocumentChange}
+                interviewActive={interviewActive}
+                onStart={handleStart}
+                onRepeat={handleRepeat}
+                onHint={handleHint}
+                onEnd={handleEnd}
+                loading={loading}
+                modelSelected={modelSelected}
+                onNextQuestion={handleNextQuestion}
+                isStructuredMode={isStructuredMode}
+                currentBankQuestion={currentBankQuestion}
+                progress={progress}
+                scores={scores}
+                evaluating={evaluating}
+                isLastQuestion={isLastQuestion}
+              />
+            )}
           </div>
 
           {/* Chat panel — 35% */}
@@ -316,6 +395,8 @@ export default function AiInterviewer() {
               modelSelected={modelSelected}
               onSendMessage={handleSendMessage}
               onRetry={retry}
+              scores={scores}
+              evaluating={evaluating}
             />
           </div>
         </div>

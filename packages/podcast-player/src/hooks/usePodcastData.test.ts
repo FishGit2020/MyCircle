@@ -4,7 +4,7 @@ import { renderHook, act } from '@testing-library/react';
 const mockUseQuery = vi.fn();
 
 vi.mock('@mycircle/shared', () => ({
-  useQuery: (...args: any[]) => mockUseQuery(...args),
+  useQuery: (...args: any[]) => mockUseQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
   SEARCH_PODCASTS: 'SEARCH_PODCASTS_QUERY',
   GET_TRENDING_PODCASTS: 'GET_TRENDING_PODCASTS_QUERY',
   GET_PODCAST_EPISODES: 'GET_PODCAST_EPISODES_QUERY',

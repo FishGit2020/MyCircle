@@ -11,7 +11,7 @@ const mockAnnouncements = [
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
-  PageContent: ({ children }: any) => <div>{children}</div>,
+  PageContent: ({ children }: any) => <div>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 let mockHasUnread = true;

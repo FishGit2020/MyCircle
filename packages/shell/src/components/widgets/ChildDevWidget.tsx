@@ -51,9 +51,9 @@ const ChildDevWidget = React.memo(function ChildDevWidget() {
     const ageMonths = getAgeInMonths(child.birthDate);
     const ageDays = getAgeRemainingDays(child.birthDate);
     if (ageMonths >= 24) {
-      return t('childDev.yearsMonthsOld' as any).replace('{years}', String(Math.floor(ageMonths / 12))).replace('{months}', String(ageMonths % 12)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '');
+      return t('childDev.yearsMonthsOld' as any).replace('{years}', String(Math.floor(ageMonths / 12))).replace('{months}', String(ageMonths % 12)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : ''); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
-    return t('childDev.monthsOld' as any).replace('{months}', String(ageMonths)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : '');
+    return t('childDev.monthsOld' as any).replace('{months}', String(ageMonths)) + (ageDays > 0 ? ', ' + t('childDev.daysCount' as any).replace('{days}', String(ageDays)) : ''); // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 
   return (

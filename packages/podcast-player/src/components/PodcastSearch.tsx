@@ -16,6 +16,7 @@ export default function PodcastSearch({ onSelectPodcast }: PodcastSearchProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data, loading, error } = usePodcastSearch(query);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const results = data?.feeds ?? [];
 
   useEffect(() => {

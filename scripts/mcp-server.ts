@@ -20,6 +20,11 @@ import {
   validatePwaShortcuts,
   validateWidgetRegistry,
   validateAll,
+  validateI18nStructured,
+  validateDockerfileStructured,
+  validatePwaShortcutsStructured,
+  validateWidgetRegistryStructured,
+  validateAllStructured,
 } from './mcp-tools/validators.js';
 import { ALL_TOOLS } from './mcp-tools/mfe-tools.js';
 import {
@@ -73,47 +78,77 @@ const server = new McpServer({
 
 server.tool(
   'validate_i18n',
-  'Check that all 3 i18n locale files (en, es, zh) have the same keys. Reports missing keys per locale.',
+  'Check that all 3 i18n locale files (en, es, zh) have the same keys. Reports missing keys per locale. Returns Pass/Warn/Fail status.',
   {},
-  async () => ({
-    content: [{ type: 'text', text: validateI18n() }],
-  })
+  async () => {
+    const result = validateI18nStructured();
+    return {
+      content: [
+        { type: 'text', text: validateI18n() },
+        { type: 'text', text: `\n\n<structured-result>\n${JSON.stringify(result, null, 2)}\n</structured-result>` },
+      ],
+    };
+  }
 );
 
 server.tool(
   'validate_dockerfile',
-  'Check that deploy/docker/Dockerfile references all packages in both build and runtime stages. Reports missing or stale package references.',
+  'Check that deploy/docker/Dockerfile references all packages in both build and runtime stages. Reports missing or stale package references. Returns Pass/Warn/Fail status.',
   {},
-  async () => ({
-    content: [{ type: 'text', text: validateDockerfile() }],
-  })
+  async () => {
+    const result = validateDockerfileStructured();
+    return {
+      content: [
+        { type: 'text', text: validateDockerfile() },
+        { type: 'text', text: `\n\n<structured-result>\n${JSON.stringify(result, null, 2)}\n</structured-result>` },
+      ],
+    };
+  }
 );
 
 server.tool(
   'validate_pwa_shortcuts',
-  'Count PWA shortcuts in packages/shell/vite.config.ts and warn if at or over the browser limit of 10.',
+  'Count PWA shortcuts in packages/shell/vite.config.ts and warn if at or over the browser limit of 10. Returns Pass/Warn/Fail status.',
   {},
-  async () => ({
-    content: [{ type: 'text', text: validatePwaShortcuts() }],
-  })
+  async () => {
+    const result = validatePwaShortcutsStructured();
+    return {
+      content: [
+        { type: 'text', text: validatePwaShortcuts() },
+        { type: 'text', text: `\n\n<structured-result>\n${JSON.stringify(result, null, 2)}\n</structured-result>` },
+      ],
+    };
+  }
 );
 
 server.tool(
   'validate_widget_registry',
-  'Check that WidgetType, DEFAULT_LAYOUT, WIDGET_COMPONENTS, and WIDGET_ROUTES in WidgetDashboard.tsx are all in sync. Reports any ID mismatches.',
+  'Check that WidgetType, DEFAULT_LAYOUT, WIDGET_COMPONENTS, and WIDGET_ROUTES in widgetConfig.ts are all in sync. Reports any ID mismatches. Returns Pass/Warn/Fail status.',
   {},
-  async () => ({
-    content: [{ type: 'text', text: validateWidgetRegistry() }],
-  })
+  async () => {
+    const result = validateWidgetRegistryStructured();
+    return {
+      content: [
+        { type: 'text', text: validateWidgetRegistry() },
+        { type: 'text', text: `\n\n<structured-result>\n${JSON.stringify(result, null, 2)}\n</structured-result>` },
+      ],
+    };
+  }
 );
 
 server.tool(
   'validate_all',
-  'Run all project health validators (i18n, Dockerfile, PWA shortcuts, widget registry) and return a combined report.',
+  'Run all project health validators (i18n, Dockerfile, PWA shortcuts, widget registry) and return a combined report with Pass/Warn/Fail status for each.',
   {},
-  async () => ({
-    content: [{ type: 'text', text: validateAll() }],
-  })
+  async () => {
+    const results = validateAllStructured();
+    return {
+      content: [
+        { type: 'text', text: validateAll() },
+        { type: 'text', text: `\n\n<structured-results>\n${JSON.stringify(results, null, 2)}\n</structured-results>` },
+      ],
+    };
+  }
 );
 
 // ─── MFE Tool Registry (read-only schema reference) ──────────

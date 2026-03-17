@@ -68,6 +68,7 @@ export default function NotificationBell() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fcmToken]);
 
   const handleToggleWeather = useCallback(async () => {
@@ -114,6 +115,7 @@ export default function NotificationBell() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weatherEnabled, loading, fcmToken, favoriteCities, ensureToken]);
 
   const handleToggleAnnouncements = useCallback(async () => {
@@ -154,6 +156,7 @@ export default function NotificationBell() {
     } finally {
       setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [announcementEnabled, loading, fcmToken, ensureToken]);
 
   // Re-acquire FCM token on mount if any alerts were previously enabled

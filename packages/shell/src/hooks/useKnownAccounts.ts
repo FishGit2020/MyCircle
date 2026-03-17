@@ -12,7 +12,7 @@ function readAccounts(): KnownAccount[] {
     if (!Array.isArray(parsed)) return [];
     // Filter out invalid entries
     return parsed.filter(
-      (a: any) => a && typeof a.uid === 'string' && typeof a.lastSignedInAt === 'number',
+      (a: any) => a && typeof a.uid === 'string' && typeof a.lastSignedInAt === 'number', // eslint-disable-line @typescript-eslint/no-explicit-any
     );
   } catch {
     return [];

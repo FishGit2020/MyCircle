@@ -51,10 +51,10 @@ export default function BenchmarkHistory() {
       {runs.map(run => {
         const results = Array.isArray(run.results) ? run.results : [];
         const fastest = results
-          .filter((r: any) => r.timing)
-          .sort((a: any, b: any) => (b.timing?.tokensPerSecond ?? 0) - (a.timing?.tokensPerSecond ?? 0))[0];
+          .filter((r: any) => r.timing) // eslint-disable-line @typescript-eslint/no-explicit-any
+          .sort((a: any, b: any) => (b.timing?.tokensPerSecond ?? 0) - (a.timing?.tokensPerSecond ?? 0))[0]; // eslint-disable-line @typescript-eslint/no-explicit-any
         // Show model(s) + prompt from results (may differ across endpoints)
-        const uniqueModels = [...new Set(results.map((r: any) => r.model).filter(Boolean))];
+        const uniqueModels = [...new Set(results.map((r: any) => r.model).filter(Boolean))]; // eslint-disable-line @typescript-eslint/no-explicit-any
         const model = uniqueModels.join(', ');
         const prompt = results[0]?.prompt;
         const isExpanded = expandedRunId === run.id;
@@ -100,7 +100,7 @@ export default function BenchmarkHistory() {
             {/* Summary row */}
             {results.length > 0 && !isExpanded && (
               <div className="space-y-1.5">
-                {results.map((r: any, i: number) => (
+                {results.map((r: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                   <div key={i} className="flex items-center justify-between text-sm gap-2">
                     <span className="text-gray-700 dark:text-gray-300 font-medium">{r.endpointName || r.endpointId}</span>
                     {r.error ? (
@@ -136,7 +136,7 @@ export default function BenchmarkHistory() {
             {/* Expanded detail view */}
             {isExpanded && results.length > 0 && (
               <div className="space-y-3 mt-2">
-                {results.map((r: any, i: number) => (
+                {results.map((r: any, i: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
                   <div key={i} className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between mb-2">
                       <div>

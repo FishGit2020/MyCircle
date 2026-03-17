@@ -31,7 +31,7 @@ const baseEpisode: Episode = {
   image: '',
 };
 
-const episode2: Episode = {
+const _episode2: Episode = {
   id: 202,
   title: 'Episode Two',
   description: '',

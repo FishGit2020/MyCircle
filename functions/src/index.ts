@@ -9,7 +9,6 @@ export { digitalLibrary } from './handlers/digitalLibrary.js';
 export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.js';
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';
 
-export { interviewSessions } from './handlers/interviewSessions.js';
 export { dealsProxy } from './handlers/dealsProxy.js';
 
 // Re-export shared utilities that were previously exported from index.ts

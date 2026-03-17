@@ -4,7 +4,7 @@ import RadioStation from './RadioStation';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
-  PageContent: ({ children, className }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
   WindowEvents: { RADIO_CHANGED: 'radio-changed' },
   StorageKeys: { RADIO_FAVORITES: 'radio-favorites' },
   MFEvents: { AUDIO_PLAY: 'mf:audio-play', AUDIO_CLOSE: 'mf:audio-close', AUDIO_TOGGLE_PLAY: 'mf:audio-toggle-play', AUDIO_PLAYBACK_STATE: 'mf:audio-playback-state' },
@@ -30,7 +30,7 @@ const mockFetch = vi.fn(() =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  global.fetch = mockFetch as any;
+  global.fetch = mockFetch as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 });
 
 describe('RadioStation', () => {

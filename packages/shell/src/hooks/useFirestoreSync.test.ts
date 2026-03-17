@@ -54,7 +54,7 @@ vi.mock('../lib/firebase', () => ({
   updateBookLastPlayed: (...args: unknown[]) => mockUpdateBookLastPlayed(...args),
 }));
 
-const makeUser = (uid = 'user1') => ({ uid } as any);
+const makeUser = (uid = 'user1') => ({ uid } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
 beforeEach(() => {
   localStorage.clear();

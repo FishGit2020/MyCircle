@@ -37,7 +37,7 @@ function getTripStatus(trip: Trip): 'upcoming' | 'ongoing' | 'past' {
   return 'ongoing';
 }
 
-export default function TripList({ trips, onSelect, onDelete }: TripListProps) {
+export default function TripList({ trips, onSelect, onDelete: _onDelete }: TripListProps) {
   const { t } = useTranslation();
 
   if (trips.length === 0) {

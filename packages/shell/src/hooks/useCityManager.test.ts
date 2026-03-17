@@ -18,7 +18,7 @@ vi.mock('../lib/firebase', () => ({
   logEvent: vi.fn(),
 }));
 
-const makeUser = (uid = 'user1') => ({ uid } as any);
+const makeUser = (uid = 'user1') => ({ uid } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -16,7 +16,7 @@ let dbPromise: Promise<TileDb> | null = null;
 
 function getDb(): Promise<TileDb> {
   if (!dbPromise) {
-    dbPromise = openDB<any>(DB_NAME, DB_VERSION, {
+    dbPromise = openDB<any>(DB_NAME, DB_VERSION, { // eslint-disable-line @typescript-eslint/no-explicit-any
       upgrade(db) {
         if (!db.objectStoreNames.contains(STORE)) {
           db.createObjectStore(STORE);

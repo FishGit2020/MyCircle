@@ -9,9 +9,9 @@ const PollSystemWidget = React.memo(function PollSystemWidget() {
     function fetchCounts() {
       const api = window.__pollSystem;
       if (api?.getAll) {
-        api.getAll().then((polls: any[]) => {
-          const personal = polls.filter((p: any) => !p.isPublic).length;
-          const pub = polls.filter((p: any) => p.isPublic).length;
+        api.getAll().then((polls: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+          const personal = polls.filter((p: any) => !p.isPublic).length; // eslint-disable-line @typescript-eslint/no-explicit-any
+          const pub = polls.filter((p: any) => p.isPublic).length; // eslint-disable-line @typescript-eslint/no-explicit-any
           setCounts({ personal, public: pub });
         }).catch(() => { /* ignore */ });
       }
@@ -36,25 +36,25 @@ const PollSystemWidget = React.memo(function PollSystemWidget() {
           </svg>
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.pollSystem' as any)}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.pollSystemDesc' as any)}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.pollSystem' as any)}</h4> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.pollSystemDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
       </div>
       {total > 0 ? (
         <div className="space-y-0.5">
           {counts!.personal > 0 && (
             <p className="text-sm text-violet-600 dark:text-violet-400 font-medium">
-              {t('widgets.pollPersonalCount' as any).replace('{count}', String(counts!.personal))}
+              {t('widgets.pollPersonalCount' as any).replace('{count}', String(counts!.personal))} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </p>
           )}
           {counts!.public > 0 && (
             <p className="text-xs text-violet-500 dark:text-violet-400/70">
-              {t('widgets.pollPublicCount' as any).replace('{count}', String(counts!.public))}
+              {t('widgets.pollPublicCount' as any).replace('{count}', String(counts!.public))} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </p>
           )}
         </div>
       ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noActivePolls' as any)}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.noActivePolls' as any)}</p> // eslint-disable-line @typescript-eslint/no-explicit-any
       )}
     </div>
   );

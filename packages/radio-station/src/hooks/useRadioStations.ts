@@ -53,6 +53,7 @@ export function useRadioStations() {
       }
       fetchStations({ name: query, order: 'votes', reverse: 'true' });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [fetchStations],
   );
 

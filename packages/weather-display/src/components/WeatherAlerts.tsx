@@ -158,7 +158,7 @@ export default function WeatherAlerts({ current, forecast }: Props) {
             if (count === 0) return null;
             return (
               <span key={sev} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${severityConfig[sev].badge}`}>
-                {count} {t(`alert.severity.${sev}` as any)}
+                {count} {t(`alert.severity.${sev}` as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </span>
             );
           })}

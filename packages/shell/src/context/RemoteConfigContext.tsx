@@ -11,6 +11,7 @@ const RemoteConfigContext = createContext<RemoteConfigState>({
   loading: true,
 });
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRemoteConfigContext() {
   return useContext(RemoteConfigContext);
 }

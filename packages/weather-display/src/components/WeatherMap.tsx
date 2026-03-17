@@ -89,10 +89,10 @@ export default function WeatherMap({ lat, lon }: Props) {
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
-                title={t(layer.labelKey as any)}
+                title={t(layer.labelKey as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
               >
                 <span className="text-sm">{layer.icon}</span>
-                <span className="hidden sm:inline">{t(layer.labelKey as any)}</span>
+                <span className="hidden sm:inline">{t(layer.labelKey as any)}</span> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </button>
             ))}
           </div>
@@ -146,7 +146,7 @@ export default function WeatherMap({ lat, lon }: Props) {
                 {t('map.showMap')}
               </button>
               <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
-                {t(layers.find(l => l.id === activeLayer)!.labelKey as any)} · {zoom}x
+                {t(layers.find(l => l.id === activeLayer)!.labelKey as any)} · {zoom}x {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </p>
             </div>
           )

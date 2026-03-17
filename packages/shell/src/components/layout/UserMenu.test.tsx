@@ -19,9 +19,9 @@ vi.mock('@mycircle/shared', () => ({
   StorageKeys: { TEMP_UNIT: 'tempUnit', SPEED_UNIT: 'speedUnit', DISTANCE_UNIT: 'distanceUnit' },
 }));
 
-let mockUser: any = null;
+let mockUser: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 let mockLoading = false;
-let mockKnownAccounts: any[] = [];
+let mockKnownAccounts: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({

@@ -7,10 +7,10 @@ const mockUpdateLocale = vi.fn();
 const mockLogEvent = vi.fn();
 
 let mockLocale = 'en';
-let mockUser: any = null;
-let mockProfile: any = null;
+let mockUser: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
+let mockProfile: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-vi.mock('../../lib/firebase', () => ({ logEvent: (...args: any[]) => mockLogEvent(...args) }));
+vi.mock('../../lib/firebase', () => ({ logEvent: (...args: any[]) => mockLogEvent(...args) })); // eslint-disable-line @typescript-eslint/no-explicit-any
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({

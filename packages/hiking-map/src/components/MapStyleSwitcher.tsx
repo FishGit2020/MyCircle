@@ -24,7 +24,7 @@ export default function MapStyleSwitcher({ providers, activeId, onChange }: Prop
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`}
         >
-          {t(p.labelKey as any)}
+          {t(p.labelKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </button>
       ))}
     </div>

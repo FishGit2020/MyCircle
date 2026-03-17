@@ -8,7 +8,7 @@ vi.mock('@mycircle/shared', () => ({
 }));
 
 vi.mock('./FlipCard', () => ({
-  default: ({ front, back, flipped, onFlip }: any) => (
+  default: ({ front, back, flipped, onFlip }: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid="flip-card" onClick={onFlip}>
       {flipped ? back : front}
     </div>
@@ -16,7 +16,7 @@ vi.mock('./FlipCard', () => ({
 }));
 
 vi.mock('./PracticeCanvas', () => ({
-  default: ({ onBack }: any) => (
+  default: ({ onBack }: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid="practice-canvas">
       <button onClick={onBack}>Back</button>
     </div>

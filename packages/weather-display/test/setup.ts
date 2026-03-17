@@ -33,4 +33,4 @@ class MockIntersectionObserver {
   unobserve() {}
   disconnect() {}
 }
-global.IntersectionObserver = MockIntersectionObserver as any;
+global.IntersectionObserver = MockIntersectionObserver as any; // eslint-disable-line @typescript-eslint/no-explicit-any

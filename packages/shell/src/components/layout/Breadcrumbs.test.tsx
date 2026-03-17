@@ -6,7 +6,7 @@ const mockLocation = { pathname: '/', search: '', hash: '', state: null, key: 'd
 let mockSearchParams = new URLSearchParams();
 
 vi.mock('react-router', () => ({
-  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>,
+  Link: ({ to, children, ...props }: any) => <a href={to} {...props}>{children}</a>, // eslint-disable-line @typescript-eslint/no-explicit-any
   useLocation: () => mockLocation,
   useSearchParams: () => [mockSearchParams],
 }));

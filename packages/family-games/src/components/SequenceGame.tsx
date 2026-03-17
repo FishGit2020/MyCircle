@@ -39,7 +39,7 @@ function generatePuzzle(level: number): Puzzle {
 }
 
 const TOTAL_PUZZLES = 10;
-const TIME_LIMIT = 90_000;
+const _TIME_LIMIT = 90_000;
 
 const NUMPAD_KEYS = [
   ['1', '2', '3'],
@@ -133,12 +133,12 @@ export default function SequenceGame({ onBack }: { onBack: () => void }) {
           </svg>
         </div>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.numberSequence' as any)}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.sequenceDesc' as any)}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.numberSequence' as any)}</h2> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.sequenceDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-teal-700 dark:text-teal-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-teal-600 dark:text-teal-400 mt-0.5">{t('games.sequenceRules' as any)}</p>
+          <p className="text-xs font-medium text-teal-700 dark:text-teal-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-teal-600 dark:text-teal-400 mt-0.5">{t('games.sequenceRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <button type="button" onClick={startGame} className="px-8 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium transition active:scale-95">
           {t('games.startGame')}

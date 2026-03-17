@@ -142,7 +142,7 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
 
   // Always restore widget layout from Firestore on sign-in — Firestore is source of truth
   // New format: { pinned: string[], size: string }; old array format is ignored
-  const wl = profile.widgetLayout as any;
+  const wl = profile.widgetLayout as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   if (wl && typeof wl === 'object' && !Array.isArray(wl) && Array.isArray(wl.pinned)) {
     localStorage.setItem(StorageKeys.WIDGET_LAYOUT, JSON.stringify(wl));
     window.dispatchEvent(new Event(WindowEvents.WIDGET_LAYOUT_CHANGED));

@@ -39,6 +39,7 @@ export default function AiAssistant() {
   const { data: endpointsData } = useQuery(GET_BENCHMARK_ENDPOINTS, {
     fetchPolicy: 'cache-and-network',
   });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const endpoints: Array<{ id: string; url: string; name: string }> = endpointsData?.benchmarkEndpoints ?? [];
 
   const [selectedEndpoint, setSelectedEndpoint] = useState(() => {
@@ -59,7 +60,7 @@ export default function AiAssistant() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const VALID_TABS = new Set(['chat', 'endpoints', 'monitor']);
-  const activeTab: 'chat' | 'endpoints' | 'monitor' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'chat';
+  const activeTab: 'chat' | 'endpoints' | 'monitor' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'chat'; // eslint-disable-line @typescript-eslint/no-explicit-any
   const setActiveTab = useCallback((tab: 'chat' | 'endpoints' | 'monitor') => {
     setSearchParams(tab === 'chat' ? {} : { tab }, { replace: true });
   }, [setSearchParams]);

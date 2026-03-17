@@ -6,7 +6,7 @@ import ModelBenchmark from './ModelBenchmark';
 
 // Mock @mycircle/shared (includes Apollo hooks)
 vi.mock('@mycircle/shared', () => ({
-  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>,
+  PageContent: ({ children, className = '' }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
   useTranslation: () => ({
     t: (key: string) => key,
   }),
@@ -19,7 +19,7 @@ vi.mock('@mycircle/shared', () => ({
 
 // Mock child components
 vi.mock('./BenchmarkRunner', () => ({
-  default: ({ onResults }: { onResults: (r: any[]) => void }) => (
+  default: ({ onResults }: { onResults: (r: any[]) => void }) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid="benchmark-runner">
       <button type="button" onClick={() => onResults([])}>mock-run</button>
     </div>
@@ -42,7 +42,7 @@ vi.mock('../hooks/useBenchmark', () => ({
     results: [],
     runBenchmark: vi.fn(async () => []),
     saveRun: vi.fn(),
-    scoreResults: vi.fn(async (r: any) => r),
+    scoreResults: vi.fn(async (r: any) => r), // eslint-disable-line @typescript-eslint/no-explicit-any
   }),
   BENCHMARK_PROMPTS: [],
 }));

@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 
-const mockUseQuery = vi.fn();
-const mockSaveMutation = vi.fn();
-const mockDeleteMutation = vi.fn();
+const _mockUseQuery = vi.fn();
+const _mockSaveMutation = vi.fn();
+const _mockDeleteMutation = vi.fn();
 
 vi.mock('@mycircle/shared', () => {
   const saveMut = vi.fn();
   const deleteMut = vi.fn();
   const queryMock = vi.fn();
-  const mutationMock = vi.fn((query: any) => {
+  const mutationMock = vi.fn((query: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     if (query === 'SAVE_BENCHMARK_ENDPOINT') return [saveMut, { loading: false }];
     if (query === 'DELETE_BENCHMARK_ENDPOINT') return [deleteMut, { loading: false }];
     return [vi.fn(), { loading: false }];
@@ -20,15 +20,15 @@ vi.mock('@mycircle/shared', () => {
     const [save, { loading: saving }] = mutationMock('SAVE_BENCHMARK_ENDPOINT');
     const [del] = mutationMock('DELETE_BENCHMARK_ENDPOINT');
     const endpoints = data?.benchmarkEndpoints ?? [];
-    const saveEndpoint = async (input: any) => { await save({ variables: { input } }); };
+    const saveEndpoint = async (input: any) => { await save({ variables: { input } }); }; // eslint-disable-line @typescript-eslint/no-explicit-any
     const deleteEndpoint = async (id: string) => { await del({ variables: { id } }); };
     return { endpoints, loading, saving, refetch, saveEndpoint, deleteEndpoint };
   }
 
   // Expose internal mocks for tests via __mocks
-  (useEndpoints as any).__queryMock = queryMock;
-  (useEndpoints as any).__saveMutation = saveMut;
-  (useEndpoints as any).__deleteMutation = deleteMut;
+  (useEndpoints as any).__queryMock = queryMock; // eslint-disable-line @typescript-eslint/no-explicit-any
+  (useEndpoints as any).__saveMutation = saveMut; // eslint-disable-line @typescript-eslint/no-explicit-any
+  (useEndpoints as any).__deleteMutation = deleteMut; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   const t = (key: string) => key;
   return {
@@ -50,7 +50,7 @@ let deleteMut: ReturnType<typeof vi.fn>;
 
 beforeEach(async () => {
   const shared = await import('@mycircle/shared');
-  const hook = (shared as any).useEndpoints;
+  const hook = (shared as any).useEndpoints; // eslint-disable-line @typescript-eslint/no-explicit-any
   queryMock = hook.__queryMock;
   saveMut = hook.__saveMutation;
   deleteMut = hook.__deleteMutation;

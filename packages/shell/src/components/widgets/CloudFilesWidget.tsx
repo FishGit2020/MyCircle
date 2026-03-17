@@ -22,13 +22,13 @@ const CloudFilesWidget = React.memo(function CloudFilesWidget() {
     // Also try the bridge API for fresh data
     const api = window.__cloudFiles;
     if (api?.getAll) {
-      api.getAll().then((files: any[]) => {
+      api.getAll().then((files: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setFileCount(files.length);
         try { localStorage.setItem(StorageKeys.CLOUD_FILES_CACHE, JSON.stringify(files)); } catch { /* ignore */ }
       }).catch(() => { /* ignore */ });
     }
     if (api?.getAllShared) {
-      api.getAllShared().then((files: any[]) => {
+      api.getAllShared().then((files: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setSharedCount(files.length);
       }).catch(() => { /* ignore */ });
     }

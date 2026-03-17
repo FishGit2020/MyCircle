@@ -15,8 +15,8 @@ const mockSubmitFeedback = vi.fn().mockResolvedValue(undefined);
 const mockLogEvent = vi.fn();
 
 vi.mock('../../lib/firebase', () => ({
-  submitFeedback: (...args: any[]) => mockSubmitFeedback(...args),
-  logEvent: (...args: any[]) => mockLogEvent(...args),
+  submitFeedback: (...args: any[]) => mockSubmitFeedback(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
+  logEvent: (...args: any[]) => mockLogEvent(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
 }));
 
 beforeEach(() => {
