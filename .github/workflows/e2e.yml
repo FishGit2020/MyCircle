@@ -204,6 +204,11 @@ jobs:
     steps:
       - name: Check required jobs
         run: |
+          # Release Please PRs only bump version/changelog — skip E2E
+          if [[ "${{ github.head_ref }}" == release-please--* ]]; then
+            echo "Release Please PR — auto-passing gate"
+            exit 0
+          fi
           # If no source changes, all jobs were skipped — that's OK
           if [ "${{ needs.changes.outputs.src }}" != "true" ]; then
             echo "No source changes — skipping E2E (docs/config-only PR)"

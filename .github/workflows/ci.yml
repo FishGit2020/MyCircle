@@ -342,6 +342,11 @@ jobs:
     steps:
       - name: Check required jobs
         run: |
+          # Release Please PRs only bump version/changelog — skip CI
+          if [[ "${{ github.head_ref }}" == release-please--* ]]; then
+            echo "Release Please PR — auto-passing gate"
+            exit 0
+          fi
           # If no source changes, all jobs were skipped — that's OK
           if [ "${{ needs.changes.outputs.src }}" != "true" ]; then
             echo "No source changes — skipping CI (docs/config-only PR)"
