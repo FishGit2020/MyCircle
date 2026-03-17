@@ -3,12 +3,12 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import ReloadPrompt from './ReloadPrompt';
 
 // Track the hook options so we can trigger needRefresh from tests
-let hookOptions: any = {};
+let hookOptions: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 const mockSetNeedRefresh = vi.fn();
 let mockNeedRefresh = false;
 
 vi.mock('virtual:pwa-register/react', () => ({
-  useRegisterSW: (opts: any) => {
+  useRegisterSW: (opts: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     hookOptions = opts;
     return {
       needRefresh: [mockNeedRefresh, mockSetNeedRefresh],

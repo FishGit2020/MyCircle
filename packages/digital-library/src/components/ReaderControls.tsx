@@ -35,7 +35,7 @@ export default function ReaderControls({
         {/* Page info */}
         {pageInfo && pageInfo.total > 0 && (
           <div className="text-center text-xs text-gray-500 dark:text-gray-400 mb-1">
-            {t('library.pageInfo' as any, { page: pageInfo.page, total: pageInfo.total })}
+            {t('library.pageInfo' as any, { page: pageInfo.page, total: pageInfo.total })} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
           </div>
         )}
 

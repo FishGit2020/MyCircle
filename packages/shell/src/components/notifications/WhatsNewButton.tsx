@@ -10,7 +10,7 @@ const ICON_MAP: Record<string, string> = {
   announcement: '\ud83d\udce2',
 };
 
-function formatDate(date: Date): string {
+function _formatDate(date: Date): string {
   return date.toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',

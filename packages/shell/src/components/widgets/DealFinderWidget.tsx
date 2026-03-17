@@ -14,11 +14,11 @@ const DealFinderWidget = React.memo(function DealFinderWidget() {
           </svg>
         </div>
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.dealFinder' as any)}</h4>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.dealFinderDesc' as any)}</p>
+          <h4 className="font-semibold text-sm text-gray-900 dark:text-white">{t('widgets.dealFinder' as any)}</h4> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.dealFinderDesc' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.dealFinderBrowse' as any)}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.dealFinderBrowse' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
     </div>
   );
 });

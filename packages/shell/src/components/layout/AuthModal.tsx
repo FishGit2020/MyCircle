@@ -77,7 +77,7 @@ export default function AuthModal({ open, onClose }: Props) {
     try {
       await signInWithEmail(email, password);
       onClose();
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(mapFirebaseError(err?.code || ''));
     } finally {
       setLoading(false);
@@ -101,7 +101,7 @@ export default function AuthModal({ open, onClose }: Props) {
     try {
       await signUpWithEmail(email, password, displayName || undefined);
       onClose();
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(mapFirebaseError(err?.code || ''));
     } finally {
       setLoading(false);
@@ -118,7 +118,7 @@ export default function AuthModal({ open, onClose }: Props) {
     try {
       await resetPassword(email);
       setResetSent(true);
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(mapFirebaseError(err?.code || ''));
     } finally {
       setLoading(false);
@@ -131,7 +131,7 @@ export default function AuthModal({ open, onClose }: Props) {
     try {
       await signIn();
       onClose();
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(mapFirebaseError(err?.code || ''));
     } finally {
       setLoading(false);

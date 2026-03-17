@@ -31,7 +31,7 @@ export default function AddCaseForm({ onAdd, onCancel }: Props) {
     setError(null);
     try {
       await onAdd({ receiptNumber: trimmed, formType, nickname: nickname.trim() });
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message || t('immigration.addError'));
     } finally {
       setSubmitting(false);

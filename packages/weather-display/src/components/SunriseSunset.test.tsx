@@ -88,7 +88,7 @@ describe('SunriseSunset', () => {
   });
 
   it('hides visibility section when visibility is null', () => {
-    const noVis = { ...baseCurrent, visibility: undefined as any };
+    const noVis = { ...baseCurrent, visibility: undefined as any }; // eslint-disable-line @typescript-eslint/no-explicit-any
     render(<SunriseSunset data={noVis} />);
     expect(screen.queryByText('Visibility')).not.toBeInTheDocument();
   });

@@ -49,8 +49,8 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/stocks',  labelKey: 'nav.stocks',        icon: 'stocks' },
     { path: '/podcasts', labelKey: 'nav.podcasts',     icon: 'podcasts' },
     { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
-    { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' },
-    { path: '/deals', labelKey: 'nav.dealFinder' as any, icon: 'deals' },
+    { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+    { path: '/deals', labelKey: 'nav.dealFinder' as any, icon: 'deals' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   ]},
   { labelKey: 'nav.group.faith', items: [
     { path: '/bible',   labelKey: 'nav.bible',   icon: 'bible' },
@@ -61,12 +61,12 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/child-dev', labelKey: 'nav.childDev', icon: 'child-dev' },
     { path: '/immigration', labelKey: 'nav.immigration', icon: 'immigration' },
     { path: '/family-games', labelKey: 'nav.familyGames', icon: 'family-games' },
-    { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' },
+    { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   ]},
   { labelKey: 'nav.group.learning', items: [
     { path: '/flashcards', labelKey: 'nav.flashcards', icon: 'flashcards' },
     { path: '/ai',       labelKey: 'nav.ai',      icon: 'ai' },
-    { path: '/interview', labelKey: 'nav.interview' as any, icon: 'interview' },
+    { path: '/interview', labelKey: 'nav.interview' as any, icon: 'interview' }, // eslint-disable-line @typescript-eslint/no-explicit-any
     { path: '/benchmark', labelKey: 'nav.benchmark', icon: 'benchmark' },
   ]},
   { labelKey: 'nav.group.workspace', items: [
@@ -75,11 +75,11 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/library', labelKey: 'nav.digitalLibrary', icon: 'digital-library' },
     { path: '/daily-log', labelKey: 'nav.dailyLog', icon: 'daily-log' },
     { path: '/doc-scanner', labelKey: 'nav.docScanner', icon: 'doc-scanner' },
-    { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' },
+    { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   ]},
   { labelKey: 'nav.group.outdoor', items: [
     { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
-    { path: '/travel-map', labelKey: 'nav.travelMap' as any, icon: 'travel-map' },
+    { path: '/travel-map', labelKey: 'nav.travelMap' as any, icon: 'travel-map' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   ]},
 ];
 
@@ -103,11 +103,11 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/family-games', labelKey: 'nav.familyGames', icon: 'family-games' },
   { path: '/doc-scanner', labelKey: 'nav.docScanner', icon: 'doc-scanner' },
   { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
-  { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' },
-  { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' },
+  { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   { path: '/radio', labelKey: 'nav.radio', icon: 'radio' },
-  { path: '/interview', labelKey: 'nav.interview' as any, icon: 'interview' },
-  { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' },
-  { path: '/travel-map', labelKey: 'nav.travelMap' as any, icon: 'travel-map' },
-  { path: '/deals', labelKey: 'nav.dealFinder' as any, icon: 'deals' },
+  { path: '/interview', labelKey: 'nav.interview' as any, icon: 'interview' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/transit', labelKey: 'nav.transit' as any, icon: 'transit' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/travel-map', labelKey: 'nav.travelMap' as any, icon: 'travel-map' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/deals', labelKey: 'nav.dealFinder' as any, icon: 'deals' }, // eslint-disable-line @typescript-eslint/no-explicit-any
 ];

@@ -914,6 +914,110 @@ export const PERMANENT_DELETE_BOOK = gql`
   }
 `;
 
+// ─── Interview Queries ──────────────────────────────────────────
+
+export const GET_QUESTION_BANK = gql`
+  query GetQuestionBank {
+    questionBank {
+      chapters
+      questions {
+        id
+        chapter
+        chapterSlug
+        difficulty
+        title
+        description
+        tags
+      }
+    }
+  }
+`;
+
+export const GET_INTERVIEW_SESSIONS = gql`
+  query GetInterviewSessions {
+    interviewSessions {
+      id
+      questionPreview
+      messageCount
+      mode
+      updatedAt
+      createdAt
+    }
+  }
+`;
+
+export const GET_INTERVIEW_SESSION = gql`
+  query GetInterviewSession($id: ID!) {
+    interviewSession(id: $id) {
+      id
+      question
+      document
+      messages {
+        id
+        role
+        content
+        timestamp
+      }
+      sessionName
+      interviewState
+      scores
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_INTERVIEW_QUESTION = gql`
+  mutation CreateInterviewQuestion($input: CreateInterviewQuestionInput!) {
+    createInterviewQuestion(input: $input) {
+      id
+      chapter
+      chapterSlug
+      difficulty
+      title
+      description
+      tags
+    }
+  }
+`;
+
+export const UPDATE_INTERVIEW_QUESTION = gql`
+  mutation UpdateInterviewQuestion($id: ID!, $input: UpdateInterviewQuestionInput!) {
+    updateInterviewQuestion(id: $id, input: $input) {
+      id
+      chapter
+      chapterSlug
+      difficulty
+      title
+      description
+      tags
+    }
+  }
+`;
+
+export const DELETE_INTERVIEW_QUESTION = gql`
+  mutation DeleteInterviewQuestion($id: ID!) {
+    deleteInterviewQuestion(id: $id)
+  }
+`;
+
+export const SAVE_INTERVIEW_SESSION = gql`
+  mutation SaveInterviewSession($input: SaveInterviewSessionInput!) {
+    saveInterviewSession(input: $input) {
+      id
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_INTERVIEW_SESSION = gql`
+  mutation DeleteInterviewSession($id: ID!) {
+    deleteInterviewSession(id: $id)
+  }
+`;
+
 export const WEATHER_UPDATES = gql`
   ${WEATHER_CONDITION_FRAGMENT}
   subscription WeatherUpdates($lat: Float!, $lon: Float!) {

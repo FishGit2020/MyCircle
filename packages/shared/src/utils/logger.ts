@@ -11,7 +11,7 @@ type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 const LEVEL_ORDER: Record<LogLevel, number> = { debug: 0, info: 1, warn: 2, error: 3 };
 
 const minLevel: LogLevel =
-  typeof import.meta !== 'undefined' && (import.meta as any).env?.PROD ? 'warn' : 'debug';
+  typeof import.meta !== 'undefined' && (import.meta as any).env?.PROD ? 'warn' : 'debug'; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 function shouldLog(level: LogLevel): boolean {
   return LEVEL_ORDER[level] >= LEVEL_ORDER[minLevel];

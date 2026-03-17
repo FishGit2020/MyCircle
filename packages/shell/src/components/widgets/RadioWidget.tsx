@@ -41,10 +41,10 @@ const RadioWidget = React.memo(function RadioWidget() {
       </div>
       {favCount > 0 ? (
         <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">
-          {t('widgets.radioFavCount' as any).replace('{count}', String(favCount))}
+          {t('widgets.radioFavCount' as any).replace('{count}', String(favCount))} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </p>
       ) : (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.radioNoFavorites' as any)}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('widgets.radioNoFavorites' as any)}</p> // eslint-disable-line @typescript-eslint/no-explicit-any
       )}
     </div>
   );

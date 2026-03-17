@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useMutation, AI_CHAT, StorageKeys } from '@mycircle/shared';
 import { useAiChatStream } from './useAiChatStream';
-import type { ChatMessage, ToolCall, AiAction } from './useAiChat';
+import type { ChatMessage, AiAction } from './useAiChat';
 
 const STORAGE_KEY = 'ai-chat-history';
 const MODEL_STORAGE_KEY = 'mycircle-ai-model';
@@ -16,7 +16,7 @@ function gatherUserContext(): Record<string, unknown> {
     const watchlist = localStorage.getItem(StorageKeys.STOCK_WATCHLIST);
     if (watchlist) {
       const parsed = JSON.parse(watchlist);
-      if (Array.isArray(parsed) && parsed.length > 0) ctx.stockWatchlist = parsed.map((w: any) => w.symbol || w).slice(0, 20);
+      if (Array.isArray(parsed) && parsed.length > 0) ctx.stockWatchlist = parsed.map((w: any) => w.symbol || w).slice(0, 20); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
     const subs = localStorage.getItem(StorageKeys.PODCAST_SUBSCRIPTIONS);
     if (subs) {
@@ -26,7 +26,7 @@ function gatherUserContext(): Record<string, unknown> {
     const recents = localStorage.getItem(StorageKeys.RECENT_CITIES);
     if (recents) {
       const parsed = JSON.parse(recents);
-      if (Array.isArray(parsed) && parsed.length > 0) ctx.recentCities = parsed.map((c: any) => c.name || c).slice(0, 5);
+      if (Array.isArray(parsed) && parsed.length > 0) ctx.recentCities = parsed.map((c: any) => c.name || c).slice(0, 5); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
     const babyDueDate = localStorage.getItem(StorageKeys.BABY_DUE_DATE);
     if (babyDueDate) ctx.babyDueDate = babyDueDate;

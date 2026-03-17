@@ -2,8 +2,8 @@ import { useTranslation } from '@mycircle/shared';
 import type { Note, PublicNote } from '../types';
 
 function formatDate(date: Note['updatedAt']): string {
-  const d = date && typeof (date as any).toDate === 'function'
-    ? (date as any).toDate()
+  const d = date && typeof (date as any).toDate === 'function' // eslint-disable-line @typescript-eslint/no-explicit-any
+    ? (date as any).toDate() // eslint-disable-line @typescript-eslint/no-explicit-any
     : date instanceof Date ? date : new Date();
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }

@@ -19,7 +19,7 @@ describe('tracedLazy', () => {
 
   it('traces a successful import', async () => {
     const { trace: traceFn } = await import('firebase/performance');
-    const perf = {} as any;
+    const perf = {} as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     const importFn = vi.fn().mockResolvedValue({ default: DummyComponent });
 
     const Lazy = tracedLazy('mfe_test_load', importFn, () => perf);
@@ -59,7 +59,7 @@ describe('tracedLazy', () => {
 
   it('stops the trace even when the import fails', async () => {
     const { trace: traceFn } = await import('firebase/performance');
-    const perf = {} as any;
+    const perf = {} as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     const importFn = vi.fn().mockRejectedValue(new Error('chunk failed'));
 
     const Lazy = tracedLazy('mfe_fail_load', importFn, () => perf);

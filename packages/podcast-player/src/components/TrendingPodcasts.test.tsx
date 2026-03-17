@@ -82,7 +82,7 @@ describe('TrendingPodcasts', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseTrending.mockReturnValue({
-      data: mockPodcasts as any,
+      data: mockPodcasts as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       loading: false,
       error: null,
       refetch: vi.fn(),

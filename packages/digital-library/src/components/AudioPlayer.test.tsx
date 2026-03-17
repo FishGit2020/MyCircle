@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AudioPlayer from './AudioPlayer';
 
 // Instead of rendering the full component (which has many effects that
 // cause CI timeouts), test buildAudioSource logic directly by extracting

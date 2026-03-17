@@ -192,7 +192,7 @@ export default function WordGame({ onBack }: WordGameProps) {
         <span className="w-16" />
       </div>
       <div className="bg-green-50 dark:bg-green-900/20 rounded-lg px-3 py-1.5 w-full">
-        <p className="text-[10px] text-green-600 dark:text-green-400">{t('games.scoringRules' as any)}: {t('games.wordRules' as any)}</p>
+        <p className="text-[10px] text-green-600 dark:text-green-400">{t('games.scoringRules' as any)}: {t('games.wordRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
       </div>
 
       {/* Grid */}

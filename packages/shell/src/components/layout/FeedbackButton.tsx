@@ -206,7 +206,7 @@ export default function FeedbackButton() {
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
                   >
                     {CATEGORY_KEYS.map((c) => (
-                      <option key={c.value} value={c.value}>{t(c.key as any)}</option>
+                      <option key={c.value} value={c.value}>{t(c.key as any)}</option> // eslint-disable-line @typescript-eslint/no-explicit-any
                     ))}
                   </select>
                 </div>

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import type maplibregl from 'maplibre-gl';
-import { getTile } from '../services/tileCacheService';
 
 interface Props {
   style: string | Record<string, unknown>;

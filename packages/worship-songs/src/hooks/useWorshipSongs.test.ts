@@ -30,7 +30,7 @@ vi.mock('@mycircle/shared', () => {
       loading: mockQueryLoading,
       refetch: mockRefetch,
     }),
-    useMutation: (mutation: any) => {
+    useMutation: (mutation: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       const opName = mutation?.definitions?.[0]?.name?.value ?? '';
       if (opName === 'AddWorshipSong') return [mockAddSongMutation, {}];
       if (opName === 'UpdateWorshipSong') return [mockUpdateSongMutation, {}];

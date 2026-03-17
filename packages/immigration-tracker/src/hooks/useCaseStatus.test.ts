@@ -25,7 +25,7 @@ describe('useCaseStatus', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockExecute = vi.fn();
-    mockUseLazyQuery.mockReturnValue([mockExecute, { loading: false, data: null } as any]);
+    mockUseLazyQuery.mockReturnValue([mockExecute, { loading: false, data: null } as any]); // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   it('initializes with empty statuses and no error', () => {
@@ -42,7 +42,7 @@ describe('useCaseStatus', () => {
 
     const { result } = renderHook(() => useCaseStatus());
 
-    let data: any;
+    let data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       data = await result.current.fetchStatus('IOE0912345678');
     });
@@ -57,12 +57,12 @@ describe('useCaseStatus', () => {
   });
 
   it('sets loadingReceipt during fetch', async () => {
-    let resolvePromise!: (value: any) => void;
+    let resolvePromise!: (value: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
     mockExecute.mockReturnValue(new Promise(r => { resolvePromise = r; }));
 
     const { result } = renderHook(() => useCaseStatus());
 
-    let fetchPromise: Promise<any>;
+    let fetchPromise: Promise<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
     act(() => {
       fetchPromise = result.current.fetchStatus('IOE0912345678');
     });
@@ -84,7 +84,7 @@ describe('useCaseStatus', () => {
 
     const { result } = renderHook(() => useCaseStatus());
 
-    let data: any;
+    let data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       data = await result.current.fetchStatus('IOE0912345678');
     });
@@ -99,7 +99,7 @@ describe('useCaseStatus', () => {
 
     const { result } = renderHook(() => useCaseStatus());
 
-    let data: any;
+    let data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       data = await result.current.fetchStatus('IOE0912345678');
     });
@@ -113,7 +113,7 @@ describe('useCaseStatus', () => {
 
     const { result } = renderHook(() => useCaseStatus());
 
-    let data: any;
+    let data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     await act(async () => {
       data = await result.current.fetchStatus('IOE0912345678');
     });

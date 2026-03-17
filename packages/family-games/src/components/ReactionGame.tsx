@@ -88,12 +88,12 @@ export default function ReactionGame({ onBack }: { onBack: () => void }) {
           </svg>
         </div>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.reactionTime' as any)}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{ROUNDS} {t('games.round' as any)}s</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('games.reactionTime' as any)}</h2> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-sm text-gray-500 dark:text-gray-400">{ROUNDS} {t('games.round' as any)}s</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="bg-red-50 dark:bg-red-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-red-700 dark:text-red-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{t('games.reactionRules' as any)}</p>
+          <p className="text-xs font-medium text-red-700 dark:text-red-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{t('games.reactionRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <button type="button" onClick={startGame} className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition active:scale-95">
           {t('games.startGame')}
@@ -107,7 +107,7 @@ export default function ReactionGame({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-      <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.round' as any)} {times.length + 1}/{ROUNDS}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{t('games.round' as any)} {times.length + 1}/{ROUNDS}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
 
       {phase === 'waiting' && (
         <button
@@ -115,7 +115,7 @@ export default function ReactionGame({ onBack }: { onBack: () => void }) {
           onClick={handleTap}
           className="w-64 h-64 rounded-3xl bg-red-500 flex items-center justify-center text-white text-xl font-bold transition active:scale-95"
         >
-          {t('games.reactionWait' as any)}
+          {t('games.reactionWait' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </button>
       )}
 
@@ -125,7 +125,7 @@ export default function ReactionGame({ onBack }: { onBack: () => void }) {
           onClick={handleTap}
           className="w-64 h-64 rounded-3xl bg-green-500 flex items-center justify-center text-white text-xl font-bold transition active:scale-95 animate-pulse"
         >
-          {t('games.reactionTap' as any)}
+          {t('games.reactionTap' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </button>
       )}
 
@@ -133,7 +133,7 @@ export default function ReactionGame({ onBack }: { onBack: () => void }) {
         <div className="text-center space-y-4">
           {tooEarly ? (
             <div className="w-64 h-64 rounded-3xl bg-yellow-500 flex items-center justify-center">
-              <p className="text-white text-xl font-bold">{t('games.reactionTooEarly' as any)}</p>
+              <p className="text-white text-xl font-bold">{t('games.reactionTooEarly' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </div>
           ) : (
             <div className="w-64 h-64 rounded-3xl bg-blue-500 flex items-center justify-center flex-col">

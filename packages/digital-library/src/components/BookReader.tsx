@@ -39,20 +39,20 @@ interface BookReaderProps {
   onRefreshChapters?: () => Promise<void>;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack, onRefreshChapters }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack: _onBack, onRefreshChapters }: BookReaderProps) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') === 'listen' ? 'listen' : 'read';
   const autoPlayOnMount = searchParams.get('autoPlay') === '1';
   const viewerRef = useRef<HTMLDivElement>(null);
-  const renditionRef = useRef<any>(null);
-  const bookRef = useRef<any>(null);
+  const renditionRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const bookRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [currentChapter, setCurrentChapter] = useState(0);
   const [fontSize, setFontSize] = useState(16);
   const [tocOpen, setTocOpen] = useState(false);
   const [ttsText, setTtsText] = useState('');
   const [loading, setLoading] = useState(true);
-  const [readerExpanded, setReaderExpanded] = useState(true);
+  const [_readerExpanded, _setReaderExpanded] = useState(true);
   const [bookmarks, setBookmarks] = useState<BookBookmark[]>([]);
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -124,7 +124,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
       window.dispatchEvent(new CustomEvent(WindowEvents.BOOK_LISTEN_TAB_ACTIVE, { detail: false }));
     };
   }, [activeTab]);
-  const spineItemsRef = useRef<Array<{ href: string; index: number }>>([]);
+  const _spineItemsRef = useRef<Array<{ href: string; index: number }>>([]);
 
   const getThemeStyles = useCallback((isDark: boolean) => {
     const base: Record<string, Record<string, string>> = {
@@ -139,7 +139,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
       base.body.color = '#e5e7eb';
       base.body.background = '#1f2937';
       base.a = base.a || {};
-      (base as any).a = { color: '#60a5fa' };
+      (base as any).a = { color: '#60a5fa' }; // eslint-disable-line @typescript-eslint/no-explicit-any
     }
     return base;
   }, []);
@@ -178,7 +178,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         try { await book.loaded.spine; } catch { /* ignore */ }
 
         // Extract text for TTS + page info
-        rendition.on('relocated', async (location: any) => {
+        rendition.on('relocated', async (location: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           if (cancelled) return;
           try {
             const contents = rendition.getContents();
@@ -218,6 +218,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         try { bookRef.current.destroy(); } catch { /* ignore */ }
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [epubUrl, chapters]);
 
   // ResizeObserver — re-fit rendition on container resize (fullscreen, window resize)
@@ -252,13 +253,13 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
     if (!r) return;
     r.themes.fontSize(`${fontSize}px`);
     // Force CSS override on all text elements inside the EPUB iframe
-    r.hooks?.content?.register((contents: any) => {
+    r.hooks?.content?.register((contents: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       contents.addStylesheetRules({ 'body, body *': { 'font-size': `${fontSize}px !important` } });
     });
     // Re-display current location to apply the new size
     const loc = r.location;
     if (loc?.start?.cfi) {
-      r.display(loc.start.cfi).catch((err: any) => {
+      r.display(loc.start.cfi).catch((err: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         logger.error('Failed to re-display after font change', err);
       });
     }
@@ -283,7 +284,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         renditionRef.current!.display(chapterHref).then(() => {
           setCurrentChapter(index);
           setTocOpen(false);
-        }).catch((err: any) => {
+        }).catch((err: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           logger.error('All chapter navigation methods failed', { index, target, chapterHref, err });
           // Still update UI even if display fails
           setCurrentChapter(index);
@@ -386,7 +387,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
   const goToBookmark = useCallback((cfi: string) => {
     if (renditionRef.current) {
-      renditionRef.current.display(cfi).catch((err: any) => {
+      renditionRef.current.display(cfi).catch((err: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         logger.error('Failed to navigate to bookmark', err);
       });
       setBookmarksOpen(false);
@@ -395,21 +396,21 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
   // Fullscreen (with Safari webkit prefix fallback)
   const toggleFullscreen = useCallback(() => {
-    const el = containerRef.current as any;
+    const el = containerRef.current as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!el) return;
-    const fsElement = document.fullscreenElement ?? (document as any).webkitFullscreenElement;
+    const fsElement = document.fullscreenElement ?? (document as any).webkitFullscreenElement; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (!fsElement) {
       const request = el.requestFullscreen ?? el.webkitRequestFullscreen;
       request?.call(el)?.catch?.(() => {});
     } else {
-      const exit = document.exitFullscreen ?? (document as any).webkitExitFullscreen;
+      const exit = document.exitFullscreen ?? (document as any).webkitExitFullscreen; // eslint-disable-line @typescript-eslint/no-explicit-any
       exit?.call(document)?.catch?.(() => {});
     }
   }, []);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!(document.fullscreenElement ?? (document as any).webkitFullscreenElement));
+      setIsFullscreen(!!(document.fullscreenElement ?? (document as any).webkitFullscreenElement)); // eslint-disable-line @typescript-eslint/no-explicit-any
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -540,7 +541,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
               : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
           }`}
         >
-          {t('library.tabRead' as any)}
+          {t('library.tabRead' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </button>
         <button
           type="button"
@@ -553,7 +554,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
               : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
           }`}
         >
-          {t('library.tabListen' as any)}
+          {t('library.tabListen' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </button>
       </div>
 

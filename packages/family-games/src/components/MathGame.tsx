@@ -174,8 +174,8 @@ export default function MathGame({ onBack }: MathGameProps) {
           <p className="text-sm text-gray-500 dark:text-gray-400">60s &middot; {t('games.difficulty')}</p>
         </div>
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-2.5 max-w-xs">
-          <p className="text-xs font-medium text-blue-700 dark:text-blue-300">{t('games.scoringRules' as any)}</p>
-          <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">{t('games.mathRules' as any)}</p>
+          <p className="text-xs font-medium text-blue-700 dark:text-blue-300">{t('games.scoringRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">{t('games.mathRules' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </div>
         <div className="flex gap-3">
           {(['easy', 'medium', 'hard'] as const).map(d => (

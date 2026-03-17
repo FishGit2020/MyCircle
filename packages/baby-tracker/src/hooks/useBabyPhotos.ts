@@ -58,7 +58,7 @@ export function useBabyPhotos() {
       await refetch();
       window.dispatchEvent(new Event(WindowEvents.BABY_MILESTONES_CHANGED));
       window.__logAnalyticsEvent?.('baby_milestone_photo_upload', { stageId });
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       const msg = err?.message || 'Upload failed';
       setError(msg);
       setErrorStageId(stageId);

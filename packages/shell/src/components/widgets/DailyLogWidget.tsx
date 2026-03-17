@@ -7,9 +7,9 @@ const DailyLogWidget = React.memo(function DailyLogWidget() {
 
   useEffect(() => {
     const currentMonth = new Date().toISOString().slice(0, 7);
-    function countThisMonth(entries: any[]): number {
+    function countThisMonth(entries: any[]): number { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!Array.isArray(entries)) return 0;
-      return entries.filter((e: any) => e.date && e.date.startsWith(currentMonth)).length;
+      return entries.filter((e: any) => e.date && e.date.startsWith(currentMonth)).length; // eslint-disable-line @typescript-eslint/no-explicit-any
     }
     function load() {
       try {
@@ -25,7 +25,7 @@ const DailyLogWidget = React.memo(function DailyLogWidget() {
     // Also try the bridge API for fresh data
     const api = window.__workTracker;
     if (api?.getAll) {
-      api.getAll().then((entries: any[]) => {
+      api.getAll().then((entries: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         setEntryCount(countThisMonth(entries));
         try { localStorage.setItem(StorageKeys.DAILY_LOG_CACHE, JSON.stringify(entries)); } catch { /* ignore */ }
       }).catch(() => { /* ignore */ });

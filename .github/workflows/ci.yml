@@ -242,14 +242,33 @@ jobs:
           done
           cat bundle-report.md
 
-      - name: Check shell bundle size limit
+      - name: Check bundle size limits
         run: |
+          FAIL=0
+          # Shell limit: 5MB
           SHELL_SIZE=$(du -sb packages/shell/dist 2>/dev/null | cut -f1)
-          LIMIT=5242880  # 5MB
-          echo "Shell bundle: $(du -sh packages/shell/dist | cut -f1) ($SHELL_SIZE bytes, limit: $LIMIT)"
-          if [ "$SHELL_SIZE" -gt "$LIMIT" ]; then
-            echo "::warning::Shell bundle exceeds 5MB limit"
+          SHELL_LIMIT=5242880
+          echo "Shell: $(du -sh packages/shell/dist | cut -f1) (limit: 5MB)"
+          if [ "$SHELL_SIZE" -gt "$SHELL_LIMIT" ]; then
+            echo "::error::Shell bundle exceeds 5MB limit ($SHELL_SIZE bytes)"
+            FAIL=1
           fi
+          # MFE limit: 2MB each
+          MFE_LIMIT=2097152
+          for dir in packages/*/dist; do
+            pkg=$(basename $(dirname "$dir"))
+            [ "$pkg" = "shell" ] || [ "$pkg" = "shared" ] && continue
+            if [ -d "$dir" ]; then
+              SIZE=$(du -sb "$dir" 2>/dev/null | cut -f1)
+              if [ "$SIZE" -gt "$MFE_LIMIT" ]; then
+                echo "::warning::$pkg bundle exceeds 2MB limit ($(du -sh "$dir" | cut -f1))"
+              fi
+            fi
+          done
+          # Total size check
+          TOTAL=$(du -sb packages/*/dist 2>/dev/null | awk '{s+=$1} END{print s}')
+          echo "Total bundle size: $(numfmt --to=iec $TOTAL)"
+          echo "total_size=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: Upload bundle size report
         if: always()

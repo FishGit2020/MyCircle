@@ -22,7 +22,7 @@ afterEach(() => {
 
 function fireBeforeInstallPrompt() {
   const promptMock = vi.fn().mockResolvedValue(undefined);
-  const event = new Event('beforeinstallprompt') as any;
+  const event = new Event('beforeinstallprompt') as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   event.prompt = promptMock;
   event.userChoice = Promise.resolve({ outcome: 'accepted' as const });
   window.dispatchEvent(event);

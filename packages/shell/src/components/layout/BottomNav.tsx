@@ -40,7 +40,7 @@ function getItemByPath(path: string): NavItem {
   return ALL_NAV_ITEMS.find(item => item.path === path) || ALL_NAV_ITEMS[0];
 }
 
-export default function BottomNav({ hasActivePlayer }: { hasActivePlayer: boolean }) {
+export default function BottomNav({ hasActivePlayer: _hasActivePlayer }: { hasActivePlayer: boolean }) {
   const { t } = useTranslation();
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);

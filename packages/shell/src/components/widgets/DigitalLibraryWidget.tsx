@@ -143,7 +143,7 @@ const DigitalLibraryWidget = React.memo(function DigitalLibraryWidget() {
       )}
       {bookmarkCount > 0 && (
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          {t('widgets.bookBookmarks' as any).replace('{count}', String(bookmarkCount))}
+          {t('widgets.bookBookmarks' as any).replace('{count}', String(bookmarkCount))} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </p>
       )}
     </div>

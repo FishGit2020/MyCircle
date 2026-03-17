@@ -41,7 +41,7 @@ function FileIconSvg({ type }: { type: string }) {
 
 export default function FileCard({ fileName, contentType, size, downloadUrl, date, sharedBy, isOwner, onShare, onDelete }: FileCardProps) {
   const { t } = useTranslation();
-  const dateObj = typeof date === 'string' ? new Date(date) : typeof (date as any)?.toDate === 'function' ? (date as any).toDate() : date instanceof Date ? date : new Date();
+  const dateObj = typeof date === 'string' ? new Date(date) : typeof (date as any)?.toDate === 'function' ? (date as any).toDate() : date instanceof Date ? date : new Date(); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">

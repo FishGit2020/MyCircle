@@ -18,7 +18,7 @@ const NotebookWidget = React.memo(function NotebookWidget() {
     function fetchDirect() {
       const api = window.__notebook;
       if (api?.getAll) {
-        api.getAll().then((notes: any[]) => {
+        api.getAll().then((notes: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           setNoteCount(notes.length);
           try { localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(notes.length)); } catch { /* ignore */ }
         }).catch(() => { /* ignore */ });
@@ -56,7 +56,7 @@ const NotebookWidget = React.memo(function NotebookWidget() {
     function loadPublic() {
       const api = window.__notebook;
       if (api?.getAllPublic) {
-        api.getAllPublic().then((notes: any[]) => {
+        api.getAllPublic().then((notes: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           setPublicCount(notes.length);
         }).catch(() => { /* ignore */ });
       }

@@ -62,7 +62,7 @@ if (firebaseEnabled) {
   // App Check: verify requests come from our app, not bots/curl
   try {
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN =
+      (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = // eslint-disable-line @typescript-eslint/no-explicit-any
         import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
     }
     appCheck = initializeAppCheck(app, {
@@ -224,7 +224,7 @@ export async function signInWithGoogle() {
     const result = await signInWithPopup(auth, googleProvider);
     await ensureUserProfile(result.user);
     return result.user;
-  } catch (error: any) {
+  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     // Popup blocked, App Check throttled, or Firefox cookie partitioning — fall back to redirect
     const code = error?.code || '';
     if (
@@ -250,7 +250,7 @@ export async function signInWithGoogleHint(email: string) {
     const result = await signInWithPopup(auth, hintedProvider);
     await ensureUserProfile(result.user);
     return result.user;
-  } catch (error: any) {
+  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     const code = error?.code || '';
     if (
       code === 'auth/internal-error' ||
@@ -308,7 +308,7 @@ export function subscribeToAuthChanges(callback: (user: User | null) => void) {
   }
   // E2E test bypass: if a fixture has injected __e2eAuthCallback, use it to
   // resolve auth state immediately instead of waiting for Firebase network calls.
-  const e2eMock = (window as any).__e2eAuthCallback as ((cb: (user: User | null) => void) => void) | undefined;
+  const e2eMock = (window as any).__e2eAuthCallback as ((cb: (user: User | null) => void) => void) | undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
   if (e2eMock) {
     e2eMock(callback);
     return () => {};
@@ -323,7 +323,7 @@ async function ensureUserProfile(user: User) {
   const userDoc = await getDoc(userRef);
 
   if (!userDoc.exists()) {
-    const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> & { createdAt: any; updatedAt: any } = {
+    const newProfile: Omit<UserProfile, 'createdAt' | 'updatedAt'> & { createdAt: any; updatedAt: any } = { // eslint-disable-line @typescript-eslint/no-explicit-any
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
@@ -574,7 +574,7 @@ export async function updateWorshipFavorites(uid: string, favorites: string[]) {
 }
 
 
-export async function updateRadioFavorites(uid: string, favorites: any[]) {
+export async function updateRadioFavorites(uid: string, favorites: any[]) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return;
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
@@ -701,11 +701,11 @@ export function identifyUser(uid: string, properties?: Record<string, string>) {
 /** Clear user identity on sign-out */
 export function clearUserIdentity() {
   if (!analytics) return;
-  setUserId(analytics, null as any);
+  setUserId(analytics, null as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /** Log a custom analytics event */
-export function logEvent(eventName: string, params?: Record<string, any>) {
+export function logEvent(eventName: string, params?: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!analytics) return;
   firebaseLogEvent(analytics, eventName, params);
 }
@@ -733,11 +733,11 @@ export async function getWorshipSong(id: string) {
 }
 
 /** Strip undefined values — Firestore rejects them */
-function stripUndefined(obj: Record<string, any>): Record<string, any> {
+function stripUndefined(obj: Record<string, any>): Record<string, any> { // eslint-disable-line @typescript-eslint/no-explicit-any
   return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 }
 
-export async function addWorshipSong(song: Record<string, any>) {
+export async function addWorshipSong(song: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const docRef = await addDoc(collection(db, 'worshipSongs'), {
     ...stripUndefined(song),
@@ -751,11 +751,11 @@ export async function addWorshipSong(song: Record<string, any>) {
 /** Optional fields that should be removed from Firestore when cleared */
 const OPTIONAL_SONG_FIELDS = ['youtubeUrl', 'bpm', 'tags'];
 
-export async function updateWorshipSong(id: string, updates: Record<string, any>) {
+export async function updateWorshipSong(id: string, updates: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const docRef = doc(db, 'worshipSongs', id);
   // For optional fields, explicitly delete them from Firestore when undefined
-  const deletions: Record<string, any> = {};
+  const deletions: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
   for (const field of OPTIONAL_SONG_FIELDS) {
     if (field in updates && updates[field] === undefined) {
       deletions[field] = deleteField();
@@ -774,7 +774,7 @@ export async function deleteWorshipSong(id: string) {
 }
 
 /** Subscribe to real-time worship songs updates via Firestore onSnapshot */
-export function subscribeToWorshipSongs(callback: (songs: Array<Record<string, any>>) => void): () => void {
+export function subscribeToWorshipSongs(callback: (songs: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'worshipSongs'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -829,7 +829,7 @@ export async function deleteUserNote(uid: string, noteId: string) {
 }
 
 /** Subscribe to real-time private notes updates via Firestore onSnapshot */
-export function subscribeToUserNotes(uid: string, callback: (notes: Array<Record<string, any>>) => void): () => void {
+export function subscribeToUserNotes(uid: string, callback: (notes: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'notes'), orderBy('updatedAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -875,7 +875,7 @@ export async function deletePublicNote(noteId: string) {
 }
 
 /** Subscribe to real-time public notes updates via Firestore onSnapshot */
-export function subscribeToPublicNotes(callback: (notes: Array<Record<string, any>>) => void): () => void {
+export function subscribeToPublicNotes(callback: (notes: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'publicNotes'), orderBy('updatedAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -894,7 +894,7 @@ export async function getChineseCharacters() {
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-export async function addChineseCharacter(char: Record<string, any>) {
+export async function addChineseCharacter(char: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const user = auth?.currentUser;
   const docRef = await addDoc(collection(db, 'chineseCharacters'), {
@@ -905,7 +905,7 @@ export async function addChineseCharacter(char: Record<string, any>) {
   return docRef.id;
 }
 
-export async function updateChineseCharacter(id: string, updates: Record<string, any>) {
+export async function updateChineseCharacter(id: string, updates: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const user = auth?.currentUser;
   const docRef = doc(db, 'chineseCharacters', id);
@@ -921,7 +921,7 @@ export async function deleteChineseCharacter(id: string) {
   await deleteDoc(doc(db, 'chineseCharacters', id));
 }
 
-export function subscribeToChineseCharacters(callback: (chars: Array<Record<string, any>>) => void): () => void {
+export function subscribeToChineseCharacters(callback: (chars: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'chineseCharacters'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -952,7 +952,7 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deleteUserNote(auth.currentUser.uid, id);
     },
-    subscribe: (callback: (notes: Array<Record<string, any>>) => void) => {
+    subscribe: (callback: (notes: Array<Record<string, any>>) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) return () => {};
       return subscribeToUserNotes(auth.currentUser.uid, callback);
     },
@@ -978,8 +978,8 @@ if (firebaseEnabled) {
 // Expose Chinese characters API for MFEs — CRUD now routes to user-scoped flashcards
 if (firebaseEnabled) {
   window.__chineseCharacters = {
-    getAll: getChineseCharacters as any,
-    add: async (char: Record<string, any>) => {
+    getAll: getChineseCharacters as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    add: async (char: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) throw new Error('Not authenticated');
       const uid = auth.currentUser.uid;
       const card = {
@@ -992,10 +992,10 @@ if (firebaseEnabled) {
       };
       return addUserFlashcard(uid, card);
     },
-    update: async (id: string, updates: Record<string, any>) => {
+    update: async (id: string, updates: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) throw new Error('Not authenticated');
       const uid = auth.currentUser.uid;
-      const cardUpdates: Record<string, any> = {};
+      const cardUpdates: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
       if (updates.character !== undefined) cardUpdates.front = updates.character;
       if (updates.meaning !== undefined) cardUpdates.back = updates.meaning;
       if (updates.pinyin !== undefined) cardUpdates.meta = { pinyin: updates.pinyin };
@@ -1041,7 +1041,7 @@ export async function deleteDailyLogEntry(uid: string, entryId: string) {
   await deleteDoc(doc(db, 'users', uid, 'dailylog', entryId));
 }
 
-export function subscribeToDailyLogEntries(uid: string, callback: (entries: Array<Record<string, any>>) => void): () => void {
+export function subscribeToDailyLogEntries(uid: string, callback: (entries: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'dailylog'), orderBy('date', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -1068,7 +1068,7 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deleteDailyLogEntry(auth.currentUser.uid, id);
     },
-    subscribe: (callback: (entries: Array<Record<string, any>>) => void) => {
+    subscribe: (callback: (entries: Array<Record<string, any>>) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) return () => {};
       return subscribeToDailyLogEntries(auth.currentUser.uid, callback);
     },
@@ -1098,7 +1098,7 @@ export async function addHikingRoute(uid: string, route: {
   return docRef.id;
 }
 
-export async function updateHikingRoute(uid: string, routeId: string, updates: Record<string, any>) {
+export async function updateHikingRoute(uid: string, routeId: string, updates: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), { ...updates, updatedAt: serverTimestamp() });
 }
@@ -1111,7 +1111,7 @@ export async function deleteHikingRoute(uid: string, routeId: string) {
   });
 }
 
-export function subscribeToHikingRoutes(uid: string, callback: (routes: Array<Record<string, any>>) => void): () => void {
+export function subscribeToHikingRoutes(uid: string, callback: (routes: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'hikingRoutes'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => callback(snap.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }))),
@@ -1149,7 +1149,7 @@ export async function unshareHikingRoute(uid: string, routeId: string) {
   await updateDoc(doc(db, 'users', uid, 'hikingRoutes', routeId), { sharedId: null });
 }
 
-export function subscribeToPublicHikingRoutes(callback: (routes: Array<Record<string, any>>) => void): () => void {
+export function subscribeToPublicHikingRoutes(callback: (routes: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'publicHikingRoutes'), orderBy('sharedAt', 'desc'));
   return onSnapshot(q, (snap) => callback(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
@@ -1219,7 +1219,7 @@ export async function deleteImmigrationCase(uid: string, caseId: string) {
   await deleteDoc(doc(db, 'users', uid, 'immigrationCases', caseId));
 }
 
-export function subscribeToImmigrationCases(uid: string, callback: (cases: Array<Record<string, any>>) => void): () => void {
+export function subscribeToImmigrationCases(uid: string, callback: (cases: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'immigrationCases'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -1242,7 +1242,7 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deleteImmigrationCase(auth.currentUser.uid, id);
     },
-    subscribe: (callback: (cases: Array<Record<string, any>>) => void) => {
+    subscribe: (callback: (cases: Array<Record<string, any>>) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) return () => {};
       return subscribeToImmigrationCases(auth.currentUser.uid, callback);
     },
@@ -1257,7 +1257,7 @@ export async function getPublicFlashcards() {
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-export async function addPublicFlashcard(card: Record<string, any>) {
+export async function addPublicFlashcard(card: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const user = auth?.currentUser;
   const id = card.id || `pub-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -1276,7 +1276,7 @@ export async function deletePublicFlashcard(id: string) {
   await deleteDoc(doc(db, 'publicFlashcards', id));
 }
 
-export function subscribeToPublicFlashcards(callback: (cards: Array<Record<string, any>>) => void): () => void {
+export function subscribeToPublicFlashcards(callback: (cards: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'publicFlashcards'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -1295,7 +1295,7 @@ export async function getUserFlashcards(uid: string) {
   return snapshot.docs.filter(d => !d.data().isDeleted).map(d => ({ id: d.id, ...d.data() }));
 }
 
-export async function addUserFlashcard(uid: string, card: Record<string, any>) {
+export async function addUserFlashcard(uid: string, card: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const id = card.id || `card-${Date.now()}`;
   await setDoc(doc(db, 'users', uid, 'flashcards', id), {
@@ -1306,7 +1306,7 @@ export async function addUserFlashcard(uid: string, card: Record<string, any>) {
   return id;
 }
 
-export async function addUserFlashcards(uid: string, cards: Array<Record<string, any>>) {
+export async function addUserFlashcards(uid: string, cards: Array<Record<string, any>>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const promises = cards.map(card => {
     const id = card.id || `card-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -1319,7 +1319,7 @@ export async function addUserFlashcards(uid: string, cards: Array<Record<string,
   await Promise.all(promises);
 }
 
-export async function updateUserFlashcard(uid: string, cardId: string, updates: Record<string, any>) {
+export async function updateUserFlashcard(uid: string, cardId: string, updates: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const docRef = doc(db, 'users', uid, 'flashcards', cardId);
   await updateDoc(docRef, {
@@ -1336,7 +1336,7 @@ export async function deleteUserFlashcard(uid: string, cardId: string) {
   });
 }
 
-export function subscribeToUserFlashcards(uid: string, callback: (cards: Array<Record<string, any>>) => void): () => void {
+export function subscribeToUserFlashcards(uid: string, callback: (cards: Array<Record<string, any>>) => void): () => void { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'flashcards'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
@@ -1354,7 +1354,7 @@ export async function getUserFlashcardProgress(uid: string) {
   return snap.exists() ? snap.data() : null;
 }
 
-export async function updateUserFlashcardProgress(uid: string, progress: Record<string, any>) {
+export async function updateUserFlashcardProgress(uid: string, progress: Record<string, any>) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) throw new Error('Firebase not initialized');
   const docRef = doc(db, 'users', uid, 'flashcardProgress', 'main');
   await setDoc(docRef, {
@@ -1367,15 +1367,15 @@ export async function updateUserFlashcardProgress(uid: string, progress: Record<
 if (firebaseEnabled) {
   window.__flashcards = {
     getAll: () => auth?.currentUser ? getUserFlashcards(auth.currentUser.uid) : Promise.resolve([]),
-    add: (card: Record<string, any>) => {
+    add: (card: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return addUserFlashcard(auth.currentUser.uid, card);
     },
-    addBatch: (cards: Array<Record<string, any>>) => {
+    addBatch: (cards: Array<Record<string, any>>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return addUserFlashcards(auth.currentUser.uid, cards);
     },
-    update: (id: string, updates: Record<string, any>) => {
+    update: (id: string, updates: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return updateUserFlashcard(auth.currentUser.uid, id, updates);
     },
@@ -1383,19 +1383,19 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deleteUserFlashcard(auth.currentUser.uid, id);
     },
-    subscribe: (callback: (cards: Array<Record<string, any>>) => void) => {
+    subscribe: (callback: (cards: Array<Record<string, any>>) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) return () => {};
       return subscribeToUserFlashcards(auth.currentUser.uid, callback);
     },
     getProgress: () => auth?.currentUser ? getUserFlashcardProgress(auth.currentUser.uid) : Promise.resolve(null),
-    updateProgress: (progress: Record<string, any>) => {
+    updateProgress: (progress: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return updateUserFlashcardProgress(auth.currentUser.uid, progress);
     },
     // Public flashcards
     getAllPublic: () => getPublicFlashcards(),
     subscribePublic: subscribeToPublicFlashcards,
-    publish: (card: Record<string, any>) => {
+    publish: (card: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return addPublicFlashcard(card);
     },
@@ -1480,7 +1480,7 @@ export async function getBenchmarkSummary(uid: string): Promise<{ lastRunAt?: st
   const snapshot = await getDocs(q);
   if (snapshot.empty) return null;
   const lastRun = snapshot.docs[0].data();
-  const results: any[] = lastRun.results || [];
+  const results: any[] = lastRun.results || []; // eslint-disable-line @typescript-eslint/no-explicit-any
   let fastestEndpoint: string | null = null;
   let fastestTps: number | null = null;
   for (const r of results) {
@@ -1513,7 +1513,7 @@ if (auth) {
 }
 
 // Expose analytics for MFEs
-window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => {
+window.__logAnalyticsEvent = (eventName: string, params?: Record<string, any>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   logEvent(eventName, params);
 };
 
@@ -1530,7 +1530,7 @@ if (db && auth) {
       return snap.docs.map(d => ({ id: d.id, ...d.data() }));
     },
 
-    subscribe(gameType: string, cb: (scores: any[]) => void) {
+    subscribe(gameType: string, cb: (scores: any[]) => void) { // eslint-disable-line @typescript-eslint/no-explicit-any
       const scoresRef = collection(gamesDb, 'games', 'scores', gameType);
       const q = query(scoresRef, orderBy('score', 'desc'), limit(20));
       return onSnapshot(q, (snap) => {
@@ -1905,7 +1905,7 @@ if (firebaseEnabled) {
 }
 
 // ─── Transit Favorites CRUD ──────────────────────────────────────────
-export async function updateTransitFavorites(uid: string, favorites: any[]) {
+export async function updateTransitFavorites(uid: string, favorites: any[]) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return;
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
@@ -1924,7 +1924,7 @@ async function getTransitFavorites(uid: string) {
 async function addTransitFavorite(uid: string, stop: { stopId: string; stopName: string; direction: string; routes: string[] }) {
   if (!db) throw new Error('Firebase not initialized');
   const current = await getTransitFavorites(uid);
-  if (current.some((f: any) => f.stopId === stop.stopId)) return;
+  if (current.some((f: any) => f.stopId === stop.stopId)) return; // eslint-disable-line @typescript-eslint/no-explicit-any
   const next = [...current, { ...stop, addedAt: Date.now() }];
   await updateTransitFavorites(uid, next);
   window.dispatchEvent(new Event(WindowEvents.TRANSIT_FAVORITES_CHANGED));
@@ -1933,12 +1933,12 @@ async function addTransitFavorite(uid: string, stop: { stopId: string; stopName:
 async function removeTransitFavorite(uid: string, stopId: string) {
   if (!db) throw new Error('Firebase not initialized');
   const current = await getTransitFavorites(uid);
-  const next = current.filter((f: any) => f.stopId !== stopId);
+  const next = current.filter((f: any) => f.stopId !== stopId); // eslint-disable-line @typescript-eslint/no-explicit-any
   await updateTransitFavorites(uid, next);
   window.dispatchEvent(new Event(WindowEvents.TRANSIT_FAVORITES_CHANGED));
 }
 
-function subscribeToTransitFavorites(uid: string, callback: (favorites: any[]) => void) {
+function subscribeToTransitFavorites(uid: string, callback: (favorites: any[]) => void) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   return onSnapshot(doc(db, 'users', uid), (snapshot) => {
     const data = snapshot.data();
@@ -1957,7 +1957,7 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return removeTransitFavorite(auth.currentUser.uid, stopId);
     },
-    subscribe: (callback: (favorites: any[]) => void) => {
+    subscribe: (callback: (favorites: any[]) => void) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!auth?.currentUser) return () => {};
       return subscribeToTransitFavorites(auth.currentUser.uid, callback);
     },
@@ -1996,7 +1996,7 @@ async function deleteTravelPin(uid: string, id: string) {
   window.dispatchEvent(new Event(WindowEvents.TRAVEL_PINS_CHANGED));
 }
 
-function subscribeToTravelPins(uid: string, callback: (pins: any[]) => void) {
+function subscribeToTravelPins(uid: string, callback: (pins: any[]) => void) { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!db) return () => {};
   const q = query(collection(db, 'users', uid, 'travelPins'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => {
@@ -2023,32 +2023,6 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) return () => {};
       return subscribeToTravelPins(auth.currentUser.uid, callback);
     },
-  };
-}
-
-// ─── Interview Sessions API bridge ──────────────────────────────────
-if (firebaseEnabled) {
-  const interviewApiCall = async (path: string, method: string, body?: unknown) => {
-    if (!auth?.currentUser) throw new Error('Not authenticated');
-    const token = await auth.currentUser.getIdToken();
-    const opts: RequestInit = {
-      method,
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    };
-    if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(`/interview-api/${path}`, opts);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err.error || res.statusText);
-    }
-    return res.json();
-  };
-
-  window.__interviewApi = {
-    save: (session) => interviewApiCall('save', 'POST', session),
-    list: () => interviewApiCall('sessions', 'GET'),
-    load: (sessionId) => interviewApiCall(`load/${sessionId}`, 'GET'),
-    delete: (sessionId) => interviewApiCall(`delete/${sessionId}`, 'DELETE'),
   };
 }
 

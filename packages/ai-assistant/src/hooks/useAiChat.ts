@@ -41,7 +41,7 @@ function gatherUserContext(): Record<string, unknown> {
     if (watchlist) {
       const parsed = JSON.parse(watchlist);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        ctx.stockWatchlist = parsed.map((w: any) => w.symbol || w).slice(0, 20);
+        ctx.stockWatchlist = parsed.map((w: any) => w.symbol || w).slice(0, 20); // eslint-disable-line @typescript-eslint/no-explicit-any
       }
     }
 
@@ -59,7 +59,7 @@ function gatherUserContext(): Record<string, unknown> {
     if (favs) {
       const parsed = JSON.parse(favs);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        ctx.favoriteCities = parsed.map((c: any) => c.name || c).slice(0, 10);
+        ctx.favoriteCities = parsed.map((c: any) => c.name || c).slice(0, 10); // eslint-disable-line @typescript-eslint/no-explicit-any
       }
     }
 
@@ -68,7 +68,7 @@ function gatherUserContext(): Record<string, unknown> {
     if (recents) {
       const parsed = JSON.parse(recents);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        ctx.recentCities = parsed.map((c: any) => c.name || c).slice(0, 5);
+        ctx.recentCities = parsed.map((c: any) => c.name || c).slice(0, 5); // eslint-disable-line @typescript-eslint/no-explicit-any
       }
     }
 

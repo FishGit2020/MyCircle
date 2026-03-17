@@ -12,7 +12,7 @@ const FamilyGamesWidget = React.memo(function FamilyGamesWidget() {
     let total = 0;
     let done = 0;
     gameTypes.forEach(gt => {
-      api.getScores(gt).then((scores: any[]) => {
+      api.getScores(gt).then((scores: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
         total += scores.length;
         done++;
         if (done === gameTypes.length) setTotalGames(total);
@@ -38,7 +38,7 @@ const FamilyGamesWidget = React.memo(function FamilyGamesWidget() {
       </div>
       {totalGames > 0 && (
         <p className="text-xs text-fuchsia-600 dark:text-fuchsia-400/70">
-          {t('widgets.gamesPlayed' as any).replace('{count}', String(totalGames))}
+          {t('widgets.gamesPlayed' as any).replace('{count}', String(totalGames))} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </p>
       )}
     </div>

@@ -25,7 +25,7 @@ vi.mock('../utils/localDate', () => ({
 
 // Mock EntryForm to simplify DayNode tests
 vi.mock('./EntryForm', () => ({
-  default: ({ onSubmit, onCancel, initialValue }: any) => (
+  default: ({ onSubmit, onCancel, initialValue }: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid="entry-form">
       <span data-testid="form-initial-value">{initialValue}</span>
       <button type="button" onClick={() => onSubmit('updated content')}>mock-save</button>

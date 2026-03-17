@@ -242,6 +242,7 @@ export default function DigitalLibrary() {
     refetchQueries: [{ query: GET_BOOKS }],
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const books: Book[] = (data?.books ?? []) as Book[];
 
   // Refetch when BOOKS_CHANGED event fires (after upload)

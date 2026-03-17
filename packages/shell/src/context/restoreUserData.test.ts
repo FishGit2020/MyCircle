@@ -87,65 +87,65 @@ beforeEach(() => {
 
 describe('restoreUserData', () => {
   it('returns empty favoriteCities when profile has none', () => {
-    const result = restoreUserData(makeProfile() as any, 'user1');
+    const result = restoreUserData(makeProfile() as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(result.favoriteCities).toEqual([]);
   });
 
   it('returns favoriteCities from profile', () => {
     const favs = [{ id: '2', name: 'LA', country: 'US', lat: 34, lon: -118 }];
-    const result = restoreUserData(makeProfile({ favoriteCities: favs }) as any, 'user1');
+    const result = restoreUserData(makeProfile({ favoriteCities: favs }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(result.favoriteCities).toEqual(favs);
   });
 
   it('restores tempUnit to localStorage and dispatches event', () => {
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    restoreUserData(makeProfile({ tempUnit: 'F' }) as any, 'user1');
+    restoreUserData(makeProfile({ tempUnit: 'F' }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(localStorage.getItem('tempUnit')).toBe('F');
     expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'units-changed' }));
   });
 
   it('restores speedUnit to localStorage', () => {
-    restoreUserData(makeProfile({ speedUnit: 'mph' }) as any, 'user1');
+    restoreUserData(makeProfile({ speedUnit: 'mph' }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(localStorage.getItem('speedUnit')).toBe('mph');
   });
 
   it('restores stock watchlist to localStorage', () => {
     const watchlist = [{ symbol: 'AAPL', name: 'Apple' }];
-    restoreUserData(makeProfile({ stockWatchlist: watchlist }) as any, 'user1');
+    restoreUserData(makeProfile({ stockWatchlist: watchlist }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('stock-tracker-watchlist')!)).toEqual(watchlist);
   });
 
   it('skips empty stock watchlist', () => {
-    restoreUserData(makeProfile({ stockWatchlist: [] }) as any, 'user1');
+    restoreUserData(makeProfile({ stockWatchlist: [] }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(localStorage.getItem('stock-tracker-watchlist')).toBeNull();
   });
 
   it('restores podcast subscriptions', () => {
     const subs = ['pod1', 'pod2'];
-    restoreUserData(makeProfile({ podcastSubscriptions: subs }) as any, 'user1');
+    restoreUserData(makeProfile({ podcastSubscriptions: subs }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('podcast-subscriptions')!)).toEqual(subs);
   });
 
   it('restores baby due date', () => {
-    restoreUserData(makeProfile({ babyDueDate: '2026-06-01' }) as any, 'user1');
+    restoreUserData(makeProfile({ babyDueDate: '2026-06-01' }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(localStorage.getItem('baby-due-date')).toBe('2026-06-01');
   });
 
   it('restores bottom nav order', () => {
     const order = ['weather', 'stocks'];
-    restoreUserData(makeProfile({ bottomNavOrder: order }) as any, 'user1');
+    restoreUserData(makeProfile({ bottomNavOrder: order }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('bottom-nav-order')!)).toEqual(order);
   });
 
   it('restores Bible bookmarks', () => {
     const bookmarks = [{ book: 'Gen', chapter: 1, label: 'Test', timestamp: 1000 }];
-    restoreUserData(makeProfile({ bibleBookmarks: bookmarks }) as any, 'user1');
+    restoreUserData(makeProfile({ bibleBookmarks: bookmarks }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('bible-bookmarks')!)).toEqual(bookmarks);
   });
 
   it('restores worship favorites', () => {
     const favs = ['song1', 'song2'];
-    restoreUserData(makeProfile({ worshipFavorites: favs }) as any, 'user1');
+    restoreUserData(makeProfile({ worshipFavorites: favs }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('worship-favorites')!)).toEqual(favs);
   });
 
@@ -155,7 +155,7 @@ describe('restoreUserData', () => {
       podcast: { id: 'pod1' },
       position: 120,
     };
-    restoreUserData(makeProfile({ lastPlayed }) as any, 'user1');
+    restoreUserData(makeProfile({ lastPlayed }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('podcast-last-played')!)).toEqual(lastPlayed);
     expect(JSON.parse(localStorage.getItem('podcast-now-playing')!)).toEqual({
       episode: lastPlayed.episode,
@@ -172,14 +172,14 @@ describe('restoreUserData', () => {
       podcast: { id: 'pod1' },
       position: 120,
     };
-    restoreUserData(makeProfile({ lastPlayed }) as any, 'user1');
+    restoreUserData(makeProfile({ lastPlayed }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     const progress = JSON.parse(localStorage.getItem('podcast-progress')!);
     expect(progress['ep1'].position).toBe(200);
   });
 
   it('merges podcast played episodes with local', () => {
     localStorage.setItem('podcast-played-episodes', JSON.stringify(['ep1']));
-    restoreUserData(makeProfile({ podcastPlayedEpisodes: ['ep2', 'ep1'] }) as any, 'user1');
+    restoreUserData(makeProfile({ podcastPlayedEpisodes: ['ep2', 'ep1'] }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     const merged = JSON.parse(localStorage.getItem('podcast-played-episodes')!);
     expect(merged).toContain('ep1');
     expect(merged).toContain('ep2');
@@ -187,20 +187,20 @@ describe('restoreUserData', () => {
   });
 
   it('restores child name and encoded birth date', () => {
-    restoreUserData(makeProfile({ childName: 'Alice', childBirthDate: '2024-01-15' }) as any, 'user1');
+    restoreUserData(makeProfile({ childName: 'Alice', childBirthDate: '2024-01-15' }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(localStorage.getItem('child-name')).toBe('Alice');
     expect(atob(localStorage.getItem('child-birth-date')!)).toBe('2024-01-15');
   });
 
   it('decodes legacy btoa-encoded birth dates', () => {
     const encoded = btoa('2024-01-15');
-    restoreUserData(makeProfile({ childBirthDate: encoded }) as any, 'user1');
+    restoreUserData(makeProfile({ childBirthDate: encoded }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(atob(localStorage.getItem('child-birth-date')!)).toBe('2024-01-15');
   });
 
   it('restores widget layout only when local is empty', () => {
     const layout = { pinned: ['weather', 'stocks'], size: 'large' };
-    restoreUserData(makeProfile({ widgetLayout: layout }) as any, 'user1');
+    restoreUserData(makeProfile({ widgetLayout: layout }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     const stored = JSON.parse(localStorage.getItem('widget-dashboard-layout')!);
     expect(stored.pinned).toEqual(['weather', 'stocks']);
     expect(stored.size).toBe('large');
@@ -208,33 +208,33 @@ describe('restoreUserData', () => {
 
   it('overwrites local widget layout with Firestore data on sign-in', () => {
     localStorage.setItem('widget-dashboard-layout', JSON.stringify({ pinned: ['stocks'], size: 'comfortable' }));
-    restoreUserData(makeProfile({ widgetLayout: { pinned: ['weather'], size: 'comfortable' } }) as any, 'user1');
+    restoreUserData(makeProfile({ widgetLayout: { pinned: ['weather'], size: 'comfortable' } }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     const stored = JSON.parse(localStorage.getItem('widget-dashboard-layout')!);
     expect(stored.pinned).toEqual(['weather']);
   });
 
   it('ignores old array-format widget layout from Firestore', () => {
     const oldLayout = [{ id: 'weather', visible: true }];
-    restoreUserData(makeProfile({ widgetLayout: oldLayout }) as any, 'user1');
+    restoreUserData(makeProfile({ widgetLayout: oldLayout }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(localStorage.getItem('widget-dashboard-layout')).toBeNull();
   });
 
   it('restores book bookmarks', () => {
     const bookmarks = [{ bookId: 'b1', bookTitle: 'Test', cfi: 'c1', label: 'L1', createdAt: 1000 }];
-    restoreUserData(makeProfile({ bookBookmarks: bookmarks }) as any, 'user1');
+    restoreUserData(makeProfile({ bookBookmarks: bookmarks }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('book-bookmarks')!)).toEqual(bookmarks);
   });
 
   it('restores book audio progress', () => {
     const progress = { b1: { position: 10, duration: 100, chapter: 1 } };
-    restoreUserData(makeProfile({ bookAudioProgress: progress }) as any, 'user1');
+    restoreUserData(makeProfile({ bookAudioProgress: progress }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('book-audio-progress')!)).toEqual(progress);
   });
 
   it('restores book played chapters and merges with local', () => {
     localStorage.setItem('book-played-chapters', JSON.stringify({ b1: [0, 1], b2: [3] }));
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    restoreUserData(makeProfile({ bookPlayedChapters: { b1: [1, 2], b3: [0] } }) as any, 'user1');
+    restoreUserData(makeProfile({ bookPlayedChapters: { b1: [1, 2], b3: [0] } }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     const stored = JSON.parse(localStorage.getItem('book-played-chapters')!);
     expect(stored.b1).toEqual([0, 1, 2]); // merged and sorted
     expect(stored.b2).toEqual([3]); // local-only preserved
@@ -244,14 +244,14 @@ describe('restoreUserData', () => {
 
   it('restores book last played', () => {
     const bookLastPlayed = { bookId: 'b1', title: 'Test', position: 50 };
-    restoreUserData(makeProfile({ bookLastPlayed }) as any, 'user1');
+    restoreUserData(makeProfile({ bookLastPlayed }) as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(JSON.parse(localStorage.getItem('book-last-played')!)).toEqual(bookLastPlayed);
   });
 
   it('fetches note count and dispatches NOTEBOOK_CHANGED on sign-in', async () => {
     mockGetUserNotes.mockResolvedValueOnce([{ id: '1' }, { id: '2' }, { id: '3' }]);
-    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
-    restoreUserData(makeProfile() as any, 'user1');
+    const _dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    restoreUserData(makeProfile() as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     await vi.runAllTimersAsync?.().catch(() => {});
     // Flush microtasks
     await Promise.resolve();
@@ -259,7 +259,7 @@ describe('restoreUserData', () => {
   });
 
   it('fires subcollection fetches', () => {
-    restoreUserData(makeProfile() as any, 'user1');
+    restoreUserData(makeProfile() as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(mockGetDailyLogEntries).toHaveBeenCalledWith('user1');
     expect(mockGetBenchmarkSummary).toHaveBeenCalledWith('user1');
     expect(mockGetUserNotes).toHaveBeenCalledWith('user1');
@@ -268,7 +268,7 @@ describe('restoreUserData', () => {
   it('stores daily log cache when entries returned', async () => {
     const entries = [{ id: '1', date: '2026-01-01' }];
     mockGetDailyLogEntries.mockResolvedValue(entries);
-    restoreUserData(makeProfile() as any, 'user1');
+    restoreUserData(makeProfile() as any, 'user1'); // eslint-disable-line @typescript-eslint/no-explicit-any
     await vi.waitFor(() => {
       expect(JSON.parse(localStorage.getItem('daily-log-cache')!)).toEqual(entries);
     });

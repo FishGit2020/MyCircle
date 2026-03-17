@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { ChatMessage } from '../hooks/useInterviewChat';
+import type { EvaluationScore } from '../hooks/useInterviewStateMachine';
 
 const CHAR_DELAY = 12; // ms per character
 
@@ -37,6 +38,21 @@ function TypewriterText({ text, onDone }: { text: string; onDone?: () => void })
   return <>{displayed}<span className="animate-pulse">|</span></>;
 }
 
+function ScoreBadge({ score }: { score: EvaluationScore }) {
+  const { t } = useTranslation();
+  const avg = ((score.technical + score.problemSolving + score.communication + score.depth) / 4).toFixed(1);
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-xs">
+      <span className="font-semibold text-green-700 dark:text-green-300">
+        {t('aiInterviewer.questionComplete')}
+      </span>
+      <span className="text-green-600 dark:text-green-400">
+        {t('aiInterviewer.score')}: {avg}/10
+      </span>
+    </div>
+  );
+}
+
 interface InterviewChatProps {
   messages: ChatMessage[];
   loading: boolean;
@@ -45,6 +61,8 @@ interface InterviewChatProps {
   modelSelected: boolean;
   onSendMessage: (text: string) => void;
   onRetry: () => void;
+  scores?: EvaluationScore[];
+  evaluating?: boolean;
 }
 
 export default function InterviewChat({
@@ -55,6 +73,8 @@ export default function InterviewChat({
   modelSelected,
   onSendMessage,
   onRetry,
+  scores = [],
+  evaluating = false,
 }: InterviewChatProps) {
   const { t } = useTranslation();
   const [input, setInput] = useState('');
@@ -95,6 +115,18 @@ export default function InterviewChat({
     if (typingDone) setTypingDone(false);
   }
 
+  // Build a map of message index -> score (for showing badges after question transitions)
+  const scoreByIndex = new Map<number, EvaluationScore>();
+  if (scores.length > 0) {
+    // Each score maps to the question ID — find where transitions happen in messages
+    // We show score badges after the last assistant message before a transition
+    scores.forEach((score, idx) => {
+      // Place badge after score count's worth of question transitions
+      // Simple heuristic: scores appear in order, show them inline
+      scoreByIndex.set(idx, score);
+    });
+  }
+
   const canSend = interviewActive && modelSelected;
 
   const handleSend = () => {
@@ -130,33 +162,54 @@ export default function InterviewChat({
           </div>
         )}
 
-        {messages.map((msg) => {
+        {messages.map((msg, idx) => {
           const isLatestAssistant = msg.id === lastAssistantId;
           const shouldAnimate = msg.role === 'assistant' && isLatestAssistant && !finishedRef.current.has(msg.id);
 
+          // Check if there's a score badge to show after this message
+          const scoreForIdx = scores.find((_s, sIdx) => {
+            // Show score after the message corresponding to this score index
+            // This is approximate — show after every Nth assistant reply group
+            return scoreByIndex.has(sIdx) && idx === messages.length - 1;
+          });
+
           return (
-            <div
-              key={msg.id}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
+            <div key={msg.id}>
               <div
-                className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
-                  msg.role === 'user'
-                    ? 'bg-blue-600 text-white dark:bg-blue-500'
-                    : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
-                }`}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {shouldAnimate ? (
-                  <TypewriterText text={msg.content} onDone={() => handleTypingDone(msg.id)} />
-                ) : (
-                  msg.content
-                )}
+                <div
+                  className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
+                    msg.role === 'user'
+                      ? 'bg-blue-600 text-white dark:bg-blue-500'
+                      : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
+                  }`}
+                >
+                  {shouldAnimate ? (
+                    <TypewriterText text={msg.content} onDone={() => handleTypingDone(msg.id)} />
+                  ) : (
+                    msg.content
+                  )}
+                </div>
               </div>
+              {scoreForIdx && (
+                <div className="flex justify-start mt-2">
+                  <ScoreBadge score={scoreForIdx} />
+                </div>
+              )}
             </div>
           );
         })}
 
-        {loading && (
+        {evaluating && (
+          <div className="flex justify-start">
+            <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg px-3 py-2 text-sm text-yellow-700 dark:text-yellow-300 animate-pulse">
+              {t('aiInterviewer.evaluating')}
+            </div>
+          </div>
+        )}
+
+        {loading && !evaluating && (
           <div className="flex justify-start">
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2 text-sm text-gray-500 dark:text-gray-400 animate-pulse">
               {t('aiInterviewer.thinking')}
