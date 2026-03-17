@@ -1,8 +1,6 @@
 // Re-export all Cloud Function handlers
 export { graphql } from './handlers/graphql.js';
 export { aiChat, aiChatStream } from './handlers/aiChat.js';
-export { stockProxy } from './handlers/stockProxy.js';
-export { podcastProxy } from './handlers/podcastProxy.js';
 export { cloudFiles } from './handlers/cloudFiles.js';
 export { babyPhotos } from './handlers/babyPhotos.js';
 export { digitalLibrary } from './handlers/digitalLibrary.js';

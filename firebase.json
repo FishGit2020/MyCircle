@@ -15,14 +15,6 @@
         "function": "graphql"
       },
       {
-        "source": "/stock/**",
-        "function": "stockProxy"
-      },
-      {
-        "source": "/podcast/**",
-        "function": "podcastProxy"
-      },
-      {
         "source": "/ai/chat/stream",
         "function": "aiChatStream"
       },

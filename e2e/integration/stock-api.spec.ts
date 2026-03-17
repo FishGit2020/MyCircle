@@ -3,9 +3,7 @@ import { test, expect } from '@playwright/test';
 /**
  * Integration tests for stock API — no mocking.
  *
- * Local: Tests GraphQL queries (localhost:3003, no reCAPTCHA)
- * Deployed: Tests REST proxy (/stock/*, no reCAPTCHA) + UI
- *
+ * Tests GraphQL queries and UI rendering.
  * With placeholder Finnhub key, expect structured errors (not crashes).
  */
 test.describe('Stock API Integration', () => {
@@ -44,42 +42,6 @@ test.describe('Stock API Integration', () => {
     if (json.errors) {
       expect(Array.isArray(json.errors)).toBe(true);
       expect(json.errors[0]).toHaveProperty('message');
-    }
-  });
-
-  // ─── Deployed-only: REST proxy endpoints ──────────────────────────
-
-  test('stock REST search endpoint (deployed only)', async ({ page, baseURL }) => {
-    test.skip(baseURL?.includes('localhost') ?? false, 'No REST stock proxy in local dev');
-
-    const response = await page.request.get(`${baseURL}/stock/search?q=AAPL`);
-
-    // Should be reachable (no 403/404)
-    const text = await response.text();
-    expect(() => JSON.parse(text)).not.toThrow();
-
-    const json = JSON.parse(text);
-    if (response.status() === 200 && json.result) {
-      expect(Array.isArray(json.result)).toBe(true);
-    } else if (json.error) {
-      // Placeholder API key — structured error
-      expect(typeof json.error).toBe('string');
-    }
-  });
-
-  test('stock REST quote endpoint (deployed only)', async ({ page, baseURL }) => {
-    test.skip(baseURL?.includes('localhost') ?? false, 'No REST stock proxy in local dev');
-
-    const response = await page.request.get(`${baseURL}/stock/quote?symbol=AAPL`);
-
-    const text = await response.text();
-    expect(() => JSON.parse(text)).not.toThrow();
-
-    const json = JSON.parse(text);
-    if (response.status() === 200 && json.c !== undefined) {
-      expect(typeof json.c).toBe('number');
-    } else if (json.error) {
-      expect(typeof json.error).toBe('string');
     }
   });
 

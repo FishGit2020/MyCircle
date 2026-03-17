@@ -3,9 +3,7 @@ import { test, expect } from '@playwright/test';
 /**
  * Integration tests for podcast API — no mocking.
  *
- * Local: Tests GraphQL queries (localhost:3003, no reCAPTCHA)
- * Deployed: Tests REST proxy (/podcast/*, no reCAPTCHA) + UI
- *
+ * Tests GraphQL queries and UI rendering.
  * With placeholder PodcastIndex key, expect structured errors (not crashes).
  */
 test.describe('Podcast API Integration', () => {
@@ -55,40 +53,6 @@ test.describe('Podcast API Integration', () => {
     expect(response.status()).toBe(200);
     const json = await response.json();
     expect(json.data !== undefined || json.errors !== undefined).toBe(true);
-  });
-
-  // ─── Deployed-only: REST proxy endpoints ──────────────────────────
-
-  test('podcast REST trending endpoint (deployed only)', async ({ page, baseURL }) => {
-    test.skip(baseURL?.includes('localhost') ?? false, 'No REST podcast proxy in local dev');
-
-    const response = await page.request.get(`${baseURL}/podcast/trending`);
-
-    const text = await response.text();
-    expect(() => JSON.parse(text)).not.toThrow();
-
-    const json = JSON.parse(text);
-    if (response.status() === 200 && json.feeds) {
-      expect(Array.isArray(json.feeds)).toBe(true);
-    } else if (json.error) {
-      expect(typeof json.error).toBe('string');
-    }
-  });
-
-  test('podcast REST search endpoint (deployed only)', async ({ page, baseURL }) => {
-    test.skip(baseURL?.includes('localhost') ?? false, 'No REST podcast proxy in local dev');
-
-    const response = await page.request.get(`${baseURL}/podcast/search?q=technology`);
-
-    const text = await response.text();
-    expect(() => JSON.parse(text)).not.toThrow();
-
-    const json = JSON.parse(text);
-    if (response.status() === 200 && json.feeds) {
-      expect(Array.isArray(json.feeds)).toBe(true);
-    } else if (json.error) {
-      expect(typeof json.error).toBe('string');
-    }
   });
 
   // ─── UI tests (both local and deployed) ────────────────────────────
