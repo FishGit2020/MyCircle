@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.2.0...mycircle-v1.3.0) (2026-03-17)
+
+
+### Features
+
+* add web crawler MFE with GraphQL backend ([#774](https://github.com/FishGit2020/MyCircle/issues/774)) ([4019cc0](https://github.com/FishGit2020/MyCircle/commit/4019cc03b27fcf65e373b3d8cdfa1d5ab3254afb))
+
+
+### Documentation
+
+* add spec-check to required CI checks documentation ([#778](https://github.com/FishGit2020/MyCircle/issues/778)) ([c7dc8f9](https://github.com/FishGit2020/MyCircle/commit/c7dc8f91050d1f428c542e5a0da24ca758b9a97d))
+
 ## [1.2.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.3...mycircle-v1.2.0) (2026-03-17)
 
 
