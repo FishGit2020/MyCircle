@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.2...mycircle-v1.1.3) (2026-03-17)
+
+
+### Bug Fixes
+
+* **ci:** auto-pass gate checks for Release Please PRs ([#770](https://github.com/FishGit2020/MyCircle/issues/770)) ([9b6defb](https://github.com/FishGit2020/MyCircle/commit/9b6defbd1eae99bf6411e7b3a09a15794c2b469c))
+
 ## [1.1.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.1.1...mycircle-v1.1.2) (2026-03-17)
 
 
