@@ -2,7 +2,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions';
 import { getAppCheck } from 'firebase-admin/app-check';
 import type { Request, Response } from 'express';
-import { expandApiKeys, ALLOWED_ORIGINS, checkRateLimit, verifyAuthToken } from './shared.js';
+import { expandApiKeys, ALLOWED_ORIGINS, checkRateLimit, verifyAuthToken, verifyApiKey } from './shared.js';
 
 // Cache the Apollo Server instance to avoid re-initialization on every request
 let serverPromise: Promise<any> | null = null;
@@ -90,7 +90,19 @@ export const graphql = onRequest(
     const { body, headers } = req;
 
     // Extract uid for resolvers that need authenticated Firestore access
-    const uid = await verifyAuthToken(req);
+    // Try Firebase ID token first, then fall back to API key (for OpenClaw/server-to-server)
+    let uid = await verifyAuthToken(req);
+    if (!uid) {
+      uid = await verifyApiKey(req);
+    }
+
+    // Rate-limit API key requests (30 req/min per uid)
+    if (uid && req.headers['x-api-key']) {
+      if (checkRateLimit(`apikey:${uid}`, 30, 60)) {
+        res.status(429).json({ errors: [{ message: 'API rate limit exceeded. Please wait a moment.' }] });
+        return;
+      }
+    }
 
     // Rate-limit expensive benchmark mutations (5 req/min per user)
     const BENCHMARK_RATE_LIMITED_OPS = ['RunBenchmark', 'SaveBenchmarkRun'];
