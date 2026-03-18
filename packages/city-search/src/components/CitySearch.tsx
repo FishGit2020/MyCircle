@@ -587,7 +587,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                     {t('favorites.manageFavorites')}
                   </button>
                 </div>
-                {favoriteCities.slice(0, 5).map((city, index) => (
+                {favoriteCities.slice(0, 5).map((city, _index) => (
                   <button
                     key={`fav-${city.id}`}
                     type="button"
