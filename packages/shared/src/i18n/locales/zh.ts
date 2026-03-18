@@ -2560,6 +2560,14 @@ const zh: Record<TranslationKey, string> = {
   'webCrawler.backToJobs': '\u8fd4\u56de\u4efb\u52a1',
   'webCrawler.crawling': '\u722c\u53d6\u4e2d...',
   'webCrawler.startingCrawl': '\u542f\u52a8\u4e2d...',
+  'webCrawler.reader.backToDocuments': '\u8fd4\u56de\u6587\u6863',
+  'webCrawler.reader.author': '\u4f5c\u8005',
+  'webCrawler.reader.publishDate': '\u53d1\u5e03\u65e5\u671f',
+  'webCrawler.reader.contentTruncated': '\u5185\u5bb9\u56e0\u5927\u5c0f\u9650\u5236\u5df2\u88ab\u622a\u65ad\u3002',
+  'webCrawler.reader.noContent': '\u6b64\u9875\u9762\u65e0\u53ef\u7528\u7684\u6587\u672c\u5185\u5bb9\u3002',
+  'webCrawler.search.placeholder': '\u641c\u7d22\u722c\u53d6\u5386\u53f2...',
+  'webCrawler.search.noResults': '\u672a\u627e\u5230\u5339\u914d\u7684\u722c\u53d6\u4efb\u52a1\u3002',
+  'webCrawler.search.clear': '\u6e05\u9664\u641c\u7d22',
 };
 
 export default zh;

@@ -2560,6 +2560,14 @@ const es: Record<TranslationKey, string> = {
   'webCrawler.backToJobs': 'Volver a Trabajos',
   'webCrawler.crawling': 'Rastreando...',
   'webCrawler.startingCrawl': 'Iniciando...',
+  'webCrawler.reader.backToDocuments': 'Volver a Documentos',
+  'webCrawler.reader.author': 'Autor',
+  'webCrawler.reader.publishDate': 'Publicado',
+  'webCrawler.reader.contentTruncated': 'El contenido fue truncado debido a l\u00edmites de tama\u00f1o.',
+  'webCrawler.reader.noContent': 'No hay contenido de texto disponible para esta p\u00e1gina.',
+  'webCrawler.search.placeholder': 'Buscar historial de rastreo...',
+  'webCrawler.search.noResults': 'No se encontraron trabajos de rastreo.',
+  'webCrawler.search.clear': 'Limpiar b\u00fasqueda',
 };
 
 export default es;

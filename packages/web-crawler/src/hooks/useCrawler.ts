@@ -7,6 +7,7 @@ import {
   START_CRAWL,
   STOP_CRAWL,
   DELETE_CRAWL_JOB,
+  SEARCH_CRAWL_JOBS,
 } from '@mycircle/shared';
 import type {
   GetCrawlJobsQuery,
@@ -18,6 +19,8 @@ import type {
   StopCrawlMutationVariables,
   DeleteCrawlJobMutation,
   DeleteCrawlJobMutationVariables,
+  SearchCrawlJobsQuery,
+  SearchCrawlJobsQueryVariables,
 } from '@mycircle/shared';
 
 // ─── useCrawlJobs ────────────────────────────────────────────
@@ -125,4 +128,22 @@ export function useDeleteCrawlJob() {
   );
 
   return { deleteCrawlJob, loading };
+}
+
+// ─── useSearchCrawlJobs ─────────────────────────────────────
+export function useSearchCrawlJobs(query: string) {
+  const { data, loading, error } = useQuery<
+    SearchCrawlJobsQuery,
+    SearchCrawlJobsQueryVariables
+  >(SEARCH_CRAWL_JOBS, {
+    variables: { query },
+    skip: query.length < 2,
+    fetchPolicy: 'network-only',
+  });
+
+  return {
+    jobs: data?.searchCrawlJobs ?? [],
+    loading,
+    error: error?.message ?? null,
+  };
 }

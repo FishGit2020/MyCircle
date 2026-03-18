@@ -3,6 +3,44 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import * as dns from 'dns';
+
+/**
+ * Check if a resolved IP address falls within private/reserved ranges.
+ * Blocks SSRF attacks by preventing requests to internal infrastructure.
+ */
+function isPrivateIp(ip: string): boolean {
+  // IPv4 private/reserved ranges
+  const parts = ip.split('.').map(Number);
+  if (parts.length === 4 && parts.every((p) => p >= 0 && p <= 255)) {
+    if (parts[0] === 127) return true;                                    // 127.0.0.0/8
+    if (parts[0] === 10) return true;                                     // 10.0.0.0/8
+    if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true; // 172.16.0.0/12
+    if (parts[0] === 192 && parts[1] === 168) return true;               // 192.168.0.0/16
+    if (parts[0] === 169 && parts[1] === 254) return true;               // 169.254.0.0/16
+    if (parts[0] === 0) return true;                                      // 0.0.0.0/8
+  }
+  // IPv6 private/reserved
+  if (ip === '::1') return true;
+  if (ip.startsWith('fc') || ip.startsWith('fd')) return true;   // fc00::/7
+  if (ip.startsWith('fe80')) return true;                         // fe80::/10
+  return false;
+}
+
+/**
+ * Resolve a URL's hostname and check if it points to a private/reserved IP.
+ * Returns true if the URL is blocked (private), false if safe to fetch.
+ */
+export async function isPrivateUrl(urlString: string): Promise<boolean> {
+  try {
+    const parsed = new URL(urlString);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return true;
+    const { address } = await dns.promises.lookup(parsed.hostname);
+    return isPrivateIp(address);
+  } catch {
+    return true; // If DNS resolution fails, block the request
+  }
+}
 
 /**
  * Firestore trigger: when a new crawl job is created, start crawling.
@@ -70,6 +108,26 @@ export const crawlWorker = onDocumentCreated(
 
         const start = Date.now();
         try {
+          // SSRF protection: block private/internal IPs
+          if (await isPrivateUrl(current.url)) {
+            await addTrace(
+              'warn',
+              `Blocked private/internal URL: ${current.url}`,
+              current.url,
+            );
+            await jobRef.collection('documents').add({
+              url: current.url,
+              title: null,
+              contentPreview: 'Error: URL resolves to a private or reserved network address',
+              statusCode: 0,
+              contentType: null,
+              crawledAt: new Date(),
+              size: 0,
+              depth: current.depth,
+            });
+            continue;
+          }
+
           const response = await axios.get(current.url, {
             timeout: 10_000,
             maxRedirects: 3,
@@ -89,16 +147,39 @@ export const crawlWorker = onDocumentCreated(
           const $ = cheerio.load(html);
           const title = $('title').first().text().trim().substring(0, 500) || null;
 
-          // Extract text preview (strip script/style, first 500 chars)
+          // Extract metadata from <meta> tags
+          const description =
+            $('meta[name="description"]').attr('content')?.substring(0, 1000) ||
+            $('meta[property="og:description"]').attr('content')?.substring(0, 1000) ||
+            null;
+          const author =
+            $('meta[name="author"]').attr('content')?.substring(0, 200) || null;
+          const publishDate =
+            $('meta[property="article:published_time"]').attr('content') || null;
+          const ogImage =
+            $('meta[property="og:image"]').attr('content') || null;
+
+          // Extract text content (strip script/style)
           $('script, style').remove();
           const textContent = $.root().text().replace(/\s+/g, ' ').trim();
           const contentPreview = textContent.substring(0, 500);
+
+          // Full content up to 100KB with truncation flag
+          const MAX_CONTENT_LENGTH = 100_000;
+          const fullContent = textContent.substring(0, MAX_CONTENT_LENGTH);
+          const contentTruncated = textContent.length > MAX_CONTENT_LENGTH;
 
           // Store document
           await jobRef.collection('documents').add({
             url: current.url,
             title,
             contentPreview,
+            fullContent,
+            contentTruncated,
+            description,
+            author,
+            publishDate,
+            ogImage,
             statusCode: response.status,
             contentType: contentType.split(';')[0].trim(),
             crawledAt: new Date(),

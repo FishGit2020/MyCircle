@@ -488,6 +488,7 @@ export const typeDefs = `#graphql
     # Web Crawler (auth required)
     crawlJobs: [CrawlJob!]!
     crawlJobDetail(id: ID!): CrawlJobDetail
+    searchCrawlJobs(query: String!): [CrawlJob!]!
   }
 
   # ─── AI Usage & Monitoring Types ──────────────────────────────
@@ -802,6 +803,12 @@ export const typeDefs = `#graphql
     url: String!
     title: String
     contentPreview: String
+    fullContent: String
+    contentTruncated: Boolean
+    description: String
+    author: String
+    publishDate: String
+    ogImage: String
     statusCode: Int!
     contentType: String
     crawledAt: String!

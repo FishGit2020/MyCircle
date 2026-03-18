@@ -1089,6 +1089,12 @@ export const GET_CRAWL_JOB_DETAIL = gql`
         url
         title
         contentPreview
+        fullContent
+        contentTruncated
+        description
+        author
+        publishDate
+        ogImage
         statusCode
         contentType
         crawledAt
@@ -1141,6 +1147,21 @@ export const STOP_CRAWL = gql`
 export const DELETE_CRAWL_JOB = gql`
   mutation DeleteCrawlJob($id: ID!) {
     deleteCrawlJob(id: $id)
+  }
+`;
+
+export const SEARCH_CRAWL_JOBS = gql`
+  query SearchCrawlJobs($query: String!) {
+    searchCrawlJobs(query: $query) {
+      id
+      url
+      status
+      maxDepth
+      maxPages
+      pagesVisited
+      createdAt
+      updatedAt
+    }
   }
 `;
 

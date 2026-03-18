@@ -349,12 +349,18 @@ export type CrawlTrace = {
 
 export type CrawledDocument = {
   __typename?: 'CrawledDocument';
+  author?: Maybe<Scalars['String']['output']>;
   contentPreview?: Maybe<Scalars['String']['output']>;
+  contentTruncated?: Maybe<Scalars['Boolean']['output']>;
   contentType?: Maybe<Scalars['String']['output']>;
   crawledAt: Scalars['String']['output'];
   depth: Scalars['Int']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  fullContent?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   jobId: Scalars['String']['output'];
+  ogImage?: Maybe<Scalars['String']['output']>;
+  publishDate?: Maybe<Scalars['String']['output']>;
   size: Scalars['Int']['output'];
   statusCode: Scalars['Int']['output'];
   title?: Maybe<Scalars['String']['output']>;
@@ -783,6 +789,7 @@ export type Query = {
   questionBank: QuestionBank;
   reverseGeocode?: Maybe<City>;
   searchCities: Array<City>;
+  searchCrawlJobs: Array<CrawlJob>;
   searchPodcasts: PodcastSearchResponse;
   searchStocks: Array<StockSearchResult>;
   sharedFiles: Array<SharedFile>;
@@ -934,6 +941,11 @@ export type QueryReverseGeocodeArgs = {
 
 export type QuerySearchCitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
+};
+
+
+export type QuerySearchCrawlJobsArgs = {
   query: Scalars['String']['input'];
 };
 
@@ -1757,7 +1769,7 @@ export type GetCrawlJobDetailQueryVariables = Exact<{
 }>;
 
 
-export type GetCrawlJobDetailQuery = { __typename?: 'Query', crawlJobDetail?: { __typename?: 'CrawlJobDetail', job: { __typename?: 'CrawlJob', id: string, url: string, status: string, maxDepth: number, maxPages: number, pagesVisited: number, createdAt: string, updatedAt: string }, documents: Array<{ __typename?: 'CrawledDocument', id: string, jobId: string, url: string, title?: string | null, contentPreview?: string | null, statusCode: number, contentType?: string | null, crawledAt: string, size: number, depth: number }>, traces: Array<{ __typename?: 'CrawlTrace', id: string, jobId: string, timestamp: string, level: string, message: string, url?: string | null, durationMs?: number | null }> } | null };
+export type GetCrawlJobDetailQuery = { __typename?: 'Query', crawlJobDetail?: { __typename?: 'CrawlJobDetail', job: { __typename?: 'CrawlJob', id: string, url: string, status: string, maxDepth: number, maxPages: number, pagesVisited: number, createdAt: string, updatedAt: string }, documents: Array<{ __typename?: 'CrawledDocument', id: string, jobId: string, url: string, title?: string | null, contentPreview?: string | null, fullContent?: string | null, contentTruncated?: boolean | null, description?: string | null, author?: string | null, publishDate?: string | null, ogImage?: string | null, statusCode: number, contentType?: string | null, crawledAt: string, size: number, depth: number }>, traces: Array<{ __typename?: 'CrawlTrace', id: string, jobId: string, timestamp: string, level: string, message: string, url?: string | null, durationMs?: number | null }> } | null };
 
 export type StartCrawlMutationVariables = Exact<{
   input: StartCrawlInput;
@@ -1779,6 +1791,13 @@ export type DeleteCrawlJobMutationVariables = Exact<{
 
 
 export type DeleteCrawlJobMutation = { __typename?: 'Mutation', deleteCrawlJob: boolean };
+
+export type SearchCrawlJobsQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+}>;
+
+
+export type SearchCrawlJobsQuery = { __typename?: 'Query', searchCrawlJobs: Array<{ __typename?: 'CrawlJob', id: string, url: string, status: string, maxDepth: number, maxPages: number, pagesVisited: number, createdAt: string, updatedAt: string }> };
 
 export type GetDealsQueryVariables = Exact<{ [key: string]: never; }>;
 
