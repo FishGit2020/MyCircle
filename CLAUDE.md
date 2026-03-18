@@ -44,6 +44,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 
 ## Must-Follow Rules
 
+- **GraphQL-first**: All data operations MUST use the existing Apollo GraphQL service (`useQuery`, `useMutation` from `@mycircle/shared`). Never add a new REST endpoint for MFE feature data — extend the GraphQL schema instead (`functions/src/schema.ts` → `pnpm codegen`). REST is only acceptable for: (a) third-party APIs that don't offer GraphQL, (b) Firebase admin operations (e.g. `firebase.json` rewrites for existing Cloud Functions), or (c) one-off scripts/tooling outside the MFE runtime. When in doubt, use GraphQL.
 - **Apollo imports in MFEs**: Never import `useQuery`/`useMutation`/etc. directly from `@apollo/client` in MFE packages. Always import from `@mycircle/shared` which re-exports them. Direct `@apollo/client` imports break Module Federation at runtime (`R is not a function`).
 - **i18n**: Every visible string uses `t('key')`. Add keys to all 3 locales (`en`, `es`, `zh`). Rebuild shared after: `pnpm build:shared`
 - **Dark mode**: Every color class needs a `dark:` variant. Check existing patterns in codebase.

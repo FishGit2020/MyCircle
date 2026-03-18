@@ -43,10 +43,19 @@ MCP tool MUST pass before a feature is considered ready for review.
 ### III. GraphQL-First Data Layer
 
 All MFE data operations (queries, mutations) MUST go through the existing Apollo
-GraphQL service. No new REST API endpoints for MFE features. Schema changes in
-`functions/src/schema.ts` MUST be followed by `pnpm codegen` to regenerate types.
-New resolvers MUST follow the existing factory pattern
+GraphQL service (`useQuery`/`useMutation` from `@mycircle/shared`). Never add a
+new REST endpoint for MFE feature data — extend the GraphQL schema instead.
+Schema changes in `functions/src/schema.ts` MUST be followed by `pnpm codegen`
+to regenerate types. New resolvers MUST follow the existing factory pattern
 (`createXxxQueryResolvers()` / `createXxxMutationResolvers()`).
+
+**REST is only acceptable for**:
+- Third-party APIs that do not offer a GraphQL interface
+- Firebase admin/infrastructure operations (e.g. `firebase.json` rewrites, secret management)
+- One-off scripts and tooling that run outside the MFE runtime (e.g. seed scripts, CI tools)
+
+Any REST usage inside an MFE or Cloud Function that serves MFE data is a
+blocking violation and MUST be justified in the plan's Complexity Tracking table.
 
 ### IV. Inclusive by Default
 
