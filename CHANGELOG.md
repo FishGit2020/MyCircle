@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.2...mycircle-v1.4.3) (2026-03-18)
+
+
+### Miscellaneous
+
+* move changelogs from docs/specs to MFE packages ([#789](https://github.com/FishGit2020/MyCircle/issues/789)) ([d76bc50](https://github.com/FishGit2020/MyCircle/commit/d76bc50307e7b82eea7cb1544aa878960325db34))
+
 ## [1.4.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.1...mycircle-v1.4.2) (2026-03-18)
 
 
