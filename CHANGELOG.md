@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.7](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.6...mycircle-v1.4.7) (2026-03-18)
+
+
+### Documentation
+
+* add web-crawler and deal-finder to README and CONTRIBUTING ([#799](https://github.com/FishGit2020/MyCircle/issues/799)) ([95b8499](https://github.com/FishGit2020/MyCircle/commit/95b84998aebcbdd240afdccdd0ba6524bc71a7af))
+* remove root CONSTITUTION.md (superseded by .specify/memory/constitution.md and CLAUDE.md) ([#798](https://github.com/FishGit2020/MyCircle/issues/798)) ([24825d5](https://github.com/FishGit2020/MyCircle/commit/24825d5a8dc0336722ca03bd6cf559a8cf1888fe))
+
+
+### Miscellaneous
+
+* add bash scripts for speckit (macOS/Linux support) ([#801](https://github.com/FishGit2020/MyCircle/issues/801)) ([f92f423](https://github.com/FishGit2020/MyCircle/commit/f92f423d1d91f53ca59fc4ae0ec93451984442ec))
+
 ## [1.4.6](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.5...mycircle-v1.4.6) (2026-03-18)
 
 
