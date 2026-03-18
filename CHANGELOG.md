@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.7...mycircle-v1.5.0) (2026-03-18)
+
+
+### Features
+
+* **city-search:** add cross-MFE favorite cities ([#802](https://github.com/FishGit2020/MyCircle/issues/802)) ([e8b3c4d](https://github.com/FishGit2020/MyCircle/commit/e8b3c4dfe0d6b9042ef2ed6cb7ef991074c1ab9a))
+
 ## [1.4.7](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.6...mycircle-v1.4.7) (2026-03-18)
 
 
