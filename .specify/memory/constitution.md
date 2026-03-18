@@ -91,9 +91,10 @@ amendment with MINOR version bump.
 - **Branching**: Feature branches with prefixes (`feat/`, `fix/`, `docs/`,
   `refactor/`, `test/`). Never commit directly to main.
 - **Commits**: Conventional Commits, imperative mood, under 72 characters.
-- **PR lifecycle**: Branch, implement, `pnpm build:shared && pnpm test:run &&
-  pnpm typecheck`, push, create PR, wait for ALL checks (`ci`, `e2e-gate`,
-  `spec-check`) to pass, squash-merge.
+- **PR lifecycle**: Branch, implement, `pnpm build:shared && pnpm lint &&
+  pnpm test:run && pnpm typecheck`, push, create PR, wait for ALL checks
+  (`ci`, `e2e-gate`, `spec-check`) to pass, squash-merge. All four commands
+  MUST pass locally before pushing — lint failures in CI are avoidable.
 - **New MFE gate**: `spec-check` CI job blocks merge if
   `docs/specs/NNN-<mfe-name>/spec.md` is missing.
 - **functions/ backend**: Separate strict tsconfig (`noUnusedLocals: true`).
@@ -114,4 +115,4 @@ Amendments follow semantic versioning:
 Amendments require updating this file, incrementing the version, and verifying
 that dependent templates (plan, spec, tasks) remain aligned.
 
-**Version**: 1.0.0 | **Ratified**: 2026-03-17 | **Last Amended**: 2026-03-17
+**Version**: 1.0.1 | **Ratified**: 2026-03-17 | **Last Amended**: 2026-03-18

@@ -8,7 +8,7 @@ pnpm monorepo · Vite Module Federation · React 18 · Tailwind · TypeScript
 git checkout -b feat/my-feature
 # implement (honor rules below)
 pnpm build:shared
-pnpm test:run && pnpm typecheck
+pnpm lint && pnpm test:run && pnpm typecheck
 git add <files> && git commit --no-verify -m "feat: description"
 git push -u origin HEAD
 gh pr create --title "feat: description" --body "summary"
@@ -24,7 +24,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 
 ## Testing
 
-- After implementing changes, always run the full test suite (`pnpm test:run` / `pnpm typecheck`) and fix any failures before creating a PR. Do not assume tests pass without running them.
+- After implementing changes, always run the full local suite — `pnpm lint && pnpm test:run && pnpm typecheck` — and fix any failures before pushing. All three MUST pass. Do not assume they pass without running them.
 
 ## General Guidelines
 
