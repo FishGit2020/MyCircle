@@ -142,6 +142,8 @@ const es: Record<TranslationKey, string> = {
   'weather.warmer': 'm\u00e1s c\u00e1lido',
   'weather.cooler': 'm\u00e1s fr\u00edo',
   'weather.noHistoricalData': 'Datos hist\u00f3ricos no disponibles',
+  'weather.citySwitch': 'Cambiar ciudad',
+  'weather.forecastHighLow': 'M\u00e1x / m\u00edn de hoy',
 
   // Notifications
   'notifications.enable': 'Activar notificaciones',

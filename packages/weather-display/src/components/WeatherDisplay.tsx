@@ -27,7 +27,21 @@ function getRecentCitiesFromStorage(): Array<{ id: string; name: string; country
   return [];
 }
 
-export default function WeatherDisplay() {
+interface FavoriteCity {
+  id: string;
+  name: string;
+  country: string;
+  state?: string;
+  lat: number;
+  lon: number;
+}
+
+interface WeatherDisplayProps {
+  favoriteCities?: FavoriteCity[];
+  currentCityId?: string;
+}
+
+export default function WeatherDisplay({ favoriteCities, currentCityId: _currentCityId }: WeatherDisplayProps = {}) {
   const { coords } = useParams<{ coords: string }>();
   const [searchParams] = useSearchParams();
   const nameParam = searchParams.get('name');
@@ -268,7 +282,7 @@ export default function WeatherDisplay() {
             lat: location.lat,
             lon: location.lon,
           }}
-          availableCities={getRecentCitiesFromStorage()}
+          availableCities={favoriteCities ?? getRecentCitiesFromStorage()}
         />
       )}
 

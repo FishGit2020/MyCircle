@@ -1,25 +1,23 @@
-import React, { Suspense, useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router';
 import { useTranslation } from '@mycircle/shared';
 import { Layout } from './components/layout';
-import { Loading, ErrorBoundary, RequireAuth, MFEPageWrapper } from './components/common';
+import { RequireAuth, MFEPageWrapper } from './components/common';
 import { WeatherCompare } from './components/widgets';
 import TransitWrapper from './components/widgets/TransitWrapper';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
+import WeatherPage from './pages/WeatherPage';
 import WhatsNewPage from './pages/WhatsNewPage';
 import RecycleBinPage from './pages/RecycleBinPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
-import FavoriteButton from './components/weather/FavoriteButton';
-import ShareButton from './components/weather/ShareButton';
 import { tracedLazy } from './lib/tracedLazy';
 import { perf } from './lib/firebase';
 
 const getPerf = () => perf;
 
 // Lazy load remote micro frontends with Firebase Performance tracing
-const WeatherDisplayMF = tracedLazy('mfe_weather_load', () => import('weatherDisplay/WeatherDisplay'), getPerf);
 const StockTrackerMF = tracedLazy('mfe_stocks_load', () => import('stockTracker/StockTracker'), getPerf);
 const PodcastPlayerMF = tracedLazy('mfe_podcasts_load', () => import('podcastPlayer/PodcastPlayer'), getPerf);
 const AiAssistantMF = tracedLazy('mfe_ai_load', () => import('aiAssistant/AiAssistant'), getPerf);
@@ -44,31 +42,6 @@ const AiInterviewerMF = tracedLazy('mfe_ai_interviewer_load', () => import('aiIn
 const TravelMapMF = tracedLazy('mfe_travel_map_load', () => import('travelMap/TravelMap'), getPerf);
 const DealFinderMF = tracedLazy('mfe_deals_load', () => import('dealFinder/DealFinder'), getPerf);
 const WebCrawlerMF = tracedLazy('mfe_web_crawler_load', () => import('webCrawler/WebCrawler'), getPerf);
-
-// Weather page with full weather display (special case: has FavoriteButton/ShareButton)
-function WeatherPage() {
-  const weatherRef = useRef<HTMLDivElement>(null);
-  const fallback = (
-    <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-      <p className="text-yellow-700 dark:text-yellow-300">Weather Display module is loading...</p>
-    </div>
-  );
-  return (
-    <div>
-      <div className="flex justify-end gap-2 mb-4">
-        <ShareButton weatherRef={weatherRef} />
-        <FavoriteButton />
-      </div>
-      <div ref={weatherRef}>
-        <ErrorBoundary fallback={fallback}>
-          <Suspense fallback={<Loading />}>
-            <WeatherDisplayMF />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-    </div>
-  );
-}
 
 // 404 Not Found
 function NotFound() {
