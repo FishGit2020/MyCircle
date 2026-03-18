@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.6](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.5...mycircle-v1.4.6) (2026-03-18)
+
+
+### Bug Fixes
+
+* store radio favorites as UUIDs only and migrate radio/routing to GraphQL ([#797](https://github.com/FishGit2020/MyCircle/issues/797)) ([e81c88b](https://github.com/FishGit2020/MyCircle/commit/e81c88b3a93cd47e5c2506a178a681717f4ffb42))
+
 ## [1.4.5](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.4...mycircle-v1.4.5) (2026-03-18)
 
 
