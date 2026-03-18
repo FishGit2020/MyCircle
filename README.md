@@ -1,6 +1,6 @@
 # MyCircle — Personal Dashboard
 
-A modern personal dashboard built with **micro frontend architecture**, React, GraphQL, and deployed on Firebase. MyCircle brings together 25 micro frontends — weather, stocks, podcasts, AI chat, Bible reading, worship songs, digital library, transit tracking, travel maps, coding interviews, and much more — into a single unified experience.
+A modern personal dashboard built with **micro frontend architecture**, React, GraphQL, and deployed on Firebase. MyCircle brings together 27 micro frontends — weather, stocks, podcasts, AI chat, Bible reading, worship songs, digital library, transit tracking, travel maps, coding interviews, web crawling, and much more — into a single unified experience.
 
 **Live Demo:** https://mycircle-dash.web.app
 
@@ -268,11 +268,11 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │    (MFE)     │ │    (MFE)    │ │      (MFE)       │ │      (MFE)       │       │
 │  │  Port 3024   │ │  Port 3025  │ │   Port 3026      │ │   Port 3027      │       │
 │  └──────────────┘ └─────────────┘ └──────────────────┘ └──────────────────┘       │
-│  ┌─────────────────┐ ┌──────────────┐                                              │
-│  │ Transit Tracker │ │  Travel Map  │                                              │
-│  │      (MFE)      │ │    (MFE)     │                                              │
-│  │   Port 3028     │ │  Port 3029   │                                              │
-│  └─────────────────┘ └──────────────┘                                              │
+│  ┌─────────────────┐ ┌──────────────┐ ┌──────────────┐ ┌─────────────────┐       │
+│  │ Transit Tracker │ │  Travel Map  │ │ Deal Finder  │ │   Web Crawler   │       │
+│  │      (MFE)      │ │    (MFE)     │ │    (MFE)     │ │      (MFE)      │       │
+│  │   Port 3028     │ │  Port 3029   │ │  Port 3030   │ │   Port 3031     │       │
+│  └─────────────────┘ └──────────────┘ └──────────────┘ └─────────────────┘       │
 └──────────────────────────────────────────────────────────────────────────────────┘
                                      │
                                      ▼
@@ -305,7 +305,7 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Baby Tracker** | Baby growth tracking with weekly fruit comparisons and Bible verses | `BabyTracker` |
 | **Child Development** | Postnatal milestone tracker (birth–5 years) across 5 CDC/AAP-aligned domains | `ChildDevelopment` |
 | **Flashcards** | Unified learning hub: quiz mode, handwriting practice canvas, character editor with Pinyin keyboard, 88 English phrases, 3D flip cards, Bible verses, custom cards, and mastery tracking | `FlashCards` |
-| **Work Tracker** | Firestore-backed daily work log with timeline view and real-time sync | `WorkTracker` |
+| **Daily Log** | Firestore-backed daily journal with timeline view and real-time sync | `DailyLog` |
 | **Cloud Files** | Upload, share, and download files (images, PDFs, docs) via Cloud Function | `CloudFiles` |
 | **Model Benchmark** | Compare AI model performance across Ollama endpoints (CPU vs GPU), nanosecond-precision timing | `ModelBenchmark` |
 | **Hiking Map** | Interactive trail map with GPS auto-locate, tap-to-place waypoints, foot-routing via OSRM, offline tile cache (IndexedDB), saved routes, and topo/street style switcher | `HikingMap` |
@@ -320,6 +320,8 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **AI Interviewer** | Coding interview practice with AI evaluation, working document, typewriter effect, and Firebase persistence | `AiInterviewer` |
 | **Transit Tracker** | Real-time bus arrivals via OneBusAway API (Puget Sound), favorite stops, URL routing | `TransitTracker` |
 | **Travel Map** | World map with color-coded pins (lived/visited/wishlist) and per-user Firestore storage | `TravelMap` |
+| **Deal Finder** | Curated deals and discounts discovery | `DealFinder` |
+| **Web Crawler** | Submit URLs for crawling, extract content, view documents and real-time trace logs, search history | `WebCrawler` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
@@ -371,6 +373,8 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/transit` | Transit Tracker — real-time bus arrivals |
 | `/transit/:stopId` | Transit stop detail with live arrivals |
 | `/travel-map` | Travel Map — world map with travel pins |
+| `/deals` | Deal Finder — curated deals and discounts |
+| `/web-crawler` | Web Crawler — submit URLs, extract content, view documents and traces |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack
@@ -469,7 +473,9 @@ mycircle/
 │   ├── radio-station/           # Internet radio streaming MFE
 │   ├── ai-interviewer/          # Coding interview practice MFE
 │   ├── transit-tracker/         # Real-time bus arrivals MFE
-│   └── travel-map/              # World travel map MFE
+│   ├── travel-map/              # World travel map MFE
+│   ├── deal-finder/             # Deals and discounts discovery MFE
+│   └── web-crawler/             # URL crawling and content extraction MFE
 ├── server/                      # Local development Express server
 │   ├── index.ts                 # Entry point — Apollo, REST proxies, AI endpoint
 │   ├── api/                     # OpenWeather & geocoding API clients
@@ -560,7 +566,7 @@ mycircle/
    This starts all services concurrently:
    - Express server (GraphQL + proxies): http://localhost:3000
    - Shell (host): http://localhost:3000
-   - All 25 MFE preview servers (City Search, Weather, Stocks, Podcasts, AI Assistant, Bible Reader, Worship Songs, Notebook, Baby Tracker, Child Development, Flashcards, Daily Log, Cloud Files, Model Benchmark, Immigration Tracker, Digital Library, Family Games, Doc Scanner, Hiking Map, Trip Planner, Poll System, Radio Station, AI Interviewer, Transit Tracker, Travel Map)
+   - All 27 MFE preview servers (City Search, Weather, Stocks, Podcasts, AI Assistant, Bible Reader, Worship Songs, Notebook, Baby Tracker, Child Development, Flashcards, Daily Log, Cloud Files, Model Benchmark, Immigration Tracker, Digital Library, Family Games, Doc Scanner, Hiking Map, Trip Planner, Poll System, Radio Station, AI Interviewer, Transit Tracker, Travel Map, Deal Finder, Web Crawler)
 
 ### Available Scripts
 
