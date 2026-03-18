@@ -1,7 +1,7 @@
 {
   "name": "mycircle",
   "private": true,
-  "version": "1.4.3",
+  "version": "1.4.4",
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "engines": {

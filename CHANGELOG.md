@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.4](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.3...mycircle-v1.4.4) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ci:** use PAT for release-please to unblock required status checks ([#791](https://github.com/FishGit2020/MyCircle/issues/791)) ([31f2ddc](https://github.com/FishGit2020/MyCircle/commit/31f2ddcecf24e23adaabfb2902943db35439f2ba))
+
 ## [1.4.3](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.2...mycircle-v1.4.3) (2026-03-18)
 
 
