@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.5](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.4...mycircle-v1.4.5) (2026-03-18)
+
+
+### Bug Fixes
+
+* add jsx and full compilerOptions to web-crawler tsconfig ([#793](https://github.com/FishGit2020/MyCircle/issues/793)) ([1e339b7](https://github.com/FishGit2020/MyCircle/commit/1e339b7c82e82532e42a97b0d2947fadab50494f))
+
 ## [1.4.4](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.3...mycircle-v1.4.4) (2026-03-18)
 
 
