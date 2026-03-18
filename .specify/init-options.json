@@ -4,6 +4,6 @@
   "ai_skills": false,
   "here": true,
   "preset": null,
-  "script": "ps",
-  "speckit_version": "0.3.0"
+  "script": "sh",
+  "speckit_version": "0.3.1"
 }
