@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.3.0...mycircle-v1.4.0) (2026-03-18)
+
+
+### Features
+
+* add 112 PDF songbook worship songs as individual seed scripts ([#784](https://github.com/FishGit2020/MyCircle/issues/784)) ([e90a0f4](https://github.com/FishGit2020/MyCircle/commit/e90a0f4b9fa52a582f28df42f1ec219982adeff6))
+* **web-crawler:** add SSRF protection, metadata extraction, content reader, and search ([#783](https://github.com/FishGit2020/MyCircle/issues/783)) ([71fce4c](https://github.com/FishGit2020/MyCircle/commit/71fce4c80d6e42ae7f4e4347d1632208294d6cc4))
+
+
+### Bug Fixes
+
+* constrain interview chat to viewport height to prevent page scroll ([#782](https://github.com/FishGit2020/MyCircle/issues/782)) ([e5c0f3e](https://github.com/FishGit2020/MyCircle/commit/e5c0f3ee997b852c19ed684d88a0f337cf956a97))
+* show UX hint when question bank is empty ([#780](https://github.com/FishGit2020/MyCircle/issues/780)) ([a1ab2d9](https://github.com/FishGit2020/MyCircle/commit/a1ab2d9b6108e950bc54d33c43555c7827292bd4))
+
 ## [1.3.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.2.0...mycircle-v1.3.0) (2026-03-17)
 
 
