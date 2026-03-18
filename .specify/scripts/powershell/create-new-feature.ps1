@@ -158,7 +158,7 @@ try {
 
 Set-Location $repoRoot
 
-$specsDir = Join-Path $repoRoot 'specs'
+$specsDir = Join-Path (Join-Path $repoRoot 'docs') 'specs'
 New-Item -ItemType Directory -Path $specsDir -Force | Out-Null
 
 # Function to generate branch name with stop word filtering and length filtering

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation, PageContent } from '@mycircle/shared';
 import {
   useCrawlJobs,
@@ -6,6 +6,7 @@ import {
   useStartCrawl,
   useStopCrawl,
   useDeleteCrawlJob,
+  useSearchCrawlJobs,
 } from '../hooks/useCrawler';
 
 type Tab = 'jobs' | 'documents' | 'tracing';
@@ -37,12 +38,25 @@ export default function WebCrawler() {
   const [maxPages, setMaxPages] = useState(20);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('jobs');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const { jobs, loading: jobsLoading } = useCrawlJobs();
+  const { jobs: allJobs, loading: jobsLoading } = useCrawlJobs();
+  const { jobs: searchResults, loading: searchLoading } = useSearchCrawlJobs(searchQuery);
   const { detail, loading: detailLoading } = useCrawlJobDetail(selectedJobId);
   const { startCrawl, loading: starting, error: startError } = useStartCrawl();
   const { stopCrawl, loading: stopping } = useStopCrawl();
   const { deleteCrawlJob, loading: deleting } = useDeleteCrawlJob();
+
+  const isSearching = searchQuery.length >= 2;
+  const jobs = isSearching ? searchResults : allJobs;
+
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setSearchQuery(searchInput), 300);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchInput]);
 
   const handleStartCrawl = useCallback(async () => {
     if (!url.trim()) return;
@@ -187,18 +201,48 @@ export default function WebCrawler() {
 
       {/* Tab content */}
       {activeTab === 'jobs' && (
-        <JobsList
-          jobs={jobs}
-          loading={jobsLoading}
-          selectedJobId={selectedJobId}
-          hasActiveJob={hasActiveJob}
-          stopping={stopping}
-          deleting={deleting}
-          onSelect={handleSelectJob}
-          onStop={handleStop}
-          onDelete={handleDelete}
-          t={t}
-        />
+        <>
+          {/* Search bar */}
+          <div className="mb-4 relative">
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder={t('webCrawler.search.placeholder')}
+              className="w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              aria-label={t('webCrawler.search.placeholder')}
+            />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => { setSearchInput(''); setSearchQuery(''); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label={t('webCrawler.search.clear')}
+              >
+                &times;
+              </button>
+            )}
+          </div>
+
+          {isSearching && searchResults.length === 0 && !searchLoading ? (
+            <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+              {t('webCrawler.search.noResults')}
+            </p>
+          ) : (
+            <JobsList
+              jobs={jobs}
+              loading={isSearching ? searchLoading : jobsLoading}
+              selectedJobId={selectedJobId}
+              hasActiveJob={hasActiveJob}
+              stopping={stopping}
+              deleting={deleting}
+              onSelect={handleSelectJob}
+              onStop={handleStop}
+              onDelete={handleDelete}
+              t={t}
+            />
+          )}
+        </>
       )}
 
       {activeTab === 'documents' && (
@@ -357,20 +401,28 @@ function JobsList({
 }
 
 // ─── Documents Panel ────────────────────────────────────────
+interface CrawledDoc {
+  id: string;
+  jobId: string;
+  url: string;
+  title: string | null;
+  contentPreview: string | null;
+  fullContent: string | null;
+  contentTruncated: boolean | null;
+  description: string | null;
+  author: string | null;
+  publishDate: string | null;
+  ogImage: string | null;
+  statusCode: number;
+  contentType: string | null;
+  crawledAt: string;
+  size: number;
+  depth: number;
+}
+
 interface CrawlJobDetail {
   job: CrawlJob;
-  documents: Array<{
-    id: string;
-    jobId: string;
-    url: string;
-    title: string | null;
-    contentPreview: string | null;
-    statusCode: number;
-    contentType: string | null;
-    crawledAt: string;
-    size: number;
-    depth: number;
-  }>;
+  documents: CrawledDoc[];
   traces: Array<{
     id: string;
     jobId: string;
@@ -395,6 +447,8 @@ function DocumentsPanel({
   onBack: () => void;
   t: (key: string) => string;
 }) {
+  const [readingDocId, setReadingDocId] = useState<string | null>(null);
+
   if (!selectedJobId) {
     return (
       <p className="text-center text-gray-500 dark:text-gray-400 py-12">
@@ -412,7 +466,86 @@ function DocumentsPanel({
   }
 
   const docs = detail?.documents ?? [];
+  const readingDoc = readingDocId ? docs.find((d) => d.id === readingDocId) : null;
 
+  // ─── Content Reader View ────────────────────────────────
+  if (readingDoc) {
+    return (
+      <div>
+        <button
+          type="button"
+          onClick={() => setReadingDocId(null)}
+          className="mb-4 text-sm text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] inline-flex items-center"
+          aria-label={t('webCrawler.reader.backToDocuments')}
+        >
+          &larr; {t('webCrawler.reader.backToDocuments')}
+        </button>
+
+        <article className="max-w-3xl mx-auto">
+          {/* OG Image */}
+          {readingDoc.ogImage && (
+            <img
+              src={readingDoc.ogImage}
+              alt=""
+              className="w-full h-48 object-cover rounded-lg mb-4"
+            />
+          )}
+
+          {/* Title */}
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {readingDoc.title || readingDoc.url}
+          </h2>
+
+          {/* URL */}
+          <a
+            href={readingDoc.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all"
+          >
+            {readingDoc.url}
+          </a>
+
+          {/* Metadata block */}
+          {(readingDoc.author || readingDoc.publishDate || readingDoc.description) && (
+            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              {readingDoc.author && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">{t('webCrawler.reader.author')}:</span>{' '}
+                  {readingDoc.author}
+                </p>
+              )}
+              {readingDoc.publishDate && (
+                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                  <span className="font-medium">{t('webCrawler.reader.publishDate')}:</span>{' '}
+                  {new Date(readingDoc.publishDate).toLocaleDateString()}
+                </p>
+              )}
+              {readingDoc.description && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 italic">
+                  {readingDoc.description}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Full content */}
+          <div className="mt-6 text-base leading-relaxed text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+            {readingDoc.fullContent || readingDoc.contentPreview || t('webCrawler.reader.noContent')}
+          </div>
+
+          {/* Truncation notice */}
+          {readingDoc.contentTruncated && (
+            <p className="mt-4 text-sm text-amber-600 dark:text-amber-400 italic">
+              {t('webCrawler.reader.contentTruncated')}
+            </p>
+          )}
+        </article>
+      </div>
+    );
+  }
+
+  // ─── Documents List View ────────────────────────────────
   return (
     <div>
       <button
@@ -449,7 +582,11 @@ function DocumentsPanel({
           {docs.map((doc) => (
             <div
               key={doc.id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3"
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 cursor-pointer hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
+              onClick={() => setReadingDocId(doc.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setReadingDocId(doc.id)}
             >
               <div className="flex items-start justify-between gap-2 mb-1">
                 <div className="flex-1 min-w-0">

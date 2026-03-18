@@ -48,7 +48,7 @@
   "pnpm": {
     "overrides": {
       "ajv": ">=8.18.0",
-      "fast-xml-parser": ">=5.3.6"
+      "fast-xml-parser": ">=5.5.6"
     }
   }
 }

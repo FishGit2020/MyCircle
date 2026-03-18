@@ -1,5 +1,6 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { GraphQLError } from 'graphql';
+import { isPrivateUrl } from '../handlers/webCrawler';
 
 interface ResolverContext {
   uid: string | null;
@@ -87,6 +88,12 @@ export function createWebCrawlerResolvers() {
               url: data.url ?? '',
               title: data.title ?? null,
               contentPreview: data.contentPreview ?? null,
+              fullContent: data.fullContent ?? null,
+              contentTruncated: data.contentTruncated ?? false,
+              description: data.description ?? null,
+              author: data.author ?? null,
+              publishDate: data.publishDate ?? null,
+              ogImage: data.ogImage ?? null,
               statusCode: data.statusCode ?? 0,
               contentType: data.contentType ?? null,
               crawledAt: toTimestampString(data.crawledAt),
@@ -108,6 +115,65 @@ export function createWebCrawlerResolvers() {
           }),
         };
       },
+
+      searchCrawlJobs: async (_: unknown, { query }: { query: string }, context: ResolverContext) => {
+        const uid = requireAuth(context);
+        if (!query || query.length < 2) {
+          throw new GraphQLError('Search query must be at least 2 characters', {
+            extensions: { code: 'BAD_USER_INPUT' },
+          });
+        }
+        const db = getFirestore();
+        const snap = await db
+          .collection(jobPath(uid))
+          .orderBy('createdAt', 'desc')
+          .limit(50)
+          .get();
+
+        const lowerQuery = query.toLowerCase();
+        const results = [];
+
+        for (const jobDoc of snap.docs) {
+          const jobData = jobDoc.data();
+          // Check job URL
+          if ((jobData.url ?? '').toLowerCase().includes(lowerQuery)) {
+            results.push({
+              id: jobDoc.id,
+              url: jobData.url ?? '',
+              status: jobData.status ?? 'pending',
+              maxDepth: jobData.maxDepth ?? 2,
+              maxPages: jobData.maxPages ?? 20,
+              pagesVisited: jobData.pagesVisited ?? 0,
+              createdAt: toTimestampString(jobData.createdAt),
+              updatedAt: toTimestampString(jobData.updatedAt),
+            });
+            continue;
+          }
+          // Check document titles and content previews
+          const docSnap = await jobDoc.ref.collection('documents').get();
+          const matches = docSnap.docs.some((d) => {
+            const data = d.data();
+            return (
+              (data.title ?? '').toLowerCase().includes(lowerQuery) ||
+              (data.contentPreview ?? '').toLowerCase().includes(lowerQuery)
+            );
+          });
+          if (matches) {
+            results.push({
+              id: jobDoc.id,
+              url: jobData.url ?? '',
+              status: jobData.status ?? 'pending',
+              maxDepth: jobData.maxDepth ?? 2,
+              maxPages: jobData.maxPages ?? 20,
+              pagesVisited: jobData.pagesVisited ?? 0,
+              createdAt: toTimestampString(jobData.createdAt),
+              updatedAt: toTimestampString(jobData.updatedAt),
+            });
+          }
+        }
+
+        return results;
+      },
     },
 
     Mutation: {
@@ -124,6 +190,13 @@ export function createWebCrawlerResolvers() {
           new URL(input.url);
         } catch {
           throw new GraphQLError('Invalid URL');
+        }
+
+        // SSRF protection: block private/internal IPs
+        if (await isPrivateUrl(input.url)) {
+          throw new GraphQLError('URL resolves to a private or reserved network address', {
+            extensions: { code: 'BAD_USER_INPUT' },
+          });
         }
 
         const now = new Date();

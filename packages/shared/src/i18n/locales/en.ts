@@ -2562,6 +2562,14 @@ const en = {
   'webCrawler.backToJobs': 'Back to Jobs',
   'webCrawler.crawling': 'Crawling...',
   'webCrawler.startingCrawl': 'Starting...',
+  'webCrawler.reader.backToDocuments': 'Back to Documents',
+  'webCrawler.reader.author': 'Author',
+  'webCrawler.reader.publishDate': 'Published',
+  'webCrawler.reader.contentTruncated': 'Content was truncated due to size limits.',
+  'webCrawler.reader.noContent': 'No text content available for this page.',
+  'webCrawler.search.placeholder': 'Search crawl history...',
+  'webCrawler.search.noResults': 'No matching crawl jobs found.',
+  'webCrawler.search.clear': 'Clear search',
 } as const;
 
 export default en;
