@@ -54,6 +54,7 @@ const zh: Record<TranslationKey, string> = {
   'search.recentMatch': '\u6700\u8fd1',
   'search.justNow': '\u521a\u521a',
   'search.suggestedCities': '\u60a8\u662f\u5426\u5728\u627e\uff1f',
+  'search.favoritesSection': '\u6536\u85cf\u5217\u8868',
 
   // Weather Display
   'weather.refresh': '\u5237\u65b0',
@@ -176,6 +177,8 @@ const zh: Record<TranslationKey, string> = {
   'favorites.favorite': '\u6536\u85cf',
   'favorites.removeFromFavorites': '\u53d6\u6d88\u6536\u85cf',
   'favorites.addToFavorites': '\u6dfb\u52a0\u6536\u85cf',
+  'favorites.manageFavorites': '\u7ba1\u7406\u6536\u85cf',
+  'favorites.noFavorites': '\u6682\u65e0\u6536\u85cf',
 
   // Share
   'share.share': '\u5206\u4eab',
@@ -2446,6 +2449,7 @@ const zh: Record<TranslationKey, string> = {
   'transit.unfavorite': '\u53d6\u6d88\u6536\u85cf',
   'transit.favorites': '\u6536\u85cf\u7ad9\u70b9',
   'transit.noFavorites': '\u6682\u65e0\u6536\u85cf\u7ad9\u70b9',
+  'transit.favoriteCities': '\u6536\u85cf\u57ce\u5e02',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': '\u65c5\u884c\u5730\u56fe',

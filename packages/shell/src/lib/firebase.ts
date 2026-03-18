@@ -458,6 +458,9 @@ export async function clearRecentCities(uid: string) {
   });
 }
 
+/** Max number of favorite cities a user can save. */
+export const MAX_FAVORITE_CITIES = 10;
+
 export async function toggleFavoriteCity(uid: string, city: FavoriteCity): Promise<boolean> {
   if (!db) return false;
   const userRef = doc(db, 'users', uid);
@@ -467,6 +470,11 @@ export async function toggleFavoriteCity(uid: string, city: FavoriteCity): Promi
     const profile = userDoc.data() as UserProfile;
     const favorites = profile.favoriteCities || [];
     const exists = favorites.some(c => c.id === city.id);
+
+    // Cap: do not allow adding beyond MAX_FAVORITE_CITIES
+    if (!exists && favorites.length >= MAX_FAVORITE_CITIES) {
+      return false;
+    }
 
     const updatedFavorites = exists
       ? favorites.filter(c => c.id !== city.id)

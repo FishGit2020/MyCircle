@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { useLazyQuery } from '@apollo/client/react';
 import { SEARCH_CITIES, REVERSE_GEOCODE, City, eventBus, MFEvents, useTranslation, fuzzySearchCities, MAJOR_CITIES, StorageKeys } from '@mycircle/shared';
 import WeatherPreview from './WeatherPreview';
+import FavoritesManager from './FavoritesManager';
 import './CitySearch.css';
 
 interface SearchCitiesResponse {
@@ -21,6 +22,15 @@ interface RecentCity {
   lat: number;
   lon: number;
   searchedAt?: number;
+}
+
+interface FavoriteCity {
+  id: string;
+  name: string;
+  country: string;
+  state?: string;
+  lat: number;
+  lon: number;
 }
 
 const POPULAR_CITIES: RecentCity[] = [
@@ -60,9 +70,11 @@ interface Props {
   recentCities?: RecentCity[];
   onRemoveCity?: (cityId: string) => void;
   onClearRecents?: () => void;
+  favoriteCities?: FavoriteCity[];
+  onToggleFavorite?: (city: FavoriteCity) => Promise<boolean>;
 }
 
-export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCity, onClearRecents }: Props) {
+export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCity, onClearRecents, favoriteCities, onToggleFavorite }: Props) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<City[]>([]);
@@ -70,6 +82,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [showFavoritesManager, setShowFavoritesManager] = useState(false);
   const [localRecents, setLocalRecents] = useState<RecentCity[]>(loadLocalRecents);
   const navigate = useNavigate();
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -348,6 +361,50 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
     </button>
   );
 
+  const isFavorite = useCallback((city: City | RecentCity | FavoriteCity) => {
+    if (!favoriteCities) return false;
+    const id = city.id || `${city.lat},${city.lon}`;
+    return favoriteCities.some(f => f.id === id);
+  }, [favoriteCities]);
+
+  const StarButton = ({ city }: { city: City | RecentCity | FavoriteCity }) => {
+    if (!onToggleFavorite) return null;
+    const fav = isFavorite(city);
+    const handleStar = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const favCity: FavoriteCity = {
+        id: city.id || `${city.lat},${city.lon}`,
+        name: city.name,
+        country: city.country,
+        state: city.state,
+        lat: city.lat,
+        lon: city.lon,
+      };
+      onToggleFavorite(favCity);
+    };
+    return (
+      <button
+        type="button"
+        onClick={handleStar}
+        aria-label={fav ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
+        className="min-w-[44px] min-h-[44px] flex items-center justify-center text-yellow-400 hover:text-yellow-500 dark:text-yellow-300 dark:hover:text-yellow-200 flex-shrink-0 transition-colors"
+      >
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+        </svg>
+      </button>
+    );
+  };
+
+  const FavoriteBadge = () => (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 rounded ml-2 flex-shrink-0">
+      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+      </svg>
+      {t('search.favoritesSection')}
+    </span>
+  );
+
   const RecentBadge = () => (
     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded ml-2 flex-shrink-0">
       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -422,7 +479,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center">
                     <p className="font-medium dark:text-white">{city.name}</p>
-                    <RecentBadge />
+                    {isFavorite(city) ? <FavoriteBadge /> : <RecentBadge />}
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {city.state && `${city.state}, `}{city.country}
@@ -431,6 +488,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                     )}
                   </p>
                 </div>
+                <StarButton city={city} />
                 <WeatherPreview lat={city.lat} lon={city.lon} />
               </button>
             ))}
@@ -458,6 +516,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                       {city.state && `${city.state}, `}{city.country}
                     </p>
                   </div>
+                  <StarButton city={city} />
                   <WeatherPreview lat={city.lat} lon={city.lon} />
                 </button>
               );
@@ -491,6 +550,7 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                     {city.state && `${city.state}, `}{city.country}
                   </p>
                 </div>
+                <StarButton city={city} />
                 <WeatherPreview lat={city.lat} lon={city.lon} />
               </button>
             ))}
@@ -514,6 +574,39 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
               <div className="px-4 py-2 text-xs text-red-500 dark:text-red-400 border-b dark:border-gray-700">
                 {geoError}
               </div>
+            )}
+            {favoriteCities && favoriteCities.length > 0 && (
+              <>
+                <div className="px-4 py-2 bg-yellow-50 dark:bg-yellow-900/20 border-b dark:border-gray-700 flex items-center justify-between">
+                  <p className="text-xs font-medium text-yellow-600 dark:text-yellow-400 uppercase tracking-wide">{t('search.favoritesSection')}</p>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setShowFavoritesManager(true); }}
+                    className="text-xs text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-200 font-medium transition-colors"
+                  >
+                    {t('favorites.manageFavorites')}
+                  </button>
+                </div>
+                {favoriteCities.slice(0, 5).map((city, index) => (
+                  <button
+                    key={`fav-${city.id}`}
+                    type="button"
+                    data-dropdown-item
+                    onClick={() => handleCityClick(city)}
+                    className="w-full text-left px-4 py-3 transition border-b dark:border-gray-700 last:border-b-0 flex items-center hover:bg-yellow-50 dark:hover:bg-yellow-900/10"
+                    role="option"
+                    aria-selected={false}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium dark:text-white">{city.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {city.state && `${city.state}, `}{city.country}
+                      </p>
+                    </div>
+                    <StarButton city={city} />
+                  </button>
+                ))}
+              </>
             )}
             <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex items-center justify-between">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{dropdownLabel}</p>
@@ -578,6 +671,14 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
           {t('mfe.citySearch')}
         </span>
       </div>
+
+      {showFavoritesManager && favoriteCities && onToggleFavorite && (
+        <FavoritesManager
+          favoriteCities={favoriteCities}
+          onToggleFavorite={onToggleFavorite}
+          onClose={() => setShowFavoritesManager(false)}
+        />
+      )}
     </div>
   );
 }

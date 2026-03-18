@@ -52,6 +52,7 @@ const en = {
   'search.recentMatch': 'Recent',
   'search.justNow': 'Just now',
   'search.suggestedCities': 'Did you mean?',
+  'search.favoritesSection': 'Favorites',
 
   // Weather Display
   'weather.refresh': 'Refresh',
@@ -174,6 +175,8 @@ const en = {
   'favorites.favorite': 'Favorite',
   'favorites.removeFromFavorites': 'Remove from favorites',
   'favorites.addToFavorites': 'Add to favorites',
+  'favorites.manageFavorites': 'Manage favorites',
+  'favorites.noFavorites': 'No favorites yet',
 
   // Share
   'share.share': 'Share',
@@ -2446,6 +2449,7 @@ const en = {
   'transit.unfavorite': 'Remove from favorites',
   'transit.favorites': 'Favorite Stops',
   'transit.noFavorites': 'No favorite stops yet',
+  'transit.favoriteCities': 'Favorite Cities',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': 'Travel Map',
