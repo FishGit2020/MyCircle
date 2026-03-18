@@ -140,6 +140,8 @@ const en = {
   'weather.warmer': 'warmer',
   'weather.cooler': 'cooler',
   'weather.noHistoricalData': 'Historical data not available',
+  'weather.citySwitch': 'Switch city',
+  'weather.forecastHighLow': "Today's high / low",
 
   // Notifications
   'notifications.enable': 'Enable notifications',

@@ -142,6 +142,8 @@ const zh: Record<TranslationKey, string> = {
   'weather.warmer': '\u66f4\u6696',
   'weather.cooler': '\u66f4\u51c9',
   'weather.noHistoricalData': '\u5386\u53f2\u6570\u636e\u4e0d\u53ef\u7528',
+  'weather.citySwitch': '\u5207\u6362\u57ce\u5e02',
+  'weather.forecastHighLow': '\u4eca\u65e5\u6700\u9ad8/\u6700\u4f4e\u6c14\u6e29',
 
   // Notifications
   'notifications.enable': '\u5f00\u542f\u901a\u77e5',

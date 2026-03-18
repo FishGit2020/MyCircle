@@ -22,17 +22,31 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   useUnits: () => ({ tempUnit: 'C', speedUnit: 'ms' }),
   GET_CURRENT_WEATHER: 'GET_CURRENT_WEATHER',
+  GET_AIR_QUALITY: 'GET_AIR_QUALITY',
+  GET_FORECAST: 'GET_FORECAST',
+  GET_HISTORICAL_WEATHER: 'GET_HISTORICAL_WEATHER',
   getWeatherIconUrl: (icon: string) => `https://icons/${icon}.png`,
   formatTemperature: (temp: number) => `${Math.round(temp)}°`,
-  useQuery: () => ({
-    data: {
-      currentWeather: {
-        temp: 22,
-        weather: [{ icon: '01d', main: 'Clear', description: 'clear sky' }],
-      },
-    },
-    loading: false,
-  }),
+  useQuery: (query: string) => {
+    if (query === 'GET_CURRENT_WEATHER') {
+      return {
+        data: {
+          currentWeather: {
+            temp: 22,
+            weather: [{ icon: '01d', main: 'Clear', description: 'clear sky' }],
+          },
+        },
+        loading: false,
+      };
+    }
+    if (query === 'GET_AIR_QUALITY') {
+      return { data: { airQuality: { aqi: 1 } }, loading: false };
+    }
+    if (query === 'GET_FORECAST') {
+      return { data: { forecast: [{ temp: { min: 14, max: 24 } }] }, loading: false };
+    }
+    return { data: null, loading: false };
+  },
 }));
 
 describe('FavoriteCities', () => {
@@ -76,5 +90,11 @@ describe('FavoriteCities', () => {
     render(<FavoriteCities />);
     const icons = screen.getAllByRole('img');
     expect(icons.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders AQI badge when aqi=1 is returned', () => {
+    render(<FavoriteCities />);
+    const aqiBadges = screen.getAllByText('weather.aqiGood');
+    expect(aqiBadges.length).toBeGreaterThanOrEqual(1);
   });
 });

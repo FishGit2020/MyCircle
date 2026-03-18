@@ -17,7 +17,11 @@ declare module 'citySearch/CitySearch' {
 }
 
 declare module 'weatherDisplay/WeatherDisplay' {
-  const WeatherDisplay: React.ComponentType;
+  interface WeatherDisplayProps {
+    favoriteCities?: Array<{ id: string; name: string; country: string; state?: string; lat: number; lon: number }>;
+    currentCityId?: string;
+  }
+  const WeatherDisplay: React.ComponentType<WeatherDisplayProps>;
   export default WeatherDisplay;
 }
 
