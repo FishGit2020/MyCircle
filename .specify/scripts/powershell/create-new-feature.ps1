@@ -158,7 +158,7 @@ try {
 
 Set-Location $repoRoot
 
-$specsDir = Join-Path (Join-Path $repoRoot 'docs') 'specs'
+$specsDir = Join-Path $repoRoot 'specs'
 New-Item -ItemType Directory -Path $specsDir -Force | Out-Null
 
 # Function to generate branch name with stop word filtering and length filtering
@@ -305,4 +305,3 @@ if ($Json) {
     Write-Output "HAS_GIT: $hasGit"
     Write-Output "SPECIFY_FEATURE environment variable set to: $branchName"
 }
-
