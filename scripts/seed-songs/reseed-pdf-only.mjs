@@ -1,35 +1,77 @@
 #!/usr/bin/env node
 /**
- * Full reseed: deletes all existing worshipSongs and re-creates from seed files.
- * Handles title changes (e.g., [INCOMPLETE] flags), removed songs, key/chord fixes.
+ * Reseed worship songs from PDF songbook only.
+ * 1. Deletes ALL existing worshipSongs from Firestore
+ * 2. Deletes ALL worship-songs/ files from Firebase Storage
+ * 3. Re-creates songs from song-*.mjs individual seed files (or pdf-songbook-part*.mjs)
  *
  * Usage:
- *   GOOGLE_APPLICATION_CREDENTIALS=<path> node scripts/seed-songs/reseed-all.mjs
- *   GOOGLE_APPLICATION_CREDENTIALS=<path> node scripts/seed-songs/reseed-all.mjs --dry-run
+ *   GOOGLE_APPLICATION_CREDENTIALS=<path> node scripts/seed-songs/reseed-pdf-only.mjs
+ *   GOOGLE_APPLICATION_CREDENTIALS=<path> node scripts/seed-songs/reseed-pdf-only.mjs --dry-run
  */
 import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import { readdirSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 initializeApp({ credential: applicationDefault() });
 const db = getFirestore();
+const bucket = getStorage().bucket('mycircle-dash.firebasestorage.app');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dryRun = process.argv.includes('--dry-run');
 
-const SKIP_FILES = new Set([
-  'update-all.mjs', 'force-update-all.mjs', 'reseed-all.mjs',
-  'reseed-pdf-only.mjs', 'split-to-individual.mjs', 'README.md',
-]);
+async function deleteStorageFiles() {
+  console.log('Cleaning up Firebase Storage worship-songs/ files...');
+  try {
+    const [files] = await bucket.getFiles({ prefix: 'worship-songs/' });
+    if (files.length === 0) {
+      console.log('  No Storage files found to delete.');
+      return;
+    }
+    if (!dryRun) {
+      let count = 0;
+      for (const file of files) {
+        await file.delete();
+        count++;
+        if (count % 50 === 0) {
+          console.log(`  ... deleted ${count}/${files.length} storage files`);
+        }
+      }
+      console.log(`  Deleted ${count} storage files.\n`);
+    } else {
+      console.log(`  DRY RUN: Would delete ${files.length} storage files.\n`);
+    }
+  } catch (err) {
+    // Storage bucket may not exist or be empty - that's fine
+    if (err.code === 404 || err.message?.includes('Not Found')) {
+      console.log('  No Storage bucket or files found (OK).\n');
+    } else {
+      console.warn('  Warning: Could not clean Storage:', err.message);
+    }
+  }
+}
 
 async function main() {
-  const files = readdirSync(__dirname).filter(
-    (f) => f.endsWith('.mjs') && !SKIP_FILES.has(f),
+  // 1. Find song-*.mjs files (individual), fallback to pdf-songbook-*.mjs (batched)
+  let files = readdirSync(__dirname).filter(
+    (f) => f.startsWith('song-') && f.endsWith('.mjs'),
   );
+  if (files.length === 0) {
+    // Fallback to batched part files
+    files = readdirSync(__dirname).filter(
+      (f) => f.startsWith('pdf-songbook-') && f.endsWith('.mjs'),
+    );
+  }
 
-  // 1. Parse all songs from seed files
+  if (files.length === 0) {
+    console.error('No song-*.mjs or pdf-songbook-*.mjs files found in', __dirname);
+    process.exit(1);
+  }
+
+  // 2. Parse all songs from PDF seed files
   const allSongs = [];
 
   for (const f of files) {
@@ -58,10 +100,15 @@ async function main() {
   }
 
   console.log(
-    `Loaded ${allSongs.length} songs from ${files.length} seed files.\n`,
+    `Loaded ${allSongs.length} songs from ${files.length} PDF seed files.\n`,
   );
 
-  // 2. Delete all existing worshipSongs
+  if (allSongs.length === 0) {
+    console.error('No songs parsed from seed files. Check file format.');
+    process.exit(1);
+  }
+
+  // 3. Delete all existing worshipSongs from Firestore
   const col = db.collection('worshipSongs');
   const snapshot = await col.get();
   console.log(`Found ${snapshot.size} existing songs in Firestore.`);
@@ -85,12 +132,15 @@ async function main() {
     if (deleteBatchCount > 0) {
       await deleteBatch.commit();
     }
-    console.log(`Deleted ${deleteCount} existing songs.\n`);
+    console.log(`Deleted ${deleteCount} existing songs from Firestore.\n`);
   } else {
     console.log(`DRY RUN: Would delete ${snapshot.size} existing songs.\n`);
   }
 
-  // 3. Re-add all songs from seed files
+  // 4. Delete all Storage files
+  await deleteStorageFiles();
+
+  // 5. Re-add all songs from PDF seed files
   if (!dryRun) {
     let addBatch = db.batch();
     let addCount = 0;
@@ -107,7 +157,7 @@ async function main() {
         notes: song.notes,
         bpm: song.bpm,
         tags: song.tags,
-        createdBy: 'seed-script',
+        createdBy: 'pdf-seed-script',
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });
@@ -124,15 +174,16 @@ async function main() {
     if (addBatchCount > 0) {
       await addBatch.commit();
     }
-    console.log(`\nReseeded ${addCount} songs into Firestore.`);
+    console.log(`\nReseeded ${addCount} PDF songs into Firestore.`);
+    console.log('Done! All worship songs are now from the PDF songbook.');
   } else {
     console.log(`DRY RUN: Would add ${allSongs.length} songs.`);
-    // Show a sample
-    console.log('\nSample titles:');
-    for (const song of allSongs.slice(0, 10)) {
-      console.log(`  "${song.title}" by ${song.artist} [${song.originalKey}]`);
+    console.log('\nSong list:');
+    for (const song of allSongs) {
+      console.log(
+        `  "${song.title}" by ${song.artist} [${song.originalKey}] (${song.sourceFile})`,
+      );
     }
-    console.log('  ...');
   }
 }
 
