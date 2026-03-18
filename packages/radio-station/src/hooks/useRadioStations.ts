@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, StorageKeys, useQuery, useLazyQuery, GET_RADIO_STATIONS, GET_RADIO_STATIONS_BY_UUIDS } from '@mycircle/shared';
+import { WindowEvents, StorageKeys, useQuery, GET_RADIO_STATIONS, GET_RADIO_STATIONS_BY_UUIDS } from '@mycircle/shared';
 import type { RadioStation } from '../types';
 
 function loadFavoriteIds(): string[] {
@@ -26,7 +26,6 @@ function saveFavoriteIds(ids: string[]): void {
 
 export function useRadioStations() {
   const [favoriteIds, setFavoriteIds] = useState<string[]>(loadFavoriteIds);
-  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
 
   const { data: stationsData, loading, error: stationsError, refetch } = useQuery(GET_RADIO_STATIONS, {
     variables: { limit: 50 },
@@ -44,14 +43,12 @@ export function useRadioStations() {
 
   const search = useCallback(
     (query: string) => {
-      setSearchQuery(query.trim() || undefined);
       refetch({ query: query.trim() || undefined, limit: 50 });
     },
     [refetch],
   );
 
   const topStations = useCallback(() => {
-    setSearchQuery(undefined);
     refetch({ query: undefined, limit: 50 });
   }, [refetch]);
 
