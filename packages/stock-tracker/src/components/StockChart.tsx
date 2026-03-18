@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { StockCandle, Timeframe, TIMEFRAMES } from '../hooks/useStockData';
+
+type ChartType = 'line' | 'candlestick';
 
 interface Props {
   symbol: string;
@@ -11,6 +13,7 @@ interface Props {
 
 function StockChart({ symbol, candles, timeframe = '1M', onTimeframeChange }: Props) {
   const { t, locale } = useTranslation();
+  const [chartType, setChartType] = useState<ChartType>('line');
 
   if (!candles || candles.s === 'no_data' || !candles.c || candles.c.length < 2) {
     return (
@@ -99,23 +102,44 @@ function StockChart({ symbol, candles, timeframe = '1M', onTimeframeChange }: Pr
             </span>
           </div>
         </div>
-        {onTimeframeChange && (
-          <div className="flex gap-1">
-            {TIMEFRAMES.map(tf => (
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Chart type toggle */}
+          <div className="flex gap-0.5 bg-gray-100 dark:bg-gray-700 rounded-md p-0.5">
+            {(['line', 'candlestick'] as ChartType[]).map(type => (
               <button
-                key={tf.id}
-                onClick={() => onTimeframeChange(tf.id)}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition ${
-                  timeframe === tf.id
+                key={type}
+                type="button"
+                onClick={() => setChartType(type)}
+                className={`px-2.5 py-1 text-xs font-medium rounded transition ${
+                  chartType === type
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                {tf.label}
+                {type === 'line' ? t('stocks.chartLine') : t('stocks.chartCandle')}
               </button>
             ))}
           </div>
-        )}
+          {/* Timeframe selector */}
+          {onTimeframeChange && (
+            <div className="flex gap-1">
+              {TIMEFRAMES.map(tf => (
+                <button
+                  key={tf.id}
+                  type="button"
+                  onClick={() => onTimeframeChange(tf.id)}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition ${
+                    timeframe === tf.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {tf.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -124,7 +148,7 @@ function StockChart({ symbol, candles, timeframe = '1M', onTimeframeChange }: Pr
           className="w-full min-w-[500px]"
           preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label={`${symbol} price chart`}
+          aria-label={`${symbol} ${chartType === 'candlestick' ? 'candlestick' : 'price'} chart`}
         >
           {/* Grid lines */}
           {yLabels.map(({ y }, i) => (
@@ -140,18 +164,44 @@ function StockChart({ symbol, candles, timeframe = '1M', onTimeframeChange }: Pr
             />
           ))}
 
-          {/* Area fill */}
-          <path d={areaPath} fill={areaColor} />
-
-          {/* Price line */}
-          <path
-            d={linePath}
-            fill="none"
-            stroke={lineColor}
-            strokeWidth={2.5}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
+          {chartType === 'line' ? (
+            <>
+              {/* Area fill */}
+              <path d={areaPath} fill={areaColor} />
+              {/* Price line */}
+              <path
+                d={linePath}
+                fill="none"
+                stroke={lineColor}
+                strokeWidth={2.5}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </>
+          ) : (
+            <>
+              {/* Candlestick bars */}
+              {candles.c.map((_c, i) => {
+                const cx = getX(i);
+                const barWidth = plotWidth / Math.max(1, candles.c.length - 1) * 0.6;
+                const isUp = candles.c[i] >= candles.o[i];
+                const color = isUp ? '#22c55e' : '#ef4444';
+                const bodyTop = Math.min(getY(candles.o[i]), getY(candles.c[i]));
+                const bodyBottom = Math.max(getY(candles.o[i]), getY(candles.c[i]));
+                const bodyHeight = Math.max(1, bodyBottom - bodyTop);
+                return (
+                  <g key={`candle-${i}`}>
+                    {/* Upper wick */}
+                    <line x1={cx} y1={getY(candles.h[i])} x2={cx} y2={bodyTop} stroke={color} strokeWidth={1} />
+                    {/* Body */}
+                    <rect x={cx - barWidth / 2} y={bodyTop} width={barWidth} height={bodyHeight} fill={color} />
+                    {/* Lower wick */}
+                    <line x1={cx} y1={bodyBottom} x2={cx} y2={getY(candles.l[i])} stroke={color} strokeWidth={1} />
+                  </g>
+                );
+              })}
+            </>
+          )}
 
           {/* Min/Max markers */}
           <circle cx={getX(maxIndex)} cy={getY(maxPrice)} r={4} fill={lineColor} />

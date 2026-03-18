@@ -26,9 +26,9 @@ export default function StockNews({ symbol }: StockNewsProps) {
     };
   }, []);
 
-  const { data, loading } = useQuery<GetCompanyNewsQuery>(GET_COMPANY_NEWS, {
+  const { data, loading, refetch: newsRefetch } = useQuery<GetCompanyNewsQuery>(GET_COMPANY_NEWS, {
     variables: { symbol, from, to },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
   });
 
   const articles = data?.companyNews ?? [];
@@ -40,6 +40,17 @@ export default function StockNews({ symbol }: StockNewsProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
         </svg>
         <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('stocks.news')}</h3>
+        <button
+          type="button"
+          onClick={() => newsRefetch()}
+          disabled={loading}
+          aria-label={t('stocks.refreshNews')}
+          className="ml-auto p-2 rounded-full text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 transition"
+        >
+          <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
       </div>
 
       {loading ? (

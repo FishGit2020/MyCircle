@@ -164,6 +164,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 ## Active Technologies
 - TypeScript 5.x, React 18 + React, Tailwind CSS, `@mycircle/shared` (eventBus, i18n, StorageKeys), Firebase Firestore SDK (shell-only) (001-favorite-cities)
 - Firestore `users/{uid}.favoriteCities[]` (existing); localStorage for recents (unchanged) (001-favorite-cities)
+- TypeScript 5.x, React 18 + `@mycircle/shared` (Apollo re-exports, i18n), SVG (no new charting library) (003-stock-data)
+- `localStorage` (watchlist, unchanged); no new storage (003-stock-data)
 
 ## Recent Changes
 - 001-favorite-cities: Added cross-MFE favorite cities — star/unstar from search, favorites dropdown, transit city chips, FavoritesManager panel

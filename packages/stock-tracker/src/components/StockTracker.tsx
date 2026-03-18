@@ -39,11 +39,11 @@ export default function StockTracker() {
   const [timeframe, setTimeframe] = useState<Timeframe>('1M');
   const isInitialMount = useRef(true);
 
-  const { quote: selectedQuote, loading: quoteLoading, lastUpdated, refetch } = useStockQuote(
+  const { quote: selectedQuote, loading: quoteLoading, lastUpdated, refetch: quoteRefetch } = useStockQuote(
     selectedSymbol,
     0
   );
-  const { candles: selectedCandles, loading: candlesLoading } = useStockCandles(selectedSymbol, timeframe);
+  const { candles: selectedCandles, loading: candlesLoading, refetch: candlesRefetch } = useStockCandles(selectedSymbol, timeframe);
 
   // Persist watchlist — skip first render to avoid overwriting restored data
   useEffect(() => {
@@ -174,8 +174,8 @@ export default function StockTracker() {
               {/* Refresh button */}
               <button
                 type="button"
-                onClick={() => refetch()}
-                disabled={quoteLoading}
+                onClick={() => { quoteRefetch(); candlesRefetch(); }}
+                disabled={quoteLoading || candlesLoading}
                 className="p-2 rounded-full text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50"
                 aria-label={t('stocks.refresh')}
               >

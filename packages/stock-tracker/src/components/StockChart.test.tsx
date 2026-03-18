@@ -92,13 +92,39 @@ describe('StockChart', () => {
   it('does not render timeframe buttons when onTimeframeChange is not provided', () => {
     render(<StockChart symbol="AAPL" candles={mockCandles} />);
 
-    // TIMEFRAMES buttons should not be present (no callback = no buttons)
-    for (const _tf of TIMEFRAMES) {
-      // The labels are short strings like "1W", "1M" etc.
-      // They might appear in price text, so check specifically for button role
-      const buttons = screen.queryAllByRole('button');
-      expect(buttons.length).toBe(0);
+    // Timeframe buttons (1W, 1M, etc.) should not be present
+    for (const tf of TIMEFRAMES) {
+      expect(screen.queryByRole('button', { name: tf.label })).not.toBeInTheDocument();
     }
+    // Chart type toggle buttons (Line/Candle) are always present
+    const buttons = screen.queryAllByRole('button');
+    expect(buttons.length).toBe(2);
+  });
+
+  it('renders Line and Candle toggle buttons always', () => {
+    render(<StockChart symbol="AAPL" candles={mockCandles} />);
+
+    expect(screen.getByRole('button', { name: /line/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /candle/i })).toBeInTheDocument();
+  });
+
+  it('switches to candlestick mode when Candle button is clicked', () => {
+    const { container } = render(<StockChart symbol="AAPL" candles={mockCandles} />);
+
+    // In line mode, area path exists
+    expect(container.querySelector('path[fill="rgba(34, 197, 94, 0.1)"]')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /candle/i }));
+
+    // In candlestick mode, rect elements (candle bodies) appear
+    const rects = container.querySelectorAll('rect');
+    expect(rects.length).toBe(mockCandles.c.length);
+
+    // Area path no longer present
+    expect(container.querySelector('path[fill="rgba(34, 197, 94, 0.1)"]')).not.toBeInTheDocument();
+
+    // aria-label updates to candlestick
+    expect(screen.getByRole('img', { name: 'AAPL candlestick chart' })).toBeInTheDocument();
   });
 
   it('calls onTimeframeChange when a timeframe button is clicked', () => {

@@ -383,6 +383,9 @@ const en = {
   'stocks.news': 'News',
   'stocks.newsNoArticles': 'No recent news available for this stock.',
   'stocks.newsReadMore': 'Read more',
+  'stocks.chartLine': 'Line',
+  'stocks.chartCandle': 'Candle',
+  'stocks.refreshNews': 'Refresh news',
 
   // Crypto Tracker
   'crypto.title': 'Crypto',
