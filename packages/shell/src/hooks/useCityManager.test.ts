@@ -16,6 +16,7 @@ vi.mock('../lib/firebase', () => ({
   toggleFavoriteCity: (...args: unknown[]) => mockToggleFavoriteCity(...args),
   getUserProfile: (...args: unknown[]) => mockGetUserProfile(...args),
   logEvent: vi.fn(),
+  MAX_FAVORITE_CITIES: 10,
 }));
 
 const makeUser = (uid = 'user1') => ({ uid } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -132,6 +133,28 @@ describe('useCityManager', () => {
     });
 
     expect(isNowFavorite).toBe(false);
+  });
+
+  it('toggleFavorite returns false and sets favoritesCapReached when cap is reached', async () => {
+    const tenCities = Array.from({ length: 10 }, (_, i) => ({
+      id: `city-${i}`, name: `City ${i}`, country: 'US', lat: i, lon: i,
+    }));
+    mockGetUserProfile.mockResolvedValue({ favoriteCities: tenCities });
+
+    const { result } = renderHook(() => useCityManager(makeUser()));
+
+    // Populate favorites via setFavoriteCities
+    act(() => {
+      result.current.setFavoriteCities(tenCities);
+    });
+
+    let capResult = true;
+    await act(async () => {
+      capResult = await result.current.toggleFavorite({ id: 'new-city', name: 'New', country: 'US', lat: 0, lon: 0 });
+    });
+
+    expect(capResult).toBe(false);
+    expect(result.current.favoritesCapReached).toBe(true);
   });
 
   it('setFavoriteCities updates state', () => {

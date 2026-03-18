@@ -27,12 +27,24 @@ function saveRecentStops(stops: string[]) {
   } catch { /* ignore */ }
 }
 
-const TransitTracker: React.FC = () => {
+interface FavoriteCity {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+}
+
+interface TransitTrackerProps {
+  favoriteCities?: FavoriteCity[];
+}
+
+const TransitTracker: React.FC<TransitTrackerProps> = ({ favoriteCities }) => {
   const { t } = useTranslation();
   const { stopId: routeStopId } = useParams<{ stopId: string }>();
   const navigate = useNavigate();
   const [selectedStopId, setSelectedStopId] = useState<string | null>(routeStopId || null);
   const [recentStops, setRecentStops] = useState<string[]>(loadRecentStops);
+  const [selectedCityChip, setSelectedCityChip] = useState<string | null>(null);
 
   const { arrivals, stop, loading, error, refresh, lastUpdated } = useTransitArrivals(selectedStopId);
   const { stops: nearbyStops, loading: nearbyLoading, error: nearbyError, findNearby } = useNearbyStops();
@@ -175,16 +187,47 @@ const TransitTracker: React.FC = () => {
           ) : null}
         </div>
       ) : (
-        <StopSearch
-          onSelectStop={handleSelectStop}
-          nearbyStops={nearbyStops}
-          nearbyLoading={nearbyLoading}
-          nearbyError={nearbyError}
-          onFindNearby={findNearby}
-          recentStops={recentStops}
-          favorites={favorites}
-          onToggleFavorite={toggleFavorite}
-        />
+        <>
+          {favoriteCities && favoriteCities.length > 0 && (
+            <div className="mb-4">
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                {t('transit.favoriteCities')}
+              </p>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {favoriteCities.map(city => (
+                  <button
+                    key={city.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCityChip(city.id);
+                      findNearby({ lat: city.lat, lon: city.lon });
+                    }}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                      selectedCityChip === city.id
+                        ? 'bg-teal-600 text-white border-teal-600 dark:bg-teal-500 dark:border-teal-500'
+                        : 'bg-white text-teal-700 border-teal-300 hover:bg-teal-50 dark:bg-gray-800 dark:text-teal-400 dark:border-teal-700 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {city.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <StopSearch
+            onSelectStop={handleSelectStop}
+            nearbyStops={nearbyStops}
+            nearbyLoading={nearbyLoading}
+            nearbyError={nearbyError}
+            onFindNearby={(coords) => {
+              setSelectedCityChip(null);
+              findNearby(coords);
+            }}
+            recentStops={recentStops}
+            favorites={favorites}
+            onToggleFavorite={toggleFavorite}
+          />
+        </>
       )}
     </PageContent>
   );

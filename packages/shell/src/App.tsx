@@ -4,6 +4,7 @@ import { useTranslation } from '@mycircle/shared';
 import { Layout } from './components/layout';
 import { Loading, ErrorBoundary, RequireAuth, MFEPageWrapper } from './components/common';
 import { WeatherCompare } from './components/widgets';
+import TransitWrapper from './components/widgets/TransitWrapper';
 import DashboardPage from './pages/DashboardPage';
 import WeatherLandingPage from './pages/WeatherLandingPage';
 import WhatsNewPage from './pages/WhatsNewPage';
@@ -40,7 +41,6 @@ const TripPlannerMF = tracedLazy('mfe_trip_planner_load', () => import('tripPlan
 const PollSystemMF = tracedLazy('mfe_poll_system_load', () => import('pollSystem/PollSystem'), getPerf);
 const RadioStationMF = tracedLazy('mfe_radio_station_load', () => import('radioStation/RadioStation'), getPerf);
 const AiInterviewerMF = tracedLazy('mfe_ai_interviewer_load', () => import('aiInterviewer/AiInterviewer'), getPerf);
-const TransitTrackerMF = tracedLazy('mfe_transit_tracker_load', () => import('transitTracker/TransitTracker'), getPerf);
 const TravelMapMF = tracedLazy('mfe_travel_map_load', () => import('travelMap/TravelMap'), getPerf);
 const DealFinderMF = tracedLazy('mfe_deals_load', () => import('dealFinder/DealFinder'), getPerf);
 const WebCrawlerMF = tracedLazy('mfe_web_crawler_load', () => import('webCrawler/WebCrawler'), getPerf);
@@ -138,8 +138,8 @@ export default function App() {
         <Route path="polls" element={<RequireAuth><MFEPageWrapper component={PollSystemMF} name="Poll System" /></RequireAuth>} />
         <Route path="radio" element={<MFEPageWrapper component={RadioStationMF} name="Radio Station" />} />
         <Route path="interview" element={<RequireAuth><MFEPageWrapper component={AiInterviewerMF} name="AI Interviewer" /></RequireAuth>} />
-        <Route path="transit" element={<MFEPageWrapper component={TransitTrackerMF} name="Transit Tracker" />} />
-        <Route path="transit/:stopId" element={<MFEPageWrapper component={TransitTrackerMF} name="Transit Tracker" />} />
+        <Route path="transit" element={<TransitWrapper />} />
+        <Route path="transit/:stopId" element={<TransitWrapper />} />
         <Route path="travel-map" element={<RequireAuth><MFEPageWrapper component={TravelMapMF} name="Travel Map" /></RequireAuth>} />
         <Route path="deals" element={<MFEPageWrapper component={DealFinderMF} name="Deal Finder" />} />
         <Route path="web-crawler" element={<RequireAuth><MFEPageWrapper component={WebCrawlerMF} name="Web Crawler" /></RequireAuth>} />

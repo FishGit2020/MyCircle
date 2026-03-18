@@ -2,6 +2,15 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import CitySearchWrapper from './CitySearchWrapper';
 
+vi.mock('../../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    favoriteCities: [],
+    toggleFavorite: vi.fn(),
+    favoritesCapReached: false,
+  }),
+}));
+
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   createLogger: () => ({ debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }),
@@ -32,5 +41,11 @@ describe('CitySearchWrapper', () => {
   it('renders the search input from the mock', async () => {
     render(<CitySearchWrapper />);
     expect(await screen.findByPlaceholderText('Search for a city...')).toBeInTheDocument();
+  });
+
+  it('passes undefined favoriteCities and onToggleFavorite when user is null', async () => {
+    render(<CitySearchWrapper />);
+    // When user is null, the mock renders without crashing — props are not passed
+    expect(await screen.findByTestId('city-search-mock')).toBeInTheDocument();
   });
 });

@@ -86,6 +86,7 @@ interface AuthContextType {
   removeCity: (cityId: string) => Promise<void>;
   clearCities: () => Promise<void>;
   toggleFavorite: (city: FavoriteCity) => Promise<boolean>;
+  favoritesCapReached: boolean;
   syncStockWatchlist: (watchlist: WatchlistItem[]) => Promise<void>;
   syncPodcastSubscriptions: (subscriptionIds: string[]) => Promise<void>;
   syncBabyDueDate: (date: string | null) => Promise<void>;
@@ -254,6 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         removeCity: cityManager.removeCity,
         clearCities: cityManager.clearCities,
         toggleFavorite: cityManager.toggleFavorite,
+        favoritesCapReached: cityManager.favoritesCapReached,
         syncStockWatchlist,
         syncPodcastSubscriptions,
         syncBabyDueDate,

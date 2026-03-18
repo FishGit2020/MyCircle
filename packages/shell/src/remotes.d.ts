@@ -2,7 +2,17 @@
 
 // Type declarations for remote micro frontend modules
 declare module 'citySearch/CitySearch' {
-  const CitySearch: React.ComponentType;
+  import type { FavoriteCity, RecentCity } from './lib/firebase';
+  import type { City } from '@mycircle/shared';
+  interface CitySearchProps {
+    onCitySelect?: (city: City) => void;
+    recentCities?: RecentCity[];
+    onRemoveCity?: (cityId: string) => void;
+    onClearRecents?: () => void;
+    favoriteCities?: FavoriteCity[];
+    onToggleFavorite?: (city: FavoriteCity) => Promise<boolean>;
+  }
+  const CitySearch: React.ComponentType<CitySearchProps>;
   export default CitySearch;
 }
 
@@ -127,7 +137,10 @@ declare module 'aiInterviewer/AiInterviewer' {
 }
 
 declare module 'transitTracker/TransitTracker' {
-  const TransitTracker: React.ComponentType;
+  interface TransitTrackerProps {
+    favoriteCities?: Array<{ id: string; name: string; lat: number; lon: number }>;
+  }
+  const TransitTracker: React.ComponentType<TransitTrackerProps>;
   export default TransitTracker;
 }
 

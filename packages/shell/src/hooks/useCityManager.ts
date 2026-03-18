@@ -6,6 +6,7 @@ import {
   toggleFavoriteCity,
   getUserProfile,
   logEvent,
+  MAX_FAVORITE_CITIES,
 } from '../lib/firebase';
 import { StorageKeys, eventBus, MFEvents } from '@mycircle/shared';
 
@@ -31,6 +32,8 @@ export interface CityManagerResult {
   removeCity: (cityId: string) => Promise<void>;
   clearCities: () => Promise<void>;
   toggleFavorite: (city: FavoriteCity) => Promise<boolean>;
+  /** True when the last toggleFavorite add attempt was rejected because cap was reached */
+  favoritesCapReached: boolean;
   /** Internal setter — not exposed through AuthContext */
   setRecentCities: React.Dispatch<React.SetStateAction<RecentCity[]>>;
   /** Internal setter — not exposed through AuthContext */
@@ -40,6 +43,7 @@ export interface CityManagerResult {
 export function useCityManager(user: User | null): CityManagerResult {
   const [recentCities, setRecentCities] = useState<RecentCity[]>(loadLocalRecents);
   const [favoriteCities, setFavoriteCities] = useState<FavoriteCity[]>([]);
+  const [favoritesCapReached, setFavoritesCapReached] = useState(false);
 
   // Refresh state when CitySearch MFE selects a city and updates localStorage
   useEffect(() => {
@@ -74,6 +78,12 @@ export function useCityManager(user: User | null): CityManagerResult {
 
   const toggleFavorite = useCallback(async (city: FavoriteCity): Promise<boolean> => {
     if (user) {
+      const isRemoving = favoriteCities.some(c => c.id === city.id);
+      if (!isRemoving && favoriteCities.length >= MAX_FAVORITE_CITIES) {
+        setFavoritesCapReached(true);
+        return false;
+      }
+      setFavoritesCapReached(false);
       const isNowFavorite = await toggleFavoriteCity(user.uid, city);
       const updatedProfile = await getUserProfile(user.uid);
       if (updatedProfile) {
@@ -82,7 +92,7 @@ export function useCityManager(user: User | null): CityManagerResult {
       return isNowFavorite;
     }
     return false;
-  }, [user]);
+  }, [user, favoriteCities]);
 
   return {
     recentCities,
@@ -91,6 +101,7 @@ export function useCityManager(user: User | null): CityManagerResult {
     removeCity,
     clearCities,
     toggleFavorite,
+    favoritesCapReached,
     setRecentCities,
     setFavoriteCities,
   };

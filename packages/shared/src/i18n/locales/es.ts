@@ -54,6 +54,7 @@ const es: Record<TranslationKey, string> = {
   'search.recentMatch': 'Reciente',
   'search.justNow': 'Ahora mismo',
   'search.suggestedCities': '\u00bfQuisiste decir?',
+  'search.favoritesSection': 'Favoritos',
 
   // Weather Display
   'weather.refresh': 'Actualizar',
@@ -176,6 +177,8 @@ const es: Record<TranslationKey, string> = {
   'favorites.favorite': 'Favorito',
   'favorites.removeFromFavorites': 'Quitar de favoritos',
   'favorites.addToFavorites': 'Agregar a favoritos',
+  'favorites.manageFavorites': 'Gestionar favoritos',
+  'favorites.noFavorites': 'Sin favoritos a\u00fan',
 
   // Share
   'share.share': 'Compartir',
@@ -2446,6 +2449,7 @@ const es: Record<TranslationKey, string> = {
   'transit.unfavorite': 'Eliminar de favoritos',
   'transit.favorites': 'Paradas Favoritas',
   'transit.noFavorites': 'Sin paradas favoritas a\u00fan',
+  'transit.favoriteCities': 'Ciudades favoritas',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': 'Mapa de Viajes',
