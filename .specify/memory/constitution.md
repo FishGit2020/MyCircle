@@ -95,6 +95,8 @@ amendment with MINOR version bump.
   pnpm test:run && pnpm typecheck`, push, create PR, wait for ALL checks
   (`ci`, `e2e-gate`, `spec-check`) to pass, squash-merge. All four commands
   MUST pass locally before pushing — lint failures in CI are avoidable.
+  After merge, delete the local branch: `git checkout main && git pull origin main && git branch -d <branch>`.
+  The remote branch is deleted automatically by GitHub (`delete_branch_on_merge: true`).
 - **New MFE gate**: `spec-check` CI job blocks merge if
   `docs/specs/NNN-<mfe-name>/spec.md` is missing.
 - **functions/ backend**: Separate strict tsconfig (`noUnusedLocals: true`).
@@ -115,4 +117,4 @@ Amendments follow semantic versioning:
 Amendments require updating this file, incrementing the version, and verifying
 that dependent templates (plan, spec, tasks) remain aligned.
 
-**Version**: 1.0.1 | **Ratified**: 2026-03-17 | **Last Amended**: 2026-03-18
+**Version**: 1.0.2 | **Ratified**: 2026-03-17 | **Last Amended**: 2026-03-18

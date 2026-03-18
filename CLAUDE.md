@@ -14,7 +14,7 @@ git push -u origin HEAD
 gh pr create --title "feat: description" --body "summary"
 gh pr checks <PR#> --watch          # wait for ALL checks to pass
 gh pr merge <PR#> --squash --admin  # ONLY after ci, e2e-gate, and spec-check all pass
-git checkout main && git pull origin main
+git checkout main && git pull origin main && git branch -d feat/my-feature
 ```
 
 Branch prefixes: `feat/` `fix/` `docs/` `refactor/` `test/`
