@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.1...mycircle-v1.4.2) (2026-03-18)
+
+
+### Bug Fixes
+
+* skip deploy and docker build for release-please commits ([#787](https://github.com/FishGit2020/MyCircle/issues/787)) ([6f1367f](https://github.com/FishGit2020/MyCircle/commit/6f1367f5e7427e63367f54aeedc2bf750098f03c))
+
 ## [1.4.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.0...mycircle-v1.4.1) (2026-03-18)
 
 
