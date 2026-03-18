@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useTranslation, useUnits, formatDistance } from '@mycircle/shared';
+import { useTranslation, useUnits, formatDistance, useLazyQuery, CALC_ROUTE } from '@mycircle/shared';
 import type maplibregl from 'maplibre-gl';
-import { createRoutingProvider } from '../providers/RoutingProvider';
 import type { RouteResult } from '../providers/RoutingProvider';
 import RouteDisplay from './RouteDisplay';
-import type { RoutingProviderConfig } from '../config/mapConfig';
-
 /**
  * Parse a coordinate string into [lng, lat] for MapLibre.
  * Accepts: "47.67, -122.12" or "(47.67, -122.12)" or "47.67,-122.12"
@@ -29,7 +26,6 @@ function formatDuration(seconds: number) {
 
 interface Props {
   map: maplibregl.Map | null;
-  routingConfig: RoutingProviderConfig;
   /** Pre-filled start coords from map click, format: "lat, lng" */
   externalStart?: string;
   /** Pre-filled end coords from map click, format: "lat, lng" */
@@ -40,14 +36,15 @@ interface Props {
   onRouteChange?: (route: RouteResult | null, start: string, end: string) => void;
 }
 
-export default function RoutePlanner({ map, routingConfig, externalStart, externalEnd, onClearWaypoints, onRouteChange }: Props) {
+export default function RoutePlanner({ map, externalStart, externalEnd, onClearWaypoints, onRouteChange }: Props) {
   const { t } = useTranslation();
   const { distanceUnit } = useUnits();
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [route, setRoute] = useState<RouteResult | null>(null);
+
+  const [fetchRoute, { loading }] = useLazyQuery(CALC_ROUTE);
 
   // Sync external (map-click) coords into text inputs
   useEffect(() => {
@@ -78,11 +75,23 @@ export default function RoutePlanner({ map, routingConfig, externalStart, extern
       setError(t('hiking.coordsError'));
       return;
     }
-    setLoading(true);
     setError('');
     try {
-      const provider = createRoutingProvider(routingConfig);
-      const result = await provider.getRoute(startCoords, endCoords);
+      const { data } = await fetchRoute({
+        variables: {
+          startLon: startCoords[0],
+          startLat: startCoords[1],
+          endLon: endCoords[0],
+          endLat: endCoords[1],
+        },
+      });
+      const raw = data?.calcRoute;
+      if (!raw) { setError(t('hiking.routeError')); return; }
+      const result: RouteResult = {
+        geometry: { type: 'LineString', coordinates: raw.coordinates as [number, number][] },
+        distance: raw.distance,
+        duration: raw.duration,
+      };
       setRoute(result);
       onRouteChange?.(result, start, end);
       // Fit map to route bounds
@@ -101,8 +110,6 @@ export default function RoutePlanner({ map, routingConfig, externalStart, extern
       }
     } catch {
       setError(t('hiking.routeError'));
-    } finally {
-      setLoading(false);
     }
   };
 

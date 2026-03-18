@@ -1183,3 +1183,49 @@ export const GET_DEALS = gql`
     }
   }
 `;
+
+// ─── Radio Stations ──────────────────────────────────────────────
+const RADIO_STATION_FIELDS = gql`
+  fragment RadioStationFields on RadioStation {
+    stationuuid
+    name
+    url
+    url_resolved
+    favicon
+    tags
+    country
+    language
+    codec
+    bitrate
+    votes
+  }
+`;
+
+export const GET_RADIO_STATIONS = gql`
+  ${RADIO_STATION_FIELDS}
+  query GetRadioStations($query: String, $limit: Int) {
+    radioStations(query: $query, limit: $limit) {
+      ...RadioStationFields
+    }
+  }
+`;
+
+export const GET_RADIO_STATIONS_BY_UUIDS = gql`
+  ${RADIO_STATION_FIELDS}
+  query GetRadioStationsByUuids($uuids: [String!]!) {
+    radioStationsByUuids(uuids: $uuids) {
+      ...RadioStationFields
+    }
+  }
+`;
+
+// ─── Hiking Route ────────────────────────────────────────────────
+export const CALC_ROUTE = gql`
+  query CalcRoute($startLon: Float!, $startLat: Float!, $endLon: Float!, $endLat: Float!) {
+    calcRoute(startLon: $startLon, startLat: $startLat, endLon: $endLon, endLat: $endLat) {
+      coordinates
+      distance
+      duration
+    }
+  }
+`;

@@ -18,6 +18,8 @@ import { createNotesResolvers } from './notes.js';
 import { createDailyLogResolvers } from './dailyLog.js';
 import { createDealsResolvers } from './deals.js';
 import { createWebCrawlerResolvers } from './webCrawler.js';
+import { createRadioStationResolvers } from './radioStations.js';
+import { createRoutingResolvers } from './routing.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -70,6 +72,8 @@ export function createResolvers(
       ...notesResolvers.Query,
       ...dealsResolvers.Query,
       ...webCrawlerResolvers.Query,
+      ...createRadioStationResolvers().Query,
+      ...createRoutingResolvers().Query,
     },
   };
 }

@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import RadioStation from './RadioStation';
 
+const mockUseQuery = vi.fn(() => ({ data: { radioStations: [], radioStationsByUuids: [] }, loading: false, error: undefined, refetch: vi.fn() }));
+
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   PageContent: ({ children, className }: any) => <div className={className}>{children}</div>, // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -11,6 +13,10 @@ vi.mock('@mycircle/shared', () => ({
   eventBus: { publish: vi.fn() },
   subscribeToMFEvent: () => () => {},
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
+  useQuery: (...args: any[]) => mockUseQuery(...args), // eslint-disable-line @typescript-eslint/no-explicit-any
+  useLazyQuery: () => [vi.fn(), { loading: false }],
+  GET_RADIO_STATIONS: {},
+  GET_RADIO_STATIONS_BY_UUIDS: {},
 }));
 
 vi.mock('react-router', () => ({
@@ -20,17 +26,9 @@ vi.mock('react-router', () => ({
   useSearchParams: () => [new URLSearchParams(), vi.fn()],
 }));
 
-// Mock fetch for the API call
-const mockFetch = vi.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve([]),
-  }),
-);
-
 beforeEach(() => {
   vi.clearAllMocks();
-  global.fetch = mockFetch as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  mockUseQuery.mockReturnValue({ data: { radioStations: [], radioStationsByUuids: [] }, loading: false, error: undefined, refetch: vi.fn() });
 });
 
 describe('RadioStation', () => {
@@ -42,8 +40,7 @@ describe('RadioStation', () => {
   });
 
   it('shows loading state initially', () => {
-    // Make fetch never resolve to keep loading state
-    mockFetch.mockImplementationOnce(() => new Promise(() => {}));
+    mockUseQuery.mockReturnValueOnce({ data: undefined, loading: true, error: undefined, refetch: vi.fn() });
     render(<RadioStation />);
     expect(screen.getByRole('status')).toBeInTheDocument();
   });

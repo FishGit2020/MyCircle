@@ -489,6 +489,33 @@ export const typeDefs = `#graphql
     crawlJobs: [CrawlJob!]!
     crawlJobDetail(id: ID!): CrawlJobDetail
     searchCrawlJobs(query: String!): [CrawlJob!]!
+
+    # Radio stations (public)
+    radioStations(query: String, limit: Int = 50): [RadioStation!]!
+    radioStationsByUuids(uuids: [String!]!): [RadioStation!]!
+
+    # Hiking route (public)
+    calcRoute(startLon: Float!, startLat: Float!, endLon: Float!, endLat: Float!): RouteResult
+  }
+
+  type RadioStation {
+    stationuuid: String!
+    name: String!
+    url: String!
+    url_resolved: String!
+    favicon: String!
+    tags: String!
+    country: String!
+    language: String!
+    codec: String!
+    bitrate: Int!
+    votes: Int!
+  }
+
+  type RouteResult {
+    coordinates: [[Float!]!]!
+    distance: Float!
+    duration: Float!
   }
 
   # ─── AI Usage & Monitoring Types ──────────────────────────────
