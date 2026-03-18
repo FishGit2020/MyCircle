@@ -110,6 +110,12 @@ export default function InterviewSetup({
             <p className="text-sm text-red-500 dark:text-red-400">{questionBankError}</p>
           )}
 
+          {!questionBankLoading && !questionBankError && !questionBankAvailable && (
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              {t('aiInterviewer.noQuestionsInBank')}
+            </p>
+          )}
+
           {/* Chapter selection */}
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -233,7 +239,9 @@ export default function InterviewSetup({
       >
         {!modelSelected
           ? t('aiInterviewer.selectModelFirst')
-          : t('aiInterviewer.startInterview')}
+          : mode === 'question-bank' && !questionBankAvailable && !questionBankLoading
+            ? t('aiInterviewer.addQuestionsFirst')
+            : t('aiInterviewer.startInterview')}
       </button>
     </div>
   );

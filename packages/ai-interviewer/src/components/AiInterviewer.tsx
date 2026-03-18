@@ -248,7 +248,7 @@ export default function AiInterviewer() {
   }, [deleteSession, currentSessionId]);
 
   return (
-    <PageContent fill>
+    <PageContent fill className="overflow-hidden">
       <div className="flex flex-col flex-1 min-h-0">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">

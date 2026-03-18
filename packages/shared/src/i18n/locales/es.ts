@@ -2384,6 +2384,8 @@ const es: Record<TranslationKey, string> = {
   'aiInterviewer.questionDeleted': 'Pregunta eliminada',
   'aiInterviewer.allChapters': 'Todos los Cap\u00edtulos',
   'aiInterviewer.allDifficulties': 'Todas las Dificultades',
+  'aiInterviewer.noQuestionsInBank': 'No hay preguntas en el banco a\u00fan. Haz clic en \u201cGestionar Preguntas\u201d para agregar algunas.',
+  'aiInterviewer.addQuestionsFirst': 'Agrega preguntas al banco primero',
 
   'widgets.aiAssistant': 'Asistente IA',
   'widgets.aiAssistantDesc': 'Chatea con tu asistente de IA',
