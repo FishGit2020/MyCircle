@@ -57,7 +57,7 @@ pnpm test:all
 
 Every change should follow these four principles:
 
-- **i18n** — All user-visible text must use translation keys in `packages/shared/src/i18n/translations.ts` (English, Spanish, Chinese)
+- **i18n** — All user-visible text must use translation keys in `packages/shared/src/i18n/locales/` (en, es, zh — keys must be present in all 3)
 - **Accessibility** — ARIA labels, keyboard navigation, screen reader support, WCAG 2.1 AA compliance
 - **Dark mode** — All UI must work in both light and dark themes using Tailwind's `dark:` variants
 - **Responsive** — Mobile-first design that works from 320px to 1920px+
@@ -66,17 +66,35 @@ Every change should follow these four principles:
 
 ```
 packages/
-  shared/       — i18n, types, utilities, event bus (build first!)
-  shell/        — Host app with layout, routing, dashboard
-  city-search/  — City search MFE
-  weather-display/ — Weather MFE
-  stock-tracker/   — Stock tracking MFE
-  podcast-player/  — Podcast MFE
-  ai-assistant/    — AI chat MFE
-  bible-reader/    — Bible reader MFE
-  worship-songs/   — Worship songs MFE
-  notebook/        — Note-taking MFE
-  baby-tracker/    — Baby growth tracker MFE
+  shared/              — i18n, types, utilities, event bus (build first!)
+  shell/               — Host app with layout, routing, dashboard
+  city-search/         — City search MFE
+  weather-display/     — Weather MFE
+  stock-tracker/       — Stock tracking MFE
+  podcast-player/      — Podcast MFE
+  ai-assistant/        — AI chat MFE
+  bible-reader/        — Bible reader MFE
+  worship-songs/       — Worship songs MFE
+  notebook/            — Note-taking MFE
+  baby-tracker/        — Baby growth tracker MFE
+  child-development/   — Child milestone tracker MFE
+  flashcards/          — Flashcards learning hub MFE
+  daily-log/           — Daily journal MFE
+  cloud-files/         — Cloud file storage MFE
+  model-benchmark/     — AI model benchmark MFE
+  immigration-tracker/ — Immigration case tracker MFE
+  digital-library/     — E-book & audiobook library MFE
+  family-games/        — Multiplayer party games MFE
+  doc-scanner/         — Document scanner MFE
+  hiking-map/          — Hiking trail map MFE
+  trip-planner/        — Trip itinerary planner MFE
+  poll-system/         — Poll creation & voting MFE
+  radio-station/       — Internet radio streaming MFE
+  ai-interviewer/      — Coding interview practice MFE
+  transit-tracker/     — Real-time bus arrivals MFE
+  travel-map/          — World travel map MFE
+  deal-finder/         — Deals and discounts discovery MFE
+  web-crawler/         — URL crawling and content extraction MFE
 ```
 
 ## CI Pipeline
