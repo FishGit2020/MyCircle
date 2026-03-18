@@ -229,7 +229,6 @@ export default function HikingMap() {
 
           <RoutePlanner
             map={map}
-            routingConfig={MAP_CONFIG.routing}
             externalStart={startCoords ? lngLatToString(startCoords) : undefined}
             externalEnd={endCoords ? lngLatToString(endCoords) : undefined}
             onClearWaypoints={handleClearWaypoints}

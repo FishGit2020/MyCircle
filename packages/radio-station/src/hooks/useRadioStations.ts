@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WindowEvents, StorageKeys } from '@mycircle/shared';
+import { WindowEvents, StorageKeys, useQuery, useLazyQuery, GET_RADIO_STATIONS, GET_RADIO_STATIONS_BY_UUIDS } from '@mycircle/shared';
 import type { RadioStation } from '../types';
-
-const API_BASE = 'https://de1.api.radio-browser.info/json/stations/search';
-const API_BY_UUID = 'https://de1.api.radio-browser.info/json/stations/byuuid';
 
 function loadFavoriteIds(): string[] {
   try {
@@ -27,89 +24,62 @@ function saveFavoriteIds(ids: string[]): void {
   window.dispatchEvent(new Event(WindowEvents.RADIO_CHANGED));
 }
 
-async function fetchStationsByUuids(uuids: string[]): Promise<RadioStation[]> {
-  const results = await Promise.all(
-    uuids.map(async (uuid) => {
-      try {
-        const res = await fetch(`${API_BY_UUID}/${uuid}`);
-        if (!res.ok) return null;
-        const data: RadioStation[] = await res.json();
-        return data[0] ?? null;
-      } catch {
-        return null;
-      }
-    }),
-  );
-  return results.filter((s): s is RadioStation => s !== null);
-}
-
 export function useRadioStations() {
-  const [stations, setStations] = useState<RadioStation[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[]>(loadFavoriteIds);
-  const [favorites, setFavorites] = useState<RadioStation[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
 
-  // Resolve favorite UUIDs to full station objects for display
-  useEffect(() => {
-    if (favoriteIds.length === 0) {
-      setFavorites([]);
-      return;
-    }
-    fetchStationsByUuids(favoriteIds).then(setFavorites);
-  }, [favoriteIds]);
+  const { data: stationsData, loading, error: stationsError, refetch } = useQuery(GET_RADIO_STATIONS, {
+    variables: { limit: 50 },
+  });
 
-  const fetchStations = useCallback(async (params: Record<string, string>) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const query = new URLSearchParams({
-        ...params,
-        limit: '50',
-        hidebroken: 'true',
-      });
-      const res = await fetch(`${API_BASE}?${query.toString()}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data: RadioStation[] = await res.json();
-      setStations(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch stations');
-      setStations([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data: favoritesData, refetch: refetchFavorites } = useQuery(GET_RADIO_STATIONS_BY_UUIDS, {
+    variables: { uuids: favoriteIds },
+    skip: favoriteIds.length === 0,
+  });
+
+  const stations: RadioStation[] = (stationsData?.radioStations ?? []) as RadioStation[];
+  const favorites: RadioStation[] = (favoritesData?.radioStationsByUuids ?? []) as RadioStation[];
+
+  const error = stationsError ? stationsError.message : null;
 
   const search = useCallback(
     (query: string) => {
-      if (!query.trim()) {
-        topStations();
-        return;
-      }
-      fetchStations({ name: query, order: 'votes', reverse: 'true' });
+      setSearchQuery(query.trim() || undefined);
+      refetch({ query: query.trim() || undefined, limit: 50 });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fetchStations],
+    [refetch],
   );
 
   const topStations = useCallback(() => {
-    fetchStations({ order: 'votes', reverse: 'true' });
-  }, [fetchStations]);
+    setSearchQuery(undefined);
+    refetch({ query: undefined, limit: 50 });
+  }, [refetch]);
 
-  const toggleFavorite = useCallback((station: RadioStation) => {
-    setFavoriteIds((prev) => {
-      const exists = prev.includes(station.stationuuid);
-      const next = exists
-        ? prev.filter((id) => id !== station.stationuuid)
-        : [...prev, station.stationuuid];
-      saveFavoriteIds(next);
-      return next;
-    });
-  }, []);
+  const toggleFavorite = useCallback(
+    (station: RadioStation) => {
+      setFavoriteIds((prev) => {
+        const exists = prev.includes(station.stationuuid);
+        const next = exists
+          ? prev.filter((id) => id !== station.stationuuid)
+          : [...prev, station.stationuuid];
+        saveFavoriteIds(next);
+        return next;
+      });
+    },
+    [],
+  );
 
+  // Re-fetch favorite station details when IDs change
   useEffect(() => {
-    topStations();
-  }, [topStations]);
+    if (favoriteIds.length > 0) {
+      refetchFavorites({ uuids: favoriteIds });
+    }
+  }, [favoriteIds, refetchFavorites]);
 
-  return { stations, favorites, favoriteIds, loading, error, search, topStations, toggleFavorite };
+  const isFavorite = useCallback(
+    (stationuuid: string) => favoriteIds.includes(stationuuid),
+    [favoriteIds],
+  );
+
+  return { stations, favorites, favoriteIds, loading, error, search, topStations, toggleFavorite, isFavorite };
 }

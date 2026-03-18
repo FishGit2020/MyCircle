@@ -1,1 +1,49 @@
-import { describe, it, expect, vi } from "vitest"; import { render, screen, fireEvent } from "@testing-library/react"; import RoutePlanner from "./RoutePlanner"; vi.mock("@mycircle/shared", () => ({ useTranslation: () => ({ t: (key: string) => key }), useUnits: () => ({ distanceUnit: "mi" }), formatDistance: (m: number) => m + "m" })); vi.mock("../providers/RoutingProvider", () => ({ createRoutingProvider: vi.fn(() => ({ getRoute: vi.fn().mockResolvedValue({ geometry: { type: "LineString", coordinates: [[0,0],[1,1]] }, distance: 5000, duration: 3600 }) })) })); vi.mock("./RouteDisplay", () => ({ default: () => null })); const cfg = { baseUrl: "https://router.example.com", profile: "foot" }; describe("RoutePlanner", () => { it("heading", () => { render(<RoutePlanner map={null} routingConfig={cfg} />); expect(screen.getByText("hiking.routePlanner")).toBeInTheDocument(); }); it("inputs", () => { render(<RoutePlanner map={null} routingConfig={cfg} />); expect(screen.getByPlaceholderText("hiking.startPoint")).toBeInTheDocument(); expect(screen.getByPlaceholderText("hiking.endPoint")).toBeInTheDocument(); }); it("disabled", () => { render(<RoutePlanner map={null} routingConfig={cfg} />); expect(screen.getByRole("button", { name: "hiking.planRoute" })).toBeDisabled(); }); it("enables", () => { const map = { flyTo: vi.fn(), fitBounds: vi.fn(), on: vi.fn(), off: vi.fn(), remove: vi.fn(), resize: vi.fn() } as any; render(<RoutePlanner map={map} routingConfig={cfg} />); fireEvent.change(screen.getByPlaceholderText("hiking.startPoint"), { target: { value: "47.6, -122.3" } }); fireEvent.change(screen.getByPlaceholderText("hiking.endPoint"), { target: { value: "47.7, -122.4" } }); expect(screen.getByRole("button", { name: "hiking.planRoute" })).not.toBeDisabled(); }); it("clear", () => { render(<RoutePlanner map={null} routingConfig={cfg} />); fireEvent.change(screen.getByPlaceholderText("hiking.startPoint"), { target: { value: "47.6" } }); expect(screen.getByRole("button", { name: "hiking.clearRoute" })).toBeInTheDocument(); }); it("instruction", () => { render(<RoutePlanner map={null} routingConfig={cfg} />); expect(screen.getByText("hiking.tapToSetRoute")).toBeInTheDocument(); }); it("location", () => { render(<RoutePlanner map={null} routingConfig={cfg} />); expect(screen.getByRole("button", { name: "hiking.useMyLocation" })).toBeInTheDocument(); }); }); // eslint-disable-line @typescript-eslint/no-explicit-any
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import RoutePlanner from "./RoutePlanner";
+
+vi.mock("@mycircle/shared", () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+  useUnits: () => ({ distanceUnit: "mi" }),
+  formatDistance: (m: number) => m + "m",
+  useLazyQuery: () => [vi.fn().mockResolvedValue({ data: { calcRoute: { coordinates: [[0,0],[1,1]], distance: 5000, duration: 3600 } } }), { loading: false }],
+  CALC_ROUTE: {},
+}));
+
+vi.mock("./RouteDisplay", () => ({ default: () => null }));
+
+describe("RoutePlanner", () => {
+  it("heading", () => {
+    render(<RoutePlanner map={null} />);
+    expect(screen.getByText("hiking.routePlanner")).toBeInTheDocument();
+  });
+  it("inputs", () => {
+    render(<RoutePlanner map={null} />);
+    expect(screen.getByPlaceholderText("hiking.startPoint")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("hiking.endPoint")).toBeInTheDocument();
+  });
+  it("disabled", () => {
+    render(<RoutePlanner map={null} />);
+    expect(screen.getByRole("button", { name: "hiking.planRoute" })).toBeDisabled();
+  });
+  it("enables", () => {
+    const map = { flyTo: vi.fn(), fitBounds: vi.fn(), on: vi.fn(), off: vi.fn(), remove: vi.fn(), resize: vi.fn() } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    render(<RoutePlanner map={map} />);
+    fireEvent.change(screen.getByPlaceholderText("hiking.startPoint"), { target: { value: "47.6, -122.3" } });
+    fireEvent.change(screen.getByPlaceholderText("hiking.endPoint"), { target: { value: "47.7, -122.4" } });
+    expect(screen.getByRole("button", { name: "hiking.planRoute" })).not.toBeDisabled();
+  });
+  it("clear", () => {
+    render(<RoutePlanner map={null} />);
+    fireEvent.change(screen.getByPlaceholderText("hiking.startPoint"), { target: { value: "47.6" } });
+    expect(screen.getByRole("button", { name: "hiking.clearRoute" })).toBeInTheDocument();
+  });
+  it("instruction", () => {
+    render(<RoutePlanner map={null} />);
+    expect(screen.getByText("hiking.tapToSetRoute")).toBeInTheDocument();
+  });
+  it("location", () => {
+    render(<RoutePlanner map={null} />);
+    expect(screen.getByRole("button", { name: "hiking.useMyLocation" })).toBeInTheDocument();
+  });
+});

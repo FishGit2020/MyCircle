@@ -767,6 +767,7 @@ export type Query = {
   bookChapters: Array<BookChapter>;
   bookConversionProgress: BookConversionProgress;
   books: Array<Book>;
+  calcRoute?: Maybe<RouteResult>;
   checkCaseStatus: CaseStatus;
   cloudFiles: Array<CloudFile>;
   companyNews: Array<CompanyNews>;
@@ -787,6 +788,8 @@ export type Query = {
   podcastEpisodes: PodcastEpisodesResponse;
   podcastFeed?: Maybe<PodcastFeed>;
   questionBank: QuestionBank;
+  radioStations: Array<RadioStation>;
+  radioStationsByUuids: Array<RadioStation>;
   reverseGeocode?: Maybe<City>;
   searchCities: Array<City>;
   searchCrawlJobs: Array<CrawlJob>;
@@ -855,6 +858,14 @@ export type QueryBookChaptersArgs = {
 
 export type QueryBookConversionProgressArgs = {
   bookId: Scalars['ID']['input'];
+};
+
+
+export type QueryCalcRouteArgs = {
+  endLat: Scalars['Float']['input'];
+  endLon: Scalars['Float']['input'];
+  startLat: Scalars['Float']['input'];
+  startLon: Scalars['Float']['input'];
 };
 
 
@@ -930,6 +941,17 @@ export type QueryPodcastEpisodesArgs = {
 
 export type QueryPodcastFeedArgs = {
   feedId: Scalars['ID']['input'];
+};
+
+
+export type QueryRadioStationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryRadioStationsByUuidsArgs = {
+  uuids: Array<Scalars['String']['input']>;
 };
 
 
@@ -1015,6 +1037,28 @@ export type QuestionBank = {
   __typename?: 'QuestionBank';
   chapters: Array<Scalars['String']['output']>;
   questions: Array<InterviewQuestion>;
+};
+
+export type RadioStation = {
+  __typename?: 'RadioStation';
+  bitrate: Scalars['Int']['output'];
+  codec: Scalars['String']['output'];
+  country: Scalars['String']['output'];
+  favicon: Scalars['String']['output'];
+  language: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  stationuuid: Scalars['String']['output'];
+  tags: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+  url_resolved: Scalars['String']['output'];
+  votes: Scalars['Int']['output'];
+};
+
+export type RouteResult = {
+  __typename?: 'RouteResult';
+  coordinates: Array<Array<Scalars['Float']['output']>>;
+  distance: Scalars['Float']['output'];
+  duration: Scalars['Float']['output'];
 };
 
 export type SaveInterviewSessionInput = {
@@ -1803,3 +1847,30 @@ export type GetDealsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetDealsQuery = { __typename?: 'Query', deals: Array<{ __typename?: 'Deal', id: string, title: string, url: string, source: string, price?: string | null, originalPrice?: string | null, store?: string | null, category?: string | null, thumbnail?: string | null, postedAt: string, score?: number | null }> };
+
+export type RadioStationFieldsFragment = { __typename?: 'RadioStation', stationuuid: string, name: string, url: string, url_resolved: string, favicon: string, tags: string, country: string, language: string, codec: string, bitrate: number, votes: number };
+
+export type GetRadioStationsQueryVariables = Exact<{
+  query?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetRadioStationsQuery = { __typename?: 'Query', radioStations: Array<{ __typename?: 'RadioStation', stationuuid: string, name: string, url: string, url_resolved: string, favicon: string, tags: string, country: string, language: string, codec: string, bitrate: number, votes: number }> };
+
+export type GetRadioStationsByUuidsQueryVariables = Exact<{
+  uuids: Array<Scalars['String']['input']> | Scalars['String']['input'];
+}>;
+
+
+export type GetRadioStationsByUuidsQuery = { __typename?: 'Query', radioStationsByUuids: Array<{ __typename?: 'RadioStation', stationuuid: string, name: string, url: string, url_resolved: string, favicon: string, tags: string, country: string, language: string, codec: string, bitrate: number, votes: number }> };
+
+export type CalcRouteQueryVariables = Exact<{
+  startLon: Scalars['Float']['input'];
+  startLat: Scalars['Float']['input'];
+  endLon: Scalars['Float']['input'];
+  endLat: Scalars['Float']['input'];
+}>;
+
+
+export type CalcRouteQuery = { __typename?: 'Query', calcRoute?: { __typename?: 'RouteResult', coordinates: Array<Array<number>>, distance: number, duration: number } | null };

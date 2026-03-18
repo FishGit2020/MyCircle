@@ -8,7 +8,7 @@ type Tab = 'browse' | 'favorites';
 
 const RadioStation: React.FC = () => {
   const { t } = useTranslation();
-  const { stations, favorites, favoriteIds, loading, error, search, toggleFavorite } = useRadioStations();
+  const { stations, favorites, loading, error, search, toggleFavorite, isFavorite } = useRadioStations();
   const { play, currentStation, isPlaying } = useRadioPlayer();
   const [activeTab, setActiveTab] = useState<Tab>('browse');
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,11 +19,6 @@ const RadioStation: React.FC = () => {
       search(searchQuery);
     },
     [search, searchQuery],
-  );
-
-  const isFavorite = useCallback(
-    (stationuuid: string) => favoriteIds.includes(stationuuid),
-    [favoriteIds],
   );
 
   const displayStations = activeTab === 'browse' ? stations : favorites;
