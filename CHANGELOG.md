@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.0...mycircle-v1.4.1) (2026-03-18)
+
+
+### Bug Fixes
+
+* post spec-check status for release-please PRs ([#785](https://github.com/FishGit2020/MyCircle/issues/785)) ([4121c61](https://github.com/FishGit2020/MyCircle/commit/4121c61fbcf5e7512bc4ad9738229fc1db6a5306))
+
 ## [1.4.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.3.0...mycircle-v1.4.0) (2026-03-18)
 
 
