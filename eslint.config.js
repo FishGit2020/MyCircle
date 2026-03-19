@@ -36,4 +36,17 @@ export default defineConfig([
       reportUnusedDisableDirectives: 'warn',
     },
   },
+  // Prevent direct @apollo/client imports in MFE packages (breaks Module Federation at runtime).
+  // packages/shared is the only allowed consumer — it re-exports Apollo to all MFEs.
+  {
+    files: ['packages/!(shared)/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        paths: [{
+          name: '@apollo/client',
+          message: 'Import from @mycircle/shared instead — direct @apollo/client imports break Module Federation.',
+        }],
+      }],
+    },
+  },
 ])
