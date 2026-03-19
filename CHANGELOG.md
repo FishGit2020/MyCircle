@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.6.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.5.0...mycircle-v1.6.0) (2026-03-19)
+
+
+### Features
+
+* **ai-assistant:** strip &lt;think&gt; tags, render headings and tables ([#810](https://github.com/FishGit2020/MyCircle/issues/810)) ([c9aeba7](https://github.com/FishGit2020/MyCircle/commit/c9aeba70fffeb9083cce06ef8165ed0c96bed747))
+* **podcast-player:** add spec docs, sanitizeHtml utility, and Apollo import guard ([#809](https://github.com/FishGit2020/MyCircle/issues/809)) ([35617d6](https://github.com/FishGit2020/MyCircle/commit/35617d661a7e30b2e342127a8055d5ae3fd3e385))
+* **stock-tracker:** add candlestick chart mode and unified refresh ([#808](https://github.com/FishGit2020/MyCircle/issues/808)) ([da5ee45](https://github.com/FishGit2020/MyCircle/commit/da5ee45752d5671eb80ef14c0c2dc99c8ed292cb))
+* **weather:** enrich city cards with AQI, forecast H/L, city switcher, and WeatherWrapper ([#807](https://github.com/FishGit2020/MyCircle/issues/807)) ([203e0b7](https://github.com/FishGit2020/MyCircle/commit/203e0b74ce33353b5733d7b7b68d13b35dbffb17))
+
+
+### Documentation
+
+* enforce GraphQL-first rule in CLAUDE.md and constitution ([#806](https://github.com/FishGit2020/MyCircle/issues/806)) ([7ad4e89](https://github.com/FishGit2020/MyCircle/commit/7ad4e891e2e4c3f1c2ac6a6121cafa9cef972772))
+
+
+### Miscellaneous
+
+* enable auto-delete branch on merge and document local cleanup ([#804](https://github.com/FishGit2020/MyCircle/issues/804)) ([3989d05](https://github.com/FishGit2020/MyCircle/commit/3989d05a9917aeba03c814f251d05c008e291a13))
+
 ## [1.5.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.4.7...mycircle-v1.5.0) (2026-03-18)
 
 
