@@ -385,6 +385,9 @@ const es: Record<TranslationKey, string> = {
   'stocks.news': 'Noticias',
   'stocks.newsNoArticles': 'No hay noticias recientes disponibles para esta acci\u00f3n.',
   'stocks.newsReadMore': 'Leer m\u00e1s',
+  'stocks.chartLine': 'L\u00ednea',
+  'stocks.chartCandle': 'Vela',
+  'stocks.refreshNews': 'Actualizar noticias',
 
   // Crypto Tracker
   'crypto.title': 'Cripto',

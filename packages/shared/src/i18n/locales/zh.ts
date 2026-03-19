@@ -385,6 +385,9 @@ const zh: Record<TranslationKey, string> = {
   'stocks.news': '\u65b0\u95fb',
   'stocks.newsNoArticles': '\u6682\u65e0\u8be5\u80a1\u7968\u7684\u8fd1\u671f\u65b0\u95fb\u3002',
   'stocks.newsReadMore': '\u9605\u8bfb\u66f4\u591a',
+  'stocks.chartLine': '\u6298\u7ebf\u56fe',
+  'stocks.chartCandle': '\u868c\u70db\u56fe',
+  'stocks.refreshNews': '\u5237\u65b0\u65b0\u95fb',
 
   // Crypto Tracker
   'crypto.title': '\u52a0\u5bc6\u8d27\u5e01',
