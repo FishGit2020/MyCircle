@@ -8,26 +8,11 @@ import PodcastSearch from './PodcastSearch';
 import TrendingPodcasts from './TrendingPodcasts';
 import SubscribedPodcasts from './SubscribedPodcasts';
 import EpisodeList from './EpisodeList';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 import InlinePlaybackControls from './InlinePlaybackControls';
 import './PodcastPlayer.css';
 
 /** Strip dangerous HTML elements/attributes, keep safe formatting tags */
-function sanitizeHtml(html: string): string {
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  doc.querySelectorAll('script,iframe,style,object,embed,form,input,textarea,select').forEach(el => el.remove());
-  doc.querySelectorAll('*').forEach(el => {
-    for (const attr of Array.from(el.attributes)) {
-      if (attr.name.startsWith('on') || attr.name === 'style') {
-        el.removeAttribute(attr.name);
-      }
-    }
-    if (el.tagName === 'A') {
-      el.setAttribute('target', '_blank');
-      el.setAttribute('rel', 'noopener noreferrer');
-    }
-  });
-  return doc.body.innerHTML;
-}
 
 function loadSubscriptions(): Set<string> {
   try {
