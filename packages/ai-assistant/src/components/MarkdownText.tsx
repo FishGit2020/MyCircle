@@ -8,7 +8,7 @@ interface MarkdownTextProps {
 
 /**
  * Lightweight markdown renderer for AI assistant responses.
- * Handles: code blocks, inline code, bold, italic, bullet lists, numbered lists.
+ * Handles: code blocks, tables, headings, inline code, bold, italic, bullet lists, numbered lists.
  */
 export default function MarkdownText({ content, streaming }: MarkdownTextProps) {
   // Split into code blocks and text segments
@@ -21,13 +21,28 @@ export default function MarkdownText({ content, streaming }: MarkdownTextProps) 
       processedContent = content + '\n```';
     }
   }
-  const segments = processedContent.split(/(```[\s\S]*?```)/g);
+  // Stage 1: Split by code blocks
+  const codeSegments = processedContent.split(/(```[\s\S]*?```)/g);
+
+  // Stage 1.5: Split non-code segments by markdown tables, then flatten
+  const segments: Array<{ content: string; isCode: boolean }> = [];
+  for (const seg of codeSegments) {
+    if (seg.startsWith('```') && seg.endsWith('```')) {
+      segments.push({ content: seg, isCode: true });
+    } else {
+      // Split by table blocks (2+ consecutive pipe-delimited lines)
+      const tableParts = seg.split(/((?:\|[^\n]+\|(?:\n|$)){2,})/g);
+      for (const part of tableParts) {
+        segments.push({ content: part, isCode: false });
+      }
+    }
+  }
 
   return (
     <>
-      {segments.map((segment, i) => {
+      {segments.map(({ content: segment, isCode }, i) => {
         // Code block
-        if (segment.startsWith('```') && segment.endsWith('```')) {
+        if (isCode) {
           const inner = segment.slice(3, -3);
           // Remove optional language identifier on first line
           const firstNewline = inner.indexOf('\n');
@@ -42,12 +57,29 @@ export default function MarkdownText({ content, streaming }: MarkdownTextProps) 
           );
         }
 
-        // Regular text — process line by line
+        // T009/T010/T011: Markdown table (Stage 1.5 — requires separator row)
+        if (isMarkdownTable(segment)) {
+          return renderMarkdownTable(segment, i);
+        }
+
+        // Regular text — process line by line (Stage 2)
         const lines = segment.split('\n');
         return (
           <React.Fragment key={i}>
             {lines.map((line, j) => {
               const trimmed = line.trimStart();
+
+              // T008: Headings (#, ##, ### — ATX-style only, space required)
+              const headingMatch = trimmed.match(/^(#{1,3})\s+(.+)/);
+              if (headingMatch) {
+                const level = headingMatch[1].length;
+                const classMap = ['text-xl font-bold', 'text-lg font-semibold', 'text-base font-semibold'];
+                return (
+                  <div key={j} className={`mt-3 mb-1 text-gray-900 dark:text-gray-100 ${classMap[level - 1]}`}>
+                    {renderInline(headingMatch[2])}
+                  </div>
+                );
+              }
 
               // Bullet list items
               if (/^[-*]\s+/.test(trimmed)) {
@@ -89,6 +121,59 @@ export default function MarkdownText({ content, streaming }: MarkdownTextProps) 
         );
       })}
     </>
+  );
+}
+
+// T009: Detect a complete markdown table (requires separator row as gate)
+function isMarkdownTable(text: string): boolean {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) return false;
+  if (!lines[0].includes('|')) return false;
+  // Separator row: only pipes, dashes, colons, spaces
+  return /^\|[\s\-:|]+\|$/.test(lines[1].trim());
+}
+
+// T010: Render a markdown table with styled header, body, and dark mode variants
+function renderMarkdownTable(segment: string, key: number): React.ReactNode {
+  const lines = segment.trim().split('\n').filter(l => l.trim());
+  const parseRow = (line: string): string[] =>
+    line.split('|').slice(1, -1).map(cell => cell.trim());
+
+  const headers = parseRow(lines[0]);
+  // lines[1] is separator — skip it
+  const rows = lines.slice(2).map(parseRow);
+
+  return (
+    <div key={key} className="overflow-x-auto my-2">
+      <table className="w-full text-sm border-collapse">
+        <thead>
+          <tr>
+            {headers.map((header, i) => (
+              <th
+                key={i}
+                className="text-left px-3 py-2 font-semibold bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200"
+              >
+                {renderInline(header)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i} className="even:bg-gray-50 dark:even:bg-gray-800/50">
+              {row.map((cell, j) => (
+                <td
+                  key={j}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                >
+                  {renderInline(cell)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

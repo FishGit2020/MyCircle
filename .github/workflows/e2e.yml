@@ -69,6 +69,7 @@ jobs:
             packages/*/node_modules
             packages/*/dist
             functions/lib
+            functions/node_modules
             dist
           key: e2e-build-${{ github.sha }}
 
@@ -100,6 +101,7 @@ jobs:
             packages/*/node_modules
             packages/*/dist
             functions/lib
+            functions/node_modules
             dist
           key: e2e-build-${{ github.sha }}
 
@@ -160,6 +162,7 @@ jobs:
             packages/*/node_modules
             packages/*/dist
             functions/lib
+            functions/node_modules
             dist
           key: e2e-build-${{ github.sha }}
 

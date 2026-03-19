@@ -80,6 +80,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 ## CI/CD Gotchas
 
 - **`cancel-in-progress: true` at workflow level kills gate jobs**: If you set concurrency at the workflow level with `cancel-in-progress: true`, a new push cancels the entire in-progress workflow including the gate job — GitHub then shows "Waiting for status to be reported" indefinitely. Fix: set concurrency at the **job level** on expensive jobs only (setup, test, build), and give gate jobs **no concurrency group** so they always run and always post a status.
+- **`functions/node_modules` must be in the e2e cache**: `functions/` is NOT a pnpm workspace package — `pnpm install` at the root does not install `functions/node_modules`. `firebase:build:functions` runs `npm install` inside `functions/` and produces `functions/lib` (compiled JS), but only `functions/lib` was cached. When the emulator restores the cache and runs Cloud Functions, runtime deps like `cheerio` are missing (`Cannot find module 'cheerio'`). Fix: include `functions/node_modules` in the `e2e-build` cache path alongside `functions/lib`. Any new runtime dep added to `functions/package.json` needs this cache path present — otherwise the emulator job silently breaks.
 
 ## Test Gotchas
 
@@ -166,6 +167,10 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - Firestore `users/{uid}.favoriteCities[]` (existing); localStorage for recents (unchanged) (001-favorite-cities)
 - TypeScript 5.x, React 18 + `@mycircle/shared` (Apollo re-exports, i18n), SVG (no new charting library) (003-stock-data)
 - `localStorage` (watchlist, unchanged); no new storage (003-stock-data)
+- TypeScript 5.x, React 18 + `@mycircle/shared` (Apollo re-exports, eventBus, i18n, StorageKeys, PageContent), `react-router` (URL routing and deep-link autoplay) (004-podcast-player)
+- `localStorage` — subscriptions, progress, played state, playback speed, now-playing; Firestore sync via shell on `SUBSCRIPTIONS_CHANGED` (004-podcast-player)
+- TypeScript 5.x, React 18 (same as existing `ai-assistant` MFE) + `packages/ai-assistant` (existing MFE), `functions/src/handlers/aiChat.ts` (existing SSE stream handler), `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys) — no new dependencies (005-ollama-chat)
+- No new storage — all state managed by existing hooks (005-ollama-chat)
 
 ## Recent Changes
 - 001-favorite-cities: Added cross-MFE favorite cities — star/unstar from search, favorites dropdown, transit city chips, FavoritesManager panel

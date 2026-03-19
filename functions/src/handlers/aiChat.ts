@@ -757,6 +757,8 @@ export const aiChatStream = onRequest(
           // Buffer tool calls from deltas
           const toolCallBuffers: Map<number, { id: string; name: string; arguments: string }> = new Map();
           let streamText = '';
+          // T004: thinkBuffer intercepts <think>...</think> blocks from reasoning models
+          let thinkBuffer = '';
 
           for await (const chunk of stream) {
             if (aborted) break;
@@ -766,7 +768,27 @@ export const aiChatStream = onRequest(
             if (delta.content) {
               streamText += delta.content;
               fullText += delta.content;
-              sendEvent('text', { content: delta.content });
+              // T004: Accumulate in thinkBuffer instead of emitting directly
+              thinkBuffer += delta.content;
+
+              // T005: Extract complete <think>...</think> blocks → emit as thinking events
+              const thinkRegex = /<think>([\s\S]*?)<\/think>/g;
+              let thinkMatch: RegExpExecArray | null;
+              while ((thinkMatch = thinkRegex.exec(thinkBuffer)) !== null) {
+                sendEvent('thinking', { content: thinkMatch[1] });
+                thinkBuffer = thinkBuffer.slice(0, thinkMatch.index) + thinkBuffer.slice(thinkMatch.index + thinkMatch[0].length);
+                thinkRegex.lastIndex = 0;
+              }
+
+              // T006: Flush pre-think text; hold partial <think> prefix for next chunk
+              const thinkStart = thinkBuffer.indexOf('<think>');
+              if (thinkStart === -1) {
+                if (thinkBuffer) { sendEvent('text', { content: thinkBuffer }); thinkBuffer = ''; }
+              } else if (thinkStart > 0) {
+                sendEvent('text', { content: thinkBuffer.slice(0, thinkStart) });
+                thinkBuffer = thinkBuffer.slice(thinkStart);
+              }
+              // else: buffer starts with <think> — partial open tag, wait for closing
             }
 
             // Buffer incremental tool call deltas
@@ -787,6 +809,9 @@ export const aiChatStream = onRequest(
               outputTokens += chunk.usage.completion_tokens || 0;
             }
           }
+
+          // T007: Flush any remaining thinkBuffer after main stream ends (handles unclosed <think>)
+          if (thinkBuffer) { sendEvent('text', { content: thinkBuffer }); thinkBuffer = ''; }
 
           // Execute buffered tool calls
           if (toolCallBuffers.size > 0 && !aborted) {
@@ -827,13 +852,30 @@ export const aiChatStream = onRequest(
               const delta = chunk.choices[0]?.delta;
               if (delta?.content) {
                 fullText += delta.content;
-                sendEvent('text', { content: delta.content });
+                // Route follow-up stream through thinkBuffer as well
+                thinkBuffer += delta.content;
+                const followThinkRegex = /<think>([\s\S]*?)<\/think>/g;
+                let followThinkMatch: RegExpExecArray | null;
+                while ((followThinkMatch = followThinkRegex.exec(thinkBuffer)) !== null) {
+                  sendEvent('thinking', { content: followThinkMatch[1] });
+                  thinkBuffer = thinkBuffer.slice(0, followThinkMatch.index) + thinkBuffer.slice(followThinkMatch.index + followThinkMatch[0].length);
+                  followThinkRegex.lastIndex = 0;
+                }
+                const followThinkStart = thinkBuffer.indexOf('<think>');
+                if (followThinkStart === -1) {
+                  if (thinkBuffer) { sendEvent('text', { content: thinkBuffer }); thinkBuffer = ''; }
+                } else if (followThinkStart > 0) {
+                  sendEvent('text', { content: thinkBuffer.slice(0, followThinkStart) });
+                  thinkBuffer = thinkBuffer.slice(followThinkStart);
+                }
               }
               if (chunk.usage) {
                 inputTokens += chunk.usage.prompt_tokens || 0;
                 outputTokens += chunk.usage.completion_tokens || 0;
               }
             }
+            // T007: Flush any remaining thinkBuffer after follow-up stream
+            if (thinkBuffer) { sendEvent('text', { content: thinkBuffer }); thinkBuffer = ''; }
           }
         } catch {
           // Model doesn't support native tools — prompt-based fallback (non-streaming for simplicity)
