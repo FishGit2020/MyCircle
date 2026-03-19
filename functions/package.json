@@ -31,7 +31,7 @@
     "graphql": "^16.13.1",
     "graphql-depth-limit": "^1.1.0",
     "graphql-subscriptions": "^3.0.0",
-    "fast-xml-parser": "^5.3.6",
+    "fast-xml-parser": "^5.5.7",
     "node-cache": "^5.1.2",
     "openai": "^4.73.0",
     "epub2": "^3.0.2",
