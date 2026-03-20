@@ -62,9 +62,16 @@ export function restoreUserData(profile: UserProfile, uid: string): RestoreResul
     window.dispatchEvent(new Event(WindowEvents.BOTTOM_NAV_ORDER_CHANGED));
   }
 
-  // Restore Bible bookmarks
+  // Restore Bible bookmarks — merge with local bookmarks (union by book+chapter, Firestore wins on conflict)
   if (profile.bibleBookmarks && profile.bibleBookmarks.length > 0) {
-    localStorage.setItem(StorageKeys.BIBLE_BOOKMARKS, JSON.stringify(profile.bibleBookmarks));
+    let existingLocal: Array<{ book: string; chapter: number; label: string; timestamp: number }> = [];
+    try {
+      const raw = localStorage.getItem(StorageKeys.BIBLE_BOOKMARKS);
+      existingLocal = raw ? JSON.parse(raw) : [];
+    } catch { /* ignore parse errors */ }
+    const firestoreKeys = new Set(profile.bibleBookmarks.map(b => `${b.book}.${b.chapter}`));
+    const merged = [...profile.bibleBookmarks, ...existingLocal.filter(b => !firestoreKeys.has(`${b.book}.${b.chapter}`))];
+    localStorage.setItem(StorageKeys.BIBLE_BOOKMARKS, JSON.stringify(merged));
     window.dispatchEvent(new Event(WindowEvents.BIBLE_BOOKMARKS_CHANGED));
   }
 

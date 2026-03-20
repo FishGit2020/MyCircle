@@ -752,6 +752,14 @@ const es: Record<TranslationKey, string> = {
   'bible.version': 'Versi\u00f3n',
   'bible.versionSelect': 'Seleccionar versi\u00f3n de la Biblia',
   'bible.sharePassage': 'Compartir enlace',
+  'bible.referenceSearch': 'Ir al vers\u00edculo',
+  'bible.referenceSearchPlaceholder': 'ej. Juan 3:16, Sal 23',
+  'bible.referenceNotFound': 'Referencia no encontrada',
+  'bible.referenceSearchLabel': 'B\u00fasqueda de referencia de vers\u00edculo',
+  'bible.compareTranslations': 'Comparar traducciones',
+  'bible.closeComparison': 'Cerrar comparaci\u00f3n',
+  'bible.chooseDifferentTranslation': 'Elige una traducci\u00f3n diferente para comparar',
+  'bible.comparisonSecondLabel': 'Segunda traducci\u00f3n',
 
   // Toast messages
   'toast.addedToWatchlist': 'Agregado a la lista',

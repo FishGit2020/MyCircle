@@ -752,6 +752,14 @@ const zh: Record<TranslationKey, string> = {
   'bible.version': '\u7248\u672c',
   'bible.versionSelect': '\u9009\u62e9\u5723\u7ecf\u7248\u672c',
   'bible.sharePassage': '\u5206\u4eab\u94fe\u63a5',
+  'bible.referenceSearch': '\u8f6c\u5230\u7ecf\u6587',
+  'bible.referenceSearchPlaceholder': '\u5982\uff1a\u7ea6\u7ff0\u798f\u97f33:16\uff0c\u8bd123',
+  'bible.referenceNotFound': '\u672a\u627e\u5230\u8be5\u7ecf\u6587',
+  'bible.referenceSearchLabel': '\u7ecf\u6587\u53c2\u8003\u641c\u7d22',
+  'bible.compareTranslations': '\u5bf9\u7167\u7ffb\u8bd1',
+  'bible.closeComparison': '\u5173\u95ed\u5bf9\u7167',
+  'bible.chooseDifferentTranslation': '\u8bf7\u9009\u62e9\u4e0d\u540c\u7684\u7ffb\u8bd1\u7248\u672c\u8fdb\u884c\u5bf9\u7167',
+  'bible.comparisonSecondLabel': '\u7b2c\u4e8c\u7ffb\u8bd1',
 
   // Toast messages
   'toast.addedToWatchlist': '\u5df2\u6dfb\u52a0\u5230\u81ea\u9009\u5217\u8868',

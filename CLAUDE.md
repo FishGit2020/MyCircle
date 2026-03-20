@@ -171,6 +171,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - `localStorage` — subscriptions, progress, played state, playback speed, now-playing; Firestore sync via shell on `SUBSCRIPTIONS_CHANGED` (004-podcast-player)
 - TypeScript 5.x, React 18 (same as existing `ai-assistant` MFE) + `packages/ai-assistant` (existing MFE), `functions/src/handlers/aiChat.ts` (existing SSE stream handler), `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys) — no new dependencies (005-ollama-chat)
 - No new storage — all state managed by existing hooks (005-ollama-chat)
+- TypeScript 5.x, React 18 (same as existing `ai-assistant`, `bible-reader` MFEs) + Existing — `packages/bible-reader`, `packages/shell`, `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, WindowEvents) (006-bible-enhancements)
+- localStorage (`bible-bookmarks`) + Firestore `users/{uid}.bibleBookmarks` (already exists) + no new storage (006-bible-enhancements)
 
 ## Recent Changes
 - 001-favorite-cities: Added cross-MFE favorite cities — star/unstar from search, favorites dropdown, transit city chips, FavoritesManager panel
