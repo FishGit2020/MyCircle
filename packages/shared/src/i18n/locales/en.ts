@@ -1417,6 +1417,27 @@ const en = {
   // Refresh buttons
   'notebook.refresh': 'Refresh',
   'worship.refresh': 'Refresh',
+
+  // Worship Setlist Management (007-worship-songs)
+  'worship.setlists': 'Setlists',
+  'worship.newSetlist': 'New Setlist',
+  'worship.editSetlist': 'Edit Setlist',
+  'worship.deleteSetlist': 'Delete Setlist',
+  'worship.deleteSetlistConfirm': 'Are you sure you want to delete this setlist?',
+  'worship.setlistName': 'Setlist Name',
+  'worship.serviceDate': 'Service Date (optional)',
+  'worship.setlistSongs': 'Songs in Setlist',
+  'worship.addSongToSetlist': 'Add to Setlist',
+  'worship.noSetlists': 'No setlists yet. Create one to plan your service.',
+  'worship.emptySetlist': 'No songs in this setlist yet.',
+  'worship.setlistNameRequired': 'Setlist name is required',
+  'worship.startService': 'Start Service',
+  'worship.songOfTotal': 'Song {current} of {total}',
+  'worship.endOfSetlist': 'End of setlist',
+  'worship.songNotFound': 'Song not found',
+  'worship.exportSetlist': 'Export Setlist',
+  'worship.exportPrint': 'Print All Songs',
+  'worship.exportText': 'Export as Text',
   'crypto.refresh': 'Refresh',
 
   // Flash Cards

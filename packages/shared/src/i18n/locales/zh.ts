@@ -1421,6 +1421,27 @@ const zh: Record<TranslationKey, string> = {
   'worship.refresh': '\u5237\u65b0',
   'crypto.refresh': '\u5237\u65b0',
 
+  // Worship Setlist Management (007-worship-songs)
+  'worship.setlists': '\u6b4c\u5355\u5217\u8868',
+  'worship.newSetlist': '\u65b0\u5efa\u6b4c\u5355',
+  'worship.editSetlist': '\u7f16\u8f91\u6b4c\u5355',
+  'worship.deleteSetlist': '\u5220\u9664\u6b4c\u5355',
+  'worship.deleteSetlistConfirm': '\u786e\u5b9a\u8981\u5220\u9664\u6b4c\u5355\u5417\uff1f',
+  'worship.setlistName': '\u6b4c\u5355\u540d\u79f0',
+  'worship.serviceDate': '\u5d07\u62dc\u65e5\u671f\uff08\u53ef\u9009\uff09',
+  'worship.setlistSongs': '\u6b4c\u5355\u4e2d\u7684\u6b4c\u66f2',
+  'worship.addSongToSetlist': '\u6dfb\u52a0\u5230\u6b4c\u5355',
+  'worship.noSetlists': '\u8fd8\u6ca1\u6709\u6b4c\u5355\uff0c\u521b\u5efa\u4e00\u4e2a\u6765\u89c4\u5212\u5d07\u62dc\u670d\u52a1\u3002',
+  'worship.emptySetlist': '\u6b4c\u5355\u4e2d\u5c1a\u65e0\u6b4c\u66f2\u3002',
+  'worship.setlistNameRequired': '\u6b4c\u5355\u540d\u79f0\u4e0d\u80fd\u4e3a\u7a7a',
+  'worship.startService': '\u5f00\u59cb\u5d07\u62dc',
+  'worship.songOfTotal': '\u7b2c {current} \u9996\uff0c\u5171 {total} \u9996',
+  'worship.endOfSetlist': '\u6b4c\u5355\u7ed3\u675f',
+  'worship.songNotFound': '\u672a\u627e\u5230\u6b4c\u66f2',
+  'worship.exportSetlist': '\u5bfc\u51fa\u6b4c\u5355',
+  'worship.exportPrint': '\u6253\u5370\u6240\u6709\u6b4c\u66f2',
+  'worship.exportText': '\u5bfc\u51fa\u4e3a\u6587\u672c',
+
   // Flash Cards
   'nav.flashcards': '\u95ea\u5361',
   'bottomNav.flashcards': '\u95ea\u5361',

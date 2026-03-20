@@ -7,6 +7,7 @@ import { createBibleQueryResolvers } from './bible.js';
 import { createImmigrationQueryResolvers } from './immigration.js';
 import { createAiMutationResolvers, createAiQueryResolvers } from './ai.js';
 import { createWorshipSongResolvers } from './worshipSongs.js';
+import { createWorshipSetlistResolvers } from './worshipSetlists.js';
 import { createCloudFileResolvers } from './cloudFiles.js';
 import { createBabyPhotoResolvers } from './babyPhotos.js';
 import { createDigitalLibraryResolvers } from './digitalLibrary.js';
@@ -29,6 +30,7 @@ export function createResolvers(
   getYouVersionKey?: () => string,
 ) {
   const worshipSongResolvers = createWorshipSongResolvers();
+  const worshipSetlistResolvers = createWorshipSetlistResolvers();
   const cloudFileResolvers = createCloudFileResolvers();
   const babyPhotoResolvers = createBabyPhotoResolvers();
   const digitalLibraryResolvers = createDigitalLibraryResolvers();
@@ -45,6 +47,7 @@ export function createResolvers(
     Mutation: {
       ...createAiMutationResolvers(getApiKey, getFinnhubKey, getPodcastKeys, getYouVersionKey),
       ...worshipSongResolvers.Mutation,
+      ...worshipSetlistResolvers.Mutation,
       ...cloudFileResolvers.Mutation,
       ...babyPhotoResolvers.Mutation,
       ...digitalLibraryResolvers.Mutation,
@@ -62,6 +65,7 @@ export function createResolvers(
       ...createBibleQueryResolvers(getYouVersionKey),
       ...createImmigrationQueryResolvers(),
       ...worshipSongResolvers.Query,
+      ...worshipSetlistResolvers.Query,
       ...cloudFileResolvers.Query,
       ...babyPhotoResolvers.Query,
       ...digitalLibraryResolvers.Query,

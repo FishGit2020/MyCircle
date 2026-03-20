@@ -1421,6 +1421,27 @@ const es: Record<TranslationKey, string> = {
   'worship.refresh': 'Actualizar',
   'crypto.refresh': 'Actualizar',
 
+  // Worship Setlist Management (007-worship-songs)
+  'worship.setlists': 'Listas de canciones',
+  'worship.newSetlist': 'Nueva lista',
+  'worship.editSetlist': 'Editar lista',
+  'worship.deleteSetlist': 'Eliminar lista',
+  'worship.deleteSetlistConfirm': '\u00bfEst\u00e1s seguro de que quieres eliminar esta lista?',
+  'worship.setlistName': 'Nombre de la lista',
+  'worship.serviceDate': 'Fecha del servicio (opcional)',
+  'worship.setlistSongs': 'Canciones en la lista',
+  'worship.addSongToSetlist': 'Agregar a la lista',
+  'worship.noSetlists': 'A\u00fan no hay listas. Crea una para planificar tu servicio.',
+  'worship.emptySetlist': 'No hay canciones en esta lista todav\u00eda.',
+  'worship.setlistNameRequired': 'El nombre de la lista es obligatorio',
+  'worship.startService': 'Iniciar servicio',
+  'worship.songOfTotal': 'Canci\u00f3n {current} de {total}',
+  'worship.endOfSetlist': 'Fin de la lista',
+  'worship.songNotFound': 'Canci\u00f3n no encontrada',
+  'worship.exportSetlist': 'Exportar lista',
+  'worship.exportPrint': 'Imprimir todas las canciones',
+  'worship.exportText': 'Exportar como texto',
+
   // Flash Cards
   'nav.flashcards': 'Tarjetas',
   'bottomNav.flashcards': 'Tarjetas',

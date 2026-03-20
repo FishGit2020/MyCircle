@@ -16,6 +16,32 @@ export interface WorshipSong {
   createdBy?: string;
 }
 
+export interface SetlistEntry {
+  songId: string;
+  position: number;
+  snapshotTitle: string;
+  snapshotKey: string;
+}
+
+export interface Setlist {
+  id: string;
+  name: string;
+  serviceDate?: string | null;
+  entries: SetlistEntry[];
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
+
+export interface SetlistListItem {
+  id: string;
+  name: string;
+  serviceDate?: string | null;
+  entries: SetlistEntry[];
+  updatedAt: string;
+  createdBy: string;
+}
+
 export interface WorshipSongListItem {
   id: string;
   title: string;

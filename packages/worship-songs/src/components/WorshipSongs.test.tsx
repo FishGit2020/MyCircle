@@ -38,6 +38,18 @@ const mockGetSong = vi.fn().mockImplementation((id: string) =>
 );
 const mockRefresh = vi.fn().mockResolvedValue({});
 
+vi.mock('../hooks/useWorshipSetlists', () => ({
+  useWorshipSetlists: () => ({
+    setlists: [],
+    loading: false,
+    isAuthenticated: true,
+    addSetlist: vi.fn().mockResolvedValue('sl-1'),
+    updateSetlist: vi.fn().mockResolvedValue(undefined),
+    deleteSetlist: vi.fn().mockResolvedValue(undefined),
+    getSetlist: vi.fn().mockResolvedValue(null),
+  }),
+}));
+
 vi.mock('../hooks/useWorshipSongs', () => ({
   useWorshipSongs: () => ({
     songs: mockSongs,
