@@ -755,6 +755,81 @@ export const DELETE_WORSHIP_SONG = gql`
   }
 `;
 
+// ─── Worship Setlists ────────────────────────────────────────
+
+const SETLIST_ENTRY_FIELDS = gql`
+  fragment SetlistEntryFields on SetlistEntry {
+    songId
+    position
+    snapshotTitle
+    snapshotKey
+  }
+`;
+
+const SETLIST_FIELDS = gql`
+  fragment SetlistFields on Setlist {
+    id
+    name
+    serviceDate
+    entries {
+      ...SetlistEntryFields
+    }
+    createdAt
+    updatedAt
+    createdBy
+  }
+  ${SETLIST_ENTRY_FIELDS}
+`;
+
+export const GET_WORSHIP_SETLISTS = gql`
+  query GetWorshipSetlists {
+    worshipSetlists {
+      id
+      name
+      serviceDate
+      updatedAt
+      createdBy
+      entries {
+        ...SetlistEntryFields
+      }
+    }
+  }
+  ${SETLIST_ENTRY_FIELDS}
+`;
+
+export const GET_WORSHIP_SETLIST = gql`
+  query GetWorshipSetlist($id: ID!) {
+    worshipSetlist(id: $id) {
+      ...SetlistFields
+    }
+  }
+  ${SETLIST_FIELDS}
+`;
+
+export const ADD_WORSHIP_SETLIST = gql`
+  mutation AddWorshipSetlist($input: WorshipSetlistInput!) {
+    addWorshipSetlist(input: $input) {
+      ...SetlistFields
+    }
+  }
+  ${SETLIST_FIELDS}
+`;
+
+export const UPDATE_WORSHIP_SETLIST = gql`
+  mutation UpdateWorshipSetlist($id: ID!, $input: WorshipSetlistUpdateInput!) {
+    updateWorshipSetlist(id: $id, input: $input) {
+      ...SetlistFields
+    }
+  }
+  ${SETLIST_FIELDS}
+`;
+
+export const DELETE_WORSHIP_SETLIST = gql`
+  mutation DeleteWorshipSetlist($id: ID!) {
+    deleteWorshipSetlist(id: $id)
+  }
+`;
+
 // ─── Cloud Files ────────────────────────────────────────────
 
 export const GET_CLOUD_FILES = gql`

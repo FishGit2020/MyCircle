@@ -457,6 +457,8 @@ export const typeDefs = `#graphql
     # Worship songs
     worshipSongsList(limit: Int, offset: Int, search: String, artist: String, tag: String, format: String, favoriteIds: [String!]): WorshipSongsPage!
     worshipSong(id: ID!): WorshipSong
+    worshipSetlists: [Setlist!]!
+    worshipSetlist(id: ID!): Setlist
 
     # Interview (question bank is public, sessions require auth)
     questionBank: QuestionBank!
@@ -811,6 +813,44 @@ export const typeDefs = `#graphql
     tags: [String!]
   }
 
+  # ─── Worship Setlist Types ──────────────────────────────────
+
+  type SetlistEntry {
+    songId: ID!
+    position: Int!
+    snapshotTitle: String!
+    snapshotKey: String!
+  }
+
+  type Setlist {
+    id: ID!
+    name: String!
+    serviceDate: String
+    entries: [SetlistEntry!]!
+    createdAt: String!
+    updatedAt: String!
+    createdBy: String!
+  }
+
+  input SetlistEntryInput {
+    songId: ID!
+    position: Int!
+    snapshotTitle: String!
+    snapshotKey: String!
+  }
+
+  input WorshipSetlistInput {
+    name: String!
+    serviceDate: String
+    entries: [SetlistEntryInput!]
+  }
+
+  input WorshipSetlistUpdateInput {
+    name: String
+    serviceDate: String
+    entries: [SetlistEntryInput!]
+  }
+
   # ─── Web Crawler Types ──────────────────────────────────────
 
   type CrawlJob {
@@ -878,6 +918,11 @@ export const typeDefs = `#graphql
     addWorshipSong(input: WorshipSongInput!): WorshipSong!
     updateWorshipSong(id: ID!, input: WorshipSongUpdateInput!): WorshipSong!
     deleteWorshipSong(id: ID!): Boolean!
+
+    # Worship setlists (auth required)
+    addWorshipSetlist(input: WorshipSetlistInput!): Setlist!
+    updateWorshipSetlist(id: ID!, input: WorshipSetlistUpdateInput!): Setlist!
+    deleteWorshipSetlist(id: ID!): Boolean!
 
     # Cloud Files (auth required)
     shareFile(fileId: ID!): ShareFileResult!

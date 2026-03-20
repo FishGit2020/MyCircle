@@ -511,6 +511,7 @@ export type LocationSearchResult = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addWorshipSetlist: Setlist;
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
   createDailyLog: DailyLogEntry;
@@ -524,6 +525,7 @@ export type Mutation = {
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
+  deleteWorshipSetlist: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
   permanentDeleteBook: Scalars['Boolean']['output'];
   restoreBook: Scalars['Boolean']['output'];
@@ -536,7 +538,13 @@ export type Mutation = {
   startCrawl: CrawlJob;
   stopCrawl: CrawlJob;
   updateInterviewQuestion: InterviewQuestion;
+  updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
+};
+
+
+export type MutationAddWorshipSetlistArgs = {
+  input: WorshipSetlistInput;
 };
 
 
@@ -611,6 +619,11 @@ export type MutationDeleteSharedFileArgs = {
 };
 
 
+export type MutationDeleteWorshipSetlistArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteWorshipSongArgs = {
   id: Scalars['ID']['input'];
 };
@@ -675,6 +688,12 @@ export type MutationStopCrawlArgs = {
 export type MutationUpdateInterviewQuestionArgs = {
   id: Scalars['ID']['input'];
   input: UpdateInterviewQuestionInput;
+};
+
+
+export type MutationUpdateWorshipSetlistArgs = {
+  id: Scalars['ID']['input'];
+  input: WorshipSetlistUpdateInput;
 };
 
 
@@ -804,6 +823,8 @@ export type Query = {
   trendingPodcasts: PodcastTrendingResponse;
   ttsQuota: TtsQuota;
   weather: WeatherData;
+  worshipSetlist?: Maybe<Setlist>;
+  worshipSetlists: Array<Setlist>;
   worshipSong?: Maybe<WorshipSong>;
   worshipSongsList: WorshipSongsPage;
 };
@@ -1018,6 +1039,11 @@ export type QueryWeatherArgs = {
 };
 
 
+export type QueryWorshipSetlistArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryWorshipSongArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1085,6 +1111,32 @@ export type SessionMessageInput = {
   id: Scalars['String']['input'];
   role: Scalars['String']['input'];
   timestamp: Scalars['Float']['input'];
+};
+
+export type Setlist = {
+  __typename?: 'Setlist';
+  createdAt: Scalars['String']['output'];
+  createdBy: Scalars['String']['output'];
+  entries: Array<SetlistEntry>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  serviceDate?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['String']['output'];
+};
+
+export type SetlistEntry = {
+  __typename?: 'SetlistEntry';
+  position: Scalars['Int']['output'];
+  snapshotKey: Scalars['String']['output'];
+  snapshotTitle: Scalars['String']['output'];
+  songId: Scalars['ID']['output'];
+};
+
+export type SetlistEntryInput = {
+  position: Scalars['Int']['input'];
+  snapshotKey: Scalars['String']['input'];
+  snapshotTitle: Scalars['String']['input'];
+  songId: Scalars['ID']['input'];
 };
 
 export type ShareFileResult = {
@@ -1236,6 +1288,18 @@ export type Wind = {
   deg: Scalars['Int']['output'];
   gust?: Maybe<Scalars['Float']['output']>;
   speed: Scalars['Float']['output'];
+};
+
+export type WorshipSetlistInput = {
+  entries?: InputMaybe<Array<SetlistEntryInput>>;
+  name: Scalars['String']['input'];
+  serviceDate?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WorshipSetlistUpdateInput = {
+  entries?: InputMaybe<Array<SetlistEntryInput>>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  serviceDate?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type WorshipSong = {
@@ -1651,6 +1715,44 @@ export type DeleteWorshipSongMutationVariables = Exact<{
 
 
 export type DeleteWorshipSongMutation = { __typename?: 'Mutation', deleteWorshipSong: boolean };
+
+export type SetlistEntryFieldsFragment = { __typename?: 'SetlistEntry', songId: string, position: number, snapshotTitle: string, snapshotKey: string };
+
+export type SetlistFieldsFragment = { __typename?: 'Setlist', id: string, name: string, serviceDate?: string | null, createdAt: string, updatedAt: string, createdBy: string, entries: Array<{ __typename?: 'SetlistEntry', songId: string, position: number, snapshotTitle: string, snapshotKey: string }> };
+
+export type GetWorshipSetlistsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetWorshipSetlistsQuery = { __typename?: 'Query', worshipSetlists: Array<{ __typename?: 'Setlist', id: string, name: string, serviceDate?: string | null, updatedAt: string, createdBy: string, entries: Array<{ __typename?: 'SetlistEntry', songId: string, position: number, snapshotTitle: string, snapshotKey: string }> }> };
+
+export type GetWorshipSetlistQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetWorshipSetlistQuery = { __typename?: 'Query', worshipSetlist?: { __typename?: 'Setlist', id: string, name: string, serviceDate?: string | null, createdAt: string, updatedAt: string, createdBy: string, entries: Array<{ __typename?: 'SetlistEntry', songId: string, position: number, snapshotTitle: string, snapshotKey: string }> } | null };
+
+export type AddWorshipSetlistMutationVariables = Exact<{
+  input: WorshipSetlistInput;
+}>;
+
+
+export type AddWorshipSetlistMutation = { __typename?: 'Mutation', addWorshipSetlist: { __typename?: 'Setlist', id: string, name: string, serviceDate?: string | null, createdAt: string, updatedAt: string, createdBy: string, entries: Array<{ __typename?: 'SetlistEntry', songId: string, position: number, snapshotTitle: string, snapshotKey: string }> } };
+
+export type UpdateWorshipSetlistMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: WorshipSetlistUpdateInput;
+}>;
+
+
+export type UpdateWorshipSetlistMutation = { __typename?: 'Mutation', updateWorshipSetlist: { __typename?: 'Setlist', id: string, name: string, serviceDate?: string | null, createdAt: string, updatedAt: string, createdBy: string, entries: Array<{ __typename?: 'SetlistEntry', songId: string, position: number, snapshotTitle: string, snapshotKey: string }> } };
+
+export type DeleteWorshipSetlistMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWorshipSetlistMutation = { __typename?: 'Mutation', deleteWorshipSetlist: boolean };
 
 export type GetCloudFilesQueryVariables = Exact<{ [key: string]: never; }>;
 
