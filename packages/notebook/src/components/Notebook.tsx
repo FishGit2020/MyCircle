@@ -55,8 +55,6 @@ export default function Notebook() {
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
     return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
   }, []);
-  const hasApi = typeof window.__notebook !== 'undefined';
-
   // All hooks MUST be above early returns (React rules of hooks)
   const tabQuery = tab === 'public' ? '?tab=public' : '';
 
@@ -89,7 +87,7 @@ export default function Notebook() {
     navigate('/notebook?tab=public', { replace: true });
   }, [publishNote, setTab, navigate]);
 
-  if (!isAuthenticated || !hasApi) {
+  if (!isAuthenticated) {
     return (
       <div className="text-center py-16">
         <svg className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

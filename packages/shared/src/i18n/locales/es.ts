@@ -692,6 +692,8 @@ const es: Record<TranslationKey, string> = {
   'notebook.loginToUse': 'Inicia sesi\u00f3n para usar tu bloc de notas',
   'notebook.noResults': 'No se encontraron notas',
   'notebook.loadError': 'Error al cargar las notas',
+  'notebook.saveError': 'Error al guardar la nota',
+  'notebook.deleteError': 'Error al eliminar la nota',
   'notebook.myNotes': 'Mis Notas',
   'notebook.publicNotes': 'Notas P\u00fablicas',
   'notebook.tabs.my': 'Mis Notas',

@@ -368,6 +368,16 @@ export const typeDefs = `#graphql
     updatedAt: String!
   }
 
+  input NoteInput {
+    title: String!
+    content: String!
+  }
+
+  input NoteUpdateInput {
+    title: String
+    content: String
+  }
+
   type DailyLogEntry {
     id: ID!
     content: String!
@@ -913,6 +923,11 @@ export const typeDefs = `#graphql
     scoreBenchmarkResponse(prompt: String!, response: String!, judgeProvider: String!, judgeEndpointId: String, judgeModel: String): BenchmarkQualityResult!
     saveBenchmarkRun(results: JSON!): BenchmarkRun!
     deleteBenchmarkRun(id: String!): Boolean!
+
+    # Notes (auth required)
+    addNote(input: NoteInput!): Note!
+    updateNote(id: ID!, input: NoteUpdateInput!): Note!
+    deleteNote(id: ID!): Boolean!
 
     # Worship songs (auth required for mutations)
     addWorshipSong(input: WorshipSongInput!): WorshipSong!

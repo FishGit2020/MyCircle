@@ -54,6 +54,7 @@ export function createResolvers(
       ...interviewSessionResolvers.Mutation,
       ...dailyLogResolvers.Mutation,
       ...webCrawlerResolvers.Mutation,
+      ...notesResolvers.Mutation,
     },
 
     Query: {

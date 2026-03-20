@@ -2,11 +2,31 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useNotes } from './useNotes';
 
+const mockAddMutation = vi.fn().mockResolvedValue({ data: { addNote: { id: 'new-id', title: 'T', content: 'C', createdAt: '', updatedAt: '' } } });
+const mockUpdateMutation = vi.fn().mockResolvedValue({ data: { updateNote: { id: '1', title: 'Updated', content: 'Body', createdAt: '', updatedAt: '' } } });
+const mockDeleteMutation = vi.fn().mockResolvedValue({ data: { deleteNote: true } });
+
+const mockNotes = [
+  { id: '1', title: 'Note 1', content: 'Content 1', createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { id: '2', title: 'Note 2', content: 'Content 2', createdAt: '2024-01-02', updatedAt: '2024-01-02' },
+];
+
 // Stable t reference prevents infinite re-renders from useCallback([..., t])
 vi.mock('@mycircle/shared', () => {
   const t = (key: string) => key;
   return {
     useTranslation: () => ({ t }),
+    useQuery: vi.fn(() => ({ data: { notes: mockNotes }, loading: false })),
+    useMutation: vi.fn((mutation: unknown) => {
+      if (mutation === 'ADD_NOTE') return [mockAddMutation];
+      if (mutation === 'UPDATE_NOTE') return [mockUpdateMutation];
+      if (mutation === 'DELETE_NOTE') return [mockDeleteMutation];
+      return [vi.fn()];
+    }),
+    GET_NOTES: 'GET_NOTES',
+    ADD_NOTE: 'ADD_NOTE',
+    UPDATE_NOTE: 'UPDATE_NOTE',
+    DELETE_NOTE: 'DELETE_NOTE',
     WindowEvents: {
       AUTH_STATE_CHANGED: 'auth-state-changed',
       NOTEBOOK_CHANGED: 'notebook-changed',
@@ -15,161 +35,107 @@ vi.mock('@mycircle/shared', () => {
   };
 });
 
-const mockNotes = [
-  { id: '1', title: 'Note 1', content: 'Content 1', createdAt: new Date(), updatedAt: new Date() },
-  { id: '2', title: 'Note 2', content: 'Content 2', createdAt: new Date(), updatedAt: new Date() },
-];
-
 describe('useNotes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    delete window.__notebook;
+    // Default: authenticated
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue('mock-token');
+    delete (window as Record<string, unknown>).__notebook;
   });
 
   afterEach(() => {
-    delete window.__notebook;
+    delete (window as Record<string, unknown>).__notebook;
+    delete window.__getFirebaseIdToken;
   });
 
-  it('returns empty notes and stops loading when no API', async () => {
-    const { result } = renderHook(() => useNotes());
-    await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.notes).toEqual([]);
-    expect(result.current.error).toBeNull();
-  });
-
-  it('loads notes via getAll when no subscribe', async () => {
-    window.__notebook = {
-      getAll: vi.fn().mockResolvedValue(mockNotes),
-      add: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      get: vi.fn(),
-    };
+  it('returns notes from GraphQL query when authenticated', async () => {
     const { result } = renderHook(() => useNotes());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.notes).toEqual(mockNotes);
+    expect(result.current.error).toBeNull();
   });
 
-  it('uses subscribe when available', async () => {
-    const unsubscribe = vi.fn();
-    window.__notebook = {
-      getAll: vi.fn(),
-      add: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      get: vi.fn(),
-      subscribe: vi.fn((cb: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-        setTimeout(() => cb(mockNotes), 10);
-        return unsubscribe;
-      }),
-    };
-    const { result, unmount } = renderHook(() => useNotes());
-    await waitFor(() => expect(result.current.notes).toEqual(mockNotes));
-    expect(result.current.loading).toBe(false);
-    unmount();
-    expect(unsubscribe).toHaveBeenCalled();
+  it('returns empty notes and no error when not authenticated', async () => {
+    window.__getFirebaseIdToken = vi.fn().mockResolvedValue(null);
+    const { useQuery } = await import('@mycircle/shared');
+    (useQuery as ReturnType<typeof vi.fn>).mockReturnValue({ data: null, loading: false });
+    const { result } = renderHook(() => useNotes());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.notes).toEqual([]);
   });
 
-  it('saves new note via add', async () => {
-    const addFn = vi.fn().mockResolvedValue('new-id');
-    window.__notebook = {
-      getAll: vi.fn().mockResolvedValue([]),
-      add: addFn,
-      update: vi.fn(),
-      delete: vi.fn(),
-      get: vi.fn(),
-    };
+  it('calls addNoteMutation when saveNote is called with null id', async () => {
     const { result } = renderHook(() => useNotes());
     await waitFor(() => expect(result.current.loading).toBe(false));
     await act(async () => {
       await result.current.saveNote(null, { title: 'New', content: 'Body' });
     });
-    expect(addFn).toHaveBeenCalledWith({ title: 'New', content: 'Body' });
+    expect(mockAddMutation).toHaveBeenCalledWith({
+      variables: { input: { title: 'New', content: 'Body' } },
+    });
   });
 
-  it('updates existing note via update', async () => {
-    const updateFn = vi.fn().mockResolvedValue(undefined);
-    window.__notebook = {
-      getAll: vi.fn().mockResolvedValue([]),
-      add: vi.fn(),
-      update: updateFn,
-      delete: vi.fn(),
-      get: vi.fn(),
-    };
+  it('calls updateNoteMutation when saveNote is called with an id', async () => {
     const { result } = renderHook(() => useNotes());
     await waitFor(() => expect(result.current.loading).toBe(false));
     await act(async () => {
       await result.current.saveNote('note-1', { title: 'Updated', content: 'New body' });
     });
-    expect(updateFn).toHaveBeenCalledWith('note-1', { title: 'Updated', content: 'New body' });
+    expect(mockUpdateMutation).toHaveBeenCalledWith({
+      variables: { id: 'note-1', input: { title: 'Updated', content: 'New body' } },
+    });
   });
 
-  it('deletes note', async () => {
-    const deleteFn = vi.fn().mockResolvedValue(undefined);
-    window.__notebook = {
-      getAll: vi.fn().mockResolvedValue([]),
-      add: vi.fn(),
-      update: vi.fn(),
-      delete: deleteFn,
-      get: vi.fn(),
-    };
+  it('calls deleteNoteMutation when deleteNote is called', async () => {
     const { result } = renderHook(() => useNotes());
     await waitFor(() => expect(result.current.loading).toBe(false));
     await act(async () => {
       await result.current.deleteNote('note-1');
     });
-    expect(deleteFn).toHaveBeenCalledWith('note-1');
+    expect(mockDeleteMutation).toHaveBeenCalledWith({ variables: { id: 'note-1' } });
   });
 
-  it('handles error during load', async () => {
-    window.__notebook = {
-      getAll: vi.fn().mockRejectedValue(new Error('Load failed')),
-      add: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      get: vi.fn(),
-    };
-    const { result } = renderHook(() => useNotes());
-    await waitFor(() => expect(result.current.error).toBe('Load failed'));
-  });
-
-  it('throws when saving without API', async () => {
+  it('sets error when saveNote mutation throws', async () => {
+    mockAddMutation.mockRejectedValueOnce(new Error('Save failed'));
     const { result } = renderHook(() => useNotes());
     await waitFor(() => expect(result.current.loading).toBe(false));
-    await expect(
-      act(async () => { await result.current.saveNote(null, { title: 'T', content: 'C' }); })
-    ).rejects.toThrow('Notebook API not available');
+    await act(async () => {
+      await result.current.saveNote(null, { title: 'T', content: 'C' }).catch(() => {});
+    });
+    await waitFor(() => expect(result.current.error).toBe('Save failed'));
   });
 
-  it('caches note count in localStorage', async () => {
-    window.__notebook = {
-      getAll: vi.fn().mockResolvedValue(mockNotes),
-      add: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      get: vi.fn(),
-    };
-    renderHook(() => useNotes());
-    await waitFor(() => {
-      expect(localStorage.getItem('notebook-cache')).toBe('2');
+  it('sets error when deleteNote mutation throws', async () => {
+    mockDeleteMutation.mockRejectedValueOnce(new Error('Delete failed'));
+    const { result } = renderHook(() => useNotes());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await act(async () => {
+      await result.current.deleteNote('note-1').catch(() => {});
     });
+    await waitFor(() => expect(result.current.error).toBe('Delete failed'));
   });
 
-  it('reloads notes on NOTEBOOK_CHANGED event when no subscribe', async () => {
-    const getAllFn = vi.fn().mockResolvedValue(mockNotes);
-    window.__notebook = {
-      getAll: getAllFn,
-      add: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      get: vi.fn(),
-    };
-    renderHook(() => useNotes());
-    await waitFor(() => expect(getAllFn).toHaveBeenCalledTimes(1));
-    act(() => {
-      window.dispatchEvent(new Event('notebook-changed'));
+  it('attaches real-time subscribe when window.__notebook is available', async () => {
+    const unsubscribe = vi.fn();
+    const subscribeFn = vi.fn().mockImplementation((cb: (notes: unknown[]) => void) => {
+      setTimeout(() => cb(mockNotes), 10);
+      return unsubscribe;
     });
-    await waitFor(() => expect(getAllFn).toHaveBeenCalledTimes(2));
+    (window as Record<string, unknown>).__notebook = { subscribe: subscribeFn };
+    const { unmount } = renderHook(() => useNotes());
+    await waitFor(() => expect(subscribeFn).toHaveBeenCalled());
+    unmount();
+    expect(unsubscribe).toHaveBeenCalled();
+  });
+
+  it('dispatches NOTEBOOK_CHANGED event after save', async () => {
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    const { result } = renderHook(() => useNotes());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await act(async () => {
+      await result.current.saveNote(null, { title: 'T', content: 'C' });
+    });
+    expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'notebook-changed' }));
   });
 });

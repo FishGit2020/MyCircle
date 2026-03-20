@@ -1294,6 +1294,50 @@ export const GET_RADIO_STATIONS_BY_UUIDS = gql`
   }
 `;
 
+// ─── Notes ───────────────────────────────────────────────────────
+const NOTE_FIELDS = gql`
+  fragment NoteFields on Note {
+    id
+    title
+    content
+    createdAt
+    updatedAt
+  }
+`;
+
+export const GET_NOTES = gql`
+  ${NOTE_FIELDS}
+  query GetNotes($search: String) {
+    notes(limit: 500, search: $search) {
+      ...NoteFields
+    }
+  }
+`;
+
+export const ADD_NOTE = gql`
+  ${NOTE_FIELDS}
+  mutation AddNote($input: NoteInput!) {
+    addNote(input: $input) {
+      ...NoteFields
+    }
+  }
+`;
+
+export const UPDATE_NOTE = gql`
+  ${NOTE_FIELDS}
+  mutation UpdateNote($id: ID!, $input: NoteUpdateInput!) {
+    updateNote(id: $id, input: $input) {
+      ...NoteFields
+    }
+  }
+`;
+
+export const DELETE_NOTE = gql`
+  mutation DeleteNote($id: ID!) {
+    deleteNote(id: $id)
+  }
+`;
+
 // ─── Hiking Route ────────────────────────────────────────────────
 export const CALC_ROUTE = gql`
   query CalcRoute($startLon: Float!, $startLat: Float!, $endLon: Float!, $endLat: Float!) {
