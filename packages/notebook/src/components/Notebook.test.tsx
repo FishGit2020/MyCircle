@@ -9,7 +9,17 @@ vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-  WindowEvents: { NOTEBOOK_CHANGED: 'notebook-changed', PUBLIC_NOTES_CHANGED: 'public-notes-changed' },
+  useQuery: vi.fn(() => ({ data: null, loading: false })),
+  useMutation: vi.fn(() => [vi.fn()]),
+  GET_NOTES: 'GET_NOTES',
+  ADD_NOTE: 'ADD_NOTE',
+  UPDATE_NOTE: 'UPDATE_NOTE',
+  DELETE_NOTE: 'DELETE_NOTE',
+  GET_PUBLIC_NOTES: 'GET_PUBLIC_NOTES',
+  ADD_PUBLIC_NOTE: 'ADD_PUBLIC_NOTE',
+  UPDATE_PUBLIC_NOTE: 'UPDATE_PUBLIC_NOTE',
+  DELETE_PUBLIC_NOTE: 'DELETE_PUBLIC_NOTE',
+  WindowEvents: { AUTH_STATE_CHANGED: 'auth-state-changed', NOTEBOOK_CHANGED: 'notebook-changed', PUBLIC_NOTES_CHANGED: 'public-notes-changed' },
   StorageKeys: { NOTEBOOK_CACHE: 'notebook-cache' },
 }));
 

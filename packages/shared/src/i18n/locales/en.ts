@@ -690,6 +690,8 @@ const en = {
   'notebook.loginToUse': 'Sign in to use your notebook',
   'notebook.noResults': 'No matching notes found',
   'notebook.loadError': 'Failed to load notes',
+  'notebook.saveError': 'Failed to save note',
+  'notebook.deleteError': 'Failed to delete note',
   'notebook.myNotes': 'My Notes',
   'notebook.publicNotes': 'Public Notes',
   'notebook.tabs.my': 'My Notes',

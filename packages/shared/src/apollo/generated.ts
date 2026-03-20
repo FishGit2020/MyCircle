@@ -511,6 +511,7 @@ export type LocationSearchResult = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addNote: Note;
   addWorshipSetlist: Setlist;
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
@@ -524,6 +525,7 @@ export type Mutation = {
   deleteFile: Scalars['Boolean']['output'];
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
+  deleteNote: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
   deleteWorshipSetlist: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
@@ -538,8 +540,14 @@ export type Mutation = {
   startCrawl: CrawlJob;
   stopCrawl: CrawlJob;
   updateInterviewQuestion: InterviewQuestion;
+  updateNote: Note;
   updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
+};
+
+
+export type MutationAddNoteArgs = {
+  input: NoteInput;
 };
 
 
@@ -610,6 +618,11 @@ export type MutationDeleteInterviewQuestionArgs = {
 
 
 export type MutationDeleteInterviewSessionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteNoteArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -691,6 +704,12 @@ export type MutationUpdateInterviewQuestionArgs = {
 };
 
 
+export type MutationUpdateNoteArgs = {
+  id: Scalars['ID']['input'];
+  input: NoteUpdateInput;
+};
+
+
 export type MutationUpdateWorshipSetlistArgs = {
   id: Scalars['ID']['input'];
   input: WorshipSetlistUpdateInput;
@@ -709,6 +728,16 @@ export type Note = {
   id: Scalars['ID']['output'];
   title: Scalars['String']['output'];
   updatedAt: Scalars['String']['output'];
+};
+
+export type NoteInput = {
+  content: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type NoteUpdateInput = {
+  content?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type OllamaRunningModel = {
@@ -1966,6 +1995,37 @@ export type GetRadioStationsByUuidsQueryVariables = Exact<{
 
 
 export type GetRadioStationsByUuidsQuery = { __typename?: 'Query', radioStationsByUuids: Array<{ __typename?: 'RadioStation', stationuuid: string, name: string, url: string, url_resolved: string, favicon: string, tags: string, country: string, language: string, codec: string, bitrate: number, votes: number }> };
+
+export type NoteFieldsFragment = { __typename?: 'Note', id: string, title: string, content: string, createdAt: string, updatedAt: string };
+
+export type GetNotesQueryVariables = Exact<{
+  search?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetNotesQuery = { __typename?: 'Query', notes: Array<{ __typename?: 'Note', id: string, title: string, content: string, createdAt: string, updatedAt: string }> };
+
+export type AddNoteMutationVariables = Exact<{
+  input: NoteInput;
+}>;
+
+
+export type AddNoteMutation = { __typename?: 'Mutation', addNote: { __typename?: 'Note', id: string, title: string, content: string, createdAt: string, updatedAt: string } };
+
+export type UpdateNoteMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: NoteUpdateInput;
+}>;
+
+
+export type UpdateNoteMutation = { __typename?: 'Mutation', updateNote: { __typename?: 'Note', id: string, title: string, content: string, createdAt: string, updatedAt: string } };
+
+export type DeleteNoteMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteNoteMutation = { __typename?: 'Mutation', deleteNote: boolean };
 
 export type CalcRouteQueryVariables = Exact<{
   startLon: Scalars['Float']['input'];

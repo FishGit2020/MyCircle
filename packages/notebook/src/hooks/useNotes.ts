@@ -1,102 +1,116 @@
 import { useState, useEffect, useCallback, startTransition } from 'react';
-import { WindowEvents, StorageKeys, useTranslation } from '@mycircle/shared';
+import {
+  useQuery,
+  useMutation,
+  GET_NOTES,
+  ADD_NOTE,
+  UPDATE_NOTE,
+  DELETE_NOTE,
+  WindowEvents,
+  StorageKeys,
+  useTranslation,
+} from '@mycircle/shared';
 import type { Note, NoteInput } from '../types';
 
-interface NotebookAPI {
-  getAll: () => Promise<Note[]>;
-  get: (id: string) => Promise<Note | null>;
-  add: (note: NoteInput) => Promise<string>;
-  update: (id: string, updates: Partial<NoteInput>) => Promise<void>;
-  delete: (id: string) => Promise<void>;
+interface NotebookSubscribeAPI {
   subscribe?: (callback: (notes: Note[]) => void) => () => void;
 }
 
 export function useNotes() {
   const { t } = useTranslation();
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [authVersion, setAuthVersion] = useState(0);
 
-  // Re-initialize subscriptions when auth state changes (sign-in / sign-out)
+  // Auth check — mirrors the pattern used by other MFE hooks
   useEffect(() => {
-    const handler = () => setAuthVersion(v => v + 1);
+    let mounted = true;
+    const checkAuth = async () => {
+      try {
+        const token = await window.__getFirebaseIdToken?.();
+        if (mounted) setIsAuthenticated(!!token);
+      } catch {
+        if (mounted) setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+    const handler = () => { checkAuth(); };
     window.addEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
-    return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    return () => {
+      mounted = false;
+      window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, handler);
+    };
   }, []);
 
-  const api = window.__notebook as NotebookAPI | undefined;
+  // Primary data source: Apollo query (GraphQL-first)
+  const { data, loading } = useQuery(GET_NOTES, {
+    fetchPolicy: 'cache-and-network',
+    skip: !isAuthenticated,
+  });
 
-  const loadNotes = useCallback(async () => {
-    if (!api) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await api.getAll();
-      setNotes(result);
-      // Cache note count for dashboard tile
-      try {
-        localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(result.length));
-      } catch { /* ignore */ }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('notebook.loadError'));
-    } finally {
-      setLoading(false);
-    }
-  }, [api, t]);
+  const notes = (data?.notes ?? []) as Note[];
 
-  // Real-time subscription with one-shot fallback
+  // Mutations
+  const [addNoteMutation] = useMutation(ADD_NOTE, {
+    refetchQueries: [{ query: GET_NOTES }],
+  });
+  const [updateNoteMutation] = useMutation(UPDATE_NOTE, {
+    refetchQueries: [{ query: GET_NOTES }],
+  });
+  const [deleteNoteMutation] = useMutation(DELETE_NOTE, {
+    refetchQueries: [{ query: GET_NOTES }],
+  });
+
+  // Secondary: real-time Firestore subscription via window.__notebook (belt-and-suspenders for cross-device sync)
   useEffect(() => {
-    if (!api) {
-      setLoading(false);
-      return;
-    }
+    const api = window.__notebook as NotebookSubscribeAPI | undefined;
+    if (!api?.subscribe || !isAuthenticated) return;
 
-    if (api.subscribe) {
-      let received = false;
-      const unsubscribe = api.subscribe((data) => {
-        received = true;
-        // Defer note list update so it doesn't block user input (INP)
-        startTransition(() => { setNotes(data); });
-        setLoading(false);
-        // Update dashboard cache
+    const unsubscribe = api.subscribe((data) => {
+      // Update dashboard cache on real-time push
+      startTransition(() => {
         try {
           localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(data.length));
           window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
         } catch { /* ignore */ }
       });
-      // Safety: stop loading if subscription doesn't fire (e.g. not authenticated)
-      const timeout = setTimeout(() => {
-        if (!received) setLoading(false);
-      }, 3000);
-      return () => { unsubscribe(); clearTimeout(timeout); };
-    }
-
-    // Fallback: one-shot fetch + manual invalidation
-    loadNotes();
-    const handler = () => loadNotes();
-    window.addEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
-    return () => window.removeEventListener(WindowEvents.NOTEBOOK_CHANGED, handler);
-  }, [api, loadNotes, authVersion]);
+    });
+    return () => { unsubscribe(); };
+  }, [isAuthenticated]);
 
   const saveNote = useCallback(async (id: string | null, data: NoteInput) => {
-    if (!api) throw new Error('Notebook API not available');
-    if (id) {
-      await api.update(id, data);
-    } else {
-      await api.add(data);
+    setError(null);
+    try {
+      if (id) {
+        await updateNoteMutation({ variables: { id, input: data } });
+      } else {
+        await addNoteMutation({ variables: { input: data } });
+      }
+      // Update dashboard cache
+      try {
+        localStorage.setItem(StorageKeys.NOTEBOOK_CACHE, JSON.stringify(notes.length));
+        window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+      } catch { /* ignore */ }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('notebook.saveError'));
+      throw err;
     }
-    window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-  }, [api]);
+  }, [updateNoteMutation, addNoteMutation, notes.length, t]);
 
   const deleteNote = useCallback(async (id: string) => {
-    if (!api) throw new Error('Notebook API not available');
-    await api.delete(id);
-    window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
-  }, [api]);
+    setError(null);
+    try {
+      await deleteNoteMutation({ variables: { id } });
+      try {
+        window.dispatchEvent(new Event(WindowEvents.NOTEBOOK_CHANGED));
+      } catch { /* ignore */ }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('notebook.deleteError'));
+      throw err;
+    }
+  }, [deleteNoteMutation, t]);
 
-  return { notes, loading, error, saveNote, deleteNote, reload: loadNotes };
+  // Stub for backward compatibility (callers that used `reload`)
+  const reload = useCallback(() => {}, []);
+
+  return { notes, loading, error, saveNote, deleteNote, reload };
 }
