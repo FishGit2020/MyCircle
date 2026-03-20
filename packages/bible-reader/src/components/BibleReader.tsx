@@ -1,11 +1,110 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation, StorageKeys, WindowEvents, getDailyDevotional, parseVerseReference, PageContent } from '@mycircle/shared';
-import { useVotd, useBiblePassage, useBibleVersions, BIBLE_BOOKS } from '../hooks/useBibleData';
+import { useVotd, useBiblePassage, useComparisonPassage, useBibleVersions, BIBLE_BOOKS } from '../hooks/useBibleData';
 import type { BiblePassage } from '../hooks/useBibleData';
 
 // Default Bible version (NIV 2011 = 111 on YouVersion)
 const DEFAULT_VERSION_ID = '111';
+
+// --- Reference search helpers (US1) ---
+
+type VerseReference = { book: string; chapter: number; verse: number | null };
+
+/** Maps common abbreviations to canonical BIBLE_BOOKS names (lowercase keys). */
+const BOOK_ALIASES: Record<string, string> = {
+  // Old Testament
+  gen: 'Genesis', genesis: 'Genesis',
+  ex: 'Exodus', exo: 'Exodus', exodus: 'Exodus',
+  lev: 'Leviticus', leviticus: 'Leviticus',
+  num: 'Numbers', numbers: 'Numbers',
+  deut: 'Deuteronomy', dt: 'Deuteronomy', deuteronomy: 'Deuteronomy',
+  josh: 'Joshua', joshua: 'Joshua',
+  judg: 'Judges', jdg: 'Judges', judges: 'Judges',
+  ruth: 'Ruth',
+  '1sam': '1 Samuel', '1sm': '1 Samuel', '1 samuel': '1 Samuel',
+  '2sam': '2 Samuel', '2sm': '2 Samuel', '2 samuel': '2 Samuel',
+  '1ki': '1 Kings', '1kgs': '1 Kings', '1 kings': '1 Kings',
+  '2ki': '2 Kings', '2kgs': '2 Kings', '2 kings': '2 Kings',
+  '1chr': '1 Chronicles', '1chron': '1 Chronicles', '1 chronicles': '1 Chronicles',
+  '2chr': '2 Chronicles', '2chron': '2 Chronicles', '2 chronicles': '2 Chronicles',
+  ezra: 'Ezra',
+  neh: 'Nehemiah', nehemiah: 'Nehemiah',
+  esth: 'Esther', est: 'Esther', esther: 'Esther',
+  job: 'Job',
+  ps: 'Psalms', psa: 'Psalms', psalm: 'Psalms', psalms: 'Psalms',
+  prov: 'Proverbs', pr: 'Proverbs', pro: 'Proverbs', proverbs: 'Proverbs',
+  eccl: 'Ecclesiastes', ecc: 'Ecclesiastes', ecclesiastes: 'Ecclesiastes',
+  song: 'Song of Solomon', sos: 'Song of Solomon', ss: 'Song of Solomon', sg: 'Song of Solomon', 'song of solomon': 'Song of Solomon',
+  isa: 'Isaiah', isaiah: 'Isaiah',
+  jer: 'Jeremiah', jeremiah: 'Jeremiah',
+  lam: 'Lamentations', lamentations: 'Lamentations',
+  ezek: 'Ezekiel', eze: 'Ezekiel', ezekiel: 'Ezekiel',
+  dan: 'Daniel', daniel: 'Daniel',
+  hos: 'Hosea', hosea: 'Hosea',
+  joel: 'Joel',
+  amos: 'Amos',
+  obad: 'Obadiah', ob: 'Obadiah', obadiah: 'Obadiah',
+  jonah: 'Jonah', jon: 'Jonah',
+  mic: 'Micah', micah: 'Micah',
+  nah: 'Nahum', nahum: 'Nahum',
+  hab: 'Habakkuk', habakkuk: 'Habakkuk',
+  zeph: 'Zephaniah', zep: 'Zephaniah', zephaniah: 'Zephaniah',
+  hag: 'Haggai', haggai: 'Haggai',
+  zech: 'Zechariah', zec: 'Zechariah', zechariah: 'Zechariah',
+  mal: 'Malachi', malachi: 'Malachi',
+  // New Testament
+  matt: 'Matthew', mt: 'Matthew', matthew: 'Matthew',
+  mark: 'Mark', mk: 'Mark', mr: 'Mark',
+  luke: 'Luke', lk: 'Luke',
+  john: 'John', jn: 'John',
+  acts: 'Acts',
+  rom: 'Romans', romans: 'Romans',
+  '1cor': '1 Corinthians', '1co': '1 Corinthians', '1 corinthians': '1 Corinthians',
+  '2cor': '2 Corinthians', '2co': '2 Corinthians', '2 corinthians': '2 Corinthians',
+  gal: 'Galatians', galatians: 'Galatians',
+  eph: 'Ephesians', ephesians: 'Ephesians',
+  phil: 'Philippians', php: 'Philippians', philippians: 'Philippians',
+  col: 'Colossians', colossians: 'Colossians',
+  '1thess': '1 Thessalonians', '1th': '1 Thessalonians', '1 thessalonians': '1 Thessalonians',
+  '2thess': '2 Thessalonians', '2th': '2 Thessalonians', '2 thessalonians': '2 Thessalonians',
+  '1tim': '1 Timothy', '1ti': '1 Timothy', '1 timothy': '1 Timothy',
+  '2tim': '2 Timothy', '2ti': '2 Timothy', '2 timothy': '2 Timothy',
+  titus: 'Titus', tit: 'Titus',
+  philem: 'Philemon', phlm: 'Philemon', phm: 'Philemon', philemon: 'Philemon',
+  heb: 'Hebrews', hebrews: 'Hebrews',
+  jas: 'James', ja: 'James', james: 'James',
+  '1pet': '1 Peter', '1pe': '1 Peter', '1pt': '1 Peter', '1 peter': '1 Peter',
+  '2pet': '2 Peter', '2pe': '2 Peter', '2pt': '2 Peter', '2 peter': '2 Peter',
+  '1jn': '1 John', '1jo': '1 John', '1 john': '1 John',
+  '2jn': '2 John', '2jo': '2 John', '2 john': '2 John',
+  '3jn': '3 John', '3jo': '3 John', '3 john': '3 John',
+  jude: 'Jude',
+  rev: 'Revelation', apoc: 'Revelation', revelation: 'Revelation',
+};
+
+/**
+ * Parse a user-typed reference like "John 3:16", "Ps 23", "1 Cor 13" into
+ * a resolved canonical book name + chapter + optional verse number.
+ * Returns null if the book cannot be resolved or chapter is not valid.
+ */
+function parseRefInput(input: string): VerseReference | null {
+  const normalized = input.trim().replace(/\s+/g, ' ').toLowerCase();
+  if (!normalized) return null;
+  // Match: optional number-prefix book name + chapter + optional :verse
+  const m = normalized.match(/^(.+?)\s+(\d+)(?:[:.](\d+))?$/);
+  if (!m) return null;
+  const rawBook = m[1].trim();
+  const chapter = parseInt(m[2], 10);
+  const verse = m[3] ? parseInt(m[3], 10) : null;
+  if (!chapter || chapter < 1) return null;
+  // Resolve alias or match canonical name directly (case-insensitive)
+  const canonical = BOOK_ALIASES[rawBook]
+    ?? BIBLE_BOOKS.find(b => b.name.toLowerCase() === rawBook)?.name
+    ?? null;
+  if (!canonical) return null;
+  return { book: canonical, chapter, verse };
+}
 
 function loadBibleVersion(): string {
   try {
@@ -322,7 +421,7 @@ function ChapterSelector({ book, chapters, onSelect, onBack }: {
   );
 }
 
-function PassageDisplay({ book, chapter, totalChapters, passage, loading, error, onBack, onNavigate }: {
+function PassageDisplay({ book, chapter, totalChapters, passage, loading, error, onBack, onNavigate, highlightedVerse }: {
   book: string;
   chapter: number;
   totalChapters: number;
@@ -331,6 +430,7 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
   error: unknown;
   onBack: () => void;
   onNavigate: (chapter: number) => void;
+  highlightedVerse?: number | null;
 }) {
   const { t } = useTranslation();
   const [fontSize, setFontSize] = useState(loadFontSize);
@@ -338,6 +438,13 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
   const [bookmarks, setBookmarks] = useState(loadBookmarks);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isBookmarked = bookmarks.some(b => b.book === book && b.chapter === chapter);
+
+  // Scroll highlighted verse into view when it changes
+  useEffect(() => {
+    if (!highlightedVerse || loading) return;
+    const el = document.querySelector<HTMLElement>(`[data-verse="${highlightedVerse}"]`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightedVerse, loading]);
 
   useEffect(() => {
     let mounted = true;
@@ -565,7 +672,11 @@ function PassageDisplay({ book, chapter, totalChapters, passage, loading, error,
               style={{ fontSize: `${fontSize}px`, lineHeight: fontSize > 18 ? '1.8' : '1.6' }}
             >
               {passage.verses.map(verse => (
-                <span key={verse.number}>
+                <span
+                  key={verse.number}
+                  data-verse={verse.number}
+                  className={verse.number === highlightedVerse ? 'bg-yellow-100 dark:bg-yellow-900/30 rounded px-1' : undefined}
+                >
                   <sup className="text-xs font-bold text-blue-400 dark:text-blue-500 mr-0.5 select-none">
                     {verse.number}
                   </sup>
@@ -636,7 +747,15 @@ export default function BibleReader() {
   const [currentChapter, setCurrentChapter] = useState(0);
   const [bookmarks] = useState(loadBookmarks);
   const [bibleVersion, setBibleVersion] = useState(loadBibleVersion);
+  // US1: Reference search state
+  const [referenceInput, setReferenceInput] = useState('');
+  const [referenceError, setReferenceError] = useState<string | null>(null);
+  const [highlightedVerse, setHighlightedVerse] = useState<number | null>(null);
+  // US3: Comparison state
+  const [comparisonMode, setComparisonMode] = useState(false);
+  const [secondTranslation, setSecondTranslation] = useState('');
   const { loadPassage, passage, loading: passageLoading, error: passageError } = useBiblePassage();
+  const { comparisonPassage, comparisonLoading, loadComparisonPassage } = useComparisonPassage();
   const { versions: dynamicVersions, loading: versionsLoading, error: versionsError } = useBibleVersions();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -676,9 +795,59 @@ export default function BibleReader() {
     }
   }, [view, currentBook, currentChapter, loadPassage, setSearchParams]);
 
+  // US1: Handle verse reference search submission
+  const handleReferenceSearch = useCallback(() => {
+    if (!referenceInput.trim()) return;
+    const ref = parseRefInput(referenceInput);
+    if (!ref) {
+      setReferenceError(t('bible.referenceNotFound'));
+      return;
+    }
+    const bookData = BIBLE_BOOKS.find(b => b.name === ref.book);
+    if (!bookData || ref.chapter < 1 || ref.chapter > bookData.chapters) {
+      setReferenceError(t('bible.referenceNotFound'));
+      return;
+    }
+    setReferenceError(null);
+    setReferenceInput('');
+    setCurrentBook(ref.book);
+    setCurrentChapters(bookData.chapters);
+    setCurrentChapter(ref.chapter);
+    setHighlightedVerse(ref.verse);
+    loadPassage(ref.book, ref.chapter, bibleVersion);
+    saveLastRead({ book: ref.book, chapter: ref.chapter, chapters: bookData.chapters });
+    setSearchParams({ book: ref.book, chapter: String(ref.chapter), version: bibleVersion }, { replace: true });
+    setView('passage');
+  }, [referenceInput, bibleVersion, loadPassage, setSearchParams, t]);
+
+  // US3: Toggle comparison mode
+  const handleComparisonToggle = useCallback(() => {
+    setComparisonMode(prev => {
+      if (!prev) {
+        // Opening: pick default second translation (first that differs from bibleVersion)
+        const other = dynamicVersions.find(v => String(v.id) !== bibleVersion);
+        const defaultSecond = other ? String(other.id) : '';
+        setSecondTranslation(st => st || defaultSecond);
+        if (defaultSecond && currentBook && currentChapter > 0) {
+          loadComparisonPassage(currentBook, currentChapter, defaultSecond);
+        }
+      }
+      return !prev;
+    });
+  }, [bibleVersion, currentBook, currentChapter, dynamicVersions, loadComparisonPassage]);
+
+  // US3: Handle second translation selection
+  const handleSecondTranslationChange = useCallback((version: string) => {
+    setSecondTranslation(version);
+    if (version !== bibleVersion && currentBook && currentChapter > 0) {
+      loadComparisonPassage(currentBook, currentChapter, version);
+    }
+  }, [bibleVersion, currentBook, currentChapter, loadComparisonPassage]);
+
   const handleBookSelect = (book: string, chapters: number) => {
     setCurrentBook(book);
     setCurrentChapters(chapters);
+    setHighlightedVerse(null);
     if (chapters === 1) {
       setCurrentChapter(1);
       loadPassage(book, 1, bibleVersion);
@@ -702,7 +871,11 @@ export default function BibleReader() {
   const handleNavigateChapter = (chapter: number) => {
     if (chapter < 1 || chapter > currentChapters) return;
     setCurrentChapter(chapter);
+    setHighlightedVerse(null);
     loadPassage(currentBook, chapter, bibleVersion);
+    if (comparisonMode && secondTranslation && secondTranslation !== bibleVersion) {
+      loadComparisonPassage(currentBook, chapter, secondTranslation);
+    }
     saveLastRead({ book: currentBook, chapter, chapters: currentChapters });
     setSearchParams({ book: currentBook, chapter: String(chapter), version: bibleVersion }, { replace: true });
     window.__logAnalyticsEvent?.('bible_chapter_read', { book: currentBook, chapter });
@@ -808,6 +981,31 @@ export default function BibleReader() {
           </div>
         </div>
 
+        {/* US1: Reference search bar — always visible */}
+        <div className="mb-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              aria-label={t('bible.referenceSearchLabel')}
+              placeholder={t('bible.referenceSearchPlaceholder')}
+              value={referenceInput}
+              onChange={e => { setReferenceInput(e.target.value); setReferenceError(null); }}
+              onKeyDown={e => { if (e.key === 'Enter') handleReferenceSearch(); }}
+              className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleReferenceSearch}
+              className="px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-500 transition"
+            >
+              {t('bible.referenceSearch')}
+            </button>
+          </div>
+          {referenceError && (
+            <p className="text-red-500 dark:text-red-400 text-xs mt-1">{referenceError}</p>
+          )}
+        </div>
+
         {view === 'books' && (
           <BookSelector onSelect={handleBookSelect} />
         )}
@@ -822,16 +1020,97 @@ export default function BibleReader() {
         )}
 
         {view === 'passage' && (
-          <PassageDisplay
-            book={currentBook}
-            chapter={currentChapter}
-            totalChapters={currentChapters}
-            passage={passage}
-            loading={passageLoading}
-            error={passageError}
-            onBack={() => { setView('chapters'); setSearchParams({}, { replace: true }); }}
-            onNavigate={handleNavigateChapter}
-          />
+          <div>
+            {/* US3: Comparison controls */}
+            {dynamicVersions.length > 1 && (
+              <div className="flex items-center justify-end gap-2 mb-3 flex-wrap">
+                {comparisonMode && (
+                  <div className="flex items-center gap-1.5">
+                    <label className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('bible.comparisonSecondLabel')}
+                    </label>
+                    <select
+                      value={secondTranslation}
+                      onChange={e => handleSecondTranslationChange(e.target.value)}
+                      aria-label={t('bible.comparisonSecondLabel')}
+                      className="text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-1.5 py-1 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                    >
+                      {dynamicVersions.map(v => (
+                        <option key={v.id} value={String(v.id)}>
+                          {v.abbreviation}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleComparisonToggle}
+                  className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                  {comparisonMode ? t('bible.closeComparison') : t('bible.compareTranslations')}
+                </button>
+              </div>
+            )}
+            {comparisonMode && secondTranslation === bibleVersion && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 mb-3">
+                {t('bible.chooseDifferentTranslation')}
+              </p>
+            )}
+            <div className={comparisonMode && secondTranslation !== bibleVersion ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}>
+              <PassageDisplay
+                book={currentBook}
+                chapter={currentChapter}
+                totalChapters={currentChapters}
+                passage={passage}
+                loading={passageLoading}
+                error={passageError}
+                onBack={() => { setComparisonMode(false); setView('chapters'); setSearchParams({}, { replace: true }); }}
+                onNavigate={handleNavigateChapter}
+                highlightedVerse={highlightedVerse}
+              />
+              {comparisonMode && secondTranslation !== bibleVersion && (
+                <div className="border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 pt-4 md:pt-0 md:pl-4">
+                  {comparisonLoading ? (
+                    <div className="space-y-3 animate-pulse">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+                      ))}
+                    </div>
+                  ) : comparisonPassage ? (
+                    <div>
+                      {comparisonPassage.translation && (
+                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+                          {comparisonPassage.translation}
+                        </p>
+                      )}
+                      {comparisonPassage.verses && comparisonPassage.verses.length > 0 ? (
+                        <div className="leading-relaxed text-gray-700 dark:text-gray-300 text-sm">
+                          {comparisonPassage.verses.map(v => (
+                            <span key={v.number}>
+                              <sup className="text-xs font-bold text-blue-400 dark:text-blue-500 mr-0.5 select-none">
+                                {v.number}
+                              </sup>
+                              {v.text}{' '}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                          {comparisonPassage.text}
+                        </div>
+                      )}
+                      {comparisonPassage.copyright && (
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 italic">
+                          {comparisonPassage.copyright}
+                        </p>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
 

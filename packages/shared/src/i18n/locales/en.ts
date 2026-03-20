@@ -750,6 +750,14 @@ const en = {
   'bible.version': 'Version',
   'bible.versionSelect': 'Select Bible version',
   'bible.sharePassage': 'Share link',
+  'bible.referenceSearch': 'Go to verse',
+  'bible.referenceSearchPlaceholder': 'e.g. John 3:16, Ps 23',
+  'bible.referenceNotFound': 'Reference not found',
+  'bible.referenceSearchLabel': 'Verse reference search',
+  'bible.compareTranslations': 'Compare translations',
+  'bible.closeComparison': 'Close comparison',
+  'bible.chooseDifferentTranslation': 'Choose a different translation to compare',
+  'bible.comparisonSecondLabel': 'Second translation',
 
   // Toast messages
   'toast.addedToWatchlist': 'Added to watchlist',

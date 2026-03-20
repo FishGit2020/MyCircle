@@ -100,3 +100,21 @@ export function useBiblePassage() {
     loadPassage,
   };
 }
+
+/** Hook to lazily fetch a secondary Bible passage for side-by-side translation comparison */
+export function useComparisonPassage() {
+  const [fetchPassage, { data, loading, error }] = useLazyQuery<GetBiblePassageQuery>(GET_BIBLE_PASSAGE, {
+    fetchPolicy: 'cache-first',
+  });
+
+  const loadComparisonPassage = useCallback((book: string, chapter: number, translation: string) => {
+    fetchPassage({ variables: { reference: `${book} ${chapter}`, translation } });
+  }, [fetchPassage]);
+
+  return {
+    comparisonPassage: data?.biblePassage ?? null,
+    comparisonLoading: loading,
+    comparisonError: error,
+    loadComparisonPassage,
+  };
+}
