@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.7.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.6.0...mycircle-v1.7.0) (2026-03-20)
+
+
+### Features
+
+* **bible-reader:** add verse reference lookup, bookmark sync fix, and translation comparison ([#813](https://github.com/FishGit2020/MyCircle/issues/813)) ([2cc8187](https://github.com/FishGit2020/MyCircle/commit/2cc818757776b51689aed3f5b4f102c78befd081))
+* **notebook:** migrate writes to GraphQL mutations and add search support ([#815](https://github.com/FishGit2020/MyCircle/issues/815)) ([3d604bf](https://github.com/FishGit2020/MyCircle/commit/3d604bf963faedce5394ae6ab285406f1f0ebe30))
+* **worship-songs:** add setlist management with present mode and export ([#814](https://github.com/FishGit2020/MyCircle/issues/814)) ([f05c48e](https://github.com/FishGit2020/MyCircle/commit/f05c48ebb5e7eab2a309eac239a6ada50323de7c))
+
+
+### Miscellaneous
+
+* **deps:** bump fast-xml-parser from 5.5.6 to 5.5.7 in /functions ([#811](https://github.com/FishGit2020/MyCircle/issues/811)) ([06ad016](https://github.com/FishGit2020/MyCircle/commit/06ad0164d8a26e87672e745c831bc08fd8a7f7d1))
+
 ## [1.6.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.5.0...mycircle-v1.6.0) (2026-03-19)
 
 
