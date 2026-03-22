@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.8.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.7.0...mycircle-v1.8.0) (2026-03-22)
+
+
+### Features
+
+* address user feedback — 8 fixes + Sentry error handling ([#818](https://github.com/FishGit2020/MyCircle/issues/818)) ([fdca8c1](https://github.com/FishGit2020/MyCircle/commit/fdca8c1c349e871f0b9a3917d8391346e95e563c))
+
+
+### Miscellaneous
+
+* **deps:** bump the actions group with 4 updates ([#816](https://github.com/FishGit2020/MyCircle/issues/816)) ([400199c](https://github.com/FishGit2020/MyCircle/commit/400199cae41fab9ba5e99646ba48129e700cf6df))
+
 ## [1.7.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.6.0...mycircle-v1.7.0) (2026-03-20)
 
 
