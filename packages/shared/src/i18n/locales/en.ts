@@ -38,6 +38,7 @@ const en = {
   'search.noResultsHint': 'Try a different search term',
   'search.recentSearches': 'Recent Searches',
   'search.popularCities': 'Popular Cities',
+  'search.searchHint': 'Search for a city, e.g. "New York", "London", "Tokyo"',
   'search.useMyLocation': 'Use my current location',
   'search.gettingLocation': 'Getting location...',
   'search.geolocationNotSupported': 'Geolocation not supported',
@@ -1902,6 +1903,11 @@ const en = {
   'games.anagramDesc': 'Unscramble the letters',
   'games.anagramRules': 'Speed + fewer hints = more points. Each hint costs 30 pts.',
   'games.anagramHint': 'Reveal a letter',
+  'games.dinoRun': 'Dino Run',
+  'games.dinoRunDesc': 'Jump over obstacles in this endless runner',
+  'games.tapOrSpaceToStart': 'Tap or press Space to start',
+  'games.dinoControls': 'Space/Up to jump \u00b7 Down to duck \u00b7 Tap to jump on mobile',
+  'games.scoringDino': '+1 point every few frames. Speed increases over time.',
 
   // Privacy Policy
   'privacy.title': 'Privacy Policy',

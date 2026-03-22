@@ -18,12 +18,11 @@ describe('useDeals', () => {
     localStorage.clear();
   });
 
-  it('returns demo deals when GraphQL has no data yet', () => {
+  it('returns empty deals when GraphQL has no data yet', () => {
     const { result } = renderHook(() => useDeals());
 
-    // Should have initial demo deals (cache empty, no GraphQL response yet)
-    expect(result.current.deals.length).toBeGreaterThan(0);
-    expect(result.current.deals[0].title).toContain('Sony');
+    // Should start empty (no cache, no GraphQL response yet)
+    expect(result.current.deals).toEqual([]);
   });
 
   it('returns deals array', () => {

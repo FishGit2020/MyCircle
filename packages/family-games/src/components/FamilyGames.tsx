@@ -5,13 +5,13 @@ import GameCard from './GameCard';
 import Scoreboard from './Scoreboard';
 import type { GameType } from './GameCard';
 
-const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram']);
+const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram', 'dino']);
 
 const GAME_TITLE_KEYS: Record<string, string> = {
   trivia: 'games.trivia', math: 'games.mathChallenge', word: 'games.wordGame',
   memory: 'games.memoryMatch', headsup: 'games.headsUp', reaction: 'games.reactionTime',
   simon: 'games.simonSays', sequence: 'games.numberSequence', colormatch: 'games.colorMatch',
-  maze: 'games.mazeRunner', anagram: 'games.anagram',
+  maze: 'games.mazeRunner', anagram: 'games.anagram', dino: 'games.dinoRun',
 };
 
 export default function FamilyGames() {
@@ -77,6 +77,9 @@ export default function FamilyGames() {
             break;
           case 'anagram':
             mod = await import('./AnagramGame');
+            break;
+          case 'dino':
+            mod = await import('./DinoGame');
             break;
           default:
             return;
@@ -197,6 +200,9 @@ export default function FamilyGames() {
         />
         <GameCard type="anagram" titleKey={'games.anagram' as any} descKey={'games.anagramDesc' as any} color="sky" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>}
+        />
+        <GameCard type="dino" titleKey={'games.dinoRun' as any} descKey={'games.dinoRunDesc' as any} color="lime" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 15l3-3 3 3 3-3 3 3 3-3 3 3" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 19H3" /></svg>}
         />
       </div>
 

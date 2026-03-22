@@ -49,7 +49,7 @@ export default function NotificationBell() {
 
   const ensureToken = useCallback(async (): Promise<string | null> => {
     if (fcmToken) return fcmToken;
-    if (Notification.permission === 'denied') {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
       showFeedback(t('notifications.blocked'));
       return null;
     }
