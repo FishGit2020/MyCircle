@@ -43,14 +43,14 @@ test.describe('City Search', () => {
     await expect(page).toHaveURL(/\/weather\//, { timeout: 10_000 });
   });
 
-  test('shows popular cities when input is focused with no text', async ({ page }) => {
+  test('shows search hint when input is focused with no text', async ({ page }) => {
     await page.goto('/weather');
 
     const searchInput = page.getByPlaceholder(/search for a city/i);
     await expect(searchInput).toBeVisible({ timeout: 10_000 });
     await searchInput.focus();
 
-    // Should show popular cities dropdown (includes Tokyo, New York, etc.)
-    await expect(page.getByText('Popular Cities')).toBeVisible({ timeout: 5_000 });
+    // Should show search hint placeholder
+    await expect(page.getByText(/Search for a city, e\.g\./)).toBeVisible({ timeout: 5_000 });
   });
 });
