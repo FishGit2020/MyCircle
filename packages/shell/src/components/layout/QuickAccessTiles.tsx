@@ -41,6 +41,7 @@ const QUICK_ACCESS_ITEMS: QuickAccessItem[] = [
   { path: '/interview', labelKey: 'nav.interview', color: 'bg-indigo-50 text-indigo-500', darkColor: 'dark:bg-indigo-900/20 dark:text-indigo-400', widgetId: 'aiInterviewer', iconKey: 'interview' },
   { path: '/transit', labelKey: 'nav.transit' as any, color: 'bg-teal-50 text-teal-500', darkColor: 'dark:bg-teal-900/20 dark:text-teal-400', widgetId: 'transitTracker', iconKey: 'transit' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   { path: '/travel-map', labelKey: 'nav.travelMap' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'travelMap', iconKey: 'travel-map' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/deals', labelKey: 'nav.deals' as any, color: 'bg-emerald-50 text-emerald-500', darkColor: 'dark:bg-emerald-900/20 dark:text-emerald-400', widgetId: 'dealFinder', iconKey: 'deals' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   { path: '/web-crawler', labelKey: 'nav.webCrawler' as any, color: 'bg-cyan-50 text-cyan-500', darkColor: 'dark:bg-cyan-900/20 dark:text-cyan-400', widgetId: 'webCrawler', iconKey: 'web-crawler' }, // eslint-disable-line @typescript-eslint/no-explicit-any
 ];
 
