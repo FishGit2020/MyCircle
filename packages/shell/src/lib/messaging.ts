@@ -10,7 +10,12 @@ let messaging: Messaging | null = null;
 function getMessagingInstance(): Messaging | null {
   if (!app) return null;
   if (!messaging) {
-    messaging = getMessaging(app);
+    try {
+      messaging = getMessaging(app);
+    } catch {
+      // Browser doesn't support Firebase Messaging (e.g. Safari iOS, Firefox private)
+      return null;
+    }
   }
   return messaging;
 }
@@ -26,6 +31,7 @@ export async function requestNotificationPermission(): Promise<string | null> {
   const msg = getMessagingInstance();
   if (!msg) return null;
 
+  if (typeof Notification === 'undefined') return null;
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') return null;
 

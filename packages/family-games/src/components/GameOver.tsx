@@ -14,6 +14,7 @@ const SCORING_RULES: Record<GameType, string> = {
   colormatch: 'games.scoringColorMatch',
   maze: 'games.scoringMaze',
   anagram: 'games.scoringAnagram',
+  dino: 'games.scoringDino',
 };
 
 const GAME_NAME_KEYS: Record<GameType, string> = {
@@ -28,6 +29,7 @@ const GAME_NAME_KEYS: Record<GameType, string> = {
   colormatch: 'games.colorMatch',
   maze: 'games.mazeRunner',
   anagram: 'games.anagram',
+  dino: 'games.dinoRun',
 };
 
 const GAME_ROUTES: Record<GameType, string> = {
@@ -42,6 +44,7 @@ const GAME_ROUTES: Record<GameType, string> = {
   colormatch: '/family-games/colormatch',
   maze: '/family-games/maze',
   anagram: '/family-games/anagram',
+  dino: '/family-games/dino',
 };
 
 interface GameOverProps {

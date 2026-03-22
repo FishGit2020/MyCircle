@@ -33,14 +33,6 @@ interface FavoriteCity {
   lon: number;
 }
 
-const POPULAR_CITIES: RecentCity[] = [
-  { id: '40.71,-74.01', name: 'New York', country: 'US', state: 'New York', lat: 40.7128, lon: -74.006 },
-  { id: '51.51,-0.13', name: 'London', country: 'GB', lat: 51.5074, lon: -0.1278 },
-  { id: '35.68,139.69', name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
-  { id: '48.86,2.35', name: 'Paris', country: 'FR', lat: 48.8566, lon: 2.3522 },
-  { id: '-33.87,151.21', name: 'Sydney', country: 'AU', state: 'New South Wales', lat: -33.8688, lon: 151.2093 },
-];
-
 const MAX_LOCAL_RECENTS = 10;
 
 function loadLocalRecents(): RecentCity[] {
@@ -285,8 +277,8 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
   const showNoResults = query.length >= 2 && !loading && results.length === 0 && data?.searchCities !== undefined && fuzzySuggestions.length === 0 && matchingRecents.length === 0;
   const showDropdown = inputFocused && query.length < 2 && !loading && results.length === 0;
   const isShowingRecent = allRecents.length > 0;
-  const dropdownCities = isShowingRecent ? allRecents.slice(0, 5) : POPULAR_CITIES;
-  const dropdownLabel = isShowingRecent ? t('search.recentSearches') : t('search.popularCities');
+  const dropdownCities = isShowingRecent ? allRecents.slice(0, 5) : [];
+  const dropdownLabel = isShowingRecent ? t('search.recentSearches') : '';
 
   // Build combined visible items for keyboard nav: matching recents + API results
   const visibleItems: (City | RecentCity)[] = showSearchResults
@@ -608,60 +600,67 @@ export default function CitySearch({ onCitySelect, recentCities = [], onRemoveCi
                 ))}
               </>
             )}
-            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex items-center justify-between">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{dropdownLabel}</p>
-              {isShowingRecent && (
-                <button
-                  onClick={handleClearAllRecents}
-                  className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
-                  aria-label={t('search.clearAllRecents')}
-                >
-                  {t('search.clearAllRecents')}
-                </button>
-              )}
-            </div>
-            {dropdownCities.map((city, index) => (
-              <div
-                key={city.id}
-                id={`city-option-${index}`}
-                data-dropdown-item
-                onClick={() => handleCityClick(city)}
-                onMouseEnter={() => setHighlightedIndex(index)}
-                className={`w-full text-left px-4 py-3 transition border-b dark:border-gray-700 last:border-b-0 flex items-center cursor-pointer ${
-                  index === highlightedIndex
-                    ? 'bg-blue-50 dark:bg-gray-700'
-                    : 'hover:bg-blue-50 dark:hover:bg-gray-700'
-                }`}
-                role="option"
-                aria-selected={index === highlightedIndex}
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium dark:text-white">{city.name}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {city.state && `${city.state}, `}{city.country}
-                    {city.searchedAt && (
-                      <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">{formatTimeAgo(city.searchedAt)}</span>
-                    )}
-                  </p>
-                </div>
-                <WeatherPreview lat={city.lat} lon={city.lon} />
-                {isShowingRecent && (
+            {isShowingRecent ? (
+              <>
+                <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600 flex items-center justify-between">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{dropdownLabel}</p>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveCity(city.id);
-                    }}
-                    className="ml-2 p-1 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition flex-shrink-0"
-                    aria-label={`Remove ${city.name} from recent searches`}
-                    title={t('search.removeFromRecent')}
+                    onClick={handleClearAllRecents}
+                    className="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+                    aria-label={t('search.clearAllRecents')}
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    {t('search.clearAllRecents')}
                   </button>
-                )}
+                </div>
+                {dropdownCities.map((city, index) => (
+                  <div
+                    key={city.id}
+                    id={`city-option-${index}`}
+                    data-dropdown-item
+                    onClick={() => handleCityClick(city)}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={`w-full text-left px-4 py-3 transition border-b dark:border-gray-700 last:border-b-0 flex items-center cursor-pointer ${
+                      index === highlightedIndex
+                        ? 'bg-blue-50 dark:bg-gray-700'
+                        : 'hover:bg-blue-50 dark:hover:bg-gray-700'
+                    }`}
+                    role="option"
+                    aria-selected={index === highlightedIndex}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium dark:text-white">{city.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {city.state && `${city.state}, `}{city.country}
+                        {city.searchedAt && (
+                          <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">{formatTimeAgo(city.searchedAt)}</span>
+                        )}
+                      </p>
+                    </div>
+                    <WeatherPreview lat={city.lat} lon={city.lon} />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveCity(city.id);
+                      }}
+                      className="ml-2 p-1 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition flex-shrink-0"
+                      aria-label={`Remove ${city.name} from recent searches`}
+                      title={t('search.removeFromRecent')}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="px-6 py-8 text-center">
+                <svg className="w-10 h-10 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('search.searchHint')}</p>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>

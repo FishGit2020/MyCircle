@@ -40,6 +40,7 @@ const es: Record<TranslationKey, string> = {
   'search.noResultsHint': 'Prueba con otro t\u00e9rmino de b\u00fasqueda',
   'search.recentSearches': 'B\u00fasquedas recientes',
   'search.popularCities': 'Ciudades populares',
+  'search.searchHint': 'Busca una ciudad, p. ej. "Nueva York", "Londres", "Tokio"',
   'search.useMyLocation': 'Usar mi ubicaci\u00f3n actual',
   'search.gettingLocation': 'Obteniendo ubicaci\u00f3n...',
   'search.geolocationNotSupported': 'Geolocalizaci\u00f3n no soportada',
@@ -1904,6 +1905,11 @@ const es: Record<TranslationKey, string> = {
   'games.anagramDesc': 'Descifra las letras',
   'games.anagramRules': 'Rapidez + menos pistas = m\u00e1s puntos. Cada pista cuesta 30 pts.',
   'games.anagramHint': 'Revelar una letra',
+  'games.dinoRun': 'Dino Run',
+  'games.dinoRunDesc': 'Salta obst\u00e1culos en esta carrera sin fin',
+  'games.tapOrSpaceToStart': 'Toca o presiona Espacio para comenzar',
+  'games.dinoControls': 'Espacio/Arriba para saltar \u00b7 Abajo para agacharse',
+  'games.scoringDino': '+1 punto cada pocos cuadros. La velocidad aumenta con el tiempo.',
 
   // Privacy Policy
   'privacy.title': 'Pol\u00edtica de Privacidad',

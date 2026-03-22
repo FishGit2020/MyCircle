@@ -136,25 +136,51 @@ export default function WebCrawler() {
           <div className="flex gap-4 items-center">
             <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               {t('webCrawler.maxDepth')}
-              <input
-                type="number"
-                min={1}
-                max={5}
-                value={maxDepth}
-                onChange={(e) => setMaxDepth(Number(e.target.value))}
-                className="w-16 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-              />
+              <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900">
+                <button
+                  type="button"
+                  onClick={() => setMaxDepth(Math.max(1, maxDepth - 1))}
+                  disabled={maxDepth <= 1}
+                  className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 rounded-l min-w-[32px] min-h-[32px]"
+                  aria-label="Decrease max depth"
+                >
+                  -
+                </button>
+                <span className="px-2 py-1 text-center min-w-[32px] text-gray-900 dark:text-white tabular-nums">{maxDepth}</span>
+                <button
+                  type="button"
+                  onClick={() => setMaxDepth(Math.min(5, maxDepth + 1))}
+                  disabled={maxDepth >= 5}
+                  className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 rounded-r min-w-[32px] min-h-[32px]"
+                  aria-label="Increase max depth"
+                >
+                  +
+                </button>
+              </div>
             </label>
             <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               {t('webCrawler.maxPages')}
-              <input
-                type="number"
-                min={1}
-                max={100}
-                value={maxPages}
-                onChange={(e) => setMaxPages(Number(e.target.value))}
-                className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-              />
+              <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900">
+                <button
+                  type="button"
+                  onClick={() => setMaxPages(Math.max(1, maxPages - 1))}
+                  disabled={maxPages <= 1}
+                  className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 rounded-l min-w-[32px] min-h-[32px]"
+                  aria-label="Decrease max pages"
+                >
+                  -
+                </button>
+                <span className="px-2 py-1 text-center min-w-[36px] text-gray-900 dark:text-white tabular-nums">{maxPages}</span>
+                <button
+                  type="button"
+                  onClick={() => setMaxPages(Math.min(100, maxPages + 1))}
+                  disabled={maxPages >= 100}
+                  className="px-2 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 rounded-r min-w-[32px] min-h-[32px]"
+                  aria-label="Increase max pages"
+                >
+                  +
+                </button>
+              </div>
             </label>
           </div>
 

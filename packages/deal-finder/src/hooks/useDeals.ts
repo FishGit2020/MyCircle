@@ -30,105 +30,6 @@ function saveCache(deals: Deal[]) {
   } catch { /* ignore */ }
 }
 
-// Demo deals used when the API is not configured yet
-const DEMO_DEALS: Deal[] = [
-  {
-    id: 'demo-1',
-    title: 'Sony WH-1000XM5 Wireless Noise Cancelling Headphones',
-    url: '#',
-    source: 'slickdeals',
-    price: '$248.00',
-    originalPrice: '$399.99',
-    store: 'Amazon',
-    category: 'electronics',
-    postedAt: new Date().toISOString(),
-    score: 245,
-  },
-  {
-    id: 'demo-2',
-    title: 'Costco Membership + $45 Digital Costco Shop Card',
-    url: '#',
-    source: 'slickdeals',
-    price: '$65.00',
-    store: 'Costco',
-    category: 'other',
-    postedAt: new Date(Date.now() - 3600000).toISOString(),
-    score: 189,
-  },
-  {
-    id: 'demo-3',
-    title: 'Apple AirPods Pro 2nd Gen USB-C',
-    url: '#',
-    source: 'dealnews',
-    price: '$169.99',
-    originalPrice: '$249.00',
-    store: 'Walmart',
-    category: 'electronics',
-    postedAt: new Date(Date.now() - 7200000).toISOString(),
-    score: 312,
-  },
-  {
-    id: 'demo-4',
-    title: 'KitchenAid Artisan 5-Quart Stand Mixer',
-    url: '#',
-    source: 'reddit',
-    price: '$279.99',
-    originalPrice: '$449.99',
-    store: 'Amazon',
-    category: 'home',
-    postedAt: new Date(Date.now() - 10800000).toISOString(),
-    score: 156,
-  },
-  {
-    id: 'demo-5',
-    title: 'Nintendo Switch OLED Bundle w/ Mario Kart 8',
-    url: '#',
-    source: 'reddit',
-    price: '$299.99',
-    originalPrice: '$349.99',
-    store: 'Target',
-    category: 'electronics',
-    postedAt: new Date(Date.now() - 14400000).toISOString(),
-    score: 198,
-  },
-  {
-    id: 'demo-6',
-    title: 'Dyson V15 Detect Cordless Vacuum',
-    url: '#',
-    source: 'dealnews',
-    price: '$449.99',
-    originalPrice: '$749.99',
-    store: 'Best Buy',
-    category: 'home',
-    postedAt: new Date(Date.now() - 18000000).toISOString(),
-    score: 267,
-  },
-  {
-    id: 'demo-7',
-    title: 'Levi\'s 501 Original Fit Jeans',
-    url: '#',
-    source: 'slickdeals',
-    price: '$29.99',
-    originalPrice: '$69.50',
-    store: 'Amazon',
-    category: 'fashion',
-    postedAt: new Date(Date.now() - 21600000).toISOString(),
-    score: 134,
-  },
-  {
-    id: 'demo-8',
-    title: 'Tide Pods 112-Count Laundry Detergent',
-    url: '#',
-    source: 'dealnews',
-    price: '$19.94',
-    originalPrice: '$31.99',
-    store: 'Walmart',
-    category: 'grocery',
-    postedAt: new Date(Date.now() - 25200000).toISOString(),
-    score: 89,
-  },
-];
-
 function mapGqlDeals(data: GetDealsQuery): Deal[] {
   return data.deals.map(d => ({
     id: d.id,
@@ -146,7 +47,7 @@ function mapGqlDeals(data: GetDealsQuery): Deal[] {
 }
 
 export function useDeals() {
-  const [deals, setDeals] = useState<Deal[]>(() => loadCache() || DEMO_DEALS);
+  const [deals, setDeals] = useState<Deal[]>(() => loadCache() || []);
   const [error, setError] = useState<string | null>(null);
 
   const { loading, refetch } = useQuery<GetDealsQuery>(GET_DEALS, {
@@ -158,12 +59,10 @@ export function useDeals() {
       setError(null);
     },
     onError: (err) => {
-      // If GraphQL fails, fall back to cache or demo deals
+      // If GraphQL fails, fall back to cache
       const cached = loadCache();
       if (cached) {
         setDeals(cached);
-      } else {
-        setDeals(DEMO_DEALS);
       }
       setError(err.message);
     },

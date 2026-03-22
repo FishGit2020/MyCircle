@@ -40,6 +40,7 @@ const zh: Record<TranslationKey, string> = {
   'search.noResultsHint': '\u8bf7\u5c1d\u8bd5\u5176\u4ed6\u641c\u7d22\u8bcd',
   'search.recentSearches': '\u6700\u8fd1\u641c\u7d22',
   'search.popularCities': '\u70ed\u95e8\u57ce\u5e02',
+  'search.searchHint': '\u641c\u7d22\u57ce\u5e02\uff0c\u4f8b\u5982 "New York"\u3001"London"\u3001"Tokyo"',
   'search.useMyLocation': '\u4f7f\u7528\u6211\u7684\u5f53\u524d\u4f4d\u7f6e',
   'search.gettingLocation': '\u6b63\u5728\u83b7\u53d6\u4f4d\u7f6e...',
   'search.geolocationNotSupported': '\u4e0d\u652f\u6301\u5730\u7406\u5b9a\u4f4d',
@@ -1904,6 +1905,11 @@ const zh: Record<TranslationKey, string> = {
   'games.anagramDesc': '\u91cd\u65b0\u6392\u5217\u5b57\u6bcd',
   'games.anagramRules': '\u901f\u5ea6\u8d8a\u5feb+\u63d0\u793a\u8d8a\u5c11=\u5206\u6570\u8d8a\u9ad8\u3002\u6bcf\u6b21\u63d0\u793a\u626330\u5206\u3002',
   'games.anagramHint': '\u63ed\u793a\u4e00\u4e2a\u5b57\u6bcd',
+  'games.dinoRun': '\u6050\u9f99\u5feb\u8dd1',
+  'games.dinoRunDesc': '\u5728\u8fd9\u4e2a\u65e0\u5c3d\u8dd1\u9177\u4e2d\u8df3\u8fc7\u969c\u788d\u7269',
+  'games.tapOrSpaceToStart': '\u70b9\u51fb\u6216\u6309\u7a7a\u683c\u952e\u5f00\u59cb',
+  'games.dinoControls': '\u7a7a\u683c/\u4e0a\u7bad\u5934\u8df3\u8dc3 \u00b7 \u4e0b\u7bad\u5934\u4e0b\u8e72 \u00b7 \u70b9\u51fb\u8df3\u8dc3',
+  'games.scoringDino': '\u6bcf\u51e0\u5e27+1\u5206\u3002\u901f\u5ea6\u968f\u65f6\u95f4\u589e\u52a0\u3002',
 
   // Privacy Policy
   'privacy.title': '\u9690\u79c1\u653f\u7b56',

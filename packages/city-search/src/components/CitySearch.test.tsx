@@ -334,12 +334,12 @@ describe('CitySearch', () => {
       expect(onClearRecents).toHaveBeenCalled();
     });
 
-    it('does not show "Clear all" when showing popular cities', () => {
+    it('does not show "Clear all" when showing search hint', () => {
       renderWithProviders(<CitySearch recentCities={[]} />);
       const input = screen.getByPlaceholderText('Search for a city...');
       fireEvent.focus(input);
 
-      expect(screen.getByText('Popular Cities')).toBeInTheDocument();
+      expect(screen.getByText(/Search for a city, e\.g\./)).toBeInTheDocument();
       expect(screen.queryByText('Clear all')).not.toBeInTheDocument();
     });
 
@@ -370,13 +370,12 @@ describe('CitySearch', () => {
       expect(onRemoveCity).toHaveBeenCalledWith('35.68,139.69');
     });
 
-    it('shows popular cities when no recents exist', () => {
+    it('shows search hint when no recents exist', () => {
       renderWithProviders(<CitySearch />);
       const input = screen.getByPlaceholderText('Search for a city...');
       fireEvent.focus(input);
 
-      expect(screen.getByText('Popular Cities')).toBeInTheDocument();
-      expect(screen.getByText('New York')).toBeInTheDocument();
+      expect(screen.getByText(/Search for a city, e\.g\./)).toBeInTheDocument();
     });
   });
 

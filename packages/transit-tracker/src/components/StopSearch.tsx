@@ -13,7 +13,7 @@ interface StopSearchProps {
   nearbyStops: NearbyStop[];
   nearbyLoading: boolean;
   nearbyError: string | null;
-  onFindNearby: () => void;
+  onFindNearby: (coords?: { lat: number; lon: number }) => void;
   recentStops: string[];
   favorites: FavoriteStop[];
   onToggleFavorite: (stop: { stopId: string; stopName: string; direction: string; routes: string[] }) => void;
