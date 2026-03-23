@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.8.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.8.1...mycircle-v1.8.2) (2026-03-23)
+
+
+### Bug Fixes
+
+* **transit:** fix Find Nearby button and add fuzzy stop search ([#825](https://github.com/FishGit2020/MyCircle/issues/825)) ([2a2948e](https://github.com/FishGit2020/MyCircle/commit/2a2948e7a93bca5b7601c16aaf408e0b5f5cb59b))
+
+
+### Miscellaneous
+
+* **deps:** bump the minor-and-patch group in /functions with 2 updates ([#821](https://github.com/FishGit2020/MyCircle/issues/821)) ([979390a](https://github.com/FishGit2020/MyCircle/commit/979390a3a07365c8e3f52a591c9cfa3488f196ca))
+
 ## [1.8.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.8.0...mycircle-v1.8.1) (2026-03-22)
 
 
