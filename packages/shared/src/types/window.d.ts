@@ -98,15 +98,6 @@ declare global {
       upload: (stageId: number, file: Blob, caption?: string) => Promise<string>;
     };
 
-    /* ── Journal Photos ────────────────────────────────────── */
-    /* NOTE: Metadata is stored via GraphQL (addJournalPhoto). Only upload is REST. */
-    __journalPhotos?: {
-      upload: (
-        file: Blob,
-        options?: { childId?: string | null; caption?: string | null; photoDate?: string | null },
-      ) => Promise<{ photoUrl: string; storagePath: string; photoId: string }>;
-    };
-
     /* ── Children (multi-child) ────────────────────────────── */
     __children?: {
       getAll: () => Promise<Array<import('./child').Child>>;

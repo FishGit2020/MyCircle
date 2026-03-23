@@ -156,9 +156,6 @@ export const StorageKeys = {
   TRANSIT_RECENT_STOPS: 'transit-recent-stops',
   TRANSIT_FAVORITES: 'transit-favorites',
   TRAVEL_PINS: 'travel-pins-cache',
-  BABY_EVENTS_EXPANDED: 'baby_events_expanded',
-  BABY_PHOTOS_EXPANDED: 'baby_photos_expanded',
-  BABY_MILESTONES_EXPANDED: 'baby_milestones_expanded',
 } as const;
 
 export interface CitySelectedEvent {

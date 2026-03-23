@@ -467,29 +467,6 @@ export type HourlyForecast = {
   wind_speed: Scalars['Float']['output'];
 };
 
-export type InfantAchievement = {
-  __typename?: 'InfantAchievement';
-  achievedDate: Scalars['String']['output'];
-  childId: Scalars['String']['output'];
-  createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  milestoneId: Scalars['String']['output'];
-  note?: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['String']['output'];
-};
-
-export type InfantAchievementInput = {
-  achievedDate: Scalars['String']['input'];
-  childId: Scalars['String']['input'];
-  milestoneId: Scalars['String']['input'];
-  note?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type InfantAchievementUpdateInput = {
-  achievedDate?: InputMaybe<Scalars['String']['input']>;
-  note?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type InterviewQuestion = {
   __typename?: 'InterviewQuestion';
   chapter: Scalars['String']['output'];
@@ -525,27 +502,6 @@ export type InterviewSessionSummary = {
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
 
-export type JournalPhoto = {
-  __typename?: 'JournalPhoto';
-  caption?: Maybe<Scalars['String']['output']>;
-  childId?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  photoDate: Scalars['String']['output'];
-  photoUrl: Scalars['String']['output'];
-  stageLabel?: Maybe<Scalars['String']['output']>;
-  storagePath: Scalars['String']['output'];
-};
-
-export type JournalPhotoInput = {
-  caption?: InputMaybe<Scalars['String']['input']>;
-  childId?: InputMaybe<Scalars['String']['input']>;
-  photoDate: Scalars['String']['input'];
-  photoUrl: Scalars['String']['input'];
-  stageLabel?: InputMaybe<Scalars['String']['input']>;
-  storagePath: Scalars['String']['input'];
-};
-
 export type LocationSearchResult = {
   __typename?: 'LocationSearchResult';
   displayName: Scalars['String']['output'];
@@ -553,35 +509,8 @@ export type LocationSearchResult = {
   lon: Scalars['Float']['output'];
 };
 
-export type MilestoneEvent = {
-  __typename?: 'MilestoneEvent';
-  childId?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['String']['output'];
-  eventDate: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  note?: Maybe<Scalars['String']['output']>;
-  title: Scalars['String']['output'];
-  updatedAt: Scalars['String']['output'];
-};
-
-export type MilestoneEventInput = {
-  childId?: InputMaybe<Scalars['String']['input']>;
-  eventDate: Scalars['String']['input'];
-  note?: InputMaybe<Scalars['String']['input']>;
-  title: Scalars['String']['input'];
-};
-
-export type MilestoneEventUpdateInput = {
-  eventDate?: InputMaybe<Scalars['String']['input']>;
-  note?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
-  addInfantAchievement: InfantAchievement;
-  addJournalPhoto: JournalPhoto;
-  addMilestoneEvent: MilestoneEvent;
   addNote: Note;
   addWorshipSetlist: Setlist;
   addWorshipSong: WorshipSong;
@@ -594,11 +523,8 @@ export type Mutation = {
   deleteBook: Scalars['Boolean']['output'];
   deleteCrawlJob: Scalars['Boolean']['output'];
   deleteFile: Scalars['Boolean']['output'];
-  deleteInfantAchievement: Scalars['Boolean']['output'];
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
-  deleteJournalPhoto: Scalars['Boolean']['output'];
-  deleteMilestoneEvent: Scalars['Boolean']['output'];
   deleteNote: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
   deleteWorshipSetlist: Scalars['Boolean']['output'];
@@ -613,27 +539,10 @@ export type Mutation = {
   shareFile: ShareFileResult;
   startCrawl: CrawlJob;
   stopCrawl: CrawlJob;
-  updateInfantAchievement: InfantAchievement;
   updateInterviewQuestion: InterviewQuestion;
-  updateMilestoneEvent: MilestoneEvent;
   updateNote: Note;
   updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
-};
-
-
-export type MutationAddInfantAchievementArgs = {
-  input: InfantAchievementInput;
-};
-
-
-export type MutationAddJournalPhotoArgs = {
-  input: JournalPhotoInput;
-};
-
-
-export type MutationAddMilestoneEventArgs = {
-  input: MilestoneEventInput;
 };
 
 
@@ -703,27 +612,12 @@ export type MutationDeleteFileArgs = {
 };
 
 
-export type MutationDeleteInfantAchievementArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type MutationDeleteInterviewQuestionArgs = {
   id: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteInterviewSessionArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteJournalPhotoArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMilestoneEventArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -804,21 +698,9 @@ export type MutationStopCrawlArgs = {
 };
 
 
-export type MutationUpdateInfantAchievementArgs = {
-  id: Scalars['ID']['input'];
-  input: InfantAchievementUpdateInput;
-};
-
-
 export type MutationUpdateInterviewQuestionArgs = {
   id: Scalars['ID']['input'];
   input: UpdateInterviewQuestionInput;
-};
-
-
-export type MutationUpdateMilestoneEventArgs = {
-  id: Scalars['ID']['input'];
-  input: MilestoneEventUpdateInput;
 };
 
 
@@ -945,12 +827,9 @@ export type Query = {
   forecast: Array<ForecastDay>;
   historicalWeather?: Maybe<HistoricalWeatherDay>;
   hourlyForecast: Array<HourlyForecast>;
-  infantAchievements: Array<InfantAchievement>;
   interviewSession?: Maybe<InterviewSessionDetail>;
   interviewSessions: Array<InterviewSessionSummary>;
-  journalPhotos: Array<JournalPhoto>;
   locationSearch: Array<LocationSearchResult>;
-  milestoneEvents: Array<MilestoneEvent>;
   notes: Array<Note>;
   ollamaModels: Array<Scalars['String']['output']>;
   ollamaStatus: OllamaStatus;
@@ -1088,31 +967,14 @@ export type QueryHourlyForecastArgs = {
 };
 
 
-export type QueryInfantAchievementsArgs = {
-  childId: Scalars['String']['input'];
-};
-
-
 export type QueryInterviewSessionArgs = {
   id: Scalars['ID']['input'];
-};
-
-
-export type QueryJournalPhotosArgs = {
-  childId?: InputMaybe<Scalars['String']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryLocationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
-};
-
-
-export type QueryMilestoneEventsArgs = {
-  childId?: InputMaybe<Scalars['String']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2174,90 +2036,3 @@ export type CalcRouteQueryVariables = Exact<{
 
 
 export type CalcRouteQuery = { __typename?: 'Query', calcRoute?: { __typename?: 'RouteResult', coordinates: Array<Array<number>>, distance: number, duration: number } | null };
-
-export type MilestoneEventFieldsFragment = { __typename?: 'MilestoneEvent', id: string, childId?: string | null, title: string, eventDate: string, note?: string | null, createdAt: string, updatedAt: string };
-
-export type GetMilestoneEventsQueryVariables = Exact<{
-  childId?: InputMaybe<Scalars['String']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type GetMilestoneEventsQuery = { __typename?: 'Query', milestoneEvents: Array<{ __typename?: 'MilestoneEvent', id: string, childId?: string | null, title: string, eventDate: string, note?: string | null, createdAt: string, updatedAt: string }> };
-
-export type AddMilestoneEventMutationVariables = Exact<{
-  input: MilestoneEventInput;
-}>;
-
-
-export type AddMilestoneEventMutation = { __typename?: 'Mutation', addMilestoneEvent: { __typename?: 'MilestoneEvent', id: string, childId?: string | null, title: string, eventDate: string, note?: string | null, createdAt: string, updatedAt: string } };
-
-export type UpdateMilestoneEventMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: MilestoneEventUpdateInput;
-}>;
-
-
-export type UpdateMilestoneEventMutation = { __typename?: 'Mutation', updateMilestoneEvent: { __typename?: 'MilestoneEvent', id: string, childId?: string | null, title: string, eventDate: string, note?: string | null, createdAt: string, updatedAt: string } };
-
-export type DeleteMilestoneEventMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteMilestoneEventMutation = { __typename?: 'Mutation', deleteMilestoneEvent: boolean };
-
-export type JournalPhotoFieldsFragment = { __typename?: 'JournalPhoto', id: string, childId?: string | null, photoUrl: string, storagePath: string, caption?: string | null, stageLabel?: string | null, photoDate: string, createdAt: string };
-
-export type GetJournalPhotosQueryVariables = Exact<{
-  childId?: InputMaybe<Scalars['String']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type GetJournalPhotosQuery = { __typename?: 'Query', journalPhotos: Array<{ __typename?: 'JournalPhoto', id: string, childId?: string | null, photoUrl: string, storagePath: string, caption?: string | null, stageLabel?: string | null, photoDate: string, createdAt: string }> };
-
-export type AddJournalPhotoMutationVariables = Exact<{
-  input: JournalPhotoInput;
-}>;
-
-
-export type AddJournalPhotoMutation = { __typename?: 'Mutation', addJournalPhoto: { __typename?: 'JournalPhoto', id: string, childId?: string | null, photoUrl: string, storagePath: string, caption?: string | null, stageLabel?: string | null, photoDate: string, createdAt: string } };
-
-export type DeleteJournalPhotoMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteJournalPhotoMutation = { __typename?: 'Mutation', deleteJournalPhoto: boolean };
-
-export type InfantAchievementFieldsFragment = { __typename?: 'InfantAchievement', id: string, childId: string, milestoneId: string, achievedDate: string, note?: string | null, createdAt: string, updatedAt: string };
-
-export type GetInfantAchievementsQueryVariables = Exact<{
-  childId: Scalars['String']['input'];
-}>;
-
-
-export type GetInfantAchievementsQuery = { __typename?: 'Query', infantAchievements: Array<{ __typename?: 'InfantAchievement', id: string, childId: string, milestoneId: string, achievedDate: string, note?: string | null, createdAt: string, updatedAt: string }> };
-
-export type AddInfantAchievementMutationVariables = Exact<{
-  input: InfantAchievementInput;
-}>;
-
-
-export type AddInfantAchievementMutation = { __typename?: 'Mutation', addInfantAchievement: { __typename?: 'InfantAchievement', id: string, childId: string, milestoneId: string, achievedDate: string, note?: string | null, createdAt: string, updatedAt: string } };
-
-export type UpdateInfantAchievementMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: InfantAchievementUpdateInput;
-}>;
-
-
-export type UpdateInfantAchievementMutation = { __typename?: 'Mutation', updateInfantAchievement: { __typename?: 'InfantAchievement', id: string, childId: string, milestoneId: string, achievedDate: string, note?: string | null, createdAt: string, updatedAt: string } };
-
-export type DeleteInfantAchievementMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteInfantAchievementMutation = { __typename?: 'Mutation', deleteInfantAchievement: boolean };
