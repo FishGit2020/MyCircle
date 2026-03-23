@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.8.0...mycircle-v1.8.1) (2026-03-22)
+
+
+### Bug Fixes
+
+* **shell:** add Deal Finder to Quick Access tiles ([#819](https://github.com/FishGit2020/MyCircle/issues/819)) ([ffd7a7c](https://github.com/FishGit2020/MyCircle/commit/ffd7a7ce0fe9c7e096cdb0f3f890c2545e675780))
+
 ## [1.8.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.7.0...mycircle-v1.8.0) (2026-03-22)
 
 
