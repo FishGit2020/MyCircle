@@ -2473,6 +2473,7 @@ const es: Record<TranslationKey, string> = {
   'transit.subtitle': 'Tiempos de llegada de autob\u00fas en tiempo real',
   'transit.search': 'Buscar',
   'transit.stopIdPlaceholder': 'Ingrese ID de parada (ej. 1_75403)',
+  'transit.stopSearchPlaceholder': 'Buscar por nombre o ID de parada...',
   'transit.findNearby': 'Buscar paradas cercanas',
   'transit.findingNearby': 'Buscando paradas cercanas...',
   'transit.nearbyStops': 'Paradas Cercanas',

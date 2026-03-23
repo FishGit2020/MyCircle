@@ -2473,6 +2473,7 @@ const en = {
   'transit.subtitle': 'Real-time bus arrival times',
   'transit.search': 'Search',
   'transit.stopIdPlaceholder': 'Enter stop ID (e.g. 1_75403)',
+  'transit.stopSearchPlaceholder': 'Search by stop name or ID...',
   'transit.findNearby': 'Find nearby stops',
   'transit.findingNearby': 'Finding nearby stops...',
   'transit.nearbyStops': 'Nearby Stops',

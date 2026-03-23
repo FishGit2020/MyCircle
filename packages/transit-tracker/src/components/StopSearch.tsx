@@ -33,29 +33,55 @@ export default function StopSearch({
   const [inputValue, setInputValue] = useState('');
   const loggedIn = useMemo(() => isLoggedIn(), []);
 
+  // Fuzzy filter nearby stops and favorites by typed text
+  const query = inputValue.trim().toLowerCase();
+  const filteredNearby = useMemo(() => {
+    if (!query) return nearbyStops;
+    return nearbyStops.filter(s =>
+      s.name.toLowerCase().includes(query) ||
+      s.id.toLowerCase().includes(query) ||
+      s.direction.toLowerCase().includes(query)
+    );
+  }, [nearbyStops, query]);
+
+  const filteredFavorites = useMemo(() => {
+    if (!query) return favorites;
+    return favorites.filter(f =>
+      f.stopName.toLowerCase().includes(query) ||
+      f.stopId.toLowerCase().includes(query) ||
+      f.direction.toLowerCase().includes(query)
+    );
+  }, [favorites, query]);
+
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       const trimmed = inputValue.trim();
-      if (trimmed) {
-        onSelectStop(trimmed);
-      }
+      if (!trimmed) return;
+      // If input matches a nearby stop name, select it
+      const matchedNearby = nearbyStops.find(s => s.name.toLowerCase() === trimmed.toLowerCase());
+      if (matchedNearby) { onSelectStop(matchedNearby.id); return; }
+      // If input matches a favorite stop name, select it
+      const matchedFav = favorites.find(f => f.stopName.toLowerCase() === trimmed.toLowerCase());
+      if (matchedFav) { onSelectStop(matchedFav.stopId); return; }
+      // Otherwise treat as stop ID
+      onSelectStop(trimmed);
     },
-    [inputValue, onSelectStop]
+    [inputValue, onSelectStop, nearbyStops, favorites]
   );
 
   return (
     <div className="space-y-4">
-      {/* Stop ID input */}
+      {/* Stop search input */}
       <form onSubmit={handleSubmit}>
         <div className="flex gap-2">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={t('transit.stopIdPlaceholder')}
+            placeholder={t('transit.stopSearchPlaceholder' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
             className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-teal-400 dark:focus:ring-teal-400"
-            aria-label={t('transit.stopIdPlaceholder')}
+            aria-label={t('transit.stopSearchPlaceholder' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
           />
           <button
             type="submit"
@@ -70,7 +96,7 @@ export default function StopSearch({
       {/* Find nearby button */}
       <button
         type="button"
-        onClick={onFindNearby}
+        onClick={() => onFindNearby()}
         disabled={nearbyLoading}
         className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
         aria-label={t('transit.findNearby')}
@@ -87,13 +113,13 @@ export default function StopSearch({
       )}
 
       {/* Nearby stops list */}
-      {nearbyStops.length > 0 && (
+      {filteredNearby.length > 0 && (
         <div>
           <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('transit.nearbyStops')}
           </h3>
           <ul className="space-y-1">
-            {nearbyStops.map((stop) => (
+            {filteredNearby.map((stop) => (
               <li key={stop.id} className="flex items-center">
                 <button
                   type="button"
@@ -135,13 +161,13 @@ export default function StopSearch({
       )}
 
       {/* Favorite stops — only show when logged in */}
-      {loggedIn && favorites.length > 0 && (
+      {loggedIn && filteredFavorites.length > 0 && (
         <div>
           <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('transit.favorites')}
           </h3>
           <ul className="space-y-1">
-            {favorites.map((fav) => (
+            {filteredFavorites.map((fav) => (
               <li key={fav.stopId} className="flex items-center">
                 <button
                   type="button"
