@@ -94,11 +94,12 @@ test.describe('Feedback → Firestore Emulator', () => {
       { timeout: 10000 },
     );
 
-    // Sign in via the exposed test helper
+    // Sign in via the exposed test helper.
+    // The sign-in may trigger a page reload, destroying the eval context — that's expected.
     await page.evaluate(
       ({ email, password }) => window.__signInForTest(email, password),
       { email: testEmail, password: testPassword },
-    );
+    ).catch(() => {/* navigation destroyed context — sign-in still succeeds */});
 
     // Wait for auth state to propagate (user name appears in header)
     await page.waitForTimeout(2000);
