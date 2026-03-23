@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.9.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.8.2...mycircle-v1.9.0) (2026-03-23)
+
+
+### Features
+
+* **baby-tracker:** add pregnancy milestone log, photo album, and infant milestone tracking ([#829](https://github.com/FishGit2020/MyCircle/issues/829)) ([bf99583](https://github.com/FishGit2020/MyCircle/commit/bf99583952a4fc791ab78dbbd1122babd6c853df))
+* **dino-game:** add explicit jump and duck buttons below canvas ([#828](https://github.com/FishGit2020/MyCircle/issues/828)) ([002e4ab](https://github.com/FishGit2020/MyCircle/commit/002e4ab27f31ec78f331d3aa6a2ad2d494a65dce))
+
+
+### Documentation
+
+* add active technologies for worship-songs, personal-notes, baby-photo-journal ([#826](https://github.com/FishGit2020/MyCircle/issues/826)) ([b98f3d4](https://github.com/FishGit2020/MyCircle/commit/b98f3d4c8c7ca3ab714893a20f2ac484927358d8))
+
 ## [1.8.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.8.1...mycircle-v1.8.2) (2026-03-23)
 
 
