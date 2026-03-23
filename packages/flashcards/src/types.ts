@@ -1,4 +1,4 @@
-export type CardType = 'chinese' | 'english' | 'bible-first-letter' | 'bible-full' | 'custom';
+export type CardType = 'chinese' | 'english' | 'bible-first-letter' | 'bible-full' | 'custom' | 'technique';
 
 export interface FlashCard {
   id: string;

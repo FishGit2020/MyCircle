@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { FlashCard, FlashCardProgress, CardType, VisibilityFilter } from '../types';
 import { phrases } from '../data/phrases';
+import { TECHNIQUE_CARDS } from '../data/techniques';
 
 const log = createLogger('flashcards');
 
@@ -297,7 +298,7 @@ export function useFlashCards() {
 
   // Apply visibility filter
   const allCards = useMemo(() => {
-    const combined = [...privateCards, ...ENGLISH_PHRASES, ...publicCardsFiltered];
+    const combined = [...privateCards, ...ENGLISH_PHRASES, ...TECHNIQUE_CARDS, ...publicCardsFiltered];
     if (visibilityFilter === 'all') return combined;
     if (visibilityFilter === 'private') return combined.filter(c => !c.isPublic);
     // 'published' — only public cards

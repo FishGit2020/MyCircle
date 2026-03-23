@@ -1496,6 +1496,7 @@ const es: Record<TranslationKey, string> = {
   'flashcards.cardType': 'Tipo de Tarjeta',
   'flashcards.chinese': 'Chino',
   'flashcards.english': 'Ingl\u00e9s',
+  'flashcards.technique': 'T\u00e9cnica',
   'flashcards.bible': 'Biblia',
   'flashcards.custom': 'Personalizada',
   'flashcards.resetProgress': 'Restablecer Progreso',

@@ -1496,6 +1496,7 @@ const zh: Record<TranslationKey, string> = {
   'flashcards.cardType': '\u5361\u7247\u7c7b\u578b',
   'flashcards.chinese': '\u4e2d\u6587',
   'flashcards.english': '\u82f1\u6587',
+  'flashcards.technique': '\u6280\u5de7',
   'flashcards.bible': '\u5723\u7ecf',
   'flashcards.custom': '\u81ea\u5b9a\u4e49',
   'flashcards.resetProgress': '\u91cd\u7f6e\u8fdb\u5ea6',

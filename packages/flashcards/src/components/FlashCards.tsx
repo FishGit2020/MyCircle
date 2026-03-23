@@ -18,6 +18,7 @@ const TYPE_LABELS: Record<CardType, string> = {
   'bible-first-letter': 'flashcards.bibleFirstLetter',
   'bible-full': 'flashcards.bibleFull',
   custom: 'flashcards.custom',
+  technique: 'flashcards.technique',
 };
 
 const VISIBILITY_OPTIONS: { value: VisibilityFilter; labelKey: string }[] = [

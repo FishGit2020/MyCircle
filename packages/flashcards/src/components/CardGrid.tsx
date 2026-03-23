@@ -14,11 +14,11 @@ interface CardGridProps {
 }
 
 function canDelete(card: FlashCard): boolean {
-  return card.type !== 'english';
+  return card.type !== 'english' && card.type !== 'technique';
 }
 
 function canEdit(card: FlashCard): boolean {
-  return card.type !== 'english';
+  return card.type !== 'english' && card.type !== 'technique';
 }
 
 function canPublish(card: FlashCard): boolean {

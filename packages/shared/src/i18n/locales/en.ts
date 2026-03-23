@@ -1494,6 +1494,7 @@ const en = {
   'flashcards.cardType': 'Card Type',
   'flashcards.chinese': 'Chinese',
   'flashcards.english': 'English',
+  'flashcards.technique': 'Technique',
   'flashcards.bible': 'Bible',
   'flashcards.custom': 'Custom',
   'flashcards.resetProgress': 'Reset Progress',
