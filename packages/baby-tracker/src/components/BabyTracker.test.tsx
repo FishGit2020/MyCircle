@@ -45,11 +45,18 @@ vi.mock('@mycircle/shared', () => ({
       {onAdd && <button type="button" onClick={onAdd} data-testid="child-selector-add">add-baby</button>}
     </div>
   ),
-  // Apollo hooks (used by useBabyPhotos)
+  // Apollo hooks
   useQuery: () => ({ data: undefined, loading: false, refetch: vi.fn() }),
   useMutation: () => [vi.fn().mockResolvedValue({})],
   GET_BABY_PHOTOS: {},
   DELETE_BABY_PHOTO: {},
+  GET_MILESTONE_EVENTS: {},
+  ADD_MILESTONE_EVENT: {},
+  UPDATE_MILESTONE_EVENT: {},
+  DELETE_MILESTONE_EVENT: {},
+  GET_JOURNAL_PHOTOS: {},
+  ADD_JOURNAL_PHOTO: {},
+  DELETE_JOURNAL_PHOTO: {},
 }));
 
 vi.mock('react-router', () => ({

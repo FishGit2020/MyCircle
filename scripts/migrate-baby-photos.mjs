@@ -16,7 +16,7 @@
  *   with Firestore read/write access.
  */
 
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, cert, applicationDefault } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { randomUUID } from 'crypto';
 
@@ -35,7 +35,10 @@ const STAGE_LABELS = {
 };
 
 initializeApp({
-  credential: cert(process.env.GOOGLE_APPLICATION_CREDENTIALS ?? ''),
+  credential: process.env.GOOGLE_APPLICATION_CREDENTIALS
+    ? cert(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+    : applicationDefault(),
+  projectId: 'mycircle-dash',
 });
 
 const db = getFirestore();

@@ -40,7 +40,7 @@ export function useJournalPhotos({ childId }: UseJournalPhotosOptions = {}) {
 
   const upload = async (
     file: Blob,
-    options?: { caption?: string | null; photoDate?: string | null },
+    options?: { caption?: string | null; photoDate?: string | null; stageLabel?: string | null },
   ) => {
     if (!window.__journalPhotos) {
       throw new Error('Journal photos API not available');
@@ -61,7 +61,7 @@ export function useJournalPhotos({ childId }: UseJournalPhotosOptions = {}) {
             photoUrl: result.photoUrl,
             storagePath: result.storagePath,
             caption: options?.caption ?? null,
-            stageLabel: null,
+            stageLabel: options?.stageLabel ?? null,
             photoDate: options?.photoDate ?? new Date().toISOString().substring(0, 10),
           },
         },
