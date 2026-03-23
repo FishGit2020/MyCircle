@@ -889,6 +889,7 @@ export const GET_BABY_PHOTOS = gql`
   query GetBabyPhotos {
     babyPhotos {
       stageId
+      photoId
       photoUrl
       caption
       uploadedAt
@@ -897,8 +898,23 @@ export const GET_BABY_PHOTOS = gql`
 `;
 
 export const DELETE_BABY_PHOTO = gql`
-  mutation DeleteBabyPhoto($stageId: Int!) {
-    deleteBabyPhoto(stageId: $stageId)
+  mutation DeleteBabyPhoto($stageId: Int!, $photoId: String!) {
+    deleteBabyPhoto(stageId: $stageId, photoId: $photoId)
+  }
+`;
+
+export const GET_BABY_MILESTONE_NOTES = gql`
+  query GetBabyMilestoneNotes {
+    babyMilestoneNotes {
+      stageId
+      notes
+    }
+  }
+`;
+
+export const SAVE_BABY_MILESTONE_NOTES = gql`
+  mutation SaveBabyMilestoneNotes($stageId: Int!, $notes: String!) {
+    saveBabyMilestoneNotes(stageId: $stageId, notes: $notes)
   }
 `;
 

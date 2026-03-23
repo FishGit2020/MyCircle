@@ -1045,6 +1045,12 @@ const en = {
   'baby.cancel': 'Cancel',
   'baby.uploadFailed': 'Upload failed. Please try again.',
   'baby.tryAgain': 'Try again',
+  'baby.addAnotherPhoto': 'Add Another Photo',
+  'baby.notes': 'Stage notes',
+  'baby.notesPlaceholder': 'Add notes about this stage...',
+  'baby.saveNotes': 'Save',
+  'baby.saving': 'Saving...',
+  'baby.notesSaved': 'Notes saved',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Keyboard Shortcuts',

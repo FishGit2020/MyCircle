@@ -1047,6 +1047,12 @@ const zh: Record<TranslationKey, string> = {
   'baby.cancel': '\u53d6\u6d88',
   'baby.uploadFailed': '\u4e0a\u4f20\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002',
   'baby.tryAgain': '\u91cd\u8bd5',
+  'baby.addAnotherPhoto': '\u518d\u6dfb\u52a0\u7167\u7247',
+  'baby.notes': '\u9636\u6bb5\u5907\u6ce8',
+  'baby.notesPlaceholder': '\u6dfb\u52a0\u6b64\u9636\u6bb5\u7684\u5907\u6ce8\u2026',
+  'baby.saveNotes': '\u4fdd\u5b58',
+  'baby.saving': '\u4fdd\u5b58\u4e2d\u2026',
+  'baby.notesSaved': '\u5907\u6ce8\u5df2\u4fdd\u5b58',
 
   // Keyboard Shortcuts
   'shortcuts.title': '\u952e\u76d8\u5feb\u6377\u952e',

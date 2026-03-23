@@ -50,6 +50,8 @@ vi.mock('@mycircle/shared', () => ({
   useMutation: () => [vi.fn().mockResolvedValue({})],
   GET_BABY_PHOTOS: {},
   DELETE_BABY_PHOTO: {},
+  GET_BABY_MILESTONE_NOTES: {},
+  SAVE_BABY_MILESTONE_NOTES: {},
 }));
 
 vi.mock('react-router', () => ({

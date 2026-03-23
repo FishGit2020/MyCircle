@@ -4,19 +4,36 @@ import { useBabyPhotos } from './useBabyPhotos';
 
 // Apollo mock state
 let mockBabyPhotosData: any = undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
+let mockNotesData: any = undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
 let mockQueryLoading = false;
 const mockRefetch = vi.fn().mockResolvedValue({});
+const mockRefetchNotes = vi.fn().mockResolvedValue({});
 const mockDeleteMutation = vi.fn().mockResolvedValue({});
+const mockSaveNotesMutation = vi.fn().mockResolvedValue({});
+
+// Track which query is being called
+let queryCallCount = 0;
+let mutationCallCount = 0;
 
 vi.mock('@mycircle/shared', () => ({
-  useQuery: () => ({ data: mockBabyPhotosData, loading: mockQueryLoading, refetch: mockRefetch }),
-  useMutation: () => [mockDeleteMutation],
+  useQuery: (_doc: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const isNotesQuery = queryCallCount++ % 2 === 1;
+    return isNotesQuery
+      ? { data: mockNotesData, loading: mockQueryLoading, refetch: mockRefetchNotes }
+      : { data: mockBabyPhotosData, loading: mockQueryLoading, refetch: mockRefetch };
+  },
+  useMutation: () => {
+    const isSaveNotes = mutationCallCount++ % 2 === 1;
+    return isSaveNotes ? [mockSaveNotesMutation] : [mockDeleteMutation];
+  },
   WindowEvents: {
     BABY_MILESTONES_CHANGED: 'baby-milestones-changed',
   },
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
   GET_BABY_PHOTOS: {},
   DELETE_BABY_PHOTO: {},
+  GET_BABY_MILESTONE_NOTES: {},
+  SAVE_BABY_MILESTONE_NOTES: {},
 }));
 
 vi.mock('../utils/compressImage', () => ({
@@ -24,14 +41,18 @@ vi.mock('../utils/compressImage', () => ({
 }));
 
 const mockGqlPhotos = [
-  { stageId: 5, photoUrl: 'https://example.com/5.jpg', caption: 'Week 5', uploadedAt: new Date().toISOString() },
-  { stageId: 10, photoUrl: 'https://example.com/10.jpg', caption: null, uploadedAt: new Date().toISOString() },
+  { stageId: 5, photoId: 'photo-a', photoUrl: 'https://example.com/5a.jpg', caption: 'Week 5', uploadedAt: new Date().toISOString() },
+  { stageId: 5, photoId: 'photo-b', photoUrl: 'https://example.com/5b.jpg', caption: null, uploadedAt: new Date().toISOString() },
+  { stageId: 10, photoId: 'photo-c', photoUrl: 'https://example.com/10.jpg', caption: null, uploadedAt: new Date().toISOString() },
 ];
 
 describe('useBabyPhotos', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    queryCallCount = 0;
+    mutationCallCount = 0;
     mockBabyPhotosData = undefined;
+    mockNotesData = undefined;
     mockQueryLoading = false;
     delete window.__babyPhotos;
     delete window.__getFirebaseIdToken;
@@ -61,12 +82,21 @@ describe('useBabyPhotos', () => {
     await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
   });
 
-  it('builds photos map from GraphQL data', () => {
+  it('builds photos map with arrays from GraphQL data', () => {
     mockBabyPhotosData = { babyPhotos: mockGqlPhotos };
     const { result } = renderHook(() => useBabyPhotos());
     expect(result.current.photos.size).toBe(2);
-    expect(result.current.photos.get(5)).toEqual({ photoUrl: 'https://example.com/5.jpg', caption: 'Week 5' });
-    expect(result.current.photos.get(10)).toEqual({ photoUrl: 'https://example.com/10.jpg', caption: undefined });
+    const stage5 = result.current.photos.get(5);
+    expect(stage5).toHaveLength(2);
+    expect(stage5?.[0]).toEqual({ photoId: 'photo-a', photoUrl: 'https://example.com/5a.jpg', caption: 'Week 5' });
+    expect(stage5?.[1]).toEqual({ photoId: 'photo-b', photoUrl: 'https://example.com/5b.jpg', caption: undefined });
+    expect(result.current.photos.get(10)).toHaveLength(1);
+  });
+
+  it('builds notes map from GraphQL data', () => {
+    mockNotesData = { babyMilestoneNotes: [{ stageId: 3, notes: 'Some notes' }] };
+    const { result } = renderHook(() => useBabyPhotos());
+    expect(result.current.notes.get(3)).toBe('Some notes');
   });
 
   it('shows loading when query is loading', () => {
@@ -94,7 +124,7 @@ describe('useBabyPhotos', () => {
     expect(window.__logAnalyticsEvent).toHaveBeenCalledWith('baby_milestone_photo_upload', { stageId: 5 });
   });
 
-  it('sets uploading stageId during upload', async () => {
+  it('isUploading returns true during upload for that stageId', async () => {
     let resolveUpload: (val: string) => void;
     const uploadFn = vi.fn().mockImplementation(
       () => new Promise<string>((resolve) => { resolveUpload = resolve; })
@@ -111,14 +141,15 @@ describe('useBabyPhotos', () => {
       uploadPromise = result.current.uploadPhoto(5, file);
     });
 
-    await waitFor(() => expect(result.current.uploading).toBe(5));
+    await waitFor(() => expect(result.current.isUploading(5)).toBe(true));
+    expect(result.current.isUploading(3)).toBe(false);
 
     await act(async () => {
       resolveUpload!('https://example.com/new.jpg');
       await uploadPromise!;
     });
 
-    expect(result.current.uploading).toBeNull();
+    expect(result.current.isUploading(5)).toBe(false);
   });
 
   it('sets error on upload failure', async () => {
@@ -138,7 +169,7 @@ describe('useBabyPhotos', () => {
 
     expect(result.current.error).toBe('Upload failed');
     expect(result.current.errorStageId).toBe(5);
-    expect(result.current.uploading).toBeNull();
+    expect(result.current.isUploading(5)).toBe(false);
     vi.restoreAllMocks();
   });
 
@@ -164,22 +195,33 @@ describe('useBabyPhotos', () => {
     vi.restoreAllMocks();
   });
 
-  it('deletePhoto calls mutation and dispatches event', async () => {
+  it('deletePhoto calls mutation with stageId and photoId', async () => {
     window.__logAnalyticsEvent = vi.fn();
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
     const { result } = renderHook(() => useBabyPhotos());
 
     await act(async () => {
-      await result.current.deletePhoto(5);
+      await result.current.deletePhoto(5, 'photo-a');
     });
 
-    expect(mockDeleteMutation).toHaveBeenCalledWith({ variables: { stageId: 5 } });
+    expect(mockDeleteMutation).toHaveBeenCalledWith({ variables: { stageId: 5, photoId: 'photo-a' } });
     expect(dispatchSpy).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'baby-milestones-changed' })
     );
     expect(window.__logAnalyticsEvent).toHaveBeenCalledWith('baby_milestone_photo_delete', { stageId: 5 });
     dispatchSpy.mockRestore();
+  });
+
+  it('saveNotes calls mutation and refetches notes', async () => {
+    const { result } = renderHook(() => useBabyPhotos());
+
+    await act(async () => {
+      await result.current.saveNotes(3, 'Great week!');
+    });
+
+    expect(mockSaveNotesMutation).toHaveBeenCalledWith({ variables: { stageId: 3, notes: 'Great week!' } });
+    expect(mockRefetchNotes).toHaveBeenCalled();
   });
 
   it('throws when uploadPhoto is called without bridge API', async () => {

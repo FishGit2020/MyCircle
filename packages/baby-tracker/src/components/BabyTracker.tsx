@@ -56,7 +56,7 @@ export default function BabyTracker() {
   const [inputDate, setInputDate] = useState<string>('');
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
   const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
-  const { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated, loading: photosLoading } = useBabyPhotos();
+  const { photos, notes, isUploading, isSavingNotes, error, errorStageId, clearError, uploadPhoto, deletePhoto, saveNotes, isAuthenticated, loading: photosLoading } = useBabyPhotos();
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
@@ -511,13 +511,15 @@ export default function BabyTracker() {
                       {(isCurrent || isCompleted) && (
                         <MilestonePhoto
                           stageId={stage.id}
-                          photoUrl={photos.get(stage.id)?.photoUrl}
-                          caption={photos.get(stage.id)?.caption}
+                          photos={photos.get(stage.id) ?? []}
+                          notes={notes.get(stage.id)}
                           isAuthenticated={isAuthenticated}
                           loading={photosLoading}
                           onUpload={uploadPhoto}
                           onDelete={deletePhoto}
-                          uploading={uploading === stage.id}
+                          onSaveNotes={saveNotes}
+                          uploading={isUploading(stage.id)}
+                          savingNotes={isSavingNotes(stage.id)}
                           error={errorStageId === stage.id ? error : null}
                           onClearError={clearError}
                         />

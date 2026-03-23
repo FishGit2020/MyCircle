@@ -12,10 +12,6 @@ const babyPhotoUploadSchema = z.object({
   caption: z.string().max(500).optional(),
 });
 
-const babyPhotoDeleteSchema = z.object({
-  stageId: z.number().int().min(1).max(10),
-});
-
 // ─── Baby Photos — Firebase Storage upload/delete via Cloud Function ───
 export const babyPhotos = onRequest(
   {
@@ -58,52 +54,26 @@ export const babyPhotos = onRequest(
       }
 
       try {
+        const photoId = crypto.randomUUID();
         const bucket = getStorage().bucket();
-        const filePath = `users/${uid}/baby-photos/${stageId}.jpg`;
+        const filePath = `users/${uid}/baby-photos/${stageId}/${photoId}.jpg`;
         const { downloadUrl: photoUrl } = await uploadToStorage(bucket, filePath, buffer, 'image/jpeg', {
           cacheControl: 'public, max-age=31536000',
         });
 
-        // Write metadata to Firestore
+        // Write metadata to Firestore subcollection
         const db = getFirestore();
-        await db.doc(`users/${uid}/babyMilestones/${stageId}`).set({
+        await db.doc(`users/${uid}/babyMilestones/${stageId}/photos/${photoId}`).set({
           photoUrl,
           caption: caption || null,
           uploadedAt: FieldValue.serverTimestamp(),
         });
 
-        logger.info('Baby photo uploaded', { uid, stageId });
-        res.status(200).json({ photoUrl });
+        logger.info('Baby photo uploaded', { uid, stageId, photoId });
+        res.status(200).json({ photoUrl, photoId });
       } catch (err: any) {
         logger.error('Baby photo upload error', { uid, stageId, error: err.message });
         res.status(500).json({ error: 'Upload failed' });
-      }
-
-    } else if (path === 'delete' && req.method === 'POST') {
-      const parsed = babyPhotoDeleteSchema.safeParse(req.body);
-      if (!parsed.success) {
-        res.status(400).json({ error: 'Invalid request', details: parsed.error.issues });
-        return;
-      }
-      const { stageId } = parsed.data;
-
-      try {
-        const bucket = getStorage().bucket();
-        const file = bucket.file(`users/${uid}/baby-photos/${stageId}.jpg`);
-        try {
-          await file.delete();
-        } catch (e: any) {
-          if (e.code !== 404) throw e;
-        }
-
-        const db = getFirestore();
-        await db.doc(`users/${uid}/babyMilestones/${stageId}`).delete();
-
-        logger.info('Baby photo deleted', { uid, stageId });
-        res.status(200).json({ ok: true });
-      } catch (err: any) {
-        logger.error('Baby photo delete error', { uid, stageId, error: err.message });
-        res.status(500).json({ error: 'Delete failed' });
       }
 
     } else {
