@@ -301,9 +301,26 @@ export default function DinoGame({ onBack }: { onBack: () => void }) {
       </div>
 
       {phase === 'playing' && (
-        <p className="text-xs text-gray-400 dark:text-gray-500">
-          {t('games.dinoControls' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
-        </p>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onPointerDown={() => { gameRef.current.isDucking = true; }}
+            onPointerUp={() => { gameRef.current.isDucking = false; }}
+            onPointerLeave={() => { gameRef.current.isDucking = false; }}
+            className="w-20 h-14 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold text-sm active:bg-gray-300 dark:active:bg-gray-600 select-none touch-none"
+            aria-label="Duck"
+          >
+            ↓ Duck
+          </button>
+          <button
+            type="button"
+            onPointerDown={jump}
+            className="w-20 h-14 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold text-sm select-none touch-none"
+            aria-label="Jump"
+          >
+            ↑ Jump
+          </button>
+        </div>
       )}
     </div>
   );
