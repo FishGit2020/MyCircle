@@ -142,9 +142,15 @@ export const typeDefs = `#graphql
 
   type BabyPhoto {
     stageId: Int!
+    photoId: String!
     photoUrl: String!
     caption: String
     uploadedAt: String!
+  }
+
+  type BabyMilestoneNote {
+    stageId: Int!
+    notes: String
   }
 
   # ─── Digital Library Types ──────────────────────────────────────
@@ -490,6 +496,7 @@ export const typeDefs = `#graphql
 
     # Baby Photos (auth required)
     babyPhotos: [BabyPhoto!]!
+    babyMilestoneNotes: [BabyMilestoneNote!]!
 
     # Digital Library (auth required)
     books: [Book!]!
@@ -945,7 +952,8 @@ export const typeDefs = `#graphql
     deleteSharedFile(fileId: ID!): Boolean!
 
     # Baby Photos (auth required)
-    deleteBabyPhoto(stageId: Int!): Boolean!
+    deleteBabyPhoto(stageId: Int!, photoId: String!): Boolean!
+    saveBabyMilestoneNotes(stageId: Int!, notes: String!): Boolean!
 
     # Interview (auth required for mutations)
     createInterviewQuestion(input: CreateInterviewQuestionInput!): InterviewQuestion!

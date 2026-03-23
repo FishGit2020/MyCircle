@@ -9,23 +9,33 @@ vi.mock('@mycircle/shared', () => ({
   }),
 }));
 
+const samplePhotos = [
+  { photoId: 'photo-1', photoUrl: 'https://example.com/1.jpg', caption: 'Week 5' },
+  { photoId: 'photo-2', photoUrl: 'https://example.com/2.jpg' },
+];
+
 describe('MilestonePhoto', () => {
   let onUpload: ReturnType<typeof vi.fn>;
   let onDelete: ReturnType<typeof vi.fn>;
+  let onSaveNotes: ReturnType<typeof vi.fn>;
   let onClearError: ReturnType<typeof vi.fn>;
 
   const defaultProps = {
     stageId: 5,
+    photos: [],
     isAuthenticated: true,
     uploading: false,
+    savingNotes: false,
     onUpload: vi.fn().mockResolvedValue(undefined),
     onDelete: vi.fn().mockResolvedValue(undefined),
+    onSaveNotes: vi.fn().mockResolvedValue(undefined),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
     onUpload = vi.fn().mockResolvedValue(undefined);
     onDelete = vi.fn().mockResolvedValue(undefined);
+    onSaveNotes = vi.fn().mockResolvedValue(undefined);
     onClearError = vi.fn();
   });
 
@@ -42,27 +52,27 @@ describe('MilestonePhoto', () => {
     const { container } = render(
       <MilestonePhoto {...defaultProps} loading={true} />
     );
-    // Skeleton has animate-pulse elements
     const pulseElements = container.querySelectorAll('.animate-pulse');
     expect(pulseElements.length).toBeGreaterThan(0);
   });
 
-  it('shows uploading state', () => {
+  it('shows uploading placeholder when uploading', () => {
     render(
-      <MilestonePhoto {...defaultProps} uploading={true} onUpload={onUpload} onDelete={onDelete} />
+      <MilestonePhoto {...defaultProps} uploading={true} onUpload={onUpload} onDelete={onDelete} onSaveNotes={onSaveNotes} />
     );
     expect(screen.getByText('baby.uploading')).toBeInTheDocument();
   });
 
   // --- Error state ---
 
-  it('shows error with try again button when error exists and no photo', () => {
+  it('shows error with try again button when error exists', () => {
     render(
       <MilestonePhoto
         {...defaultProps}
         error="Upload failed"
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
         onClearError={onClearError}
       />
     );
@@ -78,6 +88,7 @@ describe('MilestonePhoto', () => {
         error="Upload failed"
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
         onClearError={onClearError}
       />
     );
@@ -85,19 +96,32 @@ describe('MilestonePhoto', () => {
     expect(onClearError).toHaveBeenCalledTimes(1);
   });
 
-  // --- Add Photo (no photo URL) ---
+  // --- Add Photo ---
 
-  it('shows "Add Photo" button when authenticated with no photo', () => {
+  it('shows "Add Photo" button when authenticated with no photos', () => {
     render(
-      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} />
+      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} onSaveNotes={onSaveNotes} />
     );
     expect(screen.getByRole('button', { name: 'baby.addPhoto' })).toBeInTheDocument();
+  });
+
+  it('shows "Add Another Photo" button when photos exist', () => {
+    render(
+      <MilestonePhoto
+        {...defaultProps}
+        photos={samplePhotos}
+        onUpload={onUpload}
+        onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'baby.addAnotherPhoto' })).toBeInTheDocument();
   });
 
   it('shows caption input when "Add Photo" is clicked', async () => {
     const user = userEvent.setup({ delay: null });
     render(
-      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} />
+      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} onSaveNotes={onSaveNotes} />
     );
     await user.click(screen.getByRole('button', { name: 'baby.addPhoto' }));
     expect(screen.getByLabelText('baby.photoCaption')).toBeInTheDocument();
@@ -106,93 +130,83 @@ describe('MilestonePhoto', () => {
   it('hides caption input when cancel is clicked', async () => {
     const user = userEvent.setup({ delay: null });
     render(
-      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} />
+      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} onSaveNotes={onSaveNotes} />
     );
     await user.click(screen.getByRole('button', { name: 'baby.addPhoto' }));
     expect(screen.getByLabelText('baby.photoCaption')).toBeInTheDocument();
 
-    // Click the cancel (X) button - the second button in the caption row
+    // Cancel button (X) is the last button in the caption row
     const buttons = screen.getAllByRole('button');
-    // The last button is the cancel button
     await user.click(buttons[buttons.length - 1]);
     expect(screen.queryByLabelText('baby.photoCaption')).not.toBeInTheDocument();
   });
 
-  // --- Photo exists ---
+  // --- Multiple photos ---
 
-  it('shows photo thumbnail when photoUrl is provided', () => {
+  it('shows all photo thumbnails', () => {
     render(
       <MilestonePhoto
         {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
+        photos={samplePhotos}
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
-    const img = screen.getByAltText('baby.milestonePhoto');
-    expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', 'https://example.com/photo.jpg');
+    const images = screen.getAllByAltText('baby.milestonePhoto');
+    expect(images.length).toBe(2);
   });
 
-  it('shows caption when provided with photo', () => {
+  it('shows view button for each photo', () => {
     render(
       <MilestonePhoto
         {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
-        caption="Week 20 bump"
+        photos={samplePhotos}
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
-    expect(screen.getByText('Week 20 bump')).toBeInTheDocument();
-  });
-
-  it('shows delete button when photo exists', () => {
-    render(
-      <MilestonePhoto
-        {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
-        onUpload={onUpload}
-        onDelete={onDelete}
-      />
-    );
-    expect(screen.getByRole('button', { name: 'baby.deletePhoto' })).toBeInTheDocument();
+    const viewButtons = screen.getAllByRole('button', { name: 'baby.viewPhoto' });
+    expect(viewButtons.length).toBe(2);
   });
 
   // --- Delete confirmation ---
 
-  it('shows delete confirmation dialog on delete click', async () => {
+  it('shows delete confirmation dialog when delete is clicked', async () => {
     const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
+        photos={[samplePhotos[0]]}
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
-    await user.click(screen.getByRole('button', { name: 'baby.deletePhoto' }));
+    const deleteBtn = screen.getByRole('button', { name: 'baby.deletePhoto' });
+    await user.click(deleteBtn);
     expect(screen.getByText('baby.deletePhotoConfirm')).toBeInTheDocument();
   });
 
-  it('calls onDelete with stageId on confirm', async () => {
+  it('calls onDelete with stageId and photoId on confirm', async () => {
     const user = userEvent.setup({ delay: null });
     render(
       <MilestonePhoto
         {...defaultProps}
         stageId={5}
-        photoUrl="https://example.com/photo.jpg"
+        photos={[samplePhotos[0]]}
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
     await user.click(screen.getByRole('button', { name: 'baby.deletePhoto' }));
-    // Now there are two "deletePhoto" buttons: the original + one inside the confirm dialog
+    // Confirm dialog has a button with text baby.deletePhoto
     const deleteButtons = screen.getAllByText('baby.deletePhoto');
-    // The confirm dialog button is the last one
     await user.click(deleteButtons[deleteButtons.length - 1]);
     await waitFor(() => {
-      expect(onDelete).toHaveBeenCalledWith(5);
+      expect(onDelete).toHaveBeenCalledWith(5, 'photo-1');
     });
   });
 
@@ -201,9 +215,10 @@ describe('MilestonePhoto', () => {
     render(
       <MilestonePhoto
         {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
+        photos={[samplePhotos[0]]}
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
     await user.click(screen.getByRole('button', { name: 'baby.deletePhoto' }));
@@ -219,46 +234,14 @@ describe('MilestonePhoto', () => {
     render(
       <MilestonePhoto
         {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
+        photos={[samplePhotos[0]]}
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
     await user.click(screen.getByRole('button', { name: 'baby.viewPhoto' }));
     expect(screen.getByRole('dialog', { name: 'baby.milestonePhoto' })).toBeInTheDocument();
-  });
-
-  it('shows full image in lightbox', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(
-      <MilestonePhoto
-        {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
-        onUpload={onUpload}
-        onDelete={onDelete}
-      />
-    );
-    await user.click(screen.getByRole('button', { name: 'baby.viewPhoto' }));
-    const images = screen.getAllByAltText('baby.milestonePhoto');
-    // Lightbox shows a second img element
-    expect(images.length).toBe(2);
-  });
-
-  it('shows caption in lightbox when provided', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(
-      <MilestonePhoto
-        {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
-        caption="Week 20 bump"
-        onUpload={onUpload}
-        onDelete={onDelete}
-      />
-    );
-    await user.click(screen.getByRole('button', { name: 'baby.viewPhoto' }));
-    // Caption should appear twice: once in the thumbnail view and once in lightbox
-    const captions = screen.getAllByText('Week 20 bump');
-    expect(captions.length).toBe(2);
   });
 
   it('closes lightbox via close button', async () => {
@@ -266,9 +249,10 @@ describe('MilestonePhoto', () => {
     render(
       <MilestonePhoto
         {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
+        photos={[samplePhotos[0]]}
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
     await user.click(screen.getByRole('button', { name: 'baby.viewPhoto' }));
@@ -277,20 +261,54 @@ describe('MilestonePhoto', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  // --- Does not show error UI when photo exists with error ---
+  // --- Notes ---
 
-  it('does not show error state when photoUrl exists even with error', () => {
+  it('shows notes textarea', () => {
+    render(
+      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} onSaveNotes={onSaveNotes} />
+    );
+    expect(screen.getByRole('textbox', { name: 'baby.notes' })).toBeInTheDocument();
+  });
+
+  it('shows existing notes value', () => {
     render(
       <MilestonePhoto
         {...defaultProps}
-        photoUrl="https://example.com/photo.jpg"
-        error="some error"
+        notes="Great week!"
         onUpload={onUpload}
         onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
       />
     );
-    expect(screen.queryByText('baby.uploadFailed')).not.toBeInTheDocument();
-    // Photo should still be shown
-    expect(screen.getByAltText('baby.milestonePhoto')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'baby.notes' })).toHaveValue('Great week!');
+  });
+
+  it('shows save button when notes are edited', async () => {
+    const user = userEvent.setup({ delay: null });
+    render(
+      <MilestonePhoto {...defaultProps} onUpload={onUpload} onDelete={onDelete} onSaveNotes={onSaveNotes} />
+    );
+    const textarea = screen.getByRole('textbox', { name: 'baby.notes' });
+    await user.type(textarea, 'New note');
+    expect(screen.getByRole('button', { name: 'baby.saveNotes' })).toBeInTheDocument();
+  });
+
+  it('calls onSaveNotes when save button is clicked', async () => {
+    const user = userEvent.setup({ delay: null });
+    render(
+      <MilestonePhoto
+        {...defaultProps}
+        stageId={5}
+        onUpload={onUpload}
+        onDelete={onDelete}
+        onSaveNotes={onSaveNotes}
+      />
+    );
+    const textarea = screen.getByRole('textbox', { name: 'baby.notes' });
+    await user.type(textarea, 'My note');
+    await user.click(screen.getByRole('button', { name: 'baby.saveNotes' }));
+    await waitFor(() => {
+      expect(onSaveNotes).toHaveBeenCalledWith(5, 'My note');
+    });
   });
 });

@@ -108,9 +108,16 @@ export type BabyInfo = {
   weight: Scalars['String']['output'];
 };
 
+export type BabyMilestoneNote = {
+  __typename?: 'BabyMilestoneNote';
+  notes?: Maybe<Scalars['String']['output']>;
+  stageId: Scalars['Int']['output'];
+};
+
 export type BabyPhoto = {
   __typename?: 'BabyPhoto';
   caption?: Maybe<Scalars['String']['output']>;
+  photoId: Scalars['String']['output'];
   photoUrl: Scalars['String']['output'];
   stageId: Scalars['Int']['output'];
   uploadedAt: Scalars['String']['output'];
@@ -532,6 +539,7 @@ export type Mutation = {
   permanentDeleteBook: Scalars['Boolean']['output'];
   restoreBook: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
+  saveBabyMilestoneNotes: Scalars['Boolean']['output'];
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
   saveInterviewSession: InterviewSessionDetail;
@@ -583,6 +591,7 @@ export type MutationCreateInterviewQuestionArgs = {
 
 
 export type MutationDeleteBabyPhotoArgs = {
+  photoId: Scalars['String']['input'];
   stageId: Scalars['Int']['input'];
 };
 
@@ -656,6 +665,12 @@ export type MutationRunBenchmarkArgs = {
   endpointId: Scalars['String']['input'];
   model: Scalars['String']['input'];
   prompt: Scalars['String']['input'];
+};
+
+
+export type MutationSaveBabyMilestoneNotesArgs = {
+  notes: Scalars['String']['input'];
+  stageId: Scalars['Int']['input'];
 };
 
 
@@ -803,6 +818,7 @@ export type Query = {
   aiUsageSummary: AiUsageSummary;
   airQuality?: Maybe<AirQuality>;
   babyInfo: BabyInfo;
+  babyMilestoneNotes: Array<BabyMilestoneNote>;
   babyPhotos: Array<BabyPhoto>;
   benchmarkEndpointModels: Array<Scalars['String']['output']>;
   benchmarkEndpoints: Array<BenchmarkEndpoint>;
@@ -1817,14 +1833,28 @@ export type DeleteSharedFileMutation = { __typename?: 'Mutation', deleteSharedFi
 export type GetBabyPhotosQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBabyPhotosQuery = { __typename?: 'Query', babyPhotos: Array<{ __typename?: 'BabyPhoto', stageId: number, photoUrl: string, caption?: string | null, uploadedAt: string }> };
+export type GetBabyPhotosQuery = { __typename?: 'Query', babyPhotos: Array<{ __typename?: 'BabyPhoto', stageId: number, photoId: string, photoUrl: string, caption?: string | null, uploadedAt: string }> };
 
 export type DeleteBabyPhotoMutationVariables = Exact<{
   stageId: Scalars['Int']['input'];
+  photoId: Scalars['String']['input'];
 }>;
 
 
 export type DeleteBabyPhotoMutation = { __typename?: 'Mutation', deleteBabyPhoto: boolean };
+
+export type GetBabyMilestoneNotesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBabyMilestoneNotesQuery = { __typename?: 'Query', babyMilestoneNotes: Array<{ __typename?: 'BabyMilestoneNote', stageId: number, notes?: string | null }> };
+
+export type SaveBabyMilestoneNotesMutationVariables = Exact<{
+  stageId: Scalars['Int']['input'];
+  notes: Scalars['String']['input'];
+}>;
+
+
+export type SaveBabyMilestoneNotesMutation = { __typename?: 'Mutation', saveBabyMilestoneNotes: boolean };
 
 export type BookFieldsFragment = { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } };
 

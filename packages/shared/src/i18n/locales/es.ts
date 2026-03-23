@@ -1047,6 +1047,12 @@ const es: Record<TranslationKey, string> = {
   'baby.cancel': 'Cancelar',
   'baby.uploadFailed': 'Error al subir. Int\u00e9ntalo de nuevo.',
   'baby.tryAgain': 'Reintentar',
+  'baby.addAnotherPhoto': 'A\u00f1adir otra foto',
+  'baby.notes': 'Notas de esta etapa',
+  'baby.notesPlaceholder': 'A\u00f1ade notas sobre esta etapa...',
+  'baby.saveNotes': 'Guardar',
+  'baby.saving': 'Guardando...',
+  'baby.notesSaved': 'Notas guardadas',
 
   // Keyboard Shortcuts
   'shortcuts.title': 'Atajos de teclado',
