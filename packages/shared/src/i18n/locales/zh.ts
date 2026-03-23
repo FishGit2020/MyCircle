@@ -2473,6 +2473,7 @@ const zh: Record<TranslationKey, string> = {
   'transit.subtitle': '\u5b9e\u65f6\u516c\u4ea4\u5230\u7ad9\u65f6\u95f4',
   'transit.search': '\u641c\u7d22',
   'transit.stopIdPlaceholder': '\u8f93\u5165\u7ad9\u70b9ID\uff08\u4f8b\u5982 1_75403\uff09',
+  'transit.stopSearchPlaceholder': '\u6309\u7ad9\u70b9\u540d\u79f0\u6216ID\u641c\u7d22...',
   'transit.findNearby': '\u67e5\u627e\u9644\u8fd1\u7ad9\u70b9',
   'transit.findingNearby': '\u6b63\u5728\u67e5\u627e\u9644\u8fd1\u7ad9\u70b9...',
   'transit.nearbyStops': '\u9644\u8fd1\u7ad9\u70b9',

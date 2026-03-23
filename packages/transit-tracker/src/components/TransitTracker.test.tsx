@@ -63,7 +63,7 @@ describe('TransitTracker', () => {
 
   it('renders the stop ID input', () => {
     render(<TransitTracker />);
-    const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
+    const input = screen.getByRole('textbox', { name: /transit\.stopSearchPlaceholder/i });
     expect(input).toBeInTheDocument();
   });
 
@@ -74,7 +74,7 @@ describe('TransitTracker', () => {
 
   it('selects a stop when form is submitted', () => {
     render(<TransitTracker />);
-    const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
+    const input = screen.getByRole('textbox', { name: /transit\.stopSearchPlaceholder/i });
     fireEvent.change(input, { target: { value: '1_75403' } });
     fireEvent.submit(input.closest('form')!);
     // After selecting a stop, the back button should appear
@@ -85,7 +85,7 @@ describe('TransitTracker', () => {
 
   it('shows recent stops after selecting one and going back', () => {
     render(<TransitTracker />);
-    const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
+    const input = screen.getByRole('textbox', { name: /transit\.stopSearchPlaceholder/i });
     fireEvent.change(input, { target: { value: '1_75403' } });
     fireEvent.submit(input.closest('form')!);
 
@@ -99,7 +99,7 @@ describe('TransitTracker', () => {
   it('shows favorite toggle button when viewing a stop while logged in', () => {
     window.__currentUid = 'test-user-123';
     render(<TransitTracker />);
-    const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
+    const input = screen.getByRole('textbox', { name: /transit\.stopSearchPlaceholder/i });
     fireEvent.change(input, { target: { value: '1_75403' } });
     fireEvent.submit(input.closest('form')!);
     // Favorite button should be present when logged in
@@ -110,7 +110,7 @@ describe('TransitTracker', () => {
   it('hides favorite toggle button when not logged in', () => {
     window.__currentUid = undefined;
     render(<TransitTracker />);
-    const input = screen.getByRole('textbox', { name: /transit\.stopIdPlaceholder/i });
+    const input = screen.getByRole('textbox', { name: /transit\.stopSearchPlaceholder/i });
     fireEvent.change(input, { target: { value: '1_75403' } });
     fireEvent.submit(input.closest('form')!);
     // Favorite button should NOT be present when not logged in
