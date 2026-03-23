@@ -354,11 +354,6 @@ Exposes `BabyTracker` component via Module Federation. Port **3011**.
 - Gestational week = `40 - ceil(weeksUntilDue)`, trimester display, ARIA progress bar
 - Uses Apollo `GET_BIBLE_PASSAGE` query for accurate verse text from YouVersion API
 - **Milestone Photos**: Per-stage photo upload routed through `babyPhotos` Cloud Function (`POST /baby-photos/upload`) which uses Firebase Admin SDK to write to Storage (`users/{uid}/baby-photos/{stageId}.jpg`) and Firestore (`users/{uid}/babyMilestones/{stageId}`). Client-side image compression (canvas, max 1024px, JPEG 0.8) then base64-encoded in JSON body. `window.__babyPhotos` bridge exposes `upload`, `getAll`, `delete` for MFE access. Photos are private per-user with signed URLs.
-- **Baby Memory Journal** (extended in feature 009): Three collapsible sections appended below the existing pregnancy stage cards:
-  - **My Moments** — personal milestone events (title, date, optional note) stored in `users/{uid}/milestoneEvents` Firestore subcollection; supports create/edit/delete with inline forms; future-date events show "Upcoming" badge
-  - **Photo Album** — unified journal photo gallery (grouped by month) backed by `users/{uid}/journalPhotos` Firestore subcollection; photos uploaded via `journalPhotoUpload` Cloud Function (`POST /journal-photos/upload`); `window.__journalPhotos` bridge exposes `upload` for MFE access; fullscreen `PhotoLightbox` with keyboard nav; migrated stage photos show `stageLabel` badge
-  - **Baby Milestones** — 115 infant developmental milestones (0–18 months, 5 age bands, 5 domains from `@mycircle/child-development`) tracked per child; achievements stored in `users/{uid}/milestoneAchievements` Firestore subcollection; filter by All/Achieved/Upcoming
-- Expand state for all three sections persists to `localStorage` (via `StorageKeys.BABY_*_EXPANDED`)
 - Route: `/baby`
 
 ### Child Development - `packages/child-development/`

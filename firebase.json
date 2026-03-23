@@ -31,10 +31,6 @@
         "function": "babyPhotos"
       },
       {
-        "source": "/journal-photos/upload",
-        "function": "journalPhotoUpload"
-      },
-      {
         "source": "/digital-library-api/**",
         "function": "digitalLibrary"
       },

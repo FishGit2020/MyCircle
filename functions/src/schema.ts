@@ -412,77 +412,6 @@ export const typeDefs = `#graphql
     routeIds: [String!]!
   }
 
-  # ── Milestone Events ──────────────────────────────────────────────────────────
-
-  type MilestoneEvent {
-    id: ID!
-    childId: String
-    title: String!
-    eventDate: String!
-    note: String
-    createdAt: String!
-    updatedAt: String!
-  }
-
-  input MilestoneEventInput {
-    childId: String
-    title: String!
-    eventDate: String!
-    note: String
-  }
-
-  input MilestoneEventUpdateInput {
-    title: String
-    eventDate: String
-    note: String
-  }
-
-  # ── Journal Photos ──────────────────────────────────────────────────────────
-
-  type JournalPhoto {
-    id: ID!
-    childId: String
-    photoUrl: String!
-    storagePath: String!
-    caption: String
-    stageLabel: String
-    photoDate: String!
-    createdAt: String!
-  }
-
-  input JournalPhotoInput {
-    childId: String
-    photoUrl: String!
-    storagePath: String!
-    caption: String
-    stageLabel: String
-    photoDate: String!
-  }
-
-  # ── Infant Achievements ─────────────────────────────────────────────────────
-
-  type InfantAchievement {
-    id: ID!
-    childId: String!
-    milestoneId: String!
-    achievedDate: String!
-    note: String
-    createdAt: String!
-    updatedAt: String!
-  }
-
-  input InfantAchievementInput {
-    childId: String!
-    milestoneId: String!
-    achievedDate: String!
-    note: String
-  }
-
-  input InfantAchievementUpdateInput {
-    achievedDate: String
-    note: String
-  }
-
   type Query {
     weather(lat: Float!, lon: Float!): WeatherData!
     currentWeather(lat: Float!, lon: Float!): CurrentWeather!
@@ -579,11 +508,6 @@ export const typeDefs = `#graphql
 
     # Hiking route (public)
     calcRoute(startLon: Float!, startLat: Float!, endLon: Float!, endLat: Float!): RouteResult
-
-    # Baby Memory Journal (auth required)
-    milestoneEvents(childId: String, limit: Int): [MilestoneEvent!]!
-    journalPhotos(childId: String, limit: Int): [JournalPhoto!]!
-    infantAchievements(childId: String!): [InfantAchievement!]!
   }
 
   type RadioStation {
@@ -1042,18 +966,6 @@ export const typeDefs = `#graphql
     startCrawl(input: StartCrawlInput!): CrawlJob!
     stopCrawl(id: ID!): CrawlJob!
     deleteCrawlJob(id: ID!): Boolean!
-
-    # Baby Memory Journal (auth required)
-    addMilestoneEvent(input: MilestoneEventInput!): MilestoneEvent!
-    updateMilestoneEvent(id: ID!, input: MilestoneEventUpdateInput!): MilestoneEvent!
-    deleteMilestoneEvent(id: ID!): Boolean!
-
-    addJournalPhoto(input: JournalPhotoInput!): JournalPhoto!
-    deleteJournalPhoto(id: ID!): Boolean!
-
-    addInfantAchievement(input: InfantAchievementInput!): InfantAchievement!
-    updateInfantAchievement(id: ID!, input: InfantAchievementUpdateInput!): InfantAchievement!
-    deleteInfantAchievement(id: ID!): Boolean!
   }
 
   schema {

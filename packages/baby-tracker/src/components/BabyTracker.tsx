@@ -4,26 +4,8 @@ import type { Child } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
-import MilestoneEventsSection from './MilestoneEventsSection';
-import JournalPhotoSection from './JournalPhotoSection';
-
-/** Derive a stage label from week range for photo tagging */
-function getStageLabel(weekStart: number, weekEnd: number): string {
-  if (weekStart === weekEnd) return `Week ${weekStart}`;
-  return `Weeks ${weekStart}\u2013${weekEnd}`;
-}
-
-/** Compute calendar date range for a pregnancy stage given a due date string */
-function getStageCalendarDates(weekStart: number, weekEnd: number, dueDateStr: string): { from: string; to: string } {
-  const dueDate = new Date(dueDateStr + 'T00:00:00');
-  const MS_PER_DAY = 24 * 60 * 60 * 1000;
-  const from = new Date(dueDate.getTime() - (280 - (weekStart - 1) * 7) * MS_PER_DAY);
-  const to = new Date(dueDate.getTime() - (280 - weekEnd * 7) * MS_PER_DAY);
-  return {
-    from: from.toISOString().substring(0, 10),
-    to: to.toISOString().substring(0, 10),
-  };
-}
+import { useBabyPhotos } from '../hooks/useBabyPhotos';
+import MilestonePhoto from './MilestonePhoto';
 
 function calculateGestationalAge(dueDateStr: string): { weeks: number; days: number; totalDays: number } {
   const dueDate = new Date(dueDateStr + 'T00:00:00');
@@ -74,23 +56,7 @@ export default function BabyTracker() {
   const [inputDate, setInputDate] = useState<string>('');
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
   const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Check auth state for journal sections
-  useEffect(() => {
-    let mounted = true;
-    const checkAuth = async () => {
-      try {
-        const token = await window.__getFirebaseIdToken?.();
-        if (mounted) setIsAuthenticated(!!token);
-      } catch {
-        if (mounted) setIsAuthenticated(false);
-      }
-    };
-    checkAuth();
-    const interval = setInterval(checkAuth, 5000);
-    return () => { mounted = false; clearInterval(interval); };
-  }, []);
+  const { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated, loading: photosLoading } = useBabyPhotos();
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
@@ -543,17 +509,18 @@ export default function BabyTracker() {
                         </p>
                       )}
                       {(isCurrent || isCompleted) && (
-                        <div className="mt-3 space-y-4">
-                          <MilestoneEventsSection
-                            childId={currentBaby?.id ?? null}
-                            isAuthenticated={isAuthenticated}
-                            dateRange={dueDate ? getStageCalendarDates(stage.weekStart, stage.weekEnd, dueDate) : undefined}
-                          />
-                          <JournalPhotoSection
-                            childId={currentBaby?.id ?? null}
-                            stageLabel={getStageLabel(stage.weekStart, stage.weekEnd)}
-                          />
-                        </div>
+                        <MilestonePhoto
+                          stageId={stage.id}
+                          photoUrl={photos.get(stage.id)?.photoUrl}
+                          caption={photos.get(stage.id)?.caption}
+                          isAuthenticated={isAuthenticated}
+                          loading={photosLoading}
+                          onUpload={uploadPhoto}
+                          onDelete={deletePhoto}
+                          uploading={uploading === stage.id}
+                          error={errorStageId === stage.id ? error : null}
+                          onClearError={clearError}
+                        />
                       )}
                     </div>
                   </div>
@@ -561,6 +528,13 @@ export default function BabyTracker() {
               })}
             </div>
           </div>
+
+          {/* Sign in hint for photos */}
+          {!isAuthenticated && !photosLoading && (
+            <p className="text-xs text-center text-gray-400 dark:text-gray-500 italic">
+              {t('baby.signInForPhotos')}
+            </p>
+          )}
 
           {/* Source Attribution Links */}
           <div className="space-y-2">
@@ -614,7 +588,6 @@ export default function BabyTracker() {
           </div>
         </section>
       )}
-
     </PageContent>
   );
 }

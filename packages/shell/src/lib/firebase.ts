@@ -1461,36 +1461,6 @@ if (firebaseEnabled) {
   };
 }
 
-// Expose journal photo upload API for MFEs (add/delete now via GraphQL)
-if (firebaseEnabled) {
-  window.__journalPhotos = {
-    upload: async (
-      file: Blob,
-      options?: { childId?: string | null; caption?: string | null; photoDate?: string | null },
-    ) => {
-      if (!auth?.currentUser) throw new Error('Not authenticated');
-      const token = await auth.currentUser.getIdToken();
-      const imageBase64 = await blobToBase64(file);
-      const res = await fetch('/journal-photos/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          imageBase64,
-          childId: options?.childId ?? null,
-          caption: options?.caption ?? null,
-          photoDate: options?.photoDate ?? null,
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Upload failed' }));
-        throw new Error(err.error || 'Upload failed');
-      }
-      const data = await res.json();
-      return { photoUrl: data.photoUrl as string, storagePath: data.storagePath as string, photoId: data.photoId as string };
-    },
-  };
-}
-
 // Expose cloud files upload API for MFEs (list/share/delete now via GraphQL)
 if (firebaseEnabled) {
   window.__cloudFiles = {
