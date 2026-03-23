@@ -173,6 +173,11 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - No new storage — all state managed by existing hooks (005-ollama-chat)
 - TypeScript 5.x, React 18 (same as existing `ai-assistant`, `bible-reader` MFEs) + Existing — `packages/bible-reader`, `packages/shell`, `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, WindowEvents) (006-bible-enhancements)
 - localStorage (`bible-bookmarks`) + Firestore `users/{uid}.bibleBookmarks` (already exists) + no new storage (006-bible-enhancements)
+- TypeScript 5.x, React 18 + `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent) — no new packages (007-worship-songs)
+- Firestore `worshipSetlists` collection (new, top-level, `createdBy`-scoped) via GraphQL (007-worship-songs)
+- TypeScript 5.x + React 18, `@mycircle/shared` (Apollo re-exports, i18n, WindowEvents, PageContent), `react-router`, Tailwind CSS (008-personal-notes)
+- Firestore `users/{uid}/notes/{noteId}` — existing collection, no schema migration needed (008-personal-notes)
+- TypeScript 5.x (frontend + backend) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions v2, Firestore, Cloud Storage, Tailwind CSS, Zod (input validation in Cloud Functions) (009-baby-photo-journal)
 
 ## Recent Changes
 - 001-favorite-cities: Added cross-MFE favorite cities — star/unstar from search, favorites dropdown, transit city chips, FavoritesManager panel
