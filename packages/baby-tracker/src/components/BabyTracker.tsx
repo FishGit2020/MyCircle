@@ -4,10 +4,26 @@ import type { Child } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
-import CollapsibleSection from './CollapsibleSection';
 import MilestoneEventsSection from './MilestoneEventsSection';
 import JournalPhotoSection from './JournalPhotoSection';
-import InfantMilestonesSection from './InfantMilestonesSection';
+
+/** Derive a stage label from week range for photo tagging */
+function getStageLabel(weekStart: number, weekEnd: number): string {
+  if (weekStart === weekEnd) return `Week ${weekStart}`;
+  return `Weeks ${weekStart}\u2013${weekEnd}`;
+}
+
+/** Compute calendar date range for a pregnancy stage given a due date string */
+function getStageCalendarDates(weekStart: number, weekEnd: number, dueDateStr: string): { from: string; to: string } {
+  const dueDate = new Date(dueDateStr + 'T00:00:00');
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const from = new Date(dueDate.getTime() - (280 - (weekStart - 1) * 7) * MS_PER_DAY);
+  const to = new Date(dueDate.getTime() - (280 - weekEnd * 7) * MS_PER_DAY);
+  return {
+    from: from.toISOString().substring(0, 10),
+    to: to.toISOString().substring(0, 10),
+  };
+}
 
 function calculateGestationalAge(dueDateStr: string): { weeks: number; days: number; totalDays: number } {
   const dueDate = new Date(dueDateStr + 'T00:00:00');
@@ -526,6 +542,19 @@ export default function BabyTracker() {
                           {t(stage.descKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                         </p>
                       )}
+                      {(isCurrent || isCompleted) && (
+                        <div className="mt-3 space-y-4">
+                          <MilestoneEventsSection
+                            childId={currentBaby?.id ?? null}
+                            isAuthenticated={isAuthenticated}
+                            dateRange={dueDate ? getStageCalendarDates(stage.weekStart, stage.weekEnd, dueDate) : undefined}
+                          />
+                          <JournalPhotoSection
+                            childId={currentBaby?.id ?? null}
+                            stageLabel={getStageLabel(stage.weekStart, stage.weekEnd)}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -586,32 +615,6 @@ export default function BabyTracker() {
         </section>
       )}
 
-      {/* My Moments — personal milestone event log */}
-      <CollapsibleSection
-        titleKey="babyJournal.myMoments.title"
-        storageKey={StorageKeys.BABY_EVENTS_EXPANDED}
-      >
-        <MilestoneEventsSection
-          childId={currentBaby?.id ?? null}
-          isAuthenticated={isAuthenticated}
-        />
-      </CollapsibleSection>
-
-      {/* Photo Album — unified journal photo album */}
-      <CollapsibleSection
-        titleKey="babyJournal.photoAlbum.title"
-        storageKey={StorageKeys.BABY_PHOTOS_EXPANDED}
-      >
-        <JournalPhotoSection childId={currentBaby?.id ?? null} />
-      </CollapsibleSection>
-
-      {/* Baby Milestones — infant developmental achievement tracker */}
-      <CollapsibleSection
-        titleKey="babyJournal.milestones.title"
-        storageKey={StorageKeys.BABY_MILESTONES_EXPANDED}
-      >
-        <InfantMilestonesSection selectedChildId={currentBaby?.id ?? null} />
-      </CollapsibleSection>
     </PageContent>
   );
 }

@@ -6,6 +6,7 @@ import type { MilestoneEvent } from '../hooks/useMilestoneEvents';
 interface MilestoneEventsSectionProps {
   childId?: string | null;
   isAuthenticated: boolean;
+  dateRange?: { from: string; to: string };
 }
 
 function isFutureDate(dateStr: string): boolean {
@@ -19,9 +20,12 @@ function formatDate(dateStr: string): string {
   return dt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-export default function MilestoneEventsSection({ childId, isAuthenticated }: MilestoneEventsSectionProps) {
+export default function MilestoneEventsSection({ childId, isAuthenticated, dateRange }: MilestoneEventsSectionProps) {
   const { t } = useTranslation();
-  const { events, loading, addEvent, updateEvent, deleteEvent } = useMilestoneEvents({ childId });
+  const { events: allEvents, loading, addEvent, updateEvent, deleteEvent } = useMilestoneEvents({ childId });
+  const events = dateRange
+    ? allEvents.filter(e => e.eventDate >= dateRange.from && e.eventDate <= dateRange.to)
+    : allEvents;
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

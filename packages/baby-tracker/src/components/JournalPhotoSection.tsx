@@ -6,6 +6,7 @@ import PhotoLightbox from './PhotoLightbox';
 
 interface JournalPhotoSectionProps {
   childId?: string | null;
+  stageLabel?: string | null;
 }
 
 function groupByMonth(photos: JournalPhoto[]): { label: string; photos: JournalPhoto[] }[] {
@@ -20,9 +21,12 @@ function groupByMonth(photos: JournalPhoto[]): { label: string; photos: JournalP
   return Array.from(groups.entries()).map(([label, photos]) => ({ label, photos }));
 }
 
-export default function JournalPhotoSection({ childId }: JournalPhotoSectionProps) {
+export default function JournalPhotoSection({ childId, stageLabel }: JournalPhotoSectionProps) {
   const { t } = useTranslation();
-  const { photos, loading, uploading, uploadError, clearUploadError, upload, deletePhoto } = useJournalPhotos({ childId });
+  const { photos: allPhotos, loading, uploading, uploadError, clearUploadError, upload, deletePhoto } = useJournalPhotos({ childId });
+  const photos = stageLabel !== undefined && stageLabel !== null
+    ? allPhotos.filter(p => p.stageLabel === stageLabel)
+    : allPhotos;
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -38,6 +42,7 @@ export default function JournalPhotoSection({ childId }: JournalPhotoSectionProp
       await upload(file, {
         caption: captionInput || null,
         photoDate: dateInput || null,
+        stageLabel: stageLabel ?? null,
       });
       setCaptionInput('');
       setDateInput('');
