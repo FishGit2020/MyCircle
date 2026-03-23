@@ -31,6 +31,21 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
+      // Baby Memory Journal — milestone events (text-only personal moments)
+      match /milestoneEvents/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Baby Memory Journal — unified photo album
+      match /journalPhotos/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Baby Memory Journal — infant developmental achievement records
+      match /milestoneAchievements/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // Cloud files subcollection - private per-user file metadata
       match /files/{fileId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;

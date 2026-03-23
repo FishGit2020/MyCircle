@@ -21,6 +21,9 @@ import { createDealsResolvers } from './deals.js';
 import { createWebCrawlerResolvers } from './webCrawler.js';
 import { createRadioStationResolvers } from './radioStations.js';
 import { createRoutingResolvers } from './routing.js';
+import { createMilestoneEventResolvers } from './milestoneEvents.js';
+import { createJournalPhotoResolvers } from './journalPhotos.js';
+import { createInfantAchievementResolvers } from './infantAchievements.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -40,6 +43,9 @@ export function createResolvers(
   const dailyLogResolvers = createDailyLogResolvers();
   const dealsResolvers = createDealsResolvers();
   const webCrawlerResolvers = createWebCrawlerResolvers();
+  const milestoneEventResolvers = createMilestoneEventResolvers();
+  const journalPhotoResolvers = createJournalPhotoResolvers();
+  const infantAchievementResolvers = createInfantAchievementResolvers();
 
   return {
     JSON: JSONScalar,
@@ -55,6 +61,9 @@ export function createResolvers(
       ...dailyLogResolvers.Mutation,
       ...webCrawlerResolvers.Mutation,
       ...notesResolvers.Mutation,
+      ...milestoneEventResolvers.Mutation,
+      ...journalPhotoResolvers.Mutation,
+      ...infantAchievementResolvers.Mutation,
     },
 
     Query: {
@@ -79,6 +88,9 @@ export function createResolvers(
       ...webCrawlerResolvers.Query,
       ...createRadioStationResolvers().Query,
       ...createRoutingResolvers().Query,
+      ...milestoneEventResolvers.Query,
+      ...journalPhotoResolvers.Query,
+      ...infantAchievementResolvers.Query,
     },
   };
 }

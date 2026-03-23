@@ -3,6 +3,7 @@ export { graphql } from './handlers/graphql.js';
 export { aiChat, aiChatStream } from './handlers/aiChat.js';
 export { cloudFiles } from './handlers/cloudFiles.js';
 export { babyPhotos } from './handlers/babyPhotos.js';
+export { journalPhotoUpload } from './handlers/journalPhotos.js';
 export { digitalLibrary } from './handlers/digitalLibrary.js';
 export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.js';
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';

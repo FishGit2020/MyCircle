@@ -178,6 +178,10 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - TypeScript 5.x + React 18, `@mycircle/shared` (Apollo re-exports, i18n, WindowEvents, PageContent), `react-router`, Tailwind CSS (008-personal-notes)
 - Firestore `users/{uid}/notes/{noteId}` — existing collection, no schema migration needed (008-personal-notes)
 - TypeScript 5.x (frontend + backend) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions v2, Firestore, Cloud Storage, Tailwind CSS, Zod (input validation in Cloud Functions) (009-baby-photo-journal)
+- TypeScript 5.x, React 18 + `@mycircle/shared` (Apollo re-exports, i18n, useChildren, PageContent), `react-router`, Tailwind CSS (009-pregnancy-baby-tracker)
+- Firestore per-user subcollections (`users/{uid}/milestoneEvents`, `users/{uid}/journalPhotos`, `users/{uid}/milestoneAchievements`); Cloud Storage (`users/{uid}/journal-photos/{id}.{ext}`) (009-pregnancy-baby-tracker)
+- TypeScript 5.x, React 18 (same as existing baby-tracker) + `@mycircle/shared` (Apollo re-exports, i18n, useChildren, PageContent, StorageKeys), `@mycircle/child-development` (static milestone catalogue — new devDependency in baby-tracker), `react-router`, Tailwind CSS (009-pregnancy-baby-tracker)
+- Three new Firestore per-user subcollections (`users/{uid}/milestoneEvents`, `users/{uid}/journalPhotos`, `users/{uid}/milestoneAchievements`); new Cloud Storage prefix `users/{uid}/journal-photos/{id}.jpg` (009-pregnancy-baby-tracker)
 
 ## Recent Changes
 - 001-favorite-cities: Added cross-MFE favorite cities — star/unstar from search, favorites dropdown, transit city chips, FavoritesManager panel

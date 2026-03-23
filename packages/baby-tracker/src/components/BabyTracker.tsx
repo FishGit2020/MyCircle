@@ -4,8 +4,10 @@ import type { Child } from '@mycircle/shared';
 import { Link } from 'react-router';
 import { getGrowthDataForWeek, getTrimester, ComparisonCategory, developmentStages, getStageForWeek } from '../data/babyGrowthData';
 import { pregnancyVerses } from '../data/pregnancyVerses';
-import { useBabyPhotos } from '../hooks/useBabyPhotos';
-import MilestonePhoto from './MilestonePhoto';
+import CollapsibleSection from './CollapsibleSection';
+import MilestoneEventsSection from './MilestoneEventsSection';
+import JournalPhotoSection from './JournalPhotoSection';
+import InfantMilestonesSection from './InfantMilestonesSection';
 
 function calculateGestationalAge(dueDateStr: string): { weeks: number; days: number; totalDays: number } {
   const dueDate = new Date(dueDateStr + 'T00:00:00');
@@ -56,7 +58,23 @@ export default function BabyTracker() {
   const [inputDate, setInputDate] = useState<string>('');
   const [compareCategory, setCompareCategory] = useState<ComparisonCategory>('fruit');
   const { reference: verseRef, text: verseText, loading: verseLoading, shuffle: shuffleVerse } = useVerseOfDay(pregnancyVerses);
-  const { photos, uploading, error, errorStageId, clearError, uploadPhoto, deletePhoto, isAuthenticated, loading: photosLoading } = useBabyPhotos();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check auth state for journal sections
+  useEffect(() => {
+    let mounted = true;
+    const checkAuth = async () => {
+      try {
+        const token = await window.__getFirebaseIdToken?.();
+        if (mounted) setIsAuthenticated(!!token);
+      } catch {
+        if (mounted) setIsAuthenticated(false);
+      }
+    };
+    checkAuth();
+    const interval = setInterval(checkAuth, 5000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
@@ -508,33 +526,12 @@ export default function BabyTracker() {
                           {t(stage.descKey as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
                         </p>
                       )}
-                      {(isCurrent || isCompleted) && (
-                        <MilestonePhoto
-                          stageId={stage.id}
-                          photoUrl={photos.get(stage.id)?.photoUrl}
-                          caption={photos.get(stage.id)?.caption}
-                          isAuthenticated={isAuthenticated}
-                          loading={photosLoading}
-                          onUpload={uploadPhoto}
-                          onDelete={deletePhoto}
-                          uploading={uploading === stage.id}
-                          error={errorStageId === stage.id ? error : null}
-                          onClearError={clearError}
-                        />
-                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
           </div>
-
-          {/* Sign in hint for photos */}
-          {!isAuthenticated && !photosLoading && (
-            <p className="text-xs text-center text-gray-400 dark:text-gray-500 italic">
-              {t('baby.signInForPhotos')}
-            </p>
-          )}
 
           {/* Source Attribution Links */}
           <div className="space-y-2">
@@ -588,6 +585,33 @@ export default function BabyTracker() {
           </div>
         </section>
       )}
+
+      {/* My Moments — personal milestone event log */}
+      <CollapsibleSection
+        titleKey="babyJournal.myMoments.title"
+        storageKey={StorageKeys.BABY_EVENTS_EXPANDED}
+      >
+        <MilestoneEventsSection
+          childId={currentBaby?.id ?? null}
+          isAuthenticated={isAuthenticated}
+        />
+      </CollapsibleSection>
+
+      {/* Photo Album — unified journal photo album */}
+      <CollapsibleSection
+        titleKey="babyJournal.photoAlbum.title"
+        storageKey={StorageKeys.BABY_PHOTOS_EXPANDED}
+      >
+        <JournalPhotoSection childId={currentBaby?.id ?? null} />
+      </CollapsibleSection>
+
+      {/* Baby Milestones — infant developmental achievement tracker */}
+      <CollapsibleSection
+        titleKey="babyJournal.milestones.title"
+        storageKey={StorageKeys.BABY_MILESTONES_EXPANDED}
+      >
+        <InfantMilestonesSection selectedChildId={currentBaby?.id ?? null} />
+      </CollapsibleSection>
     </PageContent>
   );
 }
