@@ -397,6 +397,12 @@ Exposes `FlashCards` component via Module Federation. Port **3015**.
 - Chinese cards loaded from `window.__flashcards` subscription when authenticated, `window.__chineseCharacters` as fallback; English cards bundled at build time
 - `WindowEvents.FLASHCARD_PROGRESS_CHANGED` for cross-tab sync
 - Route: `/flashcards`
+- **Language Deck system** (010-language-flashcards) — SM-2 spaced repetition for language learning decks:
+  - **Firestore collections**: `users/{uid}/flashcardDecks/{deckId}` (name, languagePair, createdAt, updatedAt); `users/{uid}/flashcardDecks/{deckId}/deckCards/{cardId}` (SM-2 state: interval, easeFactor, repetitions, dueDate, maturity); `users/{uid}/reviewSessions/{sessionId}` (session stats and rating counts); `users/{uid}/dailyStreak` (currentStreak, longestStreak, lastReviewDate)
+  - **`window.__flashcardDecks` bridge** — exposes: `getAll`, `subscribe`, `create`, `update`, `delete`, `getDeckCards`, `subscribeDeckCards`, `addCard`, `removeCard`, `updateCardSR`, `saveSession`, `getStreak`, `updateStreak`. Implemented in `packages/shell/src/lib/firebase.ts`.
+  - **SM-2 algorithm** — pure function in `packages/flashcards/src/lib/sm2.ts`; quality mapping: again=0, hard=2, good=4, easy=5; EF update: `max(1.3, EF + 0.1 - (5-q)*(0.08+(5-q)*0.02))`; intervals: fail→1, rep1→1, rep2→6, rep3+→round(prev×EF); due dates set to midnight local time
+  - **In-session re-queue** — "again" rating moves card to end of queue; session only completes when queue is empty (all requeued cards must pass with hard/good/easy)
+  - **StorageKeys**: `FLASHCARD_DECKS`, `FLASHCARD_DECK_CARDS`, `FLASHCARD_STREAK` for localStorage fallback (unauthenticated users)
 
 ### Work Tracker - `packages/work-tracker/`
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useTranslation, StorageKeys, PageContent } from '@mycircle/shared';
 import type { FlashCard, CardType, VisibilityFilter } from '../types';
 import { useFlashCards } from '../hooks/useFlashCards';
@@ -9,6 +9,8 @@ import AddCardModal from './AddCardModal';
 import BibleVersePicker from './BibleVersePicker';
 import QuizView from './QuizView';
 import CharacterEditor from './CharacterEditor';
+
+const DeckList = lazy(() => import('./DeckList'));
 
 const TYPE_LABELS: Record<CardType, string> = {
   chinese: 'flashcards.chinese',
@@ -24,8 +26,11 @@ const VISIBILITY_OPTIONS: { value: VisibilityFilter; labelKey: string }[] = [
   { value: 'published', labelKey: 'flashcards.published' },
 ];
 
+type MainMode = 'practice' | 'decks';
+
 export default function FlashCards() {
   const { t } = useTranslation();
+  const [mainMode, setMainMode] = useState<MainMode>('practice');
   const {
     allCards,
     _chineseCards,
@@ -154,12 +159,49 @@ export default function FlashCards() {
     );
   }
 
+  if (mainMode === 'decks') {
+    return (
+      <Suspense fallback={
+        <PageContent>
+          <div className="h-7 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        </PageContent>
+      }>
+        <DeckList
+          onSwitchToPractice={() => setMainMode('practice')}
+        />
+      </Suspense>
+    );
+  }
+
   return (
     <PageContent>
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-4">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('flashcards.title')}</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('flashcards.subtitle')}</p>
+      </div>
+
+      {/* Mode tabs */}
+      <div className="flex gap-1 mb-4 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit">
+        {(['practice', 'decks'] as const).map(mode => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => setMainMode(mode)}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+              mainMode === mode
+                ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            {mode === 'practice' ? t('flashcards.deck.tabs.practice' as any) : t('flashcards.deck.tabs.decks' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          </button>
+        ))}
       </div>
 
       {/* Stats bar */}

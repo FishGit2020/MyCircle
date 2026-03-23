@@ -1,7 +1,7 @@
 import { createLogger, WindowEvents } from '@mycircle/shared';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot, writeBatch } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -1410,6 +1410,184 @@ if (firebaseEnabled) {
     deletePublic: (id: string) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deletePublicFlashcard(id);
+    },
+  };
+}
+
+// ── Flashcard Decks (Spaced Repetition) ──────────────────────────────────────
+
+function toMs(ts: unknown): number {
+  if (!ts) return Date.now();
+  if (typeof ts === 'number') return ts;
+  // Firestore Timestamp
+  if (ts && typeof (ts as { toMillis?: () => number }).toMillis === 'function') {
+    return (ts as { toMillis: () => number }).toMillis();
+  }
+  return Date.now();
+}
+
+// Expose flashcard decks API for MFEs
+if (firebaseEnabled) {
+  window.__flashcardDecks = {
+    getAll: async () => {
+      if (!db || !auth?.currentUser) return [];
+      const uid = auth.currentUser.uid;
+      const snap = await getDocs(collection(db, 'users', uid, 'flashcardDecks'));
+      return snap.docs.map(d => {
+        const data = d.data();
+        return { id: d.id, name: data.name, languagePair: data.languagePair, createdAt: toMs(data.createdAt), updatedAt: toMs(data.updatedAt) };
+      });
+    },
+
+    subscribe: (callback) => {
+      if (!db || !auth?.currentUser) { callback([]); return () => {}; }
+      const uid = auth.currentUser.uid;
+      return onSnapshot(collection(db, 'users', uid, 'flashcardDecks'), (snap) => {
+        callback(snap.docs.map(d => {
+          const data = d.data();
+          return { id: d.id, name: data.name, languagePair: data.languagePair, createdAt: toMs(data.createdAt), updatedAt: toMs(data.updatedAt) };
+        }));
+      }, (err) => { handleSnapshotError('FlashcardDecks', err); });
+    },
+
+    create: async ({ name, languagePair }) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      const ref = await addDoc(collection(db, 'users', uid, 'flashcardDecks'), {
+        name,
+        languagePair: languagePair ?? null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      return ref.id;
+    },
+
+    update: async (id, updates) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      await updateDoc(doc(db, 'users', uid, 'flashcardDecks', id), { ...updates, updatedAt: serverTimestamp() });
+    },
+
+    delete: async (id) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      // Delete all deckCards subcollection docs first
+      const cardsSnap = await getDocs(collection(db, 'users', uid, 'flashcardDecks', id, 'deckCards'));
+      const chunks: Array<typeof cardsSnap.docs> = [];
+      for (let i = 0; i < cardsSnap.docs.length; i += 499) {
+        chunks.push(cardsSnap.docs.slice(i, i + 499));
+      }
+      for (const chunk of chunks) {
+        const batch = writeBatch(db);
+        chunk.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+      await deleteDoc(doc(db, 'users', uid, 'flashcardDecks', id));
+    },
+
+    getDeckCards: async (deckId) => {
+      if (!db || !auth?.currentUser) return [];
+      const uid = auth.currentUser.uid;
+      const snap = await getDocs(collection(db, 'users', uid, 'flashcardDecks', deckId, 'deckCards'));
+      return snap.docs.map(d => {
+        const data = d.data();
+        return { cardId: d.id, interval: data.interval ?? 0, easeFactor: data.easeFactor ?? 2.5, repetitions: data.repetitions ?? 0, dueDate: toMs(data.dueDate), maturity: data.maturity ?? 'new', addedAt: toMs(data.addedAt), lastReviewedAt: data.lastReviewedAt ? toMs(data.lastReviewedAt) : undefined };
+      });
+    },
+
+    subscribeDeckCards: (deckId, callback) => {
+      if (!db || !auth?.currentUser) { callback([]); return () => {}; }
+      const uid = auth.currentUser.uid;
+      return onSnapshot(collection(db, 'users', uid, 'flashcardDecks', deckId, 'deckCards'), (snap) => {
+        callback(snap.docs.map(d => {
+          const data = d.data();
+          return { cardId: d.id, interval: data.interval ?? 0, easeFactor: data.easeFactor ?? 2.5, repetitions: data.repetitions ?? 0, dueDate: toMs(data.dueDate), maturity: data.maturity ?? 'new', addedAt: toMs(data.addedAt), lastReviewedAt: data.lastReviewedAt ? toMs(data.lastReviewedAt) : undefined };
+        }));
+      }, (err) => { handleSnapshotError('DeckCards', err); });
+    },
+
+    addCard: async (deckId, cardId) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      const cardRef = doc(db, 'users', uid, 'flashcardDecks', deckId, 'deckCards', cardId);
+      const existing = await getDoc(cardRef);
+      if (existing.exists()) return; // Idempotent — preserve existing SR state
+      await setDoc(cardRef, {
+        interval: 0,
+        easeFactor: 2.5,
+        repetitions: 0,
+        dueDate: serverTimestamp(),
+        maturity: 'new',
+        addedAt: serverTimestamp(),
+      });
+    },
+
+    removeCard: async (deckId, cardId) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      await deleteDoc(doc(db, 'users', uid, 'flashcardDecks', deckId, 'deckCards', cardId));
+    },
+
+    updateCardSR: async (deckId, cardId, update) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      await setDoc(doc(db, 'users', uid, 'flashcardDecks', deckId, 'deckCards', cardId), {
+        interval: update.interval,
+        easeFactor: update.easeFactor,
+        repetitions: update.repetitions,
+        dueDate: new Date(update.dueDate),
+        maturity: update.maturity,
+        lastReviewedAt: new Date(update.lastReviewedAt),
+      }, { merge: true });
+    },
+
+    saveSession: async (session) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      await addDoc(collection(db, 'users', uid, 'reviewSessions'), {
+        ...session,
+        startTime: new Date(session.startTime),
+        completedTime: new Date(session.completedTime),
+        createdAt: serverTimestamp(),
+      });
+    },
+
+    getStreak: async () => {
+      if (!db || !auth?.currentUser) return null;
+      const uid = auth.currentUser.uid;
+      const snap = await getDoc(doc(db, 'users', uid, 'dailyStreak'));
+      if (!snap.exists()) return null;
+      const data = snap.data();
+      return { currentStreak: data.currentStreak ?? 0, longestStreak: data.longestStreak ?? 0, lastReviewDate: data.lastReviewDate ?? '' };
+    },
+
+    updateStreak: async (localDate) => {
+      if (!db || !auth?.currentUser) throw new Error('Not authenticated');
+      const uid = auth.currentUser.uid;
+      const streakRef = doc(db, 'users', uid, 'dailyStreak');
+      const snap = await getDoc(streakRef);
+      const existing = snap.exists() ? snap.data() : { currentStreak: 0, longestStreak: 0, lastReviewDate: '' };
+      const last = existing.lastReviewDate ?? '';
+
+      let newStreak: number;
+      if (last === localDate) {
+        newStreak = existing.currentStreak; // Already counted today
+      } else {
+        // Check if yesterday
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yStr = yesterday.toLocaleDateString('en-CA');
+        newStreak = last === yStr ? (existing.currentStreak ?? 0) + 1 : 1;
+      }
+
+      const updated = {
+        currentStreak: newStreak,
+        longestStreak: Math.max(existing.longestStreak ?? 0, newStreak),
+        lastReviewDate: localDate,
+        updatedAt: serverTimestamp(),
+      };
+      await setDoc(streakRef, updated, { merge: true });
+      return { currentStreak: updated.currentStreak, longestStreak: updated.longestStreak, lastReviewDate: updated.lastReviewDate };
     },
   };
 }
