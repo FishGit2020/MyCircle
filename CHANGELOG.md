@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.10.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.9.0...mycircle-v1.10.0) (2026-03-24)
+
+
+### Features
+
+* **baby-tracker:** multiple photos and notes per stage ([#834](https://github.com/FishGit2020/MyCircle/issues/834)) ([60a8a02](https://github.com/FishGit2020/MyCircle/commit/60a8a02eb305e3fa4cc35fe7be2ff3904cf901c1))
+* **flashcards:** language learning decks with SM-2 spaced repetition ([#836](https://github.com/FishGit2020/MyCircle/issues/836)) ([3c94345](https://github.com/FishGit2020/MyCircle/commit/3c943455c16c75c0818e5f7aa3e216e196bb0b77))
+
+
+### Bug Fixes
+
+* **baby-tracker:** embed moments and photo album per stage, remove baby milestones tab ([#830](https://github.com/FishGit2020/MyCircle/issues/830)) ([2b4c51c](https://github.com/FishGit2020/MyCircle/commit/2b4c51cb0192f12051d76564601b7fb4774dafff))
+* **shell:** sync baby tracker widget vegetable data with MFE ([#835](https://github.com/FishGit2020/MyCircle/issues/835)) ([446f7a9](https://github.com/FishGit2020/MyCircle/commit/446f7a928555c8a551cf6fbe9a52469266309b2e))
+
+
+### Documentation
+
+* add speckit design artifacts for 009-pregnancy-baby-tracker ([#832](https://github.com/FishGit2020/MyCircle/issues/832)) ([6d9ff9e](https://github.com/FishGit2020/MyCircle/commit/6d9ff9e07e1b118e5a3d9b2b68e9408bb6ba1970))
+
 ## [1.9.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.8.2...mycircle-v1.9.0) (2026-03-23)
 
 
