@@ -6,6 +6,7 @@ import type { ChineseCharacter, CharacterCategory } from '../data/characters';
 import CardGrid from './CardGrid';
 import CardPractice from './CardPractice';
 import AddCardModal from './AddCardModal';
+import AddTechniqueModal from './AddTechniqueModal';
 import BibleVersePicker from './BibleVersePicker';
 import QuizView from './QuizView';
 import CharacterEditor from './CharacterEditor';
@@ -67,6 +68,7 @@ export default function FlashCards() {
   const [cardToDelete, setCardToDelete] = useState<FlashCard | null>(null);
   const [cardToEdit, setCardToEdit] = useState<FlashCard | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [showAddTechniqueModal, setShowAddTechniqueModal] = useState(false);
   const [showCharEditor, setShowCharEditor] = useState(false);
   const [editingChar, setEditingChar] = useState<ChineseCharacter | undefined>(undefined);
 
@@ -112,6 +114,8 @@ export default function FlashCards() {
     setCardToDelete(null);
   };
 
+  const [techniqueToEdit, setTechniqueToEdit] = useState<FlashCard | null>(null);
+
   const handleEditRequest = (card: FlashCard) => {
     if (card.type === 'chinese') {
       const rawId = card.id.replace(/^zh-/, '');
@@ -123,6 +127,8 @@ export default function FlashCards() {
         category: (card.category || 'phrases') as CharacterCategory,
       });
       setShowCharEditor(true);
+    } else if (card.type === 'technique') {
+      setTechniqueToEdit(card);
     } else {
       setCardToEdit(card);
     }
@@ -132,6 +138,13 @@ export default function FlashCards() {
     if (cardToEdit) {
       updateCard(cardToEdit.id, updates);
       setCardToEdit(null);
+    }
+  };
+
+  const handleTechniqueEdit = (updates: { front: string; back: string; category: string }) => {
+    if (techniqueToEdit) {
+      updateCard(techniqueToEdit.id, updates);
+      setTechniqueToEdit(null);
     }
   };
 
@@ -283,6 +296,13 @@ export default function FlashCards() {
             </button>
             <button
               type="button"
+              onClick={() => setShowAddTechniqueModal(true)}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition"
+            >
+              {t('flashcards.addTechniqueCard' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+            </button>
+            <button
+              type="button"
               onClick={() => { setEditingChar(undefined); setShowCharEditor(true); }}
               className="px-4 py-2 rounded-lg text-sm font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-900/50 transition"
             >
@@ -348,6 +368,28 @@ export default function FlashCards() {
           }}
           onEdit={handleEdit}
           onClose={() => setCardToEdit(null)}
+        />
+      )}
+
+      {/* Add technique card modal */}
+      {showAddTechniqueModal && (
+        <AddTechniqueModal
+          onAdd={(card) => addCustomCard({ ...card, type: 'technique' })}
+          onClose={() => setShowAddTechniqueModal(false)}
+        />
+      )}
+
+      {/* Edit technique card modal */}
+      {techniqueToEdit && (
+        <AddTechniqueModal
+          initialValues={{
+            front: techniqueToEdit.front,
+            back: techniqueToEdit.back,
+            category: techniqueToEdit.category,
+            meta: techniqueToEdit.meta,
+          }}
+          onEdit={handleTechniqueEdit}
+          onClose={() => setTechniqueToEdit(null)}
         />
       )}
 

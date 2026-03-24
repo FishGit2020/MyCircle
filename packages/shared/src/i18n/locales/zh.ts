@@ -1519,6 +1519,10 @@ const zh: Record<TranslationKey, string> = {
   'flashcards.myCards': '\u6211\u7684\u5361\u7247',
   'flashcards.published': '\u5df2\u53d1\u5e03',
   'flashcards.allCards': '\u5168\u90e8',
+  'flashcards.addTechniqueCard': '\u6dfb\u52a0\u6280\u672f\u5361\u7247',
+  'flashcards.customCategory': '\u81ea\u5b9a\u4e49\u5206\u7c7b...',
+  'flashcards.enterCategory': '\u8f93\u5165\u5206\u7c7b\u540d\u79f0',
+  'flashcards.difficulty': '\u96be\u5ea6',
 
   // Flashcard Decks (Spaced Repetition)
   'flashcards.deck.title': '\u5361\u7ec4',

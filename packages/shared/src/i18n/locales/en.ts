@@ -1517,6 +1517,10 @@ const en = {
   'flashcards.myCards': 'My Cards',
   'flashcards.published': 'Published',
   'flashcards.allCards': 'All',
+  'flashcards.addTechniqueCard': 'Add Technique Card',
+  'flashcards.customCategory': 'Custom category...',
+  'flashcards.enterCategory': 'Enter category name',
+  'flashcards.difficulty': 'Difficulty',
 
   // Flashcard Decks (Spaced Repetition)
   'flashcards.deck.title': 'Decks',

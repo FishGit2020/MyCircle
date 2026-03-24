@@ -14,11 +14,17 @@ interface CardGridProps {
 }
 
 function canDelete(card: FlashCard): boolean {
-  return card.type !== 'english' && card.type !== 'technique';
+  if (card.type === 'english') return false;
+  // Built-in technique cards (from techniques.ts) are not deletable
+  if (card.type === 'technique' && card.id.startsWith('tech-') && !card.id.startsWith('tech-user-')) return false;
+  return true;
 }
 
 function canEdit(card: FlashCard): boolean {
-  return card.type !== 'english' && card.type !== 'technique';
+  if (card.type === 'english') return false;
+  // Built-in technique cards are not editable
+  if (card.type === 'technique' && card.id.startsWith('tech-') && !card.id.startsWith('tech-user-')) return false;
+  return true;
 }
 
 function canPublish(card: FlashCard): boolean {
