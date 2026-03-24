@@ -69,9 +69,16 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [bookId, onComplete, t, fetchConversionProgress]);
 
+  // On mount, always sync from server — initialStatus is just the Apollo cache
+  // snapshot; the server is the source of truth for fire-and-forget conversions.
   useEffect(() => {
-    if (initialStatus === 'complete') onComplete();
-  }, [initialStatus, onComplete]);
+    if (initialStatus === 'processing' || initialStatus === 'paused') {
+      checkStatus();
+    } else if (initialStatus === 'complete') {
+      onComplete();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCheckStatus = useCallback(async () => {
     setChecking(true);
