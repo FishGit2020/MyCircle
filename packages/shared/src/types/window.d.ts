@@ -28,6 +28,27 @@ declare global {
       delete: (id: string) => Promise<void>;
     };
 
+    /* ── Flashcard Decks (Spaced Repetition) ──────────────── */
+    __flashcardDecks?: {
+      // Decks
+      getAll: () => Promise<Array<{ id: string; name: string; languagePair?: string; createdAt: number; updatedAt: number }>>;
+      subscribe: (callback: (decks: Array<{ id: string; name: string; languagePair?: string; createdAt: number; updatedAt: number }>) => void) => () => void;
+      create: (deck: { name: string; languagePair?: string }) => Promise<string>;
+      update: (id: string, updates: { name?: string; languagePair?: string }) => Promise<void>;
+      delete: (id: string) => Promise<void>;
+      // Deck cards (SR state)
+      getDeckCards: (deckId: string) => Promise<Array<{ cardId: string; interval: number; easeFactor: number; repetitions: number; dueDate: number; maturity: 'new' | 'learning' | 'mature'; addedAt: number; lastReviewedAt?: number }>>;
+      subscribeDeckCards: (deckId: string, callback: (cards: Array<{ cardId: string; interval: number; easeFactor: number; repetitions: number; dueDate: number; maturity: 'new' | 'learning' | 'mature'; addedAt: number; lastReviewedAt?: number }>) => void) => () => void;
+      addCard: (deckId: string, cardId: string) => Promise<void>;
+      removeCard: (deckId: string, cardId: string) => Promise<void>;
+      updateCardSR: (deckId: string, cardId: string, update: { interval: number; easeFactor: number; repetitions: number; dueDate: number; maturity: 'new' | 'learning' | 'mature'; lastReviewedAt: number }) => Promise<void>;
+      // Sessions
+      saveSession: (session: { deckId: string; startTime: number; completedTime: number; cardsReviewed: number; ratings: { again: number; hard: number; good: number; easy: number } }) => Promise<void>;
+      // Streak
+      getStreak: () => Promise<{ currentStreak: number; longestStreak: number; lastReviewDate: string } | null>;
+      updateStreak: (localDate: string) => Promise<{ currentStreak: number; longestStreak: number; lastReviewDate: string }>;
+    };
+
     /* ── Flashcards ────────────────────────────────────────── */
     __flashcards?: {
       getAll: () => Promise<any[]>; // eslint-disable-line @typescript-eslint/no-explicit-any

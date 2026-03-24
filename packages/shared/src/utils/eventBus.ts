@@ -156,6 +156,9 @@ export const StorageKeys = {
   TRANSIT_RECENT_STOPS: 'transit-recent-stops',
   TRANSIT_FAVORITES: 'transit-favorites',
   TRAVEL_PINS: 'travel-pins-cache',
+  FLASHCARD_DECKS: 'flashcard-decks',
+  FLASHCARD_DECK_CARDS: 'flashcard-deck-cards',
+  FLASHCARD_STREAK: 'flashcard-streak',
 } as const;
 
 export interface CitySelectedEvent {

@@ -178,6 +178,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - TypeScript 5.x + React 18, `@mycircle/shared` (Apollo re-exports, i18n, WindowEvents, PageContent), `react-router`, Tailwind CSS (008-personal-notes)
 - Firestore `users/{uid}/notes/{noteId}` — existing collection, no schema migration needed (008-personal-notes)
 - TypeScript 5.x (frontend + backend) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions v2, Firestore, Cloud Storage, Tailwind CSS, Zod (input validation in Cloud Functions) (009-baby-photo-journal)
+- TypeScript 5.x + React 18, Tailwind CSS, `@mycircle/shared` (i18n, StorageKeys, PageContent), Firebase Firestore SDK (shell-only, via `window.__flashcardDecks` bridge) (010-language-flashcards)
+- Firestore `users/{uid}/flashcardDecks`, `users/{uid}/flashcardDecks/{id}/deckCards`, `users/{uid}/reviewSessions`, `users/{uid}/dailyStreak`; localStorage fallback for unauthenticated users (010-language-flashcards)
 
 ## Recent Changes
 - 001-favorite-cities: Added cross-MFE favorite cities — star/unstar from search, favorites dropdown, transit city chips, FavoritesManager panel
