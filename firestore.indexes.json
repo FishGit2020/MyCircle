@@ -32,13 +32,6 @@
         { "fieldPath": "fileId", "order": "ASCENDING" },
         { "fieldPath": "revokedAt", "order": "ASCENDING" }
       ]
-    },
-    {
-      "collectionGroup": "files",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        { "fieldPath": "ownerUid", "order": "ASCENDING" }
-      ]
     }
   ],
   "fieldOverrides": []
