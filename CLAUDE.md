@@ -183,6 +183,10 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - Firestore `users/{uid}/flashcardDecks`, `users/{uid}/flashcardDecks/{id}/deckCards`, `users/{uid}/reviewSessions`, `users/{uid}/dailyStreak`; localStorage fallback for unauthenticated users (010-language-flashcards)
 - TypeScript 5.x + React 18 + `@mycircle/shared` (useTranslation, StorageKeys, PageContent), Tailwind CSS — no new packages added (011-daily-log-enhancements)
 - Firestore `users/{uid}/dailylog/{entryId}` — two optional fields added (`mood`, `tags`); existing documents untouched (011-daily-log-enhancements)
+- TypeScript 5.x (frontend + backend) + React 18, Tailwind CSS, Apollo Client (via `@mycircle/shared`), Firebase Admin SDK (Cloud Functions), Vitest + React Testing Library (012-file-manager)
+- Firestore (`users/{uid}/files`, `users/{uid}/folders`, `sharedWithMe/{uid}/files`) + Firebase Storage (unchanged paths) (012-file-manager)
+- TypeScript 5.3.3, React 18 + `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent), Tailwind CSS — no new packages (013-ai-benchmark)
+- localStorage (prompt selection persistence), Firestore via existing GraphQL queries (unchanged) (013-ai-benchmark)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)

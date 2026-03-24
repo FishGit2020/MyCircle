@@ -119,6 +119,39 @@ export const typeDefs = `#graphql
     downloadUrl: String!
     storagePath: String!
     uploadedAt: String!
+    folderId: ID
+  }
+
+  type Folder {
+    id: ID!
+    name: String!
+    parentFolderId: ID
+    createdAt: String!
+    depth: Int!
+  }
+
+  type TargetedSharedFile {
+    shareId: String!
+    ownerUid: String!
+    ownerName: String!
+    fileId: String!
+    fileName: String!
+    contentType: String!
+    size: Int!
+    downloadUrl: String!
+    sharedAt: String!
+  }
+
+  type ShareRecipient {
+    recipientUid: String!
+    recipientName: String!
+    shareId: String!
+    sharedAt: String!
+  }
+
+  type TargetedShareResult {
+    ok: Boolean!
+    shareId: String!
   }
 
   type SharedFile {
@@ -484,6 +517,9 @@ export const typeDefs = `#graphql
     # Cloud Files (auth required)
     cloudFiles: [CloudFile!]!
     sharedFiles: [SharedFile!]!
+    folders: [Folder!]!
+    fileShareRecipients(fileId: ID!): [ShareRecipient!]!
+    filesSharedWithMe: [TargetedSharedFile!]!
 
     # Deals (auth required)
     deals: [Deal!]!
@@ -950,6 +986,13 @@ export const typeDefs = `#graphql
     shareFile(fileId: ID!): ShareFileResult!
     deleteFile(fileId: ID!): Boolean!
     deleteSharedFile(fileId: ID!): Boolean!
+    renameFile(fileId: ID!, newName: String!): CloudFile!
+    createFolder(name: String!, parentFolderId: ID): Folder!
+    deleteFolder(folderId: ID!, deleteContents: Boolean!): Boolean!
+    renameFolder(folderId: ID!, newName: String!): Folder!
+    moveFile(fileId: ID!, targetFolderId: ID): CloudFile!
+    shareFileWith(fileId: ID!, recipientEmail: String!): TargetedShareResult!
+    revokeFileAccess(shareId: String!): Boolean!
 
     # Baby Photos (auth required)
     deleteBabyPhoto(stageId: Int!, photoId: String!): Boolean!

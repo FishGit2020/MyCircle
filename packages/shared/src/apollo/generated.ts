@@ -300,6 +300,7 @@ export type CloudFile = {
   contentType: Scalars['String']['output'];
   downloadUrl: Scalars['String']['output'];
   fileName: Scalars['String']['output'];
+  folderId?: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   size: Scalars['Int']['output'];
   storagePath: Scalars['String']['output'];
@@ -444,6 +445,15 @@ export type Deal = {
   url: Scalars['String']['output'];
 };
 
+export type Folder = {
+  __typename?: 'Folder';
+  createdAt: Scalars['String']['output'];
+  depth: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  parentFolderId?: Maybe<Scalars['ID']['output']>;
+};
+
 export type ForecastDay = {
   __typename?: 'ForecastDay';
   dt: Scalars['Int']['output'];
@@ -523,6 +533,7 @@ export type Mutation = {
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
   createDailyLog: DailyLogEntry;
+  createFolder: Folder;
   createInterviewQuestion: InterviewQuestion;
   deleteBabyPhoto: Scalars['Boolean']['output'];
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
@@ -530,14 +541,19 @@ export type Mutation = {
   deleteBook: Scalars['Boolean']['output'];
   deleteCrawlJob: Scalars['Boolean']['output'];
   deleteFile: Scalars['Boolean']['output'];
+  deleteFolder: Scalars['Boolean']['output'];
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
   deleteNote: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
   deleteWorshipSetlist: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
+  moveFile: CloudFile;
   permanentDeleteBook: Scalars['Boolean']['output'];
+  renameFile: CloudFile;
+  renameFolder: Folder;
   restoreBook: Scalars['Boolean']['output'];
+  revokeFileAccess: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
   saveBabyMilestoneNotes: Scalars['Boolean']['output'];
   saveBenchmarkEndpoint: BenchmarkEndpoint;
@@ -545,6 +561,7 @@ export type Mutation = {
   saveInterviewSession: InterviewSessionDetail;
   scoreBenchmarkResponse: BenchmarkQualityResult;
   shareFile: ShareFileResult;
+  shareFileWith: TargetedShareResult;
   startCrawl: CrawlJob;
   stopCrawl: CrawlJob;
   updateInterviewQuestion: InterviewQuestion;
@@ -585,6 +602,12 @@ export type MutationCreateDailyLogArgs = {
 };
 
 
+export type MutationCreateFolderArgs = {
+  name: Scalars['String']['input'];
+  parentFolderId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
 export type MutationCreateInterviewQuestionArgs = {
   input: CreateInterviewQuestionInput;
 };
@@ -621,6 +644,12 @@ export type MutationDeleteFileArgs = {
 };
 
 
+export type MutationDeleteFolderArgs = {
+  deleteContents: Scalars['Boolean']['input'];
+  folderId: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteInterviewQuestionArgs = {
   id: Scalars['ID']['input'];
 };
@@ -651,13 +680,36 @@ export type MutationDeleteWorshipSongArgs = {
 };
 
 
+export type MutationMoveFileArgs = {
+  fileId: Scalars['ID']['input'];
+  targetFolderId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
 export type MutationPermanentDeleteBookArgs = {
   id: Scalars['ID']['input'];
 };
 
 
+export type MutationRenameFileArgs = {
+  fileId: Scalars['ID']['input'];
+  newName: Scalars['String']['input'];
+};
+
+
+export type MutationRenameFolderArgs = {
+  folderId: Scalars['ID']['input'];
+  newName: Scalars['String']['input'];
+};
+
+
 export type MutationRestoreBookArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeFileAccessArgs = {
+  shareId: Scalars['String']['input'];
 };
 
 
@@ -700,6 +752,12 @@ export type MutationScoreBenchmarkResponseArgs = {
 
 export type MutationShareFileArgs = {
   fileId: Scalars['ID']['input'];
+};
+
+
+export type MutationShareFileWithArgs = {
+  fileId: Scalars['ID']['input'];
+  recipientEmail: Scalars['String']['input'];
 };
 
 
@@ -840,6 +898,9 @@ export type Query = {
   cryptoPrices: Array<CryptoPrice>;
   currentWeather: CurrentWeather;
   deals: Array<Deal>;
+  fileShareRecipients: Array<ShareRecipient>;
+  filesSharedWithMe: Array<TargetedSharedFile>;
+  folders: Array<Folder>;
   forecast: Array<ForecastDay>;
   historicalWeather?: Maybe<HistoricalWeatherDay>;
   hourlyForecast: Array<HourlyForecast>;
@@ -961,6 +1022,11 @@ export type QueryCryptoPricesArgs = {
 export type QueryCurrentWeatherArgs = {
   lat: Scalars['Float']['input'];
   lon: Scalars['Float']['input'];
+};
+
+
+export type QueryFileShareRecipientsArgs = {
+  fileId: Scalars['ID']['input'];
 };
 
 
@@ -1190,6 +1256,14 @@ export type ShareFileResult = {
   ok: Scalars['Boolean']['output'];
 };
 
+export type ShareRecipient = {
+  __typename?: 'ShareRecipient';
+  recipientName: Scalars['String']['output'];
+  recipientUid: Scalars['String']['output'];
+  shareId: Scalars['String']['output'];
+  sharedAt: Scalars['String']['output'];
+};
+
 export type SharedFile = {
   __typename?: 'SharedFile';
   contentType: Scalars['String']['output'];
@@ -1249,6 +1323,25 @@ export type Subscription = {
 export type SubscriptionWeatherUpdatesArgs = {
   lat: Scalars['Float']['input'];
   lon: Scalars['Float']['input'];
+};
+
+export type TargetedShareResult = {
+  __typename?: 'TargetedShareResult';
+  ok: Scalars['Boolean']['output'];
+  shareId: Scalars['String']['output'];
+};
+
+export type TargetedSharedFile = {
+  __typename?: 'TargetedSharedFile';
+  contentType: Scalars['String']['output'];
+  downloadUrl: Scalars['String']['output'];
+  fileId: Scalars['String']['output'];
+  fileName: Scalars['String']['output'];
+  ownerName: Scalars['String']['output'];
+  ownerUid: Scalars['String']['output'];
+  shareId: Scalars['String']['output'];
+  sharedAt: Scalars['String']['output'];
+  size: Scalars['Int']['output'];
 };
 
 export type Temperature = {
@@ -1829,6 +1922,78 @@ export type DeleteSharedFileMutationVariables = Exact<{
 
 
 export type DeleteSharedFileMutation = { __typename?: 'Mutation', deleteSharedFile: boolean };
+
+export type GetFoldersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetFoldersQuery = { __typename?: 'Query', folders: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, createdAt: string, depth: number }> };
+
+export type GetFileShareRecipientsQueryVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+}>;
+
+
+export type GetFileShareRecipientsQuery = { __typename?: 'Query', fileShareRecipients: Array<{ __typename?: 'ShareRecipient', recipientUid: string, recipientName: string, shareId: string, sharedAt: string }> };
+
+export type GetFilesSharedWithMeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetFilesSharedWithMeQuery = { __typename?: 'Query', filesSharedWithMe: Array<{ __typename?: 'TargetedSharedFile', shareId: string, ownerUid: string, ownerName: string, fileId: string, fileName: string, contentType: string, size: number, downloadUrl: string, sharedAt: string }> };
+
+export type RenameFileMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+  newName: Scalars['String']['input'];
+}>;
+
+
+export type RenameFileMutation = { __typename?: 'Mutation', renameFile: { __typename?: 'CloudFile', id: string, fileName: string } };
+
+export type CreateFolderMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  parentFolderId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type CreateFolderMutation = { __typename?: 'Mutation', createFolder: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, createdAt: string, depth: number } };
+
+export type DeleteFolderMutationVariables = Exact<{
+  folderId: Scalars['ID']['input'];
+  deleteContents: Scalars['Boolean']['input'];
+}>;
+
+
+export type DeleteFolderMutation = { __typename?: 'Mutation', deleteFolder: boolean };
+
+export type RenameFolderMutationVariables = Exact<{
+  folderId: Scalars['ID']['input'];
+  newName: Scalars['String']['input'];
+}>;
+
+
+export type RenameFolderMutation = { __typename?: 'Mutation', renameFolder: { __typename?: 'Folder', id: string, name: string } };
+
+export type MoveFileMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+  targetFolderId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type MoveFileMutation = { __typename?: 'Mutation', moveFile: { __typename?: 'CloudFile', id: string, folderId?: string | null } };
+
+export type ShareFileWithMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+  recipientEmail: Scalars['String']['input'];
+}>;
+
+
+export type ShareFileWithMutation = { __typename?: 'Mutation', shareFileWith: { __typename?: 'TargetedShareResult', ok: boolean, shareId: string } };
+
+export type RevokeFileAccessMutationVariables = Exact<{
+  shareId: Scalars['String']['input'];
+}>;
+
+
+export type RevokeFileAccessMutation = { __typename?: 'Mutation', revokeFileAccess: boolean };
 
 export type GetBabyPhotosQueryVariables = Exact<{ [key: string]: never; }>;
 

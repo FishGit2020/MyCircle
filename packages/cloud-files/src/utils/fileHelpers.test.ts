@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatFileSize, getFileIcon, isAllowedFileType, isFileTooLarge } from './fileHelpers';
+import { formatFileSize, getFileIcon, isAllowedFileType, isFileTooLarge, getFileTypeCategory } from './fileHelpers';
 
 describe('formatFileSize', () => {
   it('formats bytes', () => {
@@ -68,5 +68,33 @@ describe('isFileTooLarge', () => {
 
   it('rejects files over 5MB', () => {
     expect(isFileTooLarge(6 * 1024 * 1024)).toBe(true);
+  });
+});
+
+describe('getFileTypeCategory', () => {
+  it('returns image for image MIME types', () => {
+    expect(getFileTypeCategory('image/jpeg')).toBe('image');
+    expect(getFileTypeCategory('image/png')).toBe('image');
+    expect(getFileTypeCategory('image/gif')).toBe('image');
+    expect(getFileTypeCategory('image/webp')).toBe('image');
+  });
+
+  it('returns pdf for application/pdf', () => {
+    expect(getFileTypeCategory('application/pdf')).toBe('pdf');
+  });
+
+  it('returns doc for Word and Excel types', () => {
+    expect(getFileTypeCategory('application/msword')).toBe('doc');
+    expect(getFileTypeCategory('application/vnd.openxmlformats-officedocument.wordprocessingml.document')).toBe('doc');
+    expect(getFileTypeCategory('application/vnd.ms-excel')).toBe('doc');
+    expect(getFileTypeCategory('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')).toBe('doc');
+    expect(getFileTypeCategory('text/plain')).toBe('doc');
+    expect(getFileTypeCategory('text/csv')).toBe('doc');
+  });
+
+  it('returns other for unknown or binary types', () => {
+    expect(getFileTypeCategory('application/octet-stream')).toBe('other');
+    expect(getFileTypeCategory('video/mp4')).toBe('other');
+    expect(getFileTypeCategory('application/zip')).toBe('other');
   });
 });

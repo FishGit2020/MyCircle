@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useQuery, useMutation, useTranslation, WindowEvents, GET_CLOUD_FILES, SHARE_FILE, DELETE_FILE } from '@mycircle/shared';
+import { useQuery, useMutation, useTranslation, WindowEvents, GET_CLOUD_FILES, SHARE_FILE, DELETE_FILE, RENAME_FILE, MOVE_FILE } from '@mycircle/shared';
 import type { FileItem } from '../types';
 import { fileToBase64 } from '../utils/fileHelpers';
 
@@ -12,14 +12,20 @@ export function useFiles() {
   const [deleteFileMutation] = useMutation(DELETE_FILE, {
     refetchQueries: [{ query: GET_CLOUD_FILES }],
   });
+  const [renameFileMutation] = useMutation(RENAME_FILE, {
+    refetchQueries: [{ query: GET_CLOUD_FILES }],
+  });
+  const [moveFileMutation] = useMutation(MOVE_FILE, {
+    refetchQueries: [{ query: GET_CLOUD_FILES }],
+  });
 
   const files: FileItem[] = (data?.cloudFiles ?? []) as FileItem[];
 
-  const uploadFile = useCallback(async (file: File) => {
+  const uploadFile = useCallback(async (file: File, folderId?: string | null) => {
     const api = window.__cloudFiles;
     if (!api?.upload) throw new Error('Not authenticated');
     const base64 = await fileToBase64(file);
-    const result = await api.upload(file.name, base64, file.type);
+    const result = await api.upload(file.name, base64, file.type, folderId ?? null);
     await refetch();
     window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
     return result;
@@ -35,6 +41,14 @@ export function useFiles() {
     window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
   }, [deleteFileMutation]);
 
+  const renameFile = useCallback(async (fileId: string, newName: string) => {
+    await renameFileMutation({ variables: { fileId, newName } });
+  }, [renameFileMutation]);
+
+  const moveFile = useCallback(async (fileId: string, targetFolderId: string | null) => {
+    await moveFileMutation({ variables: { fileId, targetFolderId } });
+  }, [moveFileMutation]);
+
   return {
     files,
     loading,
@@ -42,6 +56,8 @@ export function useFiles() {
     uploadFile,
     shareFile,
     deleteFile,
+    renameFile,
+    moveFile,
     reload: refetch,
   };
 }

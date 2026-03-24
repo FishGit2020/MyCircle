@@ -24,6 +24,22 @@ export function getFileIcon(contentType: string): string {
   return 'file';
 }
 
+export type FileTypeCategory = 'image' | 'pdf' | 'doc' | 'other';
+
+export function getFileTypeCategory(contentType: string): FileTypeCategory {
+  if (contentType.startsWith('image/')) return 'image';
+  if (contentType === 'application/pdf') return 'pdf';
+  if (
+    contentType.includes('word') ||
+    contentType.includes('document') ||
+    contentType.includes('excel') ||
+    contentType.includes('spreadsheet') ||
+    contentType === 'text/plain' ||
+    contentType === 'text/csv'
+  ) return 'doc';
+  return 'other';
+}
+
 export function isAllowedFileType(contentType: string): boolean {
   return ALLOWED_TYPES.has(contentType);
 }
