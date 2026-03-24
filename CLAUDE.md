@@ -187,6 +187,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - Firestore (`users/{uid}/files`, `users/{uid}/folders`, `sharedWithMe/{uid}/files`) + Firebase Storage (unchanged paths) (012-file-manager)
 - TypeScript 5.3.3, React 18 + `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent), Tailwind CSS — no new packages (013-ai-benchmark)
 - localStorage (prompt selection persistence), Firestore via existing GraphQL queries (unchanged) (013-ai-benchmark)
+- TypeScript 5.x, React 18 + epubjs (already in `packages/digital-library`), `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys), React hooks, Tailwind CSS (014-ebook-tts-enhancements)
+- localStorage only — 3 new `StorageKeys` entries: `BOOK_READ_PROGRESS`, `LIBRARY_SORT`, `READER_THEME` (014-ebook-tts-enhancements)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)
