@@ -161,7 +161,7 @@ export function useFlashCards() {
         };
         if (card.type === 'bible-first-letter' || card.type === 'bible-full') {
           bible.push(card);
-        } else if (card.type === 'custom') {
+        } else if (card.type === 'custom' || card.type === 'technique') {
           custom.push(card);
         } else if (card.type === 'chinese') {
           chinese.push(card);
@@ -343,7 +343,7 @@ export function useFlashCards() {
 
   const addCustomCard = useCallback((card: Omit<FlashCard, 'id' | 'type'> & { type?: CardType }) => {
     const cardType = card.type || 'custom';
-    const prefix = cardType === 'chinese' ? 'zh' : 'custom';
+    const prefix = cardType === 'chinese' ? 'zh' : cardType === 'technique' ? 'tech-user' : 'custom';
     const newCard: FlashCard = {
       ...card,
       id: `${prefix}-${Date.now()}`,

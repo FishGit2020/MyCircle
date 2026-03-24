@@ -1519,6 +1519,10 @@ const es: Record<TranslationKey, string> = {
   'flashcards.myCards': 'Mis Tarjetas',
   'flashcards.published': 'Publicadas',
   'flashcards.allCards': 'Todas',
+  'flashcards.addTechniqueCard': 'Agregar Tarjeta T\u00e9cnica',
+  'flashcards.customCategory': 'Categor\u00eda personalizada...',
+  'flashcards.enterCategory': 'Ingrese nombre de categor\u00eda',
+  'flashcards.difficulty': 'Dificultad',
 
   // Flashcard Decks (Spaced Repetition)
   'flashcards.deck.title': 'Mazos',
