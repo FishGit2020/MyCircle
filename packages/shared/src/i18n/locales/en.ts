@@ -2582,6 +2582,7 @@ const en = {
   'widgets.dealFinder': 'Deal Finder',
   'widgets.dealFinderDesc': 'Browse the best deals from around the web',
   'widgets.dealFinderBrowse': 'Browse deals from SlickDeals, DealNews & Reddit',
+  'nav.deals': 'Deals',
   'deals.title': 'Deal Finder',
   'deals.subtitle': 'Best deals from SlickDeals, DealNews & Reddit',
   'deals.refresh': 'Refresh',

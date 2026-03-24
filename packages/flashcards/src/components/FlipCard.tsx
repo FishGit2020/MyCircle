@@ -36,23 +36,27 @@ export default function FlipCard({ front, back, flipped: controlledFlipped, onFl
         style={{
           transformStyle: 'preserve-3d',
           transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-          minHeight: '240px',
         }}
       >
+        {/* Invisible spacer: renders both sides in normal flow to determine max height */}
+        <div className="invisible" aria-hidden="true" style={{ minHeight: '240px' }}>
+          <div className="p-6">{isFlipped ? back : front}</div>
+        </div>
+
         {/* Front */}
         <div
-          className="absolute inset-0 w-full h-full rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center p-6"
-          style={{ backfaceVisibility: 'hidden' }}
+          className="absolute inset-0 w-full rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center p-6 overflow-y-auto"
+          style={{ backfaceVisibility: 'hidden', maxHeight: '60vh' }}
         >
-          <div className="text-center">{front}</div>
+          <div className="text-center w-full">{front}</div>
         </div>
 
         {/* Back */}
         <div
-          className="absolute inset-0 w-full h-full rounded-2xl bg-blue-50 dark:bg-blue-900/30 shadow-lg border border-blue-200 dark:border-blue-700 flex items-center justify-center p-6"
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          className="absolute inset-0 w-full rounded-2xl bg-blue-50 dark:bg-blue-900/30 shadow-lg border border-blue-200 dark:border-blue-700 flex items-start justify-center p-6 overflow-y-auto"
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', maxHeight: '60vh' }}
         >
-          <div className="text-center">{back}</div>
+          <div className="text-center w-full">{back}</div>
         </div>
       </div>
     </div>

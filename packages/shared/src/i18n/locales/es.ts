@@ -2582,6 +2582,7 @@ const es: Record<TranslationKey, string> = {
   'widgets.dealFinder': 'Buscador de Ofertas',
   'widgets.dealFinderDesc': 'Explora las mejores ofertas de la web',
   'widgets.dealFinderBrowse': 'Ofertas de SlickDeals, DealNews y Reddit',
+  'nav.deals': 'Ofertas',
   'deals.title': 'Buscador de Ofertas',
   'deals.subtitle': 'Mejores ofertas de SlickDeals, DealNews y Reddit',
   'deals.refresh': 'Actualizar',
