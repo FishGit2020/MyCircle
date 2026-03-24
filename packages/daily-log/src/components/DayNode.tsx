@@ -1,34 +1,36 @@
 import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import type { WorkEntry } from '../types';
+import type { MoodValue, WorkEntry } from '../types';
 import { getLocalDateString } from '../utils/localDate';
 import EntryForm from './EntryForm';
+import HighlightedText from './HighlightedText';
+
+const MOOD_EMOJI: Record<MoodValue, string> = {
+  happy: '😊',
+  neutral: '😐',
+  sad: '😔',
+  frustrated: '😤',
+  energized: '🔥',
+};
 
 interface DayNodeProps {
   date: string;
   entries: WorkEntry[];
-  onUpdate: (id: string, content: string) => Promise<void>;
+  onUpdate: (id: string, content: string, mood?: MoodValue, tags?: string[]) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onMoveEntry?: (id: string, newDate: string) => Promise<void>;
+  onTagFilter?: (tag: string) => void;
+  searchQuery?: string;
 }
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr + 'T00:00:00');
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setHours(0, 0, 0, 0);
-
   const options: Intl.DateTimeFormatOptions = {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   };
-
   return date.toLocaleDateString(undefined, options);
 }
 
@@ -42,7 +44,7 @@ function isYesterday(dateStr: string): boolean {
   return dateStr === getLocalDateString(yesterday);
 }
 
-export default function DayNode({ date, entries, onUpdate, onDelete, onMoveEntry }: DayNodeProps) {
+export default function DayNode({ date, entries, onUpdate, onDelete, onMoveEntry, onTagFilter, searchQuery }: DayNodeProps) {
   const { t } = useTranslation();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -88,8 +90,10 @@ export default function DayNode({ date, entries, onUpdate, onDelete, onMoveEntry
             {editingId === entry.id ? (
               <EntryForm
                 initialValue={entry.content}
-                onSubmit={async (content) => {
-                  await onUpdate(entry.id, content);
+                initialMood={entry.mood}
+                initialTags={entry.tags}
+                onSubmit={async (content, mood, tags) => {
+                  await onUpdate(entry.id, content, mood, tags);
                   setEditingId(null);
                 }}
                 onCancel={() => setEditingId(null)}
@@ -97,9 +101,20 @@ export default function DayNode({ date, entries, onUpdate, onDelete, onMoveEntry
             ) : (
               <div>
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap flex-1">
-                    {entry.content}
-                  </p>
+                  <div className="flex items-start gap-2 flex-1 min-w-0">
+                    {entry.mood && (
+                      <span
+                        className="flex-shrink-0 text-base leading-5 mt-0.5"
+                        aria-label={t(('dailyLog.mood.' + entry.mood) as Parameters<typeof t>[0])}
+                        role="img"
+                      >
+                        {MOOD_EMOJI[entry.mood]}
+                      </span>
+                    )}
+                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap flex-1">
+                      <HighlightedText text={entry.content} query={searchQuery ?? ''} />
+                    </p>
+                  </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                     <button
                       type="button"
@@ -148,6 +163,23 @@ export default function DayNode({ date, entries, onUpdate, onDelete, onMoveEntry
                     )}
                   </div>
                 </div>
+
+                {/* Tag chips */}
+                {entry.tags && entry.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {entry.tags.map(tag => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => onTagFilter?.(tag)}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 hover:text-indigo-700 dark:hover:text-indigo-300 transition"
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {movingId === entry.id && onMoveEntry && (
                   <div className="mt-2 flex items-center gap-2">
                     <label className="text-xs text-gray-500 dark:text-gray-400">

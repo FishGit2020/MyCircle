@@ -77,8 +77,8 @@ declare global {
     /* ── Work Tracker ──────────────────────────────────────── */
     __workTracker?: {
       getAll: () => Promise<any[]>; // eslint-disable-line @typescript-eslint/no-explicit-any
-      add: (entry: { date: string; content: string }) => Promise<string>;
-      update: (id: string, updates: Partial<{ content: string; date: string }>) => Promise<void>;
+      add: (entry: { date: string; content: string; mood?: string; tags?: string[] }) => Promise<string>;
+      update: (id: string, updates: Partial<{ content: string; date: string; mood: string; tags: string[] }>) => Promise<void>;
       delete: (id: string) => Promise<void>;
       subscribe?: (callback: (entries: any[]) => void) => () => void; // eslint-disable-line @typescript-eslint/no-explicit-any
     };
