@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.13.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.12.0...mycircle-v1.13.0) (2026-03-24)
+
+
+### Features
+
+* **digital-library:** reading progress, search/sort, and reading themes ([#850](https://github.com/FishGit2020/MyCircle/issues/850)) ([70157ad](https://github.com/FishGit2020/MyCircle/commit/70157ad83186c9e74001d51e6db7097faa5e714a))
+
+
+### Bug Fixes
+
+* **firestore:** remove redundant single-field composite index on files ([#848](https://github.com/FishGit2020/MyCircle/issues/848)) ([1da9ae1](https://github.com/FishGit2020/MyCircle/commit/1da9ae12b9e31fc85ceb112bb8f52abf09aafc82))
+
 ## [1.12.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.11.0...mycircle-v1.12.0) (2026-03-24)
 
 
