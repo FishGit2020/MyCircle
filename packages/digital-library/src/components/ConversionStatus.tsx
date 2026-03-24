@@ -3,6 +3,10 @@ import { useTranslation, createLogger, WindowEvents, useLazyQuery, GET_BOOK_CONV
 
 const logger = createLogger('ConversionStatus');
 
+function isAbortError(err: unknown): boolean {
+  return err instanceof DOMException && (err.code === 20 || err.name === 'AbortError');
+}
+
 const VOICE_SUFFIXES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] as const;
 
 function getLangCode(language: string): string {
@@ -96,7 +100,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         setProgress(0);
       }
     } catch (err) {
-      logger.error('Failed to start conversion', err);
+      if (!isAbortError(err)) logger.error('Failed to start conversion', err);
     } finally {
       setConverting(false);
     }
@@ -119,7 +123,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
       }
     } catch (err) {
-      logger.error('Reset conversion failed', err);
+      if (!isAbortError(err)) logger.error('Reset conversion failed', err);
     } finally {
       setResetting(false);
     }
@@ -167,8 +171,13 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
       const player = new Audio(url);
       player.onended = () => { setPreviewing(false); URL.revokeObjectURL(url); };
       player.onerror = () => { setPreviewing(false); URL.revokeObjectURL(url); };
-      await player.play();
-    } catch {
+      await player.play().catch((err: unknown) => {
+        if (!isAbortError(err)) throw err;
+        // AbortError is expected when navigating away during playback
+        URL.revokeObjectURL(url);
+      });
+    } catch (err) {
+      if (!isAbortError(err)) logger.error('Voice preview failed', err);
       setPreviewing(false);
     }
   }, [selectedVoice]);

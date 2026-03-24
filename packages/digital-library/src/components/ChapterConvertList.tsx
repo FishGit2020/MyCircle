@@ -4,6 +4,10 @@ import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
 
+function isAbortError(err: unknown): boolean {
+  return err instanceof DOMException && (err.code === 20 || err.name === 'AbortError');
+}
+
 interface Chapter {
   index: number;
   title: string;
@@ -27,6 +31,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   const { t } = useTranslation();
   const [converting, setConverting] = useState<number | null>(null);
   const autoPlayedRef = useRef(false);
+  const pollAbortRef = useRef(false);
 
   const audioChapters = chapters.filter(ch => ch.audioUrl);
 
@@ -93,6 +98,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   const handleConvert = useCallback(async (chapterIndex: number) => {
     setConverting(chapterIndex);
+    pollAbortRef.current = false;
     try {
       const token = await window.__getFirebaseIdToken?.();
       if (!token) return;
@@ -106,22 +112,37 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
         const data = await res.json().catch(() => ({}));
         logger.warn('Chapter conversion failed', data);
       }
-      // Poll for completion
+      // Poll for completion (cancellable via pollAbortRef)
+      // Only notify parent once when done, not on every tick (avoids full page refresh loop)
       const poll = async (attempts: number) => {
-        if (attempts > 40) { setConverting(null); return; }
-        await new Promise(r => setTimeout(r, 3000));
+        if (pollAbortRef.current || attempts > 40) {
+          setConverting(null);
+          onChapterConverted(); // Final refresh
+          return;
+        }
+        await new Promise(r => setTimeout(r, 5000));
+        if (pollAbortRef.current) return;
+        // Check silently — parent refetch will show new audio when chapter is done
         onChapterConverted();
-        // Keep polling — parent will re-render with updated chapter data
-        setTimeout(() => poll(attempts + 1), 3000);
+        // Stop if chapter now has audio (parent will re-render with updated data)
+        // Otherwise keep polling
+        poll(attempts + 1);
       };
-      poll(0);
+      // Wait before first poll to give server time
+      setTimeout(() => { if (!pollAbortRef.current) poll(0); }, 5000);
     } catch (err) {
-      logger.error('Chapter conversion failed', err);
+      if (!isAbortError(err)) logger.error('Chapter conversion failed', err);
       setConverting(null);
     }
   }, [bookId, voiceName, onChapterConverted]);
 
+  // Stop polling on unmount
+  useEffect(() => {
+    return () => { pollAbortRef.current = true; };
+  }, []);
+
   const handleCancel = useCallback(() => {
+    pollAbortRef.current = true;
     setConverting(null);
   }, []);
 

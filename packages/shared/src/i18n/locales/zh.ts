@@ -2582,6 +2582,7 @@ const zh: Record<TranslationKey, string> = {
   'widgets.dealFinder': '\u4f18\u60e0\u641c\u7d22',
   'widgets.dealFinderDesc': '\u6d4f\u89c8\u7f51\u4e0a\u6700\u4f73\u4f18\u60e0',
   'widgets.dealFinderBrowse': '\u6765\u81ea SlickDeals\u3001DealNews \u548c Reddit \u7684\u4f18\u60e0',
+  'nav.deals': '\u4f18\u60e0',
   'deals.title': '\u4f18\u60e0\u641c\u7d22',
   'deals.subtitle': '\u6765\u81ea SlickDeals\u3001DealNews \u548c Reddit \u7684\u6700\u4f73\u4f18\u60e0',
   'deals.refresh': '\u5237\u65b0',

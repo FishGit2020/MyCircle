@@ -622,11 +622,16 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
               const token = await window.__getFirebaseIdToken?.();
               if (!token) return undefined;
               const apiBase = window.__digitalLibraryApiBase?.() || '';
-              return fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ bookId, voiceName }),
-              });
+              try {
+                return await fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ bookId, voiceName }),
+                });
+              } catch (err) {
+                if (err instanceof DOMException && (err.code === 20 || err.name === 'AbortError')) return undefined;
+                throw err;
+              }
             }}
           />
 
@@ -643,7 +648,6 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
               return `${lc}-Neural2-${lc === 'en-US' ? 'D' : 'A'}`;
             })()}
             onChapterConverted={async () => {
-              window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
               await onRefreshChapters?.();
             }}
           />
