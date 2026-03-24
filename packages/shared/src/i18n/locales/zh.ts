@@ -1925,6 +1925,18 @@ const zh: Record<TranslationKey, string> = {
   'library.skipBack': '\u5feb\u900010\u79d2',
   'library.chapterComplete': '\u5df2\u5b8c\u6210',
   'library.pageInfo': '\u7b2c {page} \u9875\uff0c\u5171 {total} \u9875',
+  'library.searchPlaceholder': '\u641c\u7d22\u4e66\u7c4d\u2026',
+  'library.sortLabel': '\u6392\u5e8f',
+  'library.sortRecentlyAdded': '\u6700\u8fd1\u6dfb\u52a0',
+  'library.sortRecentlyRead': '\u6700\u8fd1\u9605\u8bfb',
+  'library.sortTitleAZ': '\u6807\u9898 A\u2013Z',
+  'library.readingProgress': '\u9605\u8bfb\u8fdb\u5ea6',
+  'library.complete': '\u5df2\u5b8c\u6210',
+  'library.noResults': '\u6ca1\u6709\u5339\u914d\u641c\u7d22\u7684\u4e66\u7c4d',
+  'library.themeDefault': '\u9ed8\u8ba4\u4e3b\u9898',
+  'library.themeSepia': '\u6ce5\u91d1\u8272\u4e3b\u9898',
+  'library.themeNight': '\u591c\u95f4\u4e3b\u9898',
+  'library.readingTheme': '\u9605\u8bfb\u4e3b\u9898',
 
   'widgets.noAudiobook': '\u6ca1\u6709\u6b63\u5728\u8fdb\u884c\u7684\u6709\u58f0\u4e66',
 

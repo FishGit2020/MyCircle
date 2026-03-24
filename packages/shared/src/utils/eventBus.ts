@@ -160,6 +160,9 @@ export const StorageKeys = {
   FLASHCARD_DECKS: 'flashcard-decks',
   FLASHCARD_DECK_CARDS: 'flashcard-deck-cards',
   FLASHCARD_STREAK: 'flashcard-streak',
+  BOOK_READ_PROGRESS: 'book-read-progress',
+  LIBRARY_SORT: 'library-sort',
+  READER_THEME: 'reader-theme',
 } as const;
 
 export interface CitySelectedEvent {

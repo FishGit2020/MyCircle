@@ -1923,6 +1923,18 @@ const en = {
   'library.skipBack': 'Skip back 10 seconds',
   'library.chapterComplete': 'Complete',
   'library.pageInfo': 'Page {page} of {total}',
+  'library.searchPlaceholder': 'Search books...',
+  'library.sortLabel': 'Sort',
+  'library.sortRecentlyAdded': 'Recently Added',
+  'library.sortRecentlyRead': 'Recently Read',
+  'library.sortTitleAZ': 'Title A\u2013Z',
+  'library.readingProgress': 'Reading progress',
+  'library.complete': 'Complete',
+  'library.noResults': 'No books match your search',
+  'library.themeDefault': 'Default theme',
+  'library.themeSepia': 'Sepia theme',
+  'library.themeNight': 'Night theme',
+  'library.readingTheme': 'Reading theme',
 
   'widgets.noAudiobook': 'No audiobook in progress',
 
