@@ -9,6 +9,7 @@ import { createAiMutationResolvers, createAiQueryResolvers } from './ai.js';
 import { createWorshipSongResolvers } from './worshipSongs.js';
 import { createWorshipSetlistResolvers } from './worshipSetlists.js';
 import { createCloudFileResolvers } from './cloudFiles.js';
+import { createCloudFilesEnhancementResolvers } from './cloudFilesEnhancements.js';
 import { createBabyPhotoResolvers } from './babyPhotos.js';
 import { createDigitalLibraryResolvers } from './digitalLibrary.js';
 import { createTransitQueryResolvers } from './transit.js';
@@ -32,6 +33,7 @@ export function createResolvers(
   const worshipSongResolvers = createWorshipSongResolvers();
   const worshipSetlistResolvers = createWorshipSetlistResolvers();
   const cloudFileResolvers = createCloudFileResolvers();
+  const cloudFilesEnhancementResolvers = createCloudFilesEnhancementResolvers();
   const babyPhotoResolvers = createBabyPhotoResolvers();
   const digitalLibraryResolvers = createDigitalLibraryResolvers();
   const interviewSessionResolvers = createInterviewSessionResolvers();
@@ -49,6 +51,7 @@ export function createResolvers(
       ...worshipSongResolvers.Mutation,
       ...worshipSetlistResolvers.Mutation,
       ...cloudFileResolvers.Mutation,
+      ...cloudFilesEnhancementResolvers.Mutation,
       ...babyPhotoResolvers.Mutation,
       ...digitalLibraryResolvers.Mutation,
       ...interviewSessionResolvers.Mutation,
@@ -68,6 +71,7 @@ export function createResolvers(
       ...worshipSongResolvers.Query,
       ...worshipSetlistResolvers.Query,
       ...cloudFileResolvers.Query,
+      ...cloudFilesEnhancementResolvers.Query,
       ...babyPhotoResolvers.Query,
       ...digitalLibraryResolvers.Query,
       ...createTransitQueryResolvers(),
