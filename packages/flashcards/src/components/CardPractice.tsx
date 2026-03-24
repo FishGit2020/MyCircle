@@ -16,7 +16,7 @@ interface CardPracticeProps {
 function CardFront({ card }: { card: FlashCard }) {
   return (
     <div>
-      <p className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+      <p className="text-3xl font-bold text-gray-800 dark:text-white mb-2 whitespace-pre-wrap">
         {card.front}
       </p>
       {card.meta?.pinyin && (
@@ -32,7 +32,7 @@ function CardFront({ card }: { card: FlashCard }) {
 function CardBack({ card }: { card: FlashCard }) {
   return (
     <div>
-      <p className="text-xl text-gray-800 dark:text-white leading-relaxed">
+      <p className="text-xl text-gray-800 dark:text-white leading-relaxed whitespace-pre-wrap">
         {card.back}
       </p>
       {card.meta?.reference && (
