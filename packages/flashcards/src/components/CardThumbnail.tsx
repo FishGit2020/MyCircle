@@ -78,7 +78,7 @@ export default function CardThumbnail({ card, isMastered, onClick, onDelete, onE
         </div>
       )}
 
-      <p className="text-sm font-medium text-gray-800 dark:text-white line-clamp-2">
+      <p className="text-sm font-medium text-gray-800 dark:text-white line-clamp-2 whitespace-pre-wrap">
         {card.front}
       </p>
       <div className="flex items-center justify-between mt-2">

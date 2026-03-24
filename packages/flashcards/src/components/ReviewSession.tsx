@@ -114,7 +114,7 @@ export default function ReviewSession({ deckId, deckName, allCards, onClose }: P
               {!isFlipped ? (
                 <>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 uppercase tracking-wide">Front</p>
-                  <p className="text-2xl font-medium text-gray-800 dark:text-white">
+                  <p className="text-2xl font-medium text-gray-800 dark:text-white whitespace-pre-wrap">
                     {resolvedCard?.front ?? currentCard.cardId}
                   </p>
                   {resolvedCard?.meta?.pinyin && (
@@ -124,7 +124,7 @@ export default function ReviewSession({ deckId, deckName, allCards, onClose }: P
               ) : (
                 <>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 uppercase tracking-wide">Answer</p>
-                  <p className="text-2xl font-medium text-gray-800 dark:text-white">
+                  <p className="text-2xl font-medium text-gray-800 dark:text-white whitespace-pre-wrap">
                     {resolvedCard?.back ?? '—'}
                   </p>
                   {resolvedCard?.meta?.reference && (

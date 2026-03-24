@@ -87,7 +87,7 @@ export default function QuizView({ cards, onQuizComplete }: QuizViewProps) {
 
       {/* Show front of card */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center w-full max-w-md">
-        <p className="text-3xl font-bold text-gray-800 dark:text-white" data-testid="quiz-question">
+        <p className="text-3xl font-bold text-gray-800 dark:text-white whitespace-pre-wrap" data-testid="quiz-question">
           {question.card.front}
         </p>
         {question.card.meta?.pinyin && (
@@ -116,7 +116,7 @@ export default function QuizView({ cards, onQuizComplete }: QuizViewProps) {
               type="button"
               onClick={() => handleSelect(option)}
               disabled={selected !== null}
-              className={`p-3 rounded-lg border text-left font-medium transition ${btnClass}`}
+              className={`p-3 rounded-lg border text-left font-medium transition whitespace-pre-wrap ${btnClass}`}
               data-testid="quiz-option"
             >
               {option}
