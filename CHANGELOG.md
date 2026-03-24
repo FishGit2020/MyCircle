@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.11.0...mycircle-v1.12.0) (2026-03-24)
+
+
+### Features
+
+* **cloud-files:** add folders, file preview, sharing, and storage quota ([#847](https://github.com/FishGit2020/MyCircle/issues/847)) ([5b94f58](https://github.com/FishGit2020/MyCircle/commit/5b94f58d9490797acefdbbec3fb5fec6b4cde728))
+* **model-benchmark:** add batch benchmarking, chart view, and history trend ([#845](https://github.com/FishGit2020/MyCircle/issues/845)) ([bc77aee](https://github.com/FishGit2020/MyCircle/commit/bc77aee1e822da9c1f35e9d42f35ae5807957021))
+
 ## [1.11.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.10.0...mycircle-v1.11.0) (2026-03-24)
 
 
