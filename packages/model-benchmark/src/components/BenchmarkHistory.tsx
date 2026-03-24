@@ -1,12 +1,24 @@
 import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { useBenchmarkHistory } from '../hooks/useBenchmarkHistory';
+import TrendChart from './TrendChart';
 
 export default function BenchmarkHistory() {
   const { t } = useTranslation();
   const { runs, loading, deleteRun, clearAll } = useBenchmarkHistory(20);
   const [expandedRunId, setExpandedRunId] = useState<string | null>(null);
   const [clearing, setClearing] = useState(false);
+  const [trendFilter, setTrendFilter] = useState('');
+
+  // Derive unique endpointName::model combinations from all runs
+  const allCombos = Array.from(new Set(
+    runs.flatMap(run => {
+      const results = Array.isArray(run.results) ? run.results : [];
+      return (results as any[]) // eslint-disable-line @typescript-eslint/no-explicit-any
+        .filter((r: any) => r.endpointName && r.model) // eslint-disable-line @typescript-eslint/no-explicit-any
+        .map((r: any) => `${r.endpointName}::${r.model}`); // eslint-disable-line @typescript-eslint/no-explicit-any
+    })
+  ));
 
   if (loading) {
     return <div className="py-12 text-center text-gray-500 dark:text-gray-400 text-sm">{t('app.loading')}</div>;
@@ -209,6 +221,32 @@ export default function BenchmarkHistory() {
           </div>
         );
       })}
+
+      {/* Trend chart — shown when at least 2 runs exist */}
+      {runs.length >= 2 && (
+        <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h4 className="text-base font-semibold text-gray-800 dark:text-white">
+              {t('benchmark.history.trendTitle')}
+            </h4>
+            <select
+              value={trendFilter}
+              onChange={e => setTrendFilter(e.target.value)}
+              className="text-xs border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 min-h-[36px]"
+              aria-label={t('benchmark.history.filterEndpoint')}
+            >
+              <option value="">{t('benchmark.history.filterAll')}</option>
+              {allCombos.map(combo => {
+                const [ep, model] = combo.split('::');
+                return (
+                  <option key={combo} value={combo}>{ep} / {model}</option>
+                );
+              })}
+            </select>
+          </div>
+          <TrendChart runs={runs} filter={trendFilter} />
+        </div>
+      )}
     </div>
   );
 }

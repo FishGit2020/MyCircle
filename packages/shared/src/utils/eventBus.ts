@@ -141,6 +141,7 @@ export const StorageKeys = {
   BENCHMARK_MODEL_MAP: 'benchmark-model-map',
   BENCHMARK_RESULTS: 'benchmark-results',
   BENCHMARK_JUDGE: 'benchmark-judge',
+  BENCHMARK_SELECTED_PROMPTS: 'mycircle-benchmark-selected-prompts',
   DAILY_LOG_DAY_FILTER: 'daily-log-day-filter',
   IMMIGRATION_CASES_CACHE: 'immigration-cases-cache',
   BOOKS_CACHE: 'books-cache',
