@@ -26,6 +26,7 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
   });
   const [discoveredModels, setDiscoveredModels] = useState<Record<string, string[]>>({});
   const [discoveryLoading, setDiscoveryLoading] = useState<Record<string, boolean>>({});
+  const [discoveryErrors, setDiscoveryErrors] = useState<Record<string, boolean>>({});
 
   // Multi-prompt selection: persisted to localStorage
   const [selectedPromptIds, setSelectedPromptIds] = useState<string[]>(() => {
@@ -56,6 +57,7 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
 
   const discoverModels = useCallback(async (endpointId: string) => {
     setDiscoveryLoading(prev => ({ ...prev, [endpointId]: true }));
+    setDiscoveryErrors(prev => ({ ...prev, [endpointId]: false }));
     try {
       const { data } = await fetchModelsQuery({ variables: { endpointId }, fetchPolicy: 'network-only' });
       const models: string[] = data?.benchmarkEndpointModels ?? [];
@@ -69,7 +71,9 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
         }
         return prev;
       });
-    } catch { /* ignore */ }
+    } catch {
+      setDiscoveryErrors(prev => ({ ...prev, [endpointId]: true }));
+    }
     setDiscoveryLoading(prev => ({ ...prev, [endpointId]: false }));
   }, [fetchModelsQuery]);
 
@@ -78,8 +82,8 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
     setSelectedEndpoints(prev =>
       prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
     );
-    // Discover models when checking (not unchecking) an endpoint
-    if (!isRemoving && !discoveredModels[id]) {
+    // Discover models when checking (not unchecking) an endpoint, or if previous discovery errored
+    if (!isRemoving && (!discoveredModels[id] || discoveryErrors[id])) {
       discoverModels(id);
     }
   };
@@ -166,9 +170,18 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
 
   const currentEndpointLabel = endpoints.find(ep => ep.id === currentEndpoint)?.name ?? currentEndpoint ?? '';
 
+  const runDisabledReason = (() => {
+    if (running || scoring) return null;
+    if (selectedEndpoints.length === 0) return t('benchmark.runner.needEndpoint');
+    if (selectedEndpoints.some(id => discoveryLoading[id])) return null; // loading, no hint needed
+    if (selectedEndpoints.some(id => !modelMap[id]?.trim())) return t('benchmark.runner.needModel');
+    if (selectedPromptIds.length === 0) return t('benchmark.runner.needPrompt');
+    if (selectedPromptIds.includes('custom') && !customPrompt.trim() && selectedPromptIds.length === 1) return t('benchmark.runner.needCustomPrompt');
+    return null;
+  })();
   const runDisabled = running || scoring
     || selectedEndpoints.length === 0
-    || selectedEndpoints.some(id => !modelMap[id]?.trim())
+    || selectedEndpoints.some(id => discoveryLoading[id] || !modelMap[id]?.trim())
     || selectedPromptIds.length === 0
     || (selectedPromptIds.includes('custom') && !customPrompt.trim() && selectedPromptIds.length === 1);
 
@@ -204,23 +217,36 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
                   </label>
                   {isSelected && (
                     <div className="pl-8 pb-2">
-                      <select
-                        value={modelMap[ep.id] || ''}
-                        onChange={e => handleModelChange(ep.id, e.target.value)}
-                        disabled={running || isLoading || epModels.length === 0}
-                        aria-label={t('benchmark.runner.selectModelFor', { endpoint: ep.name })}
-                        className="w-full max-w-xs px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                      >
-                        {isLoading ? (
-                          <option value="">{t('app.loading')}</option>
-                        ) : epModels.length === 0 ? (
-                          <option value="">{t('benchmark.runner.noModels')}</option>
-                        ) : (
-                          epModels.map(m => (
-                            <option key={m} value={m}>{m}</option>
-                          ))
-                        )}
-                      </select>
+                      {discoveryErrors[ep.id] ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-red-500 dark:text-red-400">{t('benchmark.runner.modelDiscoveryError')}</span>
+                          <button
+                            type="button"
+                            onClick={() => discoverModels(ep.id)}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {t('benchmark.runner.retryModels')}
+                          </button>
+                        </div>
+                      ) : (
+                        <select
+                          value={modelMap[ep.id] || ''}
+                          onChange={e => handleModelChange(ep.id, e.target.value)}
+                          disabled={running || isLoading || epModels.length === 0}
+                          aria-label={t('benchmark.runner.selectModelFor', { endpoint: ep.name })}
+                          className="w-full max-w-xs px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        >
+                          {isLoading ? (
+                            <option value="">{t('app.loading')}</option>
+                          ) : epModels.length === 0 ? (
+                            <option value="">{t('benchmark.runner.noModels')}</option>
+                          ) : (
+                            epModels.map(m => (
+                              <option key={m} value={m}>{m}</option>
+                            ))
+                          )}
+                        </select>
+                      )}
                     </div>
                   )}
                 </div>
@@ -314,24 +340,29 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
       </div>
 
       {/* Run Button */}
-      <button
-        type="button"
-        onClick={handleRun}
-        disabled={runDisabled}
-        className="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition flex items-center justify-center gap-2"
-      >
-        {running || scoring ? (
-          <>
-            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            {scoring ? t('benchmark.runner.scoring') : t('benchmark.runner.running')}
-          </>
-        ) : (
-          t('benchmark.runner.run')
+      <div>
+        <button
+          type="button"
+          onClick={handleRun}
+          disabled={runDisabled}
+          className="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition flex items-center justify-center gap-2"
+        >
+          {running || scoring ? (
+            <>
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              {scoring ? t('benchmark.runner.scoring') : t('benchmark.runner.running')}
+            </>
+          ) : (
+            t('benchmark.runner.run')
+          )}
+        </button>
+        {runDisabledReason && (
+          <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400 text-center">{runDisabledReason}</p>
         )}
-      </button>
+      </div>
     </div>
   );
 }
