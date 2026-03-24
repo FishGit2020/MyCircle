@@ -30,7 +30,7 @@ export default function ModelBenchmark() {
     } catch { return []; }
   });
   const benchmark = useBenchmark();
-  const { saveRun, running, scoring } = benchmark;
+  const { saveRun, running, scoring, currentPromptIndex, totalPrompts } = benchmark;
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
 
@@ -102,7 +102,7 @@ export default function ModelBenchmark() {
       {/* Tab Content — Runner stays mounted (hidden) to preserve state during benchmark */}
       <div>
         <div className={activeTab === 'run' ? '' : 'hidden'}>
-          <BenchmarkRunner onResults={handleResults} benchmark={benchmark} />
+          <BenchmarkRunner onResults={handleResults} benchmark={benchmark} currentPromptIndex={currentPromptIndex} totalPrompts={totalPrompts} />
         </div>
         {activeTab === 'endpoints' && <EndpointManager />}
         {activeTab === 'results' && <ResultsDashboard results={latestResults} saved={saved} saveError={saveError} onClear={handleClearResults} />}

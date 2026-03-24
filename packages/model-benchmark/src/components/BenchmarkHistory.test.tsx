@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import BenchmarkHistory from './BenchmarkHistory';
 
 // Mock @mycircle/shared
@@ -8,6 +9,12 @@ vi.mock('@mycircle/shared', () => ({
     t: (key: string) => key,
   }),
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
+}));
+
+vi.mock('./TrendChart', () => ({
+  default: ({ filter }: { filter: string }) => (
+    <div data-testid="trend-chart" data-filter={filter}>TrendChart</div>
+  ),
 }));
 
 const mockUseBenchmarkHistory = vi.fn();
@@ -242,5 +249,104 @@ describe('BenchmarkHistory', () => {
     render(<BenchmarkHistory />);
     // Should not crash — results fallback to empty array
     expect(screen.getByText('benchmark.history.title')).toBeInTheDocument();
+  });
+
+  it('does not show trend section when fewer than 2 runs', () => {
+    mockUseBenchmarkHistory.mockReturnValue({
+      runs: [
+        {
+          id: 'run-1',
+          createdAt: '2026-01-15T10:00:00Z',
+          results: [{ endpointName: 'NAS', model: 'gemma2:2b', timing: { tokensPerSecond: 25 }, error: null }],
+        },
+      ],
+      loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
+    });
+
+    render(<BenchmarkHistory />);
+    expect(screen.queryByTestId('trend-chart')).not.toBeInTheDocument();
+    expect(screen.queryByText('benchmark.history.trendTitle')).not.toBeInTheDocument();
+  });
+
+  it('shows trend section and TrendChart when 2 or more runs', () => {
+    mockUseBenchmarkHistory.mockReturnValue({
+      runs: [
+        {
+          id: 'run-1',
+          createdAt: '2026-01-15T10:00:00Z',
+          results: [{ endpointName: 'NAS', model: 'gemma2:2b', timing: { tokensPerSecond: 25 }, error: null }],
+        },
+        {
+          id: 'run-2',
+          createdAt: '2026-01-16T10:00:00Z',
+          results: [{ endpointName: 'NAS', model: 'gemma2:2b', timing: { tokensPerSecond: 30 }, error: null }],
+        },
+      ],
+      loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
+    });
+
+    render(<BenchmarkHistory />);
+    expect(screen.getByText('benchmark.history.trendTitle')).toBeInTheDocument();
+    expect(screen.getByTestId('trend-chart')).toBeInTheDocument();
+  });
+
+  it('renders filter dropdown with endpoint/model combinations', () => {
+    mockUseBenchmarkHistory.mockReturnValue({
+      runs: [
+        {
+          id: 'run-1',
+          createdAt: '2026-01-15T10:00:00Z',
+          results: [
+            { endpointName: 'NAS', model: 'gemma2:2b', timing: { tokensPerSecond: 25 }, error: null },
+            { endpointName: 'GPU', model: 'llama3:8b', timing: { tokensPerSecond: 50 }, error: null },
+          ],
+        },
+        {
+          id: 'run-2',
+          createdAt: '2026-01-16T10:00:00Z',
+          results: [
+            { endpointName: 'NAS', model: 'gemma2:2b', timing: { tokensPerSecond: 28 }, error: null },
+          ],
+        },
+      ],
+      loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
+    });
+
+    render(<BenchmarkHistory />);
+    expect(screen.getByText('benchmark.history.filterAll')).toBeInTheDocument();
+    expect(screen.getByText('NAS / gemma2:2b')).toBeInTheDocument();
+    expect(screen.getByText('GPU / llama3:8b')).toBeInTheDocument();
+  });
+
+  it('updates TrendChart filter when dropdown changes', async () => {
+    const user = userEvent.setup({ delay: null });
+    mockUseBenchmarkHistory.mockReturnValue({
+      runs: [
+        {
+          id: 'run-1',
+          createdAt: '2026-01-15T10:00:00Z',
+          results: [{ endpointName: 'NAS', model: 'gemma2:2b', timing: { tokensPerSecond: 25 }, error: null }],
+        },
+        {
+          id: 'run-2',
+          createdAt: '2026-01-16T10:00:00Z',
+          results: [{ endpointName: 'NAS', model: 'gemma2:2b', timing: { tokensPerSecond: 30 }, error: null }],
+        },
+      ],
+      loading: false,
+      deleteRun: vi.fn(),
+      clearAll: vi.fn(),
+    });
+
+    render(<BenchmarkHistory />);
+    const select = screen.getByRole('combobox');
+    await user.selectOptions(select, 'NAS::gemma2:2b');
+    expect(screen.getByTestId('trend-chart')).toHaveAttribute('data-filter', 'NAS::gemma2:2b');
   });
 });

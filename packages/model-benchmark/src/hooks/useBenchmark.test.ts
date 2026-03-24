@@ -62,6 +62,8 @@ describe('useBenchmark', () => {
     expect(result.current.running).toBe(false);
     expect(result.current.scoring).toBe(false);
     expect(result.current.currentEndpoint).toBeNull();
+    expect(result.current.currentPromptIndex).toBeNull();
+    expect(result.current.totalPrompts).toBe(0);
     expect(typeof result.current.runBenchmark).toBe('function');
     expect(typeof result.current.saveRun).toBe('function');
     expect(typeof result.current.scoreResults).toBe('function');
@@ -88,7 +90,7 @@ describe('useBenchmark', () => {
     act(() => {
       runPromise = result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -139,7 +141,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'gemma2:2b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -158,7 +160,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -178,7 +180,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -221,7 +223,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'gemma2:2b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -253,7 +255,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -285,7 +287,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'llama3:8b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -302,7 +304,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -347,7 +349,7 @@ describe('useBenchmark', () => {
     await act(async () => {
       returnedResults = await result.current.runBenchmark(
         [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'llama3:8b' }],
-        'test',
+        ['test'],
       );
     });
 
@@ -359,6 +361,98 @@ describe('useBenchmark', () => {
     expect(mockRunMutation).toHaveBeenCalledWith({
       variables: { endpointId: 'ep-2', model: 'llama3:8b', prompt: 'test' },
     });
+  });
+
+  it('runBenchmark batch: runs all prompts x all endpoints and returns combined results', async () => {
+    mockRunMutation.mockImplementation(async ({ variables }: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+      data: {
+        runBenchmark: {
+          endpointId: variables.endpointId,
+          endpointName: variables.endpointId,
+          model: variables.model,
+          prompt: variables.prompt,
+          response: 'r',
+          timing: { tokensPerSecond: 20 },
+          error: null,
+          timestamp: new Date().toISOString(),
+        },
+      },
+    }));
+
+    const { result } = renderHook(() => useBenchmark());
+
+    let returnedResults: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    await act(async () => {
+      returnedResults = await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }, { endpointId: 'ep-2', model: 'llama3:8b' }],
+        ['prompt-a', 'prompt-b'],
+      );
+    });
+
+    // 2 prompts × 2 endpoints = 4 results
+    expect(returnedResults).toHaveLength(4);
+    // Verify prompts were iterated
+    const prompts = returnedResults.map((r: any) => r.prompt); // eslint-disable-line @typescript-eslint/no-explicit-any
+    expect(prompts.filter((p: string) => p === 'prompt-a')).toHaveLength(2);
+    expect(prompts.filter((p: string) => p === 'prompt-b')).toHaveLength(2);
+  });
+
+  it('runBenchmark batch: resets currentPromptIndex and totalPrompts after completion', async () => {
+    mockRunMutation.mockImplementation(async ({ variables }: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+      data: {
+        runBenchmark: {
+          endpointId: variables.endpointId,
+          endpointName: variables.endpointId,
+          model: variables.model,
+          prompt: variables.prompt,
+          response: 'r',
+          timing: { tokensPerSecond: 20 },
+          error: null,
+          timestamp: new Date().toISOString(),
+        },
+      },
+    }));
+
+    const { result } = renderHook(() => useBenchmark());
+
+    await act(async () => {
+      await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
+        ['p1', 'p2'],
+      );
+    });
+
+    expect(result.current.currentPromptIndex).toBeNull();
+    expect(result.current.totalPrompts).toBe(0);
+  });
+
+  it('runBenchmark dispatches BENCHMARK_CHANGED only once after full batch', async () => {
+    mockRunMutation.mockImplementation(async ({ variables }: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
+      data: {
+        runBenchmark: {
+          endpointId: variables.endpointId,
+          endpointName: variables.endpointId,
+          model: variables.model,
+          prompt: variables.prompt,
+          response: 'r',
+          timing: { tokensPerSecond: 20 },
+          error: null,
+          timestamp: new Date().toISOString(),
+        },
+      },
+    }));
+
+    const { result } = renderHook(() => useBenchmark());
+
+    await act(async () => {
+      await result.current.runBenchmark(
+        [{ endpointId: 'ep-1', model: 'gemma2:2b' }],
+        ['p1', 'p2', 'p3'],
+      );
+    });
+
+    // Event dispatched exactly once, not once per prompt
+    expect(window.dispatchEvent).toHaveBeenCalledTimes(1);
   });
 
   it('saveRun calls save mutation with results', async () => {
