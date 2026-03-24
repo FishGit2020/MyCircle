@@ -20,12 +20,12 @@ const BABY_SIZES: Record<'fruit' | 'animal' | 'vegetable', string[]> = {
     'corgi', 'small lamb',
   ],
   vegetable: [
-    '', 'grain of salt', 'grain of salt', 'mustard seed', 'peppercorn', 'sesame seed', 'lentil', 'kidney bean',
+    '', 'grain of salt', 'grain of salt', 'mustard seed', 'peppercorn', 'radish sprout', 'sweet pea', 'kidney bean',
     'chickpea', 'olive', 'Brussels sprout', 'baby carrot', 'jalape\u00f1o', 'snap pea pod', 'tomato', 'artichoke', 'beet', 'turnip',
-    'bell pepper', 'zucchini', 'sweet potato', 'carrot', 'spaghetti squash', 'potato', 'ear of corn', 'rutabaga',
-    'scallion bunch', 'cauliflower', 'eggplant', 'butternut squash', 'cabbage', 'coconut', 'jicama',
-    'celery stalk', 'cantaloupe', 'honeydew melon', 'romaine lettuce', 'swiss chard', 'leek',
-    'pumpkin', 'watermelon',
+    'onion', 'zucchini', 'sweet potato', 'carrot', 'spaghetti squash', 'potato', 'cucumber', 'rutabaga',
+    'scallion bunch', 'cauliflower', 'large zucchini', 'acorn squash', 'cabbage', 'napa cabbage', 'jicama',
+    'celery stalk', 'savoy cabbage', 'kabocha squash', 'romaine lettuce', 'swiss chard', 'leek',
+    'pumpkin', 'large pumpkin',
   ],
 };
 const BABY_CATEGORY_ICONS: Record<string, string> = { fruit: '\uD83C\uDF4E', animal: '\uD83D\uDC3E', vegetable: '\uD83E\uDD66' };
