@@ -65,6 +65,13 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [bookId, onComplete, t, fetchConversionProgress]);
 
+  // On mount, always sync from server — local state is lost on navigation.
+  // initialStatus is just the Apollo cache snapshot; server is the source of truth.
+  useEffect(() => {
+    checkStatus();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (initialStatus === 'complete') onComplete();
   }, [initialStatus, onComplete]);
