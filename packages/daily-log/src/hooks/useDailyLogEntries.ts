@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { WindowEvents } from '@mycircle/shared';
-import type { WorkEntry } from '../types';
+import type { MoodValue, WorkEntry } from '../types';
 import { getLocalDateString } from '../utils/localDate';
 
 
@@ -66,17 +66,17 @@ export function useDailyLogEntries() {
     return () => window.removeEventListener(WindowEvents.DAILY_LOG_CHANGED, handler);
   }, [loadEntries, isAuthenticated]);
 
-  const addEntry = useCallback(async (content: string) => {
+  const addEntry = useCallback(async (content: string, mood?: MoodValue, tags?: string[]) => {
     if (!window.__workTracker) throw new Error('Daily log API not available');
     const date = getLocalDateString();
-    const id = await window.__workTracker.add({ date, content });
+    const id = await window.__workTracker.add({ date, content, mood, tags });
     window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
     return id;
   }, []);
 
-  const updateEntry = useCallback(async (id: string, content: string) => {
+  const updateEntry = useCallback(async (id: string, content: string, mood?: MoodValue, tags?: string[]) => {
     if (!window.__workTracker) throw new Error('Daily log API not available');
-    await window.__workTracker.update(id, { content });
+    await window.__workTracker.update(id, { content, mood, tags });
     window.dispatchEvent(new Event(WindowEvents.DAILY_LOG_CHANGED));
   }, []);
 

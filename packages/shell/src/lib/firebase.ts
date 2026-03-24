@@ -1026,7 +1026,7 @@ export async function getDailyLogEntries(uid: string) {
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-export async function addDailyLogEntry(uid: string, entry: { date: string; content: string }) {
+export async function addDailyLogEntry(uid: string, entry: { date: string; content: string; mood?: string; tags?: string[] }) {
   if (!db) throw new Error('Firebase not initialized');
   const docRef = await addDoc(collection(db, 'users', uid, 'dailylog'), {
     ...entry,
@@ -1035,7 +1035,7 @@ export async function addDailyLogEntry(uid: string, entry: { date: string; conte
   return docRef.id;
 }
 
-export async function updateDailyLogEntry(uid: string, entryId: string, updates: Partial<{ content: string }>) {
+export async function updateDailyLogEntry(uid: string, entryId: string, updates: Partial<{ content: string; date: string; mood: string; tags: string[] }>) {
   if (!db) throw new Error('Firebase not initialized');
   const docRef = doc(db, 'users', uid, 'dailylog', entryId);
   await updateDoc(docRef, {
@@ -1064,11 +1064,11 @@ export function subscribeToDailyLogEntries(uid: string, callback: (entries: Arra
 if (firebaseEnabled) {
   window.__workTracker = {
     getAll: () => auth?.currentUser ? getDailyLogEntries(auth.currentUser.uid) : Promise.resolve([]),
-    add: (entry: { date: string; content: string }) => {
+    add: (entry: { date: string; content: string; mood?: string; tags?: string[] }) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return addDailyLogEntry(auth.currentUser.uid, entry);
     },
-    update: (id: string, updates: Partial<{ content: string }>) => {
+    update: (id: string, updates: Partial<{ content: string; date: string; mood: string; tags: string[] }>) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return updateDailyLogEntry(auth.currentUser.uid, id, updates);
     },
