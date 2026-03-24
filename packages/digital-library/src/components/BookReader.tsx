@@ -7,6 +7,8 @@ import BrowserTTS from './BrowserTTS';
 import ConversionStatus from './ConversionStatus';
 import ChapterConvertList from './ChapterConvertList';
 import useSwipe from '../hooks/useSwipe';
+import { useReaderTheme } from '../hooks/useReaderTheme';
+import { useReadingProgress } from '../hooks/useReadingProgress';
 
 interface BookBookmark {
   bookId: string;
@@ -59,6 +61,8 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   const [activeTab, setActiveTab] = useState<'read' | 'listen'>(initialTab);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [pageInfo, setPageInfo] = useState<{ page: number; total: number } | undefined>();
+  const { theme, setTheme, applyTheme } = useReaderTheme();
+  const { saveProgress, getProgress } = useReadingProgress();
   const containerRef = useRef<HTMLDivElement>(null);
   const bookmarksRef = useRef<HTMLDivElement>(null);
   const tocButtonRef = useRef<HTMLButtonElement>(null);
@@ -126,24 +130,6 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   }, [activeTab]);
   const _spineItemsRef = useRef<Array<{ href: string; index: number }>>([]);
 
-  const getThemeStyles = useCallback((isDark: boolean) => {
-    const base: Record<string, Record<string, string>> = {
-      body: {
-        'font-family': 'Georgia, serif',
-        'line-height': '1.8',
-        padding: '1rem',
-        'text-align': 'justify',
-      },
-    };
-    if (isDark) {
-      base.body.color = '#e5e7eb';
-      base.body.background = '#1f2937';
-      base.a = base.a || {};
-      (base as any).a = { color: '#60a5fa' }; // eslint-disable-line @typescript-eslint/no-explicit-any
-    }
-    return base;
-  }, []);
-
   // Initialize EPUB renderer
   useEffect(() => {
     let cancelled = false;
@@ -168,16 +154,19 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
         rendition.themes.fontSize(`${fontSize}px`);
         const isDark = document.documentElement.classList.contains('dark');
-        rendition.themes.default(getThemeStyles(isDark));
+        applyTheme(rendition, isDark);
 
-        await rendition.display();
+        // Restore saved reading position unless navigating to a specific chapter
+        const hasChapterParam = new URLSearchParams(window.location.search).has('chapter');
+        const savedProgress = !hasChapterParam ? getProgress(bookId) : null;
+        await rendition.display(savedProgress?.cfi ?? undefined);
         if (cancelled) return;
         setLoading(false);
 
         // Wait for spine to be ready (needed for goToChapter)
         try { await book.loaded.spine; } catch { /* ignore */ }
 
-        // Extract text for TTS + page info
+        // Extract text for TTS + page info + save reading progress
         rendition.on('relocated', async (location: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
           if (cancelled) return;
           try {
@@ -200,10 +189,22 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
           } catch { /* ignore */ }
 
           // Find current chapter index
+          let chapterIdx = -1;
           if (location?.start?.href) {
-            const idx = chapters.findIndex(ch => location.start.href.includes(ch.href.split('#')[0]));
-            if (idx >= 0) setCurrentChapter(idx);
+            chapterIdx = chapters.findIndex(ch => location.start.href.includes(ch.href.split('#')[0]));
+            if (chapterIdx >= 0) setCurrentChapter(chapterIdx);
           }
+
+          // Save reading progress (CFI + percent)
+          try {
+            const cfi = location?.start?.cfi;
+            const percent = location?.start?.percentage != null
+              ? Math.round(location.start.percentage * 100)
+              : 0;
+            if (cfi) {
+              saveProgress(bookId, cfi, chapterIdx >= 0 ? chapterIdx : 0, percent);
+            }
+          } catch { /* ignore */ }
         });
       } catch (err) {
         logger.error('Failed to initialize EPUB', err);
@@ -219,7 +220,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [epubUrl, chapters]);
+  }, [epubUrl, bookId, chapters]);
 
   // ResizeObserver — re-fit rendition on container resize (fullscreen, window resize)
   useEffect(() => {
@@ -241,11 +242,19 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
     const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains('dark');
-      try { rendition.themes.default(getThemeStyles(isDark)); } catch { /* ignore */ }
+      applyTheme(rendition, isDark);
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     return () => observer.disconnect();
-  }, [loading, getThemeStyles]);
+  }, [loading, applyTheme]);
+
+  // Re-apply theme when user switches theme
+  useEffect(() => {
+    const rendition = renditionRef.current;
+    if (!rendition) return;
+    const isDark = document.documentElement.classList.contains('dark');
+    applyTheme(rendition, isDark);
+  }, [theme, applyTheme]);
 
   // Update font size — inject !important CSS to override EPUB inline styles
   useEffect(() => {
@@ -507,6 +516,33 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
           </svg>
         </button>
+
+        {/* Theme picker */}
+        <div className="flex items-center gap-0.5" role="group" aria-label={t('library.readingTheme' as any)}> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          <button
+            type="button"
+            onClick={() => setTheme('default')}
+            className={`w-6 h-6 rounded-full border-2 transition ${theme === 'default' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-200`}
+            aria-label={t('library.themeDefault' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+            aria-pressed={theme === 'default'}
+          />
+          <button
+            type="button"
+            onClick={() => setTheme('sepia')}
+            className={`w-6 h-6 rounded-full border-2 transition ${theme === 'sepia' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'}`}
+            style={{ background: '#f4ecd8' }}
+            aria-label={t('library.themeSepia' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+            aria-pressed={theme === 'sepia'}
+          />
+          <button
+            type="button"
+            onClick={() => setTheme('night')}
+            className={`w-6 h-6 rounded-full border-2 transition ${theme === 'night' ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'}`}
+            style={{ background: '#1a1a2e' }}
+            aria-label={t('library.themeNight' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+            aria-pressed={theme === 'night'}
+          />
+        </div>
 
         {/* Fullscreen button */}
         <button

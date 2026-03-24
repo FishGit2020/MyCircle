@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK } from '@mycircle/shared';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, StorageKeys } from '@mycircle/shared';
 import BookReader from './BookReader';
+import LibrarySearchSort, { SortOption } from './LibrarySearchSort';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
+import { useReadingProgress } from '../hooks/useReadingProgress';
 
 const logger = createLogger('DigitalLibrary');
 
@@ -28,13 +30,16 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function BookCard({ book, onSelect, onSelectListen, onDelete }: {
+function BookCard({ book, onSelect, onSelectListen, onDelete, readPercent }: {
   book: Book;
   onSelect: (book: Book) => void;
   onSelectListen: (book: Book) => void;
   onDelete: (bookId: string) => void;
+  readPercent?: number; // 0–100 or undefined if never opened
 }) {
   const { t } = useTranslation();
+  const isComplete = readPercent != null && readPercent >= 98;
+  const showProgress = readPercent != null && readPercent >= 1 && !isComplete;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
@@ -66,6 +71,18 @@ function BookCard({ book, onSelect, onSelectListen, onDelete }: {
             <span aria-hidden="true">&middot;</span>
             <span>{formatFileSize(book.fileSize)}</span>
           </div>
+          {isComplete && (
+            <span className="inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+              {t('library.complete' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+            </span>
+          )}
+          {showProgress && (
+            <div className="mt-2" aria-label={`${t('library.readingProgress' as any)}: ${readPercent}%`}> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+              <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${readPercent}%` }} />
+              </div>
+            </div>
+          )}
           {book.audioStatus === 'complete' && (
             <button
               type="button"
@@ -227,6 +244,14 @@ interface Chapter {
   audioUrl?: string;
 }
 
+function loadSort(): SortOption {
+  try {
+    const stored = localStorage.getItem(StorageKeys.LIBRARY_SORT);
+    if (stored === 'recentlyAdded' || stored === 'recentlyRead' || stored === 'titleAZ') return stored;
+  } catch { /* ignore */ }
+  return 'recentlyAdded';
+}
+
 export default function DigitalLibrary() {
   const { t } = useTranslation();
   const { bookId: urlBookId } = useParams<{ bookId: string }>();
@@ -235,6 +260,9 @@ export default function DigitalLibrary() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const pendingBookIdRef = useRef<string | undefined>(urlBookId);
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<SortOption>(loadSort);
+  const { getAllProgress, clearProgress } = useReadingProgress();
 
   const { data, loading, refetch } = useQuery(GET_BOOKS);
   const [fetchChapters] = useLazyQuery(GET_BOOK_CHAPTERS, { fetchPolicy: 'network-only' });
@@ -252,15 +280,43 @@ export default function DigitalLibrary() {
     return () => window.removeEventListener(WindowEvents.BOOKS_CHANGED, handleBooksChanged);
   }, [refetch]);
 
+  const progressMap = useMemo(() => getAllProgress(), [getAllProgress, books]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSortChange = useCallback((value: SortOption) => {
+    setSort(value);
+    try { localStorage.setItem(StorageKeys.LIBRARY_SORT, value); } catch { /* ignore */ }
+  }, []);
+
+  const filteredBooks = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const filtered = q
+      ? books.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q))
+      : [...books];
+
+    if (sort === 'titleAZ') {
+      return filtered.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    if (sort === 'recentlyRead') {
+      return filtered.sort((a, b) => {
+        const pa = progressMap[a.id]?.readAt ?? 0;
+        const pb = progressMap[b.id]?.readAt ?? 0;
+        return pb - pa;
+      });
+    }
+    // recentlyAdded — keep server order (uploadedAt desc from GraphQL)
+    return filtered;
+  }, [books, search, sort, progressMap]);
+
   const handleDelete = useCallback(async (bookId: string) => {
     if (!confirm(t('library.confirmDelete'))) return;
     try {
       await deleteBookMutation({ variables: { id: bookId } });
+      clearProgress(bookId);
       logger.info('Book deleted', { bookId });
     } catch (err) {
       logger.error('Failed to delete book', err);
     }
-  }, [t, deleteBookMutation]);
+  }, [t, deleteBookMutation, clearProgress]);
 
   const handleSelect = useCallback(async (book: Book, tab?: 'read' | 'listen') => {
     try {
@@ -354,6 +410,15 @@ export default function DigitalLibrary() {
 
       <BookUpload onUploadComplete={refetch} />
 
+      {!loading && books.length > 0 && (
+        <LibrarySearchSort
+          search={search}
+          sort={sort}
+          onSearch={setSearch}
+          onSort={handleSortChange}
+        />
+      )}
+
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
@@ -366,15 +431,20 @@ export default function DigitalLibrary() {
           <p className="text-gray-500 dark:text-gray-400">{t('library.emptyLibrary')}</p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('library.uploadFirst')}</p>
         </div>
+      ) : filteredBooks.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">{t('library.noResults' as any)}</p> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+        </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {books.map(book => (
+          {filteredBooks.map(book => (
             <BookCard
               key={book.id}
               book={book}
               onSelect={handleSelect}
               onSelectListen={handleSelectListen}
               onDelete={handleDelete}
+              readPercent={progressMap[book.id]?.percent}
             />
           ))}
         </div>

@@ -1925,6 +1925,18 @@ const es: Record<TranslationKey, string> = {
   'library.skipBack': 'Retroceder 10 segundos',
   'library.chapterComplete': 'Completo',
   'library.pageInfo': 'P\u00e1gina {page} de {total}',
+  'library.searchPlaceholder': 'Buscar libros...',
+  'library.sortLabel': 'Ordenar',
+  'library.sortRecentlyAdded': 'A\u00f1adidos recientemente',
+  'library.sortRecentlyRead': 'Le\u00eddos recientemente',
+  'library.sortTitleAZ': 'T\u00edtulo A\u2013Z',
+  'library.readingProgress': 'Progreso de lectura',
+  'library.complete': 'Completado',
+  'library.noResults': 'Ning\u00fan libro coincide con tu b\u00fasqueda',
+  'library.themeDefault': 'Tema predeterminado',
+  'library.themeSepia': 'Tema sepia',
+  'library.themeNight': 'Tema nocturno',
+  'library.readingTheme': 'Tema de lectura',
 
   'widgets.noAudiobook': 'No hay audiolibro en progreso',
 
