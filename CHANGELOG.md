@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.13.0...mycircle-v1.13.1) (2026-03-24)
+
+
+### Bug Fixes
+
+* **benchmark:** fix run button always disabled and show reason to user ([#851](https://github.com/FishGit2020/MyCircle/issues/851)) ([77de1f3](https://github.com/FishGit2020/MyCircle/commit/77de1f3f6c103d8c0fb9680004a9d50b4e652594))
+
 ## [1.13.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.12.0...mycircle-v1.13.0) (2026-03-24)
 
 
