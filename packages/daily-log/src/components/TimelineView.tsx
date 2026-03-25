@@ -1,12 +1,14 @@
 import { useTranslation } from '@mycircle/shared';
-import type { WorkEntry } from '../types';
+import type { MoodValue, WorkEntry } from '../types';
 import DayNode from './DayNode';
 
 interface TimelineViewProps {
   entries: WorkEntry[];
-  onUpdate: (id: string, content: string) => Promise<void>;
+  onUpdate: (id: string, content: string, mood?: MoodValue, tags?: string[]) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onMoveEntry?: (id: string, newDate: string) => Promise<void>;
+  onTagFilter?: (tag: string) => void;
+  searchQuery?: string;
 }
 
 function groupByDate(entries: WorkEntry[]): Map<string, WorkEntry[]> {
@@ -16,13 +18,12 @@ function groupByDate(entries: WorkEntry[]): Map<string, WorkEntry[]> {
     existing.push(entry);
     groups.set(entry.date, existing);
   }
-  // Sort dates descending
   return new Map(
     [...groups.entries()].sort(([a], [b]) => b.localeCompare(a))
   );
 }
 
-export default function TimelineView({ entries, onUpdate, onDelete, onMoveEntry }: TimelineViewProps) {
+export default function TimelineView({ entries, onUpdate, onDelete, onMoveEntry, onTagFilter, searchQuery }: TimelineViewProps) {
   const { t } = useTranslation();
 
   if (entries.length === 0) {
@@ -45,6 +46,8 @@ export default function TimelineView({ entries, onUpdate, onDelete, onMoveEntry 
           onUpdate={onUpdate}
           onDelete={onDelete}
           onMoveEntry={onMoveEntry}
+          onTagFilter={onTagFilter}
+          searchQuery={searchQuery}
         />
       ))}
     </div>

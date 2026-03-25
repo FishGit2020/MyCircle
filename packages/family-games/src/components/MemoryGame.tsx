@@ -32,11 +32,12 @@ function _createDeck(gridSize: number): Card[] {
 
 interface MemoryGameProps {
   onBack: () => void;
+  onGameEnd?: (score: number, timeMs: number) => void;
 }
 
 type Phase = 'menu' | 'playing' | 'over';
 
-export default function MemoryGame({ onBack }: MemoryGameProps) {
+export default function MemoryGame({ onBack, onGameEnd }: MemoryGameProps) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<Phase>('menu');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
@@ -148,6 +149,7 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
     const timeBonus = Math.max(0, 300_000 - finalElapsed) / 1000;
     const flipPenalty = flipCount * 2;
     const score = Math.round(Math.max(0, timeBonus * 10 - flipPenalty));
+    if (onGameEnd) { onGameEnd(score, finalElapsed); return null; }
     return (
       <GameOver
         gameType="memory"

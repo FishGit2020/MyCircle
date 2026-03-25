@@ -55,9 +55,10 @@ const KEYBOARD_ROWS = [
 
 interface WordGameProps {
   onBack: () => void;
+  onGameEnd?: (score: number, timeMs: number) => void;
 }
 
-export default function WordGame({ onBack }: WordGameProps) {
+export default function WordGame({ onBack, onGameEnd }: WordGameProps) {
   const { t } = useTranslation();
   const [target] = useState(getDailyWord);
   const [guesses, setGuesses] = useState<string[]>([]);
@@ -126,6 +127,7 @@ export default function WordGame({ onBack }: WordGameProps) {
   if (gameState !== 'playing') {
     const elapsed = Date.now() - startTime;
     const score = gameState === 'won' ? (MAX_ATTEMPTS - guesses.length + 1) * 100 : 0;
+    if (onGameEnd) { onGameEnd(score, elapsed); return null; }
     return (
       <div className="space-y-4">
         {gameState === 'lost' && (

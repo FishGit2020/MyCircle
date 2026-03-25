@@ -13,7 +13,7 @@ const COLOR_CLASSES: Record<Color, { idle: string; active: string }> = {
 
 type Phase = 'menu' | 'showing' | 'input' | 'over';
 
-export default function SimonGame({ onBack }: { onBack: () => void }) {
+export default function SimonGame({ onBack, onGameEnd }: { onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<Phase>('menu');
   const [sequence, setSequence] = useState<Color[]>([]);
@@ -82,11 +82,13 @@ export default function SimonGame({ onBack }: { onBack: () => void }) {
   }, [phase, sequence, playerIndex, playSequence]);
 
   if (phase === 'over') {
+    const elapsed = Date.now() - startTimeRef.current;
+    if (onGameEnd) { onGameEnd(score * 100, elapsed); return null; }
     return (
       <GameOver
         gameType="simon"
         score={score * 100}
-        timeMs={Date.now() - startTimeRef.current}
+        timeMs={elapsed}
         difficulty="pattern"
         onPlayAgain={startGame}
         onBack={onBack}

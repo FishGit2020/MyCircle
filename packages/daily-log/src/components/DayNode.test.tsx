@@ -117,7 +117,7 @@ describe('DayNode', () => {
     await user.click(screen.getByRole('button', { name: 'dailyLog.edit' }));
     await user.click(screen.getByText('mock-save'));
     await waitFor(() => {
-      expect(onUpdate).toHaveBeenCalledWith('1', 'updated content');
+      expect(onUpdate).toHaveBeenCalledWith('1', 'updated content', undefined, undefined);
     });
     // Should exit edit mode
     await waitFor(() => {

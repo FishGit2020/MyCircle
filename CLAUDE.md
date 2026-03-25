@@ -81,6 +81,7 @@ Commits: [Conventional Commits](https://www.conventionalcommits.org/), imperativ
 
 - **`cancel-in-progress: true` at workflow level kills gate jobs**: If you set concurrency at the workflow level with `cancel-in-progress: true`, a new push cancels the entire in-progress workflow including the gate job — GitHub then shows "Waiting for status to be reported" indefinitely. Fix: set concurrency at the **job level** on expensive jobs only (setup, test, build), and give gate jobs **no concurrency group** so they always run and always post a status.
 - **`functions/node_modules` must be in the e2e cache**: `functions/` is NOT a pnpm workspace package — `pnpm install` at the root does not install `functions/node_modules`. `firebase:build:functions` runs `npm install` inside `functions/` and produces `functions/lib` (compiled JS), but only `functions/lib` was cached. When the emulator restores the cache and runs Cloud Functions, runtime deps like `cheerio` are missing (`Cannot find module 'cheerio'`). Fix: include `functions/node_modules` in the `e2e-build` cache path alongside `functions/lib`. Any new runtime dep added to `functions/package.json` needs this cache path present — otherwise the emulator job silently breaks.
+- **Rebase introduces duplicate i18n keys**: When rebasing a branch that adds i18n keys onto main (which also added i18n keys), the rebase can create duplicate `// Section` comment blocks with all their keys repeated. This causes `TS1117: An object literal cannot have multiple properties with the same name` and breaks the shared build. Always run `pnpm build:shared` locally after a rebase to catch this before pushing.
 
 ## Test Gotchas
 
@@ -180,6 +181,15 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - TypeScript 5.x (frontend + backend) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions v2, Firestore, Cloud Storage, Tailwind CSS, Zod (input validation in Cloud Functions) (009-baby-photo-journal)
 - TypeScript 5.x + React 18, Tailwind CSS, `@mycircle/shared` (i18n, StorageKeys, PageContent), Firebase Firestore SDK (shell-only, via `window.__flashcardDecks` bridge) (010-language-flashcards)
 - Firestore `users/{uid}/flashcardDecks`, `users/{uid}/flashcardDecks/{id}/deckCards`, `users/{uid}/reviewSessions`, `users/{uid}/dailyStreak`; localStorage fallback for unauthenticated users (010-language-flashcards)
+- TypeScript 5.x + React 18 + `@mycircle/shared` (useTranslation, StorageKeys, PageContent), Tailwind CSS — no new packages added (011-daily-log-enhancements)
+- Firestore `users/{uid}/dailylog/{entryId}` — two optional fields added (`mood`, `tags`); existing documents untouched (011-daily-log-enhancements)
+- TypeScript 5.x (frontend + backend) + React 18, Tailwind CSS, Apollo Client (via `@mycircle/shared`), Firebase Admin SDK (Cloud Functions), Vitest + React Testing Library (012-file-manager)
+- Firestore (`users/{uid}/files`, `users/{uid}/folders`, `sharedWithMe/{uid}/files`) + Firebase Storage (unchanged paths) (012-file-manager)
+- TypeScript 5.3.3, React 18 + `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent), Tailwind CSS — no new packages (013-ai-benchmark)
+- localStorage (prompt selection persistence), Firestore via existing GraphQL queries (unchanged) (013-ai-benchmark)
+- TypeScript 5.x, React 18 + epubjs (already in `packages/digital-library`), `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys), React hooks, Tailwind CSS (014-ebook-tts-enhancements)
+- localStorage only — 3 new `StorageKeys` entries: `BOOK_READ_PROGRESS`, `LIBRARY_SORT`, `READER_THEME` (014-ebook-tts-enhancements)
 
 ## Recent Changes
+- 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)
 - 001-favorite-cities: Added cross-MFE favorite cities — star/unstar from search, favorites dropdown, transit city chips, FavoritesManager panel

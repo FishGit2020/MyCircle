@@ -1,5 +1,52 @@
 # Changelog
 
+## [1.13.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.13.0...mycircle-v1.13.1) (2026-03-24)
+
+
+### Bug Fixes
+
+* **benchmark:** fix run button always disabled and show reason to user ([#851](https://github.com/FishGit2020/MyCircle/issues/851)) ([77de1f3](https://github.com/FishGit2020/MyCircle/commit/77de1f3f6c103d8c0fb9680004a9d50b4e652594))
+
+## [1.13.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.12.0...mycircle-v1.13.0) (2026-03-24)
+
+
+### Features
+
+* **digital-library:** reading progress, search/sort, and reading themes ([#850](https://github.com/FishGit2020/MyCircle/issues/850)) ([70157ad](https://github.com/FishGit2020/MyCircle/commit/70157ad83186c9e74001d51e6db7097faa5e714a))
+
+
+### Bug Fixes
+
+* **firestore:** remove redundant single-field composite index on files ([#848](https://github.com/FishGit2020/MyCircle/issues/848)) ([1da9ae1](https://github.com/FishGit2020/MyCircle/commit/1da9ae12b9e31fc85ceb112bb8f52abf09aafc82))
+
+## [1.12.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.11.0...mycircle-v1.12.0) (2026-03-24)
+
+
+### Features
+
+* **cloud-files:** add folders, file preview, sharing, and storage quota ([#847](https://github.com/FishGit2020/MyCircle/issues/847)) ([5b94f58](https://github.com/FishGit2020/MyCircle/commit/5b94f58d9490797acefdbbec3fb5fec6b4cde728))
+* **model-benchmark:** add batch benchmarking, chart view, and history trend ([#845](https://github.com/FishGit2020/MyCircle/issues/845)) ([bc77aee](https://github.com/FishGit2020/MyCircle/commit/bc77aee1e822da9c1f35e9d42f35ae5807957021))
+
+## [1.11.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.10.0...mycircle-v1.11.0) (2026-03-24)
+
+
+### Features
+
+* **daily-log:** add mood tracking, tags, search, and stats ([#843](https://github.com/FishGit2020/MyCircle/issues/843)) ([e974578](https://github.com/FishGit2020/MyCircle/commit/e9745787e42b6ea1c3b5902c3bc774d6a56eec2d))
+* **flashcards:** add user-created technique flashcards ([#839](https://github.com/FishGit2020/MyCircle/issues/839)) ([369bac2](https://github.com/FishGit2020/MyCircle/commit/369bac222285abe4f3a24e49df7de6c686fbea8a))
+
+
+### Bug Fixes
+
+* digital library AbortError, conversion page refresh, flashcard overflow, deals i18n ([#837](https://github.com/FishGit2020/MyCircle/issues/837)) ([f66970f](https://github.com/FishGit2020/MyCircle/commit/f66970f42b15db717e58a313c58cedd290d88116))
+* **digital-library:** restore conversion status UI after navigation ([#842](https://github.com/FishGit2020/MyCircle/issues/842)) ([df212b4](https://github.com/FishGit2020/MyCircle/commit/df212b45f9f493903c962b16cd9a38fc92fb31c0))
+* **flashcards:** honor newlines and whitespace in card content ([#841](https://github.com/FishGit2020/MyCircle/issues/841)) ([001c7dd](https://github.com/FishGit2020/MyCircle/commit/001c7ddf0958d8fd124df16e956806c95167c16f))
+
+
+### Documentation
+
+* **claude:** add 011 active tech, recent changes, rebase i18n gotcha ([#844](https://github.com/FishGit2020/MyCircle/issues/844)) ([da50182](https://github.com/FishGit2020/MyCircle/commit/da5018270733a276ca97bd52e695d47ea9982e85))
+
 ## [1.10.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.9.0...mycircle-v1.10.0) (2026-03-24)
 
 

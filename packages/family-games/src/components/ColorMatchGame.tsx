@@ -38,7 +38,7 @@ function generateChallenge(): Challenge {
   return { word, displayColor };
 }
 
-export default function ColorMatchGame({ onBack }: { onBack: () => void }) {
+export default function ColorMatchGame({ onBack, onGameEnd }: { onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<'menu' | 'playing' | 'over'>('menu');
   const [challenge, setChallenge] = useState<Challenge | null>(null);
@@ -91,6 +91,7 @@ export default function ColorMatchGame({ onBack }: { onBack: () => void }) {
 
   if (phase === 'over') {
     const finalScore = score * 10;
+    if (onGameEnd) { onGameEnd(finalScore, ROUND_TIME); return null; }
     return (
       <GameOver
         gameType="colormatch"

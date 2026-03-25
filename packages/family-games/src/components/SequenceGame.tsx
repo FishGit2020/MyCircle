@@ -48,7 +48,7 @@ const NUMPAD_KEYS = [
   ['C', '0', '='],
 ];
 
-export default function SequenceGame({ onBack }: { onBack: () => void }) {
+export default function SequenceGame({ onBack, onGameEnd, initialDifficulty: _initialDifficulty }: { onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void; initialDifficulty?: 'easy' | 'medium' | 'hard' }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<'menu' | 'playing' | 'over'>('menu');
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
@@ -112,11 +112,13 @@ export default function SequenceGame({ onBack }: { onBack: () => void }) {
   submitRef.current = () => handleSubmit();
 
   if (phase === 'over') {
+    const elapsed = Date.now() - startRef.current;
+    if (onGameEnd) { onGameEnd(score, elapsed); return null; }
     return (
       <GameOver
         gameType="sequence"
         score={score}
-        timeMs={Date.now() - startRef.current}
+        timeMs={elapsed}
         difficulty="pattern"
         onPlayAgain={startGame}
         onBack={onBack}

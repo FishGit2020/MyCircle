@@ -1026,7 +1026,7 @@ export async function getDailyLogEntries(uid: string) {
   return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-export async function addDailyLogEntry(uid: string, entry: { date: string; content: string }) {
+export async function addDailyLogEntry(uid: string, entry: { date: string; content: string; mood?: string; tags?: string[] }) {
   if (!db) throw new Error('Firebase not initialized');
   const docRef = await addDoc(collection(db, 'users', uid, 'dailylog'), {
     ...entry,
@@ -1035,7 +1035,7 @@ export async function addDailyLogEntry(uid: string, entry: { date: string; conte
   return docRef.id;
 }
 
-export async function updateDailyLogEntry(uid: string, entryId: string, updates: Partial<{ content: string }>) {
+export async function updateDailyLogEntry(uid: string, entryId: string, updates: Partial<{ content: string; date: string; mood: string; tags: string[] }>) {
   if (!db) throw new Error('Firebase not initialized');
   const docRef = doc(db, 'users', uid, 'dailylog', entryId);
   await updateDoc(docRef, {
@@ -1064,11 +1064,11 @@ export function subscribeToDailyLogEntries(uid: string, callback: (entries: Arra
 if (firebaseEnabled) {
   window.__workTracker = {
     getAll: () => auth?.currentUser ? getDailyLogEntries(auth.currentUser.uid) : Promise.resolve([]),
-    add: (entry: { date: string; content: string }) => {
+    add: (entry: { date: string; content: string; mood?: string; tags?: string[] }) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return addDailyLogEntry(auth.currentUser.uid, entry);
     },
-    update: (id: string, updates: Partial<{ content: string }>) => {
+    update: (id: string, updates: Partial<{ content: string; date: string; mood: string; tags: string[] }>) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return updateDailyLogEntry(auth.currentUser.uid, id, updates);
     },
@@ -1736,6 +1736,32 @@ if (db && auth) {
         playedBy: { uid: user.uid, displayName: user.displayName || 'Anonymous' },
         playedAt: serverTimestamp(),
       });
+    },
+
+    async getLeaderboard(uids: string[]) {
+      if (!uids.length) return [];
+      const gameTypes = ['trivia', 'word', 'memory', 'math', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram', 'dino', 'beatclock'];
+      const results: Array<{ uid: string; displayName: string; gameType: string; score: number; timeMs: number; difficulty: string; playedAt: string }> = [];
+      for (const gameType of gameTypes) {
+        const scoresRef = collection(gamesDb, 'games', 'scores', gameType);
+        const q = query(scoresRef, orderBy('score', 'desc'), limit(100));
+        const snap = await getDocs(q);
+        for (const d of snap.docs) {
+          const data = d.data();
+          if (uids.includes(data.playedBy?.uid)) {
+            results.push({
+              uid: data.playedBy.uid,
+              displayName: data.playedBy.displayName || 'Anonymous',
+              gameType,
+              score: data.score,
+              timeMs: data.timeMs,
+              difficulty: data.difficulty,
+              playedAt: data.playedAt?.toDate?.()?.toISOString?.() ?? new Date().toISOString(),
+            });
+          }
+        }
+      }
+      return results;
     },
   };
 }

@@ -47,7 +47,7 @@ describe('EntryForm', () => {
     render(<EntryForm onSubmit={onSubmit} />);
     await user.type(screen.getByPlaceholderText('dailyLog.placeholder'), '  Fix bug  ');
     await user.click(screen.getByRole('button', { name: 'dailyLog.save' }));
-    expect(onSubmit).toHaveBeenCalledWith('Fix bug');
+    expect(onSubmit).toHaveBeenCalledWith('Fix bug', undefined, []);
   });
 
   it('clears input after successful submit (no initialValue)', async () => {
@@ -68,7 +68,7 @@ describe('EntryForm', () => {
     expect(input).toHaveValue('Existing work');
     await user.click(screen.getByRole('button', { name: 'dailyLog.save' }));
     await waitFor(() => {
-      expect(onSubmit).toHaveBeenCalledWith('Existing work');
+      expect(onSubmit).toHaveBeenCalledWith('Existing work', undefined, []);
     });
     // Should NOT clear since initialValue was provided
     expect(input).toHaveValue('Existing work');

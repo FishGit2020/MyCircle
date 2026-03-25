@@ -883,6 +883,107 @@ export const DELETE_SHARED_FILE = gql`
   }
 `;
 
+// ─── Cloud Files Enhancements ────────────────────────────────
+
+export const GET_FOLDERS = gql`
+  query GetFolders {
+    folders {
+      id
+      name
+      parentFolderId
+      createdAt
+      depth
+    }
+  }
+`;
+
+export const GET_FILE_SHARE_RECIPIENTS = gql`
+  query GetFileShareRecipients($fileId: ID!) {
+    fileShareRecipients(fileId: $fileId) {
+      recipientUid
+      recipientName
+      shareId
+      sharedAt
+    }
+  }
+`;
+
+export const GET_FILES_SHARED_WITH_ME = gql`
+  query GetFilesSharedWithMe {
+    filesSharedWithMe {
+      shareId
+      ownerUid
+      ownerName
+      fileId
+      fileName
+      contentType
+      size
+      downloadUrl
+      sharedAt
+    }
+  }
+`;
+
+export const RENAME_FILE = gql`
+  mutation RenameFile($fileId: ID!, $newName: String!) {
+    renameFile(fileId: $fileId, newName: $newName) {
+      id
+      fileName
+    }
+  }
+`;
+
+export const CREATE_FOLDER = gql`
+  mutation CreateFolder($name: String!, $parentFolderId: ID) {
+    createFolder(name: $name, parentFolderId: $parentFolderId) {
+      id
+      name
+      parentFolderId
+      createdAt
+      depth
+    }
+  }
+`;
+
+export const DELETE_FOLDER = gql`
+  mutation DeleteFolder($folderId: ID!, $deleteContents: Boolean!) {
+    deleteFolder(folderId: $folderId, deleteContents: $deleteContents)
+  }
+`;
+
+export const RENAME_FOLDER = gql`
+  mutation RenameFolder($folderId: ID!, $newName: String!) {
+    renameFolder(folderId: $folderId, newName: $newName) {
+      id
+      name
+    }
+  }
+`;
+
+export const MOVE_FILE = gql`
+  mutation MoveFile($fileId: ID!, $targetFolderId: ID) {
+    moveFile(fileId: $fileId, targetFolderId: $targetFolderId) {
+      id
+      folderId
+    }
+  }
+`;
+
+export const SHARE_FILE_WITH = gql`
+  mutation ShareFileWith($fileId: ID!, $recipientEmail: String!) {
+    shareFileWith(fileId: $fileId, recipientEmail: $recipientEmail) {
+      ok
+      shareId
+    }
+  }
+`;
+
+export const REVOKE_FILE_ACCESS = gql`
+  mutation RevokeFileAccess($shareId: String!) {
+    revokeFileAccess(shareId: $shareId)
+  }
+`;
+
 // ─── Baby Photos ─────────────────────────────────────────────
 
 export const GET_BABY_PHOTOS = gql`

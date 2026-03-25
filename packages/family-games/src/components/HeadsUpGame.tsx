@@ -42,7 +42,7 @@ interface HeadsUpGameProps {
 
 type GameState = 'menu' | 'ready' | 'playing' | 'over';
 
-export default function HeadsUpGame({ onBack }: HeadsUpGameProps) {
+export default function HeadsUpGame({ onBack, onGameEnd }: HeadsUpGameProps & { onGameEnd?: (score: number, timeMs: number) => void }) {
   const { t } = useTranslation();
   const [state, setState] = useState<GameState>('menu');
   const [words, setWords] = useState<string[]>([]);
@@ -114,6 +114,7 @@ export default function HeadsUpGame({ onBack }: HeadsUpGameProps) {
   const secondsLeft = Math.ceil(timeLeft / 1000);
 
   if (state === 'over') {
+    if (onGameEnd) { onGameEnd(score, elapsed); return null; }
     return (
       <GameOver
         gameType="headsup"

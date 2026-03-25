@@ -141,6 +141,7 @@ export const StorageKeys = {
   BENCHMARK_MODEL_MAP: 'benchmark-model-map',
   BENCHMARK_RESULTS: 'benchmark-results',
   BENCHMARK_JUDGE: 'benchmark-judge',
+  BENCHMARK_SELECTED_PROMPTS: 'mycircle-benchmark-selected-prompts',
   DAILY_LOG_DAY_FILTER: 'daily-log-day-filter',
   IMMIGRATION_CASES_CACHE: 'immigration-cases-cache',
   BOOKS_CACHE: 'books-cache',
@@ -150,6 +151,8 @@ export const StorageKeys = {
   BOOK_NOW_PLAYING: 'book-now-playing',
   BOOK_LAST_PLAYED: 'book-last-played',
   FAMILY_GAMES_CACHE: 'family-games-cache',
+  FAMILY_GAMES_PROFILES: 'family-games-profiles',
+  FAMILY_GAMES_TOURNAMENT: 'family-games-tournament',
   CHILDREN_CACHE: 'children-cache',
   SELECTED_CHILD_ID: 'selected-child-id',
   RADIO_FAVORITES: 'radio-favorites',
@@ -159,6 +162,9 @@ export const StorageKeys = {
   FLASHCARD_DECKS: 'flashcard-decks',
   FLASHCARD_DECK_CARDS: 'flashcard-deck-cards',
   FLASHCARD_STREAK: 'flashcard-streak',
+  BOOK_READ_PROGRESS: 'book-read-progress',
+  LIBRARY_SORT: 'library-sort',
+  READER_THEME: 'reader-theme',
 } as const;
 
 export interface CitySelectedEvent {

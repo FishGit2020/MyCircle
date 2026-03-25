@@ -36,6 +36,8 @@ export function useBenchmark() {
   const [running, setRunning] = useState(false);
   const [scoring, setScoring] = useState(false);
   const [currentEndpoint, setCurrentEndpoint] = useState<string | null>(null);
+  const [currentPromptIndex, setCurrentPromptIndex] = useState<number | null>(null);
+  const [totalPrompts, setTotalPrompts] = useState(0);
 
   const [runMutation] = useMutation(RUN_BENCHMARK);
   const [saveMutation] = useMutation(SAVE_BENCHMARK_RUN, {
@@ -45,42 +47,50 @@ export function useBenchmark() {
 
   const runBenchmark = useCallback(async (
     endpointModels: Array<{ endpointId: string; model: string }>,
-    prompt: string,
+    prompts: string[],
   ) => {
     setRunning(true);
     setResults([]);
+    setTotalPrompts(prompts.length);
     const newResults: BenchmarkRunResult[] = [];
 
-    for (const { endpointId, model } of endpointModels) {
-      setCurrentEndpoint(endpointId);
-      try {
-        const { data } = await runMutation({
-          variables: { endpointId, model, prompt },
-        });
-        if (data?.runBenchmark) {
-          newResults.push(data.runBenchmark);
+    for (let pi = 0; pi < prompts.length; pi++) {
+      const prompt = prompts[pi];
+      setCurrentPromptIndex(pi);
+
+      for (const { endpointId, model } of endpointModels) {
+        setCurrentEndpoint(endpointId);
+        try {
+          const { data } = await runMutation({
+            variables: { endpointId, model, prompt },
+          });
+          if (data?.runBenchmark) {
+            newResults.push(data.runBenchmark);
+            setResults([...newResults]);
+          }
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : 'Unknown error';
+          newResults.push({
+            endpointId,
+            endpointName: endpointId,
+            model,
+            prompt,
+            response: '',
+            timing: null,
+            error: message,
+            timestamp: new Date().toISOString(),
+          });
           setResults([...newResults]);
         }
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
-        newResults.push({
-          endpointId,
-          endpointName: endpointId,
-          model,
-          prompt,
-          response: '',
-          timing: null,
-          error: message,
-          timestamp: new Date().toISOString(),
-        });
-        setResults([...newResults]);
       }
     }
 
     setRunning(false);
     setCurrentEndpoint(null);
+    setCurrentPromptIndex(null);
+    setTotalPrompts(0);
 
-    // Update localStorage cache for widget
+    // Update localStorage cache for widget (once after full batch completes)
     if (newResults.length > 0) {
       const fastest = newResults
         .filter(r => r.timing)
@@ -147,5 +157,5 @@ export function useBenchmark() {
     return scored;
   }, [scoreMutation]);
 
-  return { results, running, scoring, currentEndpoint, runBenchmark, saveRun, scoreResults };
+  return { results, running, scoring, currentEndpoint, currentPromptIndex, totalPrompts, runBenchmark, saveRun, scoreResults };
 }

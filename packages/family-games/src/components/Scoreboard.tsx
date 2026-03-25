@@ -12,7 +12,7 @@ interface ScoreEntry {
   playedAt: string;
 }
 
-const GAME_ORDER: GameType[] = ['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram'];
+const GAME_ORDER: GameType[] = ['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram', 'dino', 'beatclock'];
 
 const GAME_COLORS: Record<GameType, string> = {
   trivia: 'purple',
@@ -26,6 +26,8 @@ const GAME_COLORS: Record<GameType, string> = {
   colormatch: 'rose',
   maze: 'emerald',
   anagram: 'sky',
+  dino: 'lime',
+  beatclock: 'fuchsia',
 };
 
 const GAME_LABEL_KEYS: Record<GameType, string> = {
@@ -40,6 +42,8 @@ const GAME_LABEL_KEYS: Record<GameType, string> = {
   colormatch: 'games.colorMatch',
   maze: 'games.mazeRunner',
   anagram: 'games.anagram',
+  dino: 'games.dinoRun',
+  beatclock: 'games.beatTheClock',
 };
 
 const TOP_N = 5;
