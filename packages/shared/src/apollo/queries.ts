@@ -1465,3 +1465,101 @@ export const CALC_ROUTE = gql`
     }
   }
 `;
+
+// ─── Resume Tailor AI ────────────────────────────────────────────
+
+export const GET_RESUME_FACT_BANK = gql`
+  query GetResumeFactBank {
+    resumeFactBank {
+      contact { name email phone location linkedin github website }
+      experiences {
+        id company location startDate endDate
+        versions { id title bullets }
+      }
+      education { id school location degree field startDate endDate notes }
+      skills
+      projects { id name startDate endDate bullets }
+      updatedAt
+    }
+  }
+`;
+
+export const GET_RESUME_APPLICATIONS = gql`
+  query GetResumeApplications($limit: Int) {
+    resumeApplications(limit: $limit) {
+      id date company role atsScoreBefore atsScoreAfter resumeSnapshot jdText
+    }
+  }
+`;
+
+export const SCRAPE_JOB_URL = gql`
+  query ScrapeJobUrl($url: String!) {
+    scrapeJobUrl(url: $url)
+  }
+`;
+
+export const SAVE_RESUME_FACT_BANK = gql`
+  mutation SaveResumeFactBank($input: ResumeFactBankInput!) {
+    saveResumeFactBank(input: $input) {
+      updatedAt
+    }
+  }
+`;
+
+export const GENERATE_RESUME = gql`
+  mutation GenerateResume($jdText: String!) {
+    generateResume(jdText: $jdText) {
+      contact { name email phone location linkedin github website }
+      experiences {
+        id company location startDate endDate
+        versions { id title bullets }
+      }
+      education { id school location degree field startDate endDate notes }
+      skills
+      projects { id name startDate endDate bullets }
+      atsScore {
+        beforeScore score covered missing beforeCovered beforeMissing hardSkillsMissing
+      }
+      keywordReport {
+        role company hardSkills titleKeywords actionKeywords businessContext
+        domainKeywords hardFilters top10 alreadyHave needToAdd
+      }
+    }
+  }
+`;
+
+export const BOOST_ATS_SCORE = gql`
+  mutation BoostAtsScore($resumeJson: String!, $jdText: String!) {
+    boostAtsScore(resumeJson: $resumeJson, jdText: $jdText) {
+      contact { name email phone location linkedin github website }
+      experiences {
+        id company location startDate endDate
+        versions { id title bullets }
+      }
+      education { id school location degree field startDate endDate notes }
+      skills
+      projects { id name startDate endDate bullets }
+      atsScore {
+        beforeScore score covered missing beforeCovered beforeMissing hardSkillsMissing
+      }
+      keywordReport {
+        role company hardSkills titleKeywords actionKeywords businessContext
+        domainKeywords hardFilters top10 alreadyHave needToAdd
+      }
+    }
+  }
+`;
+
+export const SAVE_RESUME_APPLICATION = gql`
+  mutation SaveResumeApplication($input: ResumeApplicationInput!) {
+    saveResumeApplication(input: $input) {
+      id date company role atsScoreBefore atsScoreAfter
+    }
+  }
+`;
+
+export const DELETE_RESUME_APPLICATION = gql`
+  mutation DeleteResumeApplication($id: ID!) {
+    deleteResumeApplication(id: $id)
+  }
+`;

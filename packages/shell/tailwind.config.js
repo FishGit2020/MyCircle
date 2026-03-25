@@ -30,6 +30,7 @@ export default {
     "../travel-map/src/**/*.{js,ts,jsx,tsx}",
     "../deal-finder/src/**/*.{js,ts,jsx,tsx}",
     "../web-crawler/src/**/*.{js,ts,jsx,tsx}",
+    "../resume-tailor/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

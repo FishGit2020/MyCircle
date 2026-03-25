@@ -51,6 +51,7 @@ export default defineConfig({
       'travelMap/TravelMap': resolve(__dirname, './test/mocks/TravelMapMock.tsx'),
       'dealFinder/DealFinder': resolve(__dirname, './test/mocks/DealFinderMock.tsx'),
       'webCrawler/WebCrawler': resolve(__dirname, './test/mocks/WebCrawlerMock.tsx'),
+      'resumeTailor/ResumeTailor': resolve(__dirname, './test/mocks/ResumeTailorMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

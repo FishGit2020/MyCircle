@@ -107,7 +107,7 @@ describe('BottomNav', () => {
     fireEvent.click(screen.getByText('bottomNav.more'));
     fireEvent.click(screen.getByText('bottomNav.editOrder'));
     fireEvent.click(screen.getByText('bottomNav.reset'));
-    const defaultOrder = ['/', '/weather', '/stocks', '/podcasts', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/flashcards', '/daily-log', '/files', '/ai', '/benchmark', '/immigration', '/library', '/family-games', '/doc-scanner', '/hiking', '/trips', '/polls', '/radio', '/interview', '/transit', '/travel-map', '/deals', '/web-crawler'];
+    const defaultOrder = ['/', '/weather', '/stocks', '/podcasts', '/bible', '/worship', '/notebook', '/baby', '/child-dev', '/flashcards', '/daily-log', '/files', '/ai', '/benchmark', '/immigration', '/library', '/family-games', '/doc-scanner', '/hiking', '/trips', '/polls', '/radio', '/interview', '/transit', '/travel-map', '/deals', '/web-crawler', '/resume'];
     expect(setItemSpy).toHaveBeenCalledWith('bottom-nav-order', JSON.stringify(defaultOrder));
   });
 

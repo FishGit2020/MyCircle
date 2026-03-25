@@ -1657,6 +1657,23 @@ if (firebaseEnabled) {
       return res.json();
     },
   };
+
+  window.__resumeTailor = {
+    uploadAndParse: async (fileName: string, fileBase64: string, contentType: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      const token = await auth.currentUser.getIdToken();
+      const res = await fetch('/resume-tailor/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ fileName, fileBase64, contentType }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(err.error || 'Upload failed');
+      }
+      return res.json();
+    },
+  };
 }
 
 // Benchmark summary — fetch latest run for dashboard widget

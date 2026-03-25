@@ -464,6 +464,17 @@ export type ForecastDay = {
   wind_speed: Scalars['Float']['output'];
 };
 
+export type GeneratedResumeResult = {
+  __typename?: 'GeneratedResumeResult';
+  atsScore: ResumeAtsScore;
+  contact: ResumeContact;
+  education: Array<ResumeEducation>;
+  experiences: Array<ResumeExperience>;
+  keywordReport: ResumeKeywordReport;
+  projects: Array<ResumeProject>;
+  skills: Array<Scalars['String']['output']>;
+};
+
 export type HistoricalWeatherDay = {
   __typename?: 'HistoricalWeatherDay';
   date: Scalars['String']['output'];
@@ -532,6 +543,7 @@ export type Mutation = {
   addWorshipSetlist: Setlist;
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
+  boostAtsScore: GeneratedResumeResult;
   createDailyLog: DailyLogEntry;
   createFolder: Folder;
   createInterviewQuestion: InterviewQuestion;
@@ -545,9 +557,11 @@ export type Mutation = {
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
   deleteNote: Scalars['Boolean']['output'];
+  deleteResumeApplication: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
   deleteWorshipSetlist: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
+  generateResume: GeneratedResumeResult;
   moveFile: CloudFile;
   permanentDeleteBook: Scalars['Boolean']['output'];
   renameFile: CloudFile;
@@ -559,6 +573,8 @@ export type Mutation = {
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
   saveInterviewSession: InterviewSessionDetail;
+  saveResumeApplication: ResumeApplication;
+  saveResumeFactBank: ResumeFactBank;
   scoreBenchmarkResponse: BenchmarkQualityResult;
   shareFile: ShareFileResult;
   shareFileWith: TargetedShareResult;
@@ -594,6 +610,12 @@ export type MutationAiChatArgs = {
   model?: InputMaybe<Scalars['String']['input']>;
   systemPrompt?: InputMaybe<Scalars['String']['input']>;
   toolMode?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationBoostAtsScoreArgs = {
+  jdText: Scalars['String']['input'];
+  resumeJson: Scalars['String']['input'];
 };
 
 
@@ -665,6 +687,11 @@ export type MutationDeleteNoteArgs = {
 };
 
 
+export type MutationDeleteResumeApplicationArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteSharedFileArgs = {
   fileId: Scalars['ID']['input'];
 };
@@ -677,6 +704,11 @@ export type MutationDeleteWorshipSetlistArgs = {
 
 export type MutationDeleteWorshipSongArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationGenerateResumeArgs = {
+  jdText: Scalars['String']['input'];
 };
 
 
@@ -738,6 +770,16 @@ export type MutationSaveBenchmarkRunArgs = {
 
 export type MutationSaveInterviewSessionArgs = {
   input: SaveInterviewSessionInput;
+};
+
+
+export type MutationSaveResumeApplicationArgs = {
+  input: ResumeApplicationInput;
+};
+
+
+export type MutationSaveResumeFactBankArgs = {
+  input: ResumeFactBankInput;
 };
 
 
@@ -915,7 +957,10 @@ export type Query = {
   questionBank: QuestionBank;
   radioStations: Array<RadioStation>;
   radioStationsByUuids: Array<RadioStation>;
+  resumeApplications: Array<ResumeApplication>;
+  resumeFactBank?: Maybe<ResumeFactBank>;
   reverseGeocode?: Maybe<City>;
+  scrapeJobUrl?: Maybe<Scalars['String']['output']>;
   searchCities: Array<City>;
   searchCrawlJobs: Array<CrawlJob>;
   searchPodcasts: PodcastSearchResponse;
@@ -1087,9 +1132,19 @@ export type QueryRadioStationsByUuidsArgs = {
 };
 
 
+export type QueryResumeApplicationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryReverseGeocodeArgs = {
   lat: Scalars['Float']['input'];
   lon: Scalars['Float']['input'];
+};
+
+
+export type QueryScrapeJobUrlArgs = {
+  url: Scalars['String']['input'];
 };
 
 
@@ -1189,6 +1244,164 @@ export type RadioStation = {
   url: Scalars['String']['output'];
   url_resolved: Scalars['String']['output'];
   votes: Scalars['Int']['output'];
+};
+
+export type ResumeApplication = {
+  __typename?: 'ResumeApplication';
+  atsScoreAfter: Scalars['Float']['output'];
+  atsScoreBefore: Scalars['Float']['output'];
+  company: Scalars['String']['output'];
+  date: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  jdText?: Maybe<Scalars['String']['output']>;
+  resumeSnapshot: Scalars['String']['output'];
+  role: Scalars['String']['output'];
+};
+
+export type ResumeApplicationInput = {
+  atsScoreAfter: Scalars['Float']['input'];
+  atsScoreBefore: Scalars['Float']['input'];
+  company: Scalars['String']['input'];
+  jdText?: InputMaybe<Scalars['String']['input']>;
+  resumeSnapshot: Scalars['String']['input'];
+  role: Scalars['String']['input'];
+};
+
+export type ResumeAtsScore = {
+  __typename?: 'ResumeAtsScore';
+  beforeCovered: Array<Scalars['String']['output']>;
+  beforeMissing: Array<Scalars['String']['output']>;
+  beforeScore: Scalars['Float']['output'];
+  covered: Array<Scalars['String']['output']>;
+  hardSkillsMissing: Array<Scalars['String']['output']>;
+  missing: Array<Scalars['String']['output']>;
+  score: Scalars['Float']['output'];
+};
+
+export type ResumeContact = {
+  __typename?: 'ResumeContact';
+  email?: Maybe<Scalars['String']['output']>;
+  github?: Maybe<Scalars['String']['output']>;
+  linkedin?: Maybe<Scalars['String']['output']>;
+  location?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  phone?: Maybe<Scalars['String']['output']>;
+  website?: Maybe<Scalars['String']['output']>;
+};
+
+export type ResumeContactInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  github?: InputMaybe<Scalars['String']['input']>;
+  linkedin?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+  website?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ResumeEducation = {
+  __typename?: 'ResumeEducation';
+  degree: Scalars['String']['output'];
+  endDate?: Maybe<Scalars['String']['output']>;
+  field: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  location?: Maybe<Scalars['String']['output']>;
+  notes: Array<Scalars['String']['output']>;
+  school: Scalars['String']['output'];
+  startDate?: Maybe<Scalars['String']['output']>;
+};
+
+export type ResumeEducationInput = {
+  degree: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['String']['input']>;
+  field: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+  location?: InputMaybe<Scalars['String']['input']>;
+  notes: Array<Scalars['String']['input']>;
+  school: Scalars['String']['input'];
+  startDate?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ResumeExperience = {
+  __typename?: 'ResumeExperience';
+  company: Scalars['String']['output'];
+  endDate: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  location?: Maybe<Scalars['String']['output']>;
+  startDate: Scalars['String']['output'];
+  versions: Array<ResumeVersion>;
+};
+
+export type ResumeExperienceInput = {
+  company: Scalars['String']['input'];
+  endDate: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+  location?: InputMaybe<Scalars['String']['input']>;
+  startDate: Scalars['String']['input'];
+  versions: Array<ResumeVersionInput>;
+};
+
+export type ResumeFactBank = {
+  __typename?: 'ResumeFactBank';
+  contact: ResumeContact;
+  education: Array<ResumeEducation>;
+  experiences: Array<ResumeExperience>;
+  projects: Array<ResumeProject>;
+  skills: Array<Scalars['String']['output']>;
+  updatedAt: Scalars['String']['output'];
+};
+
+export type ResumeFactBankInput = {
+  contact: ResumeContactInput;
+  education: Array<ResumeEducationInput>;
+  experiences: Array<ResumeExperienceInput>;
+  projects: Array<ResumeProjectInput>;
+  skills: Array<Scalars['String']['input']>;
+};
+
+export type ResumeKeywordReport = {
+  __typename?: 'ResumeKeywordReport';
+  actionKeywords: Array<Scalars['String']['output']>;
+  alreadyHave: Array<Scalars['String']['output']>;
+  businessContext: Array<Scalars['String']['output']>;
+  company?: Maybe<Scalars['String']['output']>;
+  domainKeywords: Array<Scalars['String']['output']>;
+  hardFilters: Array<Scalars['String']['output']>;
+  hardSkills: Array<Scalars['String']['output']>;
+  needToAdd: Array<Scalars['String']['output']>;
+  role?: Maybe<Scalars['String']['output']>;
+  titleKeywords: Array<Scalars['String']['output']>;
+  top10: Array<Scalars['String']['output']>;
+};
+
+export type ResumeProject = {
+  __typename?: 'ResumeProject';
+  bullets: Array<Scalars['String']['output']>;
+  endDate?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  startDate?: Maybe<Scalars['String']['output']>;
+};
+
+export type ResumeProjectInput = {
+  bullets: Array<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  startDate?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ResumeVersion = {
+  __typename?: 'ResumeVersion';
+  bullets: Array<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type ResumeVersionInput = {
+  bullets: Array<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
 };
 
 export type RouteResult = {
@@ -2231,3 +2444,58 @@ export type CalcRouteQueryVariables = Exact<{
 
 
 export type CalcRouteQuery = { __typename?: 'Query', calcRoute?: { __typename?: 'RouteResult', coordinates: Array<Array<number>>, distance: number, duration: number } | null };
+
+export type GetResumeFactBankQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetResumeFactBankQuery = { __typename?: 'Query', resumeFactBank?: { __typename?: 'ResumeFactBank', skills: Array<string>, updatedAt: string, contact: { __typename?: 'ResumeContact', name: string, email?: string | null, phone?: string | null, location?: string | null, linkedin?: string | null, github?: string | null, website?: string | null }, experiences: Array<{ __typename?: 'ResumeExperience', id: string, company: string, location?: string | null, startDate: string, endDate: string, versions: Array<{ __typename?: 'ResumeVersion', id: string, title: string, bullets: Array<string> }> }>, education: Array<{ __typename?: 'ResumeEducation', id: string, school: string, location?: string | null, degree: string, field: string, startDate?: string | null, endDate?: string | null, notes: Array<string> }>, projects: Array<{ __typename?: 'ResumeProject', id: string, name: string, startDate?: string | null, endDate?: string | null, bullets: Array<string> }> } | null };
+
+export type GetResumeApplicationsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetResumeApplicationsQuery = { __typename?: 'Query', resumeApplications: Array<{ __typename?: 'ResumeApplication', id: string, date: string, company: string, role: string, atsScoreBefore: number, atsScoreAfter: number, resumeSnapshot: string, jdText?: string | null }> };
+
+export type ScrapeJobUrlQueryVariables = Exact<{
+  url: Scalars['String']['input'];
+}>;
+
+
+export type ScrapeJobUrlQuery = { __typename?: 'Query', scrapeJobUrl?: string | null };
+
+export type SaveResumeFactBankMutationVariables = Exact<{
+  input: ResumeFactBankInput;
+}>;
+
+
+export type SaveResumeFactBankMutation = { __typename?: 'Mutation', saveResumeFactBank: { __typename?: 'ResumeFactBank', updatedAt: string } };
+
+export type GenerateResumeMutationVariables = Exact<{
+  jdText: Scalars['String']['input'];
+}>;
+
+
+export type GenerateResumeMutation = { __typename?: 'Mutation', generateResume: { __typename?: 'GeneratedResumeResult', skills: Array<string>, contact: { __typename?: 'ResumeContact', name: string, email?: string | null, phone?: string | null, location?: string | null, linkedin?: string | null, github?: string | null, website?: string | null }, experiences: Array<{ __typename?: 'ResumeExperience', id: string, company: string, location?: string | null, startDate: string, endDate: string, versions: Array<{ __typename?: 'ResumeVersion', id: string, title: string, bullets: Array<string> }> }>, education: Array<{ __typename?: 'ResumeEducation', id: string, school: string, location?: string | null, degree: string, field: string, startDate?: string | null, endDate?: string | null, notes: Array<string> }>, projects: Array<{ __typename?: 'ResumeProject', id: string, name: string, startDate?: string | null, endDate?: string | null, bullets: Array<string> }>, atsScore: { __typename?: 'ResumeAtsScore', beforeScore: number, score: number, covered: Array<string>, missing: Array<string>, beforeCovered: Array<string>, beforeMissing: Array<string>, hardSkillsMissing: Array<string> }, keywordReport: { __typename?: 'ResumeKeywordReport', role?: string | null, company?: string | null, hardSkills: Array<string>, titleKeywords: Array<string>, actionKeywords: Array<string>, businessContext: Array<string>, domainKeywords: Array<string>, hardFilters: Array<string>, top10: Array<string>, alreadyHave: Array<string>, needToAdd: Array<string> } } };
+
+export type BoostAtsScoreMutationVariables = Exact<{
+  resumeJson: Scalars['String']['input'];
+  jdText: Scalars['String']['input'];
+}>;
+
+
+export type BoostAtsScoreMutation = { __typename?: 'Mutation', boostAtsScore: { __typename?: 'GeneratedResumeResult', skills: Array<string>, contact: { __typename?: 'ResumeContact', name: string, email?: string | null, phone?: string | null, location?: string | null, linkedin?: string | null, github?: string | null, website?: string | null }, experiences: Array<{ __typename?: 'ResumeExperience', id: string, company: string, location?: string | null, startDate: string, endDate: string, versions: Array<{ __typename?: 'ResumeVersion', id: string, title: string, bullets: Array<string> }> }>, education: Array<{ __typename?: 'ResumeEducation', id: string, school: string, location?: string | null, degree: string, field: string, startDate?: string | null, endDate?: string | null, notes: Array<string> }>, projects: Array<{ __typename?: 'ResumeProject', id: string, name: string, startDate?: string | null, endDate?: string | null, bullets: Array<string> }>, atsScore: { __typename?: 'ResumeAtsScore', beforeScore: number, score: number, covered: Array<string>, missing: Array<string>, beforeCovered: Array<string>, beforeMissing: Array<string>, hardSkillsMissing: Array<string> }, keywordReport: { __typename?: 'ResumeKeywordReport', role?: string | null, company?: string | null, hardSkills: Array<string>, titleKeywords: Array<string>, actionKeywords: Array<string>, businessContext: Array<string>, domainKeywords: Array<string>, hardFilters: Array<string>, top10: Array<string>, alreadyHave: Array<string>, needToAdd: Array<string> } } };
+
+export type SaveResumeApplicationMutationVariables = Exact<{
+  input: ResumeApplicationInput;
+}>;
+
+
+export type SaveResumeApplicationMutation = { __typename?: 'Mutation', saveResumeApplication: { __typename?: 'ResumeApplication', id: string, date: string, company: string, role: string, atsScoreBefore: number, atsScoreAfter: number } };
+
+export type DeleteResumeApplicationMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteResumeApplicationMutation = { __typename?: 'Mutation', deleteResumeApplication: boolean };

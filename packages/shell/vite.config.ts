@@ -204,6 +204,10 @@ const webCrawlerRemote = isProduction
   ? '/web-crawler/assets/remoteEntry.js'
   : 'http://localhost:3031/assets/remoteEntry.js';
 
+const resumeTailorRemote = isProduction
+  ? '/resume-tailor/assets/remoteEntry.js'
+  : 'http://localhost:3023/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -238,7 +242,8 @@ export default defineConfig({
         transitTracker: transitTrackerRemote,
         travelMap: travelMapRemote,
         dealFinder: dealFinderRemote,
-        webCrawler: webCrawlerRemote
+        webCrawler: webCrawlerRemote,
+        resumeTailor: resumeTailorRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
