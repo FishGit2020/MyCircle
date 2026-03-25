@@ -126,7 +126,7 @@ export function useFactBank() {
     const base64 = await fileToBase64(file);
     const api = (window as unknown as { __resumeTailor?: { uploadAndParse: (n: string, b: string, c: string) => Promise<Partial<FactBank>> } }).__resumeTailor;
     if (!api) throw new Error('Resume upload not available');
-    const parsed = await api.uploadAndParse(file.name, base64, file.type);
+    const parsed = await api.uploadAndParse(file.name, base64, file.type || 'application/octet-stream');
     // Merge into existing fact bank
     update(prev => mergeFactBanks(prev, parsed));
   }, [update]);

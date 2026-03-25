@@ -25,7 +25,7 @@ export function useFiles() {
     const api = window.__cloudFiles;
     if (!api?.upload) throw new Error('Not authenticated');
     const base64 = await fileToBase64(file);
-    const result = await api.upload(file.name, base64, file.type, folderId ?? null);
+    const result = await api.upload(file.name, base64, file.type || 'application/octet-stream', folderId ?? null);
     await refetch();
     window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
     return result;
