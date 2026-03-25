@@ -9,6 +9,8 @@ const ALLOWED_RESUME_TYPES = new Set([
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/msword',
   'text/plain',
+  'text/markdown',
+  'application/octet-stream',
 ]);
 
 const uploadSchema = z.object({
