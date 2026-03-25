@@ -307,12 +307,12 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
   }, [chapters]);
 
   const goNext = useCallback(() => {
-    if (renditionRef.current) renditionRef.current.next()?.catch?.(() => {});
-  }, []);
+    if (!loading && renditionRef.current) renditionRef.current.next()?.catch?.(() => {});
+  }, [loading]);
 
   const goPrev = useCallback(() => {
-    if (renditionRef.current) renditionRef.current.prev()?.catch?.(() => {});
-  }, []);
+    if (!loading && renditionRef.current) renditionRef.current.prev()?.catch?.(() => {});
+  }, [loading]);
 
   const increaseFontSize = useCallback(() => {
     setFontSize(prev => Math.min(prev + 2, 32));
