@@ -21,10 +21,14 @@ function FileIconSvg({ type }: { type: string }) {
   const iconType = getFileIcon(type);
   const colors: Record<string, string> = {
     image: 'text-pink-500 bg-pink-50 dark:bg-pink-900/30',
+    video: 'text-purple-500 bg-purple-50 dark:bg-purple-900/30',
+    audio: 'text-orange-500 bg-orange-50 dark:bg-orange-900/30',
     pdf: 'text-red-500 bg-red-50 dark:bg-red-900/30',
     text: 'text-gray-500 bg-gray-50 dark:bg-gray-800',
     doc: 'text-blue-500 bg-blue-50 dark:bg-blue-900/30',
     sheet: 'text-green-500 bg-green-50 dark:bg-green-900/30',
+    presentation: 'text-amber-500 bg-amber-50 dark:bg-amber-900/30',
+    archive: 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/30',
     file: 'text-gray-500 bg-gray-50 dark:bg-gray-800',
   };
 
