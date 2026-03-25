@@ -45,6 +45,7 @@ export function useNotes() {
   const { data, loading } = useQuery(GET_NOTES, {
     fetchPolicy: 'cache-and-network',
     skip: !isAuthenticated,
+    errorPolicy: 'all',
   });
 
   const notes = (data?.notes ?? []) as Note[];
