@@ -2108,7 +2108,7 @@ export type DeleteWorshipSetlistMutation = { __typename?: 'Mutation', deleteWors
 export type GetCloudFilesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCloudFilesQuery = { __typename?: 'Query', cloudFiles: Array<{ __typename?: 'CloudFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, uploadedAt: string }> };
+export type GetCloudFilesQuery = { __typename?: 'Query', cloudFiles: Array<{ __typename?: 'CloudFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, uploadedAt: string, folderId?: string | null }> };
 
 export type GetSharedFilesQueryVariables = Exact<{ [key: string]: never; }>;
 

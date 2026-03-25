@@ -842,6 +842,7 @@ export const GET_CLOUD_FILES = gql`
       downloadUrl
       storagePath
       uploadedAt
+      folderId
     }
   }
 `;
