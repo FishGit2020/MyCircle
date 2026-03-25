@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.14.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.13.1...mycircle-v1.14.0) (2026-03-25)
+
+
+### Features
+
+* **cloud-files:** accept all file types for upload ([#855](https://github.com/FishGit2020/MyCircle/issues/855)) ([f6a14b5](https://github.com/FishGit2020/MyCircle/commit/f6a14b5a51a99264ce810c21fd2da79930e847fd))
+* **family-games:** add multiplayer tournament, head-to-head, and Beat the Clock ([#853](https://github.com/FishGit2020/MyCircle/issues/853)) ([25f4ef2](https://github.com/FishGit2020/MyCircle/commit/25f4ef27ede0b2d5ff49ba97fe6e35ea536582af))
+* **resume-tailor:** add AI-powered resume builder MFE ([#015](https://github.com/FishGit2020/MyCircle/issues/015)) ([#856](https://github.com/FishGit2020/MyCircle/issues/856)) ([b0f99c7](https://github.com/FishGit2020/MyCircle/commit/b0f99c741970a941d5960f68f9e1c0696fcdb645))
+
+
+### Bug Fixes
+
+* resolve Sentry crashes and picomatch audit vulnerabilities ([#857](https://github.com/FishGit2020/MyCircle/issues/857)) ([23aed9c](https://github.com/FishGit2020/MyCircle/commit/23aed9c0904ea488270d8aa749c309d4d0116b80))
+
+
+### Miscellaneous
+
+* **deps:** bump picomatch from 4.0.3 to 4.0.4 in /functions ([#858](https://github.com/FishGit2020/MyCircle/issues/858)) ([2f54ab2](https://github.com/FishGit2020/MyCircle/commit/2f54ab24b057a7571e9c3ac79c1decddde2d471a))
+
 ## [1.13.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.13.0...mycircle-v1.13.1) (2026-03-24)
 
 
