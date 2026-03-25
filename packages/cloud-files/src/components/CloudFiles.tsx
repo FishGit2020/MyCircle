@@ -62,7 +62,7 @@ export default function CloudFiles() {
   // Filtered files for current folder + search + type
   const filteredMyFiles = useMemo(() => {
     return files.filter(f => {
-      const inFolder = f.folderId === currentFolderId;
+      const inFolder = (f.folderId ?? null) === currentFolderId;
       const matchesQuery = !query.trim() || f.fileName.toLowerCase().includes(query.toLowerCase());
       const matchesType = !typeFilter || getFileTypeCategory(f.contentType) === typeFilter;
       return inFolder && matchesQuery && matchesType;
