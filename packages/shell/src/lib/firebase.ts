@@ -1659,13 +1659,13 @@ if (firebaseEnabled) {
   };
 
   window.__resumeTailor = {
-    uploadAndParse: async (fileName: string, fileBase64: string, contentType: string) => {
+    uploadAndParse: async (fileName: string, fileBase64: string, contentType: string, model: string, endpointId?: string | null) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       const token = await auth.currentUser.getIdToken();
       const res = await fetch('/resume-tailor/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ fileName, fileBase64, contentType }),
+        body: JSON.stringify({ fileName, fileBase64, contentType, model, endpointId: endpointId ?? null }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Upload failed' }));

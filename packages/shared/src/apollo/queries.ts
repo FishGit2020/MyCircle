@@ -1508,8 +1508,8 @@ export const SAVE_RESUME_FACT_BANK = gql`
 `;
 
 export const GENERATE_RESUME = gql`
-  mutation GenerateResume($jdText: String!) {
-    generateResume(jdText: $jdText) {
+  mutation GenerateResume($jdText: String!, $model: String!, $endpointId: ID) {
+    generateResume(jdText: $jdText, model: $model, endpointId: $endpointId) {
       contact { name email phone location linkedin github website }
       experiences {
         id company location startDate endDate
@@ -1530,8 +1530,8 @@ export const GENERATE_RESUME = gql`
 `;
 
 export const BOOST_ATS_SCORE = gql`
-  mutation BoostAtsScore($resumeJson: String!, $jdText: String!) {
-    boostAtsScore(resumeJson: $resumeJson, jdText: $jdText) {
+  mutation BoostAtsScore($resumeJson: String!, $jdText: String!, $model: String!, $endpointId: ID) {
+    boostAtsScore(resumeJson: $resumeJson, jdText: $jdText, model: $model, endpointId: $endpointId) {
       contact { name email phone location linkedin github website }
       experiences {
         id company location startDate endDate

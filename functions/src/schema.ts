@@ -1186,8 +1186,8 @@ export const typeDefs = `#graphql
 
     # Resume Tailor (auth required)
     saveResumeFactBank(input: ResumeFactBankInput!): ResumeFactBank!
-    generateResume(jdText: String!): GeneratedResumeResult!
-    boostAtsScore(resumeJson: String!, jdText: String!): GeneratedResumeResult!
+    generateResume(jdText: String!, model: String!, endpointId: ID): GeneratedResumeResult!
+    boostAtsScore(resumeJson: String!, jdText: String!, model: String!, endpointId: ID): GeneratedResumeResult!
     saveResumeApplication(input: ResumeApplicationInput!): ResumeApplication!
     deleteResumeApplication(id: ID!): Boolean!
   }

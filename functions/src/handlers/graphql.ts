@@ -21,7 +21,6 @@ async function getServer() {
       const podcastApiKey = piCreds.apiKey || '';
       const podcastApiSecret = piCreds.apiSecret || '';
       const youversionKey = process.env.YOUVERSION_APP_KEY || '';
-      const openAiKey = process.env.OPENAI_API_KEY || '';
 
       const depthLimit = (await import('graphql-depth-limit')).default;
 
@@ -31,8 +30,7 @@ async function getServer() {
           () => apiKey,
           () => finnhubKey,
           () => ({ apiKey: podcastApiKey, apiSecret: podcastApiSecret }),
-          () => youversionKey,
-          () => openAiKey
+          () => youversionKey
         )
       });
 
@@ -56,7 +54,7 @@ export const graphql = onRequest(
     maxInstances: 10,
     memory: '512MiB',
     timeoutSeconds: 300,
-    secrets: ['API_KEYS', 'PODCASTINDEX_CREDS', 'USCIS_CREDS', 'OPENAI_API_KEY']
+    secrets: ['API_KEYS', 'PODCASTINDEX_CREDS', 'USCIS_CREDS']
   },
   async (req: Request, res: Response) => {
     expandApiKeys();

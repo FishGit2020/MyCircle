@@ -1,20 +1,24 @@
 import { onRequest } from 'firebase-functions/v2/https';
+import { logger } from 'firebase-functions';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { ALLOWED_ORIGINS, checkRateLimit, verifyAuthToken } from './shared.js';
-import OpenAI from 'openai';
 
 const ALLOWED_RESUME_TYPES = new Set([
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/msword',
   'text/plain',
+  'text/markdown',
+  'application/octet-stream',
 ]);
 
 const uploadSchema = z.object({
   fileName: z.string().min(1).max(255),
   fileBase64: z.string().min(1),
   contentType: z.string().min(1),
+  model: z.string().min(1),
+  endpointId: z.string().nullable().optional(),
 });
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB
@@ -46,42 +50,6 @@ async function extractTextFromDocx(buffer: Buffer): Promise<string> {
   return result.value;
 }
 
-async function structureResumeWithAI(text: string, openAiKey: string): Promise<Record<string, unknown>> {
-  const openai = new OpenAI({ apiKey: openAiKey });
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    temperature: 0.1,
-    response_format: { type: 'json_object' },
-    messages: [
-      {
-        role: 'system',
-        content: `You are an expert resume parser. Extract structured data from a resume text and return JSON with this structure:
-{
-  "contact": { "name": "", "email": "", "phone": "", "location": "", "linkedin": "", "github": "", "website": "" },
-  "experiences": [
-    {
-      "id": "exp-1",
-      "company": "",
-      "location": "",
-      "startDate": "",
-      "endDate": "",
-      "versions": [{ "id": "ver-1", "title": "", "bullets": [] }]
-    }
-  ],
-  "education": [{ "id": "edu-1", "school": "", "location": "", "degree": "", "field": "", "startDate": "", "endDate": "", "notes": [] }],
-  "skills": ["Category: skill1, skill2"],
-  "projects": [{ "id": "proj-1", "name": "", "startDate": "", "endDate": "", "bullets": [] }]
-}
-Use UUID-like ids (e.g., exp-1, exp-2). Extract all experiences, group bullet points under experiences. For missing fields use empty string.`,
-      },
-      { role: 'user', content: `Parse this resume:\n\n${text.slice(0, 12000)}` },
-    ],
-  });
-
-  const content = response.choices[0]?.message?.content || '{}';
-  return JSON.parse(content) as Record<string, unknown>;
-}
-
 export const resumeTailor = onRequest(
   {
     cors: ALLOWED_ORIGINS,
@@ -89,7 +57,6 @@ export const resumeTailor = onRequest(
     maxInstances: 5,
     memory: '512MiB',
     timeoutSeconds: 120,
-    secrets: ['OPENAI_API_KEY'],
   },
   async (req: Request, res: Response) => {
     // Only POST supported
@@ -176,19 +143,86 @@ export const resumeTailor = onRequest(
       return;
     }
 
-    // Structure with AI
-    const openAiKey = process.env.OPENAI_API_KEY || '';
-    if (!openAiKey) {
-      res.status(500).json({ error: 'AI service not configured.' });
+    const { model, endpointId = null } = parsed.data;
+
+    // Get Ollama endpoint from Firestore
+    const db = (await import('firebase-admin/firestore')).getFirestore();
+    let endpointUrl = '';
+    let cfHeaders: Record<string, string> = {};
+    if (endpointId) {
+      const doc = await db.doc(`users/${uid}/benchmarkEndpoints/${endpointId}`).get();
+      if (doc.exists) {
+        const d = doc.data()!;
+        endpointUrl = d.url || '';
+        if (d.cfAccessClientId) cfHeaders['CF-Access-Client-Id'] = d.cfAccessClientId;
+        if (d.cfAccessClientSecret) cfHeaders['CF-Access-Client-Secret'] = d.cfAccessClientSecret;
+      }
+    } else {
+      const snap = await db.collection(`users/${uid}/benchmarkEndpoints`).orderBy('createdAt').limit(1).get();
+      if (!snap.empty) {
+        const d = snap.docs[0].data();
+        endpointUrl = d.url || '';
+        if (d.cfAccessClientId) cfHeaders['CF-Access-Client-Id'] = d.cfAccessClientId;
+        if (d.cfAccessClientSecret) cfHeaders['CF-Access-Client-Secret'] = d.cfAccessClientSecret;
+      }
+    }
+
+    if (!endpointUrl) {
+      res.status(500).json({ error: 'No AI endpoint configured. Please add an Ollama endpoint in Settings.' });
       return;
     }
 
     try {
-      const structured = await structureResumeWithAI(text, openAiKey);
+      const OpenAI = (await import('openai')).default;
+      const openai = new OpenAI({
+        baseURL: `${endpointUrl}/v1`,
+        apiKey: 'ollama',
+        defaultHeaders: Object.keys(cfHeaders).length > 0 ? cfHeaders : undefined,
+      });
+
+      const response = await openai.chat.completions.create({
+        model,
+        temperature: 0.1,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content: `You are an expert resume parser. Extract structured data from a resume text and return JSON with this structure:
+{
+  "contact": { "name": "", "email": "", "phone": "", "location": "", "linkedin": "", "github": "", "website": "" },
+  "experiences": [
+    {
+      "id": "exp-1",
+      "company": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "versions": [{ "id": "ver-1", "title": "", "bullets": [] }]
+    }
+  ],
+  "education": [{ "id": "edu-1", "school": "", "location": "", "degree": "", "field": "", "startDate": "", "endDate": "", "notes": [] }],
+  "skills": ["Category: skill1, skill2"],
+  "projects": [{ "id": "proj-1", "name": "", "startDate": "", "endDate": "", "bullets": [] }]
+}
+Use sequential ids (exp-1, exp-2, etc.). Extract all experiences with their bullet points. For missing fields use empty string.`,
+          },
+          { role: 'user', content: `Parse this resume:\n\n${text.slice(0, 12000)}` },
+        ],
+      });
+
+      const content = response.choices[0]?.message?.content || '{}';
+      let structured: Record<string, unknown>;
+      try {
+        structured = JSON.parse(content) as Record<string, unknown>;
+      } catch {
+        const match = content.match(/\{[\s\S]*\}/);
+        structured = match ? JSON.parse(match[0]) as Record<string, unknown> : {};
+      }
       res.status(200).json(structured);
-    } catch {
+    } catch (err: any) {
+      logger.error('Resume AI parse error', { uid, error: err.message });
       res.status(500).json({
-        error: 'Could not parse this file. Please try a different format.',
+        error: 'Could not parse this file with the selected model. Please try a different format or model.',
         fileName,
       });
     }

@@ -7,7 +7,12 @@ import AtsScoreCard from './AtsScoreCard';
 import KeywordReportPanel from './KeywordReportPanel';
 import GeneratedResumeView from './GeneratedResumeView';
 
-export default function ResumeGenerator() {
+interface ResumeGeneratorProps {
+  model: string;
+  endpointId: string | null;
+}
+
+export default function ResumeGenerator({ model, endpointId }: ResumeGeneratorProps) {
   const { t } = useTranslation();
   const { factBank } = useFactBank();
   const {
@@ -23,7 +28,7 @@ export default function ResumeGenerator() {
     boost,
     updateGeneratedBullets,
     updateGeneratedSkills,
-  } = useResumeGeneration();
+  } = useResumeGeneration(model, endpointId);
   const { saveApplication, saving } = useApplicationsLog();
 
   const [jobTitle, setJobTitle] = useState('');

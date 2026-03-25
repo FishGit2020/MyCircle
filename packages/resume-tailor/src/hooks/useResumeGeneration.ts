@@ -44,7 +44,7 @@ export interface GeneratedResume {
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
-export function useResumeGeneration() {
+export function useResumeGeneration(model: string, endpointId: string | null) {
   const [jobDescription, setJobDescription] = useState('');
   const [jobUrl, setJobUrl] = useState('');
   const [generatedResume, setGeneratedResume] = useState<GeneratedResume | null>(null);
@@ -71,9 +71,13 @@ export function useResumeGeneration() {
     }
   }, [scrapeJobUrlMutation]);
 
-  const generate = useCallback(async (factBank: FactBank) => {
+  const generate = useCallback(async (_factBank: FactBank) => {
     if (!jobDescription.trim()) {
       setErrorMsg('Please enter a job description first.');
+      return;
+    }
+    if (!model) {
+      setErrorMsg('Please select a model first.');
       return;
     }
     setStatus('generating');
@@ -81,16 +85,9 @@ export function useResumeGeneration() {
     try {
       const result = await generateResumeMutation({
         variables: {
-          input: {
-            jobDescription,
-            factBank: {
-              contact: factBank.contact,
-              experiences: factBank.experiences,
-              education: factBank.education,
-              skills: factBank.skills,
-              projects: factBank.projects,
-            },
-          },
+          jdText: jobDescription,
+          model,
+          endpointId: endpointId ?? null,
         },
       });
       const data = result.data?.generateResume;
@@ -102,26 +99,23 @@ export function useResumeGeneration() {
       setErrorMsg(err instanceof Error ? err.message : 'Failed to generate resume');
       setStatus('error');
     }
-  }, [jobDescription, generateResumeMutation]);
+  }, [jobDescription, model, endpointId, generateResumeMutation]);
 
-  const boost = useCallback(async (factBank: FactBank) => {
+  const boost = useCallback(async (_factBank: FactBank) => {
     if (!generatedResume || !jobDescription.trim()) return;
+    if (!model) {
+      setErrorMsg('Please select a model first.');
+      return;
+    }
     setStatus('boosting');
     setErrorMsg(null);
     try {
       const result = await boostAtsScoreMutation({
         variables: {
-          input: {
-            jobDescription,
-            currentResume: generatedResume,
-            factBank: {
-              contact: factBank.contact,
-              experiences: factBank.experiences,
-              education: factBank.education,
-              skills: factBank.skills,
-              projects: factBank.projects,
-            },
-          },
+          resumeJson: JSON.stringify(generatedResume),
+          jdText: jobDescription,
+          model,
+          endpointId: endpointId ?? null,
         },
       });
       const data = result.data?.boostAtsScore;
@@ -133,7 +127,7 @@ export function useResumeGeneration() {
       setErrorMsg(err instanceof Error ? err.message : 'Boost failed');
       setStatus('error');
     }
-  }, [generatedResume, jobDescription, boostAtsScoreMutation]);
+  }, [generatedResume, jobDescription, model, endpointId, boostAtsScoreMutation]);
 
   const updateGeneratedBullets = useCallback((
     experienceIndex: number,
