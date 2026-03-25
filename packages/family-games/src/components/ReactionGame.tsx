@@ -8,7 +8,7 @@ const MAX_DELAY = 4000;
 
 type Phase = 'menu' | 'waiting' | 'ready' | 'result' | 'over';
 
-export default function ReactionGame({ onBack }: { onBack: () => void }) {
+export default function ReactionGame({ onBack, onGameEnd }: { onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<Phase>('menu');
   const [times, setTimes] = useState<number[]>([]);
@@ -67,11 +67,13 @@ export default function ReactionGame({ onBack }: { onBack: () => void }) {
   if (phase === 'over') {
     const avg = times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 999;
     const score = Math.max(0, Math.round(1000 - avg));
+    const elapsed = Date.now() - startTimeRef.current;
+    if (onGameEnd) { onGameEnd(score, elapsed); return null; }
     return (
       <GameOver
         gameType="reaction"
         score={score}
-        timeMs={Date.now() - startTimeRef.current}
+        timeMs={elapsed}
         difficulty="reflex"
         onPlayAgain={startGame}
         onBack={onBack}

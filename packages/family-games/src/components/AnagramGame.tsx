@@ -25,7 +25,7 @@ function shuffle(word: string): string {
 const TOTAL_ROUNDS = 10;
 const HINT_PENALTY = 30;
 
-export default function AnagramGame({ onBack }: { onBack: () => void }) {
+export default function AnagramGame({ onBack, onGameEnd }: { onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<'menu' | 'playing' | 'over'>('menu');
   const [words, setWords] = useState<string[]>([]);
@@ -98,8 +98,10 @@ export default function AnagramGame({ onBack }: { onBack: () => void }) {
   }, [currentWord, revealed]);
 
   if (phase === 'over') {
+    const elapsed = Date.now() - startRef.current;
+    if (onGameEnd) { onGameEnd(score, elapsed); return null; }
     return (
-      <GameOver gameType="anagram" score={score} timeMs={Date.now() - startRef.current} difficulty="vocabulary" onPlayAgain={startGame} onBack={onBack} />
+      <GameOver gameType="anagram" score={score} timeMs={elapsed} difficulty="vocabulary" onPlayAgain={startGame} onBack={onBack} />
     );
   }
 

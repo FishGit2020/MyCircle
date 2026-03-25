@@ -151,6 +151,8 @@ export const StorageKeys = {
   BOOK_NOW_PLAYING: 'book-now-playing',
   BOOK_LAST_PLAYED: 'book-last-played',
   FAMILY_GAMES_CACHE: 'family-games-cache',
+  FAMILY_GAMES_PROFILES: 'family-games-profiles',
+  FAMILY_GAMES_TOURNAMENT: 'family-games-tournament',
   CHILDREN_CACHE: 'children-cache',
   SELECTED_CHILD_ID: 'selected-child-id',
   RADIO_FAVORITES: 'radio-favorites',

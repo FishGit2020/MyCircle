@@ -51,11 +51,12 @@ function generateProblem(difficulty: Difficulty): { a: number; b: number; op: Op
 
 interface MathGameProps {
   onBack: () => void;
+  onGameEnd?: (score: number, timeMs: number) => void;
 }
 
 type Phase = 'menu' | 'playing' | 'over';
 
-export default function MathGame({ onBack }: MathGameProps) {
+export default function MathGame({ onBack, onGameEnd }: MathGameProps) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<Phase>('menu');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
@@ -149,6 +150,7 @@ export default function MathGame({ onBack }: MathGameProps) {
 
   if (phase === 'over') {
     const elapsed = Date.now() - startRef.current;
+    if (onGameEnd) { onGameEnd(score, Math.min(elapsed, GAME_DURATION_MS)); return null; }
     return (
       <GameOver
         gameType="math"

@@ -110,6 +110,16 @@ declare module 'familyGames/FamilyGames' {
   export default FamilyGames;
 }
 
+interface LeaderboardEntry {
+  uid: string;
+  displayName: string;
+  gameType: string;
+  score: number;
+  timeMs: number;
+  difficulty: string;
+  playedAt: string;
+}
+
 declare module 'docScanner/DocScanner' {
   const DocScanner: React.ComponentType;
   export default DocScanner;
