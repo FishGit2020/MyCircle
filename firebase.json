@@ -35,6 +35,10 @@
         "function": "digitalLibrary"
       },
       {
+        "source": "/resume-tailor/**",
+        "function": "resumeTailor"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

@@ -221,6 +221,12 @@ const webCrawlerDest = path.join(firebaseDir, 'web-crawler');
 console.log(`Copying web-crawler to ${webCrawlerDest}`);
 copyDir(webCrawlerDist, webCrawlerDest);
 
+// 32. Copy resume-tailor MF to /resume-tailor
+const resumeTailorDist = path.join(rootDir, 'packages', 'resume-tailor', 'dist');
+const resumeTailorDest = path.join(firebaseDir, 'resume-tailor');
+console.log(`Copying resume-tailor to ${resumeTailorDest}`);
+copyDir(resumeTailorDist, resumeTailorDest);
+
 // Remove MFE index.html files — they conflict with Firebase Hosting's SPA rewrite.
 // When /notebook/ has an index.html, Firebase serves it instead of the shell's root
 // index.html, causing a blank page with "SyntaxError: Unexpected token '<'".
@@ -229,7 +235,7 @@ const mfeDirs = [
   'ai-assistant', 'bible-reader', 'worship-songs', 'notebook',
   'baby-tracker', 'child-development', 'chinese-learning', 'english-learning',
   'flashcards', 'daily-log', 'cloud-files', 'model-benchmark', 'immigration-tracker',
-  'digital-library', 'family-games', 'doc-scanner', 'hiking-map', 'trip-planner', 'poll-system', 'radio-station', 'ai-interviewer', 'transit-tracker', 'travel-map', 'deal-finder', 'web-crawler',
+  'digital-library', 'family-games', 'doc-scanner', 'hiking-map', 'trip-planner', 'poll-system', 'radio-station', 'ai-interviewer', 'transit-tracker', 'travel-map', 'deal-finder', 'web-crawler', 'resume-tailor',
 ];
 for (const mfe of mfeDirs) {
   const mfeIndex = path.join(firebaseDir, mfe, 'index.html');

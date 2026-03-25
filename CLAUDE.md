@@ -189,6 +189,10 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - localStorage (prompt selection persistence), Firestore via existing GraphQL queries (unchanged) (013-ai-benchmark)
 - TypeScript 5.x, React 18 + epubjs (already in `packages/digital-library`), `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys), React hooks, Tailwind CSS (014-ebook-tts-enhancements)
 - localStorage only — 3 new `StorageKeys` entries: `BOOK_READ_PROGRESS`, `LIBRARY_SORT`, `READER_THEME` (014-ebook-tts-enhancements)
+- TypeScript 5.x + React 18, `@mycircle/shared` (useTranslation, StorageKeys, PageContent), react-router, Tailwind CSS — no new packages (014-family-games-multiplayer)
+- localStorage (player profiles, active tournament session); Firestore via existing `window.__familyGames` bridge (score persistence, requires auth) (014-family-games-multiplayer)
+- TypeScript 5.x (frontend + backend), React 18 + `@mycircle/shared` (Apollo re-exports, i18n, PageContent, StorageKeys), `@originjs/vite-plugin-federation` (MFE), `openai@^4.73.0` (already in `functions/`), `mammoth` (new — DOCX parsing), `pdfjs-dist` (new — PDF text extraction), `cheerio` (already in `functions/` — URL scraping) (015-resume-tailor)
+- Firestore `users/{uid}/resumeFactBank/default` (fact bank document), `users/{uid}/resumeApplications/{appId}` (application log subcollection) (015-resume-tailor)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)

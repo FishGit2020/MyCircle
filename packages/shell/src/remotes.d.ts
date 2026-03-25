@@ -172,3 +172,8 @@ declare module 'webCrawler/WebCrawler' {
   const WebCrawler: React.ComponentType;
   export default WebCrawler;
 }
+
+declare module 'resumeTailor/ResumeTailor' {
+  const ResumeTailor: React.ComponentType;
+  export default ResumeTailor;
+}

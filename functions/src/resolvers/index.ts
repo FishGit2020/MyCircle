@@ -22,6 +22,7 @@ import { createDealsResolvers } from './deals.js';
 import { createWebCrawlerResolvers } from './webCrawler.js';
 import { createRadioStationResolvers } from './radioStations.js';
 import { createRoutingResolvers } from './routing.js';
+import { createResumeTailorQueryResolvers, createResumeTailorMutationResolvers } from './resumeTailor.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -29,6 +30,7 @@ export function createResolvers(
   getFinnhubKey?: () => string,
   getPodcastKeys?: () => { apiKey: string; apiSecret: string },
   getYouVersionKey?: () => string,
+  getOpenAiKey?: () => string,
 ) {
   const worshipSongResolvers = createWorshipSongResolvers();
   const worshipSetlistResolvers = createWorshipSetlistResolvers();
@@ -58,6 +60,7 @@ export function createResolvers(
       ...dailyLogResolvers.Mutation,
       ...webCrawlerResolvers.Mutation,
       ...notesResolvers.Mutation,
+      ...createResumeTailorMutationResolvers(getOpenAiKey ?? (() => '')),
     },
 
     Query: {
@@ -83,6 +86,7 @@ export function createResolvers(
       ...webCrawlerResolvers.Query,
       ...createRadioStationResolvers().Query,
       ...createRoutingResolvers().Query,
+      ...createResumeTailorQueryResolvers(getOpenAiKey ?? (() => '')),
     },
   };
 }

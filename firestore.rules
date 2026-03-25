@@ -195,6 +195,15 @@ service cloud.firestore {
       allow delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
     }
 
+    // Resume Tailor - fact bank and applications (private per-user)
+    match /resumeFactBank/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /resumeApplications/{appId} {
+      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
     // Books - shared library, authenticated read, uploader can write/delete
     match /books/{bookId} {
       allow read: if request.auth != null;

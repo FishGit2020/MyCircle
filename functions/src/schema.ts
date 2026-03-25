@@ -551,6 +551,11 @@ export const typeDefs = `#graphql
 
     # Hiking route (public)
     calcRoute(startLon: Float!, startLat: Float!, endLon: Float!, endLat: Float!): RouteResult
+
+    # Resume Tailor (auth required)
+    resumeFactBank: ResumeFactBank
+    resumeApplications(limit: Int): [ResumeApplication!]!
+    scrapeJobUrl(url: String!): String
   }
 
   type RadioStation {
@@ -958,6 +963,167 @@ export const typeDefs = `#graphql
     maxPages: Int
   }
 
+  # ─── Resume Tailor AI ────────────────────────────────────────────────────────
+
+  type ResumeContact {
+    name: String!
+    email: String
+    phone: String
+    location: String
+    linkedin: String
+    github: String
+    website: String
+  }
+
+  input ResumeContactInput {
+    name: String!
+    email: String
+    phone: String
+    location: String
+    linkedin: String
+    github: String
+    website: String
+  }
+
+  type ResumeVersion {
+    id: ID!
+    title: String!
+    bullets: [String!]!
+  }
+
+  input ResumeVersionInput {
+    id: ID!
+    title: String!
+    bullets: [String!]!
+  }
+
+  type ResumeExperience {
+    id: ID!
+    company: String!
+    location: String
+    startDate: String!
+    endDate: String!
+    versions: [ResumeVersion!]!
+  }
+
+  input ResumeExperienceInput {
+    id: ID!
+    company: String!
+    location: String
+    startDate: String!
+    endDate: String!
+    versions: [ResumeVersionInput!]!
+  }
+
+  type ResumeEducation {
+    id: ID!
+    school: String!
+    location: String
+    degree: String!
+    field: String!
+    startDate: String
+    endDate: String
+    notes: [String!]!
+  }
+
+  input ResumeEducationInput {
+    id: ID!
+    school: String!
+    location: String
+    degree: String!
+    field: String!
+    startDate: String
+    endDate: String
+    notes: [String!]!
+  }
+
+  type ResumeProject {
+    id: ID!
+    name: String!
+    startDate: String
+    endDate: String
+    bullets: [String!]!
+  }
+
+  input ResumeProjectInput {
+    id: ID!
+    name: String!
+    startDate: String
+    endDate: String
+    bullets: [String!]!
+  }
+
+  type ResumeFactBank {
+    contact: ResumeContact!
+    experiences: [ResumeExperience!]!
+    education: [ResumeEducation!]!
+    skills: [String!]!
+    projects: [ResumeProject!]!
+    updatedAt: String!
+  }
+
+  input ResumeFactBankInput {
+    contact: ResumeContactInput!
+    experiences: [ResumeExperienceInput!]!
+    education: [ResumeEducationInput!]!
+    skills: [String!]!
+    projects: [ResumeProjectInput!]!
+  }
+
+  type ResumeAtsScore {
+    beforeScore: Float!
+    score: Float!
+    covered: [String!]!
+    missing: [String!]!
+    beforeCovered: [String!]!
+    beforeMissing: [String!]!
+    hardSkillsMissing: [String!]!
+  }
+
+  type ResumeKeywordReport {
+    role: String
+    company: String
+    hardSkills: [String!]!
+    titleKeywords: [String!]!
+    actionKeywords: [String!]!
+    businessContext: [String!]!
+    domainKeywords: [String!]!
+    hardFilters: [String!]!
+    top10: [String!]!
+    alreadyHave: [String!]!
+    needToAdd: [String!]!
+  }
+
+  type GeneratedResumeResult {
+    contact: ResumeContact!
+    experiences: [ResumeExperience!]!
+    education: [ResumeEducation!]!
+    skills: [String!]!
+    projects: [ResumeProject!]!
+    atsScore: ResumeAtsScore!
+    keywordReport: ResumeKeywordReport!
+  }
+
+  type ResumeApplication {
+    id: ID!
+    date: String!
+    company: String!
+    role: String!
+    atsScoreBefore: Float!
+    atsScoreAfter: Float!
+    resumeSnapshot: String!
+    jdText: String
+  }
+
+  input ResumeApplicationInput {
+    company: String!
+    role: String!
+    atsScoreBefore: Float!
+    atsScoreAfter: Float!
+    resumeSnapshot: String!
+    jdText: String
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String, systemPrompt: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
@@ -1017,6 +1183,13 @@ export const typeDefs = `#graphql
     startCrawl(input: StartCrawlInput!): CrawlJob!
     stopCrawl(id: ID!): CrawlJob!
     deleteCrawlJob(id: ID!): Boolean!
+
+    # Resume Tailor (auth required)
+    saveResumeFactBank(input: ResumeFactBankInput!): ResumeFactBank!
+    generateResume(jdText: String!): GeneratedResumeResult!
+    boostAtsScore(resumeJson: String!, jdText: String!): GeneratedResumeResult!
+    saveResumeApplication(input: ResumeApplicationInput!): ResumeApplication!
+    deleteResumeApplication(id: ID!): Boolean!
   }
 
   schema {
