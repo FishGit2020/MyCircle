@@ -133,6 +133,7 @@ declare global {
       getScores: (gameType: string) => Promise<any[]>; // eslint-disable-line @typescript-eslint/no-explicit-any
       subscribe: (gameType: string, callback: (scores: any[]) => void) => () => void; // eslint-disable-line @typescript-eslint/no-explicit-any
       saveScore: (data: { gameType: string; score: number; timeMs: number; difficulty: string }) => Promise<void>;
+      getLeaderboard: (uids: string[]) => Promise<Array<{ uid: string; displayName: string; gameType: string; score: number; timeMs: number; difficulty: string; playedAt: string }>>;
     };
 
     /* ── Trip Planner ──────────────────────────────────────── */

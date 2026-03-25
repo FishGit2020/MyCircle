@@ -3,24 +3,38 @@ import { useParams, useNavigate } from 'react-router';
 import { useTranslation, WindowEvents, PageContent } from '@mycircle/shared';
 import GameCard from './GameCard';
 import Scoreboard from './Scoreboard';
+import TournamentSetup from './TournamentSetup';
+import TournamentHandoff from './TournamentHandoff';
+import TournamentResults from './TournamentResults';
+import FamilyLeaderboard from './FamilyLeaderboard';
+import HeadToHead from './HeadToHead';
 import type { GameType } from './GameCard';
+import { useTournament } from '../hooks/useTournament';
+import { usePlayerProfiles } from '../hooks/usePlayerProfiles';
 
-const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram', 'dino']);
+const VALID_GAMES = new Set<string>(['trivia', 'math', 'word', 'memory', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram', 'dino', 'beatclock']);
 
 const GAME_TITLE_KEYS: Record<string, string> = {
   trivia: 'games.trivia', math: 'games.mathChallenge', word: 'games.wordGame',
   memory: 'games.memoryMatch', headsup: 'games.headsUp', reaction: 'games.reactionTime',
   simon: 'games.simonSays', sequence: 'games.numberSequence', colormatch: 'games.colorMatch',
   maze: 'games.mazeRunner', anagram: 'games.anagram', dino: 'games.dinoRun',
+  beatclock: 'games.beatTheClock',
 };
+
+type View = 'hub' | 'setup' | 'h2h' | 'leaderboard';
 
 export default function FamilyGames() {
   const { t } = useTranslation();
   const { gameType } = useParams<{ gameType?: string }>();
   const navigate = useNavigate();
-  const [GameComponent, setGameComponent] = useState<React.ComponentType<{ onBack: () => void }> | null>(null);
+  const [view, setView] = useState<View>('hub');
+  const [GameComponent, setGameComponent] = useState<React.ComponentType<{ onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }> | null>(null);
 
-  // Broadcast game name as breadcrumb detail
+  const { session, startSession, beginTurn, recordTurnScore, advanceTurn, resetSession, currentTurn, isComplete } = useTournament();
+  const { updatePersonalBest, incrementWins } = usePlayerProfiles();
+
+  // Broadcast breadcrumb detail
   useEffect(() => {
     if (gameType && VALID_GAMES.has(gameType)) {
       const label = t(GAME_TITLE_KEYS[gameType] as any) || gameType; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -33,7 +47,7 @@ export default function FamilyGames() {
     };
   }, [gameType, t]);
 
-  // Load game component when URL param changes
+  // Load game component when URL param changes (solo mode)
   useEffect(() => {
     if (!gameType || !VALID_GAMES.has(gameType)) {
       setGameComponent(null);
@@ -43,46 +57,22 @@ export default function FamilyGames() {
     let cancelled = false;
     (async () => {
       try {
-        let mod: { default: React.ComponentType<{ onBack: () => void }> };
+        let mod: { default: React.ComponentType<{ onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }> };
         switch (gameType as GameType) {
-          case 'trivia':
-            mod = await import('./TriviaGame');
-            break;
-          case 'math':
-            mod = await import('./MathGame');
-            break;
-          case 'word':
-            mod = await import('./WordGame');
-            break;
-          case 'memory':
-            mod = await import('./MemoryGame');
-            break;
-          case 'headsup':
-            mod = await import('./HeadsUpGame');
-            break;
-          case 'reaction':
-            mod = await import('./ReactionGame');
-            break;
-          case 'simon':
-            mod = await import('./SimonGame');
-            break;
-          case 'sequence':
-            mod = await import('./SequenceGame');
-            break;
-          case 'colormatch':
-            mod = await import('./ColorMatchGame');
-            break;
-          case 'maze':
-            mod = await import('./MazeGame');
-            break;
-          case 'anagram':
-            mod = await import('./AnagramGame');
-            break;
-          case 'dino':
-            mod = await import('./DinoGame');
-            break;
-          default:
-            return;
+          case 'trivia':    mod = await import('./TriviaGame'); break;
+          case 'math':      mod = await import('./MathGame'); break;
+          case 'word':      mod = await import('./WordGame'); break;
+          case 'memory':    mod = await import('./MemoryGame'); break;
+          case 'headsup':   mod = await import('./HeadsUpGame'); break;
+          case 'reaction':  mod = await import('./ReactionGame'); break;
+          case 'simon':     mod = await import('./SimonGame'); break;
+          case 'sequence':  mod = await import('./SequenceGame'); break;
+          case 'colormatch':mod = await import('./ColorMatchGame'); break;
+          case 'maze':      mod = await import('./MazeGame'); break;
+          case 'anagram':   mod = await import('./AnagramGame'); break;
+          case 'dino':      mod = await import('./DinoGame'); break;
+          case 'beatclock': mod = await import('./BeatTheClock'); break;
+          default: return;
         }
         if (!cancelled) setGameComponent(() => mod.default);
       } catch {
@@ -101,7 +91,76 @@ export default function FamilyGames() {
     navigate('/family-games');
   };
 
-  // Show active game if URL has a valid game type
+  // Tournament: when a turn's game ends, record score and advance
+  const handleTournamentGameEnd = (score: number, timeMs: number) => {
+    if (!currentTurn) return;
+    recordTurnScore(score, timeMs, 'tournament');
+    // Update personal best in profile
+    updatePersonalBest(currentTurn.player.id, currentTurn.gameType, {
+      score, timeMs, difficulty: 'tournament', achievedAt: new Date().toISOString(),
+    });
+    // Try to save to Firestore
+    try {
+      window.__familyGames?.saveScore({ gameType: currentTurn.gameType, score, timeMs, difficulty: 'tournament' });
+    } catch { /* not authenticated — ok */ }
+    advanceTurn();
+  };
+
+  // When tournament completes, increment wins for winner(s)
+  useEffect(() => {
+    if (!isComplete || !session) return;
+    // Find winner(s) — rank 1 players
+    const totals: Record<string, number> = {};
+    for (const s of session.scores) {
+      totals[s.playerId] = (totals[s.playerId] ?? 0) + s.score;
+    }
+    const maxScore = Math.max(...Object.values(totals));
+    const winners = session.players.filter(p => (totals[p.id] ?? 0) === maxScore);
+    winners.forEach(w => incrementWins(w.id));
+  }, [isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── Tournament flow rendering ───────────────────────────────────────────────
+  if (session && session.status !== 'idle') {
+    if (isComplete) {
+      return (
+        <PageContent>
+          <TournamentResults
+            session={session}
+            onPlayAgain={() => resetSession()}
+            onExit={() => resetSession()}
+          />
+        </PageContent>
+      );
+    }
+
+    if (session.status === 'handoff' && currentTurn) {
+      const gameName = t(GAME_TITLE_KEYS[currentTurn.gameType] as any) || currentTurn.gameType; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const roundLabel = `${t('games.round' as any)} ${currentTurn.round} ${t('games.of' as any)} ${session.roundCount}`; // eslint-disable-line @typescript-eslint/no-explicit-any
+      return (
+        <PageContent>
+          <TournamentHandoff
+            playerName={currentTurn.player.displayName}
+            playerColor={currentTurn.player.avatarColor}
+            gameName={gameName}
+            roundLabel={roundLabel}
+            onReady={beginTurn}
+          />
+        </PageContent>
+      );
+    }
+
+    if (session.status === 'playing' && currentTurn) {
+      return (
+        <TournamentGameLoader
+          gameType={currentTurn.gameType}
+          onGameEnd={handleTournamentGameEnd}
+          onBack={() => resetSession()}
+        />
+      );
+    }
+  }
+
+  // ─── Solo mode: active game from URL ─────────────────────────────────────────
   if (gameType && VALID_GAMES.has(gameType) && GameComponent) {
     return (
       <PageContent>
@@ -110,78 +169,99 @@ export default function FamilyGames() {
     );
   }
 
+  // ─── Hub (tournament setup overlay) ──────────────────────────────────────────
+  if (view === 'setup') {
+    return (
+      <PageContent>
+        <TournamentSetup
+          onStart={({ players, games, rounds }) => {
+            setView('hub');
+            startSession(players, games, rounds);
+          }}
+          onCancel={() => setView('hub')}
+        />
+      </PageContent>
+    );
+  }
+
+  if (view === 'h2h') {
+    return (
+      <PageContent>
+        <HeadToHead onBack={() => setView('hub')} />
+      </PageContent>
+    );
+  }
+
+  if (view === 'leaderboard') {
+    return (
+      <PageContent>
+        <FamilyLeaderboard onClose={() => setView('hub')} />
+      </PageContent>
+    );
+  }
+
+  // ─── Game hub ─────────────────────────────────────────────────────────────────
   return (
     <PageContent className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-          {t('games.title')}
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {t('games.subtitle')}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+            {t('games.title')}
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t('games.subtitle')}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setView('leaderboard')}
+          className="text-xs text-fuchsia-600 dark:text-fuchsia-400 hover:text-fuchsia-700 dark:hover:text-fuchsia-300 transition font-medium"
+          aria-label={t('games.familyLeaderboard' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+        >
+          {t('games.familyLeaderboard' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+        </button>
+      </div>
+
+      {/* Multiplayer buttons */}
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => setView('setup')}
+          className="flex-1 py-3 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-xl font-medium text-sm transition active:scale-95 flex items-center justify-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {t('games.playTogether' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+        </button>
+        <button
+          type="button"
+          onClick={() => setView('h2h')}
+          className="flex-1 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium text-sm transition active:scale-95 flex items-center justify-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h8M12 8l4 4-4 4" />
+          </svg>
+          {t('games.headToHead' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+        </button>
       </div>
 
       {/* Game selector grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <GameCard
-          type="trivia"
-          titleKey="games.trivia"
-          descKey="games.triviaDesc"
-          color="purple"
-          onSelect={handleSelectGame}
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
+        <GameCard type="trivia" titleKey="games.trivia" descKey="games.triviaDesc" color="purple" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
-        <GameCard
-          type="math"
-          titleKey="games.mathChallenge"
-          descKey="games.mathDesc"
-          color="blue"
-          onSelect={handleSelectGame}
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-          }
+        <GameCard type="math" titleKey="games.mathChallenge" descKey="games.mathDesc" color="blue" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>}
         />
-        <GameCard
-          type="word"
-          titleKey="games.wordGame"
-          descKey="games.wordDesc"
-          color="green"
-          onSelect={handleSelectGame}
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-            </svg>
-          }
+        <GameCard type="word" titleKey="games.wordGame" descKey="games.wordDesc" color="green" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>}
         />
-        <GameCard
-          type="memory"
-          titleKey="games.memoryMatch"
-          descKey="games.memoryDesc"
-          color="orange"
-          onSelect={handleSelectGame}
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-          }
+        <GameCard type="memory" titleKey="games.memoryMatch" descKey="games.memoryDesc" color="orange" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>}
         />
-        <GameCard
-          type="headsup"
-          titleKey="games.headsUp"
-          descKey="games.headsUpDesc"
-          color="fuchsia"
-          onSelect={handleSelectGame}
-          icon={
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
+        <GameCard type="headsup" titleKey="games.headsUp" descKey="games.headsUpDesc" color="fuchsia" onSelect={handleSelectGame}
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
         <GameCard type="reaction" titleKey={'games.reactionTime' as any} descKey={'games.reactionDesc' as any} color="red" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
@@ -204,10 +284,50 @@ export default function FamilyGames() {
         <GameCard type="dino" titleKey={'games.dinoRun' as any} descKey={'games.dinoRunDesc' as any} color="lime" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
           icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 15l3-3 3 3 3-3 3 3 3-3 3 3" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 19H3" /></svg>}
         />
+        <GameCard type="beatclock" titleKey={'games.beatTheClock' as any} descKey={'games.beatTheClockDesc' as any} color="fuchsia" onSelect={handleSelectGame} // eslint-disable-line @typescript-eslint/no-explicit-any
+          icon={<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+        />
       </div>
 
       {/* Scoreboard */}
       <Scoreboard />
     </PageContent>
   );
+}
+
+// Lazy-load game component for tournament turns (avoids stale closure from main effect)
+function TournamentGameLoader({ gameType, onGameEnd, onBack }: {
+  gameType: string;
+  onGameEnd: (score: number, timeMs: number) => void;
+  onBack: () => void;
+}) {
+  const [Comp, setComp] = React.useState<React.ComponentType<{ onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        let mod: { default: React.ComponentType<{ onBack: () => void; onGameEnd?: (score: number, timeMs: number) => void }> };
+        switch (gameType) {
+          case 'trivia':    mod = await import('./TriviaGame'); break;
+          case 'math':      mod = await import('./MathGame'); break;
+          case 'word':      mod = await import('./WordGame'); break;
+          case 'memory':    mod = await import('./MemoryGame'); break;
+          case 'headsup':   mod = await import('./HeadsUpGame'); break;
+          case 'reaction':  mod = await import('./ReactionGame'); break;
+          case 'simon':     mod = await import('./SimonGame'); break;
+          case 'sequence':  mod = await import('./SequenceGame'); break;
+          case 'colormatch':mod = await import('./ColorMatchGame'); break;
+          case 'anagram':   mod = await import('./AnagramGame'); break;
+          case 'beatclock': mod = await import('./BeatTheClock'); break;
+          default: return;
+        }
+        if (!cancelled) setComp(() => mod.default);
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, [gameType]);
+
+  if (!Comp) return <div className="flex items-center justify-center min-h-[40vh]"><div className="w-8 h-8 border-2 border-fuchsia-500 border-t-transparent rounded-full animate-spin" /></div>;
+  return <PageContent><Comp onBack={onBack} onGameEnd={onGameEnd} /></PageContent>;
 }

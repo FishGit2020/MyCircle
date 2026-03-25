@@ -30,11 +30,12 @@ function shuffle<T>(arr: T[]): T[] {
 
 interface TriviaGameProps {
   onBack: () => void;
+  onGameEnd?: (score: number, timeMs: number) => void;
 }
 
 type Phase = 'menu' | 'playing' | 'feedback' | 'over';
 
-export default function TriviaGame({ onBack }: TriviaGameProps) {
+export default function TriviaGame({ onBack, onGameEnd }: TriviaGameProps) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<Phase>('menu');
   const [category, setCategory] = useState<Category>('all');
@@ -113,6 +114,7 @@ export default function TriviaGame({ onBack }: TriviaGameProps) {
 
   if (phase === 'over') {
     const elapsed = Date.now() - startTimeRef.current;
+    if (onGameEnd) { onGameEnd(score, elapsed); return null; }
     return (
       <GameOver
         gameType="trivia"

@@ -1737,6 +1737,32 @@ if (db && auth) {
         playedAt: serverTimestamp(),
       });
     },
+
+    async getLeaderboard(uids: string[]) {
+      if (!uids.length) return [];
+      const gameTypes = ['trivia', 'word', 'memory', 'math', 'headsup', 'reaction', 'simon', 'sequence', 'colormatch', 'maze', 'anagram', 'dino', 'beatclock'];
+      const results: Array<{ uid: string; displayName: string; gameType: string; score: number; timeMs: number; difficulty: string; playedAt: string }> = [];
+      for (const gameType of gameTypes) {
+        const scoresRef = collection(gamesDb, 'games', 'scores', gameType);
+        const q = query(scoresRef, orderBy('score', 'desc'), limit(100));
+        const snap = await getDocs(q);
+        for (const d of snap.docs) {
+          const data = d.data();
+          if (uids.includes(data.playedBy?.uid)) {
+            results.push({
+              uid: data.playedBy.uid,
+              displayName: data.playedBy.displayName || 'Anonymous',
+              gameType,
+              score: data.score,
+              timeMs: data.timeMs,
+              difficulty: data.difficulty,
+              playedAt: data.playedAt?.toDate?.()?.toISOString?.() ?? new Date().toISOString(),
+            });
+          }
+        }
+      }
+      return results;
+    },
   };
 }
 
