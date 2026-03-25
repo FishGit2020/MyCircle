@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { formatFileSize, getFileIcon, isAllowedFileType, isFileTooLarge } from './fileHelpers';
 
+
 describe('formatFileSize', () => {
   it('formats bytes', () => {
     expect(formatFileSize(500)).toBe('500 B');
@@ -39,24 +40,37 @@ describe('getFileIcon', () => {
     expect(getFileIcon('application/vnd.ms-excel')).toBe('sheet');
   });
 
+  it('returns video for video types', () => {
+    expect(getFileIcon('video/mp4')).toBe('video');
+    expect(getFileIcon('video/webm')).toBe('video');
+  });
+
+  it('returns audio for audio types', () => {
+    expect(getFileIcon('audio/mpeg')).toBe('audio');
+    expect(getFileIcon('audio/wav')).toBe('audio');
+  });
+
+  it('returns presentation for PowerPoint types', () => {
+    expect(getFileIcon('application/vnd.openxmlformats-officedocument.presentationml.presentation')).toBe('presentation');
+    expect(getFileIcon('application/vnd.ms-powerpoint')).toBe('presentation');
+  });
+
+  it('returns archive for compressed types', () => {
+    expect(getFileIcon('application/zip')).toBe('archive');
+    expect(getFileIcon('application/x-compressed')).toBe('archive');
+  });
+
   it('returns file for unknown types', () => {
     expect(getFileIcon('application/octet-stream')).toBe('file');
   });
 });
 
 describe('isAllowedFileType', () => {
-  it('allows images', () => {
+  it('allows all file types', () => {
     expect(isAllowedFileType('image/jpeg')).toBe(true);
-    expect(isAllowedFileType('image/png')).toBe(true);
-  });
-
-  it('allows PDFs', () => {
-    expect(isAllowedFileType('application/pdf')).toBe(true);
-  });
-
-  it('rejects unknown types', () => {
-    expect(isAllowedFileType('application/octet-stream')).toBe(false);
-    expect(isAllowedFileType('video/mp4')).toBe(false);
+    expect(isAllowedFileType('video/mp4')).toBe(true);
+    expect(isAllowedFileType('application/octet-stream')).toBe(true);
+    expect(isAllowedFileType('application/zip')).toBe(true);
   });
 });
 

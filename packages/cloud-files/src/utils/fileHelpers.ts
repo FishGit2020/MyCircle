@@ -1,11 +1,3 @@
-const ALLOWED_TYPES = new Set([
-  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-  'application/pdf', 'text/plain', 'text/csv',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-]);
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -17,15 +9,20 @@ export function formatFileSize(bytes: number): string {
 
 export function getFileIcon(contentType: string): string {
   if (contentType.startsWith('image/')) return 'image';
+  if (contentType.startsWith('video/')) return 'video';
+  if (contentType.startsWith('audio/')) return 'audio';
   if (contentType === 'application/pdf') return 'pdf';
-  if (contentType === 'text/plain' || contentType === 'text/csv') return 'text';
+  if (contentType.startsWith('text/') || contentType === 'application/json' || contentType === 'application/xml' || contentType === 'text/markdown' || contentType === 'text/html') return 'text';
+  // presentation check before doc — presentationml MIME contains "document"
+  if (contentType.includes('presentation') || contentType.includes('powerpoint')) return 'presentation';
   if (contentType.includes('word') || contentType.includes('document')) return 'doc';
   if (contentType.includes('excel') || contentType.includes('spreadsheet')) return 'sheet';
+  if (contentType.includes('zip') || contentType.includes('compressed') || contentType.includes('archive') || contentType.includes('rar') || contentType.includes('7z')) return 'archive';
   return 'file';
 }
 
-export function isAllowedFileType(contentType: string): boolean {
-  return ALLOWED_TYPES.has(contentType);
+export function isAllowedFileType(_contentType: string): boolean {
+  return true;
 }
 
 export function isFileTooLarge(size: number): boolean {

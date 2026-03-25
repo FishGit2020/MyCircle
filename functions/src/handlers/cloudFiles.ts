@@ -8,14 +8,6 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { ALLOWED_ORIGINS, checkRateLimit, verifyAuthToken, uploadToStorage, getStorageDownloadUrl } from './shared.js';
 
-const ALLOWED_FILE_TYPES = new Set([
-  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-  'application/pdf', 'text/plain', 'text/csv',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-]);
 
 const cloudFileUploadSchema = z.object({
   fileName: z.string().min(1).max(255),
@@ -63,11 +55,6 @@ export const cloudFiles = onRequest(
         return;
       }
       const { fileName, fileBase64, contentType } = parsed.data;
-
-      if (!ALLOWED_FILE_TYPES.has(contentType)) {
-        res.status(400).json({ error: 'Unsupported file type' });
-        return;
-      }
 
       const buffer = Buffer.from(fileBase64, 'base64');
       if (buffer.length > 5 * 1024 * 1024) {

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import { isAllowedFileType, isFileTooLarge } from '../utils/fileHelpers';
+import { isFileTooLarge } from '../utils/fileHelpers';
 
 interface FileUploadProps {
   onUpload: (file: File) => Promise<void>;
@@ -16,10 +16,6 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
   const handleFile = useCallback(async (file: File) => {
     setUploadError(null);
 
-    if (!isAllowedFileType(file.type)) {
-      setUploadError(t('cloudFiles.unsupportedType'));
-      return;
-    }
     if (isFileTooLarge(file.size)) {
       setUploadError(t('cloudFiles.fileTooLarge'));
       return;
