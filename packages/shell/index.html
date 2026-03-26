@@ -34,8 +34,8 @@
     <div id="root"></div>
     <!-- Self-healing: if stale SW serves outdated chunks that fail to load, unregister and reload -->
     <script>
-      var STALE_RE = /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module|Unexpected token '<'/i;
-      var STALE_REJECT_RE = /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module|Script .+ load failed|Unexpected token '<'/i;
+      var STALE_RE = /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed|Unexpected token '<'/i;
+      var STALE_REJECT_RE = /Loading chunk|Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed|Script .+ load failed|Unexpected token '<'/i;
       function selfHeal() {
         if (sessionStorage.getItem('sw-reload')) return; // guard against infinite loop
         sessionStorage.setItem('sw-reload', '1');
