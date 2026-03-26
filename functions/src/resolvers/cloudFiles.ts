@@ -44,7 +44,6 @@ export function createCloudFileResolvers() {
             storagePath: data.storagePath ?? '',
             folderId: data.folderId ?? null,
             uploadedAt: toIso(data.uploadedAt),
-            folderId: data.folderId ?? null,
           };
         });
       },
