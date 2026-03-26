@@ -1494,6 +1494,38 @@ export const GET_RESUME_APPLICATIONS = gql`
   }
 `;
 
+export const GET_RESUME_PARSE_JOB = gql`
+  query GetResumeParseJob($id: ID!) {
+    resumeParseJob(id: $id) {
+      id
+      status
+      error
+      result {
+        contact { name email phone location linkedin github website }
+        experiences {
+          id company location startDate endDate
+          versions { id title bullets }
+        }
+        education { id school location degree field startDate endDate notes }
+        skills
+        projects { id name startDate endDate bullets }
+        updatedAt
+      }
+      createdAt
+    }
+  }
+`;
+
+export const SUBMIT_RESUME_PARSE = gql`
+  mutation SubmitResumeParse($fileName: String!, $fileBase64: String!, $contentType: String!, $model: String!, $endpointId: ID) {
+    submitResumeParse(fileName: $fileName, fileBase64: $fileBase64, contentType: $contentType, model: $model, endpointId: $endpointId) {
+      id
+      status
+      createdAt
+    }
+  }
+`;
+
 export const SCRAPE_JOB_URL = gql`
   query ScrapeJobUrl($url: String!) {
     scrapeJobUrl(url: $url)

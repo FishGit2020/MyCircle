@@ -203,6 +203,10 @@ service cloud.firestore {
     match /resumeApplications/{appId} {
       allow read, write, delete: if request.auth != null && request.auth.uid == userId;
     }
+    match /resumeParseJobs/{jobId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+    }
 
     // Books - shared library, authenticated read, uploader can write/delete
     match /books/{bookId} {

@@ -555,6 +555,7 @@ export const typeDefs = `#graphql
     # Resume Tailor (auth required)
     resumeFactBank: ResumeFactBank
     resumeApplications(limit: Int): [ResumeApplication!]!
+    resumeParseJob(id: ID!): ResumeParseJob
     scrapeJobUrl(url: String!): String
   }
 
@@ -1053,6 +1054,14 @@ export const typeDefs = `#graphql
     bullets: [String!]!
   }
 
+  type ResumeParseJob {
+    id: ID!
+    status: String!
+    error: String
+    result: ResumeFactBank
+    createdAt: String!
+  }
+
   type ResumeFactBank {
     contact: ResumeContact!
     experiences: [ResumeExperience!]!
@@ -1186,6 +1195,7 @@ export const typeDefs = `#graphql
 
     # Resume Tailor (auth required)
     saveResumeFactBank(input: ResumeFactBankInput!): ResumeFactBank!
+    submitResumeParse(fileName: String!, fileBase64: String!, contentType: String!, model: String!, endpointId: ID): ResumeParseJob!
     generateResume(jdText: String!, model: String!, endpointId: ID): GeneratedResumeResult!
     boostAtsScore(resumeJson: String!, jdText: String!, model: String!, endpointId: ID): GeneratedResumeResult!
     saveResumeApplication(input: ResumeApplicationInput!): ResumeApplication!

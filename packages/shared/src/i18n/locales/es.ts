@@ -2944,6 +2944,7 @@ const es: Record<TranslationKey, string> = {
   'resumeTailor.factBank.pasteTextPlaceholder': 'Pega el contenido de tu curr\u00edculum aqu\u00ed...',
   'resumeTailor.factBank.parseText': 'Analizar',
   'resumeTailor.factBank.cancel': 'Cancelar',
+  'resumeTailor.factBank.pickFromFiles': 'Elegir de Archivos',
   'resumeTailor.generate.jobTitle': 'T\u00edtulo del puesto',
   'resumeTailor.generate.company': 'Empresa',
   'resumeTailor.generate.jobUrl': 'URL de la oferta',
