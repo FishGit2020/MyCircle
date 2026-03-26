@@ -841,6 +841,7 @@ export const GET_CLOUD_FILES = gql`
       size
       downloadUrl
       storagePath
+      folderId
       uploadedAt
       folderId
     }
