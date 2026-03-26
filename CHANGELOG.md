@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.15.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.14.0...mycircle-v1.15.0) (2026-03-26)
+
+
+### Features
+
+* **resume-tailor:** self-hosted Ollama AI + fix cloud-files folder visibility ([#860](https://github.com/FishGit2020/MyCircle/issues/860)) ([5c63af8](https://github.com/FishGit2020/MyCircle/commit/5c63af8bb89d42fca44f426efc55566c04040648))
+
+
+### Bug Fixes
+
+* **cloud-files,resume-tailor:** handle empty MIME type for .md uploads ([#859](https://github.com/FishGit2020/MyCircle/issues/859)) ([dd77d3b](https://github.com/FishGit2020/MyCircle/commit/dd77d3bfc770abda10db90142566d329c7a21ce7))
+* **cloud-files:** show files at root when no folder is assigned ([#862](https://github.com/FishGit2020/MyCircle/issues/862)) ([e0125c2](https://github.com/FishGit2020/MyCircle/commit/e0125c298f6102921edb3ca727698b4afd5cde58))
+
 ## [1.14.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.13.1...mycircle-v1.14.0) (2026-03-25)
 
 
