@@ -10,6 +10,10 @@ const ALLOWED_RESUME_TYPES = new Set([
   'application/msword',
   'text/plain',
   'text/markdown',
+  'text/html',
+  'text/rtf',
+  'application/rtf',
+  'application/json',
   'application/octet-stream',
 ]);
 
@@ -97,7 +101,7 @@ export const resumeTailor = onRequest(
 
     // Check content type
     if (!ALLOWED_RESUME_TYPES.has(contentType)) {
-      res.status(400).json({ error: 'Unsupported file type. Please upload a PDF, DOCX, or text file.' });
+      res.status(400).json({ error: 'Unsupported file type. Please upload a PDF, DOCX, Markdown, HTML, RTF, or text file.' });
       return;
     }
 

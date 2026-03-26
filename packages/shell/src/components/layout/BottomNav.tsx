@@ -260,7 +260,7 @@ export default function BottomNav({ hasActivePlayer: _hasActivePlayer }: { hasAc
 
           {/* More popup */}
           {moreOpen && (
-            <div className="absolute bottom-full mb-2 right-0 w-48 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1 overflow-hidden">
+            <div className="absolute bottom-full mb-2 right-0 w-48 max-w-[calc(100vw-2rem)] max-h-[70vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1">
               {moreItems.map(item => {
                 const active = isActive(item.path);
                 return (
