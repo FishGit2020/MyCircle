@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.16.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.15.1...mycircle-v1.16.0) (2026-03-26)
+
+
+### Features
+
+* **cloud-files:** extend preview to text, markdown, CSV, HTML, video, audio, SVG ([#865](https://github.com/FishGit2020/MyCircle/issues/865)) ([c7f0fc6](https://github.com/FishGit2020/MyCircle/commit/c7f0fc63fd5e4aee7bd24c1856edc3b83be6714a))
+* **flashcards:** add 30 technique cards for data structures, trees, graphs, DP, sorting ([#868](https://github.com/FishGit2020/MyCircle/issues/868)) ([6e17c32](https://github.com/FishGit2020/MyCircle/commit/6e17c32061251e45b4b28ff19041d31a5b99c5ff))
+* **resume-tailor:** async GraphQL resume parsing with cloud file picker ([#867](https://github.com/FishGit2020/MyCircle/issues/867)) ([1690ec9](https://github.com/FishGit2020/MyCircle/commit/1690ec9d8ca15282a529c01b30ded7f0c2e07999))
+
+
+### Bug Fixes
+
+* **shell:** add iOS module import error to self-healing stale chunk regex ([#869](https://github.com/FishGit2020/MyCircle/issues/869)) ([649d767](https://github.com/FishGit2020/MyCircle/commit/649d76744d237c95a459c85f0bcf88d9f4b977c3))
+
 ## [1.15.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.15.0...mycircle-v1.15.1) (2026-03-26)
 
 
