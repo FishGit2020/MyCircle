@@ -173,6 +173,43 @@ export function useFactBank() {
     throw new Error('Parse timed out. Please try again.');
   }, [pollParseJob]);
 
+  // ── Cloud snapshot persistence ────────────────────────────────────────────────
+
+  const [cloudSaveStatus, setCloudSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // Save the current fact bank as a versioned JSON snapshot to cloud files
+  const saveSnapshotToCloud = useCallback(async (bank?: FactBank) => {
+    const target = bank ?? factBank;
+    if (!window.__cloudFiles) return;
+    setCloudSaveStatus('saving');
+    try {
+      const json = JSON.stringify(target, null, 2);
+      const b64 = btoa(unescape(encodeURIComponent(json)));
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const fileName = `resume-factbank-${ts}.json`;
+      await window.__cloudFiles.upload(fileName, b64, 'application/json');
+      setCloudSaveStatus('saved');
+      setTimeout(() => setCloudSaveStatus('idle'), 3000);
+    } catch {
+      setCloudSaveStatus('error');
+      setTimeout(() => setCloudSaveStatus('idle'), 3000);
+    }
+  }, [factBank]);
+
+  // Load a fact bank from a cloud file JSON snapshot (replaces current)
+  const loadFromCloudSnapshot = useCallback(async (downloadUrl: string) => {
+    const res = await fetch(downloadUrl);
+    if (!res.ok) throw new Error('Failed to fetch snapshot');
+    const json = await res.json() as Partial<FactBank>;
+    update(() => ({
+      contact: json.contact || { name: '' },
+      experiences: json.experiences || [],
+      education: json.education || [],
+      skills: json.skills || [],
+      projects: json.projects || [],
+    }));
+  }, [update]);
+
   // Upload and parse a resume file (async via GraphQL)
   const uploadAndParse = useCallback(async (file: File, model: string, endpointId?: string | null) => {
     setParseStatus('pending');
@@ -189,8 +226,14 @@ export function useFactBank() {
     const jobId = submitData?.submitResumeParse?.id;
     if (!jobId) throw new Error('Failed to submit parse job');
     const parsed = await pollUntilDone(jobId);
-    update(prev => mergeFactBanks(prev, parsed));
-  }, [update, submitParseMutation, pollUntilDone]);
+    let merged: FactBank = emptyFactBank();
+    update(prev => {
+      merged = mergeFactBanks(prev, parsed);
+      return merged;
+    });
+    // Auto-save parsed snapshot to cloud files so it survives refreshes
+    void saveSnapshotToCloud(merged);
+  }, [update, submitParseMutation, pollUntilDone, saveSnapshotToCloud]);
 
   // Parse pasted plain text (async via GraphQL)
   const parseFromText = useCallback(async (text: string, model: string, endpointId?: string | null) => {
@@ -208,8 +251,13 @@ export function useFactBank() {
     const jobId = submitData?.submitResumeParse?.id;
     if (!jobId) throw new Error('Failed to submit parse job');
     const parsed = await pollUntilDone(jobId);
-    update(prev => mergeFactBanks(prev, parsed));
-  }, [update, submitParseMutation, pollUntilDone]);
+    let merged: FactBank = emptyFactBank();
+    update(prev => {
+      merged = mergeFactBanks(prev, parsed);
+      return merged;
+    });
+    void saveSnapshotToCloud(merged);
+  }, [update, submitParseMutation, pollUntilDone, saveSnapshotToCloud]);
 
   // Parse from a Cloud File (fetch by URL, then submit as base64)
   const parseFromCloudFile = useCallback(async (
@@ -237,8 +285,13 @@ export function useFactBank() {
     const jobId = submitData?.submitResumeParse?.id;
     if (!jobId) throw new Error('Failed to submit parse job');
     const parsed = await pollUntilDone(jobId);
-    update(prev => mergeFactBanks(prev, parsed));
-  }, [update, submitParseMutation, pollUntilDone]);
+    let merged: FactBank = emptyFactBank();
+    update(prev => {
+      merged = mergeFactBanks(prev, parsed);
+      return merged;
+    });
+    void saveSnapshotToCloud(merged);
+  }, [update, submitParseMutation, pollUntilDone, saveSnapshotToCloud]);
 
   // CRUD helpers
   const updateContact = useCallback((contact: ResumeContact) => {
@@ -347,11 +400,14 @@ export function useFactBank() {
     factBank,
     loading,
     saveStatus,
+    cloudSaveStatus,
     parseStatus,
     parseError,
     uploadAndParse,
     parseFromText,
     parseFromCloudFile,
+    saveSnapshotToCloud,
+    loadFromCloudSnapshot,
     updateContact,
     addExperience,
     updateExperience,
