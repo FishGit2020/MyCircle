@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useMutation } from '@mycircle/shared';
+import { useMutation, useLazyQuery } from '@mycircle/shared';
 import {
   GENERATE_RESUME,
   BOOST_ATS_SCORE,
@@ -53,13 +53,13 @@ export function useResumeGeneration(model: string, endpointId: string | null) {
 
   const [generateResumeMutation] = useMutation(GENERATE_RESUME);
   const [boostAtsScoreMutation] = useMutation(BOOST_ATS_SCORE);
-  const [scrapeJobUrlMutation] = useMutation(SCRAPE_JOB_URL);
+  const [scrapeJobUrlQuery] = useLazyQuery(SCRAPE_JOB_URL, { fetchPolicy: 'network-only' });
 
   const scrapeUrl = useCallback(async (url: string) => {
     setStatus('scraping');
     setErrorMsg(null);
     try {
-      const result = await scrapeJobUrlMutation({ variables: { url } });
+      const result = await scrapeJobUrlQuery({ variables: { url } });
       const text = result.data?.scrapeJobUrl ?? '';
       setJobDescription(text);
       setStatus('idle');
@@ -69,7 +69,7 @@ export function useResumeGeneration(model: string, endpointId: string | null) {
       setStatus('error');
       return '';
     }
-  }, [scrapeJobUrlMutation]);
+  }, [scrapeJobUrlQuery]);
 
   const generate = useCallback(async (_factBank: FactBank) => {
     if (!jobDescription.trim()) {
