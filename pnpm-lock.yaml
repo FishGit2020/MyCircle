@@ -631,6 +631,9 @@ importers:
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
+      marked:
+        specifier: ^17.0.5
+        version: 17.0.5
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -7125,6 +7128,11 @@ packages:
   marked@13.0.3:
     resolution: {integrity: sha512-rqRix3/TWzE9rIoFGIn8JmsVfhiuC8VIQ8IdX5TfzmeBucdY05/0UlzKaw0eVtpcN/OdVFpBk7CjKGo9iHJ/zA==}
     engines: {node: '>= 18'}
+    hasBin: true
+
+  marked@17.0.5:
+    resolution: {integrity: sha512-6hLvc0/JEbRjRgzI6wnT2P1XuM1/RrrDEX0kPt0N7jGm1133g6X7DlxFasUIx+72aKAr904GTxhSLDrd5DIlZg==}
+    engines: {node: '>= 20'}
     hasBin: true
 
   marks-pane@1.0.9:
@@ -15510,6 +15518,8 @@ snapshots:
       supports-hyperlinks: 3.2.0
 
   marked@13.0.3: {}
+
+  marked@17.0.5: {}
 
   marks-pane@1.0.9: {}
 

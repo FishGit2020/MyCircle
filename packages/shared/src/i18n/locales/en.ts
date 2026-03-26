@@ -1672,6 +1672,8 @@ const en = {
   'cloudFiles.filterImages': 'Images',
   'cloudFiles.filterPdfs': 'PDFs',
   'cloudFiles.filterDocs': 'Docs',
+  'cloudFiles.filterOther': 'Other',
+  'cloudFiles.previewError': 'Failed to load preview',
   'cloudFiles.newFolder': 'New Folder',
   'cloudFiles.folderName': 'Folder name',
   'cloudFiles.createFolder': 'Create Folder',
