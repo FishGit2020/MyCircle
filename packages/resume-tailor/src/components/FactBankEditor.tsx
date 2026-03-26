@@ -63,10 +63,20 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
   const [pasteText, setPasteText] = useState('');
   const [pasting, setPasting] = useState(false);
   const [cloudFilePickerOpen, setCloudFilePickerOpen] = useState(false);
+  const [importJsonCloudOpen, setImportJsonCloudOpen] = useState(false);
+  const [importJsonCloudLoading, setImportJsonCloudLoading] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [autoBannerDismissed, setAutoBannerDismissed] = useState(false);
   const { data: cloudFilesData, refetch: refetchCloudFiles } = useQuery(GET_CLOUD_FILES);
+
+  // All JSON files in cloud files (for import)
+  const jsonCloudFiles = useMemo(() => {
+    const all = (cloudFilesData?.cloudFiles ?? []) as Array<{ id: string; fileName: string; contentType: string; downloadUrl: string; size: number; uploadedAt?: string }>;
+    return all
+      .filter(f => f.fileName.endsWith('.json') || f.contentType === 'application/json')
+      .sort((a, b) => (b.uploadedAt ?? b.fileName).localeCompare(a.uploadedAt ?? a.fileName));
+  }, [cloudFilesData]);
 
   // Filter cloud files to only fact-bank snapshots, newest first
   const snapshotFiles = useMemo(() => {
@@ -192,6 +202,15 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
             className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
           >
             {t('resumeTailor.factBank.importJson')}
+          </button>
+
+          {/* Import JSON from Cloud Files */}
+          <button
+            type="button"
+            onClick={() => { setImportJsonCloudOpen(true); void refetchCloudFiles(); }}
+            className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
+          >
+            {t('resumeTailor.factBank.importJsonFromCloud')}
           </button>
 
           {/* Export JSON */}
@@ -403,6 +422,75 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
                 className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
               >
                 {pasting ? t('resumeTailor.factBank.parsing') : t('resumeTailor.factBank.parseText')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import JSON from Cloud Files modal */}
+      {importJsonCloudOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setImportJsonCloudOpen(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('resumeTailor.factBank.importJsonFromCloud')}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('resumeTailor.factBank.importJsonFromCloudDesc')}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setImportJsonCloudOpen(false)}
+                aria-label="Close"
+                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
+              {jsonCloudFiles.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">{t('resumeTailor.factBank.noJsonFilesInCloud')}</p>
+              ) : (
+                jsonCloudFiles.map(f => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    disabled={importJsonCloudLoading}
+                    onClick={async () => {
+                      setImportJsonCloudLoading(true);
+                      try {
+                        await loadFromCloudSnapshot(f.downloadUrl);
+                        setImportJsonCloudOpen(false);
+                      } catch {
+                        // silently ignore — malformed JSON
+                      } finally {
+                        setImportJsonCloudLoading(false);
+                      }
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                  >
+                    <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900 dark:text-white truncate">{f.fileName}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{(f.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="flex justify-end mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => setImportJsonCloudOpen(false)}
+                className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
+              >
+                {t('resumeTailor.factBank.cancel')}
               </button>
             </div>
           </div>
