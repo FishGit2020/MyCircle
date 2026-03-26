@@ -37,6 +37,16 @@ export function getFileTypeCategory(contentType: string): FileTypeCategory {
   return 'other';
 }
 
+export function canPreviewFile(contentType: string, fileName: string): boolean {
+  if (contentType.startsWith('image/')) return true;
+  if (contentType === 'application/pdf') return true;
+  if (contentType.startsWith('video/')) return true;
+  if (contentType.startsWith('audio/')) return true;
+  if (contentType.startsWith('text/') || contentType === 'application/json' || contentType === 'application/xml' || contentType === 'application/javascript' || contentType === 'application/typescript') return true;
+  const ext = fileName.toLowerCase().split('.').pop() ?? '';
+  return ['md', 'csv', 'html', 'htm', 'json', 'xml', 'txt', 'js', 'ts', 'py', 'svg', 'rtf'].includes(ext);
+}
+
 export function isAllowedFileType(_contentType: string): boolean {
   return true;
 }

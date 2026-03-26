@@ -15,6 +15,7 @@ const FILTERS: FilterButton[] = [
   { value: 'image', labelKey: 'cloudFiles.filterImages' },
   { value: 'pdf', labelKey: 'cloudFiles.filterPdfs' },
   { value: 'doc', labelKey: 'cloudFiles.filterDocs' },
+  { value: 'other', labelKey: 'cloudFiles.filterOther' },
 ];
 
 export default function SearchFilterBar({ query, typeFilter, onQueryChange, onTypeFilterChange }: SearchFilterBarProps) {

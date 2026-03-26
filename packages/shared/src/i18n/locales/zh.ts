@@ -1674,6 +1674,8 @@ const zh: Record<TranslationKey, string> = {
   'cloudFiles.filterImages': '\u56fe\u7247',
   'cloudFiles.filterPdfs': 'PDF',
   'cloudFiles.filterDocs': '\u6587\u6863',
+  'cloudFiles.filterOther': '\u5176\u4ed6',
+  'cloudFiles.previewError': '\u52a0\u8f7d\u9884\u89c8\u5931\u8d25',
   'cloudFiles.newFolder': '\u65b0\u5efa\u6587\u4ef6\u5939',
   'cloudFiles.folderName': '\u6587\u4ef6\u5939\u540d\u79f0',
   'cloudFiles.createFolder': '\u521b\u5efa\u6587\u4ef6\u5939',

@@ -1674,6 +1674,8 @@ const es: Record<TranslationKey, string> = {
   'cloudFiles.filterImages': 'Im\u00e1genes',
   'cloudFiles.filterPdfs': 'PDFs',
   'cloudFiles.filterDocs': 'Documentos',
+  'cloudFiles.filterOther': 'Otros',
+  'cloudFiles.previewError': 'Error al cargar la vista previa',
   'cloudFiles.newFolder': 'Nueva Carpeta',
   'cloudFiles.folderName': 'Nombre de carpeta',
   'cloudFiles.createFolder': 'Crear Carpeta',

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import { formatFileSize, getFileIcon } from '../utils/fileHelpers';
+import { formatFileSize, getFileIcon, canPreviewFile } from '../utils/fileHelpers';
 
 interface FileCardProps {
   fileName: string;
@@ -53,7 +53,7 @@ export default function FileCard({ fileName, contentType, size, downloadUrl, dat
   const [renameValue, setRenameValue] = useState(fileName);
   const dateObj = typeof date === 'string' ? new Date(date) : typeof (date as any)?.toDate === 'function' ? (date as any).toDate() : date instanceof Date ? date : new Date(); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  const canPreview = contentType.startsWith('image/') || contentType === 'application/pdf';
+  const canPreview = canPreviewFile(contentType, fileName);
 
   const handleRenameSave = () => {
     const trimmed = renameValue.trim();
