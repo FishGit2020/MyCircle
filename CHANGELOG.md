@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.17.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.16.0...mycircle-v1.17.0) (2026-03-26)
+
+
+### Features
+
+* **flashcards:** add seed scripts for public phrases and user technique cards ([#870](https://github.com/FishGit2020/MyCircle/issues/870)) ([065feb7](https://github.com/FishGit2020/MyCircle/commit/065feb7a3e96ef95cc860bc3e4b94b7718d1b24f))
+* resume parse status, Spanish flashcards, deck tabs header fix ([#872](https://github.com/FishGit2020/MyCircle/issues/872)) ([75cdac4](https://github.com/FishGit2020/MyCircle/commit/75cdac41af84f3e25e324cdd12639bf1680f5c50))
+
 ## [1.16.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.15.1...mycircle-v1.16.0) (2026-03-26)
 
 
