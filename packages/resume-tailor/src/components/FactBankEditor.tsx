@@ -14,6 +14,8 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
     factBank,
     loading,
     saveStatus,
+    parseStatus,
+    parseError,
     uploadAndParse,
     parseFromText,
     parseFromCloudFile,
@@ -163,9 +165,29 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
         </div>
 
         {/* Save status */}
-        <div className="text-xs text-gray-500 dark:text-gray-400" aria-live="polite">
-          {saveStatus === 'saving' && t('resumeTailor.factBank.saving')}
-          {saveStatus === 'saved' && t('resumeTailor.factBank.saved')}
+        <div className="flex items-center gap-1.5 text-xs" aria-live="polite">
+          {saveStatus === 'saving' && (
+            <>
+              <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+              <span className="text-blue-500 dark:text-blue-400">{t('resumeTailor.factBank.saving')}</span>
+            </>
+          )}
+          {saveStatus === 'saved' && (
+            <>
+              <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              <span className="text-green-600 dark:text-green-400">{t('resumeTailor.factBank.saved')}</span>
+            </>
+          )}
+          {saveStatus === 'idle' && factBank.experiences.length > 0 && (
+            <>
+              <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
+              </svg>
+              <span className="text-gray-400 dark:text-gray-500">{t('resumeTailor.factBank.autoSaved')}</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -173,6 +195,35 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
         <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">
           {uploadError}
         </p>
+      )}
+
+      {/* Parse job status banner */}
+      {(parseStatus === 'pending' || parseStatus === 'processing') && (
+        <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+              {parseStatus === 'pending' ? t('resumeTailor.factBank.parseQueued') : t('resumeTailor.factBank.parseProcessing')}
+            </p>
+            <p className="text-xs text-blue-500 dark:text-blue-400 mt-0.5">{t('resumeTailor.factBank.parseWait')}</p>
+          </div>
+        </div>
+      )}
+      {parseStatus === 'complete' && (
+        <div className="flex items-center gap-2 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+          <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-sm font-medium text-green-700 dark:text-green-300">{t('resumeTailor.factBank.parseComplete')}</p>
+        </div>
+      )}
+      {parseStatus === 'error' && parseError && (
+        <div className="flex items-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <p className="text-sm font-medium text-red-700 dark:text-red-300">{parseError}</p>
+        </div>
       )}
 
       {/* Paste text modal */}

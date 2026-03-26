@@ -473,6 +473,28 @@ export function createResumeTailorQueryResolvers() {
       };
     },
 
+    resumeActiveParseJob: async (_: unknown, __: unknown, context: ResolverContext) => {
+      const uid = requireAuth(context);
+      const db = getFirestore();
+      // Find the most recent pending or processing job
+      const snap = await db
+        .collection(`users/${uid}/resumeParseJobs`)
+        .where('status', 'in', ['pending', 'processing'])
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+      if (snap.empty) return null;
+      const doc = snap.docs[0];
+      const data = doc.data();
+      return {
+        id: doc.id,
+        status: data.status || 'pending',
+        error: null,
+        result: null,
+        createdAt: toTimestampString(data.createdAt),
+      };
+    },
+
     scrapeJobUrl: async (_: unknown, { url }: { url: string }, context: ResolverContext) => {
       requireAuth(context);
 

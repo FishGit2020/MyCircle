@@ -1516,6 +1516,16 @@ export const GET_RESUME_PARSE_JOB = gql`
   }
 `;
 
+export const GET_RESUME_ACTIVE_PARSE_JOB = gql`
+  query GetResumeActiveParseJob {
+    resumeActiveParseJob {
+      id
+      status
+      createdAt
+    }
+  }
+`;
+
 export const SUBMIT_RESUME_PARSE = gql`
   mutation SubmitResumeParse($fileName: String!, $fileBase64: String!, $contentType: String!, $model: String!, $endpointId: ID) {
     submitResumeParse(fileName: $fileName, fileBase64: $fileBase64, contentType: $contentType, model: $model, endpointId: $endpointId) {
