@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { useFactBank } from '../hooks/useFactBank';
 import ExperienceCard from './ExperienceCard';
@@ -15,6 +15,7 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
     loading,
     saveStatus,
     uploadAndParse,
+    parseFromText,
     updateContact,
     addExperience,
     updateExperience,
@@ -34,6 +35,9 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
   const importRef = useRef<HTMLInputElement>(null);
   const [uploadError, setUploadError] = React.useState<string | null>(null);
   const [uploading, setUploading] = React.useState(false);
+  const [pasteOpen, setPasteOpen] = useState(false);
+  const [pasteText, setPasteText] = useState('');
+  const [pasting, setPasting] = useState(false);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -47,6 +51,21 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
     } finally {
       setUploading(false);
       e.target.value = '';
+    }
+  }
+
+  async function handlePasteSubmit() {
+    if (!pasteText.trim()) return;
+    setUploadError(null);
+    setPasting(true);
+    try {
+      await parseFromText(pasteText, model, endpointId);
+      setPasteOpen(false);
+      setPasteText('');
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : t('resumeTailor.errors.uploadFailed'));
+    } finally {
+      setPasting(false);
     }
   }
 
@@ -79,7 +98,7 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
           <input
             ref={uploadRef}
             type="file"
-            accept=".pdf,.doc,.docx,.txt"
+            accept=".pdf,.doc,.docx,.txt,.md,.html,.rtf,.json"
             onChange={handleUpload}
             className="hidden"
             aria-label={t('resumeTailor.factBank.uploadResume')}
@@ -91,6 +110,16 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
             className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
           >
             {uploading ? t('resumeTailor.factBank.parsing') : t('resumeTailor.factBank.uploadResume')}
+          </button>
+
+          {/* Paste text */}
+          <button
+            type="button"
+            onClick={() => setPasteOpen(true)}
+            disabled={pasting}
+            className="px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
+          >
+            {pasting ? t('resumeTailor.factBank.parsing') : t('resumeTailor.factBank.pasteText')}
           </button>
 
           {/* Import JSON */}
@@ -131,6 +160,40 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
         <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">
           {uploadError}
         </p>
+      )}
+
+      {/* Paste text modal */}
+      {pasteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => { setPasteOpen(false); setPasteText(''); }}>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-lg mx-4" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('resumeTailor.factBank.pasteText')}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{t('resumeTailor.factBank.pasteTextHint')}</p>
+            <textarea
+              value={pasteText}
+              onChange={e => setPasteText(e.target.value)}
+              placeholder={t('resumeTailor.factBank.pasteTextPlaceholder')}
+              className="w-full h-64 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => { setPasteOpen(false); setPasteText(''); }}
+                className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
+              >
+                {t('resumeTailor.factBank.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handlePasteSubmit}
+                disabled={!pasteText.trim() || pasting}
+                className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
+              >
+                {pasting ? t('resumeTailor.factBank.parsing') : t('resumeTailor.factBank.parseText')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Contact */}

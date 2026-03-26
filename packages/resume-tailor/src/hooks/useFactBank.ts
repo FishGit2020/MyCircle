@@ -131,6 +131,15 @@ export function useFactBank() {
     update(prev => mergeFactBanks(prev, parsed));
   }, [update]);
 
+  // Parse pasted plain text
+  const parseFromText = useCallback(async (text: string, model: string, endpointId?: string | null) => {
+    const api = (window as unknown as { __resumeTailor?: { uploadAndParse: (n: string, b: string, c: string, model: string, endpointId?: string | null) => Promise<Partial<FactBank>> } }).__resumeTailor;
+    if (!api) throw new Error('Resume upload not available');
+    const base64 = btoa(unescape(encodeURIComponent(text)));
+    const parsed = await api.uploadAndParse('pasted-resume.txt', base64, 'text/plain', model, endpointId);
+    update(prev => mergeFactBanks(prev, parsed));
+  }, [update]);
+
   // CRUD helpers
   const updateContact = useCallback((contact: ResumeContact) => {
     update(prev => ({ ...prev, contact }));
@@ -239,6 +248,7 @@ export function useFactBank() {
     loading,
     saveStatus,
     uploadAndParse,
+    parseFromText,
     updateContact,
     addExperience,
     updateExperience,
