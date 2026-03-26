@@ -971,6 +971,7 @@ export type Query = {
   questionBank: QuestionBank;
   radioStations: Array<RadioStation>;
   radioStationsByUuids: Array<RadioStation>;
+  resumeActiveParseJob?: Maybe<ResumeParseJob>;
   resumeApplications: Array<ResumeApplication>;
   resumeFactBank?: Maybe<ResumeFactBank>;
   resumeParseJob?: Maybe<ResumeParseJob>;
@@ -2492,6 +2493,11 @@ export type GetResumeParseJobQueryVariables = Exact<{
 
 
 export type GetResumeParseJobQuery = { __typename?: 'Query', resumeParseJob?: { __typename?: 'ResumeParseJob', id: string, status: string, error?: string | null, createdAt: string, result?: { __typename?: 'ResumeFactBank', skills: Array<string>, updatedAt: string, contact: { __typename?: 'ResumeContact', name: string, email?: string | null, phone?: string | null, location?: string | null, linkedin?: string | null, github?: string | null, website?: string | null }, experiences: Array<{ __typename?: 'ResumeExperience', id: string, company: string, location?: string | null, startDate: string, endDate: string, versions: Array<{ __typename?: 'ResumeVersion', id: string, title: string, bullets: Array<string> }> }>, education: Array<{ __typename?: 'ResumeEducation', id: string, school: string, location?: string | null, degree: string, field: string, startDate?: string | null, endDate?: string | null, notes: Array<string> }>, projects: Array<{ __typename?: 'ResumeProject', id: string, name: string, startDate?: string | null, endDate?: string | null, bullets: Array<string> }> } | null } | null };
+
+export type GetResumeActiveParseJobQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetResumeActiveParseJobQuery = { __typename?: 'Query', resumeActiveParseJob?: { __typename?: 'ResumeParseJob', id: string, status: string, createdAt: string } | null };
 
 export type SubmitResumeParseMutationVariables = Exact<{
   fileName: Scalars['String']['input'];

@@ -556,6 +556,7 @@ export const typeDefs = `#graphql
     resumeFactBank: ResumeFactBank
     resumeApplications(limit: Int): [ResumeApplication!]!
     resumeParseJob(id: ID!): ResumeParseJob
+    resumeActiveParseJob: ResumeParseJob
     scrapeJobUrl(url: String!): String
   }
 

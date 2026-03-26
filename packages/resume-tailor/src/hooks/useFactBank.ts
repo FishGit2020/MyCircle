@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery, useMutation, useLazyQuery } from '@mycircle/shared';
-import { GET_RESUME_FACT_BANK, SAVE_RESUME_FACT_BANK, SUBMIT_RESUME_PARSE, GET_RESUME_PARSE_JOB } from '@mycircle/shared';
+import { GET_RESUME_FACT_BANK, SAVE_RESUME_FACT_BANK, SUBMIT_RESUME_PARSE, GET_RESUME_PARSE_JOB, GET_RESUME_ACTIVE_PARSE_JOB } from '@mycircle/shared';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -74,14 +74,17 @@ function uuid(): string {
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function useFactBank() {
-  const { data, loading } = useQuery(GET_RESUME_FACT_BANK);
+  const { data, loading } = useQuery(GET_RESUME_FACT_BANK, { fetchPolicy: 'cache-and-network' });
   const [saveFactBank] = useMutation(SAVE_RESUME_FACT_BANK);
   const [submitParseMutation] = useMutation(SUBMIT_RESUME_PARSE);
   const [pollParseJob] = useLazyQuery(GET_RESUME_PARSE_JOB, { fetchPolicy: 'network-only' });
 
   const [factBank, setFactBank] = useState<FactBank>(emptyFactBank());
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [parseStatus, setParseStatus] = useState<'idle' | 'pending' | 'processing' | 'complete' | 'error'>('idle');
+  const [parseError, setParseError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollingRef = useRef(false);
 
   // Sync from server on load
   useEffect(() => {
@@ -89,6 +92,24 @@ export function useFactBank() {
       setFactBank(data.resumeFactBank as FactBank);
     }
   }, [data]);
+
+  // Check for active parse jobs on mount and resume polling
+  const [fetchActiveJob] = useLazyQuery(GET_RESUME_ACTIVE_PARSE_JOB, { fetchPolicy: 'network-only' });
+  useEffect(() => {
+    if (pollingRef.current) return; // already polling
+    let cancelled = false;
+    fetchActiveJob().then(({ data: jobData }) => {
+      if (cancelled) return;
+      const job = jobData?.resumeActiveParseJob;
+      if (job && (job.status === 'pending' || job.status === 'processing')) {
+        setParseStatus(job.status as 'pending' | 'processing');
+        pollUntilDone(job.id).then(parsed => {
+          if (!cancelled) update(prev => mergeFactBanks(prev, parsed));
+        }).catch(() => { /* error already set in pollUntilDone */ });
+      }
+    }).catch(() => { /* ignore */ });
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced save
   const debouncedSave = useCallback((updated: FactBank) => {
@@ -125,20 +146,36 @@ export function useFactBank() {
 
   // Poll a parse job until complete
   const pollUntilDone = useCallback(async (jobId: string): Promise<Partial<FactBank>> => {
+    pollingRef.current = true;
+    setParseError(null);
     const maxAttempts = 90; // 90 * 3s = 4.5 min max
     for (let i = 0; i < maxAttempts; i++) {
       await new Promise(r => setTimeout(r, 3000));
       const { data: jobData } = await pollParseJob({ variables: { id: jobId } });
       const job = jobData?.resumeParseJob;
-      if (!job) throw new Error('Parse job not found');
-      if (job.status === 'complete' && job.result) return job.result as Partial<FactBank>;
-      if (job.status === 'error') throw new Error(job.error || 'Parse failed');
+      if (!job) { pollingRef.current = false; setParseStatus('error'); throw new Error('Parse job not found'); }
+      setParseStatus(job.status as 'pending' | 'processing');
+      if (job.status === 'complete' && job.result) {
+        pollingRef.current = false;
+        setParseStatus('complete');
+        setTimeout(() => setParseStatus('idle'), 3000);
+        return job.result as Partial<FactBank>;
+      }
+      if (job.status === 'error') {
+        pollingRef.current = false;
+        setParseStatus('error');
+        setParseError(job.error || 'Parse failed');
+        throw new Error(job.error || 'Parse failed');
+      }
     }
+    pollingRef.current = false;
+    setParseStatus('error');
     throw new Error('Parse timed out. Please try again.');
   }, [pollParseJob]);
 
   // Upload and parse a resume file (async via GraphQL)
   const uploadAndParse = useCallback(async (file: File, model: string, endpointId?: string | null) => {
+    setParseStatus('pending');
     const base64 = await fileToBase64(file);
     const { data: submitData } = await submitParseMutation({
       variables: {
@@ -157,6 +194,7 @@ export function useFactBank() {
 
   // Parse pasted plain text (async via GraphQL)
   const parseFromText = useCallback(async (text: string, model: string, endpointId?: string | null) => {
+    setParseStatus('pending');
     const base64 = btoa(unescape(encodeURIComponent(text)));
     const { data: submitData } = await submitParseMutation({
       variables: {
@@ -178,6 +216,7 @@ export function useFactBank() {
     fileName: string, downloadUrl: string, contentType: string,
     model: string, endpointId?: string | null
   ) => {
+    setParseStatus('pending');
     const res = await fetch(downloadUrl);
     if (!res.ok) throw new Error('Failed to fetch file');
     const buffer = await res.arrayBuffer();
@@ -308,6 +347,8 @@ export function useFactBank() {
     factBank,
     loading,
     saveStatus,
+    parseStatus,
+    parseError,
     uploadAndParse,
     parseFromText,
     parseFromCloudFile,
