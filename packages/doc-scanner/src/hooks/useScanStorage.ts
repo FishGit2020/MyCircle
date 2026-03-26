@@ -23,6 +23,8 @@ export interface ScanFile {
   name: string;
   url: string;
   createdAt: string;
+  pageCount: number;
+  fileType: 'image/jpeg' | 'application/pdf';
 }
 
 interface UseScanStorageReturn {
@@ -30,6 +32,7 @@ interface UseScanStorageReturn {
   isLoading: boolean;
   saveStatus: 'idle' | 'saving' | 'saved' | 'failed';
   saveScan: (canvas: HTMLCanvasElement) => Promise<string | null>;
+  savePdf: (blob: Blob, pageCount: number) => Promise<string | null>;
   deleteScan: (fileName: string) => Promise<void>;
   refreshScans: () => Promise<void>;
 }
@@ -46,9 +49,16 @@ export function useScanStorage(): UseScanStorageReturn {
     setIsLoading(true);
     try {
       const allFiles = await api.getAll();
-      const scanFiles = allFiles
+      const scanFiles: ScanFile[] = allFiles
         .filter(f => f.name.startsWith('scan-'))
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .map(f => ({
+          name: f.name,
+          url: f.url,
+          createdAt: f.createdAt,
+          fileType: f.name.endsWith('.pdf') ? 'application/pdf' as const : 'image/jpeg' as const,
+          pageCount: f.name.endsWith('.pdf') ? parsePdfPageCount(f.name) : 1,
+        }));
       setScans(scanFiles);
     } catch {
       // Silently fail — user may not be logged in
@@ -89,6 +99,27 @@ export function useScanStorage(): UseScanStorageReturn {
     }
   }, [refreshScans]);
 
+  const savePdf = useCallback(async (blob: Blob, pageCount: number): Promise<string | null> => {
+    const api = window.__cloudFiles;
+    if (!api) {
+      setSaveStatus('failed');
+      return null;
+    }
+
+    setSaveStatus('saving');
+    try {
+      const base64 = await blobToBase64(blob);
+      const fileName = `scan-${Date.now()}-${pageCount}p.pdf`;
+      await api.upload(fileName, base64, 'application/pdf');
+      setSaveStatus('saved');
+      await refreshScans();
+      return fileName;
+    } catch {
+      setSaveStatus('failed');
+      return null;
+    }
+  }, [refreshScans]);
+
   const deleteScan = useCallback(async (fileName: string) => {
     const api = window.__cloudFiles;
     if (!api) return;
@@ -106,7 +137,19 @@ export function useScanStorage(): UseScanStorageReturn {
     refreshScans();
   }, [refreshScans]);
 
-  return { scans, isLoading, saveStatus, saveScan, deleteScan, refreshScans };
+  const renameScan = useCallback((fileName: string, newName: string) => {
+    setScans(prev =>
+      prev.map(s => (s.name === fileName ? { ...s, name: newName } : s))
+    );
+  }, []);
+
+  return { scans, isLoading, saveStatus, saveScan, savePdf, deleteScan, renameScan, refreshScans };
+}
+
+/** Parse page count from PDF filename like "scan-1234567890-5p.pdf" → 5 */
+function parsePdfPageCount(name: string): number {
+  const match = name.match(/-(\d+)p\.pdf$/);
+  return match ? parseInt(match[1], 10) : 1;
 }
 
 function blobToBase64(blob: Blob): Promise<string> {

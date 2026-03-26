@@ -193,6 +193,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - localStorage (player profiles, active tournament session); Firestore via existing `window.__familyGames` bridge (score persistence, requires auth) (014-family-games-multiplayer)
 - TypeScript 5.x (frontend + backend), React 18 + `@mycircle/shared` (Apollo re-exports, i18n, PageContent, StorageKeys), `@originjs/vite-plugin-federation` (MFE), `openai@^4.73.0` (already in `functions/`), `mammoth` (new — DOCX parsing), `pdfjs-dist` (new — PDF text extraction), `cheerio` (already in `functions/` — URL scraping) (015-resume-tailor)
 - Firestore `users/{uid}/resumeFactBank/default` (fact bank document), `users/{uid}/resumeApplications/{appId}` (application log subcollection) (015-resume-tailor)
+- TypeScript 5.x + React 18, Tailwind CSS, jspdf (new), `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent) (016-document-scanner)
+- Cloud Files (Firebase Storage) for exported PDFs/JPEGs; React state (memory) for session page tray (016-document-scanner)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)
