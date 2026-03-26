@@ -3,7 +3,12 @@ import { useTranslation } from '@mycircle/shared';
 import { useFactBank } from '../hooks/useFactBank';
 import ExperienceCard from './ExperienceCard';
 
-export default function FactBankEditor() {
+interface FactBankEditorProps {
+  model: string;
+  endpointId: string | null;
+}
+
+export default function FactBankEditor({ model, endpointId }: FactBankEditorProps) {
   const { t } = useTranslation();
   const {
     factBank,
@@ -36,7 +41,7 @@ export default function FactBankEditor() {
     setUploadError(null);
     setUploading(true);
     try {
-      await uploadAndParse(file);
+      await uploadAndParse(file, model, endpointId);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : t('resumeTailor.errors.uploadFailed'));
     } finally {

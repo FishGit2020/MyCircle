@@ -614,7 +614,9 @@ export type MutationAiChatArgs = {
 
 
 export type MutationBoostAtsScoreArgs = {
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
   jdText: Scalars['String']['input'];
+  model: Scalars['String']['input'];
   resumeJson: Scalars['String']['input'];
 };
 
@@ -708,7 +710,9 @@ export type MutationDeleteWorshipSongArgs = {
 
 
 export type MutationGenerateResumeArgs = {
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
   jdText: Scalars['String']['input'];
+  model: Scalars['String']['input'];
 };
 
 
@@ -2473,6 +2477,8 @@ export type SaveResumeFactBankMutation = { __typename?: 'Mutation', saveResumeFa
 
 export type GenerateResumeMutationVariables = Exact<{
   jdText: Scalars['String']['input'];
+  model: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
@@ -2481,6 +2487,8 @@ export type GenerateResumeMutation = { __typename?: 'Mutation', generateResume: 
 export type BoostAtsScoreMutationVariables = Exact<{
   resumeJson: Scalars['String']['input'];
   jdText: Scalars['String']['input'];
+  model: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 

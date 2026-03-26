@@ -178,6 +178,11 @@ declare global {
       permanentlyDelete: (type: string, id: string) => Promise<void>;
     };
 
+    /* ── Resume Tailor ─────────────────────────────────────── */
+    __resumeTailor?: {
+      uploadAndParse: (fileName: string, fileBase64: string, contentType: string, model: string, endpointId?: string | null) => Promise<Record<string, unknown>>;
+    };
+
     /* ── DevTools / Testing ────────────────────────────────── */
     __APOLLO_CLIENT__?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     __signInForTest?: (email: string, password: string) => Promise<any>; // eslint-disable-line @typescript-eslint/no-explicit-any

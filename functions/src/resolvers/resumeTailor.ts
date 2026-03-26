@@ -1,6 +1,5 @@
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { GraphQLError } from 'graphql';
-import OpenAI from 'openai';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
@@ -186,16 +185,65 @@ interface GeneratedResumeData {
   projects: ResumeProjectData[];
 }
 
-// ─── OpenAI Helpers ──────────────────────────────────────────────────────────
+// ─── Ollama Helpers ───────────────────────────────────────────────────────────
 
-async function callOpenAI(
-  openai: OpenAI,
+interface OllamaEndpoint {
+  id: string;
+  url: string;
+  name: string;
+  cfAccessClientId?: string;
+  cfAccessClientSecret?: string;
+}
+
+async function getUserOllamaEndpoint(uid: string, endpointId?: string | null): Promise<OllamaEndpoint | null> {
+  const db = getFirestore();
+  if (endpointId) {
+    const doc = await db.doc(`users/${uid}/benchmarkEndpoints/${endpointId}`).get();
+    if (!doc.exists) return null;
+    const d = doc.data()!;
+    return { id: doc.id, url: d.url, name: d.name, cfAccessClientId: d.cfAccessClientId || undefined, cfAccessClientSecret: d.cfAccessClientSecret || undefined };
+  }
+  const snap = await db.collection(`users/${uid}/benchmarkEndpoints`).orderBy('createdAt').limit(1).get();
+  if (snap.empty) return null;
+  const doc = snap.docs[0];
+  const d = doc.data();
+  return { id: doc.id, url: d.url, name: d.name, cfAccessClientId: d.cfAccessClientId || undefined, cfAccessClientSecret: d.cfAccessClientSecret || undefined };
+}
+
+interface OllamaClient {
+  chat: {
+    completions: {
+      create: (params: {
+        model: string;
+        temperature: number;
+        response_format?: { type: string };
+        messages: Array<{ role: string; content: string }>;
+      }) => Promise<{ choices: Array<{ message: { content: string | null } }> }>;
+    };
+  };
+}
+
+async function makeOllamaClient(endpoint: OllamaEndpoint): Promise<OllamaClient> {
+  const OpenAI = (await import('openai')).default;
+  const headers: Record<string, string> = {};
+  if (endpoint.cfAccessClientId) headers['CF-Access-Client-Id'] = endpoint.cfAccessClientId;
+  if (endpoint.cfAccessClientSecret) headers['CF-Access-Client-Secret'] = endpoint.cfAccessClientSecret;
+  return new OpenAI({
+    baseURL: `${endpoint.url}/v1`,
+    apiKey: 'ollama',
+    defaultHeaders: Object.keys(headers).length > 0 ? headers : undefined,
+  }) as unknown as OllamaClient;
+}
+
+async function callLLM(
+  client: OllamaClient,
+  model: string,
   systemPrompt: string,
   userPrompt: string,
   temperature = 0.1
 ): Promise<Record<string, unknown>> {
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
+  const response = await client.chat.completions.create({
+    model,
     temperature,
     response_format: { type: 'json_object' },
     messages: [
@@ -205,12 +253,20 @@ async function callOpenAI(
   });
 
   const content = response.choices[0]?.message?.content || '{}';
-  return JSON.parse(content) as Record<string, unknown>;
+  try {
+    return JSON.parse(content) as Record<string, unknown>;
+  } catch {
+    // Extract JSON from response if model wrapped it in markdown
+    const match = content.match(/\{[\s\S]*\}/);
+    if (match) return JSON.parse(match[0]) as Record<string, unknown>;
+    return {};
+  }
 }
 
-async function extractKeywordReport(openai: OpenAI, jdText: string): Promise<KeywordReport> {
-  const result = await callOpenAI(
-    openai,
+async function extractKeywordReport(client: OllamaClient, model: string, jdText: string): Promise<KeywordReport> {
+  const result = await callLLM(
+    client,
+    model,
     `You are an expert ATS (Applicant Tracking System) analyst. Extract and categorize keywords from a job description. Return JSON with this exact structure:
 {
   "role": "job title",
@@ -245,7 +301,8 @@ async function extractKeywordReport(openai: OpenAI, jdText: string): Promise<Key
 }
 
 async function selectVersions(
-  openai: OpenAI,
+  client: OllamaClient,
+  model: string,
   experiences: ResumeExperienceData[],
   jdText: string
 ): Promise<Record<string, string>> {
@@ -255,8 +312,9 @@ async function selectVersions(
     versions: exp.versions.map(v => ({ id: v.id, title: v.title })),
   }));
 
-  const result = await callOpenAI(
-    openai,
+  const result = await callLLM(
+    client,
+    model,
     `You are an expert resume consultant. Given a job description and a list of work experiences (each with multiple title versions), select the best version ID for each experience that will resonate most with this specific job posting. Return JSON: {"selections": {"expId": "versionId", ...}}`,
     `Job Description:\n${jdText}\n\nExperiences:\n${JSON.stringify(expSummary, null, 2)}`,
     0.1
@@ -266,7 +324,8 @@ async function selectVersions(
 }
 
 async function rewriteBullets(
-  openai: OpenAI,
+  client: OllamaClient,
+  model: string,
   experiences: ResumeExperienceData[],
   selectedVersionIds: Record<string, string>,
   keywordReport: KeywordReport,
@@ -292,8 +351,9 @@ async function rewriteBullets(
     ? `You are an expert resume writer. Rewrite bullet points to naturally include missing keywords. You may make slightly larger edits but NEVER fabricate facts. Return JSON: {"rewritten": [{"id": "expId", "bullets": [...]}]}`
     : `You are an expert resume writer. Minimally rewrite bullet points to naturally include missing keywords. Return unchanged bullets if no edit needed. NEVER fabricate facts. Maintain exact bullet count per experience. Never add periods to bullets. Return JSON: {"rewritten": [{"id": "expId", "bullets": [...]}]}`;
 
-  const result = await callOpenAI(
-    openai,
+  const result = await callLLM(
+    client,
+    model,
     systemPrompt,
     `Missing keywords to include naturally:\n${targetKeywords.join(', ')}\n\nExperiences:\n${JSON.stringify(expForRewrite, null, 2)}`,
     aggressive ? 0.3 : 0.2
@@ -320,12 +380,14 @@ async function rewriteBullets(
 }
 
 async function reorganizeSkills(
-  openai: OpenAI,
+  client: OllamaClient,
+  model: string,
   skills: string[],
   keywordReport: KeywordReport
 ): Promise<string[]> {
-  const result = await callOpenAI(
-    openai,
+  const result = await callLLM(
+    client,
+    model,
     `You are an expert resume writer. Reorganize skills into 2-3 categories, front-loading the most relevant keywords from the job description. Return JSON: {"skills": ["Category: skill1, skill2", ...]}`,
     `Job keywords (prioritize these):\n${[...keywordReport.hardSkills, ...keywordReport.titleKeywords].join(', ')}\n\nCurrent skills:\n${skills.join('\n')}`,
     0.2
@@ -354,7 +416,7 @@ function isPrivateIp(hostname: string): boolean {
 
 // ─── Resolvers ───────────────────────────────────────────────────────────────
 
-export function createResumeTailorQueryResolvers(getOpenAiKey: () => string) {
+export function createResumeTailorQueryResolvers() {
   return {
     resumeFactBank: async (_: unknown, __: unknown, context: ResolverContext) => {
       const uid = requireAuth(context);
@@ -464,7 +526,7 @@ export function createResumeTailorQueryResolvers(getOpenAiKey: () => string) {
   };
 }
 
-export function createResumeTailorMutationResolvers(getOpenAiKey: () => string) {
+export function createResumeTailorMutationResolvers() {
   return {
     saveResumeFactBank: async (
       _: unknown,
@@ -492,14 +554,14 @@ export function createResumeTailorMutationResolvers(getOpenAiKey: () => string) 
 
     generateResume: async (
       _: unknown,
-      { jdText }: { jdText: string },
+      { jdText, model, endpointId }: { jdText: string; model: string; endpointId?: string | null },
       context: ResolverContext
     ) => {
       const uid = requireAuth(context);
-      const openAiKey = getOpenAiKey();
-      if (!openAiKey) {
-        throw new GraphQLError('AI service not configured', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
-      }
+
+      const endpoint = await getUserOllamaEndpoint(uid, endpointId);
+      if (!endpoint) throw new GraphQLError('No AI endpoint configured. Please add an Ollama endpoint in Settings.', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+      const client = await makeOllamaClient(endpoint);
 
       const db = getFirestore();
       const factBankDoc = await db.collection('users').doc(uid).collection('resumeFactBank').doc('default').get();
@@ -510,12 +572,11 @@ export function createResumeTailorMutationResolvers(getOpenAiKey: () => string) 
       }
 
       const factBank = factBankDoc.data() as GeneratedResumeData;
-      const openai = new OpenAI({ apiKey: openAiKey });
 
       // Run keyword extraction and version selection in parallel
       const [keywordReport, selectedVersionIds] = await Promise.all([
-        extractKeywordReport(openai, jdText),
-        selectVersions(openai, factBank.experiences || [], jdText),
+        extractKeywordReport(client, model, jdText),
+        selectVersions(client, model, factBank.experiences || [], jdText),
       ]);
 
       // Build original resume text for before-score
@@ -532,8 +593,8 @@ export function createResumeTailorMutationResolvers(getOpenAiKey: () => string) 
 
       // Run bullet rewriting and skills reorganization in parallel
       const [rewrittenExperiences, reorganizedSkills] = await Promise.all([
-        rewriteBullets(openai, factBank.experiences || [], selectedVersionIds, keywordReport, false),
-        reorganizeSkills(openai, factBank.skills || [], keywordReport),
+        rewriteBullets(client, model, factBank.experiences || [], selectedVersionIds, keywordReport, false),
+        reorganizeSkills(client, model, factBank.skills || [], keywordReport),
       ]);
 
       const generatedResume: GeneratedResumeData = {
@@ -556,14 +617,14 @@ export function createResumeTailorMutationResolvers(getOpenAiKey: () => string) 
 
     boostAtsScore: async (
       _: unknown,
-      { resumeJson, jdText }: { resumeJson: string; jdText: string },
+      { resumeJson, jdText, model, endpointId }: { resumeJson: string; jdText: string; model: string; endpointId?: string | null },
       context: ResolverContext
     ) => {
-      requireAuth(context);
-      const openAiKey = getOpenAiKey();
-      if (!openAiKey) {
-        throw new GraphQLError('AI service not configured', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
-      }
+      const uid = requireAuth(context);
+
+      const endpoint = await getUserOllamaEndpoint(uid, endpointId);
+      if (!endpoint) throw new GraphQLError('No AI endpoint configured. Please add an Ollama endpoint in Settings.', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+      const client = await makeOllamaClient(endpoint);
 
       let currentResume: GeneratedResumeData;
       try {
@@ -572,8 +633,7 @@ export function createResumeTailorMutationResolvers(getOpenAiKey: () => string) 
         throw new GraphQLError('Invalid resume JSON', { extensions: { code: 'BAD_USER_INPUT' } });
       }
 
-      const openai = new OpenAI({ apiKey: openAiKey });
-      const keywordReport = await extractKeywordReport(openai, jdText);
+      const keywordReport = await extractKeywordReport(client, model, jdText);
 
       // Build selected version map (use first version of each experience)
       const selectedVersionIds: Record<string, string> = {};
@@ -582,8 +642,8 @@ export function createResumeTailorMutationResolvers(getOpenAiKey: () => string) 
       }
 
       const [rewrittenExperiences, reorganizedSkills] = await Promise.all([
-        rewriteBullets(openai, currentResume.experiences || [], selectedVersionIds, keywordReport, true),
-        reorganizeSkills(openai, currentResume.skills || [], keywordReport),
+        rewriteBullets(client, model, currentResume.experiences || [], selectedVersionIds, keywordReport, true),
+        reorganizeSkills(client, model, currentResume.skills || [], keywordReport),
       ]);
 
       const boostedResume: GeneratedResumeData = {

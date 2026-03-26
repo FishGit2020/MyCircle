@@ -13,6 +13,7 @@ const cloudFileUploadSchema = z.object({
   fileName: z.string().min(1).max(255),
   fileBase64: z.string().min(1),
   contentType: z.string().min(1),
+  folderId: z.string().nullable().optional(),
 });
 
 const cloudFileShareSchema = z.object({
@@ -54,7 +55,7 @@ export const cloudFiles = onRequest(
         res.status(400).json({ error: 'Invalid request', details: parsed.error.issues });
         return;
       }
-      const { fileName, fileBase64, contentType } = parsed.data;
+      const { fileName, fileBase64, contentType, folderId = null } = parsed.data;
 
       const buffer = Buffer.from(fileBase64, 'base64');
       if (buffer.length > 5 * 1024 * 1024) {
@@ -77,6 +78,7 @@ export const cloudFiles = onRequest(
           size: buffer.length,
           downloadUrl,
           storagePath: filePath,
+          folderId: folderId ?? null,
           isDeleted: false,
           uploadedAt: FieldValue.serverTimestamp(),
         });

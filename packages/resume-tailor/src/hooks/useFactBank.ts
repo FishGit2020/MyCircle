@@ -122,11 +122,11 @@ export function useFactBank() {
   }, [debouncedSave]);
 
   // Upload and parse a resume file
-  const uploadAndParse = useCallback(async (file: File) => {
+  const uploadAndParse = useCallback(async (file: File, model: string, endpointId?: string | null) => {
     const base64 = await fileToBase64(file);
-    const api = (window as unknown as { __resumeTailor?: { uploadAndParse: (n: string, b: string, c: string) => Promise<Partial<FactBank>> } }).__resumeTailor;
+    const api = (window as unknown as { __resumeTailor?: { uploadAndParse: (n: string, b: string, c: string, model: string, endpointId?: string | null) => Promise<Partial<FactBank>> } }).__resumeTailor;
     if (!api) throw new Error('Resume upload not available');
-    const parsed = await api.uploadAndParse(file.name, base64, file.type || 'application/octet-stream');
+    const parsed = await api.uploadAndParse(file.name, base64, file.type || 'application/octet-stream', model, endpointId);
     // Merge into existing fact bank
     update(prev => mergeFactBanks(prev, parsed));
   }, [update]);
