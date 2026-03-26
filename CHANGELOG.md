@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.15.0...mycircle-v1.15.1) (2026-03-26)
+
+
+### Bug Fixes
+
+* **resume-tailor,shell:** support md/html/rtf uploads, paste text, and scrollable mobile nav ([#863](https://github.com/FishGit2020/MyCircle/issues/863)) ([9eac291](https://github.com/FishGit2020/MyCircle/commit/9eac291c500305a8f09533449575ea6866ee55e7))
+
 ## [1.15.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.14.0...mycircle-v1.15.0) (2026-03-26)
 
 
