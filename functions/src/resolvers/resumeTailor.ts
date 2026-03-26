@@ -458,6 +458,21 @@ export function createResumeTailorQueryResolvers() {
       });
     },
 
+    resumeParseJob: async (_: unknown, { id }: { id: string }, context: ResolverContext) => {
+      const uid = requireAuth(context);
+      const db = getFirestore();
+      const doc = await db.doc(`users/${uid}/resumeParseJobs/${id}`).get();
+      if (!doc.exists) return null;
+      const data = doc.data()!;
+      return {
+        id: doc.id,
+        status: data.status || 'pending',
+        error: data.error || null,
+        result: data.status === 'complete' ? (data.result || null) : null,
+        createdAt: toTimestampString(data.createdAt),
+      };
+    },
+
     scrapeJobUrl: async (_: unknown, { url }: { url: string }, context: ResolverContext) => {
       requireAuth(context);
 
@@ -549,6 +564,43 @@ export function createResumeTailorMutationResolvers() {
         skills: data.skills || [],
         projects: data.projects || [],
         updatedAt: toTimestampString(data.updatedAt),
+      };
+    },
+
+    submitResumeParse: async (
+      _: unknown,
+      { fileName, fileBase64, contentType, model, endpointId }: {
+        fileName: string; fileBase64: string; contentType: string;
+        model: string; endpointId?: string | null;
+      },
+      context: ResolverContext
+    ) => {
+      const uid = requireAuth(context);
+      const db = getFirestore();
+
+      // Validate file size
+      const buffer = Buffer.from(fileBase64, 'base64');
+      if (buffer.length > 5 * 1024 * 1024) {
+        throw new GraphQLError('File exceeds 5MB limit', { extensions: { code: 'BAD_USER_INPUT' } });
+      }
+
+      const jobRef = db.collection(`users/${uid}/resumeParseJobs`).doc();
+      await jobRef.set({
+        fileName,
+        fileBase64,
+        contentType: contentType || 'application/octet-stream',
+        model,
+        endpointId: endpointId || null,
+        status: 'pending',
+        createdAt: FieldValue.serverTimestamp(),
+      });
+
+      return {
+        id: jobRef.id,
+        status: 'pending',
+        error: null,
+        result: null,
+        createdAt: new Date().toISOString(),
       };
     },
 

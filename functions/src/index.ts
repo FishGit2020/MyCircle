@@ -4,6 +4,7 @@ export { aiChat, aiChatStream } from './handlers/aiChat.js';
 export { cloudFiles } from './handlers/cloudFiles.js';
 export { babyPhotos } from './handlers/babyPhotos.js';
 export { resumeTailor } from './handlers/resumeTailor.js';
+export { onResumeParseJobCreated } from './handlers/resumeParseWorker.js';
 export { digitalLibrary } from './handlers/digitalLibrary.js';
 export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.js';
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';

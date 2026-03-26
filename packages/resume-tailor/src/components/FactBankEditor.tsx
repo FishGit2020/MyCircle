@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useTranslation } from '@mycircle/shared';
+import { useTranslation, useQuery, GET_CLOUD_FILES } from '@mycircle/shared';
 import { useFactBank } from '../hooks/useFactBank';
 import ExperienceCard from './ExperienceCard';
 
@@ -16,6 +16,7 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
     saveStatus,
     uploadAndParse,
     parseFromText,
+    parseFromCloudFile,
     updateContact,
     addExperience,
     updateExperience,
@@ -38,6 +39,8 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState('');
   const [pasting, setPasting] = useState(false);
+  const [cloudFilePickerOpen, setCloudFilePickerOpen] = useState(false);
+  const { data: cloudFilesData } = useQuery(GET_CLOUD_FILES);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -122,6 +125,16 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
             {pasting ? t('resumeTailor.factBank.parsing') : t('resumeTailor.factBank.pasteText')}
           </button>
 
+          {/* Pick from Cloud Files */}
+          <button
+            type="button"
+            onClick={() => setCloudFilePickerOpen(true)}
+            disabled={uploading}
+            className="px-3 py-2 text-sm bg-cyan-600 hover:bg-cyan-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
+          >
+            {t('resumeTailor.factBank.pickFromFiles')}
+          </button>
+
           {/* Import JSON */}
           <input
             ref={importRef}
@@ -190,6 +203,57 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
                 className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
               >
                 {pasting ? t('resumeTailor.factBank.parsing') : t('resumeTailor.factBank.parseText')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cloud File picker modal */}
+      {cloudFilePickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setCloudFilePickerOpen(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('resumeTailor.factBank.pickFromFiles')}</h3>
+            <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
+              {(cloudFilesData?.cloudFiles ?? []).length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">{t('cloudFiles.noFiles')}</p>
+              ) : (
+                (cloudFilesData?.cloudFiles ?? []).map((f: { id: string; fileName: string; contentType: string; downloadUrl: string; size: number }) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={async () => {
+                      setCloudFilePickerOpen(false);
+                      setUploadError(null);
+                      setUploading(true);
+                      try {
+                        await parseFromCloudFile(f.fileName, f.downloadUrl, f.contentType, model, endpointId);
+                      } catch (err) {
+                        setUploadError(err instanceof Error ? err.message : t('resumeTailor.errors.uploadFailed'));
+                      } finally {
+                        setUploading(false);
+                      }
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900 dark:text-white truncate">{f.fileName}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{(f.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="flex justify-end mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => setCloudFilePickerOpen(false)}
+                className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
+              >
+                {t('resumeTailor.factBank.cancel')}
               </button>
             </div>
           </div>

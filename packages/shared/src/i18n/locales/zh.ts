@@ -2944,6 +2944,7 @@ const zh: Record<TranslationKey, string> = {
   'resumeTailor.factBank.pasteTextPlaceholder': '\u5728\u6b64\u7c98\u8d34\u7b80\u5386\u5185\u5bb9...',
   'resumeTailor.factBank.parseText': '\u89e3\u6790',
   'resumeTailor.factBank.cancel': '\u53d6\u6d88',
+  'resumeTailor.factBank.pickFromFiles': '\u4ece\u4e91\u6587\u4ef6\u9009\u62e9',
   'resumeTailor.generate.jobTitle': '\u804c\u4f4d\u540d\u79f0',
   'resumeTailor.generate.company': '\u516c\u53f8',
   'resumeTailor.generate.jobUrl': '\u804c\u4f4d\u94fe\u63a5',

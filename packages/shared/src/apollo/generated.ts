@@ -580,6 +580,7 @@ export type Mutation = {
   shareFileWith: TargetedShareResult;
   startCrawl: CrawlJob;
   stopCrawl: CrawlJob;
+  submitResumeParse: ResumeParseJob;
   updateInterviewQuestion: InterviewQuestion;
   updateNote: Note;
   updateWorshipSetlist: Setlist;
@@ -817,6 +818,15 @@ export type MutationStopCrawlArgs = {
 };
 
 
+export type MutationSubmitResumeParseArgs = {
+  contentType: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  fileBase64: Scalars['String']['input'];
+  fileName: Scalars['String']['input'];
+  model: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateInterviewQuestionArgs = {
   id: Scalars['ID']['input'];
   input: UpdateInterviewQuestionInput;
@@ -963,6 +973,7 @@ export type Query = {
   radioStationsByUuids: Array<RadioStation>;
   resumeApplications: Array<ResumeApplication>;
   resumeFactBank?: Maybe<ResumeFactBank>;
+  resumeParseJob?: Maybe<ResumeParseJob>;
   reverseGeocode?: Maybe<City>;
   scrapeJobUrl?: Maybe<Scalars['String']['output']>;
   searchCities: Array<City>;
@@ -1138,6 +1149,11 @@ export type QueryRadioStationsByUuidsArgs = {
 
 export type QueryResumeApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryResumeParseJobArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1376,6 +1392,15 @@ export type ResumeKeywordReport = {
   role?: Maybe<Scalars['String']['output']>;
   titleKeywords: Array<Scalars['String']['output']>;
   top10: Array<Scalars['String']['output']>;
+};
+
+export type ResumeParseJob = {
+  __typename?: 'ResumeParseJob';
+  createdAt: Scalars['String']['output'];
+  error?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  result?: Maybe<ResumeFactBank>;
+  status: Scalars['String']['output'];
 };
 
 export type ResumeProject = {
@@ -2460,6 +2485,24 @@ export type GetResumeApplicationsQueryVariables = Exact<{
 
 
 export type GetResumeApplicationsQuery = { __typename?: 'Query', resumeApplications: Array<{ __typename?: 'ResumeApplication', id: string, date: string, company: string, role: string, atsScoreBefore: number, atsScoreAfter: number, resumeSnapshot: string, jdText?: string | null }> };
+
+export type GetResumeParseJobQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetResumeParseJobQuery = { __typename?: 'Query', resumeParseJob?: { __typename?: 'ResumeParseJob', id: string, status: string, error?: string | null, createdAt: string, result?: { __typename?: 'ResumeFactBank', skills: Array<string>, updatedAt: string, contact: { __typename?: 'ResumeContact', name: string, email?: string | null, phone?: string | null, location?: string | null, linkedin?: string | null, github?: string | null, website?: string | null }, experiences: Array<{ __typename?: 'ResumeExperience', id: string, company: string, location?: string | null, startDate: string, endDate: string, versions: Array<{ __typename?: 'ResumeVersion', id: string, title: string, bullets: Array<string> }> }>, education: Array<{ __typename?: 'ResumeEducation', id: string, school: string, location?: string | null, degree: string, field: string, startDate?: string | null, endDate?: string | null, notes: Array<string> }>, projects: Array<{ __typename?: 'ResumeProject', id: string, name: string, startDate?: string | null, endDate?: string | null, bullets: Array<string> }> } | null } | null };
+
+export type SubmitResumeParseMutationVariables = Exact<{
+  fileName: Scalars['String']['input'];
+  fileBase64: Scalars['String']['input'];
+  contentType: Scalars['String']['input'];
+  model: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type SubmitResumeParseMutation = { __typename?: 'Mutation', submitResumeParse: { __typename?: 'ResumeParseJob', id: string, status: string, createdAt: string } };
 
 export type ScrapeJobUrlQueryVariables = Exact<{
   url: Scalars['String']['input'];

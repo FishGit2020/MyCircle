@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useQuery, useMutation } from '@mycircle/shared';
-import { GET_RESUME_FACT_BANK, SAVE_RESUME_FACT_BANK } from '@mycircle/shared';
+import { useQuery, useMutation, useLazyQuery } from '@mycircle/shared';
+import { GET_RESUME_FACT_BANK, SAVE_RESUME_FACT_BANK, SUBMIT_RESUME_PARSE, GET_RESUME_PARSE_JOB } from '@mycircle/shared';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -76,6 +76,8 @@ function uuid(): string {
 export function useFactBank() {
   const { data, loading } = useQuery(GET_RESUME_FACT_BANK);
   const [saveFactBank] = useMutation(SAVE_RESUME_FACT_BANK);
+  const [submitParseMutation] = useMutation(SUBMIT_RESUME_PARSE);
+  const [pollParseJob] = useLazyQuery(GET_RESUME_PARSE_JOB, { fetchPolicy: 'network-only' });
 
   const [factBank, setFactBank] = useState<FactBank>(emptyFactBank());
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -121,24 +123,83 @@ export function useFactBank() {
     });
   }, [debouncedSave]);
 
-  // Upload and parse a resume file
+  // Poll a parse job until complete
+  const pollUntilDone = useCallback(async (jobId: string): Promise<Partial<FactBank>> => {
+    const maxAttempts = 90; // 90 * 3s = 4.5 min max
+    for (let i = 0; i < maxAttempts; i++) {
+      await new Promise(r => setTimeout(r, 3000));
+      const { data: jobData } = await pollParseJob({ variables: { id: jobId } });
+      const job = jobData?.resumeParseJob;
+      if (!job) throw new Error('Parse job not found');
+      if (job.status === 'complete' && job.result) return job.result as Partial<FactBank>;
+      if (job.status === 'error') throw new Error(job.error || 'Parse failed');
+    }
+    throw new Error('Parse timed out. Please try again.');
+  }, [pollParseJob]);
+
+  // Upload and parse a resume file (async via GraphQL)
   const uploadAndParse = useCallback(async (file: File, model: string, endpointId?: string | null) => {
     const base64 = await fileToBase64(file);
-    const api = (window as unknown as { __resumeTailor?: { uploadAndParse: (n: string, b: string, c: string, model: string, endpointId?: string | null) => Promise<Partial<FactBank>> } }).__resumeTailor;
-    if (!api) throw new Error('Resume upload not available');
-    const parsed = await api.uploadAndParse(file.name, base64, file.type || 'application/octet-stream', model, endpointId);
-    // Merge into existing fact bank
+    const { data: submitData } = await submitParseMutation({
+      variables: {
+        fileName: file.name,
+        fileBase64: base64,
+        contentType: file.type || 'application/octet-stream',
+        model,
+        endpointId: endpointId || null,
+      },
+    });
+    const jobId = submitData?.submitResumeParse?.id;
+    if (!jobId) throw new Error('Failed to submit parse job');
+    const parsed = await pollUntilDone(jobId);
     update(prev => mergeFactBanks(prev, parsed));
-  }, [update]);
+  }, [update, submitParseMutation, pollUntilDone]);
 
-  // Parse pasted plain text
+  // Parse pasted plain text (async via GraphQL)
   const parseFromText = useCallback(async (text: string, model: string, endpointId?: string | null) => {
-    const api = (window as unknown as { __resumeTailor?: { uploadAndParse: (n: string, b: string, c: string, model: string, endpointId?: string | null) => Promise<Partial<FactBank>> } }).__resumeTailor;
-    if (!api) throw new Error('Resume upload not available');
     const base64 = btoa(unescape(encodeURIComponent(text)));
-    const parsed = await api.uploadAndParse('pasted-resume.txt', base64, 'text/plain', model, endpointId);
+    const { data: submitData } = await submitParseMutation({
+      variables: {
+        fileName: 'pasted-resume.txt',
+        fileBase64: base64,
+        contentType: 'text/plain',
+        model,
+        endpointId: endpointId || null,
+      },
+    });
+    const jobId = submitData?.submitResumeParse?.id;
+    if (!jobId) throw new Error('Failed to submit parse job');
+    const parsed = await pollUntilDone(jobId);
     update(prev => mergeFactBanks(prev, parsed));
-  }, [update]);
+  }, [update, submitParseMutation, pollUntilDone]);
+
+  // Parse from a Cloud File (fetch by URL, then submit as base64)
+  const parseFromCloudFile = useCallback(async (
+    fileName: string, downloadUrl: string, contentType: string,
+    model: string, endpointId?: string | null
+  ) => {
+    const res = await fetch(downloadUrl);
+    if (!res.ok) throw new Error('Failed to fetch file');
+    const buffer = await res.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = btoa(binary);
+
+    const { data: submitData } = await submitParseMutation({
+      variables: {
+        fileName,
+        fileBase64: base64,
+        contentType: contentType || 'application/octet-stream',
+        model,
+        endpointId: endpointId || null,
+      },
+    });
+    const jobId = submitData?.submitResumeParse?.id;
+    if (!jobId) throw new Error('Failed to submit parse job');
+    const parsed = await pollUntilDone(jobId);
+    update(prev => mergeFactBanks(prev, parsed));
+  }, [update, submitParseMutation, pollUntilDone]);
 
   // CRUD helpers
   const updateContact = useCallback((contact: ResumeContact) => {
@@ -249,6 +310,7 @@ export function useFactBank() {
     saveStatus,
     uploadAndParse,
     parseFromText,
+    parseFromCloudFile,
     updateContact,
     addExperience,
     updateExperience,

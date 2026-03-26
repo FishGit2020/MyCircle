@@ -2944,6 +2944,7 @@ const en = {
   'resumeTailor.factBank.pasteTextPlaceholder': 'Paste your resume content here...',
   'resumeTailor.factBank.parseText': 'Parse',
   'resumeTailor.factBank.cancel': 'Cancel',
+  'resumeTailor.factBank.pickFromFiles': 'Pick from Cloud Files',
   'resumeTailor.generate.jobTitle': 'Job Title',
   'resumeTailor.generate.company': 'Company',
   'resumeTailor.generate.jobUrl': 'Job Posting URL',
