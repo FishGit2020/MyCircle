@@ -17,6 +17,7 @@
     "graphql": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "jspdf": "^2.5.2",
     "react-router": "catalog:"
   },
   "devDependencies": {

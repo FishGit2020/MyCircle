@@ -4,9 +4,19 @@ import { useCamera } from '../hooks/useCamera';
 
 interface CameraCaptureProps {
   onCapture: (imageData: ImageData) => void;
+  batchMode?: boolean;
+  onBatchModeToggle?: (enabled: boolean) => void;
+  pageCount?: number;
+  autoCaptureProgress?: number;
 }
 
-export default function CameraCapture({ onCapture }: CameraCaptureProps) {
+export default function CameraCapture({
+  onCapture,
+  batchMode = false,
+  onBatchModeToggle,
+  pageCount = 0,
+  autoCaptureProgress = 0,
+}: CameraCaptureProps) {
   const { t } = useTranslation();
   const { videoRef, isActive, error, startCamera, stopCamera, captureFrame } = useCamera();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,12 +62,49 @@ export default function CameraCapture({ onCapture }: CameraCaptureProps) {
             className="w-full rounded-lg bg-black"
             data-testid="camera-video"
           />
+
+          {/* Batch mode toggle */}
+          {onBatchModeToggle && (
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+              {pageCount > 0 && (
+                <span className="bg-blue-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                  {pageCount}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => onBatchModeToggle(!batchMode)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition min-h-[32px] ${
+                  batchMode
+                    ? 'bg-green-500 dark:bg-green-600 text-white'
+                    : 'bg-black/40 text-white hover:bg-black/60'
+                }`}
+                aria-label={t('docScanner.batchMode')}
+              >
+                {t('docScanner.batchMode')}
+              </button>
+            </div>
+          )}
+
+          {/* Batch mode active indicator */}
+          {batchMode && (
+            <div className="absolute top-3 left-3 z-10 bg-green-500/80 text-white text-xs font-medium px-2 py-1 rounded">
+              {t('docScanner.batchModeActive')}
+            </div>
+          )}
+
+          {/* Capture button with dwell progress ring */}
           <button
             type="button"
             onClick={handleCapture}
             className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-16 h-16 rounded-full bg-white dark:bg-gray-200 border-4 border-blue-500 shadow-lg hover:scale-105 active:scale-95 transition-transform touch-manipulation"
             aria-label={t('docScanner.capture')}
           >
+            {batchMode && autoCaptureProgress > 0 ? (
+              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="28" fill="none" stroke="#3B82F6" strokeWidth="4" strokeDasharray={`${(autoCaptureProgress / 100) * 176} 176`} />
+              </svg>
+            ) : null}
             <div className="w-12 h-12 mx-auto rounded-full bg-blue-500 pointer-events-none" />
           </button>
         </div>
@@ -75,7 +122,7 @@ export default function CameraCapture({ onCapture }: CameraCaptureProps) {
             <button
               type="button"
               onClick={startCamera}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition font-medium"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
