@@ -1,11 +1,29 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { useTranslation, useQuery, GET_CLOUD_FILES } from '@mycircle/shared';
 import { useFactBank } from '../hooks/useFactBank';
 import ExperienceCard from './ExperienceCard';
 
+const SNAPSHOT_PREFIX = 'resume-factbank-';
+
 interface FactBankEditorProps {
   model: string;
   endpointId: string | null;
+}
+
+function formatSnapshotDate(fileName: string): string {
+  // resume-factbank-2024-01-15T12-30-00-000Z.json → Jan 15, 2024 12:30
+  try {
+    const iso = fileName
+      .replace(SNAPSHOT_PREFIX, '')
+      .replace('.json', '')
+      .replace(/T(\d{2})-(\d{2})-(\d{2})-\d+Z$/, 'T$1:$2:$3Z')
+      .replace(/-(\d{2})-(\d{2})-(\d{2}T)/, '-$1-$2$3'); // restore date dashes
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return fileName;
+    return d.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return fileName;
+  }
 }
 
 export default function FactBankEditor({ model, endpointId }: FactBankEditorProps) {
@@ -14,11 +32,14 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
     factBank,
     loading,
     saveStatus,
+    cloudSaveStatus,
     parseStatus,
     parseError,
     uploadAndParse,
     parseFromText,
     parseFromCloudFile,
+    saveSnapshotToCloud,
+    loadFromCloudSnapshot,
     updateContact,
     addExperience,
     updateExperience,
@@ -42,7 +63,26 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
   const [pasteText, setPasteText] = useState('');
   const [pasting, setPasting] = useState(false);
   const [cloudFilePickerOpen, setCloudFilePickerOpen] = useState(false);
-  const { data: cloudFilesData } = useQuery(GET_CLOUD_FILES);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [autoBannerDismissed, setAutoBannerDismissed] = useState(false);
+  const { data: cloudFilesData, refetch: refetchCloudFiles } = useQuery(GET_CLOUD_FILES);
+
+  // Filter cloud files to only fact-bank snapshots, newest first
+  const snapshotFiles = useMemo(() => {
+    const all = (cloudFilesData?.cloudFiles ?? []) as Array<{ id: string; fileName: string; contentType: string; downloadUrl: string; size: number; uploadedAt?: string }>;
+    return all
+      .filter(f => f.fileName.startsWith(SNAPSHOT_PREFIX) && f.fileName.endsWith('.json'))
+      .sort((a, b) => {
+        const ta = a.uploadedAt ?? a.fileName;
+        const tb = b.uploadedAt ?? b.fileName;
+        return tb.localeCompare(ta);
+      });
+  }, [cloudFilesData]);
+
+  // Show auto-load banner when GraphQL data is empty but cloud snapshots exist
+  const isFactBankEmpty = !loading && factBank.contact.name === '' && factBank.experiences.length === 0 && factBank.education.length === 0 && factBank.skills.length === 0;
+  const showAutoLoadBanner = isFactBankEmpty && snapshotFiles.length > 0 && !autoBannerDismissed;
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -162,31 +202,85 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
           >
             {t('resumeTailor.factBank.exportJson')}
           </button>
+
+          {/* Save snapshot to cloud */}
+          <button
+            type="button"
+            onClick={() => saveSnapshotToCloud()}
+            disabled={cloudSaveStatus === 'saving' || isFactBankEmpty}
+            title={t('resumeTailor.factBank.saveSnapshot')}
+            aria-label={t('resumeTailor.factBank.saveSnapshot')}
+            className="px-3 py-2 text-sm border border-blue-300 dark:border-blue-600 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-700 dark:text-blue-300 min-h-[44px] transition-colors disabled:opacity-40 flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+            </svg>
+            {t('resumeTailor.factBank.saveSnapshot')}
+          </button>
+
+          {/* History / versions */}
+          {snapshotFiles.length > 0 && (
+            <button
+              type="button"
+              onClick={() => { setHistoryOpen(true); void refetchCloudFiles(); }}
+              aria-label={t('resumeTailor.factBank.history')}
+              className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {t('resumeTailor.factBank.history')} ({snapshotFiles.length})
+            </button>
+          )}
         </div>
 
         {/* Save status */}
-        <div className="flex items-center gap-1.5 text-xs" aria-live="polite">
+        <div className="flex items-center gap-3 text-xs" aria-live="polite">
+          {/* Firestore sync status */}
           {saveStatus === 'saving' && (
-            <>
+            <span className="flex items-center gap-1 text-blue-500 dark:text-blue-400">
               <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-              <span className="text-blue-500 dark:text-blue-400">{t('resumeTailor.factBank.saving')}</span>
-            </>
+              {t('resumeTailor.factBank.saving')}
+            </span>
           )}
           {saveStatus === 'saved' && (
-            <>
-              <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
-              <span className="text-green-600 dark:text-green-400">{t('resumeTailor.factBank.saved')}</span>
-            </>
+              {t('resumeTailor.factBank.saved')}
+            </span>
           )}
-          {saveStatus === 'idle' && factBank.experiences.length > 0 && (
-            <>
-              <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          {saveStatus === 'idle' && factBank.experiences.length > 0 && cloudSaveStatus === 'idle' && (
+            <span className="flex items-center gap-1 text-gray-400 dark:text-gray-500">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
               </svg>
-              <span className="text-gray-400 dark:text-gray-500">{t('resumeTailor.factBank.autoSaved')}</span>
-            </>
+              {t('resumeTailor.factBank.autoSaved')}
+            </span>
+          )}
+          {/* Cloud file save status */}
+          {cloudSaveStatus === 'saving' && (
+            <span className="flex items-center gap-1 text-blue-500 dark:text-blue-400">
+              <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+              {t('resumeTailor.factBank.savingToCloud')}
+            </span>
+          )}
+          {cloudSaveStatus === 'saved' && (
+            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+              {t('resumeTailor.factBank.savedToCloud')}
+            </span>
+          )}
+          {cloudSaveStatus === 'error' && (
+            <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+              {t('resumeTailor.factBank.cloudSaveError')}
+            </span>
           )}
         </div>
       </div>
@@ -195,6 +289,61 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
         <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">
           {uploadError}
         </p>
+      )}
+
+      {/* Auto-load banner: fact bank is empty but cloud history exists */}
+      {showAutoLoadBanner && (
+        <div className="flex items-start gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg text-sm">
+          <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-blue-800 dark:text-blue-200">
+              {t('resumeTailor.factBank.historyFound', { count: snapshotFiles.length } as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+            </p>
+            <p className="text-blue-600 dark:text-blue-400 mt-0.5 text-xs">
+              {t('resumeTailor.factBank.historyFoundDesc')}
+            </p>
+          </div>
+          <div className="flex gap-2 flex-shrink-0">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!snapshotFiles[0]) return;
+                setHistoryLoading(true);
+                try {
+                  await loadFromCloudSnapshot(snapshotFiles[0].downloadUrl);
+                  setAutoBannerDismissed(true);
+                } catch {
+                  // ignore
+                } finally {
+                  setHistoryLoading(false);
+                }
+              }}
+              disabled={historyLoading}
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-medium transition disabled:opacity-50 min-h-[36px]"
+            >
+              {historyLoading ? t('resumeTailor.factBank.loading') : t('resumeTailor.factBank.loadLatest')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              className="px-3 py-1.5 border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300 rounded text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-800/30 transition min-h-[36px]"
+            >
+              {t('resumeTailor.factBank.seeHistory')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setAutoBannerDismissed(true)}
+              aria-label="Dismiss"
+              className="p-1.5 text-blue-400 hover:text-blue-600 dark:hover:text-blue-200 transition"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Parse job status banner */}
@@ -254,6 +403,90 @@ export default function FactBankEditor({ model, endpointId }: FactBankEditorProp
                 className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
               >
                 {pasting ? t('resumeTailor.factBank.parsing') : t('resumeTailor.factBank.parseText')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* History / versions modal */}
+      {historyOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setHistoryOpen(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('resumeTailor.factBank.history')}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('resumeTailor.factBank.historyDesc')}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setHistoryOpen(false)}
+                aria-label="Close"
+                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-1.5 min-h-0">
+              {snapshotFiles.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">{t('resumeTailor.factBank.noHistory')}</p>
+              ) : (
+                snapshotFiles.map((f, idx) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={async () => {
+                      setHistoryLoading(true);
+                      try {
+                        await loadFromCloudSnapshot(f.downloadUrl);
+                        setHistoryOpen(false);
+                        setAutoBannerDismissed(true);
+                      } catch {
+                        // ignore
+                      } finally {
+                        setHistoryLoading(false);
+                      }
+                    }}
+                    disabled={historyLoading}
+                    className="w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900 dark:text-white font-medium">
+                        {formatSnapshotDate(f.fileName)}
+                        {idx === 0 && (
+                          <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded">
+                            {t('resumeTailor.factBank.latest')}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {(f.size / 1024).toFixed(1)} KB
+                      </p>
+                    </div>
+                    <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                {t('resumeTailor.factBank.historyStoredIn')}
+              </p>
+              <button
+                type="button"
+                onClick={() => setHistoryOpen(false)}
+                className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
+              >
+                {t('resumeTailor.factBank.cancel')}
               </button>
             </div>
           </div>
