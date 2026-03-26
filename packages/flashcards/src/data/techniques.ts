@@ -4,7 +4,11 @@ export type TechniqueCategory =
   | 'algorithms'
   | 'two-pointers'
   | 'python-syntax'
-  | 'bugs';
+  | 'bugs'
+  | 'data-structures'
+  | 'trees-graphs'
+  | 'dynamic-programming'
+  | 'sorting-searching';
 
 export interface TechniqueCard {
   id: string;
@@ -151,6 +155,68 @@ export const techniques: TechniqueCard[] = [
   { id: 'bug-11', front: 'Top 5 Python syntax errors from post-mortem practice', back: '1. s[slow,fast] → should be s[slow:fast]\n2. True/False capitalization (not true/false)\n3. ++ / -- do not exist → use += 1\n4. "else if" → should be "elif"\n5. Forgot "in" in for loop: for i arr → for i in arr', category: 'bugs', difficulty: 1 },
 
   { id: 'bug-12', front: 'Bug: "looks good" trap — code review checklist', back: 'Before saying "looks good", mentally check:\n1. if conditions — are they correct?\n2. while loop exit condition\n3. off-by-one errors\n4. initialization values\n5. is there any wrap-up after the loop?\n6. variable naming conflicts (shadowing)\n7. check both bounds: not just < n, also >= 0', category: 'bugs', difficulty: 1 },
+
+  // ─── Data Structures (Tier 1 & 2) ──────────────────────────────────────────
+
+  { id: 'ds-01', front: 'Trigger: Last-In First-Out (LIFO) processing → what data structure?', back: 'Stack. Use for:\n- Matching parentheses/brackets\n- Undo operations\n- DFS (iterative)\n- Monotonic stack (next greater/smaller element)\n- Expression evaluation (postfix/infix)\n\nPython: use list as stack — append() to push, pop() to pop. O(1) amortized.', category: 'data-structures', difficulty: 1 },
+
+  { id: 'ds-02', front: 'Trigger: First-In First-Out (FIFO) processing → what data structure?', back: 'Queue. Use for:\n- BFS (level-order traversal)\n- Sliding window maximum (deque)\n- Task scheduling / round-robin\n- Stream processing\n\nPython: from collections import deque. Use append() and popleft(). O(1) both. Never use list as queue — popleft from list is O(n).', category: 'data-structures', difficulty: 1 },
+
+  { id: 'ds-03', front: 'Trigger: need fast lookup + insertion + deletion → what data structure?', back: 'Hash Map (dict) or Hash Set (set).\n- Lookup/insert/delete: O(1) average\n- Use dict for key→value mapping\n- Use set for membership testing, deduplication\n\nTrigger phrases: "find if exists", "count occurrences", "group by", "two-sum pattern", "seen before"', category: 'data-structures', difficulty: 1 },
+
+  { id: 'ds-04', front: 'Trigger: need min/max repeatedly from a changing collection → what?', back: 'Heap (Priority Queue).\n- Get min/max: O(1)\n- Insert: O(log n)\n- Remove min/max: O(log n)\n\nPython: import heapq (MIN heap by default).\nFor max heap: negate values or use heapq.nlargest().\n\nUse for: K-th largest/smallest, merge K sorted lists, Dijkstra, task scheduling by priority.', category: 'data-structures', difficulty: 2 },
+
+  { id: 'ds-05', front: 'Trigger: need to track running sum of a subarray → what technique?', back: 'Prefix Sums. Precompute prefix[i] = sum(arr[0..i]).\nSubarray sum from i to j = prefix[j+1] - prefix[i].\n\nVariants:\n- 1D prefix sum → O(n) precompute, O(1) range query\n- 2D prefix sum → O(m*n) precompute, O(1) subgrid sum\n- Prefix XOR for XOR-based problems\n\nTrigger: "sum of subarray", "range sum query", "subarray with given sum"', category: 'data-structures', difficulty: 2 },
+
+  { id: 'ds-06', front: 'What is a Monotonic Stack and when to use it?', back: 'A stack that maintains elements in increasing or decreasing order.\n\nUse when you need:\n- Next Greater Element (NGE)\n- Next Smaller Element\n- Largest rectangle in histogram\n- Stock span / daily temperatures\n\nPattern: for each element, pop all stack elements that violate monotonicity. The element being popped found its answer. O(n) total — each element pushed and popped at most once.', category: 'data-structures', difficulty: 2 },
+
+  { id: 'ds-07', front: 'Linked List: what operations and when to use it?', back: 'Insert/delete at head: O(1)\nInsert/delete at tail: O(1) with tail pointer\nSearch: O(n)\n\nUse when: frequent insertions/deletions at both ends, LRU cache (with hash map), polynomial math\n\nTechniques:\n- Dummy head node to avoid edge cases\n- Fast/slow pointers (cycle detection, middle finding)\n- Reverse in-place: prev/curr/next pattern\n\nPython: implement with class Node(val, next).', category: 'data-structures', difficulty: 1 },
+
+  { id: 'ds-08', front: 'Trigger: sliding window on array/string → what technique?', back: 'Sliding Window (Two Pointers variant).\n\nFixed window: size K, slide by 1 each step.\nVariable window: expand right until condition met, shrink left until condition breaks.\n\nTemplate:\n  left = 0\n  for right in range(n):\n    add arr[right] to window\n    while window invalid:\n      remove arr[left], left += 1\n    update answer\n\nUse for: max/min subarray of size K, longest substring without repeats, minimum window substring.', category: 'data-structures', difficulty: 2 },
+
+  // ─── Trees & Graphs ─────────────────────────────────────────────────────────
+
+  { id: 'tg-01', front: 'Tree traversals: what are the 4 types and when to use each?', back: 'Preorder (root → left → right): copy tree, serialize\nInorder (left → root → right): BST gives sorted order\nPostorder (left → right → root): delete tree, calculate heights\nLevel-order (BFS): shortest path in unweighted tree, level-by-level processing\n\nAll DFS traversals are O(n) time, O(h) space (h = height).\nBFS is O(n) time, O(w) space (w = max width).', category: 'trees-graphs', difficulty: 1 },
+
+  { id: 'tg-02', front: 'Trigger: shortest path in unweighted graph → what algorithm?', back: 'BFS. Always use BFS for unweighted shortest path — never DFS.\n\nTemplate:\n  queue = deque([(start, 0)])  # (node, distance)\n  visited = {start}\n  while queue:\n    node, dist = queue.popleft()\n    if node == target: return dist\n    for neighbor in adj[node]:\n      if neighbor not in visited:\n        visited.add(neighbor)\n        queue.append((neighbor, dist + 1))', category: 'trees-graphs', difficulty: 1 },
+
+  { id: 'tg-03', front: 'Trigger: shortest path in weighted graph → what algorithm?', back: 'Dijkstra (no negative weights) or Bellman-Ford (with negative weights).\n\nDijkstra template:\n  dist = {start: 0}\n  heap = [(0, start)]\n  while heap:\n    d, u = heappop(heap)\n    if d > dist.get(u, inf): continue\n    for v, w in adj[u]:\n      if d + w < dist.get(v, inf):\n        dist[v] = d + w\n        heappush(heap, (d + w, v))\n\nTime: O((V + E) log V) with binary heap.', category: 'trees-graphs', difficulty: 2 },
+
+  { id: 'tg-04', front: 'Trigger: detect cycle in directed graph → what approach?', back: 'DFS with 3-state coloring:\n- WHITE (unvisited)\n- GRAY (in current DFS path)\n- BLACK (fully processed)\n\nCycle exists if you visit a GRAY node.\n\nAlternative: Topological sort (Kahn\'s algorithm) — if result has fewer nodes than graph, there\'s a cycle.\n\nFor undirected graphs: DFS with parent tracking — cycle if neighbor is visited AND not parent.', category: 'trees-graphs', difficulty: 2 },
+
+  { id: 'tg-05', front: 'What is Topological Sort and when to use it?', back: 'Linear ordering of vertices where for every edge u→v, u comes before v. Only works on DAGs (Directed Acyclic Graphs).\n\nKahn\'s Algorithm (BFS-based):\n1. Count in-degrees for all nodes\n2. Add all 0 in-degree nodes to queue\n3. Process queue: for each node, decrement in-degree of neighbors; add newly 0-degree nodes\n\nUse for: course prerequisites, build order, task scheduling with dependencies.', category: 'trees-graphs', difficulty: 2 },
+
+  { id: 'tg-06', front: 'Trigger: find connected components → what approach?', back: 'Iterate all nodes. For each unvisited node, run DFS/BFS to mark all reachable nodes as one component.\n\nCount components:\n  visited = set()\n  count = 0\n  for node in all_nodes:\n    if node not in visited:\n      count += 1\n      dfs(node, visited)\n\nAlternative: Union-Find (Disjoint Set Union) — O(α(n)) per operation, nearly O(1).', category: 'trees-graphs', difficulty: 1 },
+
+  { id: 'tg-07', front: 'BST property and common operations', back: 'Binary Search Tree: left < root < right (for all subtrees).\n\nSearch/Insert/Delete: O(h) where h = height.\nBalanced BST: h = O(log n). Worst case (skewed): h = O(n).\n\nInorder traversal gives sorted order.\nTo validate BST: pass min/max bounds down recursively.\n\nCommon interview patterns: validate BST, find kth smallest (inorder), LCA in BST, convert sorted array to balanced BST.', category: 'trees-graphs', difficulty: 1 },
+
+  { id: 'tg-08', front: 'Recursion: how to think about tree problems', back: 'For any tree problem, ask:\n1. What info do I need from left and right subtrees?\n2. What do I compute at the current node?\n3. What do I return to my parent?\n\nBase case: null node → return identity value (0, True, -inf, etc.)\n\nCommon patterns:\n- Height: 1 + max(left_h, right_h)\n- Count: 1 + left_c + right_c\n- Path sum: pass remaining sum down\n- Diameter: track max(left_h + right_h) as side effect', category: 'trees-graphs', difficulty: 1 },
+
+  // ─── Dynamic Programming ────────────────────────────────────────────────────
+
+  { id: 'dp-01', front: 'What are the 3 signs a problem needs Dynamic Programming?', back: '1. Optimal substructure — optimal solution built from optimal sub-solutions\n2. Overlapping subproblems — same subproblem solved multiple times\n3. Counting/optimization language — "how many ways", "minimum cost", "maximum profit"\n\nIf you see these, think DP. Start with recursion + memoization (top-down), then optionally convert to tabulation (bottom-up).', category: 'dynamic-programming', difficulty: 1 },
+
+  { id: 'dp-02', front: 'DP: top-down (memoization) vs bottom-up (tabulation)', back: 'Top-down: write recursive solution, add cache/memo dict.\n  @cache or memo = {}\n  Pros: natural to think about, only computes needed states.\n\nBottom-up: fill table iteratively from base cases.\n  dp = [0] * (n+1)\n  for i in range(1, n+1): dp[i] = ...\n  Pros: no recursion overhead, can optimize space.\n\nStart with top-down in interviews (easier to code correctly), optimize to bottom-up if interviewer asks.', category: 'dynamic-programming', difficulty: 1 },
+
+  { id: 'dp-03', front: 'DP: common patterns and their state definitions', back: '1. Linear DP: dp[i] = best answer using first i elements\n   (climbing stairs, house robber, longest increasing subsequence)\n\n2. Two-string DP: dp[i][j] = answer for s1[:i] and s2[:j]\n   (edit distance, LCS, regex matching)\n\n3. Knapsack: dp[i][w] = best value using first i items with capacity w\n   (0/1 knapsack, subset sum, coin change)\n\n4. Interval DP: dp[i][j] = answer for subarray arr[i..j]\n   (matrix chain, palindrome partitioning)', category: 'dynamic-programming', difficulty: 2 },
+
+  { id: 'dp-04', front: 'Trigger: "minimum number of coins to make amount" → what DP?', back: 'Unbounded Knapsack / Coin Change.\n\ndp[amount] = min coins to make that amount.\ndp[0] = 0, dp[i] = inf for i > 0.\n\nFor each coin c:\n  for i in range(c, amount + 1):\n    dp[i] = min(dp[i], dp[i - c] + 1)\n\nTime: O(amount * num_coins), Space: O(amount).\nReturn dp[amount] if != inf, else -1.', category: 'dynamic-programming', difficulty: 2 },
+
+  { id: 'dp-05', front: 'Trigger: "longest common subsequence" → what DP?', back: 'Two-string DP.\n\ndp[i][j] = LCS length of s1[:i] and s2[:j]\n\nBase: dp[0][j] = dp[i][0] = 0\nTransition:\n  if s1[i-1] == s2[j-1]: dp[i][j] = dp[i-1][j-1] + 1\n  else: dp[i][j] = max(dp[i-1][j], dp[i][j-1])\n\nTime: O(m*n), Space: O(m*n) or O(min(m,n)) with rolling array.', category: 'dynamic-programming', difficulty: 2 },
+
+  { id: 'dp-06', front: 'Backtracking template and when to use it', back: 'Use when exploring ALL possible combinations/permutations/subsets.\n\ndef backtrack(path, choices):\n  if is_solution(path):\n    result.append(path.copy())\n    return\n  for choice in choices:\n    if is_valid(choice):\n      path.append(choice)     # choose\n      backtrack(path, next_choices)\n      path.pop()              # un-choose\n\nUse for: permutations, combinations, N-queens, Sudoku, word search.\nTime: usually O(2^n) or O(n!). Prune early to speed up.', category: 'dynamic-programming', difficulty: 2 },
+
+  { id: 'dp-07', front: 'Greedy algorithms: when to use and how to prove correctness', back: 'Use when locally optimal choices lead to globally optimal solution.\n\nProof techniques:\n1. Exchange argument — swapping a non-greedy choice for greedy doesn\'t worsen the result\n2. Greedy stays ahead — greedy solution is always at least as good at every step\n\nCommon greedy problems:\n- Activity selection (sort by end time)\n- Huffman coding\n- Fractional knapsack\n- Interval scheduling (sort by end, take non-overlapping)\n- Jump game (track farthest reachable)', category: 'dynamic-programming', difficulty: 2 },
+
+  // ─── Sorting & Searching ────────────────────────────────────────────────────
+
+  { id: 'sort-01', front: 'Know your sorting algorithms: time/space/stability', back: 'Merge Sort: O(n log n) time, O(n) space, STABLE\nQuick Sort: O(n log n) avg, O(n²) worst, O(log n) space, NOT stable\nHeap Sort: O(n log n) time, O(1) space, NOT stable\nCounting Sort: O(n + k) time, O(k) space, STABLE (k = range)\nRadix Sort: O(d*(n + k)) time, STABLE\n\nPython: sorted() uses Timsort — O(n log n), stable, adaptive.\nInterview default: use built-in sort unless asked to implement.', category: 'sorting-searching', difficulty: 1 },
+
+  { id: 'sort-02', front: 'Trigger: "Kth largest/smallest element" → what approaches?', back: '1. Sort + index: O(n log n) — simple but not optimal\n2. Min/Max Heap of size K: O(n log k) — good for streaming\n3. Quickselect: O(n) average, O(n²) worst — optimal for one-time query\n\nHeap approach (Kth largest):\n  heap = []  # min heap of size K\n  for num in arr:\n    heappush(heap, num)\n    if len(heap) > k: heappop(heap)\n  return heap[0]  # kth largest', category: 'sorting-searching', difficulty: 2 },
+
+  { id: 'sort-03', front: 'Binary search variants beyond basic find', back: '1. Find first occurrence: when found, search LEFT half\n2. Find last occurrence: when found, search RIGHT half\n3. Find insertion point: bisect_left / bisect_right\n4. Search rotated sorted array: check which half is sorted\n5. Search for peak element: compare mid with mid+1\n6. Minimize/maximize answer (binary search on answer space)\n\nPython: import bisect — bisect_left(arr, x), bisect_right(arr, x)', category: 'sorting-searching', difficulty: 2 },
+
+  { id: 'sort-04', front: 'Trigger: "merge K sorted lists/arrays" → what approach?', back: 'Min Heap.\n\n1. Push first element of each list into min heap: (value, list_index, element_index)\n2. Pop smallest, add to result\n3. Push next element from same list\n4. Repeat until heap is empty\n\nTime: O(N log K) where N = total elements, K = number of lists.\nSpace: O(K) for the heap.\n\nAlternative: Divide and conquer merge — merge pairs, O(N log K) same complexity.', category: 'sorting-searching', difficulty: 2 },
 
 ];
 
