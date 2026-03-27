@@ -195,6 +195,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - Firestore `users/{uid}/resumeFactBank/default` (fact bank document), `users/{uid}/resumeApplications/{appId}` (application log subcollection) (015-resume-tailor)
 - TypeScript 5.x + React 18, Tailwind CSS, jspdf (new), `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent) (016-document-scanner)
 - Cloud Files (Firebase Storage) for exported PDFs/JPEGs; React state (memory) for session page tray (016-document-scanner)
+- TypeScript 5.3.3 (frontend + functions backend) + React 18, MapLibre GL 5.x, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions, `idb@^8.0.3` (017-trail-map-gpx)
+- Firestore `users/{uid}/hikingRoutes` + `publicHikingRoutes` (existing); IndexedDB fallback for unauthenticated users (existing) (017-trail-map-gpx)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)
