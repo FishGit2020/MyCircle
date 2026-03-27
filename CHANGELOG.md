@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.18.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.17.0...mycircle-v1.18.0) (2026-03-27)
+
+
+### Features
+
+* **doc-scanner:** add multi-page PDF export, image adjustments, batch mode, and history enhancements ([#875](https://github.com/FishGit2020/MyCircle/issues/875)) ([bd12de0](https://github.com/FishGit2020/MyCircle/commit/bd12de0eb2ab5592aaa0b9537cfa791417421e80))
+* **resume-tailor:** add import JSON from Cloud Files feature ([#876](https://github.com/FishGit2020/MyCircle/issues/876)) ([99caa19](https://github.com/FishGit2020/MyCircle/commit/99caa19adb2cce6b106bc397555c8e882be6c2c4))
+
+
+### Bug Fixes
+
+* **resume-tailor:** persist fact bank to Cloud Files with version history ([#873](https://github.com/FishGit2020/MyCircle/issues/873)) ([6f6f20e](https://github.com/FishGit2020/MyCircle/commit/6f6f20e26672d4715bacd1941f5108b827aa244a))
+
+
+### Miscellaneous
+
+* **deps:** bump @apollo/server from 5.4.0 to 5.5.0 ([#879](https://github.com/FishGit2020/MyCircle/issues/879)) ([47dd96b](https://github.com/FishGit2020/MyCircle/commit/47dd96b302527d42f0ba95c6ae314283b111d0b6))
+* **deps:** bump @apollo/server from 5.4.0 to 5.5.0 in /functions ([#878](https://github.com/FishGit2020/MyCircle/issues/878)) ([7809e45](https://github.com/FishGit2020/MyCircle/commit/7809e45a79b792cb9ebf89e643d8edb1f191d857))
+* **deps:** bump brace-expansion and google-auth-library in /functions ([#877](https://github.com/FishGit2020/MyCircle/issues/877)) ([3b37d2b](https://github.com/FishGit2020/MyCircle/commit/3b37d2b5254ddcf59769103c22cfb70cb28fee25))
+* **deps:** bump brace-expansion from 5.0.3 to 5.0.5 in /functions ([#881](https://github.com/FishGit2020/MyCircle/issues/881)) ([a31168e](https://github.com/FishGit2020/MyCircle/commit/a31168e896f70e550a8d4eaf34fef9ed3d3e3c51))
+* **deps:** bump node-forge from 1.3.3 to 1.4.0 in /functions ([#880](https://github.com/FishGit2020/MyCircle/issues/880)) ([e5a883b](https://github.com/FishGit2020/MyCircle/commit/e5a883be7e663b401ecaa4b7ae44bd05a86ea3b8))
+
 ## [1.17.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.16.0...mycircle-v1.17.0) (2026-03-26)
 
 
