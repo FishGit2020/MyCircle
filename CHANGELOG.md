@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.18.0...mycircle-v1.19.0) (2026-03-27)
+
+
+### Features
+
+* **cloud-files:** add move-to-folder UI for files ([#882](https://github.com/FishGit2020/MyCircle/issues/882)) ([44285fd](https://github.com/FishGit2020/MyCircle/commit/44285fdd7465ad5912d72009d0d9b3ac55939df3))
+
 ## [1.18.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.17.0...mycircle-v1.18.0) (2026-03-27)
 
 
