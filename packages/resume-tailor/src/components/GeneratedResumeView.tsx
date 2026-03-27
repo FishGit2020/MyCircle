@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { GeneratedResume } from '../hooks/useResumeGeneration';
+import { downloadDocx, downloadPdf } from '../utils/exportResume';
 
 interface Props {
   resume: GeneratedResume;
@@ -12,10 +13,18 @@ interface Props {
 
 export default function GeneratedResumeView({ resume, onUpdateBullet, onUpdateSkills: _onUpdateSkills, onSave, saving }: Props) {
   const { t } = useTranslation();
+  const [exporting, setExporting] = useState(false);
 
-  const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+  const handlePdf = useCallback(() => downloadPdf(), []);
+
+  const handleDocx = useCallback(async () => {
+    setExporting(true);
+    try {
+      await downloadDocx(resume);
+    } finally {
+      setExporting(false);
+    }
+  }, [resume]);
 
   return (
     <>
@@ -23,10 +32,18 @@ export default function GeneratedResumeView({ resume, onUpdateBullet, onUpdateSk
       <div className="flex items-center gap-2 mb-4 print:hidden">
         <button
           type="button"
-          onClick={handlePrint}
+          onClick={handlePdf}
           className="px-4 py-2 text-sm bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 rounded hover:bg-gray-700 dark:hover:bg-gray-300 min-h-[44px] transition-colors"
         >
           {t('resumeTailor.generate.downloadPdf')}
+        </button>
+        <button
+          type="button"
+          onClick={handleDocx}
+          disabled={exporting}
+          className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded min-h-[44px] disabled:opacity-50 transition-colors"
+        >
+          {exporting ? t('resumeTailor.generate.exporting') : t('resumeTailor.generate.downloadDocx')}
         </button>
         {onSave && (
           <button

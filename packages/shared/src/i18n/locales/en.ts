@@ -2922,6 +2922,8 @@ const en = {
   'resumeTailor.generate.boosting': 'Boosting...',
   'resumeTailor.generate.recalculate': 'Recalculate Score',
   'resumeTailor.generate.downloadPdf': 'Download PDF',
+  'resumeTailor.generate.downloadDocx': 'Download DOCX',
+  'resumeTailor.generate.exporting': 'Exporting...',
   'resumeTailor.generate.saveApplication': 'Save Application',
   'resumeTailor.generate.applicationSaved': 'Application saved',
   'resumeTailor.generate.atsScore': 'ATS Score',

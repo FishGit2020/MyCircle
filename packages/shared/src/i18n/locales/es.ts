@@ -2922,6 +2922,8 @@ const es: Record<TranslationKey, string> = {
   'resumeTailor.generate.boosting': 'Impulsando...',
   'resumeTailor.generate.recalculate': 'Recalcular Puntaje',
   'resumeTailor.generate.downloadPdf': 'Descargar PDF',
+  'resumeTailor.generate.downloadDocx': 'Descargar DOCX',
+  'resumeTailor.generate.exporting': 'Exportando...',
   'resumeTailor.generate.saveApplication': 'Guardar Solicitud',
   'resumeTailor.generate.applicationSaved': 'Solicitud guardada',
   'resumeTailor.generate.atsScore': 'Puntaje ATS',
