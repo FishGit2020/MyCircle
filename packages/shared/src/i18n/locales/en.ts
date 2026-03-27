@@ -2287,6 +2287,38 @@ const en = {
   'hiking.renameRoute': 'Rename route',
   'hiking.routeNamePlaceholder': 'Route name...',
   'hiking.save': 'Save',
+  // GPX import/export (017-trail-map-gpx)
+  'hiking.importGpx': 'Import GPX',
+  'hiking.importError': 'Could not read GPX file',
+  'hiking.importFileTooLarge': 'File is too large (max 10 MB)',
+  'hiking.importNoTracks': 'No tracks found in this file',
+  'hiking.importTrackCount': '{count} tracks found — select one:',
+  'hiking.exportGpx': 'Export GPX',
+  // Multi-waypoint planner
+  'hiking.addWaypoint': 'Add Waypoint',
+  'hiking.removeWaypoint': 'Remove waypoint',
+  'hiking.moveWaypointUp': 'Move up',
+  'hiking.moveWaypointDown': 'Move down',
+  'hiking.waypoint': 'Waypoint',
+  // Elevation profile
+  'hiking.elevationProfile': 'Elevation',
+  'hiking.elevationGain': 'Gain',
+  'hiking.elevationLoss': 'Loss',
+  'hiking.noElevationData': 'No elevation data for this route',
+  // Route search & filter
+  'hiking.searchRoutes': 'Search routes\u2026',
+  'hiking.filterDistance': 'Distance',
+  'hiking.filterAny': 'Any distance',
+  'hiking.filterShort': 'Under 5 km',
+  'hiking.filterMedium': '5\u201315 km',
+  'hiking.filterLong': 'Over 15 km',
+  'hiking.noRoutesFound': 'No routes match your filters',
+  'hiking.clearFilters': 'Clear filters',
+  // Logic fixes
+  'hiking.locationDenied': 'Location access was denied',
+  'hiking.locationUnavailable': 'Location unavailable',
+  'hiking.locationTimeout': 'Location request timed out',
+  'hiking.deleteError': 'Could not delete route',
 
   // ─── Youth Tracker ───────────────────────────────────────────
   'nav.youthTracker': 'Youth Tracker',

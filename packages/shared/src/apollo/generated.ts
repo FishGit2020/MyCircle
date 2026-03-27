@@ -325,6 +325,11 @@ export type CompanyNews = {
   url: Scalars['String']['output'];
 };
 
+export type CoordinateInput = {
+  lat: Scalars['Float']['input'];
+  lon: Scalars['Float']['input'];
+};
+
 export type CrawlJob = {
   __typename?: 'CrawlJob';
   createdAt: Scalars['String']['output'];
@@ -946,6 +951,7 @@ export type Query = {
   bookConversionProgress: BookConversionProgress;
   books: Array<Book>;
   calcRoute?: Maybe<RouteResult>;
+  calcRouteMulti?: Maybe<RouteResult>;
   checkCaseStatus: CaseStatus;
   cloudFiles: Array<CloudFile>;
   companyNews: Array<CompanyNews>;
@@ -1054,6 +1060,11 @@ export type QueryCalcRouteArgs = {
   endLon: Scalars['Float']['input'];
   startLat: Scalars['Float']['input'];
   startLon: Scalars['Float']['input'];
+};
+
+
+export type QueryCalcRouteMultiArgs = {
+  waypoints: Array<CoordinateInput>;
 };
 
 
@@ -2474,6 +2485,13 @@ export type CalcRouteQueryVariables = Exact<{
 
 
 export type CalcRouteQuery = { __typename?: 'Query', calcRoute?: { __typename?: 'RouteResult', coordinates: Array<Array<number>>, distance: number, duration: number } | null };
+
+export type CalcRouteMultiQueryVariables = Exact<{
+  waypoints: Array<CoordinateInput> | CoordinateInput;
+}>;
+
+
+export type CalcRouteMultiQuery = { __typename?: 'Query', calcRouteMulti?: { __typename?: 'RouteResult', coordinates: Array<Array<number>>, distance: number, duration: number } | null };
 
 export type GetResumeFactBankQueryVariables = Exact<{ [key: string]: never; }>;
 

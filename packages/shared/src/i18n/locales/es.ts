@@ -2289,6 +2289,38 @@ const es: Record<TranslationKey, string> = {
   'hiking.renameRoute': 'Renombrar ruta',
   'hiking.routeNamePlaceholder': 'Nombre de la ruta...',
   'hiking.save': 'Guardar',
+  // GPX import/export (017-trail-map-gpx)
+  'hiking.importGpx': 'Importar GPX',
+  'hiking.importError': 'No se pudo leer el archivo GPX',
+  'hiking.importFileTooLarge': 'El archivo es demasiado grande (m\u00e1x 10 MB)',
+  'hiking.importNoTracks': 'No se encontraron pistas en este archivo',
+  'hiking.importTrackCount': '{count} pistas encontradas \u2014 selecciona una:',
+  'hiking.exportGpx': 'Exportar GPX',
+  // Multi-waypoint planner
+  'hiking.addWaypoint': 'A\u00f1adir punto',
+  'hiking.removeWaypoint': 'Eliminar punto',
+  'hiking.moveWaypointUp': 'Subir',
+  'hiking.moveWaypointDown': 'Bajar',
+  'hiking.waypoint': 'Punto intermedio',
+  // Elevation profile
+  'hiking.elevationProfile': 'Elevaci\u00f3n',
+  'hiking.elevationGain': 'Ganancia',
+  'hiking.elevationLoss': 'P\u00e9rdida',
+  'hiking.noElevationData': 'No hay datos de elevaci\u00f3n para esta ruta',
+  // Route search & filter
+  'hiking.searchRoutes': 'Buscar rutas\u2026',
+  'hiking.filterDistance': 'Distancia',
+  'hiking.filterAny': 'Cualquier distancia',
+  'hiking.filterShort': 'Menos de 5 km',
+  'hiking.filterMedium': '5\u201315 km',
+  'hiking.filterLong': 'M\u00e1s de 15 km',
+  'hiking.noRoutesFound': 'Ninguna ruta coincide con los filtros',
+  'hiking.clearFilters': 'Limpiar filtros',
+  // Logic fixes
+  'hiking.locationDenied': 'Se deneg\u00f3 el acceso a la ubicaci\u00f3n',
+  'hiking.locationUnavailable': 'Ubicaci\u00f3n no disponible',
+  'hiking.locationTimeout': 'Tiempo de espera de ubicaci\u00f3n agotado',
+  'hiking.deleteError': 'No se pudo eliminar la ruta',
 
   // ─── Youth Tracker ───────────────────────────────────────────
   'nav.youthTracker': 'Seguimiento Juvenil',

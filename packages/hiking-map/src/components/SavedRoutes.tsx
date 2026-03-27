@@ -6,6 +6,7 @@ import {
 } from '../services/routeStorageService';
 import type { SavedRoute, PublicRoute } from '../services/routeStorageService';
 import type { RouteResult } from '../providers/RoutingProvider';
+import { exportGpx, sanitizeFilename } from '../services/gpxService';
 
 interface Props {
   currentRoute: RouteResult | null;
@@ -48,6 +49,7 @@ interface PersonalCardProps {
   onShare: (r: SavedRoute) => void;
   onUnshare: (r: SavedRoute) => void;
   onDelete: (id: string) => void;
+  onExport: (r: SavedRoute) => void;
   onRenameStart: (r: SavedRoute) => void;
   onRenameChange: (v: string) => void;
   onRenameConfirm: (id: string) => void;
@@ -56,7 +58,7 @@ interface PersonalCardProps {
 
 function PersonalRouteCard({
   route, renamingId, renameValue, sharing,
-  onLoad, onShare, onUnshare, onDelete,
+  onLoad, onShare, onUnshare, onDelete, onExport,
   onRenameStart, onRenameChange, onRenameConfirm, onRenameCancel,
 }: PersonalCardProps) {
   const { t } = useTranslation();
@@ -125,6 +127,13 @@ function PersonalRouteCard({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
+            {/* Export GPX */}
+            <button type="button" onClick={() => onExport(route)} aria-label={t('hiking.exportGpx')} title={t('hiking.exportGpx')}
+              className="p-1.5 rounded text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 transition">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12V4m0 8l-3-3m3 3l3-3" />
+              </svg>
+            </button>
             {/* Delete */}
             <button type="button" onClick={() => onDelete(route.id)} aria-label={t('hiking.deleteRoute')} title={t('hiking.deleteRoute')}
               className="ml-auto p-1.5 rounded text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
@@ -160,6 +169,10 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
   const [renameValue, setRenameValue] = useState('');
 
   const [sharing, setSharing] = useState<string | null>(null);
+
+  // ── Search & filter state ──
+  const [searchQuery, setSearchQuery] = useState('');
+  const [distanceFilter, setDistanceFilter] = useState<'any' | 'short' | 'medium' | 'long'>('any');
 
   const mountedRef = useRef(true);
   useEffect(() => { return () => { mountedRef.current = false; }; }, []);
@@ -203,6 +216,9 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
         geometry: currentRoute.geometry,
         startLabel: currentStart,
         endLabel: currentEnd,
+        elevationProfile: currentRoute.elevationProfile,
+        waypoints: currentRoute.waypoints,
+        sourceFormat: currentRoute.sourceFormat,
       });
       await refresh();
     } finally {
@@ -210,10 +226,28 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
     }
   };
 
-  // ── Delete ──
+  // ── Delete (optimistic — FR-026) ──
   const handleDelete = async (id: string) => {
-    await deleteRoute(id);
-    await refresh();
+    setMyRoutes(prev => prev.filter(r => r.id !== id));
+    try {
+      await deleteRoute(id);
+    } catch {
+      await refresh();
+      // Could show a toast here; use console as minimal signal
+      console.error(t('hiking.deleteError'));
+    }
+  };
+
+  // ── Export GPX ──
+  const handleExport = (route: SavedRoute) => {
+    const gpxString = exportGpx(route);
+    const blob = new Blob([gpxString], { type: 'application/gpx+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${sanitizeFilename(route.name)}.gpx`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   // ── Load ──
@@ -239,6 +273,16 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
 
   if (!isLoggedIn) return <SignInPrompt />;
 
+  // Filter my routes by search query and distance
+  const filteredRoutes = myRoutes.filter(r => {
+    if (searchQuery && !r.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (distanceFilter === 'short' && r.distance >= 5000) return false;
+    if (distanceFilter === 'medium' && (r.distance < 5000 || r.distance > 15000)) return false;
+    if (distanceFilter === 'long' && r.distance <= 15000) return false;
+    return true;
+  });
+  const hasActiveFilter = searchQuery !== '' || distanceFilter !== 'any';
+
   return (
     <div className="mt-3 space-y-3">
       {/* ── My Routes ── */}
@@ -259,6 +303,30 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
 
         {myExpanded && (
           <div className="mt-2 space-y-2">
+            {/* Search & filter */}
+            {myRoutes.length > 2 && (
+              <div className="space-y-1.5">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder={t('hiking.searchRoutes')}
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <select
+                  value={distanceFilter}
+                  onChange={e => setDistanceFilter(e.target.value as typeof distanceFilter)}
+                  aria-label={t('hiking.filterDistance')}
+                  className="w-full px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="any">{t('hiking.filterAny')}</option>
+                  <option value="short">{t('hiking.filterShort')}</option>
+                  <option value="medium">{t('hiking.filterMedium')}</option>
+                  <option value="long">{t('hiking.filterLong')}</option>
+                </select>
+              </div>
+            )}
+
             {/* Save current route */}
             {currentRoute && !showNameInput && (
               <button type="button" onClick={handleSaveClick} disabled={saving}
@@ -288,7 +356,17 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
               <p className="text-xs text-gray-400 dark:text-gray-500">{t('hiking.noSavedRoutes')}</p>
             )}
 
-            {myRoutes.map(route => (
+            {myRoutes.length > 0 && filteredRoutes.length === 0 && hasActiveFilter && (
+              <div className="text-xs text-gray-400 dark:text-gray-500 space-y-1">
+                <p>{t('hiking.noRoutesFound')}</p>
+                <button type="button" onClick={() => { setSearchQuery(''); setDistanceFilter('any'); }}
+                  className="text-blue-500 hover:underline">
+                  {t('hiking.clearFilters')}
+                </button>
+              </div>
+            )}
+
+            {filteredRoutes.map(route => (
               <PersonalRouteCard
                 key={route.id}
                 route={route}
@@ -299,6 +377,7 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
                 onShare={handleShare}
                 onUnshare={handleUnshare}
                 onDelete={handleDelete}
+                onExport={handleExport}
                 onRenameStart={handleRenameStart}
                 onRenameChange={setRenameValue}
                 onRenameConfirm={handleRenameConfirm}
@@ -335,7 +414,7 @@ export default function SavedRoutes({ currentRoute, currentStart, currentEnd, on
                     <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{route.name}</p>
                     <p className="text-xs text-gray-400">{formatDistance(route.distance, distanceUnit)} · {formatDuration(route.duration)}</p>
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">
-                      {t('hiking.sharedBy')} {route.sharedBy.displayName}
+                      {t('hiking.sharedBy')} {route.sharedBy.displayName || `${route.sharedBy.uid.slice(0, 8)}\u2026`}
                     </p>
                   </div>
                   <button type="button" onClick={() => handleLoad(route)}

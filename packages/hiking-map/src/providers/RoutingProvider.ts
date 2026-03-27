@@ -2,6 +2,9 @@ export interface RouteResult {
   geometry: GeoJSON.LineString;
   distance: number; // meters
   duration: number; // seconds
+  elevationProfile?: { distanceM: number; elevationM: number }[];
+  waypoints?: { lat: number; lng: number; label?: string }[];
+  sourceFormat?: 'planned' | 'gpx-import';
 }
 
 export interface RoutingProvider {

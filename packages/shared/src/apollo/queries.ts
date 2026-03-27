@@ -1468,6 +1468,16 @@ export const CALC_ROUTE = gql`
   }
 `;
 
+export const CALC_ROUTE_MULTI = gql`
+  query CalcRouteMulti($waypoints: [CoordinateInput!]!) {
+    calcRouteMulti(waypoints: $waypoints) {
+      coordinates
+      distance
+      duration
+    }
+  }
+`;
+
 // ─── Resume Tailor AI ────────────────────────────────────────────
 
 export const GET_RESUME_FACT_BANK = gql`
