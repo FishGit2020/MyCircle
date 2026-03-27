@@ -40,11 +40,11 @@ importers:
         specifier: ^4.1.6
         version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@apollo/server':
-        specifier: ^5.4.0
-        version: 5.4.0(graphql@16.13.1)
+        specifier: ^5.5.0
+        version: 5.5.0(graphql@16.13.1)
       '@as-integrations/express4':
         specifier: ^1.1.2
-        version: 1.1.2(@apollo/server@5.4.0(graphql@16.13.1))(express@4.22.1)
+        version: 1.1.2(@apollo/server@5.5.0(graphql@16.13.1))(express@4.22.1)
       '@google/genai':
         specifier: ^1.45.0
         version: 1.45.0(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))
@@ -80,7 +80,7 @@ importers:
         version: 13.7.0(encoding@0.1.13)
       firebase-functions:
         specifier: ^7.1.1
-        version: 7.1.1(@apollo/server@5.4.0(graphql@16.13.1))(@as-integrations/express4@1.1.2(@apollo/server@5.4.0(graphql@16.13.1))(express@4.22.1))(firebase-admin@13.7.0(encoding@0.1.13))(graphql@16.13.1)
+        version: 7.1.1(@apollo/server@5.5.0(graphql@16.13.1))(@as-integrations/express4@1.1.2(@apollo/server@5.5.0(graphql@16.13.1))(express@4.22.1))(firebase-admin@13.7.0(encoding@0.1.13))(graphql@16.13.1)
       graphql:
         specifier: ^16.13.1
         version: 16.13.1
@@ -150,7 +150,7 @@ importers:
         version: 8.0.1(@capacitor/core@8.2.0)
       '@eslint/js':
         specifier: ^10.0.1
-        version: 10.0.1(eslint@9.39.4(jiti@1.21.7))
+        version: 10.0.1(eslint@9.39.4(jiti@2.6.1))
       '@graphql-codegen/cli':
         specifier: ^6.2.1
         version: 6.2.1(@types/node@25.5.0)(graphql@16.13.1)(typescript@5.9.3)
@@ -201,7 +201,7 @@ importers:
         version: 5.1.4(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
       '@vitest/coverage-v8':
         specifier: ~4.0.18
-        version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -210,13 +210,13 @@ importers:
         version: 9.2.1
       eslint:
         specifier: '9'
-        version: 9.39.4(jiti@1.21.7)
+        version: 9.39.4(jiti@2.6.1)
       eslint-plugin-react-hooks:
         specifier: ^7.0.1
-        version: 7.0.1(eslint@9.39.4(jiti@1.21.7))
+        version: 7.0.1(eslint@9.39.4(jiti@2.6.1))
       eslint-plugin-react-refresh:
         specifier: ^0.5.2
-        version: 0.5.2(eslint@9.39.4(jiti@1.21.7))
+        version: 0.5.2(eslint@9.39.4(jiti@2.6.1))
       firebase-tools:
         specifier: ^15.10.0
         version: 15.10.0(@types/node@25.5.0)(encoding@0.1.13)(typescript@5.9.3)
@@ -249,13 +249,13 @@ importers:
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.57.1
-        version: 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
+        version: 8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       vite:
         specifier: ^5.4.21
         version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -1649,7 +1649,7 @@ importers:
         version: 1.2.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/stock-tracker:
     dependencies:
@@ -2145,8 +2145,8 @@ packages:
     peerDependencies:
       graphql: 14.x || 15.x || 16.x
 
-  '@apollo/server@5.4.0':
-    resolution: {integrity: sha512-E0/2C5Rqp7bWCjaDh4NzYuEPDZ+dltTf2c0FI6GCKJA6GBetVferX3h1//1rS4+NxD36wrJsGGJK+xyT/M3ysg==}
+  '@apollo/server@5.5.0':
+    resolution: {integrity: sha512-vWtodBOK/SZwBTJzItECOmLfL8E8pn/IdvP7pnxN5g2tny9iW4+9sxdajE798wV1H2+PYp/rRcl/soSHIBKMPw==}
     engines: {node: '>=20'}
     peerDependencies:
       graphql: ^16.11.0
@@ -7093,10 +7093,6 @@ packages:
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
-  lru-cache@11.2.6:
-    resolution: {integrity: sha512-ESL2CrkS/2wTPfuend7Zhkzo2u0daGJ/A2VucJOgQ/C48S/zB8MMeMHSGKYpXhIjbPxfuezITkaBH1wqv00DDQ==}
-    engines: {node: 20 || >=22}
-
   lru-cache@11.2.7:
     resolution: {integrity: sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==}
     engines: {node: 20 || >=22}
@@ -8400,8 +8396,8 @@ packages:
   sentence-case@3.0.4:
     resolution: {integrity: sha512-8LS0JInaQMCRoQ7YUytAo/xUu5W2XnQxV2HI/6uM6U7CITS1RqPElr30V6uIqyMKM9lJGRVFy5/4CuzcixNYSg==}
 
-  serialize-javascript@7.0.4:
-    resolution: {integrity: sha512-DuGdB+Po43Q5Jxwpzt1lhyFSYKryqoNjQSA9M92tyw0lyHIOur+XCalOUe0KTJpyqzT8+fQ5A0Jf7vCx/NKmIg==}
+  serialize-javascript@7.0.5:
+    resolution: {integrity: sha512-F4LcB0UqUl1zErq+1nYEEzSHJnIwb3AF2XWB94b+afhrekOUijwooAYqFyRbjYkm2PAKBabx6oYv/xDxNi8IBw==}
     engines: {node: '>=20.0.0'}
 
   serve-static@1.16.3:
@@ -9601,7 +9597,7 @@ snapshots:
       '@apollo/utils.logger': 3.0.0
       graphql: 16.13.1
 
-  '@apollo/server@5.4.0(graphql@16.13.1)':
+  '@apollo/server@5.5.0(graphql@16.13.1)':
     dependencies:
       '@apollo/cache-control-types': 1.0.3(graphql@16.13.1)
       '@apollo/server-gateway-interface': 2.0.0(graphql@16.13.1)
@@ -9621,7 +9617,7 @@ snapshots:
       finalhandler: 2.1.1
       graphql: 16.13.1
       loglevel: 1.9.2
-      lru-cache: 11.2.6
+      lru-cache: 11.2.7
       negotiator: 1.0.0
       uuid: 11.1.0
       whatwg-mimetype: 4.0.0
@@ -9706,9 +9702,9 @@ snapshots:
       immutable: 5.1.5
       invariant: 2.2.4
 
-  '@as-integrations/express4@1.1.2(@apollo/server@5.4.0(graphql@16.13.1))(express@4.22.1)':
+  '@as-integrations/express4@1.1.2(@apollo/server@5.5.0(graphql@16.13.1))(express@4.22.1)':
     dependencies:
-      '@apollo/server': 5.4.0(graphql@16.13.1)
+      '@apollo/server': 5.5.0(graphql@16.13.1)
       express: 4.22.1
 
   '@asamuzakjp/css-color@5.0.1':
@@ -10594,9 +10590,9 @@ snapshots:
   '@esbuild/win32-x64@0.27.3':
     optional: true
 
-  '@eslint-community/eslint-utils@4.9.1(eslint@9.39.4(jiti@1.21.7))':
+  '@eslint-community/eslint-utils@4.9.1(eslint@9.39.4(jiti@2.6.1))':
     dependencies:
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
       eslint-visitor-keys: 3.4.3
 
   '@eslint-community/regexpp@4.12.2': {}
@@ -10631,9 +10627,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@eslint/js@10.0.1(eslint@9.39.4(jiti@1.21.7))':
+  '@eslint/js@10.0.1(eslint@9.39.4(jiti@2.6.1))':
     optionalDependencies:
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
 
   '@eslint/js@9.39.4': {}
 
@@ -12085,7 +12081,7 @@ snapshots:
 
   '@rollup/plugin-terser@0.4.4(rollup@2.80.0)':
     dependencies:
-      serialize-javascript: 7.0.4
+      serialize-javascript: 7.0.5
       smob: 1.6.1
       terser: 5.46.1
     optionalDependencies:
@@ -12466,15 +12462,15 @@ snapshots:
     dependencies:
       '@types/node': 25.5.0
 
-  '@typescript-eslint/eslint-plugin@8.57.1(@typescript-eslint/parser@8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)':
+  '@typescript-eslint/eslint-plugin@8.57.1(@typescript-eslint/parser@8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 8.57.1
-      '@typescript-eslint/type-utils': 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
+      '@typescript-eslint/type-utils': 8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+      '@typescript-eslint/utils': 8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/visitor-keys': 8.57.1
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
       ignore: 7.0.5
       natural-compare: 1.4.0
       ts-api-utils: 2.4.0(typescript@5.9.3)
@@ -12482,14 +12478,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)':
+  '@typescript-eslint/parser@8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.57.1
       '@typescript-eslint/types': 8.57.1
       '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
       '@typescript-eslint/visitor-keys': 8.57.1
       debug: 4.4.3
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -12512,13 +12508,13 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  '@typescript-eslint/type-utils@8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)':
+  '@typescript-eslint/type-utils@8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/types': 8.57.1
       '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
+      '@typescript-eslint/utils': 8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       debug: 4.4.3
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
       ts-api-utils: 2.4.0(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -12541,13 +12537,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)':
+  '@typescript-eslint/utils@8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@1.21.7))
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@2.6.1))
       '@typescript-eslint/scope-manager': 8.57.1
       '@typescript-eslint/types': 8.57.1
       '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -12581,7 +12577,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/coverage-v8@4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.0.18
@@ -12593,7 +12589,7 @@ snapshots:
       obug: 2.1.1
       std-env: 3.10.0
       tinyrainbow: 3.1.0
-      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/expect@4.0.18':
     dependencies:
@@ -13896,20 +13892,20 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-plugin-react-hooks@7.0.1(eslint@9.39.4(jiti@1.21.7)):
+  eslint-plugin-react-hooks@7.0.1(eslint@9.39.4(jiti@2.6.1)):
     dependencies:
       '@babel/core': 7.29.0
       '@babel/parser': 7.29.0
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
       hermes-parser: 0.25.1
       zod: 3.25.76
       zod-validation-error: 4.0.2(zod@3.25.76)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-react-refresh@0.5.2(eslint@9.39.4(jiti@1.21.7)):
+  eslint-plugin-react-refresh@0.5.2(eslint@9.39.4(jiti@2.6.1)):
     dependencies:
-      eslint: 9.39.4(jiti@1.21.7)
+      eslint: 9.39.4(jiti@2.6.1)
 
   eslint-scope@8.4.0:
     dependencies:
@@ -13922,9 +13918,9 @@ snapshots:
 
   eslint-visitor-keys@5.0.1: {}
 
-  eslint@9.39.4(jiti@1.21.7):
+  eslint@9.39.4(jiti@2.6.1):
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@1.21.7))
+      '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@2.6.1))
       '@eslint-community/regexpp': 4.12.2
       '@eslint/config-array': 0.21.2
       '@eslint/config-helpers': 0.4.2
@@ -13959,7 +13955,7 @@ snapshots:
       natural-compare: 1.4.0
       optionator: 0.9.4
     optionalDependencies:
-      jiti: 1.21.7
+      jiti: 2.6.1
     transitivePeerDependencies:
       - supports-color
 
@@ -14273,7 +14269,7 @@ snapshots:
       - encoding
       - supports-color
 
-  firebase-functions@7.1.1(@apollo/server@5.4.0(graphql@16.13.1))(@as-integrations/express4@1.1.2(@apollo/server@5.4.0(graphql@16.13.1))(express@4.22.1))(firebase-admin@13.7.0(encoding@0.1.13))(graphql@16.13.1):
+  firebase-functions@7.1.1(@apollo/server@5.5.0(graphql@16.13.1))(@as-integrations/express4@1.1.2(@apollo/server@5.5.0(graphql@16.13.1))(express@4.22.1))(firebase-admin@13.7.0(encoding@0.1.13))(graphql@16.13.1):
     dependencies:
       '@types/cors': 2.8.19
       '@types/express': 4.17.25
@@ -14282,8 +14278,8 @@ snapshots:
       firebase-admin: 13.7.0(encoding@0.1.13)
       protobufjs: 7.5.4
     optionalDependencies:
-      '@apollo/server': 5.4.0(graphql@16.13.1)
-      '@as-integrations/express4': 1.1.2(@apollo/server@5.4.0(graphql@16.13.1))(express@4.22.1)
+      '@apollo/server': 5.5.0(graphql@16.13.1)
+      '@as-integrations/express4': 1.1.2(@apollo/server@5.5.0(graphql@16.13.1))(express@4.22.1)
       graphql: 16.13.1
     transitivePeerDependencies:
       - supports-color
@@ -15535,8 +15531,6 @@ snapshots:
       tslib: 2.8.1
 
   lru-cache@10.4.3: {}
-
-  lru-cache@11.2.6: {}
 
   lru-cache@11.2.7: {}
 
@@ -16916,7 +16910,7 @@ snapshots:
       tslib: 2.8.1
       upper-case-first: 2.0.2
 
-  serialize-javascript@7.0.4: {}
+  serialize-javascript@7.0.5: {}
 
   serve-static@1.16.3:
     dependencies:
@@ -17645,13 +17639,13 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typescript-eslint@8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3):
+  typescript-eslint@8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.57.1(@typescript-eslint/parser@8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
-      '@typescript-eslint/parser': 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.57.1(@typescript-eslint/parser@8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+      '@typescript-eslint/parser': 8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
-      eslint: 9.39.4(jiti@1.21.7)
+      '@typescript-eslint/utils': 8.57.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+      eslint: 9.39.4(jiti@2.6.1)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
