@@ -12,10 +12,10 @@ interface FileListProps {
   onPreview?: (file: FileItem | SharedFileItem) => void;
   onRename?: (fileId: string, newName: string) => void;
   onShareWith?: (fileId: string) => void;
-  onMove?: (fileId: string, targetFolderId: string | null) => void;
+  onMove?: (fileId: string) => void;
 }
 
-export default function FileList({ files, emptyMessage, isShared, isTargetedShared, onShare, onDelete, onPreview, onRename, onShareWith, onMove: _onMove }: FileListProps) {
+export default function FileList({ files, emptyMessage, isShared, isTargetedShared, onShare, onDelete, onPreview, onRename, onShareWith, onMove }: FileListProps) {
   const { t } = useTranslation();
 
   if (files.length === 0) {
@@ -66,6 +66,7 @@ export default function FileList({ files, emptyMessage, isShared, isTargetedShar
               onPreview={onPreview ? () => onPreview(file as FileItem | SharedFileItem) : undefined}
               onRename={!isShared && onRename ? (newName: string) => onRename(file.id, newName) : undefined}
               onShareWith={!isShared && onShareWith ? () => onShareWith(file.id) : undefined}
+              onMove={!isShared && onMove ? () => onMove(file.id) : undefined}
             />
           );
         })}
