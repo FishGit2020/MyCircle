@@ -16,7 +16,7 @@
     "node": "22"
   },
   "dependencies": {
-    "@apollo/server": "^5.2.0",
+    "@apollo/server": "^5.5.0",
     "@as-integrations/express4": "^1.1.2",
     "@google-cloud/functions-framework": "^5.0.1",
     "@google/genai": "^1.46.0",
