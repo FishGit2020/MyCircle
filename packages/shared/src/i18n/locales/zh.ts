@@ -2954,6 +2954,8 @@ const zh: Record<TranslationKey, string> = {
   'resumeTailor.generate.boosting': '\u63d0\u5347\u4e2d...',
   'resumeTailor.generate.recalculate': '\u91cd\u65b0\u8ba1\u7b97\u5206\u6570',
   'resumeTailor.generate.downloadPdf': '\u4e0b\u8f7d PDF',
+  'resumeTailor.generate.downloadDocx': '\u4e0b\u8f7d DOCX',
+  'resumeTailor.generate.exporting': '\u5bfc\u51fa\u4e2d...',
   'resumeTailor.generate.saveApplication': '\u4fdd\u5b58\u7533\u8bf7',
   'resumeTailor.generate.applicationSaved': '\u7533\u8bf7\u5df2\u4fdd\u5b58',
   'resumeTailor.generate.atsScore': 'ATS \u5206\u6570',

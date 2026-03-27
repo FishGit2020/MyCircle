@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@mycircle/shared": "workspace:*",
+    "docx": "^9.6.1",
+    "file-saver": "^2.0.5",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router": "catalog:"
@@ -22,6 +24,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/file-saver": "^2.0.7",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/testing-library__jest-dom": "^6.0.0",
