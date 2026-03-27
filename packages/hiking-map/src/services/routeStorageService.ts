@@ -20,6 +20,10 @@ export interface SavedRoute {
   startLabel?: string;
   endLabel?: string;
   sharedId?: string | null; // set when this route is also in publicHikingRoutes
+  // --- GPX & multi-waypoint enhancements (017-trail-map-gpx) ---
+  elevationProfile?: { distanceM: number; elevationM: number }[];
+  waypoints?: { lat: number; lng: number; label?: string }[];
+  sourceFormat?: 'planned' | 'gpx-import';
 }
 
 export interface PublicRoute {
@@ -68,6 +72,9 @@ function normalizeRoute(raw: Record<string, any>): SavedRoute { // eslint-disabl
     startLabel: raw.startLabel,
     endLabel: raw.endLabel,
     sharedId: raw.sharedId ?? null,
+    elevationProfile: raw.elevationProfile,
+    waypoints: raw.waypoints,
+    sourceFormat: raw.sourceFormat,
   };
 }
 
@@ -90,7 +97,11 @@ function normalizePublicRoute(raw: Record<string, any>): PublicRoute { // eslint
 export async function saveRoute(route: Omit<SavedRoute, 'id' | 'createdAt' | 'sharedId'>): Promise<SavedRoute> {
   const fb = window.__hikingRoutes;
   if (fb) {
-    const id = await fb.add({ name: route.name, distance: route.distance, duration: route.duration, geometry: route.geometry, startLabel: route.startLabel, endLabel: route.endLabel });
+    const id = await fb.add({
+      name: route.name, distance: route.distance, duration: route.duration,
+      geometry: route.geometry, startLabel: route.startLabel, endLabel: route.endLabel,
+      elevationProfile: route.elevationProfile, waypoints: route.waypoints, sourceFormat: route.sourceFormat,
+    });
     return { ...route, id, createdAt: Date.now(), sharedId: null };
   }
   const db = await getDb();

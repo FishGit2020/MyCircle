@@ -4,6 +4,8 @@ import HikingMap from './HikingMap';
 
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  useUnits: () => ({ distanceUnit: 'km' }),
+  formatDistance: (m: number) => `${m}m`,
   PageContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   MapControls: ({ showStyleSwitcher, onLocate }: { map: unknown; showStyleSwitcher?: boolean; onStyleChange?: (style: string) => void; onLocate?: (lngLat: [number, number]) => void }) => (
     <div data-testid="map-controls">
@@ -53,6 +55,19 @@ vi.mock('./TileCacheOverlay', () => ({
 
 vi.mock('./RouteDisplay', () => ({
   default: () => null,
+}));
+
+vi.mock('./GpxImportButton', () => ({
+  default: () => <button type="button">Import GPX</button>,
+}));
+
+vi.mock('./ElevationProfile', () => ({
+  default: () => null,
+}));
+
+vi.mock('../services/gpxService', () => ({
+  gpxTrackToSavedRoute: vi.fn(),
+  parseGpx: vi.fn(() => []),
 }));
 
 vi.mock('./RoutePlanner', () => ({

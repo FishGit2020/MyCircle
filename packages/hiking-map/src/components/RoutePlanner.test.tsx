@@ -6,8 +6,9 @@ vi.mock("@mycircle/shared", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   useUnits: () => ({ distanceUnit: "mi" }),
   formatDistance: (m: number) => m + "m",
-  useLazyQuery: () => [vi.fn().mockResolvedValue({ data: { calcRoute: { coordinates: [[0,0],[1,1]], distance: 5000, duration: 3600 } } }), { loading: false }],
+  useLazyQuery: () => [vi.fn().mockResolvedValue({ data: { calcRoute: { coordinates: [[0,0],[1,1]], distance: 5000, duration: 3600 }, calcRouteMulti: { coordinates: [[0,0],[1,1]], distance: 5000, duration: 3600 } } }), { loading: false }],
   CALC_ROUTE: {},
+  CALC_ROUTE_MULTI: {},
 }));
 
 vi.mock("./RouteDisplay", () => ({ default: () => null }));

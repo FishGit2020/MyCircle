@@ -551,6 +551,7 @@ export const typeDefs = `#graphql
 
     # Hiking route (public)
     calcRoute(startLon: Float!, startLat: Float!, endLon: Float!, endLat: Float!): RouteResult
+    calcRouteMulti(waypoints: [CoordinateInput!]!): RouteResult
 
     # Resume Tailor (auth required)
     resumeFactBank: ResumeFactBank
@@ -578,6 +579,11 @@ export const typeDefs = `#graphql
     coordinates: [[Float!]!]!
     distance: Float!
     duration: Float!
+  }
+
+  input CoordinateInput {
+    lon: Float!
+    lat: Float!
   }
 
   # ─── AI Usage & Monitoring Types ──────────────────────────────

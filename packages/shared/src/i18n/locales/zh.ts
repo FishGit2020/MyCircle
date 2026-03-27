@@ -2289,6 +2289,38 @@ const zh: Record<TranslationKey, string> = {
   'hiking.renameRoute': '\u91cd\u547d\u540d\u8def\u7ebf',
   'hiking.routeNamePlaceholder': '\u8def\u7ebf\u540d\u79f0...',
   'hiking.save': '\u4fdd\u5b58',
+  // GPX import/export (017-trail-map-gpx)
+  'hiking.importGpx': '\u5bfc\u5165 GPX',
+  'hiking.importError': '\u65e0\u6cd5\u8bfb\u53d6 GPX \u6587\u4ef6',
+  'hiking.importFileTooLarge': '\u6587\u4ef6\u8fc7\u5927\uff08\u6700\u5927 10 MB\uff09',
+  'hiking.importNoTracks': '\u6587\u4ef6\u4e2d\u672a\u627e\u5230\u8def\u5f84',
+  'hiking.importTrackCount': '\u627e\u5230 {count} \u6761\u8def\u5f84\uff0c\u8bf7\u9009\u62e9\u4e00\u6761\uff1a',
+  'hiking.exportGpx': '\u5bfc\u51fa GPX',
+  // Multi-waypoint planner
+  'hiking.addWaypoint': '\u6dfb\u52a0\u8def\u5f84\u70b9',
+  'hiking.removeWaypoint': '\u5220\u9664\u8def\u5f84\u70b9',
+  'hiking.moveWaypointUp': '\u4e0a\u79fb',
+  'hiking.moveWaypointDown': '\u4e0b\u79fb',
+  'hiking.waypoint': '\u8def\u5f84\u70b9',
+  // Elevation profile
+  'hiking.elevationProfile': '\u6d77\u62d4',
+  'hiking.elevationGain': '\u4e0a\u5347',
+  'hiking.elevationLoss': '\u4e0b\u964d',
+  'hiking.noElevationData': '\u6b64\u8def\u7ebf\u6ca1\u6709\u6d77\u62d4\u6570\u636e',
+  // Route search & filter
+  'hiking.searchRoutes': '\u641c\u7d22\u8def\u7ebf\u2026',
+  'hiking.filterDistance': '\u8ddd\u79bb',
+  'hiking.filterAny': '\u4e0d\u9650',
+  'hiking.filterShort': '5 \u516c\u91cc\u4ee5\u5185',
+  'hiking.filterMedium': '5\u201315 \u516c\u91cc',
+  'hiking.filterLong': '15 \u516c\u91cc\u4ee5\u4e0a',
+  'hiking.noRoutesFound': '\u6ca1\u6709\u8def\u7ebf\u7b26\u5408\u7b5b\u9009\u6761\u4ef6',
+  'hiking.clearFilters': '\u6e05\u9664\u7b5b\u9009',
+  // Logic fixes
+  'hiking.locationDenied': '\u4f4d\u7f6e\u8bbf\u95ee\u88ab\u62d2\u7edd',
+  'hiking.locationUnavailable': '\u4f4d\u7f6e\u4e0d\u53ef\u7528',
+  'hiking.locationTimeout': '\u4f4d\u7f6e\u8bf7\u6c42\u8d85\u65f6',
+  'hiking.deleteError': '\u65e0\u6cd5\u5220\u9664\u8def\u7ebf',
 
   // ─── Youth Tracker ───────────────────────────────────────────
   'nav.youthTracker': '\u9752\u5c11\u5e74\u8ffd\u8e2a',
