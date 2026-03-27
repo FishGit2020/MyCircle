@@ -11,6 +11,7 @@ import FolderList from './FolderList';
 import FilePreviewModal from './FilePreviewModal';
 import StorageQuotaBar from './StorageQuotaBar';
 import ShareRecipientsModal from './ShareRecipientsModal';
+import MoveToFolderModal from './MoveToFolderModal';
 import { getFileTypeCategory } from '../utils/fileHelpers';
 import type { FileTypeCategory } from '../utils/fileHelpers';
 import type { FileItem, SharedFileItem, Folder } from '../types';
@@ -36,6 +37,7 @@ export default function CloudFiles() {
 
   // Share-with modal state
   const [shareWithFileId, setShareWithFileId] = useState<string | null>(null);
+  const [moveFileId, setMoveFileId] = useState<string | null>(null);
 
   const { files, loading, error, uploadFile, shareFile, deleteFile, renameFile, moveFile, reload } = useFiles();
   const { files: sharedFiles, loading: sharedLoading, error: sharedError, deleteSharedFile, reload: reloadShared } = useSharedFiles();
@@ -231,7 +233,7 @@ export default function CloudFiles() {
                 onPreview={f => setPreviewFile(f)}
                 onRename={handleRename}
                 onShareWith={fileId => setShareWithFileId(fileId)}
-                onMove={moveFile}
+                onMove={fileId => setMoveFileId(fileId)}
               />
             </>
           )}
@@ -262,6 +264,16 @@ export default function CloudFiles() {
         <ShareRecipientsModal
           fileId={shareWithFileId}
           onClose={() => setShareWithFileId(null)}
+        />
+      )}
+
+      {/* Move-to-folder modal */}
+      {moveFileId && (
+        <MoveToFolderModal
+          fileId={moveFileId}
+          currentFolderId={files.find(f => f.id === moveFileId)?.folderId ?? null}
+          onMove={moveFile}
+          onClose={() => setMoveFileId(null)}
         />
       )}
     </PageContent>
