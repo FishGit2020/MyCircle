@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.20.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.19.0...mycircle-v1.20.0) (2026-03-29)
+
+
+### Features
+
+* **hiking-map:** GPX import/export, multi-waypoint routing, elevation profile, route search ([#885](https://github.com/FishGit2020/MyCircle/issues/885)) ([779cafb](https://github.com/FishGit2020/MyCircle/commit/779cafb4afed1fe304cea09a50a5e4c72f8b9dc0))
+* **resume-tailor:** add PDF and DOCX resume export ([#887](https://github.com/FishGit2020/MyCircle/issues/887)) ([6e44a18](https://github.com/FishGit2020/MyCircle/commit/6e44a182d220328df8e7ab7033f26d093de1d3e8))
+
+
+### Miscellaneous
+
+* **deps:** bump path-to-regexp in /functions ([#888](https://github.com/FishGit2020/MyCircle/issues/888)) ([484e58a](https://github.com/FishGit2020/MyCircle/commit/484e58a18c36e0e259266c36855a4efbb306c8a2))
+
 ## [1.19.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.18.0...mycircle-v1.19.0) (2026-03-27)
 
 
