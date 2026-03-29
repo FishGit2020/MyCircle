@@ -14,7 +14,7 @@ interface ResumeGeneratorProps {
 
 export default function ResumeGenerator({ model, endpointId }: ResumeGeneratorProps) {
   const { t } = useTranslation();
-  const { factBank } = useFactBank();
+  const { factBank, loading: factBankLoading } = useFactBank();
   const {
     jobDescription,
     setJobDescription,
@@ -120,7 +120,7 @@ export default function ResumeGenerator({ model, endpointId }: ResumeGeneratorPr
         >
           {isGenerating ? t('resumeTailor.generate.generating') : t('resumeTailor.generate.generate')}
         </button>
-        {factBank.experiences.length === 0 && (
+        {!factBankLoading && factBank.experiences.length === 0 && (
           <p className="text-xs text-amber-600 dark:text-amber-400">{t('resumeTailor.errors.noFactBank')}</p>
         )}
       </div>

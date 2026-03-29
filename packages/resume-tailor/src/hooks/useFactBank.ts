@@ -79,7 +79,9 @@ export function useFactBank() {
   const [submitParseMutation] = useMutation(SUBMIT_RESUME_PARSE);
   const [pollParseJob] = useLazyQuery(GET_RESUME_PARSE_JOB, { fetchPolicy: 'network-only' });
 
-  const [factBank, setFactBank] = useState<FactBank>(emptyFactBank());
+  const [factBank, setFactBank] = useState<FactBank>(() =>
+    data?.resumeFactBank ? (data.resumeFactBank as FactBank) : emptyFactBank()
+  );
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [parseStatus, setParseStatus] = useState<'idle' | 'pending' | 'processing' | 'complete' | 'error'>('idle');
   const [parseError, setParseError] = useState<string | null>(null);
