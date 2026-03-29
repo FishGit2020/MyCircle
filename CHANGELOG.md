@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.20.0...mycircle-v1.20.1) (2026-03-29)
+
+
+### Bug Fixes
+
+* **resume-tailor:** show fact bank data immediately on Generate tab ([#889](https://github.com/FishGit2020/MyCircle/issues/889)) ([9dea173](https://github.com/FishGit2020/MyCircle/commit/9dea173cb8b48fb15100647da7c3ded1ae0341d1))
+
 ## [1.20.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.19.0...mycircle-v1.20.0) (2026-03-29)
 
 
