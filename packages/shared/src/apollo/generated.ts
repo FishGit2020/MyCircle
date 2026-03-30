@@ -325,6 +325,17 @@ export type CompanyNews = {
   url: Scalars['String']['output'];
 };
 
+export type ConversionJob = {
+  __typename?: 'ConversionJob';
+  bookId: Scalars['ID']['output'];
+  chapterIndex: Scalars['Int']['output'];
+  createdAt: Scalars['String']['output'];
+  error?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  status: Scalars['String']['output'];
+  voiceName: Scalars['String']['output'];
+};
+
 export type CoordinateInput = {
   lat: Scalars['Float']['input'];
   lon: Scalars['Float']['input'];
@@ -585,6 +596,7 @@ export type Mutation = {
   shareFileWith: TargetedShareResult;
   startCrawl: CrawlJob;
   stopCrawl: CrawlJob;
+  submitChapterConversions: Array<ConversionJob>;
   submitResumeParse: ResumeParseJob;
   updateInterviewQuestion: InterviewQuestion;
   updateNote: Note;
@@ -823,6 +835,13 @@ export type MutationStopCrawlArgs = {
 };
 
 
+export type MutationSubmitChapterConversionsArgs = {
+  bookId: Scalars['ID']['input'];
+  chapterIndices: Array<Scalars['Int']['input']>;
+  voiceName: Scalars['String']['input'];
+};
+
+
 export type MutationSubmitResumeParseArgs = {
   contentType: Scalars['String']['input'];
   endpointId?: InputMaybe<Scalars['ID']['input']>;
@@ -955,6 +974,7 @@ export type Query = {
   checkCaseStatus: CaseStatus;
   cloudFiles: Array<CloudFile>;
   companyNews: Array<CompanyNews>;
+  conversionJobs: Array<ConversionJob>;
   crawlJobDetail?: Maybe<CrawlJobDetail>;
   crawlJobs: Array<CrawlJob>;
   cryptoPrices: Array<CryptoPrice>;
@@ -1077,6 +1097,11 @@ export type QueryCompanyNewsArgs = {
   from: Scalars['String']['input'];
   symbol: Scalars['String']['input'];
   to: Scalars['String']['input'];
+};
+
+
+export type QueryConversionJobsArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -2300,6 +2325,22 @@ export type GetTtsQuotaQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetTtsQuotaQuery = { __typename?: 'Query', ttsQuota: { __typename?: 'TtsQuota', used: number, limit: number, remaining: number } };
+
+export type GetConversionJobsQueryVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type GetConversionJobsQuery = { __typename?: 'Query', conversionJobs: Array<{ __typename?: 'ConversionJob', id: string, bookId: string, chapterIndex: number, voiceName: string, status: string, error?: string | null, createdAt: string }> };
+
+export type SubmitChapterConversionsMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+  chapterIndices: Array<Scalars['Int']['input']> | Scalars['Int']['input'];
+  voiceName: Scalars['String']['input'];
+}>;
+
+
+export type SubmitChapterConversionsMutation = { __typename?: 'Mutation', submitChapterConversions: Array<{ __typename?: 'ConversionJob', id: string, chapterIndex: number, status: string }> };
 
 export type DeleteBookMutationVariables = Exact<{
   id: Scalars['ID']['input'];

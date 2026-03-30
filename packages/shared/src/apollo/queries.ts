@@ -1090,6 +1090,30 @@ export const GET_TTS_QUOTA = gql`
   }
 `;
 
+export const GET_CONVERSION_JOBS = gql`
+  query GetConversionJobs($bookId: ID!) {
+    conversionJobs(bookId: $bookId) {
+      id
+      bookId
+      chapterIndex
+      voiceName
+      status
+      error
+      createdAt
+    }
+  }
+`;
+
+export const SUBMIT_CHAPTER_CONVERSIONS = gql`
+  mutation SubmitChapterConversions($bookId: ID!, $chapterIndices: [Int!]!, $voiceName: String!) {
+    submitChapterConversions(bookId: $bookId, chapterIndices: $chapterIndices, voiceName: $voiceName) {
+      id
+      chapterIndex
+      status
+    }
+  }
+`;
+
 export const DELETE_BOOK = gql`
   mutation DeleteBook($id: ID!) {
     deleteBook(id: $id)
