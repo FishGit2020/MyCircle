@@ -13,6 +13,8 @@ vi.mock('@mycircle/shared', () => ({
   GET_BOOKS: {},
   GET_BOOK_CHAPTERS: {},
   DELETE_BOOK: {},
+  GET_TTS_QUOTA: {},
+  StorageKeys: { LIBRARY_SORT: 'library-sort' },
 }));
 
 // Mock BookReader to avoid epubjs dependency in tests
