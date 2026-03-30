@@ -30,8 +30,11 @@ interface Props {
 export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted, autoPlay, initialChapter }: Props) {
   const { t } = useTranslation();
   const [converting, setConverting] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [queueProcessing, setQueueProcessing] = useState(false);
   const autoPlayedRef = useRef(false);
   const pollAbortRef = useRef(false);
+  const queueAbortRef = useRef(false);
 
   const audioChapters = chapters.filter(ch => ch.audioUrl);
 
@@ -138,8 +141,71 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   // Stop polling on unmount
   useEffect(() => {
-    return () => { pollAbortRef.current = true; };
+    return () => { pollAbortRef.current = true; queueAbortRef.current = true; };
   }, []);
+
+  const unconvertedChapters = chapters.filter(ch => !ch.audioUrl);
+
+  const toggleSelect = useCallback((idx: number) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    if (selected.size === unconvertedChapters.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(unconvertedChapters.map(ch => ch.index)));
+    }
+  }, [unconvertedChapters, selected.size]);
+
+  const handleConvertSelected = useCallback(async () => {
+    if (selected.size === 0) return;
+    const indices = [...selected].sort((a, b) => a - b);
+    setQueueProcessing(true);
+    queueAbortRef.current = false;
+
+    for (const idx of indices) {
+      if (queueAbortRef.current) break;
+      setConverting(idx);
+      try {
+        const token = await window.__getFirebaseIdToken?.();
+        if (!token) break;
+        const apiBase = window.__digitalLibraryApiBase?.() || '';
+        const res = await fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ bookId, voiceName, chapterIndex: idx }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          logger.warn('Chapter conversion failed', data);
+          if (res.status === 429) break; // Quota exhausted — stop the queue
+        }
+        // Wait for this chapter to finish before starting next
+        let attempts = 0;
+        while (attempts < 60 && !queueAbortRef.current) {
+          await new Promise(r => setTimeout(r, 5000));
+          attempts++;
+          await onChapterConverted();
+          // Check if this chapter now has audio
+          const updated = chapters.find(ch => ch.index === idx);
+          if (updated?.audioUrl) break;
+        }
+      } catch (err) {
+        if (!isAbortError(err)) logger.error('Queue conversion failed', err);
+        break;
+      }
+    }
+
+    setConverting(null);
+    setQueueProcessing(false);
+    setSelected(new Set());
+    onChapterConverted();
+  }, [selected, bookId, voiceName, chapters, onChapterConverted]);
 
   const handleCancel = useCallback(() => {
     pollAbortRef.current = true;
@@ -172,7 +238,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           {t('library.chapters')}
         </h3>
@@ -180,12 +246,56 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
           {t('library.chaptersConverted').replace('{converted}', String(convertedCount)).replace('{total}', String(chapters.length))}
         </span>
       </div>
+      {/* Multi-select toolbar */}
+      {unconvertedChapters.length > 0 && !queueProcessing && (
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <button
+            type="button"
+            onClick={toggleSelectAll}
+            className="text-xs text-blue-600 dark:text-blue-400 hover:underline min-h-[44px]"
+          >
+            {selected.size === unconvertedChapters.length ? t('library.deselectAll') : t('library.selectAllUnconverted')}
+          </button>
+          {selected.size > 0 && (
+            <button
+              type="button"
+              onClick={handleConvertSelected}
+              disabled={converting !== null}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition min-h-[44px] disabled:opacity-50"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+              </svg>
+              {t('library.convertSelected').replace('{count}', String(selected.size))}
+            </button>
+          )}
+          {queueProcessing && (
+            <button
+              type="button"
+              onClick={() => { queueAbortRef.current = true; }}
+              className="text-xs text-red-600 dark:text-red-400 hover:underline min-h-[44px]"
+            >
+              {t('library.cancelQueue')}
+            </button>
+          )}
+        </div>
+      )}
       <ul className="divide-y divide-gray-200 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {chapters.map(ch => {
           const hasAudio = !!ch.audioUrl;
           const isConverting = converting === ch.index;
           return (
             <li key={ch.index} className="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-gray-800">
+              {/* Checkbox for unconverted chapters */}
+              {!hasAudio && !isConverting && !queueProcessing && (
+                <input
+                  type="checkbox"
+                  checked={selected.has(ch.index)}
+                  onChange={() => toggleSelect(ch.index)}
+                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 min-h-[44px]"
+                  aria-label={`${t('library.selectChapter')} ${ch.title || ch.index + 1}`}
+                />
+              )}
               {/* Status icon */}
               <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                 {isConverting ? (
