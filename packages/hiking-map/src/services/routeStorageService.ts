@@ -100,7 +100,7 @@ export async function saveRoute(route: Omit<SavedRoute, 'id' | 'createdAt' | 'sh
     const id = await fb.add({
       name: route.name, distance: route.distance, duration: route.duration,
       geometry: route.geometry, startLabel: route.startLabel, endLabel: route.endLabel,
-      elevationProfile: route.elevationProfile, waypoints: route.waypoints, sourceFormat: route.sourceFormat,
+      elevationProfile: route.elevationProfile ?? null, waypoints: route.waypoints ?? null, sourceFormat: route.sourceFormat,
     });
     return { ...route, id, createdAt: Date.now(), sharedId: null };
   }
