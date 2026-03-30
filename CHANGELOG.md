@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.20.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.20.0...mycircle-v1.20.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* hiking elevationProfile, TTS quota bar, Sentry noise suppression ([#896](https://github.com/FishGit2020/MyCircle/issues/896)) ([94494de](https://github.com/FishGit2020/MyCircle/commit/94494de6e5e7ced40a16bbf00a941c7c1eb25f5a))
+* **resume-tailor:** show fact bank data immediately on Generate tab ([#889](https://github.com/FishGit2020/MyCircle/issues/889)) ([9dea173](https://github.com/FishGit2020/MyCircle/commit/9dea173cb8b48fb15100647da7c3ded1ae0341d1))
+
+
+### Miscellaneous
+
+* **deps:** bump pdfjs-dist from 4.10.38 to 5.6.205 in /functions ([#892](https://github.com/FishGit2020/MyCircle/issues/892)) ([4a76e8f](https://github.com/FishGit2020/MyCircle/commit/4a76e8f70ed76bb43c72f99be2674d77684b39cd))
+* **deps:** bump the minor-and-patch group in /functions with 6 updates ([#891](https://github.com/FishGit2020/MyCircle/issues/891)) ([ddf21b5](https://github.com/FishGit2020/MyCircle/commit/ddf21b510c05c3bdf82d796ec7f6a7832ea20f8c))
+
 ## [1.20.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.19.0...mycircle-v1.20.0) (2026-03-29)
 
 
