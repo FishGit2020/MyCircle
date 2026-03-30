@@ -122,6 +122,29 @@ export function createDigitalLibraryResolvers() {
         };
       },
 
+      conversionJobs: async (_: any, { bookId }: { bookId: string }, context: ResolverContext) => {
+        const uid = requireAuth(context);
+        const db = getFirestore();
+        const snap = await db
+          .collection(`users/${uid}/conversionJobs`)
+          .where('bookId', '==', bookId)
+          .orderBy('createdAt', 'desc')
+          .limit(50)
+          .get();
+        return snap.docs.map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            bookId: data.bookId,
+            chapterIndex: data.chapterIndex,
+            voiceName: data.voiceName,
+            status: data.status || 'pending',
+            error: data.error || null,
+            createdAt: data.createdAt?.toMillis ? new Date(data.createdAt.toMillis()).toISOString() : new Date().toISOString(),
+          };
+        });
+      },
+
       ttsQuota: async (_: any, __: any, context: ResolverContext) => {
         requireAuth(context);
         const db = getFirestore();
@@ -188,6 +211,41 @@ export function createDigitalLibraryResolvers() {
         } catch { /* ignore */ }
 
         return true;
+      },
+
+      submitChapterConversions: async (
+        _: any,
+        { bookId, chapterIndices, voiceName }: { bookId: string; chapterIndices: number[]; voiceName: string },
+        context: ResolverContext
+      ) => {
+        const uid = requireAuth(context);
+        const db = getFirestore();
+        const now = FieldValue.serverTimestamp();
+        const jobs: Array<{ id: string; bookId: string; chapterIndex: number; voiceName: string; status: string; error: null; createdAt: string }> = [];
+
+        for (const chapterIndex of chapterIndices) {
+          const ref = db.collection(`users/${uid}/conversionJobs`).doc();
+          await ref.set({
+            bookId,
+            chapterIndex,
+            voiceName,
+            uid,
+            status: 'pending',
+            error: null,
+            createdAt: now,
+          });
+          jobs.push({
+            id: ref.id,
+            bookId,
+            chapterIndex,
+            voiceName,
+            status: 'pending',
+            error: null,
+            createdAt: new Date().toISOString(),
+          });
+        }
+
+        return jobs;
       },
     },
   };
