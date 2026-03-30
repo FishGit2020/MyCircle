@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, StorageKeys } from '@mycircle/shared';
 import BookReader from './BookReader';
 import LibrarySearchSort, { SortOption } from './LibrarySearchSort';
+import TtsQuotaBar from './TtsQuotaBar';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useReadingProgress } from '../hooks/useReadingProgress';
 
@@ -409,6 +410,8 @@ export default function DigitalLibrary() {
       </div>
 
       <BookUpload onUploadComplete={refetch} />
+
+      <TtsQuotaBar />
 
       {!loading && books.length > 0 && (
         <LibrarySearchSort

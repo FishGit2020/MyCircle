@@ -34,6 +34,14 @@ Sentry.init({
     /apis\.google\.com/,
     /googleapis\.com/,
   ],
+  beforeSend(event) {
+    const msg = event.exception?.values?.[0]?.value || '';
+    // Suppress known unsupported-browser errors (iOS Safari, older browsers)
+    if (/unsupported-browser|Can't find variable: Notification/i.test(msg)) return null;
+    // Suppress transient Firebase offline errors
+    if (/app-offline/i.test(msg)) return null;
+    return event;
+  },
 });
 
 const client = getApolloClient();
