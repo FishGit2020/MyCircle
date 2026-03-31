@@ -32,7 +32,8 @@ export const onBatchConversionCreated = onDocumentCreated(
     const db = getFirestore();
     const jobRef = db.doc(`users/${uid}/conversionBatchJobs/${jobId}`);
 
-    const { bookId, chapterIndices, voiceName } = data;
+    const { bookId, voiceName } = data;
+    const chapterIndices: number[] = data.chapterIndices || [];
     const completedChapters: number[] = data.completedChapters || [];
 
     try {
