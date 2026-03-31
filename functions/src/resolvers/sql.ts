@@ -73,7 +73,7 @@ async function runBackfill(
       }
 
       // Update progress
-      await db.doc(`users/${uid}/sqlBackfillState`).update({
+      await db.doc(`users/${uid}/sqlBackfillState/status`).update({
         totalMigrated,
         totalErrors,
         lastDocId,
@@ -98,17 +98,17 @@ async function runBackfill(
       }
     }
 
-    await db.doc(`users/${uid}/sqlBackfillState`).set({
+    await db.doc(`users/${uid}/sqlBackfillState/status`).set({
       status: 'completed',
       totalMigrated,
       totalErrors,
       lastDocId,
-      startedAt: (await db.doc(`users/${uid}/sqlBackfillState`).get()).data()?.startedAt,
+      startedAt: (await db.doc(`users/${uid}/sqlBackfillState/status`).get()).data()?.startedAt,
       completedAt: new Date().toISOString(),
       error: null,
     });
   } catch (err: any) {
-    await db.doc(`users/${uid}/sqlBackfillState`).update({
+    await db.doc(`users/${uid}/sqlBackfillState/status`).update({
       status: 'error',
       totalMigrated,
       totalErrors,
@@ -127,7 +127,7 @@ export function createSqlQueryResolvers() {
       if (!uid) throw new Error('Authentication required');
 
       const db = getFirestore();
-      const doc = await db.doc(`users/${uid}/sqlConnection`).get();
+      const doc = await db.doc(`users/${uid}/sqlConnection/config`).get();
       if (!doc.exists) return null;
 
       const data = doc.data() as SqlConnectionConfig;
@@ -143,7 +143,7 @@ export function createSqlQueryResolvers() {
       const uid = ctx?.uid;
       if (!uid) return null;
       const db = getFirestore();
-      const doc = await db.doc(`users/${uid}/sqlBackfillState`).get();
+      const doc = await db.doc(`users/${uid}/sqlBackfillState/status`).get();
       if (!doc.exists) return { status: 'idle', totalMigrated: 0, totalErrors: 0, startedAt: null, completedAt: null, error: null };
       const d = doc.data()!;
       return {
@@ -389,7 +389,7 @@ export function createSqlMutationResolvers() {
       const parsed = schema.parse(input);
 
       const db = getFirestore();
-      const docRef = db.doc(`users/${uid}/sqlConnection`);
+      const docRef = db.doc(`users/${uid}/sqlConnection/config`);
 
       // Save the connection config (merge so partial updates work)
       const configData: Record<string, any> = {
@@ -445,7 +445,7 @@ export function createSqlMutationResolvers() {
       if (!uid) throw new Error('Authentication required');
 
       const db = getFirestore();
-      const docRef = db.doc(`users/${uid}/sqlConnection`);
+      const docRef = db.doc(`users/${uid}/sqlConnection/config`);
       const doc = await docRef.get();
 
       if (!doc.exists) {
@@ -481,8 +481,8 @@ export function createSqlMutationResolvers() {
 
       // Delete connection config and backfill state in parallel
       await Promise.all([
-        db.doc(`users/${uid}/sqlConnection`).delete(),
-        db.doc(`users/${uid}/sqlBackfillState`).delete(),
+        db.doc(`users/${uid}/sqlConnection/config`).delete(),
+        db.doc(`users/${uid}/sqlBackfillState/status`).delete(),
       ]);
 
       clearSqlConfigCache(uid);
@@ -496,13 +496,13 @@ export function createSqlMutationResolvers() {
       const db = getFirestore();
 
       // Check SQL connection exists
-      const connDoc = await db.doc(`users/${uid}/sqlConnection`).get();
+      const connDoc = await db.doc(`users/${uid}/sqlConnection/config`).get();
       if (!connDoc.exists || connDoc.data()?.status !== 'connected') {
         throw new Error('SQL connection not configured or not connected');
       }
 
       // Check if already running
-      const stateDoc = await db.doc(`users/${uid}/sqlBackfillState`).get();
+      const stateDoc = await db.doc(`users/${uid}/sqlBackfillState/status`).get();
       const existingState = stateDoc.exists ? stateDoc.data() : null;
       if (existingState?.status === 'running') {
         return existingState;
@@ -514,7 +514,7 @@ export function createSqlMutationResolvers() {
       const totalErrors = existingState?.status === 'error' ? (existingState.totalErrors || 0) : 0;
 
       // Update state to running
-      await db.doc(`users/${uid}/sqlBackfillState`).set({
+      await db.doc(`users/${uid}/sqlBackfillState/status`).set({
         status: 'running',
         totalMigrated,
         totalErrors,

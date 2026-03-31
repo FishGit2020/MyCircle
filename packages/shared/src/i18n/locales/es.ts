@@ -3107,6 +3107,8 @@ const es: Record<TranslationKey, string> = {
   'setup.sql.deleteConfirm': '\u00bfEliminar conexi\u00f3n SQL? Los datos en la base de datos no se borrar\u00e1n.',
   'setup.sql.status.connected': 'Conectado',
   'setup.sql.status.disconnected': 'No conectado',
+  'setup.sql.savedSuccess': 'Conexi\u00f3n guardada y probada exitosamente',
+  'setup.sql.savedWithError': 'Conexi\u00f3n guardada pero la prueba fall\u00f3',
   'setup.sql.status.error': 'Error de conexi\u00f3n',
   'setup.sql.status.none': 'Sin conexi\u00f3n configurada',
   'setup.sql.lastTested': '\u00daltima prueba',

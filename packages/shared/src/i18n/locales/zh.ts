@@ -3107,6 +3107,8 @@ const zh: Record<TranslationKey, string> = {
   'setup.sql.deleteConfirm': '\u5220\u9664 SQL \u8fde\u63a5\uff1f\u6570\u636e\u5e93\u4e2d\u7684\u5206\u6790\u6570\u636e\u4e0d\u4f1a\u88ab\u5220\u9664\u3002',
   'setup.sql.status.connected': '\u5df2\u8fde\u63a5',
   'setup.sql.status.disconnected': '\u672a\u8fde\u63a5',
+  'setup.sql.savedSuccess': '\u8fde\u63a5\u5df2\u4fdd\u5b58\u5e76\u6d4b\u8bd5\u6210\u529f',
+  'setup.sql.savedWithError': '\u8fde\u63a5\u5df2\u4fdd\u5b58\u4f46\u6d4b\u8bd5\u5931\u8d25',
   'setup.sql.status.error': '\u8fde\u63a5\u9519\u8bef',
   'setup.sql.status.none': '\u672a\u914d\u7f6e\u8fde\u63a5',
   'setup.sql.lastTested': '\u4e0a\u6b21\u6d4b\u8bd5',

@@ -27,6 +27,8 @@ export default function SqlConnectionSection() {
   const [dbName, setDbName] = useState('mycircle');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [saveResult, setSaveResult] = useState<'saved' | 'error' | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const status = data?.sqlConnectionStatus;
 
@@ -38,18 +40,29 @@ export default function SqlConnectionSection() {
   }, [status]);
 
   const handleSaveAndTest = async () => {
-    await saveSqlConnection({
-      variables: {
-        input: {
-          tunnelUrl: tunnelUrl.trim(),
-          dbName: dbName.trim() || 'mycircle',
-          username: username.trim() || undefined,
-          password: password || undefined,
+    setSaveResult(null);
+    setErrorMessage('');
+    try {
+      const result = await saveSqlConnection({
+        variables: {
+          input: {
+            tunnelUrl: tunnelUrl.trim(),
+            dbName: dbName.trim() || 'mycircle',
+            username: username.trim() || undefined,
+            password: password || undefined,
+          },
         },
-      },
-    });
-    await testSqlConnection();
-    setPassword('');
+      });
+      const connStatus = result.data?.saveSqlConnection?.status;
+      setSaveResult(connStatus === 'connected' ? 'saved' : 'error');
+      if (connStatus !== 'connected') {
+        setErrorMessage(t('setup.sql.status.error'));
+      }
+      setPassword('');
+    } catch (err: any) {
+      setSaveResult('error');
+      setErrorMessage(err.message || String(err));
+    }
   };
 
   const handleDelete = async () => {
@@ -106,6 +119,24 @@ export default function SqlConnectionSection() {
           </span>
         )}
       </div>
+
+      {/* Save feedback */}
+      {saveResult === 'saved' && (
+        <div className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          {t('setup.sql.status.connected')} — {t('setup.sql.savedSuccess')}
+        </div>
+      )}
+      {saveResult === 'error' && (
+        <div className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
+          {t('setup.sql.savedWithError')}{errorMessage ? `: ${errorMessage}` : ''}
+        </div>
+      )}
 
       {/* Form */}
       <div className="space-y-4 max-w-lg">

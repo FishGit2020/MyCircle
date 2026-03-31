@@ -19,7 +19,7 @@ export async function getCachedSqlConfig(uid: string): Promise<SqlConnectionConf
   if (cached && Date.now() < cached.expiry) return cached.config;
 
   const db = getFirestore();
-  const doc = await db.doc(`users/${uid}/sqlConnection`).get();
+  const doc = await db.doc(`users/${uid}/sqlConnection/config`).get();
   const config = doc.exists ? (doc.data() as SqlConnectionConfig) : null;
   configCache.set(uid, { config, expiry: Date.now() + CACHE_TTL_MS });
   return config;
