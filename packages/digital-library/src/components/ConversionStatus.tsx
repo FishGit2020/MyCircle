@@ -64,6 +64,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         setStatus('paused');
         setProgress(prog.audioProgress || 0);
       } else if (prog.audioStatus === 'processing') {
+        setStatus('processing');
         setProgress(prog.audioProgress || 0);
       }
     } catch (err) {
