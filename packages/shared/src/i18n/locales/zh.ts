@@ -3118,6 +3118,8 @@ const zh: Record<TranslationKey, string> = {
   'setup.sql.usernamePlaceholder': 'postgres',
   'setup.sql.password': '\u5bc6\u7801',
   'setup.sql.passwordPlaceholder': '\u8f93\u5165\u5bc6\u7801',
+  'setup.sql.apiKey': 'API \u5bc6\u94a5',
+  'setup.sql.apiKeyPlaceholder': '\u8f93\u5165 docker-compose.yml \u4e2d\u7684 API \u5bc6\u94a5',
   'setup.sql.saveAndTest': '\u4fdd\u5b58\u5e76\u6d4b\u8bd5',
   'setup.sql.testing': '\u6d4b\u8bd5\u4e2d...',
   'setup.sql.delete': '\u5220\u9664\u8fde\u63a5',

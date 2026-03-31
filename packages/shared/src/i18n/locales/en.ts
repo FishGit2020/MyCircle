@@ -3118,6 +3118,8 @@ const en = {
   'setup.sql.usernamePlaceholder': 'postgres',
   'setup.sql.password': 'Password',
   'setup.sql.passwordPlaceholder': 'Enter password',
+  'setup.sql.apiKey': 'API Key',
+  'setup.sql.apiKeyPlaceholder': 'Enter the API key from docker-compose.yml',
   'setup.sql.saveAndTest': 'Save & Test',
   'setup.sql.testing': 'Testing...',
   'setup.sql.delete': 'Remove Connection',

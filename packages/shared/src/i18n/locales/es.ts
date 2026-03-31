@@ -3118,6 +3118,8 @@ const es: Record<TranslationKey, string> = {
   'setup.sql.usernamePlaceholder': 'postgres',
   'setup.sql.password': 'Contrase\u00f1a',
   'setup.sql.passwordPlaceholder': 'Ingresa la contrase\u00f1a',
+  'setup.sql.apiKey': 'Clave API',
+  'setup.sql.apiKeyPlaceholder': 'Ingresa la clave API de docker-compose.yml',
   'setup.sql.saveAndTest': 'Guardar y probar',
   'setup.sql.testing': 'Probando...',
   'setup.sql.delete': 'Eliminar conexi\u00f3n',
