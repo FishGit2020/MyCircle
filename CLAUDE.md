@@ -162,6 +162,7 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - [CI/CD Pipeline](./docs/cicd.md) — pipeline details, troubleshooting
 - [Ollama Setup](./docs/ollama-setup.md) — self-hosted AI, Cloudflare tunnel/access, Firebase secrets, troubleshooting
 - [AI Monitoring](./docs/ai-monitoring.md) — chat logging, raw data access, benchmark correlation
+- [SQL Analytics Setup](./docs/sql-analytics-setup.md) — PostgreSQL, Cloudflare tunnel, Docker setup, analytics dashboard
 
 ## Active Technologies
 - TypeScript 5.x, React 18 + React, Tailwind CSS, `@mycircle/shared` (eventBus, i18n, StorageKeys), Firebase Firestore SDK (shell-only) (001-favorite-cities)
