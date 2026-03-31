@@ -84,17 +84,21 @@ function BookCard({ book, onSelect, onSelectListen, onDelete, readPercent }: {
               </div>
             </div>
           )}
-          {book.audioStatus === 'complete' && (
+          {(book.audioStatus === 'complete' || book.audioProgress > 0) && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onSelectListen(book); }}
-              className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-medium bg-green-500 dark:bg-green-600 text-white hover:bg-green-600 dark:hover:bg-green-500 transition-colors active:scale-95 min-h-[36px]"
+              className={`inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-medium transition-colors active:scale-95 min-h-[36px] ${
+                book.audioStatus === 'complete'
+                  ? 'bg-green-500 dark:bg-green-600 text-white hover:bg-green-600 dark:hover:bg-green-500'
+                  : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50'
+              }`}
               aria-label={`${t('library.listenNow')}: ${book.title}`}
             >
               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
-              {t('library.audioAvailable')}
+              {book.audioStatus === 'complete' ? t('library.audioAvailable') : `${book.audioProgress}% ${t('library.audioAvailable')}`}
             </button>
           )}
           {(book.audioStatus === 'processing' || book.audioStatus === 'paused') && (

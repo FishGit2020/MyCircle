@@ -223,7 +223,15 @@ export function createDigitalLibraryResolvers() {
         const now = FieldValue.serverTimestamp();
         const jobs: Array<{ id: string; bookId: string; chapterIndex: number; voiceName: string; status: string; error: null; createdAt: string }> = [];
 
+        // Check for existing pending/processing jobs to prevent duplicates
+        const existingSnap = await db.collection(`users/${uid}/conversionJobs`)
+          .where('bookId', '==', bookId)
+          .where('status', 'in', ['pending', 'processing'])
+          .get();
+        const activeChapters = new Set(existingSnap.docs.map(d => d.data().chapterIndex as number));
+
         for (const chapterIndex of chapterIndices) {
+          if (activeChapters.has(chapterIndex)) continue; // Skip — already queued
           const ref = db.collection(`users/${uid}/conversionJobs`).doc();
           await ref.set({
             bookId,
