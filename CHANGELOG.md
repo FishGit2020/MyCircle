@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.21.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.20.1...mycircle-v1.21.0) (2026-03-31)
+
+
+### Features
+
+* **digital-library:** multi-select chapters for batch audio conversion ([#897](https://github.com/FishGit2020/MyCircle/issues/897)) ([d36221d](https://github.com/FishGit2020/MyCircle/commit/d36221d4aad37cd4ea3423b60e24d0f248134c40))
+* **digital-library:** offline audio conversion queue via Firestore trigger ([#899](https://github.com/FishGit2020/MyCircle/issues/899)) ([0496259](https://github.com/FishGit2020/MyCircle/commit/049625938755567506bf8a1f6eaae4ee9860c2a3))
+
+
+### Bug Fixes
+
+* **digital-library:** fix double API call and checkbox precedence bug ([#903](https://github.com/FishGit2020/MyCircle/issues/903)) ([355ce9d](https://github.com/FishGit2020/MyCircle/commit/355ce9dac6eaf738c4c7ac4384de13ffa17c8f21))
+* **digital-library:** persist conversion status across navigation ([#900](https://github.com/FishGit2020/MyCircle/issues/900)) ([065e5c7](https://github.com/FishGit2020/MyCircle/commit/065e5c7e72cb9a864767878afe430873807de309))
+* **firestore:** add composite index for conversionJobs query ([#902](https://github.com/FishGit2020/MyCircle/issues/902)) ([6f358d1](https://github.com/FishGit2020/MyCircle/commit/6f358d11bad1090ad7da012aacaa4ce5a4e4844c))
+
+
+### Code Refactoring
+
+* **digital-library:** migrate all REST endpoints to GraphQL ([#870](https://github.com/FishGit2020/MyCircle/issues/870)) ([#901](https://github.com/FishGit2020/MyCircle/issues/901)) ([c14ba0a](https://github.com/FishGit2020/MyCircle/commit/c14ba0a781ee3f8e88a345bbf2b38bda9a73195a))
+
 ## [1.20.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.20.0...mycircle-v1.20.1) (2026-03-30)
 
 
