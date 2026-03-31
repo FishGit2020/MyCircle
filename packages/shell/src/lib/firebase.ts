@@ -1,7 +1,7 @@
 import { createLogger, WindowEvents } from '@mycircle/shared';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot, writeBatch } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot, writeBatch, runTransaction } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken, AppCheck } from 'firebase/app-check';
@@ -1944,16 +1944,83 @@ async function deletePoll(pollId: string) {
   await updateDoc(doc(db, 'polls', pollId), { isDeleted: true, deletedAt: serverTimestamp() });
 }
 
-async function votePoll(pollId: string, optionId: string) {
+async function castVotePoll(uid: string, pollId: string, optionId: string) {
   if (!db) throw new Error('Firebase not initialized');
   const pollRef = doc(db, 'polls', pollId);
-  const snap = await getDoc(pollRef);
-  if (!snap.exists()) throw new Error('Poll not found');
-  const data = snap.data();
-  const options = (data.options || []).map((opt: Record<string, unknown>) =>
-    opt.id === optionId ? { ...opt, votes: ((opt.votes as number) || 0) + 1 } : opt,
-  );
-  await updateDoc(pollRef, { options, updatedAt: serverTimestamp() });
+  const voteRef = doc(db, 'polls', pollId, 'votes', uid);
+  await runTransaction(db, async (tx) => {
+    const pollSnap = await tx.get(pollRef);
+    if (!pollSnap.exists()) throw new Error('Poll not found');
+    const voteSnap = await tx.get(voteRef);
+    if (voteSnap.exists()) throw new Error('Already voted');
+    const data = pollSnap.data();
+    const options = (data.options || []).map((opt: Record<string, unknown>) =>
+      opt.id === optionId ? { ...opt, votes: ((opt.votes as number) || 0) + 1 } : opt,
+    );
+    tx.update(pollRef, { options, updatedAt: serverTimestamp() });
+    tx.set(voteRef, { optionId, votedAt: Date.now() });
+  });
+}
+
+async function changeVotePoll(uid: string, pollId: string, oldOptionId: string, newOptionId: string) {
+  if (!db) throw new Error('Firebase not initialized');
+  const pollRef = doc(db, 'polls', pollId);
+  const voteRef = doc(db, 'polls', pollId, 'votes', uid);
+  await runTransaction(db, async (tx) => {
+    const pollSnap = await tx.get(pollRef);
+    if (!pollSnap.exists()) throw new Error('Poll not found');
+    const data = pollSnap.data();
+    const options = (data.options || []).map((opt: Record<string, unknown>) => {
+      if (opt.id === oldOptionId) return { ...opt, votes: Math.max(0, ((opt.votes as number) || 0) - 1) };
+      if (opt.id === newOptionId) return { ...opt, votes: ((opt.votes as number) || 0) + 1 };
+      return opt;
+    });
+    tx.update(pollRef, { options, updatedAt: serverTimestamp() });
+    tx.set(voteRef, { optionId: newOptionId, votedAt: Date.now() });
+  });
+}
+
+async function getUserVotePoll(uid: string, pollId: string): Promise<string | null> {
+  if (!db) return null;
+  const voteSnap = await getDoc(doc(db, 'polls', pollId, 'votes', uid));
+  if (!voteSnap.exists()) return null;
+  return (voteSnap.data().optionId as string) ?? null;
+}
+
+function subscribeToUserVotesPoll(uid: string, callback: (votes: Record<string, string>) => void) {
+  if (!db) return () => {};
+  const votesRef = collection(db, 'polls');
+  // Subscribe to user's vote records via a collectionGroup-style approach:
+  // Since collectionGroup queries require an index, we use a cached approach instead.
+  // We track user votes by subscribing to each poll's vote doc reactively via the polls subscription.
+  // For a lightweight implementation: fetch all user vote docs on demand when polls update.
+  let cancelled = false;
+  const votes: Record<string, string> = {};
+
+  // Use a polls subscription to drive vote lookups
+  const pollsQ = query(votesRef, orderBy('createdAt', 'desc'));
+  const unsubPolls = onSnapshot(pollsQ, async (snapshot) => {
+    if (cancelled) return;
+    const pollIds = snapshot.docs.filter(d => !d.data().isDeleted).map(d => d.id);
+    // Batch-read all user vote documents
+    const fetches = pollIds.map(async (pollId) => {
+      try {
+        const voteSnap = await getDoc(doc(db!, 'polls', pollId, 'votes', uid));
+        if (voteSnap.exists()) {
+          votes[pollId] = voteSnap.data().optionId as string;
+        } else {
+          delete votes[pollId];
+        }
+      } catch { /* vote doc may not exist */ }
+    });
+    await Promise.all(fetches);
+    if (!cancelled) callback({ ...votes });
+  }, (error) => { handleSnapshotError('UserVotes', error); });
+
+  return () => {
+    cancelled = true;
+    unsubPolls();
+  };
 }
 
 function subscribeToPolls(callback: (polls: Array<Record<string, unknown>>) => void) {
@@ -1975,9 +2042,21 @@ if (firebaseEnabled) {
       if (!auth?.currentUser) throw new Error('Not authenticated');
       return deletePoll(id);
     },
-    vote: (pollId: string, optionId: string) => {
+    castVote: (pollId: string, optionId: string) => {
       if (!auth?.currentUser) throw new Error('Not authenticated');
-      return votePoll(pollId, optionId);
+      return castVotePoll(auth.currentUser.uid, pollId, optionId);
+    },
+    changeVote: (pollId: string, oldOptionId: string, newOptionId: string) => {
+      if (!auth?.currentUser) throw new Error('Not authenticated');
+      return changeVotePoll(auth.currentUser.uid, pollId, oldOptionId, newOptionId);
+    },
+    getUserVote: (pollId: string) => {
+      if (!auth?.currentUser) return Promise.resolve(null);
+      return getUserVotePoll(auth.currentUser.uid, pollId);
+    },
+    subscribeToUserVotes: (callback: (votes: Record<string, string>) => void) => {
+      if (!auth?.currentUser) return () => {};
+      return subscribeToUserVotesPoll(auth.currentUser.uid, callback);
     },
     subscribe: (callback: (polls: Array<Record<string, unknown>>) => void) => {
       return subscribeToPolls(callback);

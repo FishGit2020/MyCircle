@@ -19,3 +19,12 @@ export interface Vote {
   optionId: string;
   votedAt: number;
 }
+
+export interface VoteRecord {
+  optionId: string;
+  votedAt: number;
+}
+
+export interface UserVoteMap {
+  [pollId: string]: string | undefined;
+}
