@@ -1894,6 +1894,7 @@ const en = {
   'library.convertSelected': 'Convert {count} selected',
   'library.cancelQueue': 'Stop queue',
   'library.queueActive': '{count} converting...',
+  'library.refreshStatus': 'Refresh',
   'library.selectChapter': 'Select chapter',
   'library.deleteAudio': 'Delete audio',
   'library.deleteAudioConfirm': 'Remove the converted audio for this chapter? You can re-convert it later.',

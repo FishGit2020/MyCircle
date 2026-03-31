@@ -1896,6 +1896,7 @@ const es: Record<TranslationKey, string> = {
   'library.convertSelected': 'Convertir {count} seleccionados',
   'library.cancelQueue': 'Detener cola',
   'library.queueActive': '{count} convirtiendo...',
+  'library.refreshStatus': 'Actualizar',
   'library.selectChapter': 'Seleccionar cap\u00edtulo',
   'library.deleteAudio': 'Eliminar audio',
   'library.deleteAudioConfirm': '\u00bfEliminar el audio convertido de este cap\u00edtulo? Puedes volver a convertirlo despu\u00e9s.',
