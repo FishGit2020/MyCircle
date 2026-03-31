@@ -4,6 +4,7 @@ export default function LatencyPercentiles() {
   const { t } = useTranslation();
   const { data, loading } = useQuery(GET_SQL_LATENCY_PERCENTILES, {
     variables: { days: 30 },
+    fetchPolicy: 'cache-and-network',
   });
 
   if (loading) {

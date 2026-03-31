@@ -4,6 +4,7 @@ export default function CostBreakdown() {
   const { t } = useTranslation();
   const { data, loading } = useQuery(GET_SQL_ANALYTICS_SUMMARY, {
     variables: { days: 30 },
+    fetchPolicy: 'cache-and-network',
   });
 
   if (loading) {

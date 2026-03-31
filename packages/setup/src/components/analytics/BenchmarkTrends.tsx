@@ -17,6 +17,7 @@ export default function BenchmarkTrends() {
   const { t } = useTranslation();
   const { data, loading } = useQuery(GET_SQL_BENCHMARK_TRENDS, {
     variables: { weeks: 8 },
+    fetchPolicy: 'cache-and-network',
   });
 
   if (loading) {

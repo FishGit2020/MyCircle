@@ -9,9 +9,11 @@ export default function ToolUsagePatterns() {
   const { t } = useTranslation();
   const { data: statsData, loading: statsLoading } = useQuery(GET_SQL_TOOL_USAGE_STATS, {
     variables: { days: 30 },
+    fetchPolicy: 'cache-and-network',
   });
   const { data: coData, loading: coLoading } = useQuery(GET_SQL_TOOL_CO_OCCURRENCES, {
     variables: { days: 30, minCount: 2 },
+    fetchPolicy: 'cache-and-network',
   });
 
   const loading = statsLoading || coLoading;

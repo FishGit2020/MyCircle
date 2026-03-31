@@ -60,6 +60,7 @@ export default function ChatSearch() {
   const { data, loading } = useQuery(SQL_CHAT_SEARCH, {
     variables: { query: debouncedQuery, limit: 50 },
     skip: !debouncedQuery,
+    fetchPolicy: 'network-only',
   });
 
   const results: SearchResult[] = data?.sqlChatSearch || [];
