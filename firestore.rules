@@ -211,6 +211,10 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow create: if request.auth != null && request.auth.uid == userId;
     }
+    match /conversionBatchJobs/{jobId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+    }
 
     // Books - shared library, authenticated read, uploader can write/delete
     match /books/{bookId} {

@@ -325,6 +325,19 @@ export type CompanyNews = {
   url: Scalars['String']['output'];
 };
 
+export type ConversionBatchJob = {
+  __typename?: 'ConversionBatchJob';
+  bookId: Scalars['ID']['output'];
+  chapterIndices: Array<Scalars['Int']['output']>;
+  completedChapters: Array<Scalars['Int']['output']>;
+  createdAt: Scalars['String']['output'];
+  currentChapter?: Maybe<Scalars['Int']['output']>;
+  error?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  status: Scalars['String']['output'];
+  voiceName: Scalars['String']['output'];
+};
+
 export type ConversionJob = {
   __typename?: 'ConversionJob';
   bookId: Scalars['ID']['output'];
@@ -599,6 +612,7 @@ export type Mutation = {
   shareFileWith: TargetedShareResult;
   startCrawl: CrawlJob;
   stopCrawl: CrawlJob;
+  submitBatchConversion: ConversionBatchJob;
   submitChapterConversions: Array<ConversionJob>;
   submitResumeParse: ResumeParseJob;
   updateInterviewQuestion: InterviewQuestion;
@@ -855,6 +869,13 @@ export type MutationStopCrawlArgs = {
 };
 
 
+export type MutationSubmitBatchConversionArgs = {
+  bookId: Scalars['ID']['input'];
+  chapterIndices: Array<Scalars['Int']['input']>;
+  voiceName: Scalars['String']['input'];
+};
+
+
 export type MutationSubmitChapterConversionsArgs = {
   bookId: Scalars['ID']['input'];
   chapterIndices: Array<Scalars['Int']['input']>;
@@ -999,6 +1020,7 @@ export type Query = {
   checkCaseStatus: CaseStatus;
   cloudFiles: Array<CloudFile>;
   companyNews: Array<CompanyNews>;
+  conversionBatchJob?: Maybe<ConversionBatchJob>;
   conversionJobs: Array<ConversionJob>;
   crawlJobDetail?: Maybe<CrawlJobDetail>;
   crawlJobs: Array<CrawlJob>;
@@ -1122,6 +1144,11 @@ export type QueryCompanyNewsArgs = {
   from: Scalars['String']['input'];
   symbol: Scalars['String']['input'];
   to: Scalars['String']['input'];
+};
+
+
+export type QueryConversionBatchJobArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -2366,6 +2393,22 @@ export type SubmitChapterConversionsMutationVariables = Exact<{
 
 
 export type SubmitChapterConversionsMutation = { __typename?: 'Mutation', submitChapterConversions: Array<{ __typename?: 'ConversionJob', id: string, chapterIndex: number, status: string }> };
+
+export type SubmitBatchConversionMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+  chapterIndices: Array<Scalars['Int']['input']> | Scalars['Int']['input'];
+  voiceName: Scalars['String']['input'];
+}>;
+
+
+export type SubmitBatchConversionMutation = { __typename?: 'Mutation', submitBatchConversion: { __typename?: 'ConversionBatchJob', id: string, status: string, chapterIndices: Array<number>, completedChapters: Array<number> } };
+
+export type GetConversionBatchJobQueryVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type GetConversionBatchJobQuery = { __typename?: 'Query', conversionBatchJob?: { __typename?: 'ConversionBatchJob', id: string, bookId: string, chapterIndices: Array<number>, voiceName: string, status: string, currentChapter?: number | null, completedChapters: Array<number>, error?: string | null, createdAt: string } | null };
 
 export type UploadBookMutationVariables = Exact<{
   fileBase64: Scalars['String']['input'];

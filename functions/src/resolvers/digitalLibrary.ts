@@ -145,6 +145,30 @@ export function createDigitalLibraryResolvers() {
         });
       },
 
+      conversionBatchJob: async (_: any, { bookId }: { bookId: string }, context: ResolverContext) => {
+        const uid = requireAuth(context);
+        const db = getFirestore();
+        const snap = await db.collection(`users/${uid}/conversionBatchJobs`)
+          .where('bookId', '==', bookId)
+          .orderBy('createdAt', 'desc')
+          .limit(1)
+          .get();
+        if (snap.empty) return null;
+        const doc = snap.docs[0];
+        const data = doc.data();
+        return {
+          id: doc.id,
+          bookId: data.bookId,
+          chapterIndices: data.chapterIndices || [],
+          voiceName: data.voiceName,
+          status: data.status || 'pending',
+          currentChapter: data.currentChapter ?? null,
+          completedChapters: data.completedChapters || [],
+          error: data.error || null,
+          createdAt: data.createdAt?.toMillis ? new Date(data.createdAt.toMillis()).toISOString() : new Date().toISOString(),
+        };
+      },
+
       ttsQuota: async (_: any, __: any, context: ResolverContext) => {
         requireAuth(context);
         const db = getFirestore();
@@ -254,6 +278,50 @@ export function createDigitalLibraryResolvers() {
         }
 
         return jobs;
+      },
+
+      submitBatchConversion: async (
+        _: any,
+        { bookId, chapterIndices, voiceName }: { bookId: string; chapterIndices: number[]; voiceName: string },
+        context: ResolverContext
+      ) => {
+        const uid = requireAuth(context);
+        const db = getFirestore();
+
+        // Check for existing active batch for this book
+        const existingSnap = await db.collection(`users/${uid}/conversionBatchJobs`)
+          .where('bookId', '==', bookId)
+          .where('status', 'in', ['pending', 'processing'])
+          .get();
+        if (!existingSnap.empty) {
+          throw new GraphQLError('A batch conversion is already in progress for this book', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+
+        const ref = db.collection(`users/${uid}/conversionBatchJobs`).doc();
+        const now = FieldValue.serverTimestamp();
+        await ref.set({
+          bookId,
+          chapterIndices,
+          voiceName,
+          uid,
+          status: 'pending',
+          currentChapter: null,
+          completedChapters: [],
+          error: null,
+          createdAt: now,
+        });
+
+        return {
+          id: ref.id,
+          bookId,
+          chapterIndices,
+          voiceName,
+          status: 'pending',
+          currentChapter: null,
+          completedChapters: [],
+          error: null,
+          createdAt: new Date().toISOString(),
+        };
       },
 
       uploadBook: async (_: any, { fileBase64 }: { fileBase64: string }, context: ResolverContext) => {

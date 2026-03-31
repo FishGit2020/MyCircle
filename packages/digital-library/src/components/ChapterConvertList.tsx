@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, GET_CONVERSION_JOBS, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO } from '@mycircle/shared';
+import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, GET_CONVERSION_JOBS, GET_CONVERSION_BATCH_JOB, SUBMIT_BATCH_CONVERSION, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO } from '@mycircle/shared';
 import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
@@ -35,19 +35,38 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   const autoPlayedRef = useRef(false);
   const pollAbortRef = useRef(false);
 
-  // Query active conversion jobs to restore state after navigation
+  // Query active conversion jobs (per-chapter legacy + batch)
   const { data: jobsData, refetch: refetchJobs } = useQuery(GET_CONVERSION_JOBS, {
     variables: { bookId },
     fetchPolicy: 'network-only',
   });
+  const { data: batchData, refetch: refetchBatch } = useQuery(GET_CONVERSION_BATCH_JOB, {
+    variables: { bookId },
+    fetchPolicy: 'network-only',
+  });
   const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
+  const [submitBatch] = useMutation(SUBMIT_BATCH_CONVERSION);
   const [deleteChapterAudioMutation] = useMutation(DELETE_CHAPTER_AUDIO);
 
-  // Derive which chapters are actively converting from backend jobs
+  // Merge per-chapter jobs + batch job into unified status
+  const batchJob = batchData?.conversionBatchJob as { status: string; currentChapter?: number | null; completedChapters: number[]; chapterIndices: number[]; error?: string | null } | null;
+  const batchActive = batchJob && (batchJob.status === 'pending' || batchJob.status === 'processing' || batchJob.status === 'paused');
+
   const activeJobs = useMemo(() => {
-    const jobs = (jobsData?.conversionJobs ?? []) as Array<{ id: string; chapterIndex: number; status: string; error?: string | null }>;
-    return jobs.filter(j => j.status === 'pending' || j.status === 'processing');
-  }, [jobsData]);
+    const perChapter = (jobsData?.conversionJobs ?? []) as Array<{ id: string; chapterIndex: number; status: string }>;
+    const active = perChapter.filter(j => j.status === 'pending' || j.status === 'processing');
+
+    // Add batch job chapters as active
+    if (batchActive && batchJob) {
+      const batchCompleted = new Set(batchJob.completedChapters);
+      for (const idx of batchJob.chapterIndices) {
+        if (!batchCompleted.has(idx) && !active.some(a => a.chapterIndex === idx)) {
+          active.push({ id: `batch-${idx}`, chapterIndex: idx, status: idx === batchJob.currentChapter ? 'processing' : 'pending' });
+        }
+      }
+    }
+    return active;
+  }, [jobsData, batchActive, batchJob]);
 
   // Per-chapter job status map (latest job per chapter)
   const chapterJobStatus = useMemo(() => {
@@ -56,38 +75,49 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
     for (const j of jobs) {
       if (!map.has(j.chapterIndex)) map.set(j.chapterIndex, { status: j.status, error: j.error });
     }
+
+    // Overlay batch job status
+    if (batchJob) {
+      const batchCompleted = new Set(batchJob.completedChapters);
+      for (const idx of batchJob.chapterIndices) {
+        if (batchCompleted.has(idx)) {
+          if (!map.has(idx)) map.set(idx, { status: 'complete' });
+        } else if (idx === batchJob.currentChapter) {
+          map.set(idx, { status: 'processing' });
+        } else if (batchJob.status === 'error') {
+          map.set(idx, { status: 'error', error: batchJob.error });
+        } else if (batchActive) {
+          if (!map.has(idx)) map.set(idx, { status: 'pending' });
+        }
+      }
+    }
     return map;
-  }, [jobsData]);
+  }, [jobsData, batchJob, batchActive]);
 
   // Poll for job completion when there are active jobs (every 30s to save quota)
   useEffect(() => {
-    if (activeJobs.length === 0) return;
+    if (activeJobs.length === 0 && !batchActive) return;
     const interval = setInterval(async () => {
       setPolling(true);
       try {
-        const { data: refreshed } = await refetchJobs();
-        const jobs = refreshed?.conversionJobs ?? [];
-        const stillActive = (jobs as Array<{ status: string }>).some(j => j.status === 'pending' || j.status === 'processing');
-        if (!stillActive) {
-          clearInterval(interval);
-          onChapterConverted();
-        }
+        await Promise.all([refetchJobs(), refetchBatch()]);
+        await onChapterConverted();
       } finally {
         setPolling(false);
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [activeJobs.length, refetchJobs, onChapterConverted]);
+  }, [activeJobs.length, batchActive, refetchJobs, refetchBatch, onChapterConverted]);
 
   const handleManualRefresh = useCallback(async () => {
     setPolling(true);
     try {
-      await refetchJobs();
+      await Promise.all([refetchJobs(), refetchBatch()]);
       await onChapterConverted();
     } finally {
       setPolling(false);
     }
-  }, [refetchJobs, onChapterConverted]);
+  }, [refetchJobs, refetchBatch, onChapterConverted]);
 
   const audioChapters = chapters.filter(ch => ch.audioUrl);
 
@@ -193,15 +223,16 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
     if (selected.size === 0) return;
     const indices = [...selected].sort((a, b) => a - b);
     try {
-      await submitConversions({
+      // Use batch conversion (single worker, sequential processing)
+      await submitBatch({
         variables: { bookId, chapterIndices: indices, voiceName },
       });
-      await refetchJobs(); // Refresh job list so UI shows pending state
+      await Promise.all([refetchJobs(), refetchBatch()]);
       setSelected(new Set());
     } catch (err) {
       if (!isAbortError(err)) logger.error('Failed to submit conversions', err);
     }
-  }, [selected, bookId, voiceName, submitConversions, refetchJobs]);
+  }, [selected, bookId, voiceName, submitBatch, refetchJobs, refetchBatch]);
 
 
   const [deleting, setDeleting] = useState<number | null>(null);
