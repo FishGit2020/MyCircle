@@ -1,7 +1,16 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import type { Trip, Activity, ItineraryDay, Ticket } from '../types';
+import type { Trip, Activity, ItineraryDay, Ticket, TripStatus } from '../types';
+
+const TRIP_STATUS_COLORS: Record<TripStatus, string> = {
+  planning: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+  confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+  completed: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
+  cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400',
+};
 import TripMapPreview from './TripMapPreview';
+import ChecklistSection from './ChecklistSection';
+import { formatTripExport } from '../utils/exportTrip';
 
 interface TripDetailProps {
   trip: Trip;
@@ -9,6 +18,7 @@ interface TripDetailProps {
   onDelete: () => void;
   onBack: () => void;
   onUpdate: (id: string, data: Partial<Trip>) => void;
+  onDuplicate?: () => void;
 }
 
 function generateDates(start: string, end: string): string[] {
@@ -27,17 +37,26 @@ function generateDates(start: string, end: string): string[] {
   return dates;
 }
 
-export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }: TripDetailProps) {
+export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate, onDuplicate }: TripDetailProps) {
   const { t } = useTranslation();
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [actTitle, setActTitle] = useState('');
   const [actTime, setActTime] = useState('09:00');
   const [actLocation, setActLocation] = useState('');
+  const [actNotes, setActNotes] = useState('');
   const [actCost, setActCost] = useState(0);
+  const [editingActivity, setEditingActivity] = useState<{ date: string; actId: string } | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editTime, setEditTime] = useState('');
+  const [editLocation, setEditLocation] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [editCost, setEditCost] = useState(0);
+  const [exportCopied, setExportCopied] = useState(false);
   const [addingTicket, setAddingTicket] = useState(false);
   const [ticketType, setTicketType] = useState<Ticket['type']>('flight');
   const [ticketDesc, setTicketDesc] = useState('');
   const [ticketDate, setTicketDate] = useState(trip.startDate);
+  const [ticketCost, setTicketCost] = useState(0);
 
   const dates = generateDates(trip.startDate, trip.endDate);
 
@@ -55,10 +74,12 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
     return map;
   }, [trip.itinerary]);
 
-  const totalSpent = trip.itinerary.reduce(
+  const activitySpend = trip.itinerary.reduce(
     (sum, day) => sum + day.activities.reduce((s, a) => s + (a.cost || 0), 0),
     0,
   );
+  const ticketSpend = (trip.tickets || []).reduce((s, tk) => s + (tk.cost || 0), 0);
+  const totalSpent = activitySpend + ticketSpend;
 
   const handleAddActivity = useCallback((date: string) => {
     if (!actTitle.trim()) return;
@@ -67,7 +88,7 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
       time: actTime,
       title: actTitle.trim(),
       location: actLocation.trim(),
-      notes: '',
+      notes: actNotes.trim(),
       cost: actCost,
     };
 
@@ -84,9 +105,33 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
     onUpdate(trip.id, { itinerary: updated });
     setActTitle('');
     setActLocation('');
+    setActNotes('');
     setActCost(0);
     setAddingTo(null);
-  }, [actTitle, actTime, actLocation, actCost, trip, onUpdate]);
+  }, [actTitle, actTime, actLocation, actNotes, actCost, trip, onUpdate]);
+
+  const handleEditActivity = useCallback((date: string, actId: string) => {
+    if (!editTitle.trim()) return;
+    const updated = trip.itinerary.map(d => {
+      if (d.date !== date) return d;
+      const activities = d.activities
+        .map(a => a.id === actId ? { ...a, time: editTime, title: editTitle.trim(), location: editLocation.trim(), notes: editNotes.trim(), cost: editCost } : a)
+        .sort((a, b) => a.time.localeCompare(b.time));
+      return { ...d, activities };
+    });
+    onUpdate(trip.id, { itinerary: updated });
+    setEditingActivity(null);
+  }, [editTitle, editTime, editLocation, editNotes, editCost, trip, onUpdate]);
+
+  const handleStartEdit = useCallback((date: string, act: Activity) => {
+    setEditingActivity({ date, actId: act.id });
+    setEditTitle(act.title);
+    setEditTime(act.time);
+    setEditLocation(act.location);
+    setEditNotes(act.notes || '');
+    setEditCost(act.cost || 0);
+    setAddingTo(null);
+  }, []);
 
   const handleDeleteActivity = useCallback((date: string, activityId: string) => {
     const updated = trip.itinerary
@@ -102,15 +147,34 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
       type: ticketType,
       description: ticketDesc.trim(),
       date: ticketDate,
+      ...(ticketCost > 0 ? { cost: ticketCost } : {}),
     };
     onUpdate(trip.id, { tickets: [...(trip.tickets || []), ticket] });
     setTicketDesc('');
+    setTicketCost(0);
     setAddingTicket(false);
-  }, [ticketType, ticketDesc, ticketDate, trip, onUpdate]);
+  }, [ticketType, ticketDesc, ticketDate, ticketCost, trip, onUpdate]);
 
   const handleDeleteTicket = useCallback((ticketId: string) => {
     onUpdate(trip.id, { tickets: (trip.tickets || []).filter(t => t.id !== ticketId) });
   }, [trip, onUpdate]);
+
+  const handleExport = useCallback(async () => {
+    const text = formatTripExport(trip);
+    try {
+      await navigator.clipboard.writeText(text);
+      setExportCopied(true);
+      setTimeout(() => setExportCopied(false), 2000);
+    } catch {
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${trip.destination.replace(/[^a-z0-9]/gi, '-')}-itinerary.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  }, [trip]);
 
   const TICKET_ICONS: Record<Ticket['type'], string> = {
     flight: '\u2708',
@@ -128,8 +192,16 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
           <button type="button" onClick={onBack} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-2">
             &larr; {t('tripPlanner.back')}
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{trip.destination}</h2>
+            {(() => {
+              const s = trip.status || 'planning';
+              return (
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${TRIP_STATUS_COLORS[s]}`}>
+                  {t(`tripPlanner.status${s.charAt(0).toUpperCase() + s.slice(1)}`)}
+                </span>
+              );
+            })()}
             {trip.lat != null && trip.lon != null && (
               <button
                 type="button"
@@ -157,7 +229,25 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
             {new Date(trip.endDate).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleExport}
+            className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            aria-label={t('tripPlanner.export')}
+          >
+            {exportCopied ? t('tripPlanner.exportCopied') : t('tripPlanner.export')}
+          </button>
+          {onDuplicate && (
+            <button
+              type="button"
+              onClick={onDuplicate}
+              className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+              aria-label={t('tripPlanner.duplicate')}
+            >
+              {t('tripPlanner.duplicate')}
+            </button>
+          )}
           <button type="button" onClick={onEdit} className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
             {t('tripPlanner.edit')}
           </button>
@@ -194,6 +284,9 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
         <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">{trip.notes}</p>
       )}
 
+      {/* Checklist */}
+      <ChecklistSection trip={trip} onUpdate={onUpdate} />
+
       {/* Tickets */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -229,13 +322,23 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
                 className="w-36 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
-            <input
-              type="text"
-              value={ticketDesc}
-              onChange={e => setTicketDesc(e.target.value)}
-              placeholder={t('tripPlanner.ticketDescription')}
-              className="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={ticketDesc}
+                onChange={e => setTicketDesc(e.target.value)}
+                placeholder={t('tripPlanner.ticketDescription')}
+                className="flex-1 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+              />
+              <input
+                type="number"
+                value={ticketCost || ''}
+                onChange={e => setTicketCost(Number(e.target.value) || 0)}
+                placeholder={t('tripPlanner.ticketCost')}
+                className="w-24 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                min="0"
+              />
+            </div>
             <div className="flex justify-end gap-2">
               <button type="button" onClick={() => setAddingTicket(false)} className="px-3 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400">
                 {t('tripPlanner.cancel')}
@@ -261,6 +364,7 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
                   <p className="text-sm font-medium text-gray-800 dark:text-white truncate">{ticket.description}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">
                     {new Date(ticket.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                    {ticket.cost && ticket.cost > 0 ? ` · ${trip.currency} ${ticket.cost}` : ''}
                   </p>
                 </div>
                 <button
@@ -307,27 +411,105 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
                 {day && day.activities.length > 0 && (
                   <ul className="divide-y divide-gray-100 dark:divide-gray-700">
                     {day.activities.map(act => (
-                      <li key={act.id} className="flex items-center gap-3 px-4 py-2.5">
-                        <span className="text-xs text-gray-400 dark:text-gray-500 w-12 flex-shrink-0">{act.time}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 dark:text-white truncate">{act.title}</p>
-                          {act.location && (
-                            <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{act.location}</p>
-                          )}
-                        </div>
-                        {act.cost > 0 && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">{trip.currency} {act.cost}</span>
+                      <li key={act.id}>
+                        {editingActivity?.actId === act.id && editingActivity.date === date ? (
+                          <div className="p-3 bg-gray-50 dark:bg-gray-800 space-y-2">
+                            <div className="flex gap-2">
+                              <input
+                                type="time"
+                                value={editTime}
+                                onChange={e => setEditTime(e.target.value)}
+                                className="w-24 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                              />
+                              <input
+                                type="text"
+                                value={editTitle}
+                                onChange={e => setEditTitle(e.target.value)}
+                                placeholder={t('tripPlanner.activityTitle')}
+                                className="flex-1 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={editLocation}
+                                onChange={e => setEditLocation(e.target.value)}
+                                placeholder={t('tripPlanner.location')}
+                                className="flex-1 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                              />
+                              <input
+                                type="number"
+                                value={editCost || ''}
+                                onChange={e => setEditCost(Number(e.target.value) || 0)}
+                                placeholder={t('tripPlanner.cost')}
+                                className="w-24 px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                                min="0"
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              value={editNotes}
+                              onChange={e => setEditNotes(e.target.value)}
+                              placeholder={t('tripPlanner.activityNotes')}
+                              className="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                            />
+                            <div className="flex justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setEditingActivity(null)}
+                                className="px-3 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                                aria-label={t('tripPlanner.cancel')}
+                              >
+                                {t('tripPlanner.cancel')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleEditActivity(date, act.id)}
+                                disabled={!editTitle.trim()}
+                                className="px-3 py-1 text-xs bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-400 text-white rounded transition"
+                                aria-label={t('tripPlanner.save')}
+                              >
+                                {t('tripPlanner.save')}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3 px-4 py-2.5">
+                            <span className="text-xs text-gray-400 dark:text-gray-500 w-12 flex-shrink-0">{act.time}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-800 dark:text-white truncate">{act.title}</p>
+                              {act.location && (
+                                <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{act.location}</p>
+                              )}
+                              {act.notes && (
+                                <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{act.notes}</p>
+                              )}
+                            </div>
+                            {act.cost > 0 && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{trip.currency} {act.cost}</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleStartEdit(date, act)}
+                              className="p-2 text-gray-300 dark:text-gray-600 hover:text-cyan-500 dark:hover:text-cyan-400 transition"
+                              aria-label={t('tripPlanner.edit')}
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteActivity(date, act.id)}
+                              className="p-2 text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition"
+                              aria-label={t('tripPlanner.deleteActivity')}
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteActivity(date, act.id)}
-                          className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition"
-                          aria-label={t('tripPlanner.deleteActivity')}
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
                       </li>
                     ))}
                   </ul>
@@ -368,6 +550,13 @@ export default function TripDetail({ trip, onEdit, onDelete, onBack, onUpdate }:
                         min="0"
                       />
                     </div>
+                    <input
+                      type="text"
+                      value={actNotes}
+                      onChange={e => setActNotes(e.target.value)}
+                      placeholder={t('tripPlanner.activityNotes')}
+                      className="w-full px-2 py-1.5 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                    />
                     <div className="flex justify-end gap-2">
                       <button type="button" onClick={() => setAddingTo(null)} className="px-3 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400">
                         {t('tripPlanner.cancel')}

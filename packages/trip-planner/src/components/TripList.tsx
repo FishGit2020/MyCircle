@@ -1,5 +1,12 @@
 import { useTranslation } from '@mycircle/shared';
-import type { Trip } from '../types';
+import type { Trip, TripStatus } from '../types';
+
+const TRIP_STATUS_COLORS: Record<TripStatus, string> = {
+  planning: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+  confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+  completed: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
+  cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400',
+};
 
 interface TripListProps {
   trips: Trip[];
@@ -64,12 +71,13 @@ export default function TripList({ trips, onSelect, onDelete: _onDelete }: TripL
           past: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
         };
 
+        const tripStatus = trip.status || 'planning';
         return (
           <button
             key={trip.id}
             type="button"
             onClick={() => onSelect(trip)}
-            className="w-full text-left p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md hover:border-cyan-300 dark:hover:border-cyan-600 transition-all"
+            className={`w-full text-left p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md hover:border-cyan-300 dark:hover:border-cyan-600 transition-all${tripStatus === 'completed' || tripStatus === 'cancelled' ? ' opacity-70' : ''}`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
@@ -82,6 +90,9 @@ export default function TripList({ trips, onSelect, onDelete: _onDelete }: TripL
                 )}
               </div>
               <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${TRIP_STATUS_COLORS[tripStatus]}`}>
+                  {t(`tripPlanner.status${tripStatus.charAt(0).toUpperCase() + tripStatus.slice(1)}`)}
+                </span>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[status]}`}>
                   {status === 'upcoming' && daysUntil > 0
                     ? t('tripPlanner.daysUntil').replace('{days}', String(daysUntil))
