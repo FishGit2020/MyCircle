@@ -573,6 +573,7 @@ export type Mutation = {
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
   boostAtsScore: GeneratedResumeResult;
+  cancelBookConversion: Scalars['Boolean']['output'];
   createDailyLog: DailyLogEntry;
   createFolder: Folder;
   createInterviewQuestion: InterviewQuestion;
@@ -654,6 +655,11 @@ export type MutationBoostAtsScoreArgs = {
   jdText: Scalars['String']['input'];
   model: Scalars['String']['input'];
   resumeJson: Scalars['String']['input'];
+};
+
+
+export type MutationCancelBookConversionArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -2431,6 +2437,13 @@ export type ResetBookConversionMutationVariables = Exact<{
 
 
 export type ResetBookConversionMutation = { __typename?: 'Mutation', resetBookConversion: boolean };
+
+export type CancelBookConversionMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type CancelBookConversionMutation = { __typename?: 'Mutation', cancelBookConversion: boolean };
 
 export type PreviewVoiceMutationVariables = Exact<{
   voiceName: Scalars['String']['input'];

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation, createLogger, WindowEvents, useLazyQuery, useMutation, GET_BOOK_CONVERSION_PROGRESS, RESET_BOOK_CONVERSION, PREVIEW_VOICE } from '@mycircle/shared';
+import { useTranslation, createLogger, WindowEvents, useLazyQuery, useMutation, GET_BOOK_CONVERSION_PROGRESS, RESET_BOOK_CONVERSION, CANCEL_BOOK_CONVERSION, PREVIEW_VOICE } from '@mycircle/shared';
 
 const logger = createLogger('ConversionStatus');
 
@@ -39,12 +39,14 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const [selectedVoice, setSelectedVoice] = useState(getDefaultVoice(language));
   const [checking, setChecking] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const langCode = getLangCode(language);
   const voiceOptions = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
 
   const [fetchConversionProgress] = useLazyQuery(GET_BOOK_CONVERSION_PROGRESS, { fetchPolicy: 'network-only' });
   const [resetMutation] = useMutation(RESET_BOOK_CONVERSION);
+  const [cancelMutation] = useMutation(CANCEL_BOOK_CONVERSION);
   const [previewMutation] = useMutation(PREVIEW_VOICE);
 
   const checkStatus = useCallback(async () => {
@@ -64,6 +66,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         setStatus('paused');
         setProgress(prog.audioProgress || 0);
       } else if (prog.audioStatus === 'processing') {
+        setStatus('processing');
         setProgress(prog.audioProgress || 0);
       }
     } catch (err) {
@@ -117,6 +120,20 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [onConvert, selectedVoice, t]);
 
+  const handleCancel = useCallback(async () => {
+    setCancelling(true);
+    try {
+      await cancelMutation({ variables: { bookId } });
+      setStatus('none');
+      setProgress(0);
+      setError(null);
+    } catch (err) {
+      if (!isAbortError(err)) logger.error('Cancel conversion failed', err);
+    } finally {
+      setCancelling(false);
+    }
+  }, [bookId, cancelMutation]);
+
   const handleReset = useCallback(async () => {
     setResetting(true);
     try {
@@ -140,7 +157,18 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     }
   }, [status, converting, handleConvert]);
 
-  const resetButton = (status === 'processing' || status === 'paused' || status === 'error') ? (
+  const cancelButton = (status === 'processing' || status === 'paused') ? (
+    <button
+      type="button"
+      onClick={handleCancel}
+      disabled={cancelling}
+      className="text-xs text-orange-600 dark:text-orange-400 hover:underline min-h-[44px] disabled:opacity-50"
+    >
+      {cancelling ? t('library.cancelling') : t('library.cancelConversion')}
+    </button>
+  ) : null;
+
+  const resetButton = status === 'error' ? (
     <button
       type="button"
       onClick={handleReset}
@@ -262,7 +290,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           >
             {checking ? t('library.converting') : t('library.convertingRefresh')}
           </button>
-          {resetButton}
+          {cancelButton}
         </div>
       </div>
     );
@@ -284,7 +312,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           </div>
         )}
         <p className="text-xs text-gray-500 dark:text-gray-400">{t('library.autoContinueHint')}</p>
-        {resetButton}
+        {cancelButton}
       </div>
     );
   }
