@@ -25,9 +25,6 @@ vi.mock('./BenchmarkRunner', () => ({
     </div>
   ),
 }));
-vi.mock('./EndpointManager', () => ({
-  default: () => <div data-testid="endpoint-manager">EndpointManager</div>,
-}));
 vi.mock('./ResultsDashboard', () => ({
   default: () => <div data-testid="results-dashboard">ResultsDashboard</div>,
 }));
@@ -56,22 +53,12 @@ describe('ModelBenchmark', () => {
     render(<MemoryRouter><ModelBenchmark /></MemoryRouter>);
     expect(screen.getByText('benchmark.title')).toBeInTheDocument();
     expect(screen.getByText('benchmark.tabs.run')).toBeInTheDocument();
-    expect(screen.getByText('benchmark.tabs.endpoints')).toBeInTheDocument();
     expect(screen.getByText('benchmark.tabs.results')).toBeInTheDocument();
     expect(screen.getByText('benchmark.tabs.history')).toBeInTheDocument();
   });
 
   it('shows the runner tab by default', () => {
     render(<MemoryRouter><ModelBenchmark /></MemoryRouter>);
-    expect(screen.getByTestId('benchmark-runner')).toBeInTheDocument();
-  });
-
-  it('keeps runner mounted when switching to endpoints tab', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<MemoryRouter><ModelBenchmark /></MemoryRouter>);
-    await user.click(screen.getByText('benchmark.tabs.endpoints'));
-    expect(screen.getByTestId('endpoint-manager')).toBeInTheDocument();
-    // Runner should still be in the DOM (hidden)
     expect(screen.getByTestId('benchmark-runner')).toBeInTheDocument();
   });
 
@@ -86,8 +73,8 @@ describe('ModelBenchmark', () => {
     render(<MemoryRouter><ModelBenchmark /></MemoryRouter>);
     const runTab = screen.getByText('benchmark.tabs.run');
     expect(runTab).toHaveAttribute('aria-selected', 'true');
-    const endpointTab = screen.getByText('benchmark.tabs.endpoints');
-    expect(endpointTab).toHaveAttribute('aria-selected', 'false');
+    const resultsTab = screen.getByText('benchmark.tabs.results');
+    expect(resultsTab).toHaveAttribute('aria-selected', 'false');
   });
 
   it('reads tab from URL search params', () => {

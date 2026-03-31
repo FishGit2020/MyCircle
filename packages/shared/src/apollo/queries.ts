@@ -1703,3 +1703,169 @@ export const DELETE_RESUME_APPLICATION = gql`
     deleteResumeApplication(id: $id)
   }
 `;
+
+// ─── SQL Analytics ──────────────────────────────────────────────
+
+export const GET_SQL_CONNECTION_STATUS = gql`
+  query GetSqlConnectionStatus {
+    sqlConnectionStatus {
+      tunnelUrl
+      dbName
+      status
+      lastTestedAt
+      hasCredentials
+    }
+  }
+`;
+
+export const SAVE_SQL_CONNECTION = gql`
+  mutation SaveSqlConnection($input: SqlConnectionInput!) {
+    saveSqlConnection(input: $input) {
+      tunnelUrl
+      dbName
+      status
+      lastTestedAt
+      hasCredentials
+    }
+  }
+`;
+
+export const TEST_SQL_CONNECTION = gql`
+  mutation TestSqlConnection {
+    testSqlConnection {
+      tunnelUrl
+      dbName
+      status
+      lastTestedAt
+      hasCredentials
+    }
+  }
+`;
+
+export const DELETE_SQL_CONNECTION = gql`
+  mutation DeleteSqlConnection {
+    deleteSqlConnection
+  }
+`;
+
+export const GET_SQL_BACKFILL_STATUS = gql`
+  query GetSqlBackfillStatus {
+    sqlBackfillStatus {
+      status
+      totalMigrated
+      totalErrors
+      startedAt
+      completedAt
+      error
+    }
+  }
+`;
+
+export const START_SQL_BACKFILL = gql`
+  mutation StartSqlBackfill {
+    startSqlBackfill {
+      status
+      totalMigrated
+      totalErrors
+      startedAt
+      completedAt
+      error
+    }
+  }
+`;
+
+export const GET_SQL_ANALYTICS_SUMMARY = gql`
+  query GetSqlAnalyticsSummary($days: Int) {
+    sqlAnalyticsSummary(days: $days) {
+      totalCalls
+      totalInputTokens
+      totalOutputTokens
+      totalCost
+      providerBreakdown {
+        provider
+        calls
+        tokens
+        avgLatencyMs
+        errorRate
+      }
+      modelBreakdown {
+        model
+        provider
+        calls
+        tokens
+        avgLatencyMs
+        estimatedCost
+      }
+      dailyBreakdown {
+        date
+        calls
+        tokens
+        avgLatencyMs
+        errors
+      }
+      since
+    }
+  }
+`;
+
+export const GET_SQL_LATENCY_PERCENTILES = gql`
+  query GetSqlLatencyPercentiles($days: Int) {
+    sqlLatencyPercentiles(days: $days) {
+      provider
+      model
+      p50
+      p90
+      p99
+      sampleSize
+    }
+  }
+`;
+
+export const GET_SQL_TOOL_USAGE_STATS = gql`
+  query GetSqlToolUsageStats($days: Int) {
+    sqlToolUsageStats(days: $days) {
+      toolName
+      callCount
+      avgDurationMs
+      errorRate
+    }
+  }
+`;
+
+export const GET_SQL_TOOL_CO_OCCURRENCES = gql`
+  query GetSqlToolCoOccurrences($days: Int, $minCount: Int) {
+    sqlToolCoOccurrences(days: $days, minCount: $minCount) {
+      toolA
+      toolB
+      coOccurrences
+    }
+  }
+`;
+
+export const GET_SQL_BENCHMARK_TRENDS = gql`
+  query GetSqlBenchmarkTrends($weeks: Int) {
+    sqlBenchmarkTrends(weeks: $weeks) {
+      endpointName
+      model
+      week
+      avgTps
+      avgTtft
+      sampleSize
+    }
+  }
+`;
+
+export const SQL_CHAT_SEARCH = gql`
+  query SqlChatSearch($query: String!, $limit: Int) {
+    sqlChatSearch(query: $query, limit: $limit) {
+      id
+      timestamp
+      provider
+      model
+      questionPreview
+      answerPreview
+      latencyMs
+      totalTokens
+    }
+  }
+`;

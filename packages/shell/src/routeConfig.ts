@@ -30,5 +30,6 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   deals: 'nav.dealFinder',
   'web-crawler': 'nav.webCrawler',
   resume: 'nav.resumeTailor',
+  setup: 'nav.setup',
   trash: 'nav.recycleBin',
 };

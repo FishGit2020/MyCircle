@@ -177,3 +177,8 @@ declare module 'resumeTailor/ResumeTailor' {
   const ResumeTailor: React.ComponentType;
   export default ResumeTailor;
 }
+
+declare module 'setup/Setup' {
+  const Setup: React.ComponentType;
+  export default Setup;
+}

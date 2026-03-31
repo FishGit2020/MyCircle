@@ -1,5 +1,7 @@
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
+import { getCachedSqlConfig, createSqlClient } from './sqlClient';
+import { logChatToSql } from './sqlWriter';
 
 export interface AiToolCallTiming {
   name: string;
@@ -42,16 +44,35 @@ export function truncate(text: string, max: number): string {
 export function logAiChatInteraction(entry: AiChatLogEntry): void {
   try {
     const db = getFirestore();
-    db.collection('aiChatLogs').add({
+    const data = {
       ...entry,
       questionPreview: truncate(entry.questionPreview, 200),
       answerPreview: truncate(entry.answerPreview, 500),
       fullQuestion: truncate(entry.fullQuestion || '', 5000),
       fullAnswer: truncate(entry.fullAnswer || '', 10000),
       timestamp: FieldValue.serverTimestamp(),
-    }).catch((err) => {
-      logger.warn('Failed to log AI chat interaction', { error: String(err) });
-    });
+    };
+
+    db.collection('aiChatLogs').add(data)
+      .then(async (ref) => {
+        // SQL dual-write (fire-and-forget)
+        try {
+          const config = await getCachedSqlConfig(entry.userId);
+          if (config && config.status === 'connected') {
+            const client = await createSqlClient(config);
+            try {
+              await logChatToSql(client, entry, ref.id);
+            } finally {
+              try { await client.end(); } catch { /* ignore */ }
+            }
+          }
+        } catch (sqlErr) {
+          logger.warn('SQL dual-write failed', { error: String(sqlErr) });
+        }
+      })
+      .catch((err) => {
+        logger.warn('Failed to log AI chat interaction', { error: String(err) });
+      });
   } catch (err) {
     logger.warn('Failed to log AI chat interaction', { error: String(err) });
   }

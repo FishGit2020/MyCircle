@@ -52,6 +52,7 @@ export default defineConfig({
       'dealFinder/DealFinder': resolve(__dirname, './test/mocks/DealFinderMock.tsx'),
       'webCrawler/WebCrawler': resolve(__dirname, './test/mocks/WebCrawlerMock.tsx'),
       'resumeTailor/ResumeTailor': resolve(__dirname, './test/mocks/ResumeTailorMock.tsx'),
+      'setup/Setup': resolve(__dirname, './test/mocks/SetupMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }
