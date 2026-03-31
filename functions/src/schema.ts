@@ -1178,7 +1178,6 @@ export const typeDefs = `#graphql
 
   type SqlConnectionStatus {
     tunnelUrl: String!
-    dbName: String!
     status: String!
     lastTestedAt: String
     hasCredentials: Boolean!
@@ -1273,9 +1272,7 @@ export const typeDefs = `#graphql
 
   input SqlConnectionInput {
     tunnelUrl: String!
-    dbName: String
-    username: String
-    password: String
+    apiKey: String
   }
 
   type Mutation {

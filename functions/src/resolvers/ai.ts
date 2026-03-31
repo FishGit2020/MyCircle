@@ -251,13 +251,9 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
       try {
         const sqlConfig = await getCachedSqlConfig(uid);
         if (sqlConfig && sqlConfig.status === 'connected') {
-          const sqlClient = await createSqlClient(sqlConfig);
-          try {
-            for (const r of (results as any[])) {
-              await logBenchmarkToSql(sqlClient, r, ref.id, uid);
-            }
-          } finally {
-            try { await sqlClient.end(); } catch { /* ignore */ }
+          const sqlClient = createSqlClient(sqlConfig);
+          for (const r of (results as any[])) {
+            await logBenchmarkToSql(sqlClient, r, ref.id, uid);
           }
         }
       } catch (sqlErr) {

@@ -1,266 +1,219 @@
 # SQL Analytics Setup
 
-Guide to setting up the SQL analytics layer for MyCircle — PostgreSQL database, Cloudflare tunnel, and the Setup page configuration.
+Guide to setting up the SQL analytics layer for MyCircle — PostgreSQL database, HTTP proxy, Cloudflare tunnel, and the Setup page configuration.
 
 ## Overview
 
 MyCircle can optionally mirror AI chat logs and benchmark results to an external PostgreSQL database for advanced analytics (percentile latency, tool co-occurrence, cost tracking, full-text search). Firestore remains the primary data store — SQL is a supplementary 2nd source.
 
 ```
-MyCircle Cloud Functions
+MyCircle Cloud Functions (HTTP POST to /query)
     ├── Firestore (primary, real-time)
-    └── PostgreSQL (supplementary, via Cloudflare tunnel)
-           ↑
-     Cloudflare Tunnel
-           ↑
-     Docker container (your machine)
-           ↑
-     PostgreSQL (Docker)
+    └── Cloudflare Tunnel (HTTPS)
+           ↓
+     sql-proxy (Express, port 3080)
+           ↓
+     PostgreSQL (port 5432, internal only)
 ```
 
-## Prerequisites
+Cloud Functions communicate with PostgreSQL via a lightweight HTTP proxy (`sql-proxy`). This works through any Cloudflare tunnel — including the free quick tunnel that requires no account.
 
-- Docker installed on your machine
-- A Cloudflare account (free tier works)
-- `cloudflared` CLI or Docker image
+## Quick Start (Docker Compose)
 
-## Step 1: Start PostgreSQL with Docker
+> **Ready-to-use file**: [`deploy/sql-proxy/docker-compose.yml`](../deploy/sql-proxy/docker-compose.yml)
+
+**1. Edit secrets**
 
 ```bash
-docker run -d \
-  --name mycircle-postgres \
-  -e POSTGRES_DB=mycircle \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=your-secure-password \
-  -p 5432:5432 \
-  -v mycircle-pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
+cd deploy/sql-proxy
+# Edit docker-compose.yml — change POSTGRES_PASSWORD and API_KEY
 ```
 
-Verify it's running:
-
-```bash
-docker exec mycircle-postgres psql -U postgres -d mycircle -c "SELECT 1"
-```
-
-## Step 2: Set Up Cloudflare Tunnel
-
-### Option A: Using `cloudflared` Docker container (recommended)
-
-```bash
-# Create a tunnel (one-time setup)
-docker run -it --rm \
-  -v cloudflared-config:/etc/cloudflared \
-  cloudflare/cloudflared:latest \
-  tunnel login
-
-# Create the tunnel
-docker run -it --rm \
-  -v cloudflared-config:/etc/cloudflared \
-  cloudflare/cloudflared:latest \
-  tunnel create mycircle-sql
-
-# Note the tunnel ID from the output (e.g., abc123-def456-...)
-```
-
-### Configure the tunnel
-
-Create a config file at the cloudflared volume or bind-mount:
-
-```yaml
-# config.yml
-tunnel: <your-tunnel-id>
-credentials-file: /etc/cloudflared/<tunnel-id>.json
-
-ingress:
-  - hostname: sql.yourdomain.com
-    service: tcp://host.docker.internal:5432
-  - service: http_status:404
-```
-
-### Add DNS record
-
-```bash
-docker run --rm \
-  -v cloudflared-config:/etc/cloudflared \
-  cloudflare/cloudflared:latest \
-  tunnel route dns mycircle-sql sql.yourdomain.com
-```
-
-### Run the tunnel
-
-```bash
-docker run -d \
-  --name mycircle-tunnel \
-  --restart unless-stopped \
-  -v cloudflared-config:/etc/cloudflared \
-  cloudflare/cloudflared:latest \
-  tunnel run mycircle-sql
-```
-
-### Option B: Using `cloudflared` CLI directly
-
-```bash
-# Install cloudflared
-# macOS: brew install cloudflared
-# Windows: winget install Cloudflare.cloudflared
-# Linux: see https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/
-
-cloudflared tunnel login
-cloudflared tunnel create mycircle-sql
-cloudflared tunnel route dns mycircle-sql sql.yourdomain.com
-
-# Create config.yml in ~/.cloudflared/
-# Then run:
-cloudflared tunnel run mycircle-sql
-```
-
-### Option C: Docker Compose (both services together)
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: mycircle
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your-secure-password
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel run mycircle-sql
-    volumes:
-      - ./cloudflared:/etc/cloudflared
-    depends_on:
-      - postgres
-    restart: unless-stopped
-
-volumes:
-  pgdata:
-```
+**2. Start everything**
 
 ```bash
 docker compose up -d
 ```
 
-## Step 3: Configure in MyCircle
+This starts 3 containers:
+- `postgres` — PostgreSQL 16 database
+- `sql-proxy` — HTTP-to-SQL proxy (Express)
+- `cloudflared` — Cloudflare tunnel (free, no account needed)
 
-1. Open MyCircle in your browser
-2. Click your **profile avatar** (top right) to open the user menu
-3. Click **Setup**
-4. In the **SQL Connection** tab:
-   - **Tunnel URL**: Enter your Cloudflare tunnel URL (e.g., `https://sql.yourdomain.com`)
-   - **Database Name**: `mycircle` (or whatever you set in POSTGRES_DB)
-   - **Username**: `postgres`
-   - **Password**: The password you set in POSTGRES_PASSWORD
-5. Click **Save & Test**
-6. You should see a green "Connected" status
+**3. Get the tunnel URL**
 
-The app automatically creates the required tables (`ai_chat_logs`, `ai_tool_calls`, `benchmark_results`, `feature_events`) on first successful connection.
+```bash
+docker compose logs cloudflared 2>&1 | grep trycloudflare.com
+```
 
-## Step 4: Import Historical Data (Optional)
+You'll see something like: `https://random-words-here.trycloudflare.com`
+
+**4. Configure in MyCircle**
+
+1. Open MyCircle → click your **avatar** (top right) → **Setup**
+2. **SQL Connection** tab:
+   - **Tunnel URL**: paste the `trycloudflare.com` URL from step 3
+   - **API Key**: the `API_KEY` value from your docker-compose.yml
+3. Click **Save & Test**
+4. You should see a green "Connected" status
+
+Tables are created automatically on first successful connection.
+
+## Architecture
+
+### Why an HTTP proxy?
+
+Cloudflare tunnels expose HTTP/HTTPS endpoints. PostgreSQL uses a raw TCP wire protocol that doesn't work through HTTP tunnels. The `sql-proxy` bridges this gap — it accepts HTTP POST requests with SQL queries and forwards them to PostgreSQL internally.
+
+### Components
+
+| Component | Image | Port | Purpose |
+|-----------|-------|------|---------|
+| `postgres` | `postgres:16-alpine` | 5432 (internal) | Database — not exposed to the internet |
+| `sql-proxy` | Custom Node.js | 3080 (internal) | HTTP → SQL bridge, API key auth |
+| `cloudflared` | `cloudflare/cloudflared` | — | Exposes sql-proxy as HTTPS endpoint |
+
+### Security
+
+- PostgreSQL is **never exposed** to the internet — only accessible within the Docker network
+- `sql-proxy` requires an **API key** header (`X-API-Key`) on all `/query` requests
+- The `/health` endpoint is unauthenticated (used for connection testing)
+- Cloudflare tunnel provides HTTPS encryption in transit
+
+## Manual Setup (Without Docker Compose)
+
+### 1. Start PostgreSQL
+
+```bash
+docker run -d \
+  --name mycircle-postgres \
+  --network mycircle-sql \
+  -e POSTGRES_DB=mycircle \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=changeme \
+  -v mycircle-pgdata:/var/lib/postgresql/data \
+  postgres:16-alpine
+```
+
+### 2. Build and start the proxy
+
+```bash
+cd deploy/sql-proxy
+docker build -t mycircle-sql-proxy .
+docker run -d \
+  --name mycircle-sql-proxy \
+  --network mycircle-sql \
+  -e DATABASE_URL=postgres://postgres:changeme@mycircle-postgres:5432/mycircle \
+  -e API_KEY=your-secret-key \
+  -p 3080:3080 \
+  mycircle-sql-proxy
+```
+
+### 3. Start Cloudflare tunnel
+
+```bash
+docker run -d \
+  --name mycircle-tunnel \
+  --network mycircle-sql \
+  cloudflare/cloudflared:latest \
+  tunnel --url http://mycircle-sql-proxy:3080
+```
+
+### 4. Get URL and configure
+
+```bash
+docker logs mycircle-tunnel 2>&1 | grep trycloudflare.com
+```
+
+Enter the URL + API key in MyCircle Setup page.
+
+## Import Historical Data (Optional)
 
 1. Go to Setup > **Import History** tab
 2. Click **Import History**
-3. Watch the progress indicator as existing Firestore chat logs and benchmark results are migrated
-4. If interrupted, click **Resume Import** to continue from where it stopped
+3. Watch the progress indicator
+4. If interrupted, click **Resume Import** to continue
 
-## Step 5: Configure AI Endpoints
+## AI Endpoints
 
 The Setup page also centralizes AI endpoint management:
 
 1. Go to Setup > **AI Endpoints** tab
-2. Add your Ollama endpoint(s) here (URL, name, optional Cloudflare Access credentials)
-3. Endpoints configured here are available across **AI Chat**, **AI Interviewer**, and **Model Benchmark**
+2. Add Ollama endpoint(s) here
+3. Available across AI Chat, AI Interviewer, and Model Benchmark
 
-## Using the Analytics Dashboard
+## Analytics Dashboard
 
-Once data is flowing (either via backfill or new AI chat interactions):
+Once data is flowing:
 
-1. Go to Setup > **Analytics** tab
-2. View:
-   - **Usage Summary**: Total calls, tokens, provider/model breakdowns, daily chart
-   - **Cost Breakdown**: Estimated costs by model (configurable rates)
-   - **Latency Percentiles**: P50/P90/P99 by provider and model
-   - **Tool Usage**: Most-used tools and co-occurrence patterns
-   - **Benchmark Trends**: Weekly TPS and TTFT trends per endpoint/model
+1. Setup > **Analytics** tab
+2. View: Usage Summary, Cost Breakdown, Latency Percentiles (P50/P90/P99), Tool Usage, Benchmark Trends
 
 ## Chat History Search
 
-1. Go to Setup > **Chat Search** tab
-2. Type a keyword to search across all past AI conversations
-3. Results show matching conversations with highlighted context
+1. Setup > **Chat Search** tab
+2. Search by keyword across all past AI conversations
 
 ## How Dual-Write Works
 
-When SQL is configured:
-- Every AI chat interaction is written to both Firestore **and** SQL
-- Every benchmark result is written to both Firestore **and** SQL
-- SQL writes are **fire-and-forget** — if the tunnel is down, AI chat works normally
-- Firestore remains the source of truth for the live app
-
-When SQL is NOT configured:
-- Everything works exactly as before — zero impact on existing features
+- Every AI chat/benchmark is written to Firestore **and** SQL (via HTTP to the proxy)
+- SQL writes are **fire-and-forget** — if the tunnel is down, everything works normally
+- When SQL is not configured, zero impact on existing features
 
 ## Troubleshooting
 
 ### "Connection Error" on Save & Test
 
-- Verify your Docker containers are running: `docker ps`
-- Check the tunnel is active: `docker logs mycircle-tunnel`
-- Verify PostgreSQL accepts connections: `docker exec mycircle-postgres pg_isready`
-- Check the tunnel URL is correct (include `https://`)
+```bash
+# Check all containers are running
+docker compose ps
 
-### Tunnel is running but connection fails
+# Check proxy logs
+docker compose logs sql-proxy
 
-- Ensure the tunnel config routes to the correct PostgreSQL port (5432)
-- If using Docker-to-Docker, use `host.docker.internal` instead of `localhost`
-- Check Cloudflare DNS records point to the tunnel
+# Test proxy directly
+curl http://localhost:3080/health
+```
+
+### Tunnel URL changes on restart
+
+The free quick tunnel generates a new random URL each restart. For a persistent URL, use a named Cloudflare tunnel (requires free account):
+
+```bash
+cloudflared tunnel login
+cloudflared tunnel create mycircle-sql
+cloudflared tunnel route dns mycircle-sql sql.yourdomain.com
+```
+
+Then update docker-compose.yml to use `tunnel run mycircle-sql` instead of `tunnel --url`.
 
 ### Backfill stuck or errored
 
-- Check the Setup > Import History tab for the error message
-- Click **Resume Import** to continue from the last checkpoint
-- If the database is full, check disk space on the PostgreSQL volume
+Check Setup > Import History for the error. Click **Resume Import** to continue from the last checkpoint.
 
-### Analytics show no data
+### 401 Unauthorized from proxy
 
-- Verify the SQL connection shows "Connected" on the Setup page
-- Send a test AI chat message, then check the Analytics tab
-- If you just configured SQL, run Import History to backfill existing data
-
-## SQL Schema
-
-The app creates these tables automatically:
-
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `ai_chat_logs` | AI chat interactions | provider, model, tokens, latency, question/answer text |
-| `ai_tool_calls` | Tool invocations per chat | tool_name, duration_ms, error |
-| `benchmark_results` | Benchmark run results | endpoint, model, TPS, TTFT, quality score |
-| `feature_events` | Generic events (future) | feature, action, metadata |
+Check that the API key in MyCircle Setup matches the `API_KEY` in docker-compose.yml exactly.
 
 ## Stopping / Removing
 
 ```bash
-# Stop the tunnel and database
-docker stop mycircle-tunnel mycircle-postgres
+# Stop
+docker compose down
 
-# Remove containers (data persists in volumes)
-docker rm mycircle-tunnel mycircle-postgres
-
-# Remove data volumes (DESTRUCTIVE — deletes all SQL data)
-docker volume rm mycircle-pgdata cloudflared-config
+# Remove data too (DESTRUCTIVE)
+docker compose down -v
 ```
 
-To disconnect from MyCircle without stopping Docker:
-1. Go to Setup > SQL Connection
-2. Click **Remove Connection**
+To disconnect from MyCircle without stopping Docker: Setup > SQL Connection > **Remove Connection**.
 
-This removes the connection config but does NOT delete data in the database.
+## SQL Schema
+
+Created automatically on first connection:
+
+| Table | Purpose |
+|-------|---------|
+| `ai_chat_logs` | AI chat interactions (provider, model, tokens, latency, text) |
+| `ai_tool_calls` | Tool invocations per chat (name, duration, error) |
+| `benchmark_results` | Benchmark results (endpoint, model, TPS, TTFT, quality) |
+| `feature_events` | Generic events (future use) |

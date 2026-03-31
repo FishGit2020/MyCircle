@@ -1,13 +1,32 @@
 import { getFirestore } from 'firebase-admin/firestore';
-import { Client } from 'pg';
 
 export interface SqlConnectionConfig {
   tunnelUrl: string;
-  dbName: string;
-  username?: string;
-  password?: string;
+  apiKey?: string;
   status: string;
   lastTestedAt?: string;
+}
+
+export class SqlProxyClient {
+  constructor(private baseUrl: string, private apiKey: string) {}
+
+  async query(sql: string, params: any[] = []): Promise<{ rows: any[]; rowCount: number }> {
+    const resp = await fetch(`${this.baseUrl}/query`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this.apiKey,
+      },
+      body: JSON.stringify({ sql, params }),
+    });
+    if (!resp.ok) {
+      const body = await resp.text();
+      let msg: string;
+      try { msg = JSON.parse(body).error || body; } catch { msg = body; }
+      throw new Error(`SQL proxy error (${resp.status}): ${msg}`);
+    }
+    return resp.json();
+  }
 }
 
 // In-memory cache for connection configs (60s TTL)
@@ -29,34 +48,26 @@ export function clearSqlConfigCache(uid: string): void {
   configCache.delete(uid);
 }
 
-export async function createSqlClient(config: SqlConnectionConfig): Promise<Client> {
-  // Parse the tunnel URL to extract host/port
-  const url = new URL(config.tunnelUrl);
-  const client = new Client({
-    host: url.hostname,
-    port: url.port ? parseInt(url.port, 10) : 5432,
-    database: config.dbName || 'mycircle',
-    user: config.username || 'postgres',
-    password: config.password || undefined,
-    ssl: url.protocol === 'https:' ? { rejectUnauthorized: false } : undefined,
-    connectionTimeoutMillis: 10_000,
-  });
-  await client.connect();
-  return client;
+export function createSqlClient(config: SqlConnectionConfig): SqlProxyClient {
+  const baseUrl = config.tunnelUrl.replace(/\/+$/, '');
+  return new SqlProxyClient(baseUrl, config.apiKey || '');
 }
 
 export async function testSqlConnection(config: SqlConnectionConfig): Promise<{ ok: boolean; error?: string }> {
-  let client: Client | null = null;
   try {
-    client = await createSqlClient(config);
-    await client.query('SELECT 1');
-    return { ok: true };
+    const baseUrl = config.tunnelUrl.replace(/\/+$/, '');
+    const resp = await fetch(`${baseUrl}/health`, {
+      headers: config.apiKey ? { 'X-API-Key': config.apiKey } : {},
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!resp.ok) {
+      const body = await resp.text();
+      return { ok: false, error: `HTTP ${resp.status}: ${body}` };
+    }
+    const data = await resp.json();
+    return { ok: data.ok === true, error: data.error };
   } catch (err: any) {
     return { ok: false, error: err.message || String(err) };
-  } finally {
-    if (client) {
-      try { await client.end(); } catch { /* ignore */ }
-    }
   }
 }
 
@@ -131,6 +142,6 @@ const SCHEMA_SQL = `
   CREATE INDEX IF NOT EXISTS idx_benchmark_endpoint ON benchmark_results(endpoint_id, model);
 `;
 
-export async function initSqlSchema(client: Client): Promise<void> {
+export async function initSqlSchema(client: SqlProxyClient): Promise<void> {
   await client.query(SCHEMA_SQL);
 }

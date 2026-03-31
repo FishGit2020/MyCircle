@@ -9,7 +9,6 @@ import {
   initSqlSchema,
   SqlConnectionConfig,
 } from '../sqlClient';
-import { Client } from 'pg';
 import { logChatToSql, logBenchmarkToSql } from '../sqlWriter';
 
 async function runBackfill(
@@ -20,13 +19,12 @@ async function runBackfill(
   initialErrors: number,
 ): Promise<void> {
   const db = getFirestore();
-  let client: Client | null = null;
   let totalMigrated = initialMigrated;
   let totalErrors = initialErrors;
   let lastDocId = startAfterDocId;
 
   try {
-    client = await createSqlClient(config);
+    const client = createSqlClient(config);
 
     // Backfill chat logs
     let hasMore = true;
@@ -115,8 +113,6 @@ async function runBackfill(
       lastDocId,
       error: err.message || String(err),
     });
-  } finally {
-    if (client) try { await client.end(); } catch { /* ignore */ }
   }
 }
 
@@ -133,10 +129,9 @@ export function createSqlQueryResolvers() {
       const data = doc.data() as SqlConnectionConfig;
       return {
         tunnelUrl: data.tunnelUrl,
-        dbName: data.dbName || 'mycircle',
         status: data.status || 'unknown',
         lastTestedAt: data.lastTestedAt || null,
-        hasCredentials: !!(data.username && data.password),
+        hasCredentials: !!data.apiKey,
       };
     },
     sqlBackfillStatus: async (_: any, __: any, ctx: any) => {
@@ -161,9 +156,8 @@ export function createSqlQueryResolvers() {
       const config = await getCachedSqlConfig(uid);
       if (!config || config.status !== 'connected') return null;
 
-      let client;
       try {
-        client = await createSqlClient(config);
+        const client = createSqlClient(config);
         const since = new Date(Date.now() - days * 86400000).toISOString();
 
         const summary = await client.query(
@@ -215,8 +209,6 @@ export function createSqlQueryResolvers() {
       } catch (err) {
         logger.warn('sqlAnalyticsSummary failed', { error: String(err) });
         return null;
-      } finally {
-        if (client) try { await client.end(); } catch {}
       }
     },
     sqlLatencyPercentiles: async (_: any, { days = 30 }: { days?: number }, ctx: any) => {
@@ -225,9 +217,8 @@ export function createSqlQueryResolvers() {
       const config = await getCachedSqlConfig(uid);
       if (!config || config.status !== 'connected') return [];
 
-      let client;
       try {
-        client = await createSqlClient(config);
+        const client = createSqlClient(config);
         const since = new Date(Date.now() - days * 86400000).toISOString();
         const result = await client.query(
           `SELECT provider, model,
@@ -246,8 +237,6 @@ export function createSqlQueryResolvers() {
       } catch (err) {
         logger.warn('sqlLatencyPercentiles failed', { error: String(err) });
         return [];
-      } finally {
-        if (client) try { await client.end(); } catch {}
       }
     },
     sqlToolUsageStats: async (_: any, { days = 30 }: { days?: number }, ctx: any) => {
@@ -256,9 +245,8 @@ export function createSqlQueryResolvers() {
       const config = await getCachedSqlConfig(uid);
       if (!config || config.status !== 'connected') return [];
 
-      let client;
       try {
-        client = await createSqlClient(config);
+        const client = createSqlClient(config);
         const since = new Date(Date.now() - days * 86400000).toISOString();
         const result = await client.query(
           `SELECT tc.tool_name, COUNT(*) as call_count,
@@ -276,8 +264,6 @@ export function createSqlQueryResolvers() {
       } catch (err) {
         logger.warn('sqlToolUsageStats failed', { error: String(err) });
         return [];
-      } finally {
-        if (client) try { await client.end(); } catch {}
       }
     },
     sqlToolCoOccurrences: async (_: any, { days = 30, minCount = 2 }: { days?: number; minCount?: number }, ctx: any) => {
@@ -286,9 +272,8 @@ export function createSqlQueryResolvers() {
       const config = await getCachedSqlConfig(uid);
       if (!config || config.status !== 'connected') return [];
 
-      let client;
       try {
-        client = await createSqlClient(config);
+        const client = createSqlClient(config);
         const since = new Date(Date.now() - days * 86400000).toISOString();
         const result = await client.query(
           `SELECT t1.tool_name as tool_a, t2.tool_name as tool_b, COUNT(*) as co_occurrences
@@ -306,8 +291,6 @@ export function createSqlQueryResolvers() {
       } catch (err) {
         logger.warn('sqlToolCoOccurrences failed', { error: String(err) });
         return [];
-      } finally {
-        if (client) try { await client.end(); } catch {}
       }
     },
     sqlBenchmarkTrends: async (_: any, { weeks = 12 }: { weeks?: number }, ctx: any) => {
@@ -316,9 +299,8 @@ export function createSqlQueryResolvers() {
       const config = await getCachedSqlConfig(uid);
       if (!config || config.status !== 'connected') return [];
 
-      let client;
       try {
-        client = await createSqlClient(config);
+        const client = createSqlClient(config);
         const since = new Date(Date.now() - weeks * 7 * 86400000).toISOString();
         const result = await client.query(
           `SELECT endpoint_name, model, DATE_TRUNC('week', created_at)::date as week,
@@ -337,8 +319,6 @@ export function createSqlQueryResolvers() {
       } catch (err) {
         logger.warn('sqlBenchmarkTrends failed', { error: String(err) });
         return [];
-      } finally {
-        if (client) try { await client.end(); } catch {}
       }
     },
     sqlChatSearch: async (_: any, { query, limit = 20 }: { query: string; limit?: number }, ctx: any) => {
@@ -347,9 +327,8 @@ export function createSqlQueryResolvers() {
       const config = await getCachedSqlConfig(uid);
       if (!config || config.status !== 'connected') return [];
 
-      let client;
       try {
-        client = await createSqlClient(config);
+        const client = createSqlClient(config);
         const pattern = `%${query.trim()}%`;
         const cap = Math.min(limit, 50);
         const result = await client.query(
@@ -367,8 +346,6 @@ export function createSqlQueryResolvers() {
       } catch (err) {
         logger.warn('sqlChatSearch failed', { error: String(err) });
         return [];
-      } finally {
-        if (client) try { await client.end(); } catch {}
       }
     },
   };
@@ -382,9 +359,7 @@ export function createSqlMutationResolvers() {
 
       const schema = z.object({
         tunnelUrl: z.string().url().max(500),
-        dbName: z.string().max(100).optional(),
-        username: z.string().max(100).optional(),
-        password: z.string().max(200).optional(),
+        apiKey: z.string().max(200).optional(),
       });
       const parsed = schema.parse(input);
 
@@ -396,9 +371,7 @@ export function createSqlMutationResolvers() {
         tunnelUrl: parsed.tunnelUrl,
         updatedAt: new Date().toISOString(),
       };
-      if (parsed.dbName !== undefined) configData.dbName = parsed.dbName;
-      if (parsed.username !== undefined) configData.username = parsed.username;
-      if (parsed.password !== undefined) configData.password = parsed.password;
+      if (parsed.apiKey !== undefined) configData.apiKey = parsed.apiKey;
 
       await docRef.set(configData, { merge: true });
 
@@ -412,14 +385,12 @@ export function createSqlMutationResolvers() {
 
       if (result.ok) {
         // Initialize schema if connection succeeded
-        const client = await createSqlClient(config);
+        const client = createSqlClient(config);
         try {
           await initSqlSchema(client);
           status = 'connected';
         } catch {
           status = 'error';
-        } finally {
-          try { await client.end(); } catch { /* ignore */ }
         }
       }
 
@@ -434,10 +405,9 @@ export function createSqlMutationResolvers() {
 
       return {
         tunnelUrl: config.tunnelUrl,
-        dbName: config.dbName || 'mycircle',
         status,
         lastTestedAt: now,
-        hasCredentials: !!(config.username && config.password),
+        hasCredentials: !!config.apiKey,
       };
     },
     testSqlConnection: async (_: any, __: any, ctx: any) => {
@@ -467,10 +437,9 @@ export function createSqlMutationResolvers() {
 
       return {
         tunnelUrl: config.tunnelUrl,
-        dbName: config.dbName || 'mycircle',
         status,
         lastTestedAt: now,
-        hasCredentials: !!(config.username && config.password),
+        hasCredentials: !!config.apiKey,
       };
     },
     deleteSqlConnection: async (_: any, __: any, ctx: any) => {

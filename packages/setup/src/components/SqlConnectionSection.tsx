@@ -16,7 +16,7 @@ export default function SqlConnectionSection() {
   const [saveSqlConnection, { loading: saving }] = useMutation(SAVE_SQL_CONNECTION, {
     refetchQueries: [{ query: GET_SQL_CONNECTION_STATUS }],
   });
-  const [testSqlConnection, { loading: testing }] = useMutation(TEST_SQL_CONNECTION, {
+  const [_testSqlConnection, { loading: testing }] = useMutation(TEST_SQL_CONNECTION, {
     refetchQueries: [{ query: GET_SQL_CONNECTION_STATUS }],
   });
   const [deleteSqlConnection, { loading: deleting }] = useMutation(DELETE_SQL_CONNECTION, {
@@ -24,9 +24,7 @@ export default function SqlConnectionSection() {
   });
 
   const [tunnelUrl, setTunnelUrl] = useState('');
-  const [dbName, setDbName] = useState('mycircle');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [apiKey, setApiKey] = useState('');
   const [saveResult, setSaveResult] = useState<'saved' | 'error' | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -35,7 +33,6 @@ export default function SqlConnectionSection() {
   useEffect(() => {
     if (status) {
       setTunnelUrl(status.tunnelUrl || '');
-      setDbName(status.dbName || 'mycircle');
     }
   }, [status]);
 
@@ -47,9 +44,7 @@ export default function SqlConnectionSection() {
         variables: {
           input: {
             tunnelUrl: tunnelUrl.trim(),
-            dbName: dbName.trim() || 'mycircle',
-            username: username.trim() || undefined,
-            password: password || undefined,
+            apiKey: apiKey.trim() || undefined,
           },
         },
       });
@@ -58,10 +53,10 @@ export default function SqlConnectionSection() {
       if (connStatus !== 'connected') {
         setErrorMessage(t('setup.sql.status.error'));
       }
-      setPassword('');
-    } catch (err: any) {
+      setApiKey('');
+    } catch (err: unknown) {
       setSaveResult('error');
-      setErrorMessage(err.message || String(err));
+      setErrorMessage(err instanceof Error ? err.message : String(err));
     }
   };
 
@@ -69,9 +64,7 @@ export default function SqlConnectionSection() {
     if (!confirm(t('setup.sql.deleteConfirm'))) return;
     await deleteSqlConnection();
     setTunnelUrl('');
-    setDbName('mycircle');
-    setUsername('');
-    setPassword('');
+    setApiKey('');
   };
 
   const statusColor =
@@ -155,39 +148,13 @@ export default function SqlConnectionSection() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('setup.sql.dbName')}
-          </label>
-          <input
-            type="text"
-            value={dbName}
-            onChange={e => setDbName(e.target.value)}
-            placeholder={t('setup.sql.dbNamePlaceholder')}
-            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('setup.sql.username')}
-          </label>
-          <input
-            type="text"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            placeholder={t('setup.sql.usernamePlaceholder')}
-            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('setup.sql.password')}
+            {t('setup.sql.apiKey')}
           </label>
           <input
             type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder={t('setup.sql.passwordPlaceholder')}
+            value={apiKey}
+            onChange={e => setApiKey(e.target.value)}
+            placeholder={t('setup.sql.apiKeyPlaceholder')}
             className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
