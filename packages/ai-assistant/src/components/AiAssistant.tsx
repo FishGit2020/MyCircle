@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router';
-import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS, EndpointManager, PageContent } from '@mycircle/shared';
+import { useTranslation, useQuery, useLazyQuery, GET_OLLAMA_MODELS, GET_BENCHMARK_ENDPOINTS, GET_BENCHMARK_ENDPOINT_MODELS, PageContent } from '@mycircle/shared';
 import { useAiChatWithStreaming } from '../hooks/useAiChatWithStreaming';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -59,9 +59,9 @@ export default function AiAssistant() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
-  const VALID_TABS = new Set(['chat', 'endpoints', 'monitor']);
-  const activeTab: 'chat' | 'endpoints' | 'monitor' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'chat'; // eslint-disable-line @typescript-eslint/no-explicit-any
-  const setActiveTab = useCallback((tab: 'chat' | 'endpoints' | 'monitor') => {
+  const VALID_TABS = new Set(['chat', 'monitor']);
+  const activeTab: 'chat' | 'monitor' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'chat'; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const setActiveTab = useCallback((tab: 'chat' | 'monitor') => {
     setSearchParams(tab === 'chat' ? {} : { tab }, { replace: true });
   }, [setSearchParams]);
 
@@ -252,17 +252,6 @@ export default function AiAssistant() {
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab('endpoints')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'endpoints'
-              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-          }`}
-        >
-          {t('ai.tabEndpoints')}
-        </button>
-        <button
-          type="button"
           onClick={() => setActiveTab('monitor')}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'monitor'
@@ -275,11 +264,7 @@ export default function AiAssistant() {
       </div>
 
       {/* Tab content */}
-      {activeTab === 'endpoints' ? (
-        <div className="flex-1 overflow-y-auto">
-          <EndpointManager source="chat" />
-        </div>
-      ) : activeTab === 'monitor' ? (
+      {activeTab === 'monitor' ? (
         <Suspense fallback={<div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">Loading...</div>}>
           <AiMonitor />
         </Suspense>
@@ -301,7 +286,10 @@ export default function AiAssistant() {
                 <p className="text-sm mt-2 max-w-sm">{t('ai.emptyHint')}</p>
 
                 {endpoints.length === 0 && (
-                  <p className="text-sm mt-3 max-w-sm text-amber-500 dark:text-amber-400">{t('ai.noEndpointsHint')}</p>
+                  <p className="text-sm mt-3 max-w-sm text-amber-500 dark:text-amber-400">
+                    {t('ai.noEndpointsHint')}{' '}
+                    <a href="/setup" className="text-blue-600 dark:text-blue-400 hover:underline">{t('nav.setup')}</a>
+                  </p>
                 )}
 
                 {/* Suggested prompts */}
