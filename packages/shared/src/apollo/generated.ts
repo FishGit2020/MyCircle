@@ -1708,15 +1708,12 @@ export type SqlChatSearchResult = {
 };
 
 export type SqlConnectionInput = {
-  dbName?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
+  apiKey?: InputMaybe<Scalars['String']['input']>;
   tunnelUrl: Scalars['String']['input'];
-  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SqlConnectionStatus = {
   __typename?: 'SqlConnectionStatus';
-  dbName: Scalars['String']['output'];
   hasCredentials: Scalars['Boolean']['output'];
   lastTestedAt?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
@@ -2891,19 +2888,19 @@ export type DeleteResumeApplicationMutation = { __typename?: 'Mutation', deleteR
 export type GetSqlConnectionStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetSqlConnectionStatusQuery = { __typename?: 'Query', sqlConnectionStatus?: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, dbName: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } | null };
+export type GetSqlConnectionStatusQuery = { __typename?: 'Query', sqlConnectionStatus?: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } | null };
 
 export type SaveSqlConnectionMutationVariables = Exact<{
   input: SqlConnectionInput;
 }>;
 
 
-export type SaveSqlConnectionMutation = { __typename?: 'Mutation', saveSqlConnection: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, dbName: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
+export type SaveSqlConnectionMutation = { __typename?: 'Mutation', saveSqlConnection: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
 
 export type TestSqlConnectionMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TestSqlConnectionMutation = { __typename?: 'Mutation', testSqlConnection: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, dbName: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
+export type TestSqlConnectionMutation = { __typename?: 'Mutation', testSqlConnection: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
 
 export type DeleteSqlConnectionMutationVariables = Exact<{ [key: string]: never; }>;
 

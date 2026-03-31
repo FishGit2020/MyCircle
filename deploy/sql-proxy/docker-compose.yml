@@ -1,0 +1,48 @@
+# MyCircle SQL Analytics — Docker Compose
+#
+# Usage:
+#   1. Copy this file or run from deploy/sql-proxy/
+#   2. Change API_KEY and POSTGRES_PASSWORD
+#   3. docker compose up -d
+#   4. Get tunnel URL: docker logs mycircle-tunnel 2>&1 | grep trycloudflare.com
+#   5. In MyCircle: Setup > SQL Connection > paste tunnel URL + API key
+#
+# No Cloudflare account needed — uses free quick tunnel.
+# Tunnel URL changes on restart. For persistent URL, use a named tunnel.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mycircle
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme  # ← Change this
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  sql-proxy:
+    build: .
+    environment:
+      DATABASE_URL: postgres://postgres:changeme@postgres:5432/mycircle  # ← Match password above
+      API_KEY: change-this-to-a-secret-key  # ← Change this
+      PORT: "3080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://sql-proxy:3080
+    depends_on:
+      - sql-proxy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

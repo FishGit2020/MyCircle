@@ -1,14 +1,13 @@
-import { Client } from 'pg';
 import { logger } from 'firebase-functions/v2';
+import type { SqlProxyClient } from './sqlClient';
 import type { AiChatLogEntry } from './aiChatLogger';
 
 export async function logChatToSql(
-  client: Client,
+  client: SqlProxyClient,
   entry: AiChatLogEntry,
   firestoreDocId: string,
 ): Promise<void> {
   try {
-    // Insert chat log
     await client.query(
       `INSERT INTO ai_chat_logs (
         id, user_id, provider, model, input_tokens, output_tokens, total_tokens,
@@ -36,7 +35,6 @@ export async function logChatToSql(
       ],
     );
 
-    // Insert tool calls
     if (entry.toolCalls && entry.toolCalls.length > 0) {
       for (const tc of entry.toolCalls) {
         await client.query(
@@ -52,7 +50,7 @@ export async function logChatToSql(
 }
 
 export async function logBenchmarkToSql(
-  client: Client,
+  client: SqlProxyClient,
   result: {
     endpointId: string;
     endpointName: string;
@@ -89,13 +87,8 @@ export async function logBenchmarkToSql(
       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
       ON CONFLICT (id) DO NOTHING`,
       [
-        id,
-        runId,
-        userId,
-        result.endpointId,
-        result.endpointName,
-        result.model,
-        result.prompt,
+        id, runId, userId,
+        result.endpointId, result.endpointName, result.model, result.prompt,
         result.timing?.tokensPerSecond ?? null,
         result.timing?.promptTokensPerSecond ?? null,
         result.timing?.timeToFirstToken ?? null,

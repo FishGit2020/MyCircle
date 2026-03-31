@@ -1710,7 +1710,6 @@ export const GET_SQL_CONNECTION_STATUS = gql`
   query GetSqlConnectionStatus {
     sqlConnectionStatus {
       tunnelUrl
-      dbName
       status
       lastTestedAt
       hasCredentials
@@ -1722,7 +1721,6 @@ export const SAVE_SQL_CONNECTION = gql`
   mutation SaveSqlConnection($input: SqlConnectionInput!) {
     saveSqlConnection(input: $input) {
       tunnelUrl
-      dbName
       status
       lastTestedAt
       hasCredentials
@@ -1734,7 +1732,6 @@ export const TEST_SQL_CONNECTION = gql`
   mutation TestSqlConnection {
     testSqlConnection {
       tunnelUrl
-      dbName
       status
       lastTestedAt
       hasCredentials

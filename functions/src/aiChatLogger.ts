@@ -59,12 +59,8 @@ export function logAiChatInteraction(entry: AiChatLogEntry): void {
         try {
           const config = await getCachedSqlConfig(entry.userId);
           if (config && config.status === 'connected') {
-            const client = await createSqlClient(config);
-            try {
-              await logChatToSql(client, entry, ref.id);
-            } finally {
-              try { await client.end(); } catch { /* ignore */ }
-            }
+            const client = createSqlClient(config);
+            await logChatToSql(client, entry, ref.id);
           }
         } catch (sqlErr) {
           logger.warn('SQL dual-write failed', { error: String(sqlErr) });
