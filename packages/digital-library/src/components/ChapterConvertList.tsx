@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, useLazyQuery, GET_CONVERSION_JOBS, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO } from '@mycircle/shared';
+import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, GET_CONVERSION_JOBS, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO } from '@mycircle/shared';
 import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
@@ -41,7 +41,6 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   });
   const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
   const [deleteChapterAudioMutation] = useMutation(DELETE_CHAPTER_AUDIO);
-  const [pollJobs] = useLazyQuery(GET_CONVERSION_JOBS, { fetchPolicy: 'network-only' });
 
   // Derive which chapters are actively converting from backend jobs
   const activeJobs = useMemo(() => {
@@ -55,17 +54,16 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   useEffect(() => {
     if (activeJobs.length === 0) return;
     const interval = setInterval(async () => {
-      const result = await pollJobs({ variables: { bookId } });
-      const jobs = result.data?.conversionJobs ?? [];
+      const { data: refreshed } = await refetchJobs();
+      const jobs = refreshed?.conversionJobs ?? [];
       const stillActive = (jobs as Array<{ status: string }>).some(j => j.status === 'pending' || j.status === 'processing');
       if (!stillActive) {
         clearInterval(interval);
         onChapterConverted(); // Refresh chapters to show new audio URLs
       }
-      refetchJobs();
     }, 5000);
     return () => clearInterval(interval);
-  }, [activeJobs.length, bookId, pollJobs, refetchJobs, onChapterConverted]);
+  }, [activeJobs.length, refetchJobs, onChapterConverted]);
 
   const audioChapters = chapters.filter(ch => ch.audioUrl);
 
@@ -251,7 +249,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
           return (
             <li key={ch.index} className="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-gray-800">
               {/* Checkbox for unconverted chapters */}
-              {!hasAudio && !isConverting && !activeJobs.length > 0 && (
+              {!hasAudio && !isConverting && activeJobs.length === 0 && (
                 <input
                   type="checkbox"
                   checked={selected.has(ch.index)}
