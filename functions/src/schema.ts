@@ -1223,6 +1223,7 @@ export const typeDefs = `#graphql
     uploadBook(fileBase64: String!): Book!
     deleteChapterAudio(bookId: ID!, chapterIndex: Int!): Boolean!
     resetBookConversion(bookId: ID!): Boolean!
+    cancelBookConversion(bookId: ID!): Boolean!
     previewVoice(voiceName: String!): String!
 
     # Web Crawler (auth required)

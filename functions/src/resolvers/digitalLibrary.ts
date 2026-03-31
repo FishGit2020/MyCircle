@@ -450,6 +450,40 @@ export function createDigitalLibraryResolvers() {
         return true;
       },
 
+      cancelBookConversion: async (_: any, { bookId }: { bookId: string }, context: ResolverContext) => {
+        requireAuth(context);
+        const uid = context.uid!;
+        const db = getFirestore();
+        const bookRef = db.collection('books').doc(bookId);
+        const bookDoc = await bookRef.get();
+        if (!bookDoc.exists) throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
+
+        // Mark all active batch jobs so workers stop between chapters
+        const activeBatchJobs = await db.collection(`users/${uid}/conversionBatchJobs`)
+          .where('bookId', '==', bookId)
+          .where('status', 'in', ['pending', 'processing', 'paused'])
+          .get();
+
+        // Mark all pending/processing individual chapter jobs as cancelled
+        const activeChapterJobs = await db.collection(`users/${uid}/conversionJobs`)
+          .where('bookId', '==', bookId)
+          .where('status', 'in', ['pending', 'processing'])
+          .get();
+
+        const batch = db.batch();
+        for (const doc of activeBatchJobs.docs) {
+          batch.update(doc.ref, { cancelRequested: true });
+        }
+        for (const doc of activeChapterJobs.docs) {
+          batch.update(doc.ref, { status: 'cancelled' });
+        }
+
+        // Reset book state immediately so UI reflects cancellation
+        batch.update(bookRef, { audioStatus: 'none', audioProgress: 0, audioError: FieldValue.delete(), updatedAt: FieldValue.serverTimestamp() });
+        await batch.commit();
+        return true;
+      },
+
       previewVoice: async (_: any, { voiceName }: { voiceName: string }, context: ResolverContext) => {
         requireAuth(context);
         const langCode = voiceName.slice(0, voiceName.lastIndexOf('-Neural2'));

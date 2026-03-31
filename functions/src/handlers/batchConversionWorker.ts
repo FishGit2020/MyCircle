@@ -75,6 +75,14 @@ export const onBatchConversionCreated = onDocumentCreated(
       const remaining = chapterIndices.filter(idx => !completedChapters.includes(idx));
 
       for (const chapterIndex of remaining) {
+        // Cancellation check — stop if user requested cancel
+        const jobSnap = await jobRef.get();
+        if (jobSnap.data()?.cancelRequested) {
+          logger.info('Batch conversion cancelled by user', { uid, jobId, bookId });
+          try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
+          return;
+        }
+
         // Time budget check — pause and re-trigger if running low
         if (Date.now() - startTime > TIME_BUDGET_MS) {
           // Save progress and create a resume job

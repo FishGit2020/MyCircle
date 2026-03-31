@@ -1164,6 +1164,12 @@ export const RESET_BOOK_CONVERSION = gql`
   }
 `;
 
+export const CANCEL_BOOK_CONVERSION = gql`
+  mutation CancelBookConversion($bookId: ID!) {
+    cancelBookConversion(bookId: $bookId)
+  }
+`;
+
 export const PREVIEW_VOICE = gql`
   mutation PreviewVoice($voiceName: String!) {
     previewVoice(voiceName: $voiceName)
