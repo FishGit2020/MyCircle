@@ -567,6 +567,7 @@ export type Mutation = {
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
   deleteBenchmarkRun: Scalars['Boolean']['output'];
   deleteBook: Scalars['Boolean']['output'];
+  deleteChapterAudio: Scalars['Boolean']['output'];
   deleteCrawlJob: Scalars['Boolean']['output'];
   deleteFile: Scalars['Boolean']['output'];
   deleteFolder: Scalars['Boolean']['output'];
@@ -580,8 +581,10 @@ export type Mutation = {
   generateResume: GeneratedResumeResult;
   moveFile: CloudFile;
   permanentDeleteBook: Scalars['Boolean']['output'];
+  previewVoice: Scalars['String']['output'];
   renameFile: CloudFile;
   renameFolder: Folder;
+  resetBookConversion: Scalars['Boolean']['output'];
   restoreBook: Scalars['Boolean']['output'];
   revokeFileAccess: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
@@ -602,6 +605,7 @@ export type Mutation = {
   updateNote: Note;
   updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
+  uploadBook: Book;
 };
 
 
@@ -676,6 +680,12 @@ export type MutationDeleteBookArgs = {
 };
 
 
+export type MutationDeleteChapterAudioArgs = {
+  bookId: Scalars['ID']['input'];
+  chapterIndex: Scalars['Int']['input'];
+};
+
+
 export type MutationDeleteCrawlJobArgs = {
   id: Scalars['ID']['input'];
 };
@@ -745,6 +755,11 @@ export type MutationPermanentDeleteBookArgs = {
 };
 
 
+export type MutationPreviewVoiceArgs = {
+  voiceName: Scalars['String']['input'];
+};
+
+
 export type MutationRenameFileArgs = {
   fileId: Scalars['ID']['input'];
   newName: Scalars['String']['input'];
@@ -754,6 +769,11 @@ export type MutationRenameFileArgs = {
 export type MutationRenameFolderArgs = {
   folderId: Scalars['ID']['input'];
   newName: Scalars['String']['input'];
+};
+
+
+export type MutationResetBookConversionArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -872,6 +892,11 @@ export type MutationUpdateWorshipSetlistArgs = {
 export type MutationUpdateWorshipSongArgs = {
   id: Scalars['ID']['input'];
   input: WorshipSongUpdateInput;
+};
+
+
+export type MutationUploadBookArgs = {
+  fileBase64: Scalars['String']['input'];
 };
 
 export type Note = {
@@ -2341,6 +2366,35 @@ export type SubmitChapterConversionsMutationVariables = Exact<{
 
 
 export type SubmitChapterConversionsMutation = { __typename?: 'Mutation', submitChapterConversions: Array<{ __typename?: 'ConversionJob', id: string, chapterIndex: number, status: string }> };
+
+export type UploadBookMutationVariables = Exact<{
+  fileBase64: Scalars['String']['input'];
+}>;
+
+
+export type UploadBookMutation = { __typename?: 'Mutation', uploadBook: { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, audioStatus: string, audioProgress: number, uploadedAt: string, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } } };
+
+export type DeleteChapterAudioMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+  chapterIndex: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteChapterAudioMutation = { __typename?: 'Mutation', deleteChapterAudio: boolean };
+
+export type ResetBookConversionMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type ResetBookConversionMutation = { __typename?: 'Mutation', resetBookConversion: boolean };
+
+export type PreviewVoiceMutationVariables = Exact<{
+  voiceName: Scalars['String']['input'];
+}>;
+
+
+export type PreviewVoiceMutation = { __typename?: 'Mutation', previewVoice: string };
 
 export type DeleteBookMutationVariables = Exact<{
   id: Scalars['ID']['input'];

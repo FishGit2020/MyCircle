@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, StorageKeys } from '@mycircle/shared';
+import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, UPLOAD_BOOK, StorageKeys } from '@mycircle/shared';
 import BookReader from './BookReader';
 import LibrarySearchSort, { SortOption } from './LibrarySearchSort';
 import TtsQuotaBar from './TtsQuotaBar';
@@ -140,6 +140,7 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadBookMutation] = useMutation(UPLOAD_BOOK, { refetchQueries: [{ query: GET_BOOKS }] });
 
   const handleFile = useCallback(async (file: File) => {
     if (!file.name.endsWith('.epub')) {
@@ -155,14 +156,6 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
     setError(null);
 
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) {
-        setError(t('library.authRequired'));
-        return;
-      }
-
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-
       const arrayBuffer = await file.arrayBuffer();
       const bytes = new Uint8Array(arrayBuffer);
       let binary = '';
@@ -171,13 +164,8 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
       }
       const fileBase64 = btoa(binary);
 
-      const res = await fetch(`${apiBase}/digital-library-api/upload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ fileBase64 }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const { bookId } = await res.json();
+      const { data: uploadData } = await uploadBookMutation({ variables: { fileBase64 } });
+      const bookId = uploadData?.uploadBook?.id;
 
       logger.info('Book uploaded successfully', { bookId });
       window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
@@ -188,7 +176,7 @@ function BookUpload({ onUploadComplete }: { onUploadComplete: () => void }) {
     } finally {
       setUploading(false);
     }
-  }, [t, onUploadComplete]);
+  }, [t, onUploadComplete, uploadBookMutation]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();

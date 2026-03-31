@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation, createLogger, WindowEvents, useLazyQuery, GET_BOOK_CONVERSION_PROGRESS } from '@mycircle/shared';
+import { useTranslation, createLogger, WindowEvents, useLazyQuery, useMutation, GET_BOOK_CONVERSION_PROGRESS, RESET_BOOK_CONVERSION, PREVIEW_VOICE } from '@mycircle/shared';
 
 const logger = createLogger('ConversionStatus');
 
@@ -27,7 +27,7 @@ interface ConversionStatusProps {
   initialStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   initialProgress: number;
   onComplete: () => void;
-  onConvert: (voiceName: string) => Promise<Response | undefined>;
+  onConvert: (voiceName: string) => Promise<void>;
 }
 
 export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert }: ConversionStatusProps) {
@@ -44,6 +44,8 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const voiceOptions = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
 
   const [fetchConversionProgress] = useLazyQuery(GET_BOOK_CONVERSION_PROGRESS, { fetchPolicy: 'network-only' });
+  const [resetMutation] = useMutation(RESET_BOOK_CONVERSION);
+  const [previewMutation] = useMutation(PREVIEW_VOICE);
 
   const checkStatus = useCallback(async () => {
     try {
@@ -96,24 +98,20 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
     setConverting(true);
     setError(null);
     try {
-      const res = await onConvert(selectedVoice);
-      if (res && res.status === 429) {
-        const data = await res.json();
-        if (data.error?.includes('Too many conversions')) {
+      await onConvert(selectedVoice);
+      setStatus('processing');
+      setProgress(0);
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      if (!isAbortError(err)) {
+        const msg = err?.message || '';
+        if (msg.includes('quota') || msg.includes('429')) {
           setError(t('library.tooManyConversions'));
-          setStatus('error');
         } else {
-          const usedMB = ((data.used || 0) / 1_000_000).toFixed(1);
-          const limitMB = ((data.limit || 0) / 1_000_000).toFixed(1);
-          setError(t('library.quotaReached').replace('{used}', usedMB).replace('{limit}', limitMB));
-          setStatus('error');
+          setError(msg || t('library.conversionFailed'));
         }
-      } else if (res && res.ok) {
-        setStatus('processing');
-        setProgress(0);
+        setStatus('error');
+        logger.error('Failed to start conversion', err);
       }
-    } catch (err) {
-      if (!isAbortError(err)) logger.error('Failed to start conversion', err);
     } finally {
       setConverting(false);
     }
@@ -122,25 +120,17 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const handleReset = useCallback(async () => {
     setResetting(true);
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) return;
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/reset-conversion/${bookId}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        setStatus('none');
-        setProgress(0);
-        setError(null);
-        window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
-      }
+      await resetMutation({ variables: { bookId } });
+      setStatus('none');
+      setProgress(0);
+      setError(null);
+      window.dispatchEvent(new Event(WindowEvents.BOOKS_CHANGED));
     } catch (err) {
       if (!isAbortError(err)) logger.error('Reset conversion failed', err);
     } finally {
       setResetting(false);
     }
-  }, [bookId]);
+  }, [bookId, resetMutation]);
 
   // Auto-continue when paused (time-budget exhausted, server waiting for client to re-trigger)
   useEffect(() => {
@@ -166,16 +156,9 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const handlePreview = useCallback(async () => {
     setPreviewing(true);
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) return;
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/preview-voice`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ voiceName: selectedVoice }),
-      });
-      if (!res.ok) throw new Error('Preview failed');
-      const { audio } = await res.json();
+      const { data: previewData } = await previewMutation({ variables: { voiceName: selectedVoice } });
+      const audio = previewData?.previewVoice;
+      if (!audio) throw new Error('Preview failed');
       const binary = atob(audio);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
@@ -193,7 +176,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
       if (!isAbortError(err)) logger.error('Voice preview failed', err);
       setPreviewing(false);
     }
-  }, [selectedVoice]);
+  }, [selectedVoice, previewMutation]);
 
   const voicePicker = (
     <div className="flex flex-wrap items-center gap-2 mb-2">

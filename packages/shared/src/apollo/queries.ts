@@ -1114,6 +1114,35 @@ export const SUBMIT_CHAPTER_CONVERSIONS = gql`
   }
 `;
 
+export const UPLOAD_BOOK = gql`
+  mutation UploadBook($fileBase64: String!) {
+    uploadBook(fileBase64: $fileBase64) {
+      id title author description language coverUrl epubUrl
+      fileSize chapterCount totalCharacters audioStatus audioProgress
+      uploadedBy { uid displayName }
+      uploadedAt
+    }
+  }
+`;
+
+export const DELETE_CHAPTER_AUDIO = gql`
+  mutation DeleteChapterAudio($bookId: ID!, $chapterIndex: Int!) {
+    deleteChapterAudio(bookId: $bookId, chapterIndex: $chapterIndex)
+  }
+`;
+
+export const RESET_BOOK_CONVERSION = gql`
+  mutation ResetBookConversion($bookId: ID!) {
+    resetBookConversion(bookId: $bookId)
+  }
+`;
+
+export const PREVIEW_VOICE = gql`
+  mutation PreviewVoice($voiceName: String!) {
+    previewVoice(voiceName: $voiceName)
+  }
+`;
+
 export const DELETE_BOOK = gql`
   mutation DeleteBook($id: ID!) {
     deleteBook(id: $id)

@@ -1206,6 +1206,10 @@ export const typeDefs = `#graphql
     restoreBook(id: ID!): Boolean!
     permanentDeleteBook(id: ID!): Boolean!
     submitChapterConversions(bookId: ID!, chapterIndices: [Int!]!, voiceName: String!): [ConversionJob!]!
+    uploadBook(fileBase64: String!): Book!
+    deleteChapterAudio(bookId: ID!, chapterIndex: Int!): Boolean!
+    resetBookConversion(bookId: ID!): Boolean!
+    previewVoice(voiceName: String!): String!
 
     # Web Crawler (auth required)
     startCrawl(input: StartCrawlInput!): CrawlJob!

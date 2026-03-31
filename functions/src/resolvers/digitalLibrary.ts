@@ -247,6 +247,150 @@ export function createDigitalLibraryResolvers() {
 
         return jobs;
       },
+
+      uploadBook: async (_: any, { fileBase64 }: { fileBase64: string }, context: ResolverContext) => {
+        const uid = requireAuth(context);
+        const db = getFirestore();
+        const bucket = getStorage().bucket();
+        const crypto = await import('crypto');
+
+        const buffer = Buffer.from(fileBase64, 'base64');
+        if (buffer.length > 20 * 1024 * 1024) {
+          throw new GraphQLError('File too large (max 20MB)', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+
+        const bookId = crypto.randomUUID();
+        const storagePath = `books/${bookId}/original.epub`;
+        const storageFile = bucket.file(storagePath);
+        await storageFile.save(buffer, { contentType: 'application/epub+zip', metadata: { cacheControl: 'public, max-age=31536000' } });
+        await storageFile.makePublic();
+        const epubUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+
+        // Extract metadata
+        const fs = await import('fs');
+        const tmpPath = `/tmp/upload-${bookId}.epub`;
+        fs.writeFileSync(tmpPath, buffer);
+        const epub2Module = await import('epub2');
+        const EPub = epub2Module.EPub;
+        const epub = await (EPub as unknown as { createAsync(p: string): Promise<any> }).createAsync(tmpPath); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+        const title = epub.metadata?.title || 'Untitled';
+        const author = epub.metadata?.creator || 'Unknown';
+        const description = epub.metadata?.description || '';
+        const language = epub.metadata?.language || 'en';
+
+        // Extract cover
+        let coverUrl = '';
+        try {
+          const coverId = epub.metadata?.cover;
+          if (coverId && epub.manifest?.[coverId]) {
+            const coverData = await new Promise<Buffer>((resolve, reject) => {
+              epub.getImage(coverId, (err: Error | null, data: Buffer) => { if (err) reject(err); else resolve(data); });
+            });
+            const coverPath = `books/${bookId}/cover.jpg`;
+            const coverFile = bucket.file(coverPath);
+            await coverFile.save(coverData, { contentType: 'image/jpeg' });
+            await coverFile.makePublic();
+            coverUrl = `https://storage.googleapis.com/${bucket.name}/${coverPath}`;
+          }
+        } catch { /* ignore cover extraction failure */ }
+
+        // Extract chapters
+        const flow = epub.flow || [];
+        const chapters: Array<{ index: number; title: string; href: string; characterCount: number }> = [];
+        let totalCharacters = 0;
+        for (let i = 0; i < flow.length; i++) {
+          const item = flow[i];
+          let charCount = 0;
+          try {
+            const html = await new Promise<string>((resolve, reject) => {
+              epub.getChapter(item.id, (err: Error | null, data: string) => { if (err) reject(err); else resolve(data); });
+            });
+            charCount = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().length;
+          } catch { /* ignore */ }
+          totalCharacters += charCount;
+          chapters.push({ index: i, title: item.title || `Chapter ${i + 1}`, href: item.href || '', characterCount: charCount });
+        }
+
+        try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
+
+        // Get uploader name
+        let displayName = 'Unknown';
+        try {
+          const { getAuth } = await import('firebase-admin/auth');
+          const user = await getAuth().getUser(uid);
+          displayName = user.displayName || user.email || 'Unknown';
+        } catch { /* ignore */ }
+
+        // Create book document
+        const bookRef = db.collection('books').doc(bookId);
+        const bookData = {
+          title, author, description, language, coverUrl, epubUrl,
+          storagePath, fileSize: buffer.length, chapterCount: chapters.length,
+          totalCharacters, audioStatus: 'none', audioProgress: 0,
+          uploadedBy: { uid, displayName },
+          uploadedAt: FieldValue.serverTimestamp(),
+          isDeleted: false,
+        };
+        await bookRef.set(bookData);
+
+        // Create chapter documents
+        const batch = db.batch();
+        for (const ch of chapters) {
+          batch.set(bookRef.collection('chapters').doc(`ch-${ch.index}`), ch);
+        }
+        await batch.commit();
+
+        return { id: bookId, title, author, description, language, coverUrl, epubUrl, fileSize: buffer.length, chapterCount: chapters.length, totalCharacters, uploadedBy: { uid, displayName }, uploadedAt: new Date().toISOString(), audioStatus: 'none', audioProgress: 0 };
+      },
+
+      deleteChapterAudio: async (_: any, { bookId, chapterIndex }: { bookId: string; chapterIndex: number }, context: ResolverContext) => {
+        requireAuth(context);
+        const db = getFirestore();
+        const bookRef = db.collection('books').doc(bookId);
+        const chapSnap = await bookRef.collection('chapters').where('index', '==', chapterIndex).get();
+        if (chapSnap.empty) throw new GraphQLError('Chapter not found', { extensions: { code: 'NOT_FOUND' } });
+
+        const chapDoc = chapSnap.docs[0];
+        await chapDoc.ref.update({ audioUrl: FieldValue.delete(), audioStoragePath: FieldValue.delete(), audioDuration: FieldValue.delete() });
+
+        // Recount and update book progress
+        const allChaps = await bookRef.collection('chapters').get();
+        const convertedCount = allChaps.docs.filter(d => d.id !== chapDoc.id && d.data().audioUrl).length;
+        const progress = allChaps.size > 0 ? Math.round((convertedCount / allChaps.size) * 100) : 0;
+        await bookRef.update({ audioProgress: progress, audioStatus: convertedCount === 0 ? 'none' : 'complete', updatedAt: FieldValue.serverTimestamp() });
+
+        return true;
+      },
+
+      resetBookConversion: async (_: any, { bookId }: { bookId: string }, context: ResolverContext) => {
+        requireAuth(context);
+        const db = getFirestore();
+        const bookRef = db.collection('books').doc(bookId);
+        const bookDoc = await bookRef.get();
+        if (!bookDoc.exists) throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
+
+        await bookRef.update({ audioStatus: 'none', audioProgress: 0, audioError: FieldValue.delete(), updatedAt: FieldValue.serverTimestamp() });
+        return true;
+      },
+
+      previewVoice: async (_: any, { voiceName }: { voiceName: string }, context: ResolverContext) => {
+        requireAuth(context);
+        const langCode = voiceName.slice(0, voiceName.lastIndexOf('-Neural2'));
+        const sampleText = langCode.startsWith('cmn') ? '\u4f60\u597d\uff0c\u8fd9\u662f\u8bed\u97f3\u9884\u89c8\u3002'
+          : langCode.startsWith('es') ? 'Hola, esta es una vista previa de la voz.'
+          : 'Hello, this is a voice preview sample.';
+
+        const ttsClient = new (await import('@google-cloud/text-to-speech')).TextToSpeechClient();
+        const [response] = await ttsClient.synthesizeSpeech({
+          input: { text: sampleText },
+          voice: { languageCode: langCode, name: voiceName },
+          audioConfig: { audioEncoding: 'MP3' },
+        });
+
+        if (!response.audioContent) throw new GraphQLError('TTS preview failed');
+        return Buffer.from(response.audioContent as Uint8Array).toString('base64');
+      },
     },
   };
 }
