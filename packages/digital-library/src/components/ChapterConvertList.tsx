@@ -37,7 +37,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   // Query active conversion jobs to restore state after navigation
   const { data: jobsData, refetch: refetchJobs } = useQuery(GET_CONVERSION_JOBS, {
     variables: { bookId },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   });
   const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
   const [deleteChapterAudioMutation] = useMutation(DELETE_CHAPTER_AUDIO);
@@ -131,6 +131,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   }, [audioChapters.length]); // mount + when chapters load
 
   const handleConvert = useCallback(async (chapterIndex: number) => {
+    setConverting(chapterIndex); // Optimistic UI — show spinner immediately
     try {
       await submitConversions({
         variables: { bookId, chapterIndices: [chapterIndex], voiceName },
@@ -138,6 +139,8 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
       await refetchJobs();
     } catch (err) {
       if (!isAbortError(err)) logger.error('Chapter conversion failed', err);
+    } finally {
+      setConverting(null); // Clear optimistic state — activeChapterIndices takes over
     }
   }, [bookId, voiceName, submitConversions, refetchJobs]);
 
