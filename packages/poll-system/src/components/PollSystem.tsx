@@ -10,7 +10,7 @@ type View = 'list' | 'new' | 'detail';
 
 export default function PollSystem() {
   const { t } = useTranslation();
-  const { polls, loading, error, addPoll, deletePoll, vote } = usePolls();
+  const { polls, loading, error, userVotes, addPoll, deletePoll, castVote, changeVote } = usePolls();
   const [view, setView] = useState<View>('list');
   const [selectedPoll, setSelectedPoll] = useState<Poll | null>(null);
 
@@ -36,9 +36,13 @@ export default function PollSystem() {
     setSelectedPoll(null);
   }, []);
 
-  const handleVote = useCallback(async (pollId: string, optionId: string) => {
-    await vote(pollId, optionId);
-  }, [vote]);
+  const handleCastVote = useCallback(async (pollId: string, optionId: string) => {
+    await castVote(pollId, optionId);
+  }, [castVote]);
+
+  const handleChangeVote = useCallback(async (pollId: string, oldOptionId: string, newOptionId: string) => {
+    await changeVote(pollId, oldOptionId, newOptionId);
+  }, [changeVote]);
 
   if (loading) {
     return (
@@ -70,7 +74,9 @@ export default function PollSystem() {
     return (
       <PollDetail
         poll={currentPoll}
-        onVote={handleVote}
+        votedOptionId={userVotes[currentPoll.id]}
+        onVote={handleCastVote}
+        onChangeVote={handleChangeVote}
         onDelete={() => handleDelete(currentPoll.id)}
         onBack={handleBack}
       />

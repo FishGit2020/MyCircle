@@ -150,7 +150,10 @@ declare global {
       getAll: () => Promise<any[]>; // eslint-disable-line @typescript-eslint/no-explicit-any
       add: (poll: Record<string, unknown>) => Promise<string>;
       delete: (id: string) => Promise<void>;
-      vote: (pollId: string, optionId: string) => Promise<void>;
+      castVote: (pollId: string, optionId: string) => Promise<void>;
+      changeVote: (pollId: string, oldOptionId: string, newOptionId: string) => Promise<void>;
+      getUserVote: (pollId: string) => Promise<string | null>;
+      subscribeToUserVotes: (callback: (votes: Record<string, string>) => void) => () => void;
       subscribe: (callback: (polls: any[]) => void) => () => void; // eslint-disable-line @typescript-eslint/no-explicit-any
     };
 

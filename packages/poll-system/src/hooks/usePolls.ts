@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createLogger } from '@mycircle/shared';
-import type { Poll } from '../types';
+import type { Poll, UserVoteMap } from '../types';
 
 const logger = createLogger('usePolls');
 const CACHE_KEY = 'poll-system-cache';
@@ -9,6 +9,7 @@ export function usePolls() {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userVotes, setUserVotes] = useState<UserVoteMap>({});
 
   useEffect(() => {
     const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -45,6 +46,16 @@ export function usePolls() {
     setLoading(false);
   }, []);
 
+  // Subscribe to user's votes across all polls
+  useEffect(() => {
+    const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!api?.subscribeToUserVotes) return;
+    const unsubscribe = api.subscribeToUserVotes((votes: Record<string, string>) => {
+      setUserVotes(votes);
+    });
+    return unsubscribe;
+  }, []);
+
   const addPoll = useCallback(async (poll: Omit<Poll, 'id' | 'createdAt' | 'updatedAt'>) => {
     const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (api?.add) {
@@ -77,13 +88,15 @@ export function usePolls() {
     });
   }, []);
 
-  const vote = useCallback(async (pollId: string, optionId: string) => {
+  const castVote = useCallback(async (pollId: string, optionId: string) => {
     const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
-    if (api?.vote) {
-      await api.vote(pollId, optionId);
+    if (api?.castVote) {
+      await api.castVote(pollId, optionId);
+      setUserVotes(prev => ({ ...prev, [pollId]: optionId }));
       return;
     }
-    // Optimistic local update
+    // Optimistic local update (offline fallback)
+    setUserVotes(prev => ({ ...prev, [pollId]: optionId }));
     setPolls(prev => prev.map(p => {
       if (p.id !== pollId) return p;
       return {
@@ -96,5 +109,28 @@ export function usePolls() {
     }));
   }, []);
 
-  return { polls, loading, error, addPoll, deletePoll, vote };
+  const changeVote = useCallback(async (pollId: string, oldOptionId: string, newOptionId: string) => {
+    const api = (window as any).__pollSystem; // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (api?.changeVote) {
+      await api.changeVote(pollId, oldOptionId, newOptionId);
+      setUserVotes(prev => ({ ...prev, [pollId]: newOptionId }));
+      return;
+    }
+    // Optimistic local update (offline fallback)
+    setUserVotes(prev => ({ ...prev, [pollId]: newOptionId }));
+    setPolls(prev => prev.map(p => {
+      if (p.id !== pollId) return p;
+      return {
+        ...p,
+        updatedAt: Date.now(),
+        options: p.options.map(o => {
+          if (o.id === oldOptionId) return { ...o, votes: Math.max(0, o.votes - 1) };
+          if (o.id === newOptionId) return { ...o, votes: o.votes + 1 };
+          return o;
+        }),
+      };
+    }));
+  }, []);
+
+  return { polls, loading, error, userVotes, addPoll, deletePoll, castVote, changeVote };
 }

@@ -200,6 +200,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - Firestore `users/{uid}/hikingRoutes` + `publicHikingRoutes` (existing); IndexedDB fallback for unauthenticated users (existing) (017-trail-map-gpx)
 - TypeScript 5.x (frontend + Cloud Functions, Node 22) + React 18, Apollo Client/Server, `pg` (node-postgres, new in functions/), Tailwind CSS (018-sql-analytics)
 - PostgreSQL (external, via Cloudflare tunnel) + Firestore (existing, primary) (018-sql-analytics)
+- TypeScript 5.x, React 18 + Firebase Firestore SDK (shell-only), `@mycircle/shared` (i18n, PageContent), Vite Module Federation (021-polls-enhancements)
+- Firestore — existing `polls` collection + new `votes` subcollection; localStorage cache (existing fallback) (021-polls-enhancements)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)
