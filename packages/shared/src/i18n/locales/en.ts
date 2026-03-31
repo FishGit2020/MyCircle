@@ -3107,6 +3107,8 @@ const en = {
   'setup.sql.deleteConfirm': 'Remove SQL connection? Analytics data in the database will not be deleted.',
   'setup.sql.status.connected': 'Connected',
   'setup.sql.status.disconnected': 'Not Connected',
+  'setup.sql.savedSuccess': 'Connection saved and tested successfully',
+  'setup.sql.savedWithError': 'Connection saved but test failed',
   'setup.sql.status.error': 'Connection Error',
   'setup.sql.status.none': 'No connection configured',
   'setup.sql.lastTested': 'Last tested',
