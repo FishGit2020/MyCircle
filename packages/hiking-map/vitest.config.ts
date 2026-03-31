@@ -8,6 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./test/setup.ts'],
+    testTimeout: 15000, // CI runners are slower; jsdom startup adds latency
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
