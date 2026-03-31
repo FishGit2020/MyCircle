@@ -217,12 +217,26 @@ export function createDigitalLibraryResolvers() {
           throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
         }
 
+        const uid = bookDoc.data()!.uploadedBy?.uid as string | undefined;
+
         // Delete chapters subcollection + book doc in a batch
         const chaptersSnap = await bookRef.collection('chapters').get();
         const batch = db.batch();
         for (const chapDoc of chaptersSnap.docs) batch.delete(chapDoc.ref);
         batch.delete(bookRef);
         await batch.commit();
+
+        // Delete conversion job docs for this book
+        if (uid) {
+          const jobsSnap = await db.collection(`users/${uid}/conversionJobs`)
+            .where('bookId', '==', id).get();
+          const batchJobsSnap = await db.collection(`users/${uid}/conversionBatchJobs`)
+            .where('bookId', '==', id).get();
+          const jobBatch = db.batch();
+          for (const d of jobsSnap.docs) jobBatch.delete(d.ref);
+          for (const d of batchJobsSnap.docs) jobBatch.delete(d.ref);
+          if (jobsSnap.size + batchJobsSnap.size > 0) await jobBatch.commit();
+        }
 
         // Delete storage files
         const bucket = getStorage().bucket();
