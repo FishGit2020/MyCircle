@@ -244,6 +244,18 @@ export const typeDefs = `#graphql
     createdAt: String!
   }
 
+  type ConversionBatchJob {
+    id: ID!
+    bookId: ID!
+    chapterIndices: [Int!]!
+    voiceName: String!
+    status: String!
+    currentChapter: Int
+    completedChapters: [Int!]!
+    error: String
+    createdAt: String!
+  }
+
   # ─── USCIS Case Status Types ─────────────────────────────────
 
   type CaseStatusHistory {
@@ -550,6 +562,7 @@ export const typeDefs = `#graphql
     bookConversionProgress(bookId: ID!): BookConversionProgress!
     ttsQuota: TtsQuota!
     conversionJobs(bookId: ID!): [ConversionJob!]!
+    conversionBatchJob(bookId: ID!): ConversionBatchJob
 
     # Web Crawler (auth required)
     crawlJobs: [CrawlJob!]!
@@ -1206,6 +1219,7 @@ export const typeDefs = `#graphql
     restoreBook(id: ID!): Boolean!
     permanentDeleteBook(id: ID!): Boolean!
     submitChapterConversions(bookId: ID!, chapterIndices: [Int!]!, voiceName: String!): [ConversionJob!]!
+    submitBatchConversion(bookId: ID!, chapterIndices: [Int!]!, voiceName: String!): ConversionBatchJob!
     uploadBook(fileBase64: String!): Book!
     deleteChapterAudio(bookId: ID!, chapterIndex: Int!): Boolean!
     resetBookConversion(bookId: ID!): Boolean!

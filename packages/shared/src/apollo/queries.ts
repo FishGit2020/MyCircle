@@ -1114,6 +1114,33 @@ export const SUBMIT_CHAPTER_CONVERSIONS = gql`
   }
 `;
 
+export const SUBMIT_BATCH_CONVERSION = gql`
+  mutation SubmitBatchConversion($bookId: ID!, $chapterIndices: [Int!]!, $voiceName: String!) {
+    submitBatchConversion(bookId: $bookId, chapterIndices: $chapterIndices, voiceName: $voiceName) {
+      id
+      status
+      chapterIndices
+      completedChapters
+    }
+  }
+`;
+
+export const GET_CONVERSION_BATCH_JOB = gql`
+  query GetConversionBatchJob($bookId: ID!) {
+    conversionBatchJob(bookId: $bookId) {
+      id
+      bookId
+      chapterIndices
+      voiceName
+      status
+      currentChapter
+      completedChapters
+      error
+      createdAt
+    }
+  }
+`;
+
 export const UPLOAD_BOOK = gql`
   mutation UploadBook($fileBase64: String!) {
     uploadBook(fileBase64: $fileBase64) {
