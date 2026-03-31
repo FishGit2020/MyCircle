@@ -26,7 +26,19 @@ Cloud Functions communicate with PostgreSQL via a lightweight HTTP proxy (`sql-p
 
 ```bash
 cd deploy/sql-proxy
-# Edit docker-compose.yml — change POSTGRES_PASSWORD and API_KEY
+# Edit docker-compose.yml — change these two values:
+```
+
+Open `docker-compose.yml` and set your own values for:
+
+- **`POSTGRES_PASSWORD`** — internal database password (only used between the proxy and Postgres inside Docker; you never enter this in MyCircle)
+- **`API_KEY`** — authenticates MyCircle Cloud Functions with your proxy (this is what you enter in the Setup page "API Key" field)
+
+Make sure `DATABASE_URL` matches your chosen password:
+```yaml
+POSTGRES_PASSWORD: mydb2026                                          # ← pick anything
+DATABASE_URL: postgres://postgres:mydb2026@postgres:5432/mycircle    # ← password must match
+API_KEY: sk-mycircle-abc123                                          # ← pick anything
 ```
 
 **2. Start everything**
