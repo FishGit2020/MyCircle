@@ -277,6 +277,14 @@ export function createDigitalLibraryResolvers() {
           });
         }
 
+        // Mark book as processing immediately so cancel button appears on reload
+        if (jobs.length > 0) {
+          await db.collection('books').doc(bookId).update({
+            audioStatus: 'processing',
+            updatedAt: FieldValue.serverTimestamp(),
+          });
+        }
+
         return jobs;
       },
 
@@ -309,6 +317,12 @@ export function createDigitalLibraryResolvers() {
           completedChapters: [],
           error: null,
           createdAt: now,
+        });
+
+        // Mark book as processing immediately so cancel button appears on reload
+        await db.collection('books').doc(bookId).update({
+          audioStatus: 'processing',
+          updatedAt: now,
         });
 
         return {
