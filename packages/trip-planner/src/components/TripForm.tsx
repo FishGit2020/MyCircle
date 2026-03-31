@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import type { Trip } from '../types';
+import type { Trip, TripStatus } from '../types';
 import DestinationSearch from './DestinationSearch';
 
 interface TripFormProps {
@@ -22,6 +22,7 @@ export default function TripForm({ trip, onSave, onCancel, initialDestination, i
   const [notes, setNotes] = useState(trip?.notes || '');
   const [budget, setBudget] = useState(trip?.budget || 0);
   const [currency, setCurrency] = useState(trip?.currency || 'USD');
+  const [status, setStatus] = useState<TripStatus>(trip?.status || 'planning');
 
   const handleDestinationSelect = useCallback((result: { displayName: string; lat: number; lon: number }) => {
     setDestination(result.displayName);
@@ -42,8 +43,11 @@ export default function TripForm({ trip, onSave, onCancel, initialDestination, i
       lat,
       lon,
       itinerary: trip?.itinerary || [],
+      tickets: trip?.tickets,
+      checklist: trip?.checklist,
+      status,
     });
-  }, [destination, startDate, endDate, notes, budget, currency, lat, lon, trip, onSave]);
+  }, [destination, startDate, endDate, notes, budget, currency, lat, lon, status, trip, onSave]);
 
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-4">
@@ -136,6 +140,23 @@ export default function TripForm({ trip, onSave, onCancel, initialDestination, i
             <option value="TWD">TWD</option>
           </select>
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="tp-status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {t('tripPlanner.statusLabel')}
+        </label>
+        <select
+          id="tp-status"
+          value={status}
+          onChange={e => setStatus(e.target.value as TripStatus)}
+          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition"
+        >
+          <option value="planning">{t('tripPlanner.statusPlanning')}</option>
+          <option value="confirmed">{t('tripPlanner.statusConfirmed')}</option>
+          <option value="completed">{t('tripPlanner.statusCompleted')}</option>
+          <option value="cancelled">{t('tripPlanner.statusCancelled')}</option>
+        </select>
       </div>
 
       <div>

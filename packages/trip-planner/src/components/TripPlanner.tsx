@@ -4,7 +4,7 @@ import { useTrips } from '../hooks/useTrips';
 import TripList from './TripList';
 import TripForm from './TripForm';
 import TripDetail from './TripDetail';
-import type { Trip } from '../types';
+import type { Trip, ChecklistItem } from '../types';
 
 type View = 'list' | 'new' | 'detail';
 
@@ -80,6 +80,33 @@ export default function TripPlanner() {
     setSelectedTrip(null);
   }, []);
 
+  const handleDuplicate = useCallback(async (trip: Trip) => {
+    const duplicated: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'> = {
+      destination: trip.destination,
+      startDate: '',
+      endDate: '',
+      notes: trip.notes,
+      budget: trip.budget,
+      currency: trip.currency,
+      lat: trip.lat,
+      lon: trip.lon,
+      status: 'planning',
+      itinerary: trip.itinerary.map(day => ({
+        ...day,
+        activities: day.activities.map(a => ({ ...a, id: crypto.randomUUID() })),
+      })),
+      tickets: (trip.tickets || []).map(tk => ({ ...tk, id: crypto.randomUUID() })),
+      checklist: (trip.checklist || []).map((item: ChecklistItem) => ({
+        ...item,
+        id: crypto.randomUUID(),
+        checked: false,
+      })),
+    };
+    await addTrip(duplicated);
+    setView('list');
+    setSelectedTrip(null);
+  }, [addTrip]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16" role="status" aria-live="polite">
@@ -121,6 +148,7 @@ export default function TripPlanner() {
           onDelete={() => handleDelete(currentTrip.id)}
           onBack={handleBack}
           onUpdate={updateTrip}
+          onDuplicate={() => handleDuplicate(currentTrip)}
         />
       </PageContent>
     );
