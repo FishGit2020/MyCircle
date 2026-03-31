@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents } from '@mycircle/shared';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, useLazyQuery, GET_CONVERSION_JOBS, SUBMIT_CHAPTER_CONVERSIONS } from '@mycircle/shared';
 import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
@@ -31,10 +31,40 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   const { t } = useTranslation();
   const [converting, setConverting] = useState<number | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [queueProcessing, setQueueProcessing] = useState(false);
   const autoPlayedRef = useRef(false);
   const pollAbortRef = useRef(false);
-  const queueAbortRef = useRef(false);
+
+  // Query active conversion jobs to restore state after navigation
+  const { data: jobsData, refetch: refetchJobs } = useQuery(GET_CONVERSION_JOBS, {
+    variables: { bookId },
+    fetchPolicy: 'cache-and-network',
+  });
+  const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
+  const [pollJobs] = useLazyQuery(GET_CONVERSION_JOBS, { fetchPolicy: 'network-only' });
+
+  // Derive which chapters are actively converting from backend jobs
+  const activeJobs = useMemo(() => {
+    const jobs = (jobsData?.conversionJobs ?? []) as Array<{ id: string; chapterIndex: number; status: string; error?: string | null }>;
+    return jobs.filter(j => j.status === 'pending' || j.status === 'processing');
+  }, [jobsData]);
+
+  const activeChapterIndices = useMemo(() => new Set(activeJobs.map(j => j.chapterIndex)), [activeJobs]);
+
+  // Poll for job completion when there are active jobs
+  useEffect(() => {
+    if (activeJobs.length === 0) return;
+    const interval = setInterval(async () => {
+      const result = await pollJobs({ variables: { bookId } });
+      const jobs = result.data?.conversionJobs ?? [];
+      const stillActive = (jobs as Array<{ status: string }>).some(j => j.status === 'pending' || j.status === 'processing');
+      if (!stillActive) {
+        clearInterval(interval);
+        onChapterConverted(); // Refresh chapters to show new audio URLs
+      }
+      refetchJobs();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeJobs.length, bookId, pollJobs, refetchJobs, onChapterConverted]);
 
   const audioChapters = chapters.filter(ch => ch.audioUrl);
 
@@ -141,7 +171,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   // Stop polling on unmount
   useEffect(() => {
-    return () => { pollAbortRef.current = true; queueAbortRef.current = true; };
+    return () => { pollAbortRef.current = true; };
   }, []);
 
   const unconvertedChapters = chapters.filter(ch => !ch.audioUrl);
@@ -165,47 +195,16 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   const handleConvertSelected = useCallback(async () => {
     if (selected.size === 0) return;
     const indices = [...selected].sort((a, b) => a - b);
-    setQueueProcessing(true);
-    queueAbortRef.current = false;
-
-    for (const idx of indices) {
-      if (queueAbortRef.current) break;
-      setConverting(idx);
-      try {
-        const token = await window.__getFirebaseIdToken?.();
-        if (!token) break;
-        const apiBase = window.__digitalLibraryApiBase?.() || '';
-        const res = await fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ bookId, voiceName, chapterIndex: idx }),
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          logger.warn('Chapter conversion failed', data);
-          if (res.status === 429) break; // Quota exhausted — stop the queue
-        }
-        // Wait for this chapter to finish before starting next
-        let attempts = 0;
-        while (attempts < 60 && !queueAbortRef.current) {
-          await new Promise(r => setTimeout(r, 5000));
-          attempts++;
-          await onChapterConverted();
-          // Check if this chapter now has audio
-          const updated = chapters.find(ch => ch.index === idx);
-          if (updated?.audioUrl) break;
-        }
-      } catch (err) {
-        if (!isAbortError(err)) logger.error('Queue conversion failed', err);
-        break;
-      }
+    try {
+      await submitConversions({
+        variables: { bookId, chapterIndices: indices, voiceName },
+      });
+      await refetchJobs(); // Refresh job list so UI shows pending state
+      setSelected(new Set());
+    } catch (err) {
+      if (!isAbortError(err)) logger.error('Failed to submit conversions', err);
     }
-
-    setConverting(null);
-    setQueueProcessing(false);
-    setSelected(new Set());
-    onChapterConverted();
-  }, [selected, bookId, voiceName, chapters, onChapterConverted]);
+  }, [selected, bookId, voiceName, submitConversions, refetchJobs]);
 
   const handleCancel = useCallback(() => {
     pollAbortRef.current = true;
@@ -247,7 +246,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
         </span>
       </div>
       {/* Multi-select toolbar */}
-      {unconvertedChapters.length > 0 && !queueProcessing && (
+      {unconvertedChapters.length > 0 && !activeJobs.length > 0 && (
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <button
             type="button"
@@ -269,25 +268,22 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
               {t('library.convertSelected').replace('{count}', String(selected.size))}
             </button>
           )}
-          {queueProcessing && (
-            <button
-              type="button"
-              onClick={() => { queueAbortRef.current = true; }}
-              className="text-xs text-red-600 dark:text-red-400 hover:underline min-h-[44px]"
-            >
-              {t('library.cancelQueue')}
-            </button>
+          {activeJobs.length > 0 && (
+            <span className="text-xs text-purple-600 dark:text-purple-400 flex items-center gap-1">
+              <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              {t('library.queueActive').replace('{count}', String(activeJobs.length))}
+            </span>
           )}
         </div>
       )}
       <ul className="divide-y divide-gray-200 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {chapters.map(ch => {
           const hasAudio = !!ch.audioUrl;
-          const isConverting = converting === ch.index;
+          const isConverting = converting === ch.index || activeChapterIndices.has(ch.index);
           return (
             <li key={ch.index} className="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-gray-800">
               {/* Checkbox for unconverted chapters */}
-              {!hasAudio && !isConverting && !queueProcessing && (
+              {!hasAudio && !isConverting && !activeJobs.length > 0 && (
                 <input
                   type="checkbox"
                   checked={selected.has(ch.index)}
