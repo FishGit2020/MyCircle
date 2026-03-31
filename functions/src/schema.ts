@@ -583,6 +583,16 @@ export const typeDefs = `#graphql
     resumeParseJob(id: ID!): ResumeParseJob
     resumeActiveParseJob: ResumeParseJob
     scrapeJobUrl(url: String!): String
+
+    # SQL Analytics (auth required)
+    sqlConnectionStatus: SqlConnectionStatus
+    sqlBackfillStatus: SqlBackfillStatus
+    sqlAnalyticsSummary(days: Int = 30): SqlAnalyticsSummary
+    sqlLatencyPercentiles(days: Int = 30): [SqlLatencyPercentiles!]!
+    sqlToolUsageStats(days: Int = 30): [SqlToolUsageStats!]!
+    sqlToolCoOccurrences(days: Int = 30, minCount: Int = 2): [SqlToolCoOccurrence!]!
+    sqlBenchmarkTrends(weeks: Int = 12): [SqlBenchmarkTrend!]!
+    sqlChatSearch(query: String!, limit: Int = 20): [SqlChatSearchResult!]!
   }
 
   type RadioStation {
@@ -1164,6 +1174,110 @@ export const typeDefs = `#graphql
     jdText: String
   }
 
+  # ─── SQL Analytics Types ──────────────────────────────────────
+
+  type SqlConnectionStatus {
+    tunnelUrl: String!
+    dbName: String!
+    status: String!
+    lastTestedAt: String
+    hasCredentials: Boolean!
+  }
+
+  type SqlBackfillStatus {
+    status: String!
+    totalMigrated: Int!
+    totalErrors: Int!
+    startedAt: String
+    completedAt: String
+    error: String
+  }
+
+  type SqlAnalyticsSummary {
+    totalCalls: Int!
+    totalInputTokens: Int!
+    totalOutputTokens: Int!
+    totalCost: Float
+    providerBreakdown: [SqlProviderStats!]!
+    modelBreakdown: [SqlModelStats!]!
+    dailyBreakdown: [SqlDailyStats!]!
+    since: String!
+  }
+
+  type SqlProviderStats {
+    provider: String!
+    calls: Int!
+    tokens: Int!
+    avgLatencyMs: Float!
+    errorRate: Float!
+  }
+
+  type SqlModelStats {
+    model: String!
+    provider: String!
+    calls: Int!
+    tokens: Int!
+    avgLatencyMs: Float!
+    estimatedCost: Float
+  }
+
+  type SqlDailyStats {
+    date: String!
+    calls: Int!
+    tokens: Int!
+    avgLatencyMs: Float!
+    errors: Int!
+  }
+
+  type SqlLatencyPercentiles {
+    provider: String!
+    model: String!
+    p50: Float!
+    p90: Float!
+    p99: Float!
+    sampleSize: Int!
+  }
+
+  type SqlToolUsageStats {
+    toolName: String!
+    callCount: Int!
+    avgDurationMs: Float
+    errorRate: Float!
+  }
+
+  type SqlToolCoOccurrence {
+    toolA: String!
+    toolB: String!
+    coOccurrences: Int!
+  }
+
+  type SqlBenchmarkTrend {
+    endpointName: String!
+    model: String!
+    week: String!
+    avgTps: Float!
+    avgTtft: Float!
+    sampleSize: Int!
+  }
+
+  type SqlChatSearchResult {
+    id: String!
+    timestamp: String!
+    provider: String!
+    model: String!
+    questionPreview: String!
+    answerPreview: String!
+    latencyMs: Int!
+    totalTokens: Int!
+  }
+
+  input SqlConnectionInput {
+    tunnelUrl: String!
+    dbName: String
+    username: String
+    password: String
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String, systemPrompt: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
@@ -1238,6 +1352,12 @@ export const typeDefs = `#graphql
     boostAtsScore(resumeJson: String!, jdText: String!, model: String!, endpointId: ID): GeneratedResumeResult!
     saveResumeApplication(input: ResumeApplicationInput!): ResumeApplication!
     deleteResumeApplication(id: ID!): Boolean!
+
+    # SQL Analytics (auth required)
+    saveSqlConnection(input: SqlConnectionInput!): SqlConnectionStatus!
+    testSqlConnection: SqlConnectionStatus!
+    deleteSqlConnection: Boolean!
+    startSqlBackfill: SqlBackfillStatus!
   }
 
   schema {

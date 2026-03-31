@@ -208,6 +208,10 @@ const resumeTailorRemote = isProduction
   ? '/resume-tailor/assets/remoteEntry.js'
   : 'http://localhost:3023/assets/remoteEntry.js';
 
+const setupRemote = isProduction
+  ? '/setup/assets/remoteEntry.js'
+  : 'http://localhost:3032/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -243,7 +247,8 @@ export default defineConfig({
         travelMap: travelMapRemote,
         dealFinder: dealFinderRemote,
         webCrawler: webCrawlerRemote,
-        resumeTailor: resumeTailorRemote
+        resumeTailor: resumeTailorRemote,
+        setup: setupRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },

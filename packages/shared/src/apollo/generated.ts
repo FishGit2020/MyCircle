@@ -590,6 +590,7 @@ export type Mutation = {
   deleteNote: Scalars['Boolean']['output'];
   deleteResumeApplication: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
+  deleteSqlConnection: Scalars['Boolean']['output'];
   deleteWorshipSetlist: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
   generateResume: GeneratedResumeResult;
@@ -608,14 +609,17 @@ export type Mutation = {
   saveInterviewSession: InterviewSessionDetail;
   saveResumeApplication: ResumeApplication;
   saveResumeFactBank: ResumeFactBank;
+  saveSqlConnection: SqlConnectionStatus;
   scoreBenchmarkResponse: BenchmarkQualityResult;
   shareFile: ShareFileResult;
   shareFileWith: TargetedShareResult;
   startCrawl: CrawlJob;
+  startSqlBackfill: SqlBackfillStatus;
   stopCrawl: CrawlJob;
   submitBatchConversion: ConversionBatchJob;
   submitChapterConversions: Array<ConversionJob>;
   submitResumeParse: ResumeParseJob;
+  testSqlConnection: SqlConnectionStatus;
   updateInterviewQuestion: InterviewQuestion;
   updateNote: Note;
   updateWorshipSetlist: Setlist;
@@ -845,6 +849,11 @@ export type MutationSaveResumeFactBankArgs = {
 };
 
 
+export type MutationSaveSqlConnectionArgs = {
+  input: SqlConnectionInput;
+};
+
+
 export type MutationScoreBenchmarkResponseArgs = {
   judgeEndpointId?: InputMaybe<Scalars['String']['input']>;
   judgeModel?: InputMaybe<Scalars['String']['input']>;
@@ -1061,6 +1070,14 @@ export type Query = {
   searchPodcasts: PodcastSearchResponse;
   searchStocks: Array<StockSearchResult>;
   sharedFiles: Array<SharedFile>;
+  sqlAnalyticsSummary?: Maybe<SqlAnalyticsSummary>;
+  sqlBackfillStatus?: Maybe<SqlBackfillStatus>;
+  sqlBenchmarkTrends: Array<SqlBenchmarkTrend>;
+  sqlChatSearch: Array<SqlChatSearchResult>;
+  sqlConnectionStatus?: Maybe<SqlConnectionStatus>;
+  sqlLatencyPercentiles: Array<SqlLatencyPercentiles>;
+  sqlToolCoOccurrences: Array<SqlToolCoOccurrence>;
+  sqlToolUsageStats: Array<SqlToolUsageStats>;
   stockCandles?: Maybe<StockCandle>;
   stockQuote?: Maybe<StockQuote>;
   transitArrivals: Array<TransitArrival>;
@@ -1281,6 +1298,38 @@ export type QuerySearchPodcastsArgs = {
 
 export type QuerySearchStocksArgs = {
   query: Scalars['String']['input'];
+};
+
+
+export type QuerySqlAnalyticsSummaryArgs = {
+  days?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QuerySqlBenchmarkTrendsArgs = {
+  weeks?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QuerySqlChatSearchArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  query: Scalars['String']['input'];
+};
+
+
+export type QuerySqlLatencyPercentilesArgs = {
+  days?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QuerySqlToolCoOccurrencesArgs = {
+  days?: InputMaybe<Scalars['Int']['input']>;
+  minCount?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QuerySqlToolUsageStatsArgs = {
+  days?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1612,6 +1661,119 @@ export type SharedFile = {
   sharedByUid: Scalars['String']['output'];
   size: Scalars['Int']['output'];
   storagePath: Scalars['String']['output'];
+};
+
+export type SqlAnalyticsSummary = {
+  __typename?: 'SqlAnalyticsSummary';
+  dailyBreakdown: Array<SqlDailyStats>;
+  modelBreakdown: Array<SqlModelStats>;
+  providerBreakdown: Array<SqlProviderStats>;
+  since: Scalars['String']['output'];
+  totalCalls: Scalars['Int']['output'];
+  totalCost?: Maybe<Scalars['Float']['output']>;
+  totalInputTokens: Scalars['Int']['output'];
+  totalOutputTokens: Scalars['Int']['output'];
+};
+
+export type SqlBackfillStatus = {
+  __typename?: 'SqlBackfillStatus';
+  completedAt?: Maybe<Scalars['String']['output']>;
+  error?: Maybe<Scalars['String']['output']>;
+  startedAt?: Maybe<Scalars['String']['output']>;
+  status: Scalars['String']['output'];
+  totalErrors: Scalars['Int']['output'];
+  totalMigrated: Scalars['Int']['output'];
+};
+
+export type SqlBenchmarkTrend = {
+  __typename?: 'SqlBenchmarkTrend';
+  avgTps: Scalars['Float']['output'];
+  avgTtft: Scalars['Float']['output'];
+  endpointName: Scalars['String']['output'];
+  model: Scalars['String']['output'];
+  sampleSize: Scalars['Int']['output'];
+  week: Scalars['String']['output'];
+};
+
+export type SqlChatSearchResult = {
+  __typename?: 'SqlChatSearchResult';
+  answerPreview: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  latencyMs: Scalars['Int']['output'];
+  model: Scalars['String']['output'];
+  provider: Scalars['String']['output'];
+  questionPreview: Scalars['String']['output'];
+  timestamp: Scalars['String']['output'];
+  totalTokens: Scalars['Int']['output'];
+};
+
+export type SqlConnectionInput = {
+  dbName?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  tunnelUrl: Scalars['String']['input'];
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SqlConnectionStatus = {
+  __typename?: 'SqlConnectionStatus';
+  dbName: Scalars['String']['output'];
+  hasCredentials: Scalars['Boolean']['output'];
+  lastTestedAt?: Maybe<Scalars['String']['output']>;
+  status: Scalars['String']['output'];
+  tunnelUrl: Scalars['String']['output'];
+};
+
+export type SqlDailyStats = {
+  __typename?: 'SqlDailyStats';
+  avgLatencyMs: Scalars['Float']['output'];
+  calls: Scalars['Int']['output'];
+  date: Scalars['String']['output'];
+  errors: Scalars['Int']['output'];
+  tokens: Scalars['Int']['output'];
+};
+
+export type SqlLatencyPercentiles = {
+  __typename?: 'SqlLatencyPercentiles';
+  model: Scalars['String']['output'];
+  p50: Scalars['Float']['output'];
+  p90: Scalars['Float']['output'];
+  p99: Scalars['Float']['output'];
+  provider: Scalars['String']['output'];
+  sampleSize: Scalars['Int']['output'];
+};
+
+export type SqlModelStats = {
+  __typename?: 'SqlModelStats';
+  avgLatencyMs: Scalars['Float']['output'];
+  calls: Scalars['Int']['output'];
+  estimatedCost?: Maybe<Scalars['Float']['output']>;
+  model: Scalars['String']['output'];
+  provider: Scalars['String']['output'];
+  tokens: Scalars['Int']['output'];
+};
+
+export type SqlProviderStats = {
+  __typename?: 'SqlProviderStats';
+  avgLatencyMs: Scalars['Float']['output'];
+  calls: Scalars['Int']['output'];
+  errorRate: Scalars['Float']['output'];
+  provider: Scalars['String']['output'];
+  tokens: Scalars['Int']['output'];
+};
+
+export type SqlToolCoOccurrence = {
+  __typename?: 'SqlToolCoOccurrence';
+  coOccurrences: Scalars['Int']['output'];
+  toolA: Scalars['String']['output'];
+  toolB: Scalars['String']['output'];
+};
+
+export type SqlToolUsageStats = {
+  __typename?: 'SqlToolUsageStats';
+  avgDurationMs?: Maybe<Scalars['Float']['output']>;
+  callCount: Scalars['Int']['output'];
+  errorRate: Scalars['Float']['output'];
+  toolName: Scalars['String']['output'];
 };
 
 export type StartCrawlInput = {
@@ -2725,3 +2887,79 @@ export type DeleteResumeApplicationMutationVariables = Exact<{
 
 
 export type DeleteResumeApplicationMutation = { __typename?: 'Mutation', deleteResumeApplication: boolean };
+
+export type GetSqlConnectionStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSqlConnectionStatusQuery = { __typename?: 'Query', sqlConnectionStatus?: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, dbName: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } | null };
+
+export type SaveSqlConnectionMutationVariables = Exact<{
+  input: SqlConnectionInput;
+}>;
+
+
+export type SaveSqlConnectionMutation = { __typename?: 'Mutation', saveSqlConnection: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, dbName: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
+
+export type TestSqlConnectionMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TestSqlConnectionMutation = { __typename?: 'Mutation', testSqlConnection: { __typename?: 'SqlConnectionStatus', tunnelUrl: string, dbName: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
+
+export type DeleteSqlConnectionMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DeleteSqlConnectionMutation = { __typename?: 'Mutation', deleteSqlConnection: boolean };
+
+export type GetSqlBackfillStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSqlBackfillStatusQuery = { __typename?: 'Query', sqlBackfillStatus?: { __typename?: 'SqlBackfillStatus', status: string, totalMigrated: number, totalErrors: number, startedAt?: string | null, completedAt?: string | null, error?: string | null } | null };
+
+export type StartSqlBackfillMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type StartSqlBackfillMutation = { __typename?: 'Mutation', startSqlBackfill: { __typename?: 'SqlBackfillStatus', status: string, totalMigrated: number, totalErrors: number, startedAt?: string | null, completedAt?: string | null, error?: string | null } };
+
+export type GetSqlAnalyticsSummaryQueryVariables = Exact<{
+  days?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetSqlAnalyticsSummaryQuery = { __typename?: 'Query', sqlAnalyticsSummary?: { __typename?: 'SqlAnalyticsSummary', totalCalls: number, totalInputTokens: number, totalOutputTokens: number, totalCost?: number | null, since: string, providerBreakdown: Array<{ __typename?: 'SqlProviderStats', provider: string, calls: number, tokens: number, avgLatencyMs: number, errorRate: number }>, modelBreakdown: Array<{ __typename?: 'SqlModelStats', model: string, provider: string, calls: number, tokens: number, avgLatencyMs: number, estimatedCost?: number | null }>, dailyBreakdown: Array<{ __typename?: 'SqlDailyStats', date: string, calls: number, tokens: number, avgLatencyMs: number, errors: number }> } | null };
+
+export type GetSqlLatencyPercentilesQueryVariables = Exact<{
+  days?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetSqlLatencyPercentilesQuery = { __typename?: 'Query', sqlLatencyPercentiles: Array<{ __typename?: 'SqlLatencyPercentiles', provider: string, model: string, p50: number, p90: number, p99: number, sampleSize: number }> };
+
+export type GetSqlToolUsageStatsQueryVariables = Exact<{
+  days?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetSqlToolUsageStatsQuery = { __typename?: 'Query', sqlToolUsageStats: Array<{ __typename?: 'SqlToolUsageStats', toolName: string, callCount: number, avgDurationMs?: number | null, errorRate: number }> };
+
+export type GetSqlToolCoOccurrencesQueryVariables = Exact<{
+  days?: InputMaybe<Scalars['Int']['input']>;
+  minCount?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetSqlToolCoOccurrencesQuery = { __typename?: 'Query', sqlToolCoOccurrences: Array<{ __typename?: 'SqlToolCoOccurrence', toolA: string, toolB: string, coOccurrences: number }> };
+
+export type GetSqlBenchmarkTrendsQueryVariables = Exact<{
+  weeks?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetSqlBenchmarkTrendsQuery = { __typename?: 'Query', sqlBenchmarkTrends: Array<{ __typename?: 'SqlBenchmarkTrend', endpointName: string, model: string, week: string, avgTps: number, avgTtft: number, sampleSize: number }> };
+
+export type SqlChatSearchQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type SqlChatSearchQuery = { __typename?: 'Query', sqlChatSearch: Array<{ __typename?: 'SqlChatSearchResult', id: string, timestamp: string, provider: string, model: string, questionPreview: string, answerPreview: string, latencyMs: number, totalTokens: number }> };

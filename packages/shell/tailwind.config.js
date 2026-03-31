@@ -31,6 +31,7 @@ export default {
     "../deal-finder/src/**/*.{js,ts,jsx,tsx}",
     "../web-crawler/src/**/*.{js,ts,jsx,tsx}",
     "../resume-tailor/src/**/*.{js,ts,jsx,tsx}",
+    "../setup/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

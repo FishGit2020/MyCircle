@@ -2,15 +2,14 @@ import React, { useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { useTranslation, StorageKeys, PageContent } from '@mycircle/shared';
 import BenchmarkRunner from './BenchmarkRunner';
-import EndpointManager from './EndpointManager';
 import ResultsDashboard from './ResultsDashboard';
 import BenchmarkHistory from './BenchmarkHistory';
 import { useBenchmark } from '../hooks/useBenchmark';
 import type { BenchmarkRunResult } from '../hooks/useBenchmark';
 
-type Tab = 'run' | 'endpoints' | 'results' | 'history';
+type Tab = 'run' | 'results' | 'history';
 
-const TAB_KEYS: Tab[] = ['run', 'endpoints', 'results', 'history'];
+const TAB_KEYS: Tab[] = ['run', 'results', 'history'];
 const VALID_TABS = new Set<string>(TAB_KEYS);
 
 export default function ModelBenchmark() {
@@ -104,7 +103,6 @@ export default function ModelBenchmark() {
         <div className={activeTab === 'run' ? '' : 'hidden'}>
           <BenchmarkRunner onResults={handleResults} benchmark={benchmark} currentPromptIndex={currentPromptIndex} totalPrompts={totalPrompts} />
         </div>
-        {activeTab === 'endpoints' && <EndpointManager />}
         {activeTab === 'results' && <ResultsDashboard results={latestResults} saved={saved} saveError={saveError} onClear={handleClearResults} />}
         {activeTab === 'history' && <BenchmarkHistory />}
       </div>

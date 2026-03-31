@@ -4,6 +4,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 import type OpenAI from 'openai';
 import { logAiChatInteraction } from '../aiChatLogger.js';
 import type { AiToolCallTiming } from '../aiChatLogger.js';
+import { getCachedSqlConfig, createSqlClient } from '../sqlClient.js';
+import { logBenchmarkToSql } from '../sqlWriter.js';
 import { fetchUscisStatus } from '../uscisApi.js';
 import { searchCities, getCurrentWeather } from './weather.js';
 import { getStockQuote } from './stocks.js';
@@ -244,6 +246,24 @@ Return ONLY valid JSON with no other text: {"score": <number 1-10>, "feedback": 
       const ref = db.collection(`users/${uid}/benchmarkRuns`).doc();
       const data = { userId: uid, results, createdAt: new Date().toISOString() };
       await ref.set(data);
+
+      // SQL dual-write (fire-and-forget)
+      try {
+        const sqlConfig = await getCachedSqlConfig(uid);
+        if (sqlConfig && sqlConfig.status === 'connected') {
+          const sqlClient = await createSqlClient(sqlConfig);
+          try {
+            for (const r of (results as any[])) {
+              await logBenchmarkToSql(sqlClient, r, ref.id, uid);
+            }
+          } finally {
+            try { await sqlClient.end(); } catch { /* ignore */ }
+          }
+        }
+      } catch (sqlErr) {
+        // SQL failure must not affect benchmark save
+      }
+
       return { id: ref.id, ...data };
     },
 

@@ -189,7 +189,15 @@ export default function BenchmarkRunner({ onResults, benchmark, currentPromptInd
     <div className="space-y-5">
       {/* Endpoint Selection with inline model dropdowns */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('benchmark.runner.selectEndpoints')}</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('benchmark.runner.selectEndpoints')}</label>
+          <a
+            href="/setup"
+            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {t('benchmark.runner.manageEndpoints')}
+          </a>
+        </div>
         {endpoints.length === 0 ? (
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('benchmark.runner.noEndpoints')}</p>
         ) : (

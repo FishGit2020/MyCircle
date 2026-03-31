@@ -1003,6 +1003,51 @@ Auth profile loads -> ThemeSync reads profile.darkMode -> setThemeFromProfile()
 
 ---
 
+## SQL Analytics Layer
+
+MyCircle includes an optional SQL analytics layer that supplements Firestore with relational query capabilities.
+
+### Architecture
+
+- **Firestore** remains the primary data store for all live features
+- **PostgreSQL** (external, via Cloudflare tunnel) is a supplementary 2nd source for analytics
+- **Dual-write**: Cloud Functions write AI chat logs and benchmark results to both Firestore and SQL (fire-and-forget)
+- **Setup MFE** (`packages/setup`, port 3032): Configuration page for SQL connection, centralized AI endpoints, backfill, and analytics dashboard
+
+### Data Flow
+
+```
+User → AI Chat → Cloud Function → Firestore (primary, real-time)
+                                 ↘ SQL (supplementary, fire-and-forget)
+                                   via Cloudflare tunnel → PostgreSQL
+```
+
+### SQL Tables
+
+- `ai_chat_logs` — mirrors Firestore `aiChatLogs` collection
+- `ai_tool_calls` — normalized tool call records (1:N from chat logs)
+- `benchmark_results` — mirrors benchmark run results
+- `feature_events` — generic event log (future use)
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `functions/src/sqlClient.ts` | pg client wrapper, connection caching, schema init |
+| `functions/src/sqlWriter.ts` | Fire-and-forget SQL insert helpers |
+| `functions/src/resolvers/sql.ts` | GraphQL resolvers for SQL analytics queries |
+| `packages/setup/src/components/Setup.tsx` | Setup page with tabs |
+| `packages/setup/src/components/SqlConnectionSection.tsx` | SQL connection config form |
+| `packages/setup/src/components/AnalyticsDashboard.tsx` | Analytics container |
+
+### Setup Page Access
+
+- User menu (profile avatar dropdown) → "Setup" button
+- Command palette (Ctrl+K) → "Go to Setup"
+- Direct URL: `/setup`
+
+---
+
 ## Key Files Reference
 
 | Component | File Path | Purpose |

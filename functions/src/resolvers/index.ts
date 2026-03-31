@@ -23,6 +23,7 @@ import { createWebCrawlerResolvers } from './webCrawler.js';
 import { createRadioStationResolvers } from './radioStations.js';
 import { createRoutingResolvers } from './routing.js';
 import { createResumeTailorQueryResolvers, createResumeTailorMutationResolvers } from './resumeTailor.js';
+import { createSqlQueryResolvers, createSqlMutationResolvers } from './sql.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -60,6 +61,7 @@ export function createResolvers(
       ...webCrawlerResolvers.Mutation,
       ...notesResolvers.Mutation,
       ...createResumeTailorMutationResolvers(),
+      ...createSqlMutationResolvers(),
     },
 
     Query: {
@@ -86,6 +88,7 @@ export function createResolvers(
       ...createRadioStationResolvers().Query,
       ...createRoutingResolvers().Query,
       ...createResumeTailorQueryResolvers(),
+      ...createSqlQueryResolvers(),
     },
   };
 }
