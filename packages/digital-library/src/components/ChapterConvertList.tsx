@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, useLazyQuery, GET_CONVERSION_JOBS, SUBMIT_CHAPTER_CONVERSIONS } from '@mycircle/shared';
+import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, useLazyQuery, GET_CONVERSION_JOBS, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO } from '@mycircle/shared';
 import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
@@ -37,9 +37,10 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   // Query active conversion jobs to restore state after navigation
   const { data: jobsData, refetch: refetchJobs } = useQuery(GET_CONVERSION_JOBS, {
     variables: { bookId },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
   });
   const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
+  const [deleteChapterAudioMutation] = useMutation(DELETE_CHAPTER_AUDIO);
   const [pollJobs] = useLazyQuery(GET_CONVERSION_JOBS, { fetchPolicy: 'network-only' });
 
   // Derive which chapters are actively converting from backend jobs
@@ -130,44 +131,18 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
   }, [audioChapters.length]); // mount + when chapters load
 
   const handleConvert = useCallback(async (chapterIndex: number) => {
-    setConverting(chapterIndex);
-    pollAbortRef.current = false;
+    setConverting(chapterIndex); // Optimistic UI — show spinner immediately
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) return;
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ bookId, voiceName, chapterIndex }),
+      await submitConversions({
+        variables: { bookId, chapterIndices: [chapterIndex], voiceName },
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        logger.warn('Chapter conversion failed', data);
-      }
-      // Poll for completion (cancellable via pollAbortRef)
-      // Only notify parent once when done, not on every tick (avoids full page refresh loop)
-      const poll = async (attempts: number) => {
-        if (pollAbortRef.current || attempts > 40) {
-          setConverting(null);
-          onChapterConverted(); // Final refresh
-          return;
-        }
-        await new Promise(r => setTimeout(r, 5000));
-        if (pollAbortRef.current) return;
-        // Check silently — parent refetch will show new audio when chapter is done
-        onChapterConverted();
-        // Stop if chapter now has audio (parent will re-render with updated data)
-        // Otherwise keep polling
-        poll(attempts + 1);
-      };
-      // Wait before first poll to give server time
-      setTimeout(() => { if (!pollAbortRef.current) poll(0); }, 5000);
+      await refetchJobs();
     } catch (err) {
       if (!isAbortError(err)) logger.error('Chapter conversion failed', err);
-      setConverting(null);
+    } finally {
+      setConverting(null); // Clear optimistic state — activeChapterIndices takes over
     }
-  }, [bookId, voiceName, onChapterConverted]);
+  }, [bookId, voiceName, submitConversions, refetchJobs]);
 
   // Stop polling on unmount
   useEffect(() => {
@@ -217,21 +192,14 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
     if (!window.confirm(t('library.deleteAudioConfirm'))) return;
     setDeleting(chapterIndex);
     try {
-      const token = await window.__getFirebaseIdToken?.();
-      if (!token) return;
-      const apiBase = window.__digitalLibraryApiBase?.() || '';
-      const res = await fetch(`${apiBase}/digital-library-api/delete-chapter-audio`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ bookId, chapterIndex }),
-      });
-      if (res.ok) await onChapterConverted();
+      await deleteChapterAudioMutation({ variables: { bookId, chapterIndex } });
+      await onChapterConverted();
     } catch (err) {
       logger.error('Failed to delete chapter audio', err);
     } finally {
       setDeleting(null);
     }
-  }, [bookId, onChapterConverted, t]);
+  }, [bookId, onChapterConverted, t, deleteChapterAudioMutation]);
 
   const convertedCount = audioChapters.length;
 

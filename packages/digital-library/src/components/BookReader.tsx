@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation, createLogger, StorageKeys, WindowEvents } from '@mycircle/shared';
+import { useTranslation, createLogger, StorageKeys, WindowEvents, useMutation, SUBMIT_CHAPTER_CONVERSIONS } from '@mycircle/shared';
 import { useSearchParams } from 'react-router';
 import TableOfContents from './TableOfContents';
 import ReaderControls from './ReaderControls';
@@ -43,6 +43,7 @@ interface BookReaderProps {
 
 export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, onBack: _onBack, onRefreshChapters }: BookReaderProps) {
   const { t } = useTranslation();
+  const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') === 'listen' ? 'listen' : 'read';
   const autoPlayOnMount = searchParams.get('autoPlay') === '1';
@@ -655,19 +656,10 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             initialProgress={audioProgress}
             onComplete={() => { /* chapters refetch handles UI update */ }}
             onConvert={async (voiceName: string) => {
-              const token = await window.__getFirebaseIdToken?.();
-              if (!token) return undefined;
-              const apiBase = window.__digitalLibraryApiBase?.() || '';
-              try {
-                return await fetch(`${apiBase}/digital-library-api/convert-to-audio`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                  body: JSON.stringify({ bookId, voiceName }),
-                });
-              } catch (err) {
-                if (err instanceof DOMException && (err.code === 20 || err.name === 'AbortError')) return undefined;
-                throw err;
-              }
+              // Submit all unconverted chapters to the conversion queue
+              const unconverted = chapters.filter(ch => !ch.audioUrl).map(ch => ch.index);
+              if (unconverted.length === 0) return;
+              await submitConversions({ variables: { bookId, chapterIndices: unconverted, voiceName } });
             }}
           />
 

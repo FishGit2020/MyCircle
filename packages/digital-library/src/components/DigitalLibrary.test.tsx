@@ -13,6 +13,7 @@ vi.mock('@mycircle/shared', () => ({
   GET_BOOKS: {},
   GET_BOOK_CHAPTERS: {},
   DELETE_BOOK: {},
+  UPLOAD_BOOK: {},
   GET_TTS_QUOTA: {},
   StorageKeys: { LIBRARY_SORT: 'library-sort' },
 }));
