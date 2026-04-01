@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.23.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.22.0...mycircle-v1.23.0) (2026-04-01)
+
+
+### Features
+
+* **radio+tts:** radio enhancements and TTS free-tier optimization ([#925](https://github.com/FishGit2020/MyCircle/issues/925)) ([fc81f28](https://github.com/FishGit2020/MyCircle/commit/fc81f28b07c7bfd8106902a1745745f9c328d2be))
+* **setup:** add Retest Connection button to SQL connection section ([#923](https://github.com/FishGit2020/MyCircle/issues/923)) ([4671d4e](https://github.com/FishGit2020/MyCircle/commit/4671d4e557fa8a40413563f1b2ee6b2287f801cc))
+
+
+### Bug Fixes
+
+* **setup:** fix chat search missing data and add stop import button ([#920](https://github.com/FishGit2020/MyCircle/issues/920)) ([aeb15d6](https://github.com/FishGit2020/MyCircle/commit/aeb15d633b30d302e959eee6652e39b751de53b5))
+* **setup:** show previous import info in idle backfill state ([#921](https://github.com/FishGit2020/MyCircle/issues/921)) ([a54c354](https://github.com/FishGit2020/MyCircle/commit/a54c354e38b6ad4cbc792d77461e2e5ce4dee207))
+
+
+### Miscellaneous
+
+* **deps:** bump @xmldom/xmldom from 0.8.11 to 0.8.12 in /functions ([#924](https://github.com/FishGit2020/MyCircle/issues/924)) ([32b7140](https://github.com/FishGit2020/MyCircle/commit/32b71405131dad1822c2147edad924d2ba44bf91))
+
 ## [1.22.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.21.0...mycircle-v1.22.0) (2026-04-01)
 
 
