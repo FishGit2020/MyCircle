@@ -3141,6 +3141,7 @@ const es: Record<TranslationKey, string> = {
   'setup.sql.apiKeyPlaceholder': 'Ingresa la clave API de docker-compose.yml',
   'setup.sql.saveAndTest': 'Guardar y probar',
   'setup.sql.testing': 'Probando...',
+  'setup.sql.retest': 'Reprobar conexi\u00f3n',
   'setup.sql.delete': 'Eliminar conexi\u00f3n',
   'setup.sql.deleteConfirm': '\u00bfEliminar conexi\u00f3n SQL? Los datos en la base de datos no se borrar\u00e1n.',
   'setup.sql.status.connected': 'Conectado',

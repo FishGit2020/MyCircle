@@ -3141,6 +3141,7 @@ const en = {
   'setup.sql.apiKeyPlaceholder': 'Enter the API key from docker-compose.yml',
   'setup.sql.saveAndTest': 'Save & Test',
   'setup.sql.testing': 'Testing...',
+  'setup.sql.retest': 'Retest Connection',
   'setup.sql.delete': 'Remove Connection',
   'setup.sql.deleteConfirm': 'Remove SQL connection? Analytics data in the database will not be deleted.',
   'setup.sql.status.connected': 'Connected',
