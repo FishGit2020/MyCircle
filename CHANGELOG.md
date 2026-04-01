@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.22.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.21.0...mycircle-v1.22.0) (2026-04-01)
+
+
+### Features
+
+* **digital-library:** batch conversion worker with sequential processing ([#904](https://github.com/FishGit2020/MyCircle/issues/904)) ([f116e63](https://github.com/FishGit2020/MyCircle/commit/f116e634d34fbd46347596da24e61e0971f2cc94))
+* **poll-system:** add vote integrity, search/filter, analytics, change-vote, and export ([#914](https://github.com/FishGit2020/MyCircle/issues/914)) ([b7401d4](https://github.com/FishGit2020/MyCircle/commit/b7401d4376a4e72d961ccf49be8b454d385995d9))
+* **setup:** add SQL analytics layer with setup page and dual-write ([#908](https://github.com/FishGit2020/MyCircle/issues/908)) ([13cc678](https://github.com/FishGit2020/MyCircle/commit/13cc678660bdd062b933a513ee1b461406c0a93b))
+* **setup:** add SQL query runner tab and Adminer to Docker stack ([#919](https://github.com/FishGit2020/MyCircle/issues/919)) ([e19d3df](https://github.com/FishGit2020/MyCircle/commit/e19d3df509f2024ee6e24df1576f50dd9116656e))
+* **trip-planner:** enhance itinerary builder with edit, checklist, status, duplicate, export ([#912](https://github.com/FishGit2020/MyCircle/issues/912)) ([2e79b44](https://github.com/FishGit2020/MyCircle/commit/2e79b441cd4128595e5a61b54468ee3b1d2ad244))
+
+
+### Bug Fixes
+
+* **digital-library:** clean up conversion jobs on permanent book delete ([#909](https://github.com/FishGit2020/MyCircle/issues/909)) ([6e101cf](https://github.com/FishGit2020/MyCircle/commit/6e101cfda8749ca0c04878500abe2a61b0add805))
+* **digital-library:** reset button hidden + true cancellation ([#906](https://github.com/FishGit2020/MyCircle/issues/906)) ([c9dc88f](https://github.com/FishGit2020/MyCircle/commit/c9dc88fdc5afda0d4961216d4a5f3d34216c6784))
+* **digital-library:** set audioStatus processing on submit so cancel button shows ([#907](https://github.com/FishGit2020/MyCircle/issues/907)) ([cec3885](https://github.com/FishGit2020/MyCircle/commit/cec3885be166d21e48e67fd5388e9266482d3498))
+* **hiking-map:** increase testTimeout to 15000ms for CI environment ([#915](https://github.com/FishGit2020/MyCircle/issues/915)) ([5cc0d8e](https://github.com/FishGit2020/MyCircle/commit/5cc0d8e78ba020b9e96b9560630ef07007efb579))
+* **setup:** add cache-and-network fetch policy and refresh button to analytics ([#918](https://github.com/FishGit2020/MyCircle/issues/918)) ([930523c](https://github.com/FishGit2020/MyCircle/commit/930523c3d4b0b8ed259133627351510a587f30af))
+* **setup:** add missing i18n keys for SQL API key field ([#916](https://github.com/FishGit2020/MyCircle/issues/916)) ([0ae37f3](https://github.com/FishGit2020/MyCircle/commit/0ae37f34e4815697cab1f90e3cbcf9b363ddca3e))
+* **setup:** remove endpoint tab from AI assistant, add SQL setup docs ([#910](https://github.com/FishGit2020/MyCircle/issues/910)) ([92b62ff](https://github.com/FishGit2020/MyCircle/commit/92b62ff5980617a4da28e23fd247206be72407bc))
+* **setup:** use even-segment Firestore paths for SQL config ([#911](https://github.com/FishGit2020/MyCircle/issues/911)) ([b07ba31](https://github.com/FishGit2020/MyCircle/commit/b07ba3197db41c32822029a319176483aa9c3de1))
+
+
+### Code Refactoring
+
+* **setup:** replace direct pg with HTTP sql-proxy for Cloudflare tunnel ([#913](https://github.com/FishGit2020/MyCircle/issues/913)) ([b3c9097](https://github.com/FishGit2020/MyCircle/commit/b3c9097eb3c6d4b1c3abf95eeaf901856ab004b0))
+
+
+### Documentation
+
+* **setup:** explain POSTGRES_PASSWORD and API_KEY in SQL setup guide ([#917](https://github.com/FishGit2020/MyCircle/issues/917)) ([4769cb1](https://github.com/FishGit2020/MyCircle/commit/4769cb180bbddd7f103aff5f60437023fdffa76e))
+
 ## [1.21.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.20.1...mycircle-v1.21.0) (2026-03-31)
 
 
