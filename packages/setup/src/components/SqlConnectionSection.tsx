@@ -16,7 +16,7 @@ export default function SqlConnectionSection() {
   const [saveSqlConnection, { loading: saving }] = useMutation(SAVE_SQL_CONNECTION, {
     refetchQueries: [{ query: GET_SQL_CONNECTION_STATUS }],
   });
-  const [_testSqlConnection, { loading: testing }] = useMutation(TEST_SQL_CONNECTION, {
+  const [testSqlConnection, { loading: testing }] = useMutation(TEST_SQL_CONNECTION, {
     refetchQueries: [{ query: GET_SQL_CONNECTION_STATUS }],
   });
   const [deleteSqlConnection, { loading: deleting }] = useMutation(DELETE_SQL_CONNECTION, {
@@ -54,6 +54,22 @@ export default function SqlConnectionSection() {
         setErrorMessage(t('setup.sql.status.error'));
       }
       setApiKey('');
+    } catch (err: unknown) {
+      setSaveResult('error');
+      setErrorMessage(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const handleRetest = async () => {
+    setSaveResult(null);
+    setErrorMessage('');
+    try {
+      const result = await testSqlConnection();
+      const connStatus = result.data?.testSqlConnection?.status;
+      setSaveResult(connStatus === 'connected' ? 'saved' : 'error');
+      if (connStatus !== 'connected') {
+        setErrorMessage(t('setup.sql.status.error'));
+      }
     } catch (err: unknown) {
       setSaveResult('error');
       setErrorMessage(err instanceof Error ? err.message : String(err));
@@ -171,7 +187,18 @@ export default function SqlConnectionSection() {
           {saving || testing ? t('setup.sql.testing') : t('setup.sql.saveAndTest')}
         </button>
 
-        {status?.hasCredentials && (
+        {status && (
+          <button
+            type="button"
+            onClick={handleRetest}
+            disabled={saving || testing}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 rounded-lg transition"
+          >
+            {testing ? t('setup.sql.testing') : t('setup.sql.retest')}
+          </button>
+        )}
+
+        {status && (
           <button
             type="button"
             onClick={handleDelete}

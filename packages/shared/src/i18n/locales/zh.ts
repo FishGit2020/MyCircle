@@ -3141,6 +3141,7 @@ const zh: Record<TranslationKey, string> = {
   'setup.sql.apiKeyPlaceholder': '\u8f93\u5165 docker-compose.yml \u4e2d\u7684 API \u5bc6\u94a5',
   'setup.sql.saveAndTest': '\u4fdd\u5b58\u5e76\u6d4b\u8bd5',
   'setup.sql.testing': '\u6d4b\u8bd5\u4e2d...',
+  'setup.sql.retest': '\u91cd\u65b0\u6d4b\u8bd5\u8fde\u63a5',
   'setup.sql.delete': '\u5220\u9664\u8fde\u63a5',
   'setup.sql.deleteConfirm': '\u5220\u9664 SQL \u8fde\u63a5\uff1f\u6570\u636e\u5e93\u4e2d\u7684\u5206\u6790\u6570\u636e\u4e0d\u4f1a\u88ab\u5220\u9664\u3002',
   'setup.sql.status.connected': '\u5df2\u8fde\u63a5',
