@@ -1866,3 +1866,15 @@ export const SQL_CHAT_SEARCH = gql`
     }
   }
 `;
+
+export const SQL_RUN_QUERY = gql`
+  mutation SqlRunQuery($sql: String!, $limit: Int) {
+    sqlRunQuery(sql: $sql, limit: $limit) {
+      columns
+      rows
+      rowCount
+      durationMs
+      error
+    }
+  }
+`;

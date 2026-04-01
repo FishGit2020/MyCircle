@@ -5,6 +5,7 @@ import EndpointSection from './EndpointSection';
 import BackfillSection from './BackfillSection';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import ChatSearch from './analytics/ChatSearch';
+import SqlQueryRunner from './SqlQueryRunner';
 
 export default function Setup() {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ export default function Setup() {
     { id: 'backfill', label: t('setup.tabs.backfill') },
     { id: 'analytics', label: t('setup.tabs.analytics') },
     { id: 'search', label: t('setup.tabs.search') },
+    { id: 'query', label: t('setup.tabs.query') },
   ];
 
   return (
@@ -53,6 +55,7 @@ export default function Setup() {
       {activeTab === 'backfill' && <BackfillSection />}
       {activeTab === 'analytics' && <AnalyticsDashboard />}
       {activeTab === 'search' && <ChatSearch />}
+      {activeTab === 'query' && <SqlQueryRunner />}
     </PageContent>
   );
 }
