@@ -3174,6 +3174,8 @@ const zh: Record<TranslationKey, string> = {
   'setup.backfill.errors': '\u4e2a\u9519\u8bef',
   'setup.backfill.noConnection': '\u8bf7\u5148\u914d\u7f6e SQL \u8fde\u63a5',
   'setup.backfill.resume': '\u7ee7\u7eed\u5bfc\u5165',
+  'setup.backfill.cancel': '\u505c\u6b62\u5bfc\u5165',
+  'setup.backfill.cancelled': '\u5bfc\u5165\u5df2\u505c\u6b62',
   'setup.analytics.title': '\u5206\u6790',
   'setup.analytics.description': '\u6765\u81ea SQL \u6570\u636e\u5e93\u7684 AI \u4f7f\u7528\u5206\u6790',
   'setup.analytics.noData': '\u6682\u65e0\u5206\u6790\u6570\u636e\u3002\u8bf7\u5148\u53d1\u9001\u4e00\u4e9b AI \u804a\u5929\u6d88\u606f\u3002',

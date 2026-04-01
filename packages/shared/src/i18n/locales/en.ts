@@ -3174,6 +3174,8 @@ const en = {
   'setup.backfill.errors': 'errors',
   'setup.backfill.noConnection': 'Configure a SQL connection first',
   'setup.backfill.resume': 'Resume Import',
+  'setup.backfill.cancel': 'Stop Import',
+  'setup.backfill.cancelled': 'Import stopped',
   'setup.analytics.title': 'Analytics',
   'setup.analytics.description': 'AI usage analytics from SQL database',
   'setup.analytics.noData': 'No analytics data yet. Send some AI chat messages first.',

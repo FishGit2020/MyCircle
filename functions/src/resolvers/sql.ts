@@ -78,6 +78,10 @@ async function runBackfill(
       });
 
       if (snap.size < 500) hasMore = false;
+
+      // Check for cancellation between batches
+      const stateSnap = await db.doc(`users/${uid}/sqlBackfillState/status`).get();
+      if (stateSnap.data()?.status === 'cancelled') return;
     }
 
     // Backfill benchmark results
@@ -506,6 +510,17 @@ export function createSqlMutationResolvers() {
         completedAt: null,
         error: null,
       };
+    },
+
+    cancelSqlBackfill: async (_: any, __: any, ctx: any) => {
+      const uid = ctx?.uid;
+      if (!uid) throw new Error('Authentication required');
+      const db = getFirestore();
+      const ref = db.doc(`users/${uid}/sqlBackfillState/status`);
+      const snap = await ref.get();
+      if (!snap.exists || snap.data()?.status !== 'running') return false;
+      await ref.update({ status: 'cancelled', completedAt: new Date().toISOString() });
+      return true;
     },
 
     sqlRunQuery: async (_: any, { sql, limit = 200 }: { sql: string; limit?: number }, ctx: any) => {
