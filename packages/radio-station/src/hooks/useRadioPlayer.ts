@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { eventBus, MFEvents, subscribeToMFEvent, StorageKeys, WindowEvents } from '@mycircle/shared';
 import type { AudioSource, AudioPlaybackStateEvent } from '@mycircle/shared';
 import type { RadioStation } from '../types';
+import { useRecentlyPlayed } from './useRecentlyPlayed';
 
 /**
  * Radio player hook that delegates to the shell's GlobalAudioPlayer
@@ -10,6 +11,7 @@ import type { RadioStation } from '../types';
 export function useRadioPlayer() {
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { addToRecent } = useRecentlyPlayed();
 
   // Listen to playback state from GlobalAudioPlayer
   useEffect(() => {
@@ -61,8 +63,9 @@ export function useRadioPlayer() {
     };
 
     eventBus.publish(MFEvents.AUDIO_PLAY, source);
+    addToRecent(station);
     setCurrentStation(station);
-  }, [currentStation, isPlaying]);
+  }, [currentStation, isPlaying, addToRecent]);
 
   const stop = useCallback(() => {
     eventBus.publish(MFEvents.AUDIO_CLOSE);

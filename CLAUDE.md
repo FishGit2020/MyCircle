@@ -202,6 +202,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - PostgreSQL (external, via Cloudflare tunnel) + Firestore (existing, primary) (018-sql-analytics)
 - TypeScript 5.x, React 18 + Firebase Firestore SDK (shell-only), `@mycircle/shared` (i18n, PageContent), Vite Module Federation (021-polls-enhancements)
 - Firestore — existing `polls` collection + new `votes` subcollection; localStorage cache (existing fallback) (021-polls-enhancements)
+- TypeScript 5.x, React 18 (same as existing radio-station MFE) + `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent, eventBus, WindowEvents, MFEvents), `@originjs/vite-plugin-federation` (MFE — existing), Firebase Cloud Functions (backend resolvers — existing) (022-radio-enhancements)
+- `localStorage` — `RADIO_FAVORITES` (existing), `RADIO_RECENT` (new), `RADIO_VOTED` (new). Sleep timer: React state only (ephemeral, not persisted) (022-radio-enhancements)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)

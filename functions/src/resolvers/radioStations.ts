@@ -18,6 +18,11 @@ interface RadioStationRaw {
   votes: number;
 }
 
+interface RadioTagRaw {
+  name: string;
+  stationcount: number;
+}
+
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
     ...options,
@@ -30,8 +35,11 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 export function createRadioStationResolvers() {
   return {
     Query: {
-      radioStations: async (_: unknown, { query, limit = 50 }: { query?: string; limit?: number }) => {
-        const cacheKey = `search:${query ?? ''}:${limit}`;
+      radioStations: async (
+        _: unknown,
+        { query, limit = 50, tag, country }: { query?: string; limit?: number; tag?: string; country?: string },
+      ) => {
+        const cacheKey = `search:${query ?? ''}:${tag ?? ''}:${country ?? ''}:${limit}`;
         const cached = cache.get<RadioStationRaw[]>(cacheKey);
         if (cached) return cached;
 
@@ -42,6 +50,8 @@ export function createRadioStationResolvers() {
             order: 'votes',
             reverse: 'true',
             ...(query ? { name: query } : {}),
+            ...(tag ? { tag } : {}),
+            ...(country ? { country } : {}),
           });
           const data = await fetchJson<RadioStationRaw[]>(
             `${RADIO_API}/stations/search?${params.toString()}`,
@@ -73,6 +83,41 @@ export function createRadioStationResolvers() {
           }),
         );
         return results.filter((s): s is RadioStationRaw => s !== null);
+      },
+
+      radioTags: async (_: unknown, { limit = 50 }: { limit?: number }) => {
+        const cacheKey = `tags:${limit}`;
+        const cached = cache.get<{ name: string; stationCount: number }[]>(cacheKey);
+        if (cached) return cached;
+
+        try {
+          const data = await fetchJson<RadioTagRaw[]>(
+            `${RADIO_API}/tags?order=stationcount&reverse=true&hidebroken=true&limit=${limit}`,
+          );
+          const tags = data.map((t) => ({ name: t.name, stationCount: t.stationcount }));
+          cache.set(cacheKey, tags);
+          return tags;
+        } catch (err) {
+          logger.error('radioTags fetch failed', { err });
+          return [];
+        }
+      },
+    },
+
+    Mutation: {
+      voteRadioStation: async (_: unknown, { uuid }: { uuid: string }, ctx: { uid?: string }) => {
+        if (!ctx.uid) throw new Error('Authentication required');
+        try {
+          const res = await fetch(`${RADIO_API}/vote/${uuid}`, {
+            headers: { 'User-Agent': 'MyCircle/1.0' },
+          });
+          if (!res.ok) return false;
+          const data = await res.json() as { ok: boolean; message?: string };
+          return data.ok === true;
+        } catch (err) {
+          logger.error('voteRadioStation failed', { uuid, err });
+          throw new Error('Vote failed due to network error');
+        }
       },
     },
   };

@@ -1083,9 +1083,9 @@ export const GET_BOOK_CONVERSION_PROGRESS = gql`
 export const GET_TTS_QUOTA = gql`
   query GetTtsQuota {
     ttsQuota {
-      used
-      limit
-      remaining
+      wavenetStandard { used limit remaining }
+      neural2Polyglot { used limit remaining }
+      chirp3 { used limit remaining }
     }
   }
 `;
@@ -1483,10 +1483,25 @@ const RADIO_STATION_FIELDS = gql`
 
 export const GET_RADIO_STATIONS = gql`
   ${RADIO_STATION_FIELDS}
-  query GetRadioStations($query: String, $limit: Int) {
-    radioStations(query: $query, limit: $limit) {
+  query GetRadioStations($query: String, $limit: Int, $tag: String, $country: String) {
+    radioStations(query: $query, limit: $limit, tag: $tag, country: $country) {
       ...RadioStationFields
     }
+  }
+`;
+
+export const GET_RADIO_TAGS = gql`
+  query GetRadioTags($limit: Int) {
+    radioTags(limit: $limit) {
+      name
+      stationCount
+    }
+  }
+`;
+
+export const VOTE_RADIO_STATION = gql`
+  mutation VoteRadioStation($uuid: String!) {
+    voteRadioStation(uuid: $uuid)
   }
 `;
 

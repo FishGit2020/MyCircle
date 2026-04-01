@@ -2,7 +2,22 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { GraphQLError } from 'graphql';
 
-const TTS_MONTHLY_CHAR_LIMIT = 3_500_000;
+// TTS billing SKUs — each has its own independent free-tier meter.
+// Limits are capped at 90% of the free tier as a hard safety buffer.
+// SKU 9D01: WaveNet + Standard share 4M/mo → hard limit 3.6M
+// SKU FEBD: Neural2 + Polyglot share 1M/mo → hard limit 900K
+// SKU F977: Chirp3 HD 1M/mo              → hard limit 900K
+type SkuGroup = 'wavenet_standard' | 'neural2_polyglot' | 'chirp3';
+const TTS_LIMITS: Record<SkuGroup, number> = {
+  wavenet_standard: 3_600_000, // 90% of 4M free
+  neural2_polyglot:   900_000, // 90% of 1M free
+  chirp3:             900_000, // 90% of 1M free
+};
+function getSkuGroup(voiceName: string): SkuGroup {
+  if (voiceName.includes('-Chirp3-HD-')) return 'chirp3';
+  if (voiceName.includes('-Neural2-') || voiceName.includes('-Polyglot-')) return 'neural2_polyglot';
+  return 'wavenet_standard';
+}
 
 interface ResolverContext {
   uid: string | null;
@@ -174,11 +189,14 @@ export function createDigitalLibraryResolvers() {
         const db = getFirestore();
         const month = new Date().toISOString().slice(0, 7);
         const snap = await db.collection('ttsUsage').doc(month).get();
-        const used = snap.exists ? (snap.data()?.totalCharacters ?? 0) : 0;
+        const data = snap.data() || {};
+        const ws = data.wavenet_standard ?? 0;
+        const np = data.neural2_polyglot ?? 0;
+        const c3 = data.chirp3 ?? 0;
         return {
-          used,
-          limit: TTS_MONTHLY_CHAR_LIMIT,
-          remaining: Math.max(0, TTS_MONTHLY_CHAR_LIMIT - used),
+          wavenetStandard: { used: ws, limit: TTS_LIMITS.wavenet_standard, remaining: Math.max(0, TTS_LIMITS.wavenet_standard - ws) },
+          neural2Polyglot: { used: np, limit: TTS_LIMITS.neural2_polyglot, remaining: Math.max(0, TTS_LIMITS.neural2_polyglot - np) },
+          chirp3:          { used: c3, limit: TTS_LIMITS.chirp3,           remaining: Math.max(0, TTS_LIMITS.chirp3           - c3) },
         };
       },
     },
@@ -514,10 +532,22 @@ export function createDigitalLibraryResolvers() {
 
       previewVoice: async (_: any, { voiceName }: { voiceName: string }, context: ResolverContext) => {
         requireAuth(context);
-        const langCode = voiceName.slice(0, voiceName.lastIndexOf('-Neural2'));
+        const db = getFirestore();
+        const langCode = voiceName.split('-').slice(0, 2).join('-');
         const sampleText = langCode.startsWith('cmn') ? '\u4f60\u597d\uff0c\u8fd9\u662f\u8bed\u97f3\u9884\u89c8\u3002'
           : langCode.startsWith('es') ? 'Hola, esta es una vista previa de la voz.'
           : 'Hello, this is a voice preview sample.';
+
+        // Check and track quota for this voice's SKU group
+        const month = new Date().toISOString().slice(0, 7);
+        const usageRef = db.collection('ttsUsage').doc(month);
+        const usageSnap = await usageRef.get();
+        const data = usageSnap.data() || {};
+        const skuGroup = getSkuGroup(voiceName);
+        const currentChars = data[skuGroup] ?? 0;
+        if (currentChars + sampleText.length > TTS_LIMITS[skuGroup]) {
+          throw new GraphQLError('Monthly TTS quota reached', { extensions: { code: 'QUOTA_EXCEEDED' } });
+        }
 
         const ttsClient = new (await import('@google-cloud/text-to-speech')).TextToSpeechClient();
         const [response] = await ttsClient.synthesizeSpeech({
@@ -527,6 +557,7 @@ export function createDigitalLibraryResolvers() {
         });
 
         if (!response.audioContent) throw new GraphQLError('TTS preview failed');
+        await usageRef.set({ [skuGroup]: FieldValue.increment(sampleText.length), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
         return Buffer.from(response.audioContent as Uint8Array).toString('base64');
       },
     },

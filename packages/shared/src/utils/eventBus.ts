@@ -156,6 +156,8 @@ export const StorageKeys = {
   CHILDREN_CACHE: 'children-cache',
   SELECTED_CHILD_ID: 'selected-child-id',
   RADIO_FAVORITES: 'radio-favorites',
+  RADIO_RECENT: 'radio-recent',
+  RADIO_VOTED: 'radio-voted',
   TRANSIT_RECENT_STOPS: 'transit-recent-stops',
   TRANSIT_FAVORITES: 'transit-favorites',
   TRAVEL_PINS: 'travel-pins-cache',

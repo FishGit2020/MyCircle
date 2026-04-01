@@ -627,6 +627,7 @@ export type Mutation = {
   updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
   uploadBook: Book;
+  voteRadioStation: Scalars['Boolean']['output'];
 };
 
 
@@ -943,6 +944,11 @@ export type MutationUploadBookArgs = {
   fileBase64: Scalars['String']['input'];
 };
 
+
+export type MutationVoteRadioStationArgs = {
+  uuid: Scalars['String']['input'];
+};
+
 export type Note = {
   __typename?: 'Note';
   content: Scalars['String']['output'];
@@ -1067,6 +1073,7 @@ export type Query = {
   questionBank: QuestionBank;
   radioStations: Array<RadioStation>;
   radioStationsByUuids: Array<RadioStation>;
+  radioTags: Array<RadioTag>;
   resumeActiveParseJob?: Maybe<ResumeParseJob>;
   resumeApplications: Array<ResumeApplication>;
   resumeFactBank?: Maybe<ResumeFactBank>;
@@ -1257,13 +1264,20 @@ export type QueryPodcastFeedArgs = {
 
 
 export type QueryRadioStationsArgs = {
+  country?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type QueryRadioStationsByUuidsArgs = {
   uuids: Array<Scalars['String']['input']>;
+};
+
+
+export type QueryRadioTagsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1416,6 +1430,12 @@ export type RadioStation = {
   url: Scalars['String']['output'];
   url_resolved: Scalars['String']['output'];
   votes: Scalars['Int']['output'];
+};
+
+export type RadioTag = {
+  __typename?: 'RadioTag';
+  name: Scalars['String']['output'];
+  stationCount: Scalars['Int']['output'];
 };
 
 export type ResumeApplication = {
@@ -1897,6 +1917,13 @@ export type TransitStop = {
 
 export type TtsQuota = {
   __typename?: 'TtsQuota';
+  chirp3: TtsQuotaEntry;
+  neural2Polyglot: TtsQuotaEntry;
+  wavenetStandard: TtsQuotaEntry;
+};
+
+export type TtsQuotaEntry = {
+  __typename?: 'TtsQuotaEntry';
   limit: Scalars['Int']['output'];
   remaining: Scalars['Int']['output'];
   used: Scalars['Int']['output'];
@@ -2558,7 +2585,7 @@ export type GetBookConversionProgressQuery = { __typename?: 'Query', bookConvers
 export type GetTtsQuotaQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTtsQuotaQuery = { __typename?: 'Query', ttsQuota: { __typename?: 'TtsQuota', used: number, limit: number, remaining: number } };
+export type GetTtsQuotaQuery = { __typename?: 'Query', ttsQuota: { __typename?: 'TtsQuota', wavenetStandard: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, neural2Polyglot: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, chirp3: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number } } };
 
 export type GetConversionJobsQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];
@@ -2760,10 +2787,26 @@ export type RadioStationFieldsFragment = { __typename?: 'RadioStation', stationu
 export type GetRadioStationsQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type GetRadioStationsQuery = { __typename?: 'Query', radioStations: Array<{ __typename?: 'RadioStation', stationuuid: string, name: string, url: string, url_resolved: string, favicon: string, tags: string, country: string, language: string, codec: string, bitrate: number, votes: number }> };
+
+export type GetRadioTagsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetRadioTagsQuery = { __typename?: 'Query', radioTags: Array<{ __typename?: 'RadioTag', name: string, stationCount: number }> };
+
+export type VoteRadioStationMutationVariables = Exact<{
+  uuid: Scalars['String']['input'];
+}>;
+
+
+export type VoteRadioStationMutation = { __typename?: 'Mutation', voteRadioStation: boolean };
 
 export type GetRadioStationsByUuidsQueryVariables = Exact<{
   uuids: Array<Scalars['String']['input']> | Scalars['String']['input'];

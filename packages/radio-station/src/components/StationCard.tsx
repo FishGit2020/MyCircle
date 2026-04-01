@@ -6,18 +6,25 @@ interface StationCardProps {
   station: RadioStation;
   isFavorite: boolean;
   isPlaying: boolean;
+  isVoted?: boolean;
   onPlay: (station: RadioStation) => void;
   onToggleFavorite: (station: RadioStation) => void;
+  onVote?: (uuid: string) => void;
+  onSelectStation?: (station: RadioStation) => void;
 }
 
 const StationCard: React.FC<StationCardProps> = ({
   station,
   isFavorite,
   isPlaying,
+  isVoted = false,
   onPlay,
   onToggleFavorite,
+  onVote,
+  onSelectStation,
 }) => {
   const { t } = useTranslation();
+  const isSignedIn = !!(window as Window & { __currentUid?: string }).__currentUid;
 
   const tags = station.tags
     ? station.tags.split(',').filter(Boolean).slice(0, 3)
@@ -85,6 +92,43 @@ const StationCard: React.FC<StationCardProps> = ({
 
       {/* Actions */}
       <div className="flex flex-shrink-0 items-center gap-1">
+        {/* Vote button */}
+        {onVote && (
+          <button
+            type="button"
+            disabled={isVoted || !isSignedIn}
+            onClick={() => {
+              if (!isSignedIn) return;
+              onVote(station.stationuuid);
+            }}
+            title={!isSignedIn ? t('radio.voteSignIn') : isVoted ? t('radio.voted') : t('radio.vote')}
+            aria-label={isVoted ? t('radio.voted') : t('radio.vote')}
+            className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+              isVoted
+                ? 'cursor-not-allowed text-green-600 dark:text-green-400'
+                : 'text-gray-400 hover:text-orange-500 dark:text-gray-500 dark:hover:text-orange-400'
+            }`}
+          >
+            <svg className="h-4 w-4" fill={isVoted ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+            </svg>
+          </button>
+        )}
+
+        {/* Info button */}
+        {onSelectStation && (
+          <button
+            type="button"
+            onClick={() => onSelectStation(station)}
+            aria-label={t('radio.detail.title')}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-colors hover:text-blue-500 dark:text-gray-500 dark:hover:text-blue-400"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+        )}
+
         <button
           type="button"
           onClick={() => onPlay(station)}
