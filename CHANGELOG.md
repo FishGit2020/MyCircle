@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.24.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.23.0...mycircle-v1.24.0) (2026-04-01)
+
+
+### Features
+
+* **cloud-files:** show real Firebase Storage quota with hourly-cached bucket scan ([#926](https://github.com/FishGit2020/MyCircle/issues/926)) ([66132bd](https://github.com/FishGit2020/MyCircle/commit/66132bd1c8b4f2f96614ed23cee95be9dcb58aec))
+* **digital-library:** quota-aware voice picker with preview and auto-disable ([#929](https://github.com/FishGit2020/MyCircle/issues/929)) ([f180f98](https://github.com/FishGit2020/MyCircle/commit/f180f9880cd2200f58b428beff069dabb4753a9a))
+
+
+### Bug Fixes
+
+* **cloud-files:** extend storage scan cache TTL from 1h to 24h ([#928](https://github.com/FishGit2020/MyCircle/issues/928)) ([19e370d](https://github.com/FishGit2020/MyCircle/commit/19e370d32d11daf8801af2c9b12c1ff362f8620e))
+
 ## [1.23.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.22.0...mycircle-v1.23.0) (2026-04-01)
 
 
