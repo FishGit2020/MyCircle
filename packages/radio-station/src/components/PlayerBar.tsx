@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import type { RadioStation } from '../types';
+
+interface SleepTimerState {
+  active: boolean;
+  secondsLeft: number;
+}
 
 interface PlayerBarProps {
   station: RadioStation;
@@ -9,7 +14,12 @@ interface PlayerBarProps {
   onPlayPause: () => void;
   onStop: () => void;
   onVolumeChange: (volume: number) => void;
+  sleepTimer?: SleepTimerState;
+  onSleepTimerStart?: (minutes: 15 | 30 | 45 | 60) => void;
+  onSleepTimerCancel?: () => void;
 }
+
+const SLEEP_OPTIONS: Array<15 | 30 | 45 | 60> = [15, 30, 45, 60];
 
 const PlayerBar: React.FC<PlayerBarProps> = ({
   station,
@@ -18,8 +28,20 @@ const PlayerBar: React.FC<PlayerBarProps> = ({
   onPlayPause,
   onStop,
   onVolumeChange,
+  sleepTimer,
+  onSleepTimerStart,
+  onSleepTimerCancel,
 }) => {
   const { t } = useTranslation();
+  const [showSleepMenu, setShowSleepMenu] = useState(false);
+
+  const formatCountdown = (seconds: number) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return t('radio.sleep.countdown')
+      .replace('{min}', String(min))
+      .replace('{sec}', String(sec).padStart(2, '0'));
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-orange-200 bg-white px-4 py-2 shadow-lg dark:border-orange-800 dark:bg-gray-900">
@@ -65,6 +87,62 @@ const PlayerBar: React.FC<PlayerBarProps> = ({
 
         {/* Controls */}
         <div className="flex flex-shrink-0 items-center gap-2">
+          {/* Sleep timer control */}
+          {onSleepTimerStart && (
+            <div className="relative">
+              {sleepTimer?.active ? (
+                <div className="flex items-center gap-1">
+                  <span className="hidden text-xs text-orange-600 dark:text-orange-400 md:inline">
+                    {formatCountdown(sleepTimer.secondsLeft)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onSleepTimerCancel}
+                    aria-label={t('radio.sleep.cancel')}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200 dark:bg-orange-900 dark:text-orange-400 dark:hover:bg-orange-800"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowSleepMenu((v) => !v)}
+                    aria-label={t('radio.sleep.set')}
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                  </button>
+                  {showSleepMenu && (
+                    <div className="absolute bottom-12 right-0 z-10 min-w-[140px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                      <p className="px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+                        {t('radio.sleep.title')}
+                      </p>
+                      {SLEEP_OPTIONS.map((mins) => (
+                        <button
+                          key={mins}
+                          type="button"
+                          onClick={() => {
+                            onSleepTimerStart(mins);
+                            setShowSleepMenu(false);
+                          }}
+                          className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                        >
+                          {t(`radio.sleep.${mins}min` as `radio.sleep.${typeof mins}min`)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
           {/* Play/Pause */}
           <button
             type="button"

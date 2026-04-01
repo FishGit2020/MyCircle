@@ -570,8 +570,9 @@ export const typeDefs = `#graphql
     searchCrawlJobs(query: String!): [CrawlJob!]!
 
     # Radio stations (public)
-    radioStations(query: String, limit: Int = 50): [RadioStation!]!
+    radioStations(query: String, limit: Int = 50, tag: String, country: String): [RadioStation!]!
     radioStationsByUuids(uuids: [String!]!): [RadioStation!]!
+    radioTags(limit: Int = 50): [RadioTag!]!
 
     # Hiking route (public)
     calcRoute(startLon: Float!, startLat: Float!, endLon: Float!, endLat: Float!): RouteResult
@@ -615,6 +616,11 @@ export const typeDefs = `#graphql
     codec: String!
     bitrate: Int!
     votes: Int!
+  }
+
+  type RadioTag {
+    name: String!
+    stationCount: Int!
   }
 
   type RouteResult {
@@ -1357,6 +1363,9 @@ export const typeDefs = `#graphql
     boostAtsScore(resumeJson: String!, jdText: String!, model: String!, endpointId: ID): GeneratedResumeResult!
     saveResumeApplication(input: ResumeApplicationInput!): ResumeApplication!
     deleteResumeApplication(id: ID!): Boolean!
+
+    # Radio stations (auth required)
+    voteRadioStation(uuid: String!): Boolean!
 
     # SQL Analytics (auth required)
     saveSqlConnection(input: SqlConnectionInput!): SqlConnectionStatus!

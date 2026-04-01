@@ -11,3 +11,18 @@ export interface RadioStation {
   bitrate: number;
   votes: number;
 }
+
+export interface RadioTag {
+  name: string;
+  stationCount: number;
+}
+
+export interface RecentlyPlayedEntry {
+  stationuuid: string;
+  name: string;
+  favicon: string;
+  country: string;
+  url: string;
+  url_resolved: string;
+  playedAt: number;
+}

@@ -627,6 +627,7 @@ export type Mutation = {
   updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
   uploadBook: Book;
+  voteRadioStation: Scalars['Boolean']['output'];
 };
 
 
@@ -943,6 +944,11 @@ export type MutationUploadBookArgs = {
   fileBase64: Scalars['String']['input'];
 };
 
+
+export type MutationVoteRadioStationArgs = {
+  uuid: Scalars['String']['input'];
+};
+
 export type Note = {
   __typename?: 'Note';
   content: Scalars['String']['output'];
@@ -1067,6 +1073,7 @@ export type Query = {
   questionBank: QuestionBank;
   radioStations: Array<RadioStation>;
   radioStationsByUuids: Array<RadioStation>;
+  radioTags: Array<RadioTag>;
   resumeActiveParseJob?: Maybe<ResumeParseJob>;
   resumeApplications: Array<ResumeApplication>;
   resumeFactBank?: Maybe<ResumeFactBank>;
@@ -1257,13 +1264,20 @@ export type QueryPodcastFeedArgs = {
 
 
 export type QueryRadioStationsArgs = {
+  country?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type QueryRadioStationsByUuidsArgs = {
   uuids: Array<Scalars['String']['input']>;
+};
+
+
+export type QueryRadioTagsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -1416,6 +1430,12 @@ export type RadioStation = {
   url: Scalars['String']['output'];
   url_resolved: Scalars['String']['output'];
   votes: Scalars['Int']['output'];
+};
+
+export type RadioTag = {
+  __typename?: 'RadioTag';
+  name: Scalars['String']['output'];
+  stationCount: Scalars['Int']['output'];
 };
 
 export type ResumeApplication = {
@@ -2760,10 +2780,26 @@ export type RadioStationFieldsFragment = { __typename?: 'RadioStation', stationu
 export type GetRadioStationsQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type GetRadioStationsQuery = { __typename?: 'Query', radioStations: Array<{ __typename?: 'RadioStation', stationuuid: string, name: string, url: string, url_resolved: string, favicon: string, tags: string, country: string, language: string, codec: string, bitrate: number, votes: number }> };
+
+export type GetRadioTagsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetRadioTagsQuery = { __typename?: 'Query', radioTags: Array<{ __typename?: 'RadioTag', name: string, stationCount: number }> };
+
+export type VoteRadioStationMutationVariables = Exact<{
+  uuid: Scalars['String']['input'];
+}>;
+
+
+export type VoteRadioStationMutation = { __typename?: 'Mutation', voteRadioStation: boolean };
 
 export type GetRadioStationsByUuidsQueryVariables = Exact<{
   uuids: Array<Scalars['String']['input']> | Scalars['String']['input'];

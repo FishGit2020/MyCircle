@@ -62,6 +62,7 @@ export function createResolvers(
       ...notesResolvers.Mutation,
       ...createResumeTailorMutationResolvers(),
       ...createSqlMutationResolvers(),
+      ...createRadioStationResolvers().Mutation,
     },
 
     Query: {
