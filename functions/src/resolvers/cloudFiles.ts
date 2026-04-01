@@ -25,8 +25,8 @@ function toIso(val: any): string {
 
 // Firebase Storage free-tier limit for Spark plan (1 GB)
 const STORAGE_FREE_TIER_BYTES = 1_073_741_824;
-// Cache TTL: 1 hour
-const STORAGE_CACHE_TTL_MS = 60 * 60 * 1000;
+// Cache TTL: 24 hours
+const STORAGE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 async function getStorageUsageFromBucket(): Promise<number> {
   const bucket = getStorage().bucket();
