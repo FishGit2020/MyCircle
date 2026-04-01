@@ -23,9 +23,58 @@ function toIso(val: any): string {
   return new Date().toISOString();
 }
 
+// Firebase Storage free-tier limit for Spark plan (1 GB)
+const STORAGE_FREE_TIER_BYTES = 1_073_741_824;
+// Cache TTL: 1 hour
+const STORAGE_CACHE_TTL_MS = 60 * 60 * 1000;
+
+async function getStorageUsageFromBucket(): Promise<number> {
+  const bucket = getStorage().bucket();
+  let totalBytes = 0;
+  let pageToken: string | undefined;
+  do {
+    const [files, , apiResponse] = await bucket.getFiles({
+      maxResults: 1000,
+      pageToken,
+      autoPaginate: false,
+    });
+    for (const file of files) {
+      totalBytes += parseInt(file.metadata.size as string, 10) || 0;
+    }
+    pageToken = (apiResponse as any)?.nextPageToken;
+  } while (pageToken);
+  return totalBytes;
+}
+
 export function createCloudFileResolvers() {
   return {
     Query: {
+      storageUsage: async () => {
+        const db = getFirestore();
+        const cacheRef = db.doc('systemStats/storageUsage');
+        const snap = await cacheRef.get();
+        const cached = snap.data();
+        const now = Date.now();
+        if (cached?.usedBytes !== undefined && cached?.measuredAt) {
+          const age = now - (cached.measuredAt.toMillis?.() ?? now);
+          if (age < STORAGE_CACHE_TTL_MS) {
+            return {
+              usedBytes: cached.usedBytes,
+              totalBytes: STORAGE_FREE_TIER_BYTES,
+              cachedAt: new Date(cached.measuredAt.toMillis()).toISOString(),
+            };
+          }
+        }
+        // Cache miss or stale — measure the bucket
+        const usedBytes = await getStorageUsageFromBucket();
+        await cacheRef.set({ usedBytes, measuredAt: FieldValue.serverTimestamp() }, { merge: true });
+        return {
+          usedBytes,
+          totalBytes: STORAGE_FREE_TIER_BYTES,
+          cachedAt: new Date().toISOString(),
+        };
+      },
+
       cloudFiles: async (_: any, __: any, context: ResolverContext) => {
         const uid = requireAuth(context);
         const db = getFirestore();

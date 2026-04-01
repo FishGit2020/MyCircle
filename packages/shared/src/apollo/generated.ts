@@ -1095,6 +1095,7 @@ export type Query = {
   sqlToolUsageStats: Array<SqlToolUsageStats>;
   stockCandles?: Maybe<StockCandle>;
   stockQuote?: Maybe<StockQuote>;
+  storageUsage: StorageUsage;
   transitArrivals: Array<TransitArrival>;
   transitNearbyStops: Array<TransitStop>;
   transitStop?: Maybe<TransitStop>;
@@ -1847,6 +1848,13 @@ export type StockSearchResult = {
   type: Scalars['String']['output'];
 };
 
+export type StorageUsage = {
+  __typename?: 'StorageUsage';
+  cachedAt: Scalars['String']['output'];
+  totalBytes: Scalars['Float']['output'];
+  usedBytes: Scalars['Float']['output'];
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   weatherUpdates: WeatherUpdate;
@@ -2586,6 +2594,11 @@ export type GetTtsQuotaQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetTtsQuotaQuery = { __typename?: 'Query', ttsQuota: { __typename?: 'TtsQuota', wavenetStandard: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, neural2Polyglot: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, chirp3: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number } } };
+
+export type GetStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetStorageUsageQuery = { __typename?: 'Query', storageUsage: { __typename?: 'StorageUsage', usedBytes: number, totalBytes: number, cachedAt: string } };
 
 export type GetConversionJobsQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];

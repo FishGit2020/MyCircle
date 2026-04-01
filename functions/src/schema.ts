@@ -241,6 +241,13 @@ export const typeDefs = `#graphql
     chirp3: TtsQuotaEntry!            # SKU F977: Chirp3 HD — 1M free/month
   }
 
+  # Firebase Storage bucket usage (cached hourly)
+  type StorageUsage {
+    usedBytes: Float!    # total bytes across all paths in the bucket
+    totalBytes: Float!   # free-tier hard limit (1 GB for Spark plan)
+    cachedAt: String!    # ISO timestamp of last measurement
+  }
+
   type ConversionJob {
     id: ID!
     bookId: ID!
@@ -568,6 +575,7 @@ export const typeDefs = `#graphql
     bookChapters(bookId: ID!): [BookChapter!]!
     bookConversionProgress(bookId: ID!): BookConversionProgress!
     ttsQuota: TtsQuota!
+    storageUsage: StorageUsage!
     conversionJobs(bookId: ID!): [ConversionJob!]!
     conversionBatchJob(bookId: ID!): ConversionBatchJob
 

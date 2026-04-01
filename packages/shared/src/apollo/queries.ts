@@ -1090,6 +1090,16 @@ export const GET_TTS_QUOTA = gql`
   }
 `;
 
+export const GET_STORAGE_USAGE = gql`
+  query GetStorageUsage {
+    storageUsage {
+      usedBytes
+      totalBytes
+      cachedAt
+    }
+  }
+`;
+
 export const GET_CONVERSION_JOBS = gql`
   query GetConversionJobs($bookId: ID!) {
     conversionJobs(bookId: $bookId) {
