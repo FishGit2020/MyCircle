@@ -140,6 +140,20 @@ export default function BackfillSection() {
         </div>
       )}
 
+      {/* Previous import info (shown in idle state if data exists) */}
+      {!isRunning && !isCompleted && !isError && status?.totalMigrated > 0 && (
+        <div className="space-y-1">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {status.totalMigrated} {t('setup.backfill.records')}
+          </p>
+          {status.completedAt && (
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              {t('setup.backfill.lastImport')}: {new Date(status.completedAt).toLocaleString()}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Action buttons */}
       {isConnected && !isRunning && (
         <div>
@@ -153,9 +167,7 @@ export default function BackfillSection() {
               ? t('setup.backfill.importing')
               : isError
                 ? t('setup.backfill.resume')
-                : isCompleted
-                  ? t('setup.backfill.importButton')
-                  : t('setup.backfill.importButton')}
+                : t('setup.backfill.importButton')}
           </button>
         </div>
       )}
