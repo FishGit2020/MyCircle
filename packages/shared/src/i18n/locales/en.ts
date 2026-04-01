@@ -1705,8 +1705,11 @@ const en = {
   'cloudFiles.revokeConfirm': 'Remove access for this user?',
   'cloudFiles.sharedWithMe': 'Shared With Me',
   'cloudFiles.storageUsed': 'Storage',
+  'cloudFiles.storageFreeLimit': 'Free tier (1 GB)',
   'cloudFiles.storageNearFull': 'Storage almost full. Delete files to free up space.',
+  'cloudFiles.storageOverLimit': 'Over free tier. You may be incurring storage charges.',
   'cloudFiles.storageOf': 'of',
+  'cloudFiles.storageViewConsole': 'Firebase Console',
   'cloudFiles.uploadBlocked': 'Storage full. Delete files before uploading.',
 
   // Model Benchmark

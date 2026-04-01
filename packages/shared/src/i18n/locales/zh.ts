@@ -1707,8 +1707,11 @@ const zh: Record<TranslationKey, string> = {
   'cloudFiles.revokeConfirm': '\u5220\u9664\u6b64\u7528\u6237\u7684\u8bbf\u95ee\u6743\u9650\uff1f',
   'cloudFiles.sharedWithMe': '\u5171\u4eab\u7ed9\u6211',
   'cloudFiles.storageUsed': '\u5b58\u50a8\u7a7a\u95f4',
+  'cloudFiles.storageFreeLimit': '\u514d\u8d39\u989d\u5ea6\uff081 GB\uff09',
   'cloudFiles.storageNearFull': '\u5b58\u50a8\u7a7a\u95f4\u5373\u5c06\u6ee1\uff0c\u8bf7\u5220\u9664\u6587\u4ef6\u4ee5\u91ca\u653e\u7a7a\u95f4\u3002',
+  'cloudFiles.storageOverLimit': '\u5df2\u8d85\u8fc7\u514d\u8d39\u989d\u5ea6\uff0c\u53ef\u80fd\u4ea7\u751f\u5b58\u50a8\u8d39\u7528\u3002',
   'cloudFiles.storageOf': '\u5171',
+  'cloudFiles.storageViewConsole': 'Firebase \u63a7\u5236\u53f0',
   'cloudFiles.uploadBlocked': '\u5b58\u50a8\u7a7a\u95f4\u5df2\u6ee1\uff0c\u8bf7\u5148\u5220\u9664\u6587\u4ef6\u518d\u4e0a\u4f20\u3002',
 
   // Model Benchmark

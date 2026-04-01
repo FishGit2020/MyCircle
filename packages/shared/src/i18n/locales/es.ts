@@ -1707,8 +1707,11 @@ const es: Record<TranslationKey, string> = {
   'cloudFiles.revokeConfirm': '\u00bfEliminar acceso para este usuario?',
   'cloudFiles.sharedWithMe': 'Compartido Conmigo',
   'cloudFiles.storageUsed': 'Almacenamiento',
+  'cloudFiles.storageFreeLimit': 'Nivel gratuito (1 GB)',
   'cloudFiles.storageNearFull': 'Almacenamiento casi lleno. Elimina archivos para liberar espacio.',
+  'cloudFiles.storageOverLimit': 'Superaste el nivel gratuito. Es posible que se apliquen cargos.',
   'cloudFiles.storageOf': 'de',
+  'cloudFiles.storageViewConsole': 'Consola Firebase',
   'cloudFiles.uploadBlocked': 'Almacenamiento lleno. Elimina archivos antes de subir.',
 
   // Model Benchmark

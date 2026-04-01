@@ -16,7 +16,8 @@ import { getFileTypeCategory } from '../utils/fileHelpers';
 import type { FileTypeCategory } from '../utils/fileHelpers';
 import type { FileItem, SharedFileItem, Folder } from '../types';
 
-const TOTAL_STORAGE_BYTES = 500 * 1024 * 1024; // 500 MB
+// Upload is blocked if local file sizes exceed the free tier (1 GB)
+const UPLOAD_BLOCK_BYTES = 1_073_741_824;
 
 type Tab = 'my' | 'shared' | 'sharedWithMe';
 
@@ -57,9 +58,9 @@ export default function CloudFiles() {
     return () => window.removeEventListener(WindowEvents.AUTH_STATE_CHANGED, checkAuth);
   }, []);
 
-  // Storage quota
+  // Block upload if local files already approach the free tier limit
   const usedBytes = useMemo(() => files.reduce((sum, f) => sum + f.size, 0), [files]);
-  const storageFull = usedBytes >= TOTAL_STORAGE_BYTES;
+  const storageFull = usedBytes >= UPLOAD_BLOCK_BYTES;
 
   // Filtered files for current folder + search + type
   const filteredMyFiles = useMemo(() => {
@@ -166,8 +167,8 @@ export default function CloudFiles() {
         </button>
       </div>
 
-      {/* Storage Quota Bar (My Files only) */}
-      {tab === 'my' && <StorageQuotaBar usedBytes={usedBytes} totalBytes={TOTAL_STORAGE_BYTES} />}
+      {/* Storage Quota Bar — always visible, fetches actual bucket usage */}
+      <StorageQuotaBar />
 
       {/* Search & Filter */}
       <SearchFilterBar
