@@ -412,7 +412,7 @@ export const aiChat = onRequest(
               inputTokens += followup.usage?.prompt_tokens || 0;
               outputTokens += followup.usage?.completion_tokens || 0;
               answerText = followup.choices[0].message.content || '';
-              logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true });
+              logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: answerText, fullAnswer: answerText, status: 'success', usedFallback: true });
               logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
               res.status(200).json({ response: answerText, toolCalls });
               return;
@@ -420,7 +420,7 @@ export const aiChat = onRequest(
           }
           // No tool call parsed — return as plain text
           answerText = text || 'Sorry, I could not generate a response.';
-          logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: answerText, status: 'success', usedFallback: true });
+          logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: answerText, fullAnswer: answerText, status: 'success', usedFallback: true });
           logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
           res.status(200).json({ response: answerText });
           return;
@@ -460,7 +460,7 @@ export const aiChat = onRequest(
           outputTokens += followup.usage?.completion_tokens || 0;
 
           const finalText = followup.choices[0].message.content || 'I found some information but had trouble formatting it.';
-          logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false });
+          logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: finalText, fullAnswer: finalText, status: 'success', usedFallback: false });
           logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
           res.status(200).json({ response: finalText, toolCalls });
           return;
@@ -468,7 +468,7 @@ export const aiChat = onRequest(
 
         // No tool calls — return direct text response
         const text = choice.message.content || 'Sorry, I could not generate a response.';
-        logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: false });
+        logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: text, fullAnswer: text, status: 'success', usedFallback: false });
         logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
         res.status(200).json({ response: text });
         return;
@@ -617,7 +617,7 @@ export const aiChat = onRequest(
         outputTokens += (followup as any).usageMetadata?.candidatesTokenCount || 0;
 
         const finalText = followup.text || 'I found some information but had trouble formatting it.';
-        logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: finalText, status: 'success', usedFallback: false });
+        logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: finalText, fullAnswer: finalText, status: 'success', usedFallback: false });
         logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
         res.status(200).json({ response: finalText, toolCalls });
         return;
@@ -625,7 +625,7 @@ export const aiChat = onRequest(
 
       // No tool calls — return direct text response
       const text = response.text || 'Sorry, I could not generate a response.';
-      logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: text, status: 'success', usedFallback: false });
+      logAiChatInteraction({ userId: aiUid!, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: text, fullAnswer: text, status: 'success', usedFallback: false });
       logger.info('AI Chat completed', { provider: trackedProvider, model: trackedModel, latencyMs: Date.now() - startTime, inputTokens, outputTokens });
       res.status(200).json({ response: text });
     } catch (err: any) {
@@ -953,7 +953,7 @@ export const aiChatStream = onRequest(
         }
 
         if (!aborted) {
-          logAiChatInteraction({ userId: uid, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: fullText.slice(0, 200), status: 'success', usedFallback });
+          logAiChatInteraction({ userId: uid, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: fullText.slice(0, 200), fullAnswer: fullText, status: 'success', usedFallback });
           sendEvent('done', { metadata: { provider: trackedProvider, model: trackedModel, tokens: { input: inputTokens, output: outputTokens }, latencyMs: Date.now() - startTime } });
         }
         res.end();
@@ -1059,7 +1059,7 @@ export const aiChatStream = onRequest(
       }
 
       if (!aborted) {
-        logAiChatInteraction({ userId: uid, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, answerPreview: fullText.slice(0, 200), status: 'success', usedFallback: false });
+        logAiChatInteraction({ userId: uid, provider: trackedProvider, model: trackedModel, inputTokens, outputTokens, totalTokens: inputTokens + outputTokens, latencyMs: Date.now() - startTime, toolCalls: toolCallTimings, questionPreview: message, fullQuestion: message, answerPreview: fullText.slice(0, 200), fullAnswer: fullText, status: 'success', usedFallback: false });
         sendEvent('done', { metadata: { provider: trackedProvider, model: trackedModel, tokens: { input: inputTokens, output: outputTokens }, latencyMs: Date.now() - startTime } });
       }
       res.end();

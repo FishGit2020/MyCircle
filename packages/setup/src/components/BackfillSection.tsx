@@ -5,6 +5,7 @@ import {
   useMutation,
   GET_SQL_BACKFILL_STATUS,
   START_SQL_BACKFILL,
+  CANCEL_SQL_BACKFILL,
   GET_SQL_CONNECTION_STATUS,
 } from '@mycircle/shared';
 
@@ -21,11 +22,15 @@ export default function BackfillSection() {
   const [startBackfill, { loading: starting }] = useMutation(START_SQL_BACKFILL, {
     refetchQueries: [{ query: GET_SQL_BACKFILL_STATUS }],
   });
+  const [cancelBackfill, { loading: cancelling }] = useMutation(CANCEL_SQL_BACKFILL, {
+    refetchQueries: [{ query: GET_SQL_BACKFILL_STATUS }],
+  });
 
   const status = data?.sqlBackfillStatus;
   const isRunning = status?.status === 'running';
   const isCompleted = status?.status === 'completed';
   const isError = status?.status === 'error';
+  const isCancelled = status?.status === 'cancelled';
   // Poll every 3s while running
   useEffect(() => {
     if (isRunning) {
@@ -97,6 +102,26 @@ export default function BackfillSection() {
               {status.totalErrors} {t('setup.backfill.errors')}
             </p>
           )}
+          <button
+            type="button"
+            onClick={() => cancelBackfill()}
+            disabled={cancelling}
+            className="mt-1 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+          >
+            {t('setup.backfill.cancel')}
+          </button>
+        </div>
+      )}
+
+      {/* Cancelled state */}
+      {isCancelled && (
+        <div className="space-y-1">
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            {t('setup.backfill.cancelled')}
+          </span>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {status.totalMigrated} {t('setup.backfill.records')}
+          </p>
         </div>
       )}
 

@@ -1363,6 +1363,7 @@ export const typeDefs = `#graphql
     testSqlConnection: SqlConnectionStatus!
     deleteSqlConnection: Boolean!
     startSqlBackfill: SqlBackfillStatus!
+    cancelSqlBackfill: Boolean!
     sqlRunQuery(sql: String!, limit: Int): SqlQueryResult!
   }
 

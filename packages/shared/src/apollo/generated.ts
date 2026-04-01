@@ -574,6 +574,7 @@ export type Mutation = {
   aiChat: AiChatResponse;
   boostAtsScore: GeneratedResumeResult;
   cancelBookConversion: Scalars['Boolean']['output'];
+  cancelSqlBackfill: Scalars['Boolean']['output'];
   createDailyLog: DailyLogEntry;
   createFolder: Folder;
   createInterviewQuestion: InterviewQuestion;
@@ -2932,6 +2933,11 @@ export type StartSqlBackfillMutationVariables = Exact<{ [key: string]: never; }>
 
 
 export type StartSqlBackfillMutation = { __typename?: 'Mutation', startSqlBackfill: { __typename?: 'SqlBackfillStatus', status: string, totalMigrated: number, totalErrors: number, startedAt?: string | null, completedAt?: string | null, error?: string | null } };
+
+export type CancelSqlBackfillMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CancelSqlBackfillMutation = { __typename?: 'Mutation', cancelSqlBackfill: boolean };
 
 export type GetSqlAnalyticsSummaryQueryVariables = Exact<{
   days?: InputMaybe<Scalars['Int']['input']>;

@@ -3174,6 +3174,8 @@ const es: Record<TranslationKey, string> = {
   'setup.backfill.errors': 'errores',
   'setup.backfill.noConnection': 'Configura una conexi\u00f3n SQL primero',
   'setup.backfill.resume': 'Reanudar importaci\u00f3n',
+  'setup.backfill.cancel': 'Detener importaci\u00f3n',
+  'setup.backfill.cancelled': 'Importaci\u00f3n detenida',
   'setup.analytics.title': 'Anal\u00edticas',
   'setup.analytics.description': 'Anal\u00edticas de uso de IA desde la base de datos SQL',
   'setup.analytics.noData': 'Sin datos a\u00fan. Env\u00eda algunos mensajes de chat IA primero.',

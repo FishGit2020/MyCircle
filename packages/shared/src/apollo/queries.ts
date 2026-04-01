@@ -1771,6 +1771,12 @@ export const START_SQL_BACKFILL = gql`
   }
 `;
 
+export const CANCEL_SQL_BACKFILL = gql`
+  mutation CancelSqlBackfill {
+    cancelSqlBackfill
+  }
+`;
+
 export const GET_SQL_ANALYTICS_SUMMARY = gql`
   query GetSqlAnalyticsSummary($days: Int) {
     sqlAnalyticsSummary(days: $days) {
