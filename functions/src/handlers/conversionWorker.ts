@@ -20,6 +20,32 @@ function getSkuGroup(voiceName: string): SkuGroup {
   return 'wavenet_standard';
 }
 
+// Per-minute rate limits from GCP Cloud Console
+// Module-level state persists across warm invocations — exactly what we want
+const TTS_RATE_LIMITS: Record<SkuGroup, number> = {
+  wavenet_standard: 1000,
+  neural2_polyglot: 1000,
+  chirp3:            200, // Chirp3-HD voices: 200 req/min
+};
+const ttsCallTimestamps: Record<SkuGroup, number[]> = {
+  wavenet_standard: [],
+  neural2_polyglot: [],
+  chirp3: [],
+};
+async function throttleTtsRate(skuGroup: SkuGroup): Promise<void> {
+  const limit = TTS_RATE_LIMITS[skuGroup];
+  const windowMs = 60_000;
+  const now = Date.now();
+  ttsCallTimestamps[skuGroup] = ttsCallTimestamps[skuGroup].filter(t => now - t < windowMs);
+  if (ttsCallTimestamps[skuGroup].length >= limit) {
+    const waitMs = windowMs - (now - ttsCallTimestamps[skuGroup][0]) + 100;
+    logger.warn('TTS rate limit reached, waiting', { skuGroup, waitMs });
+    await new Promise(r => setTimeout(r, waitMs));
+    return throttleTtsRate(skuGroup);
+  }
+  ttsCallTimestamps[skuGroup].push(Date.now());
+}
+
 async function getTtsUsage() {
   const db = getFirestore();
   const month = new Date().toISOString().slice(0, 7);
@@ -141,6 +167,7 @@ export const onConversionJobCreated = onDocumentCreated(
       const audioBuffers: Buffer[] = [];
 
       for (const chunk of chunks) {
+        await throttleTtsRate(skuGroup);
         const [response] = await ttsClient.synthesizeSpeech({
           input: { text: chunk },
           voice: { languageCode, name: voiceName },

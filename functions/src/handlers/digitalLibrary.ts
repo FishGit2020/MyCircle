@@ -7,6 +7,38 @@ import type { Request, Response } from 'express';
 import crypto from 'crypto';
 import { ALLOWED_ORIGINS, verifyAuthToken, uploadToStorage } from './shared.js';
 
+// Per-minute rate limits from GCP Cloud Console
+// Module-level state persists across warm invocations — exactly what we want
+type TtsSkuGroup = 'wavenet_standard' | 'neural2_polyglot' | 'chirp3';
+const DL_TTS_RATE_LIMITS: Record<TtsSkuGroup, number> = {
+  wavenet_standard: 1000,
+  neural2_polyglot: 1000,
+  chirp3:            200, // Chirp3-HD voices: 200 req/min
+};
+const dlTtsCallTimestamps: Record<TtsSkuGroup, number[]> = {
+  wavenet_standard: [],
+  neural2_polyglot: [],
+  chirp3: [],
+};
+function getSkuGroupDL(voiceName: string): TtsSkuGroup {
+  if (voiceName.includes('-Chirp3-HD-')) return 'chirp3';
+  if (voiceName.includes('-Neural2-') || voiceName.includes('-Polyglot-')) return 'neural2_polyglot';
+  return 'wavenet_standard';
+}
+async function throttleDlTtsRate(skuGroup: TtsSkuGroup): Promise<void> {
+  const limit = DL_TTS_RATE_LIMITS[skuGroup];
+  const windowMs = 60_000;
+  const now = Date.now();
+  dlTtsCallTimestamps[skuGroup] = dlTtsCallTimestamps[skuGroup].filter(t => now - t < windowMs);
+  if (dlTtsCallTimestamps[skuGroup].length >= limit) {
+    const waitMs = windowMs - (now - dlTtsCallTimestamps[skuGroup][0]) + 100;
+    logger.warn('TTS rate limit reached, waiting', { skuGroup, waitMs });
+    await new Promise(r => setTimeout(r, waitMs));
+    return throttleDlTtsRate(skuGroup);
+  }
+  dlTtsCallTimestamps[skuGroup].push(Date.now());
+}
+
 // ─── Digital Library ────────────────────────────────────────────────
 export const digitalLibrary = onRequest(
   {
@@ -393,6 +425,7 @@ export const digitalLibrary = onRequest(
       try {
         const { TextToSpeechClient } = await import('@google-cloud/text-to-speech');
         const ttsClient = new TextToSpeechClient();
+        await throttleDlTtsRate(getSkuGroupDL(voiceName));
         const [ttsResponse] = await ttsClient.synthesizeSpeech({
           input: { text: sampleText },
           voice: { languageCode: langCode, name: voiceName },
@@ -588,6 +621,7 @@ export const digitalLibrary = onRequest(
 
           const audioBuffers: Buffer[] = [];
           for (const chunk of chunks) {
+            await throttleDlTtsRate(getSkuGroupDL(voiceName));
             const [ttsResponse] = await ttsClient.synthesizeSpeech({
               input: { text: chunk },
               voice: { languageCode, name: voiceName },
