@@ -595,6 +595,14 @@ export const typeDefs = `#graphql
     sqlChatSearch(query: String!, limit: Int = 20): [SqlChatSearchResult!]!
   }
 
+  type SqlQueryResult {
+    columns: [String!]!
+    rows: [JSON!]!
+    rowCount: Int!
+    durationMs: Int!
+    error: String
+  }
+
   type RadioStation {
     stationuuid: String!
     name: String!
@@ -1355,6 +1363,7 @@ export const typeDefs = `#graphql
     testSqlConnection: SqlConnectionStatus!
     deleteSqlConnection: Boolean!
     startSqlBackfill: SqlBackfillStatus!
+    sqlRunQuery(sql: String!, limit: Int): SqlQueryResult!
   }
 
   schema {

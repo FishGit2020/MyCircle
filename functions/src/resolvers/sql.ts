@@ -507,5 +507,50 @@ export function createSqlMutationResolvers() {
         error: null,
       };
     },
+
+    sqlRunQuery: async (_: any, { sql, limit = 200 }: { sql: string; limit?: number }, ctx: any) => {
+      const uid = ctx?.uid;
+      if (!uid) throw new Error('Authentication required');
+      if (!sql || sql.trim().length === 0) throw new Error('SQL query is required');
+      if (sql.trim().length > 10000) throw new Error('Query too long (max 10000 chars)');
+
+      const config = await getCachedSqlConfig(uid);
+      if (!config || config.status !== 'connected') {
+        return { columns: [], rows: [], rowCount: 0, durationMs: 0, error: 'No connected SQL database' };
+      }
+
+      const safeLimit = Math.min(Math.max(1, limit ?? 200), 1000);
+      const client = createSqlClient(config);
+      const start = Date.now();
+      try {
+        // Append LIMIT only to SELECT statements that don't already have one
+        let querySql = sql.trim();
+        const isSelect = /^\s*SELECT\b/i.test(querySql);
+        if (isSelect && !/\bLIMIT\s+\d+/i.test(querySql)) {
+          querySql = `${querySql.replace(/;+\s*$/, '')} LIMIT ${safeLimit}`;
+        }
+
+        const result = await client.query(querySql);
+        const durationMs = Date.now() - start;
+
+        const columns: string[] = result.rows.length > 0 ? Object.keys(result.rows[0]) : [];
+        return {
+          columns,
+          rows: result.rows,
+          rowCount: result.rowCount,
+          durationMs,
+          error: null,
+        };
+      } catch (err) {
+        logger.warn('sqlRunQuery failed', { uid, error: String(err) });
+        return {
+          columns: [],
+          rows: [],
+          rowCount: 0,
+          durationMs: Date.now() - start,
+          error: err instanceof Error ? err.message : String(err),
+        };
+      }
+    },
   };
 }

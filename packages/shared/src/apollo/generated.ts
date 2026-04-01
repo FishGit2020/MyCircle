@@ -613,6 +613,7 @@ export type Mutation = {
   scoreBenchmarkResponse: BenchmarkQualityResult;
   shareFile: ShareFileResult;
   shareFileWith: TargetedShareResult;
+  sqlRunQuery: SqlQueryResult;
   startCrawl: CrawlJob;
   startSqlBackfill: SqlBackfillStatus;
   stopCrawl: CrawlJob;
@@ -871,6 +872,12 @@ export type MutationShareFileArgs = {
 export type MutationShareFileWithArgs = {
   fileId: Scalars['ID']['input'];
   recipientEmail: Scalars['String']['input'];
+};
+
+
+export type MutationSqlRunQueryArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  sql: Scalars['String']['input'];
 };
 
 
@@ -1756,6 +1763,15 @@ export type SqlProviderStats = {
   errorRate: Scalars['Float']['output'];
   provider: Scalars['String']['output'];
   tokens: Scalars['Int']['output'];
+};
+
+export type SqlQueryResult = {
+  __typename?: 'SqlQueryResult';
+  columns: Array<Scalars['String']['output']>;
+  durationMs: Scalars['Int']['output'];
+  error?: Maybe<Scalars['String']['output']>;
+  rowCount: Scalars['Int']['output'];
+  rows: Array<Scalars['JSON']['output']>;
 };
 
 export type SqlToolCoOccurrence = {
@@ -2960,3 +2976,11 @@ export type SqlChatSearchQueryVariables = Exact<{
 
 
 export type SqlChatSearchQuery = { __typename?: 'Query', sqlChatSearch: Array<{ __typename?: 'SqlChatSearchResult', id: string, timestamp: string, provider: string, model: string, questionPreview: string, answerPreview: string, latencyMs: number, totalTokens: number }> };
+
+export type SqlRunQueryMutationVariables = Exact<{
+  sql: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type SqlRunQueryMutation = { __typename?: 'Mutation', sqlRunQuery: { __typename?: 'SqlQueryResult', columns: Array<string>, rows: Array<Record<string, unknown>>, rowCount: number, durationMs: number, error?: string | null } };

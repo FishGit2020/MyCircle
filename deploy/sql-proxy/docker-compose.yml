@@ -9,6 +9,14 @@
 #
 # No Cloudflare account needed — uses free quick tunnel.
 # Tunnel URL changes on restart. For persistent URL, use a named tunnel.
+#
+# Adminer (web SQL UI):
+#   URL:      http://localhost:8080
+#   System:   PostgreSQL
+#   Server:   postgres          ← use the service name, NOT the DB name
+#   Username: postgres
+#   Password: MyCircle2026!     ← or your custom POSTGRES_PASSWORD
+#   Database: mycircle
 
 services:
   postgres:
@@ -16,7 +24,7 @@ services:
     environment:
       POSTGRES_DB: mycircle
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: changeme  # ← Change this
+      POSTGRES_PASSWORD: MyCircle2026!
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
@@ -29,12 +37,20 @@ services:
   sql-proxy:
     build: .
     environment:
-      DATABASE_URL: postgres://postgres:changeme@postgres:5432/mycircle  # ← Match password above
-      API_KEY: change-this-to-a-secret-key  # ← Change this
+      DATABASE_URL: postgres://postgres:MyCircle2026!@postgres:5432/mycircle
+      API_KEY: sk-mycircle-x7k2p9q4
       PORT: "3080"
     depends_on:
       postgres:
         condition: service_healthy
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
     restart: unless-stopped
 
   cloudflared:
