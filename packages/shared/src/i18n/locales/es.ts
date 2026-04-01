@@ -1883,7 +1883,7 @@ const es: Record<TranslationKey, string> = {
   'library.ttsChars': 'caracteres',
   'library.ttsQuotaNearLimit': 'Cuota TTS casi agotada este mes',
   'library.ttsViewConsole': 'Ver en Cloud Console',
-  'library.ttsRateLimits': 'L\u00edmites de velocidad (solicitudes/min)',
+  'library.ttsRateLimits': 'L\u00edmites de velocidad (90% l\u00edmite, sol/min)',
   'library.ttsRateAll': 'Todas las solicitudes',
   'library.ttsRateChirp3': 'Voces Chirp3-HD',
   'library.ttsRateNeural2': 'Voces Neural2',

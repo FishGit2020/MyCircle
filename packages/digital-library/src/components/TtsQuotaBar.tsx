@@ -4,13 +4,13 @@ import { useTranslation, useQuery, GET_TTS_QUOTA } from '@mycircle/shared';
 const GCP_CONSOLE_URL =
   'https://console.cloud.google.com/apis/api/texttospeech.googleapis.com/quotas?project=mycircle-dash';
 
-// Static per-minute rate limits from GCP Cloud Console
+// 90% hard limits applied to GCP per-minute quotas
 const RATE_LIMITS = [
-  { labelKey: 'library.ttsRateAll',       limit: 1000 },
-  { labelKey: 'library.ttsRateNeural2',   limit: 1000 },
-  { labelKey: 'library.ttsRatePolyglot',  limit: 1000 },
-  { labelKey: 'library.ttsRateChirp3',    limit: 200  },
-  { labelKey: 'library.ttsRateLongAudio', limit: 100  },
+  { labelKey: 'library.ttsRateAll',       limit: 900  }, // 90% of 1000
+  { labelKey: 'library.ttsRateNeural2',   limit: 900  }, // 90% of 1000
+  { labelKey: 'library.ttsRatePolyglot',  limit: 900  }, // 90% of 1000
+  { labelKey: 'library.ttsRateChirp3',    limit: 180  }, // 90% of 200
+  { labelKey: 'library.ttsRateLongAudio', limit: 90   }, // 90% of 100
 ] as const;
 
 function formatChars(chars: number): string {

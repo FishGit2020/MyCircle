@@ -1881,7 +1881,7 @@ const en = {
   'library.ttsChars': 'chars',
   'library.ttsQuotaNearLimit': 'TTS quota nearly exhausted this month',
   'library.ttsViewConsole': 'View in Cloud Console',
-  'library.ttsRateLimits': 'Rate Limits (requests/min)',
+  'library.ttsRateLimits': 'Rate Limits (90% cap, req/min)',
   'library.ttsRateAll': 'All requests',
   'library.ttsRateChirp3': 'Chirp3-HD voices',
   'library.ttsRateNeural2': 'Neural2 voices',

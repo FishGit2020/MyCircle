@@ -1883,7 +1883,7 @@ const zh: Record<TranslationKey, string> = {
   'library.ttsChars': '\u5b57\u7b26',
   'library.ttsQuotaNearLimit': '\u672c\u6708TTS\u914d\u989d\u5373\u5c06\u7528\u5c3d',
   'library.ttsViewConsole': '\u5728Cloud Console\u4e2d\u67e5\u770b',
-  'library.ttsRateLimits': '\u901f\u7387\u9650\u5236\uff08\u8bf7\u6c42/\u5206\u949f\uff09',
+  'library.ttsRateLimits': '\u901f\u7387\u9650\u5236\uff0890%\u4e0a\u9650\uff0c\u8bf7\u6c42/\u5206\u949f\uff09',
   'library.ttsRateAll': '\u6240\u6709\u8bf7\u6c42',
   'library.ttsRateChirp3': 'Chirp3-HD\u8bed\u97f3',
   'library.ttsRateNeural2': 'Neural2\u8bed\u97f3',

@@ -11,9 +11,9 @@ import { ALLOWED_ORIGINS, verifyAuthToken, uploadToStorage } from './shared.js';
 // Module-level state persists across warm invocations — exactly what we want
 type TtsSkuGroup = 'wavenet_standard' | 'neural2_polyglot' | 'chirp3';
 const DL_TTS_RATE_LIMITS: Record<TtsSkuGroup, number> = {
-  wavenet_standard: 1000,
-  neural2_polyglot: 1000,
-  chirp3:            200, // Chirp3-HD voices: 200 req/min
+  wavenet_standard: 900, // 90% of 1000 req/min
+  neural2_polyglot: 900, // 90% of 1000 req/min
+  chirp3:           180, // 90% of 200 req/min (Chirp3-HD)
 };
 const dlTtsCallTimestamps: Record<TtsSkuGroup, number[]> = {
   wavenet_standard: [],
