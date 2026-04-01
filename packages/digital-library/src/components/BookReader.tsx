@@ -6,6 +6,7 @@ import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
 import ConversionStatus from './ConversionStatus';
 import ChapterConvertList from './ChapterConvertList';
+import TtsQuotaBar from './TtsQuotaBar';
 import useSwipe from '../hooks/useSwipe';
 import { useReaderTheme } from '../hooks/useReaderTheme';
 import { useReadingProgress } from '../hooks/useReadingProgress';
@@ -649,6 +650,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
       {/* Listen tab */}
       {activeTab === 'listen' && (
         <div className="flex-1 overflow-auto space-y-4" role="tabpanel">
+          <TtsQuotaBar />
           <ConversionStatus
             bookId={bookId}
             language={language}
