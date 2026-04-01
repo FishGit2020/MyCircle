@@ -673,7 +673,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             initialChapter={searchParams.get('chapter') != null ? Number(searchParams.get('chapter')) : undefined}
             voiceName={(() => {
               const lc = (language || 'en').startsWith('zh') ? 'cmn-CN' : (language || 'en').startsWith('es') ? 'es-US' : 'en-US';
-              return `${lc}-Neural2-${lc === 'en-US' ? 'D' : 'A'}`;
+              return `${lc}-Wavenet-${lc === 'en-US' ? 'D' : 'A'}`;
             })()}
             onChapterConverted={async () => {
               await onRefreshChapters?.();

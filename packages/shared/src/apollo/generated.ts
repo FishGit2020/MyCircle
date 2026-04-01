@@ -1917,6 +1917,13 @@ export type TransitStop = {
 
 export type TtsQuota = {
   __typename?: 'TtsQuota';
+  chirp3: TtsQuotaEntry;
+  neural2Polyglot: TtsQuotaEntry;
+  wavenetStandard: TtsQuotaEntry;
+};
+
+export type TtsQuotaEntry = {
+  __typename?: 'TtsQuotaEntry';
   limit: Scalars['Int']['output'];
   remaining: Scalars['Int']['output'];
   used: Scalars['Int']['output'];
@@ -2578,7 +2585,7 @@ export type GetBookConversionProgressQuery = { __typename?: 'Query', bookConvers
 export type GetTtsQuotaQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTtsQuotaQuery = { __typename?: 'Query', ttsQuota: { __typename?: 'TtsQuota', used: number, limit: number, remaining: number } };
+export type GetTtsQuotaQuery = { __typename?: 'Query', ttsQuota: { __typename?: 'TtsQuota', wavenetStandard: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, neural2Polyglot: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, chirp3: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number } } };
 
 export type GetConversionJobsQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];

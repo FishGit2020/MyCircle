@@ -1083,9 +1083,9 @@ export const GET_BOOK_CONVERSION_PROGRESS = gql`
 export const GET_TTS_QUOTA = gql`
   query GetTtsQuota {
     ttsQuota {
-      used
-      limit
-      remaining
+      wavenetStandard { used limit remaining }
+      neural2Polyglot { used limit remaining }
+      chirp3 { used limit remaining }
     }
   }
 `;

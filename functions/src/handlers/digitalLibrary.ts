@@ -335,6 +335,43 @@ export const digitalLibrary = onRequest(
       return;
     }
 
+    // ── TTS Monthly Quota ─────────────────────────────────────────────
+    // Tracked per billing SKU group — each group has its own independent free-tier meter.
+    // Limits are capped at 90% of the free tier. Once reached, all TTS is hard-blocked
+    // for that SKU group until the counter resets at the start of the next calendar month.
+    // SKU 9D01: WaveNet + Standard share 4M/mo → hard limit 3.6M
+    // SKU FEBD: Neural2 + Polyglot share 1M/mo → hard limit 900K
+    // SKU F977: Chirp3 HD 1M/mo              → hard limit 900K
+    type SkuGroup = 'wavenet_standard' | 'neural2_polyglot' | 'chirp3';
+    const TTS_LIMITS: Record<SkuGroup, number> = {
+      wavenet_standard: 3_600_000, // 90% of 4M free
+      neural2_polyglot:   900_000, // 90% of 1M free
+      chirp3:             900_000, // 90% of 1M free
+    };
+
+    function getSkuGroup(voiceName: string): SkuGroup {
+      if (voiceName.includes('-Chirp3-HD-')) return 'chirp3';
+      if (voiceName.includes('-Neural2-') || voiceName.includes('-Polyglot-')) return 'neural2_polyglot';
+      return 'wavenet_standard';
+    }
+
+    async function getTtsUsage(): Promise<{ ref: FirebaseFirestore.DocumentReference; wavenet_standard: number; neural2_polyglot: number; chirp3: number }> {
+      const month = new Date().toISOString().slice(0, 7);
+      const ref = db.collection('ttsUsage').doc(month);
+      const snap = await ref.get();
+      const data = snap.data() || {};
+      return {
+        ref,
+        wavenet_standard: data.wavenet_standard ?? 0,
+        neural2_polyglot: data.neural2_polyglot ?? 0,
+        chirp3: data.chirp3 ?? 0,
+      };
+    }
+
+    async function incrementTtsUsage(ref: FirebaseFirestore.DocumentReference, skuGroup: SkuGroup, chars: number) {
+      await ref.set({ [skuGroup]: FieldValue.increment(chars), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    }
+
     // POST /digital-library-api/preview-voice  — synthesizes a short TTS sample
     if (req.method === 'POST' && route === 'preview-voice') {
       const { voiceName } = req.body as { voiceName?: string };
@@ -342,11 +379,17 @@ export const digitalLibrary = onRequest(
         res.status(400).json({ error: 'voiceName required' });
         return;
       }
-      // Derive language code from voice name (e.g. "en-US-Neural2-D" → "en-US")
       const langCode = voiceName.split('-').slice(0, 2).join('-');
       const sampleText = langCode.startsWith('cmn') ? '你好，这是语音预览。'
         : langCode.startsWith('es') ? 'Hola, esta es una vista previa de la voz.'
         : 'Hello, this is a voice preview sample.';
+      // Check quota before synthesizing (preview counts against its SKU group)
+      const previewQuota = await getTtsUsage();
+      const previewSkuGroup = getSkuGroup(voiceName);
+      if (previewQuota[previewSkuGroup] + sampleText.length > TTS_LIMITS[previewSkuGroup]) {
+        res.status(429).json({ error: 'Monthly TTS quota reached' });
+        return;
+      }
       try {
         const { TextToSpeechClient } = await import('@google-cloud/text-to-speech');
         const ttsClient = new TextToSpeechClient();
@@ -355,6 +398,7 @@ export const digitalLibrary = onRequest(
           voice: { languageCode: langCode, name: voiceName },
           audioConfig: { audioEncoding: 'MP3' },
         });
+        await incrementTtsUsage(previewQuota.ref, previewSkuGroup, sampleText.length);
         const audio = Buffer.from(ttsResponse.audioContent as Uint8Array).toString('base64');
         res.json({ audio });
       } catch (err) {
@@ -364,25 +408,14 @@ export const digitalLibrary = onRequest(
       return;
     }
 
-    // ── TTS Monthly Quota ─────────────────────────────────────────────
-    // 3.5M chars/month (~87% of the 4M free tier) — prevents surprise bills
-    const TTS_MONTHLY_CHAR_LIMIT = 3_500_000;
-
-    async function getTtsUsage(): Promise<{ ref: FirebaseFirestore.DocumentReference; chars: number }> {
-      const month = new Date().toISOString().slice(0, 7); // e.g. "2026-03"
-      const ref = db.collection('ttsUsage').doc(month);
-      const snap = await ref.get();
-      return { ref, chars: snap.exists ? (snap.data()?.totalCharacters ?? 0) : 0 };
-    }
-
-    async function incrementTtsUsage(ref: FirebaseFirestore.DocumentReference, chars: number) {
-      await ref.set({ totalCharacters: FieldValue.increment(chars), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-    }
-
     // GET /digital-library-api/tts-quota
     if (req.method === 'GET' && route === 'tts-quota') {
-      const { chars } = await getTtsUsage();
-      res.json({ used: chars, limit: TTS_MONTHLY_CHAR_LIMIT, remaining: Math.max(0, TTS_MONTHLY_CHAR_LIMIT - chars) });
+      const usage = await getTtsUsage();
+      res.json({
+        wavenetStandard: { used: usage.wavenet_standard, limit: TTS_LIMITS.wavenet_standard, remaining: Math.max(0, TTS_LIMITS.wavenet_standard - usage.wavenet_standard) },
+        neural2Polyglot: { used: usage.neural2_polyglot, limit: TTS_LIMITS.neural2_polyglot, remaining: Math.max(0, TTS_LIMITS.neural2_polyglot - usage.neural2_polyglot) },
+        chirp3:          { used: usage.chirp3,           limit: TTS_LIMITS.chirp3,           remaining: Math.max(0, TTS_LIMITS.chirp3           - usage.chirp3) },
+      });
       return;
     }
 
@@ -420,23 +453,26 @@ export const digitalLibrary = onRequest(
 
       // Validate optional voiceName
       const voiceNameParam = req.body.voiceName as string | undefined;
-      const VOICE_REGEX = /^(en-US|es-US|cmn-CN)-Neural2-[A-J]$/;
+      const VOICE_REGEX = /^(en-US|es-US|cmn-CN)-(Wavenet|Standard|Neural2)-[A-J]$|^(en-US|es-US|cmn-CN)-Chirp3-HD-[A-Za-z]+$|^en-US-Polyglot-\d+$/;
       if (voiceNameParam && !VOICE_REGEX.test(voiceNameParam)) {
         res.status(400).json({ error: 'Invalid voiceName format' });
         return;
       }
 
-      // Check monthly TTS quota
+      // Check monthly TTS quota for this voice's SKU group
       const quota = await getTtsUsage();
+      const skuGroup = getSkuGroup(voiceNameParam || 'en-US-Wavenet-D');
+      const currentUsage = quota[skuGroup];
+      const skuLimit = TTS_LIMITS[skuGroup];
       const charsToCheck = singleChapterIndex !== null
         ? ((await bookRef.collection('chapters').where('index', '==', singleChapterIndex).get()).docs[0]?.data()?.characterCount || 5000)
         : (bookData.totalCharacters || 0);
-      if (quota.chars + charsToCheck > TTS_MONTHLY_CHAR_LIMIT) {
+      if (currentUsage + charsToCheck > skuLimit) {
         res.status(429).json({
           error: 'Monthly TTS quota reached',
-          used: quota.chars,
-          limit: TTS_MONTHLY_CHAR_LIMIT,
-          remaining: Math.max(0, TTS_MONTHLY_CHAR_LIMIT - quota.chars),
+          used: currentUsage,
+          limit: skuLimit,
+          remaining: Math.max(0, skuLimit - currentUsage),
           bookChars: charsToCheck,
         });
         return;
@@ -475,11 +511,11 @@ export const digitalLibrary = onRequest(
         const epub = await (EPub as unknown as { createAsync(path: string): Promise<any> }).createAsync(tmpPath);
 
         const language = bookData.language || 'en';
-        const defaultVoice = language.startsWith('zh') ? 'cmn-CN-Neural2-A'
-          : language.startsWith('es') ? 'es-US-Neural2-A'
-          : 'en-US-Neural2-D';
+        const defaultVoice = language.startsWith('zh') ? 'cmn-CN-Wavenet-A'
+          : language.startsWith('es') ? 'es-US-Wavenet-A'
+          : 'en-US-Wavenet-D';
         const voiceName = voiceNameParam || defaultVoice;
-        const languageCode = voiceName.slice(0, voiceName.lastIndexOf('-Neural2'));
+        const languageCode = voiceName.split('-').slice(0, 2).join('-');
 
         // Filter to single chapter if requested
         const docsToProcess = singleChapterIndex !== null
@@ -503,7 +539,7 @@ export const digitalLibrary = onRequest(
           if (singleChapterIndex === null && Date.now() - startTime > TIME_BUDGET_MS) {
             const progress = Math.round((completedChapters / totalChapters) * 100);
             await bookRef.update({ audioStatus: 'paused', audioProgress: progress, updatedAt: FieldValue.serverTimestamp() });
-            if (totalCharsUsed > 0) await incrementTtsUsage(quota.ref, totalCharsUsed);
+            if (totalCharsUsed > 0) await incrementTtsUsage(quota.ref, skuGroup, totalCharsUsed);
             try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
             logger.info('Audio conversion paused (time budget)', { bookId, completedChapters, totalChapters });
             return;
@@ -586,7 +622,7 @@ export const digitalLibrary = onRequest(
           }
         }
 
-        await incrementTtsUsage(quota.ref, totalCharsUsed);
+        await incrementTtsUsage(quota.ref, skuGroup, totalCharsUsed);
 
         // For whole-book, mark complete. For single chapter, update progress.
         if (singleChapterIndex === null) {

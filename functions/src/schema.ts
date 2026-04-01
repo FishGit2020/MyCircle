@@ -228,10 +228,17 @@ export const typeDefs = `#graphql
     canContinue: Boolean!
   }
 
-  type TtsQuota {
+  type TtsQuotaEntry {
     used: Int!
     limit: Int!
     remaining: Int!
+  }
+
+  # Tracks usage per billing SKU group — each group has its own free tier
+  type TtsQuota {
+    wavenetStandard: TtsQuotaEntry!   # SKU 9D01: WaveNet + Standard — 4M free/month shared
+    neural2Polyglot: TtsQuotaEntry!   # SKU FEBD: Neural2 + Polyglot — 1M free/month shared
+    chirp3: TtsQuotaEntry!            # SKU F977: Chirp3 HD — 1M free/month
   }
 
   type ConversionJob {

@@ -9,6 +9,14 @@ function isAbortError(err: unknown): boolean {
 
 const VOICE_SUFFIXES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] as const;
 
+// Chirp3 HD: named voices (en-US only; other locales have limited/different sets)
+const CHIRP3_HD_VOICES_EN = [
+  'Achernar', 'Aoede', 'Autonoe', 'Callirrhoe', 'Charon', 'Despina',
+  'Enceladus', 'Fenrir', 'Gacrux', 'Iapetus', 'Kore', 'Laomedeia',
+  'Leda', 'Orus', 'Puck', 'Pulcherrima', 'Rasalased', 'Sadachbia',
+  'Sadaltager', 'Schedar', 'Sulafar', 'Umbriel', 'Vindemiatrix', 'Zubenelgenubi',
+];
+
 function getLangCode(language: string): string {
   if (language.startsWith('zh')) return 'cmn-CN';
   if (language.startsWith('es')) return 'es-US';
@@ -18,7 +26,25 @@ function getLangCode(language: string): string {
 function getDefaultVoice(language: string): string {
   const langCode = getLangCode(language);
   const suffix = langCode === 'en-US' ? 'D' : 'A';
-  return `${langCode}-Neural2-${suffix}`;
+  return `${langCode}-Wavenet-${suffix}`;
+}
+
+function getVoiceGroups(langCode: string) {
+  const abSuffixes = VOICE_SUFFIXES.map(s => `${langCode}-Wavenet-${s}`);
+  const stdSuffixes = VOICE_SUFFIXES.map(s => `${langCode}-Standard-${s}`);
+  const n2Suffixes = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
+  const chirp3Voices = langCode === 'en-US'
+    ? CHIRP3_HD_VOICES_EN.map(n => `en-US-Chirp3-HD-${n}`)
+    : [];
+  const polyglotVoices = langCode === 'en-US' ? ['en-US-Polyglot-1'] : [];
+
+  return [
+    { label: 'WaveNet — 4M free/mo (shared with Standard)', voices: abSuffixes },
+    { label: 'Standard — 4M free/mo (shared with WaveNet)', voices: stdSuffixes },
+    { label: 'Neural2 — 1M free/mo (shared with Polyglot)', voices: n2Suffixes },
+    ...(chirp3Voices.length > 0 ? [{ label: 'Chirp3 HD — 1M free/mo', voices: chirp3Voices }] : []),
+    ...(polyglotVoices.length > 0 ? [{ label: 'Polyglot Preview — 1M free/mo (shared with Neural2)', voices: polyglotVoices }] : []),
+  ];
 }
 
 interface ConversionStatusProps {
@@ -42,7 +68,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   const [cancelling, setCancelling] = useState(false);
 
   const langCode = getLangCode(language);
-  const voiceOptions = VOICE_SUFFIXES.map(s => `${langCode}-Neural2-${s}`);
+  const voiceGroups = getVoiceGroups(langCode);
 
   const [fetchConversionProgress] = useLazyQuery(GET_BOOK_CONVERSION_PROGRESS, { fetchPolicy: 'network-only' });
   const [resetMutation] = useMutation(RESET_BOOK_CONVERSION);
@@ -217,8 +243,12 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         onChange={(e) => setSelectedVoice(e.target.value)}
         className="text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-2 py-1 min-h-[44px]"
       >
-        {voiceOptions.map(v => (
-          <option key={v} value={v}>{v}</option>
+        {voiceGroups.map(({ label, voices }) => (
+          <optgroup key={label} label={label}>
+            {voices.map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
+          </optgroup>
         ))}
       </select>
       <button

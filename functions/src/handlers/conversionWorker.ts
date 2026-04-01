@@ -3,16 +3,34 @@ import { logger } from 'firebase-functions';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 
-const TTS_MONTHLY_CHAR_LIMIT = 3_500_000;
+// TTS billing SKUs — each has its own independent free-tier meter.
+// Limits are capped at 90% of the free tier as a hard safety buffer.
+// SKU 9D01: WaveNet + Standard share 4M/mo → hard limit 3.6M
+// SKU FEBD: Neural2 + Polyglot share 1M/mo → hard limit 900K
+// SKU F977: Chirp3 HD 1M/mo              → hard limit 900K
+type SkuGroup = 'wavenet_standard' | 'neural2_polyglot' | 'chirp3';
+const TTS_LIMITS: Record<SkuGroup, number> = {
+  wavenet_standard: 3_600_000, // 90% of 4M free
+  neural2_polyglot:   900_000, // 90% of 1M free
+  chirp3:             900_000, // 90% of 1M free
+};
+function getSkuGroup(voiceName: string): SkuGroup {
+  if (voiceName.includes('-Chirp3-HD-')) return 'chirp3';
+  if (voiceName.includes('-Neural2-') || voiceName.includes('-Polyglot-')) return 'neural2_polyglot';
+  return 'wavenet_standard';
+}
 
 async function getTtsUsage() {
   const db = getFirestore();
   const month = new Date().toISOString().slice(0, 7);
   const ref = db.collection('ttsUsage').doc(month);
   const snap = await ref.get();
+  const data = snap.data() || {};
   return {
-    chars: snap.exists ? (snap.data()?.totalCharacters ?? 0) : 0,
     ref,
+    wavenet_standard: data.wavenet_standard ?? 0,
+    neural2_polyglot: data.neural2_polyglot ?? 0,
+    chirp3: data.chirp3 ?? 0,
   };
 }
 
@@ -65,7 +83,8 @@ export const onConversionJobCreated = onDocumentCreated(
       }
 
       const charsNeeded = chData.characterCount || 5000;
-      if (quota.chars + charsNeeded > TTS_MONTHLY_CHAR_LIMIT) {
+      const skuGroup = getSkuGroup(voiceName);
+      if (quota[skuGroup] + charsNeeded > TTS_LIMITS[skuGroup]) {
         await jobRef.update({ status: 'error', error: 'Monthly TTS quota reached' });
         return;
       }
@@ -117,7 +136,7 @@ export const onConversionJobCreated = onDocumentCreated(
       if (current.trim()) chunks.push(current.trim());
 
       // Convert each chunk to audio
-      const languageCode = voiceName.slice(0, voiceName.lastIndexOf('-Neural2'));
+      const languageCode = voiceName.split('-').slice(0, 2).join('-');
       const ttsClient = new (await import('@google-cloud/text-to-speech')).TextToSpeechClient();
       const audioBuffers: Buffer[] = [];
 
@@ -143,10 +162,10 @@ export const onConversionJobCreated = onDocumentCreated(
       // Update chapter with audio URL
       await chapterDoc.ref.update({ audioUrl });
 
-      // Increment TTS usage
+      // Increment TTS usage for this SKU group
       const charsUsed = chapterText.length;
       await quota.ref.set(
-        { totalCharacters: FieldValue.increment(charsUsed), updatedAt: FieldValue.serverTimestamp() },
+        { [skuGroup]: FieldValue.increment(charsUsed), updatedAt: FieldValue.serverTimestamp() },
         { merge: true }
       );
 
