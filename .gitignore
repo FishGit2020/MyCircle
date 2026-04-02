@@ -39,6 +39,7 @@ nul
 /blob-report/
 /playwright/.cache/
 e2e/smoke/.auth/
+/screenshots/
 
 # Test coverage
 **/coverage/
