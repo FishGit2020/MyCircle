@@ -32,4 +32,5 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   resume: 'nav.resumeTailor',
   setup: 'nav.setup',
   trash: 'nav.recycleBin',
+  quota: 'nav.quotaBilling',
 };

@@ -1,0 +1,94 @@
+# GraphQL Contract: Quota & Billing Monitor
+# These types and operations are added to the existing schema in functions/src/schema.ts
+# and implemented in functions/src/resolvers/quota.ts
+
+# ─── Query ────────────────────────────────────────────────────────────────────
+
+"""
+Returns the N most recent quota snapshots for the authenticated user.
+Defaults to 10 if limit is not specified. Max 90.
+"""
+quotaSnapshots(limit: Int): QuotaSnapshotList!
+
+# ─── Mutation ────────────────────────────────────────────────────────────────
+
+"""
+Collects fresh GCP metrics (Cloud Run, Storage, Firestore, TTS, Artifact Registry)
+and saves a new snapshot to Firestore. Prunes snapshots older than the 90 most recent.
+Returns the newly created snapshot. Partial success is allowed — errors field lists
+any services that failed to collect.
+"""
+collectQuotaSnapshot: QuotaSnapshot!
+
+"""
+Writes the most recent quota snapshot to the connected SQL database.
+Creates the quota_snapshots table if it does not exist.
+Throws if no SQL connection is configured for the authenticated user.
+"""
+dumpQuotaToSql: Boolean!
+
+# ─── Types ───────────────────────────────────────────────────────────────────
+
+type QuotaSnapshotList {
+  snapshots: [QuotaSnapshot!]!
+  total: Int!
+}
+
+type QuotaSnapshot {
+  id: String!
+  collectedAt: String!
+  cloudRun: CloudRunQuotaMetric!
+  storage: StorageQuotaMetric!
+  firestore: FirestoreQuotaMetric!
+  tts: TtsQuota!
+  artifactRegistry: ArtifactRegistryQuotaMetric!
+  totalEstimatedCostUsd: Float!
+  errors: [String!]!
+}
+
+type CloudRunQuotaMetric {
+  totalRequests: Int!
+  byService: [ServiceRequestCount!]!
+  freeTierLimit: Int!
+  estimatedCostUsd: Float!
+}
+
+type ServiceRequestCount {
+  serviceName: String!
+  requests: Int!
+}
+
+type StorageQuotaMetric {
+  totalBytes: Float!
+  byFolder: [FolderSize!]!
+  freeTierLimitBytes: Float!
+  estimatedCostUsd: Float!
+}
+
+type FolderSize {
+  folder: String!
+  bytes: Float!
+}
+
+type FirestoreQuotaMetric {
+  collections: [CollectionCount!]!
+  freeTierLimitReadsPerDay: Int!
+  estimatedCostUsd: Float!
+}
+
+type CollectionCount {
+  collection: String!
+  count: Int!
+}
+
+type ArtifactRegistryQuotaMetric {
+  totalBytes: Float!
+  byRepository: [RepositorySize!]!
+  freeTierLimitBytes: Float!
+  estimatedCostUsd: Float!
+}
+
+type RepositorySize {
+  repository: String!
+  bytes: Float!
+}

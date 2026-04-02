@@ -108,6 +108,127 @@ export async function logBenchmarkToSql(
   }
 }
 
+export async function logQuotaToSql(
+  client: SqlProxyClient,
+  snapshot: {
+    id: string;
+    collectedAt: string;
+    elapsedDays: number;
+    daysInMonth: number;
+    cloudRun: { totalRequests: number; mtdCostUsd: number; projectedCostUsd: number };
+    functions: { totalInvocations: number; mtdCostUsd: number; projectedCostUsd: number };
+    storage: { totalBytes: number; bandwidthBytes: number; mtdCostUsd: number; projectedCostUsd: number };
+    firestore: { reads: { today: number; peak7d: number }; writes: { today: number; peak7d: number }; deletes: { today: number; peak7d: number }; mtdCostUsd: number; projectedCostUsd: number };
+    tts: { wavenetStandard: { used: number }; neural2Polyglot: { used: number }; chirp3: { used: number } };
+    artifactRegistry: { totalBytes: number; mtdCostUsd: number; projectedCostUsd: number };
+    hosting: { storageBytes: number | null; dailyDownloadBytes: number | null; mtdCostUsd: number; projectedCostUsd: number };
+    totalMtdCostUsd: number;
+    totalProjectedCostUsd: number;
+    errors: string[];
+  },
+): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS quota_snapshots (
+      id                       TEXT PRIMARY KEY,
+      collected_at             TIMESTAMPTZ NOT NULL,
+      elapsed_days             INTEGER NOT NULL DEFAULT 0,
+      days_in_month            INTEGER NOT NULL DEFAULT 0,
+      cloud_run_requests       BIGINT NOT NULL DEFAULT 0,
+      cloud_run_mtd_cost       NUMERIC(10,4) NOT NULL DEFAULT 0,
+      cloud_run_proj_cost      NUMERIC(10,4) NOT NULL DEFAULT 0,
+      functions_invocations    BIGINT NOT NULL DEFAULT 0,
+      functions_mtd_cost       NUMERIC(10,4) NOT NULL DEFAULT 0,
+      functions_proj_cost      NUMERIC(10,4) NOT NULL DEFAULT 0,
+      storage_bytes            BIGINT NOT NULL DEFAULT 0,
+      storage_bandwidth_bytes  BIGINT NOT NULL DEFAULT 0,
+      storage_mtd_cost         NUMERIC(10,4) NOT NULL DEFAULT 0,
+      storage_proj_cost        NUMERIC(10,4) NOT NULL DEFAULT 0,
+      firestore_reads_today    BIGINT NOT NULL DEFAULT 0,
+      firestore_reads_peak7d   BIGINT NOT NULL DEFAULT 0,
+      firestore_writes_today   BIGINT NOT NULL DEFAULT 0,
+      firestore_writes_peak7d  BIGINT NOT NULL DEFAULT 0,
+      firestore_deletes_today  BIGINT NOT NULL DEFAULT 0,
+      firestore_deletes_peak7d BIGINT NOT NULL DEFAULT 0,
+      firestore_mtd_cost       NUMERIC(10,4) NOT NULL DEFAULT 0,
+      firestore_proj_cost      NUMERIC(10,4) NOT NULL DEFAULT 0,
+      tts_wavenet_chars        BIGINT NOT NULL DEFAULT 0,
+      tts_neural2_chars        BIGINT NOT NULL DEFAULT 0,
+      tts_chirp3_chars         BIGINT NOT NULL DEFAULT 0,
+      artifact_bytes           BIGINT NOT NULL DEFAULT 0,
+      artifact_mtd_cost        NUMERIC(10,4) NOT NULL DEFAULT 0,
+      artifact_proj_cost       NUMERIC(10,4) NOT NULL DEFAULT 0,
+      hosting_storage_bytes    BIGINT,
+      hosting_dl_bytes         BIGINT,
+      hosting_mtd_cost         NUMERIC(10,4) NOT NULL DEFAULT 0,
+      hosting_proj_cost        NUMERIC(10,4) NOT NULL DEFAULT 0,
+      total_mtd_cost           NUMERIC(10,4) NOT NULL DEFAULT 0,
+      total_proj_cost          NUMERIC(10,4) NOT NULL DEFAULT 0,
+      errors                   TEXT[] NOT NULL DEFAULT '{}',
+      raw_json                 JSONB NOT NULL,
+      created_at               TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await client.query(
+    `INSERT INTO quota_snapshots (
+      id, collected_at, elapsed_days, days_in_month,
+      cloud_run_requests, cloud_run_mtd_cost, cloud_run_proj_cost,
+      functions_invocations, functions_mtd_cost, functions_proj_cost,
+      storage_bytes, storage_bandwidth_bytes, storage_mtd_cost, storage_proj_cost,
+      firestore_reads_today, firestore_reads_peak7d,
+      firestore_writes_today, firestore_writes_peak7d,
+      firestore_deletes_today, firestore_deletes_peak7d,
+      firestore_mtd_cost, firestore_proj_cost,
+      tts_wavenet_chars, tts_neural2_chars, tts_chirp3_chars,
+      artifact_bytes, artifact_mtd_cost, artifact_proj_cost,
+      hosting_storage_bytes, hosting_dl_bytes, hosting_mtd_cost, hosting_proj_cost,
+      total_mtd_cost, total_proj_cost, errors, raw_json
+    ) VALUES (
+      $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,
+      $15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,
+      $29,$30,$31,$32,$33,$34,$35,$36
+    ) ON CONFLICT (id) DO NOTHING`,
+    [
+      snapshot.id,
+      snapshot.collectedAt,
+      snapshot.elapsedDays,
+      snapshot.daysInMonth,
+      snapshot.cloudRun.totalRequests,
+      snapshot.cloudRun.mtdCostUsd,
+      snapshot.cloudRun.projectedCostUsd,
+      snapshot.functions.totalInvocations,
+      snapshot.functions.mtdCostUsd,
+      snapshot.functions.projectedCostUsd,
+      snapshot.storage.totalBytes,
+      snapshot.storage.bandwidthBytes,
+      snapshot.storage.mtdCostUsd,
+      snapshot.storage.projectedCostUsd,
+      snapshot.firestore.reads.today,
+      snapshot.firestore.reads.peak7d,
+      snapshot.firestore.writes.today,
+      snapshot.firestore.writes.peak7d,
+      snapshot.firestore.deletes.today,
+      snapshot.firestore.deletes.peak7d,
+      snapshot.firestore.mtdCostUsd,
+      snapshot.firestore.projectedCostUsd,
+      snapshot.tts.wavenetStandard.used,
+      snapshot.tts.neural2Polyglot.used,
+      snapshot.tts.chirp3.used,
+      snapshot.artifactRegistry.totalBytes,
+      snapshot.artifactRegistry.mtdCostUsd,
+      snapshot.artifactRegistry.projectedCostUsd,
+      snapshot.hosting.storageBytes ?? null,
+      snapshot.hosting.dailyDownloadBytes ?? null,
+      snapshot.hosting.mtdCostUsd,
+      snapshot.hosting.projectedCostUsd,
+      snapshot.totalMtdCostUsd,
+      snapshot.totalProjectedCostUsd,
+      snapshot.errors,
+      JSON.stringify(snapshot),
+    ],
+  );
+}
+
 function simpleHash(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

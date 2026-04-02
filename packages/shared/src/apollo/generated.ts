@@ -95,6 +95,15 @@ export type AirQuality = {
   so2: Scalars['Float']['output'];
 };
 
+export type ArtifactRegistryQuotaMetric = {
+  __typename?: 'ArtifactRegistryQuotaMetric';
+  byRepository: Array<RepositorySize>;
+  freeTierBytes: Scalars['Float']['output'];
+  mtdCostUsd: Scalars['Float']['output'];
+  projectedCostUsd: Scalars['Float']['output'];
+  totalBytes: Scalars['Float']['output'];
+};
+
 export type BabyInfo = {
   __typename?: 'BabyInfo';
   animal: Scalars['String']['output'];
@@ -307,9 +316,24 @@ export type CloudFile = {
   uploadedAt: Scalars['String']['output'];
 };
 
+export type CloudRunQuotaMetric = {
+  __typename?: 'CloudRunQuotaMetric';
+  byService: Array<ServiceRequestCount>;
+  freeTierLimit: Scalars['Int']['output'];
+  mtdCostUsd: Scalars['Float']['output'];
+  projectedCostUsd: Scalars['Float']['output'];
+  totalRequests: Scalars['Int']['output'];
+};
+
 export type Clouds = {
   __typename?: 'Clouds';
   all: Scalars['Int']['output'];
+};
+
+export type CollectionCount = {
+  __typename?: 'CollectionCount';
+  collection: Scalars['String']['output'];
+  count: Scalars['Int']['output'];
 };
 
 export type CompanyNews = {
@@ -459,6 +483,14 @@ export type DailyLogInput = {
   date?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type DailyMetricWithPeak = {
+  __typename?: 'DailyMetricWithPeak';
+  exceeded7d: Scalars['Boolean']['output'];
+  freeTierLimit: Scalars['Float']['output'];
+  peak7d: Scalars['Float']['output'];
+  today: Scalars['Float']['output'];
+};
+
 export type Deal = {
   __typename?: 'Deal';
   category?: Maybe<Scalars['String']['output']>;
@@ -474,6 +506,15 @@ export type Deal = {
   url: Scalars['String']['output'];
 };
 
+export type FirestoreQuotaMetric = {
+  __typename?: 'FirestoreQuotaMetric';
+  deletes: DailyMetricWithPeak;
+  mtdCostUsd: Scalars['Float']['output'];
+  projectedCostUsd: Scalars['Float']['output'];
+  reads: DailyMetricWithPeak;
+  writes: DailyMetricWithPeak;
+};
+
 export type Folder = {
   __typename?: 'Folder';
   createdAt: Scalars['String']['output'];
@@ -481,6 +522,12 @@ export type Folder = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   parentFolderId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type FolderSize = {
+  __typename?: 'FolderSize';
+  bytes: Scalars['Float']['output'];
+  folder: Scalars['String']['output'];
 };
 
 export type ForecastDay = {
@@ -491,6 +538,21 @@ export type ForecastDay = {
   temp: Temperature;
   weather: Array<WeatherCondition>;
   wind_speed: Scalars['Float']['output'];
+};
+
+export type FunctionInvocationCount = {
+  __typename?: 'FunctionInvocationCount';
+  functionName: Scalars['String']['output'];
+  invocations: Scalars['Int']['output'];
+};
+
+export type FunctionsQuotaMetric = {
+  __typename?: 'FunctionsQuotaMetric';
+  byFunction: Array<FunctionInvocationCount>;
+  freeTierLimit: Scalars['Int']['output'];
+  mtdCostUsd: Scalars['Float']['output'];
+  projectedCostUsd: Scalars['Float']['output'];
+  totalInvocations: Scalars['Int']['output'];
 };
 
 export type GeneratedResumeResult = {
@@ -513,6 +575,17 @@ export type HistoricalWeatherDay = {
   weather_description: Scalars['String']['output'];
   weather_icon: Scalars['String']['output'];
   wind_speed_max: Scalars['Float']['output'];
+};
+
+export type HostingQuotaMetric = {
+  __typename?: 'HostingQuotaMetric';
+  dailyDownloadBytes?: Maybe<Scalars['Float']['output']>;
+  freeTierDailyDownloadBytes: Scalars['Float']['output'];
+  freeTierStorageBytes: Scalars['Float']['output'];
+  mtdCostUsd: Scalars['Float']['output'];
+  projectedCostUsd: Scalars['Float']['output'];
+  storageBytes?: Maybe<Scalars['Float']['output']>;
+  unavailable: Scalars['Boolean']['output'];
 };
 
 export type HourlyForecast = {
@@ -575,6 +648,7 @@ export type Mutation = {
   boostAtsScore: GeneratedResumeResult;
   cancelBookConversion: Scalars['Boolean']['output'];
   cancelSqlBackfill: Scalars['Boolean']['output'];
+  collectQuotaSnapshot: QuotaSnapshot;
   createDailyLog: DailyLogEntry;
   createFolder: Folder;
   createInterviewQuestion: InterviewQuestion;
@@ -594,6 +668,7 @@ export type Mutation = {
   deleteSqlConnection: Scalars['Boolean']['output'];
   deleteWorshipSetlist: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
+  dumpQuotaToSql: Scalars['Boolean']['output'];
   generateResume: GeneratedResumeResult;
   moveFile: CloudFile;
   permanentDeleteBook: Scalars['Boolean']['output'];
@@ -1071,6 +1146,7 @@ export type Query = {
   podcastEpisodes: PodcastEpisodesResponse;
   podcastFeed?: Maybe<PodcastFeed>;
   questionBank: QuestionBank;
+  quotaSnapshots: QuotaSnapshotList;
   radioStations: Array<RadioStation>;
   radioStationsByUuids: Array<RadioStation>;
   radioTags: Array<RadioTag>;
@@ -1264,6 +1340,11 @@ export type QueryPodcastFeedArgs = {
 };
 
 
+export type QueryQuotaSnapshotsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryRadioStationsArgs = {
   country?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -1418,6 +1499,30 @@ export type QuestionBank = {
   questions: Array<InterviewQuestion>;
 };
 
+export type QuotaSnapshot = {
+  __typename?: 'QuotaSnapshot';
+  artifactRegistry: ArtifactRegistryQuotaMetric;
+  cloudRun: CloudRunQuotaMetric;
+  collectedAt: Scalars['String']['output'];
+  daysInMonth: Scalars['Int']['output'];
+  elapsedDays: Scalars['Int']['output'];
+  errors: Array<Scalars['String']['output']>;
+  firestore: FirestoreQuotaMetric;
+  functions: FunctionsQuotaMetric;
+  hosting: HostingQuotaMetric;
+  id: Scalars['String']['output'];
+  storage: StorageQuotaMetric;
+  totalMtdCostUsd: Scalars['Float']['output'];
+  totalProjectedCostUsd: Scalars['Float']['output'];
+  tts: TtsQuota;
+};
+
+export type QuotaSnapshotList = {
+  __typename?: 'QuotaSnapshotList';
+  snapshots: Array<QuotaSnapshot>;
+  total: Scalars['Int']['output'];
+};
+
 export type RadioStation = {
   __typename?: 'RadioStation';
   bitrate: Scalars['Int']['output'];
@@ -1437,6 +1542,12 @@ export type RadioTag = {
   __typename?: 'RadioTag';
   name: Scalars['String']['output'];
   stationCount: Scalars['Int']['output'];
+};
+
+export type RepositorySize = {
+  __typename?: 'RepositorySize';
+  bytes: Scalars['Float']['output'];
+  repository: Scalars['String']['output'];
 };
 
 export type ResumeApplication = {
@@ -1622,6 +1733,12 @@ export type SaveInterviewSessionInput = {
   scores?: InputMaybe<Scalars['JSON']['input']>;
   sessionId: Scalars['String']['input'];
   sessionName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ServiceRequestCount = {
+  __typename?: 'ServiceRequestCount';
+  requests: Scalars['Int']['output'];
+  serviceName: Scalars['String']['output'];
 };
 
 export type SessionMessage = {
@@ -1846,6 +1963,17 @@ export type StockSearchResult = {
   displaySymbol: Scalars['String']['output'];
   symbol: Scalars['String']['output'];
   type: Scalars['String']['output'];
+};
+
+export type StorageQuotaMetric = {
+  __typename?: 'StorageQuotaMetric';
+  bandwidthBytes: Scalars['Float']['output'];
+  byFolder: Array<FolderSize>;
+  freeTierBandwidthBytes: Scalars['Float']['output'];
+  freeTierStorageBytes: Scalars['Float']['output'];
+  mtdCostUsd: Scalars['Float']['output'];
+  projectedCostUsd: Scalars['Float']['output'];
+  totalBytes: Scalars['Float']['output'];
 };
 
 export type StorageUsage = {
@@ -3046,3 +3174,20 @@ export type SqlRunQueryMutationVariables = Exact<{
 
 
 export type SqlRunQueryMutation = { __typename?: 'Mutation', sqlRunQuery: { __typename?: 'SqlQueryResult', columns: Array<string>, rows: Array<Record<string, unknown>>, rowCount: number, durationMs: number, error?: string | null } };
+
+export type GetQuotaSnapshotsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetQuotaSnapshotsQuery = { __typename?: 'Query', quotaSnapshots: { __typename?: 'QuotaSnapshotList', total: number, snapshots: Array<{ __typename?: 'QuotaSnapshot', id: string, collectedAt: string, elapsedDays: number, daysInMonth: number, totalMtdCostUsd: number, totalProjectedCostUsd: number, errors: Array<string>, cloudRun: { __typename?: 'CloudRunQuotaMetric', totalRequests: number, freeTierLimit: number, mtdCostUsd: number, projectedCostUsd: number, byService: Array<{ __typename?: 'ServiceRequestCount', serviceName: string, requests: number }> }, functions: { __typename?: 'FunctionsQuotaMetric', totalInvocations: number, freeTierLimit: number, mtdCostUsd: number, projectedCostUsd: number, byFunction: Array<{ __typename?: 'FunctionInvocationCount', functionName: string, invocations: number }> }, storage: { __typename?: 'StorageQuotaMetric', totalBytes: number, bandwidthBytes: number, freeTierStorageBytes: number, freeTierBandwidthBytes: number, mtdCostUsd: number, projectedCostUsd: number, byFolder: Array<{ __typename?: 'FolderSize', folder: string, bytes: number }> }, firestore: { __typename?: 'FirestoreQuotaMetric', mtdCostUsd: number, projectedCostUsd: number, reads: { __typename?: 'DailyMetricWithPeak', today: number, peak7d: number, freeTierLimit: number, exceeded7d: boolean }, writes: { __typename?: 'DailyMetricWithPeak', today: number, peak7d: number, freeTierLimit: number, exceeded7d: boolean }, deletes: { __typename?: 'DailyMetricWithPeak', today: number, peak7d: number, freeTierLimit: number, exceeded7d: boolean } }, tts: { __typename?: 'TtsQuota', wavenetStandard: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, neural2Polyglot: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, chirp3: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number } }, artifactRegistry: { __typename?: 'ArtifactRegistryQuotaMetric', totalBytes: number, freeTierBytes: number, mtdCostUsd: number, projectedCostUsd: number, byRepository: Array<{ __typename?: 'RepositorySize', repository: string, bytes: number }> }, hosting: { __typename?: 'HostingQuotaMetric', storageBytes?: number | null, dailyDownloadBytes?: number | null, freeTierStorageBytes: number, freeTierDailyDownloadBytes: number, mtdCostUsd: number, projectedCostUsd: number, unavailable: boolean } }> } };
+
+export type CollectQuotaSnapshotMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CollectQuotaSnapshotMutation = { __typename?: 'Mutation', collectQuotaSnapshot: { __typename?: 'QuotaSnapshot', id: string, collectedAt: string, elapsedDays: number, daysInMonth: number, totalMtdCostUsd: number, totalProjectedCostUsd: number, errors: Array<string>, cloudRun: { __typename?: 'CloudRunQuotaMetric', totalRequests: number, freeTierLimit: number, mtdCostUsd: number, projectedCostUsd: number, byService: Array<{ __typename?: 'ServiceRequestCount', serviceName: string, requests: number }> }, functions: { __typename?: 'FunctionsQuotaMetric', totalInvocations: number, freeTierLimit: number, mtdCostUsd: number, projectedCostUsd: number, byFunction: Array<{ __typename?: 'FunctionInvocationCount', functionName: string, invocations: number }> }, storage: { __typename?: 'StorageQuotaMetric', totalBytes: number, bandwidthBytes: number, freeTierStorageBytes: number, freeTierBandwidthBytes: number, mtdCostUsd: number, projectedCostUsd: number, byFolder: Array<{ __typename?: 'FolderSize', folder: string, bytes: number }> }, firestore: { __typename?: 'FirestoreQuotaMetric', mtdCostUsd: number, projectedCostUsd: number, reads: { __typename?: 'DailyMetricWithPeak', today: number, peak7d: number, freeTierLimit: number, exceeded7d: boolean }, writes: { __typename?: 'DailyMetricWithPeak', today: number, peak7d: number, freeTierLimit: number, exceeded7d: boolean }, deletes: { __typename?: 'DailyMetricWithPeak', today: number, peak7d: number, freeTierLimit: number, exceeded7d: boolean } }, tts: { __typename?: 'TtsQuota', wavenetStandard: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, neural2Polyglot: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number }, chirp3: { __typename?: 'TtsQuotaEntry', used: number, limit: number, remaining: number } }, artifactRegistry: { __typename?: 'ArtifactRegistryQuotaMetric', totalBytes: number, freeTierBytes: number, mtdCostUsd: number, projectedCostUsd: number, byRepository: Array<{ __typename?: 'RepositorySize', repository: string, bytes: number }> }, hosting: { __typename?: 'HostingQuotaMetric', storageBytes?: number | null, dailyDownloadBytes?: number | null, freeTierStorageBytes: number, freeTierDailyDownloadBytes: number, mtdCostUsd: number, projectedCostUsd: number, unavailable: boolean } } };
+
+export type DumpQuotaToSqlMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DumpQuotaToSqlMutation = { __typename?: 'Mutation', dumpQuotaToSql: boolean };
