@@ -206,6 +206,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - `localStorage` — `RADIO_FAVORITES` (existing), `RADIO_RECENT` (new), `RADIO_VOTED` (new). Sleep timer: React state only (ephemeral, not persisted) (022-radio-enhancements)
 - TypeScript 5.x (frontend + Cloud Functions Node 22) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Admin SDK, `google-auth-library` (already in `functions/node_modules`), `pg` (already in `functions/` for SQL dump) (023-gcp-quota-billing-monitor)
 - Firestore `quotaSnapshots/{id}` (project-scoped top-level collection); PostgreSQL `quota_snapshots` table (optional, existing connection) (023-gcp-quota-billing-monitor)
+- TypeScript 5.x (frontend + Cloud Functions Node 22) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions v2, `archiver@^7` (new — ZIP assembly), `@types/archiver@^6` (new dev dep) (024-audiobook-batch-download)
+- Firestore `books/{bookId}` (5 new fields) + `books/{bookId}/zipJobs/{jobId}` (new subcollection) · Firebase Storage `books/{bookId}/audiobook.zip` (new file) (024-audiobook-batch-download)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)

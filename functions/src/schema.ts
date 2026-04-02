@@ -209,6 +209,11 @@ export const typeDefs = `#graphql
     audioStatus: String!
     audioProgress: Int!
     audioError: String
+    zipStatus: String
+    zipUrl: String
+    zipSize: Int
+    zipGeneratedAt: String
+    zipError: String
   }
 
   type BookChapter {
@@ -1475,6 +1480,8 @@ export const typeDefs = `#graphql
     deleteChapterAudio(bookId: ID!, chapterIndex: Int!): Boolean!
     resetBookConversion(bookId: ID!): Boolean!
     cancelBookConversion(bookId: ID!): Boolean!
+    requestBookZip(bookId: ID!): Boolean!
+    deleteBookZip(bookId: ID!): Boolean!
     previewVoice(voiceName: String!): String!
 
     # Web Crawler (auth required)

@@ -1043,6 +1043,11 @@ const BOOK_FIELDS = gql`
     audioStatus
     audioProgress
     audioError
+    zipStatus
+    zipUrl
+    zipSize
+    zipGeneratedAt
+    zipError
   }
 `;
 
@@ -1201,6 +1206,18 @@ export const RESTORE_BOOK = gql`
 export const PERMANENT_DELETE_BOOK = gql`
   mutation PermanentDeleteBook($id: ID!) {
     permanentDeleteBook(id: $id)
+  }
+`;
+
+export const REQUEST_BOOK_ZIP = gql`
+  mutation RequestBookZip($bookId: ID!) {
+    requestBookZip(bookId: $bookId)
+  }
+`;
+
+export const DELETE_BOOK_ZIP = gql`
+  mutation DeleteBookZip($bookId: ID!) {
+    deleteBookZip(bookId: $bookId)
   }
 `;
 

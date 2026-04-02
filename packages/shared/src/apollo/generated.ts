@@ -249,6 +249,11 @@ export type Book = {
   totalCharacters: Scalars['Int']['output'];
   uploadedAt: Scalars['String']['output'];
   uploadedBy: BookUploader;
+  zipError?: Maybe<Scalars['String']['output']>;
+  zipGeneratedAt?: Maybe<Scalars['String']['output']>;
+  zipSize?: Maybe<Scalars['Int']['output']>;
+  zipStatus?: Maybe<Scalars['String']['output']>;
+  zipUrl?: Maybe<Scalars['String']['output']>;
 };
 
 export type BookChapter = {
@@ -656,6 +661,7 @@ export type Mutation = {
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
   deleteBenchmarkRun: Scalars['Boolean']['output'];
   deleteBook: Scalars['Boolean']['output'];
+  deleteBookZip: Scalars['Boolean']['output'];
   deleteChapterAudio: Scalars['Boolean']['output'];
   deleteCrawlJob: Scalars['Boolean']['output'];
   deleteFile: Scalars['Boolean']['output'];
@@ -675,6 +681,7 @@ export type Mutation = {
   previewVoice: Scalars['String']['output'];
   renameFile: CloudFile;
   renameFolder: Folder;
+  requestBookZip: Scalars['Boolean']['output'];
   resetBookConversion: Scalars['Boolean']['output'];
   restoreBook: Scalars['Boolean']['output'];
   revokeFileAccess: Scalars['Boolean']['output'];
@@ -782,6 +789,11 @@ export type MutationDeleteBookArgs = {
 };
 
 
+export type MutationDeleteBookZipArgs = {
+  bookId: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteChapterAudioArgs = {
   bookId: Scalars['ID']['input'];
   chapterIndex: Scalars['Int']['input'];
@@ -871,6 +883,11 @@ export type MutationRenameFileArgs = {
 export type MutationRenameFolderArgs = {
   folderId: Scalars['ID']['input'];
   newName: Scalars['String']['input'];
+};
+
+
+export type MutationRequestBookZipArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -2697,12 +2714,12 @@ export type SaveBabyMilestoneNotesMutationVariables = Exact<{
 
 export type SaveBabyMilestoneNotesMutation = { __typename?: 'Mutation', saveBabyMilestoneNotes: boolean };
 
-export type BookFieldsFragment = { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } };
+export type BookFieldsFragment = { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } };
 
 export type GetBooksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } }> };
+export type GetBooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } }> };
 
 export type GetBookChaptersQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];
@@ -2816,6 +2833,20 @@ export type PermanentDeleteBookMutationVariables = Exact<{
 
 
 export type PermanentDeleteBookMutation = { __typename?: 'Mutation', permanentDeleteBook: boolean };
+
+export type RequestBookZipMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type RequestBookZipMutation = { __typename?: 'Mutation', requestBookZip: boolean };
+
+export type DeleteBookZipMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteBookZipMutation = { __typename?: 'Mutation', deleteBookZip: boolean };
 
 export type GetQuestionBankQueryVariables = Exact<{ [key: string]: never; }>;
 

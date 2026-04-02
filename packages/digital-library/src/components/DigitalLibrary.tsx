@@ -23,6 +23,12 @@ interface Book {
   uploadedAt: string;
   audioStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   audioProgress: number;
+  audioError?: string;
+  zipStatus?: 'none' | 'processing' | 'ready' | 'error';
+  zipUrl?: string;
+  zipSize?: number;
+  zipGeneratedAt?: string;
+  zipError?: string;
 }
 
 function formatFileSize(bytes: number): string {
@@ -384,6 +390,12 @@ export default function DigitalLibrary() {
         language={selectedBook.language || 'en'}
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}
+        zipStatus={selectedBook.zipStatus ?? 'none'}
+        zipUrl={selectedBook.zipUrl}
+        zipSize={selectedBook.zipSize}
+        zipGeneratedAt={selectedBook.zipGeneratedAt}
+        zipError={selectedBook.zipError}
+        onRefreshBook={async () => { await refetch(); }}
         onBack={handleBack}
         onRefreshChapters={async () => {
           const result = await fetchChapters({ variables: { bookId: selectedBook.id } });
