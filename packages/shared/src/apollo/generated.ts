@@ -264,6 +264,8 @@ export type BookChapter = {
   href: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   index: Scalars['Int']['output'];
+  nasArchived?: Maybe<Scalars['Boolean']['output']>;
+  nasPath?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
 };
 
@@ -650,6 +652,8 @@ export type Mutation = {
   addWorshipSetlist: Setlist;
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
+  archiveBookToNas: Array<NasArchiveResult>;
+  archiveChapterToNas: NasArchiveResult;
   boostAtsScore: GeneratedResumeResult;
   cancelBookConversion: Scalars['Boolean']['output'];
   cancelSqlBackfill: Scalars['Boolean']['output'];
@@ -668,6 +672,7 @@ export type Mutation = {
   deleteFolder: Scalars['Boolean']['output'];
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
+  deleteNasConnection: Scalars['Boolean']['output'];
   deleteNote: Scalars['Boolean']['output'];
   deleteResumeApplication: Scalars['Boolean']['output'];
   deleteSharedFile: Scalars['Boolean']['output'];
@@ -684,12 +689,14 @@ export type Mutation = {
   requestBookZip: Scalars['Boolean']['output'];
   resetBookConversion: Scalars['Boolean']['output'];
   restoreBook: Scalars['Boolean']['output'];
+  restoreChapterFromNas: BookChapter;
   revokeFileAccess: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
   saveBabyMilestoneNotes: Scalars['Boolean']['output'];
   saveBenchmarkEndpoint: BenchmarkEndpoint;
   saveBenchmarkRun: BenchmarkRun;
   saveInterviewSession: InterviewSessionDetail;
+  saveNasConnection: NasConnectionStatus;
   saveResumeApplication: ResumeApplication;
   saveResumeFactBank: ResumeFactBank;
   saveSqlConnection: SqlConnectionStatus;
@@ -703,6 +710,7 @@ export type Mutation = {
   submitBatchConversion: ConversionBatchJob;
   submitChapterConversions: Array<ConversionJob>;
   submitResumeParse: ResumeParseJob;
+  testNasConnection: NasConnectionStatus;
   testSqlConnection: SqlConnectionStatus;
   updateInterviewQuestion: InterviewQuestion;
   updateNote: Note;
@@ -736,6 +744,17 @@ export type MutationAiChatArgs = {
   model?: InputMaybe<Scalars['String']['input']>;
   systemPrompt?: InputMaybe<Scalars['String']['input']>;
   toolMode?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationArchiveBookToNasArgs = {
+  bookId: Scalars['ID']['input'];
+};
+
+
+export type MutationArchiveChapterToNasArgs = {
+  bookId: Scalars['ID']['input'];
+  chapterIndex: Scalars['Int']['input'];
 };
 
 
@@ -901,6 +920,12 @@ export type MutationRestoreBookArgs = {
 };
 
 
+export type MutationRestoreChapterFromNasArgs = {
+  bookId: Scalars['ID']['input'];
+  chapterIndex: Scalars['Int']['input'];
+};
+
+
 export type MutationRevokeFileAccessArgs = {
   shareId: Scalars['String']['input'];
 };
@@ -931,6 +956,11 @@ export type MutationSaveBenchmarkRunArgs = {
 
 export type MutationSaveInterviewSessionArgs = {
   input: SaveInterviewSessionInput;
+};
+
+
+export type MutationSaveNasConnectionArgs = {
+  input: NasConnectionInput;
 };
 
 
@@ -1039,6 +1069,31 @@ export type MutationUploadBookArgs = {
 
 export type MutationVoteRadioStationArgs = {
   uuid: Scalars['String']['input'];
+};
+
+export type NasArchiveResult = {
+  __typename?: 'NasArchiveResult';
+  bookId: Scalars['ID']['output'];
+  chapterIndex: Scalars['Int']['output'];
+  error?: Maybe<Scalars['String']['output']>;
+  nasPath?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type NasConnectionInput = {
+  destFolder: Scalars['String']['input'];
+  nasUrl: Scalars['String']['input'];
+  password?: InputMaybe<Scalars['String']['input']>;
+  username: Scalars['String']['input'];
+};
+
+export type NasConnectionStatus = {
+  __typename?: 'NasConnectionStatus';
+  destFolder: Scalars['String']['output'];
+  hasCredentials: Scalars['Boolean']['output'];
+  lastTestedAt?: Maybe<Scalars['String']['output']>;
+  nasUrl: Scalars['String']['output'];
+  status: Scalars['String']['output'];
 };
 
 export type Note = {
@@ -1157,6 +1212,7 @@ export type Query = {
   interviewSession?: Maybe<InterviewSessionDetail>;
   interviewSessions: Array<InterviewSessionSummary>;
   locationSearch: Array<LocationSearchResult>;
+  nasConnectionStatus?: Maybe<NasConnectionStatus>;
   notes: Array<Note>;
   ollamaModels: Array<Scalars['String']['output']>;
   ollamaStatus: OllamaStatus;
@@ -2726,7 +2782,7 @@ export type GetBookChaptersQueryVariables = Exact<{
 }>;
 
 
-export type GetBookChaptersQuery = { __typename?: 'Query', bookChapters: Array<{ __typename?: 'BookChapter', id: string, index: number, title: string, href: string, characterCount: number, audioUrl?: string | null, audioDuration?: number | null }> };
+export type GetBookChaptersQuery = { __typename?: 'Query', bookChapters: Array<{ __typename?: 'BookChapter', id: string, index: number, title: string, href: string, characterCount: number, audioUrl?: string | null, audioDuration?: number | null, nasArchived?: boolean | null, nasPath?: string | null }> };
 
 export type GetBookConversionProgressQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];
@@ -3222,3 +3278,48 @@ export type DumpQuotaToSqlMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type DumpQuotaToSqlMutation = { __typename?: 'Mutation', dumpQuotaToSql: boolean };
+
+export type GetNasConnectionStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetNasConnectionStatusQuery = { __typename?: 'Query', nasConnectionStatus?: { __typename?: 'NasConnectionStatus', nasUrl: string, destFolder: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } | null };
+
+export type SaveNasConnectionMutationVariables = Exact<{
+  input: NasConnectionInput;
+}>;
+
+
+export type SaveNasConnectionMutation = { __typename?: 'Mutation', saveNasConnection: { __typename?: 'NasConnectionStatus', nasUrl: string, destFolder: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
+
+export type TestNasConnectionMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TestNasConnectionMutation = { __typename?: 'Mutation', testNasConnection: { __typename?: 'NasConnectionStatus', nasUrl: string, destFolder: string, status: string, lastTestedAt?: string | null, hasCredentials: boolean } };
+
+export type DeleteNasConnectionMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DeleteNasConnectionMutation = { __typename?: 'Mutation', deleteNasConnection: boolean };
+
+export type ArchiveChapterToNasMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+  chapterIndex: Scalars['Int']['input'];
+}>;
+
+
+export type ArchiveChapterToNasMutation = { __typename?: 'Mutation', archiveChapterToNas: { __typename?: 'NasArchiveResult', bookId: string, chapterIndex: number, success: boolean, nasPath?: string | null, error?: string | null } };
+
+export type ArchiveBookToNasMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type ArchiveBookToNasMutation = { __typename?: 'Mutation', archiveBookToNas: Array<{ __typename?: 'NasArchiveResult', bookId: string, chapterIndex: number, success: boolean, nasPath?: string | null, error?: string | null }> };
+
+export type RestoreChapterFromNasMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+  chapterIndex: Scalars['Int']['input'];
+}>;
+
+
+export type RestoreChapterFromNasMutation = { __typename?: 'Mutation', restoreChapterFromNas: { __typename?: 'BookChapter', id: string, index: number, title: string, href: string, characterCount: number, audioUrl?: string | null, audioDuration?: number | null, nasArchived?: boolean | null, nasPath?: string | null } };

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation, PageContent } from '@mycircle/shared';
 import SqlConnectionSection from './SqlConnectionSection';
+import NasConnectionSection from './NasConnectionSection';
 import EndpointSection from './EndpointSection';
 import BackfillSection from './BackfillSection';
 import AnalyticsDashboard from './AnalyticsDashboard';
@@ -13,6 +14,7 @@ export default function Setup() {
 
   const tabs = [
     { id: 'connection', label: t('setup.tabs.connection') },
+    { id: 'nas', label: t('setup.tabs.nas') },
     { id: 'endpoints', label: t('setup.tabs.endpoints') },
     { id: 'backfill', label: t('setup.tabs.backfill') },
     { id: 'analytics', label: t('setup.tabs.analytics') },
@@ -51,6 +53,7 @@ export default function Setup() {
 
       {/* Tab Content */}
       {activeTab === 'connection' && <SqlConnectionSection />}
+      {activeTab === 'nas' && <NasConnectionSection />}
       {activeTab === 'endpoints' && <EndpointSection />}
       {activeTab === 'backfill' && <BackfillSection />}
       {activeTab === 'analytics' && <AnalyticsDashboard />}

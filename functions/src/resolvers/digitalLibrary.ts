@@ -96,6 +96,8 @@ export function createDigitalLibraryResolvers() {
           characterCount: d.data().characterCount ?? 0,
           audioUrl: d.data().audioUrl ?? null,
           audioDuration: d.data().audioDuration ?? null,
+          nasArchived: d.data().nasArchived ?? false,
+          nasPath: d.data().nasPath ?? null,
         }));
       },
 

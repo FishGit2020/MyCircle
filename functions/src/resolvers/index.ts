@@ -25,6 +25,7 @@ import { createRoutingResolvers } from './routing.js';
 import { createResumeTailorQueryResolvers, createResumeTailorMutationResolvers } from './resumeTailor.js';
 import { createSqlQueryResolvers, createSqlMutationResolvers } from './sql.js';
 import { createQuotaQueryResolvers, createQuotaMutationResolvers } from './quota.js';
+import { createNasQueryResolvers, createNasMutationResolvers } from './nas.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -65,6 +66,7 @@ export function createResolvers(
       ...createSqlMutationResolvers(),
       ...createRadioStationResolvers().Mutation,
       ...createQuotaMutationResolvers(),
+      ...createNasMutationResolvers(),
     },
 
     Query: {
@@ -93,6 +95,7 @@ export function createResolvers(
       ...createResumeTailorQueryResolvers(),
       ...createSqlQueryResolvers(),
       ...createQuotaQueryResolvers(),
+      ...createNasQueryResolvers(),
     },
   };
 }

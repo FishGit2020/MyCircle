@@ -224,6 +224,8 @@ export const typeDefs = `#graphql
     characterCount: Int!
     audioUrl: String
     audioDuration: Int
+    nasArchived: Boolean
+    nasPath: String
   }
 
   type BookConversionProgress {
@@ -715,6 +717,9 @@ export const typeDefs = `#graphql
 
     # GCP Quota Monitor (auth required)
     quotaSnapshots(limit: Int): QuotaSnapshotList!
+
+    # NAS Storage (auth required)
+    nasConnectionStatus: NasConnectionStatus
 
     # SQL Analytics (auth required)
     sqlConnectionStatus: SqlConnectionStatus
@@ -1420,6 +1425,31 @@ export const typeDefs = `#graphql
     apiKey: String
   }
 
+  # ─── NAS Storage Types ────────────────────────────────────────
+
+  type NasConnectionStatus {
+    nasUrl: String!
+    destFolder: String!
+    status: String!
+    lastTestedAt: String
+    hasCredentials: Boolean!
+  }
+
+  input NasConnectionInput {
+    nasUrl: String!
+    username: String!
+    password: String
+    destFolder: String!
+  }
+
+  type NasArchiveResult {
+    bookId: ID!
+    chapterIndex: Int!
+    success: Boolean!
+    nasPath: String
+    error: String
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String, systemPrompt: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
@@ -1507,6 +1537,14 @@ export const typeDefs = `#graphql
     startSqlBackfill: SqlBackfillStatus!
     cancelSqlBackfill: Boolean!
     sqlRunQuery(sql: String!, limit: Int): SqlQueryResult!
+
+    # NAS Storage (auth required)
+    saveNasConnection(input: NasConnectionInput!): NasConnectionStatus!
+    testNasConnection: NasConnectionStatus!
+    deleteNasConnection: Boolean!
+    archiveChapterToNas(bookId: ID!, chapterIndex: Int!): NasArchiveResult!
+    archiveBookToNas(bookId: ID!): [NasArchiveResult!]!
+    restoreChapterFromNas(bookId: ID!, chapterIndex: Int!): BookChapter!
 
     # GCP Quota Monitor (auth required)
     collectQuotaSnapshot: QuotaSnapshot!

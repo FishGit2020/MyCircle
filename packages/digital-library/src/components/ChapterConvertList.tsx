@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, GET_CONVERSION_JOBS, GET_CONVERSION_BATCH_JOB, SUBMIT_BATCH_CONVERSION, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO } from '@mycircle/shared';
+import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, GET_CONVERSION_JOBS, GET_CONVERSION_BATCH_JOB, SUBMIT_BATCH_CONVERSION, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO, GET_NAS_CONNECTION_STATUS, ARCHIVE_CHAPTER_TO_NAS, ARCHIVE_BOOK_TO_NAS, RESTORE_CHAPTER_FROM_NAS } from '@mycircle/shared';
 import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
@@ -14,6 +14,8 @@ interface Chapter {
   characterCount: number;
   audioUrl?: string;
   audioDuration?: number;
+  nasArchived?: boolean;
+  nasPath?: string;
 }
 
 interface Props {
@@ -237,6 +239,58 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   const [deleting, setDeleting] = useState<number | null>(null);
 
+  // NAS integration
+  const { data: nasData } = useQuery(GET_NAS_CONNECTION_STATUS);
+  const [archiveChapterMutation] = useMutation(ARCHIVE_CHAPTER_TO_NAS);
+  const [archiveBookMutation] = useMutation(ARCHIVE_BOOK_TO_NAS);
+  const [restoreChapterMutation] = useMutation(RESTORE_CHAPTER_FROM_NAS);
+  const nasConnected = nasData?.nasConnectionStatus?.status === 'connected';
+  const [nasOffloading, setNasOffloading] = useState<Set<number>>(new Set());
+  const [batchOffloading, setBatchOffloading] = useState(false);
+  const [nasRestoring, setNasRestoring] = useState<Set<number>>(new Set());
+
+  const handleOffloadToNas = useCallback(async (chapterIndex: number) => {
+    setNasOffloading(prev => new Set(prev).add(chapterIndex));
+    try {
+      await archiveChapterMutation({ variables: { bookId, chapterIndex } });
+      await onChapterConverted();
+    } catch (err) {
+      logger.error('Failed to offload chapter to NAS', err);
+    } finally {
+      setNasOffloading(prev => { const next = new Set(prev); next.delete(chapterIndex); return next; });
+    }
+  }, [bookId, archiveChapterMutation, onChapterConverted]);
+
+  const handleOffloadAll = useCallback(async () => {
+    setBatchOffloading(true);
+    try {
+      const result = await archiveBookMutation({ variables: { bookId } });
+      const results = result.data?.archiveBookToNas ?? [];
+      const success = results.filter((r: { success: boolean }) => r.success).length;
+      const failed = results.filter((r: { success: boolean }) => !r.success).length;
+      if (failed > 0) {
+        logger.warn(`NAS batch offload: ${success} succeeded, ${failed} failed`);
+      }
+      await onChapterConverted();
+    } catch (err) {
+      logger.error('Failed to batch offload book to NAS', err);
+    } finally {
+      setBatchOffloading(false);
+    }
+  }, [bookId, archiveBookMutation, onChapterConverted]);
+
+  const handleRestoreFromNas = useCallback(async (chapterIndex: number) => {
+    setNasRestoring(prev => new Set(prev).add(chapterIndex));
+    try {
+      await restoreChapterMutation({ variables: { bookId, chapterIndex } });
+      await onChapterConverted();
+    } catch (err) {
+      logger.error('Failed to restore chapter from NAS', err);
+    } finally {
+      setNasRestoring(prev => { const next = new Set(prev); next.delete(chapterIndex); return next; });
+    }
+  }, [bookId, restoreChapterMutation, onChapterConverted]);
+
   const handleDeleteAudio = useCallback(async (chapterIndex: number) => {
     if (!window.confirm(t('library.deleteAudioConfirm'))) return;
     setDeleting(chapterIndex);
@@ -308,6 +362,26 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
               </button>
             </span>
           )}
+        </div>
+      )}
+      {/* NAS batch offload toolbar */}
+      {nasConnected && chapters.some(c => c.audioUrl && !c.nasArchived) && (
+        <div className="flex items-center gap-2 mb-2">
+          <button
+            type="button"
+            onClick={handleOffloadAll}
+            disabled={batchOffloading}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/40 border border-orange-200 dark:border-orange-700 rounded-lg transition min-h-[44px] disabled:opacity-50"
+          >
+            {batchOffloading ? (
+              <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+            )}
+            {t('library.nas.offloadAll')}
+          </button>
         </div>
       )}
       <ul className="divide-y divide-gray-200 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -391,8 +465,37 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
                     {t('library.retryConversion')}
                   </button>
                 </div>
+              ) : ch.nasArchived && !hasAudio ? (
+                <div className="flex items-center gap-1">
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-medium">
+                    NAS
+                  </span>
+                  {nasRestoring.has(ch.index) ? (
+                    <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 px-2">
+                      <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                      {t('library.nas.restoring')}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleRestoreFromNas(ch.index)}
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-md transition min-h-[44px]"
+                      aria-label={`${t('library.nas.restore')} ${ch.title}`}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m0 0l-4.5-4.5M12 16.5l4.5-4.5" />
+                      </svg>
+                      {t('library.nas.restore')}
+                    </button>
+                  )}
+                </div>
               ) : hasAudio ? (
                 <div className="flex items-center gap-1">
+                  {ch.nasArchived && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-medium">
+                      NAS
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() => handlePlay(ch.index)}
@@ -404,6 +507,26 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
                     </svg>
                     {t('library.play')}
                   </button>
+                  {nasConnected && !ch.nasArchived && (
+                    nasOffloading.has(ch.index) ? (
+                      <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 px-2">
+                        <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                        {t('library.nas.offloading')}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleOffloadToNas(ch.index)}
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-orange-500 dark:hover:text-orange-400 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        aria-label={`${t('library.nas.offload')} ${ch.title}`}
+                        title={t('library.nas.offload')}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                      </button>
+                    )
+                  )}
                   <button
                     type="button"
                     onClick={() => handleDeleteAudio(ch.index)}
