@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.25.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.24.0...mycircle-v1.25.0) (2026-04-02)
+
+
+### Features
+
+* **digital-library:** add audiobook batch download with ZIP generation ([#932](https://github.com/FishGit2020/MyCircle/issues/932)) ([ff43f98](https://github.com/FishGit2020/MyCircle/commit/ff43f989944bea34ebe3ff56f263b8f224ae57ec))
+* **e2e:** add Playwright screenshot evidence script for all pages ([#935](https://github.com/FishGit2020/MyCircle/issues/935)) ([f37601e](https://github.com/FishGit2020/MyCircle/commit/f37601e63122f81ae6c0a4987781497227820e3f))
+* **nas:** add Synology NAS audio offload and restore for digital library ([#934](https://github.com/FishGit2020/MyCircle/issues/934)) ([cc95326](https://github.com/FishGit2020/MyCircle/commit/cc953267f13bbd89cf0469796b9120a081892f12))
+* **quota:** add GCP Quota & Billing Monitor page ([7cb6bf7](https://github.com/FishGit2020/MyCircle/commit/7cb6bf73194406a218198fba131b2b829a6addfe))
+
 ## [1.24.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.23.0...mycircle-v1.24.0) (2026-04-01)
 
 
