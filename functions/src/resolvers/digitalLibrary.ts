@@ -59,6 +59,11 @@ function docToBook(id: string, data: FirebaseFirestore.DocumentData) {
     audioStatus: data.audioStatus ?? 'none',
     audioProgress: data.audioProgress ?? 0,
     audioError: data.audioError ?? null,
+    zipStatus: data.zipStatus ?? 'none',
+    zipUrl: data.zipUrl ?? null,
+    zipSize: data.zipSize ?? null,
+    zipGeneratedAt: data.zipGeneratedAt ? toIso(data.zipGeneratedAt) : null,
+    zipError: data.zipError ?? null,
   };
 }
 
@@ -264,6 +269,15 @@ export function createDigitalLibraryResolvers() {
         try {
           const [audioFiles] = await bucket.getFiles({ prefix: `books/${bookId}/audio/` });
           for (const f of audioFiles) { try { await f.delete(); } catch { /* ignore */ } }
+        } catch { /* ignore */ }
+        try { await bucket.file(`books/${bookId}/audiobook.zip`).delete(); } catch { /* ignore */ }
+        try {
+          const zipJobsSnap = await bookRef.collection('zipJobs').get();
+          if (zipJobsSnap.size > 0) {
+            const zipBatch = db.batch();
+            for (const d of zipJobsSnap.docs) zipBatch.delete(d.ref);
+            await zipBatch.commit();
+          }
         } catch { /* ignore */ }
 
         return true;
@@ -559,6 +573,62 @@ export function createDigitalLibraryResolvers() {
         if (!response.audioContent) throw new GraphQLError('TTS preview failed');
         await usageRef.set({ [skuGroup]: FieldValue.increment(sampleText.length), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
         return Buffer.from(response.audioContent as Uint8Array).toString('base64');
+      },
+
+      requestBookZip: async (_: any, { bookId }: { bookId: string }, context: ResolverContext) => {
+        requireAuth(context);
+        const db = getFirestore();
+        const bookRef = db.collection('books').doc(bookId);
+        const bookDoc = await bookRef.get();
+        if (!bookDoc.exists) {
+          throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
+        }
+        const data = bookDoc.data()!;
+        if (data.zipStatus === 'processing') {
+          throw new GraphQLError('ZIP generation already in progress', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+        // Verify at least one chapter has audio
+        const chaptersSnap = await bookRef.collection('chapters').get();
+        const hasAudio = chaptersSnap.docs.some(d => !!d.data().audioUrl);
+        if (!hasAudio) {
+          throw new GraphQLError('No converted chapters found', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+        await bookRef.update({ zipStatus: 'processing', zipError: null });
+        const { randomUUID } = await import('crypto');
+        await bookRef.collection('zipJobs').doc(randomUUID()).set({
+          status: 'pending',
+          bookId,
+          createdAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+          error: null,
+        });
+        return true;
+      },
+
+      deleteBookZip: async (_: any, { bookId }: { bookId: string }, context: ResolverContext) => {
+        requireAuth(context);
+        const db = getFirestore();
+        const bucket = getStorage().bucket();
+        const bookRef = db.collection('books').doc(bookId);
+        const bookDoc = await bookRef.get();
+        if (!bookDoc.exists) {
+          throw new GraphQLError('Book not found', { extensions: { code: 'NOT_FOUND' } });
+        }
+        try { await bucket.file(`books/${bookId}/audiobook.zip`).delete(); } catch { /* ignore */ }
+        const zipJobsSnap = await bookRef.collection('zipJobs').get();
+        if (zipJobsSnap.size > 0) {
+          const batch = db.batch();
+          for (const d of zipJobsSnap.docs) batch.delete(d.ref);
+          await batch.commit();
+        }
+        await bookRef.update({
+          zipStatus: 'none',
+          zipUrl: null,
+          zipSize: null,
+          zipGeneratedAt: null,
+          zipError: null,
+        });
+        return true;
       },
     },
   };

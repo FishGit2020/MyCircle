@@ -8,6 +8,7 @@ export { onResumeParseJobCreated } from './handlers/resumeParseWorker.js';
 export { digitalLibrary } from './handlers/digitalLibrary.js';
 export { onConversionJobCreated } from './handlers/conversionWorker.js';
 export { onBatchConversionCreated } from './handlers/batchConversionWorker.js';
+export { onZipJobCreated } from './handlers/zipWorker.js';
 export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.js';
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';
 
