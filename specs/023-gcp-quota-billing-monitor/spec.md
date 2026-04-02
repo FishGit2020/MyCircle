@@ -149,7 +149,7 @@ A user who has configured the SQL Analytics connection clicks "Dump to SQL" to p
 - Firebase Hosting free-tier limits: 10 GB storage total, 360 MB/day downloads.
 - TTS billing is based on character count; free tiers: 4M chars/month WaveNet/Standard, 1M chars/month Neural2/Polyglot, 1M chars/month Chirp3-HD.
 - Firebase Functions invocations (event-triggered) are tracked separately from Cloud Run HTTP requests — they use different free-tier pools (both 2M/month but consumed independently).
-- Snapshot history is stored in Firestore under `users/{uid}/quotaSnapshots` — no additional infrastructure needed
+- Snapshot history is stored in Firestore under `quotaSnapshots` — no additional infrastructure needed
 - SQL dump is optional and only shown when the user has an active SQL connection (detected via existing sql-analytics MFE state)
 - GCP pricing constants are hardcoded in the Cloud Function and updated manually when GCP changes pricing — no dynamic pricing API required
 - The GCP billing account ID is `01752D-EE3836-922FD4` (Firebase Payment account). Hardcoded in FR-013.

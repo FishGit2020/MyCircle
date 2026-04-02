@@ -319,11 +319,11 @@ function snapshotFromDoc(doc: FirebaseFirestore.DocumentSnapshot): any {
 export function createQuotaQueryResolvers() {
   return {
     quotaSnapshots: async (_: unknown, { limit = 10 }: { limit?: number }, context: ResolverContext) => {
-      const uid = requireAuth(context);
+      requireAuth(context);
       const clampedLimit = Math.min(Math.max(1, limit), 90);
       const db = getFirestore();
       const snap = await db
-        .collection(`users/${uid}/quotaSnapshots`)
+        .collection(`quotaSnapshots`)
         .orderBy('collectedAt', 'desc')
         .limit(clampedLimit)
         .get();
@@ -418,7 +418,7 @@ export function createQuotaMutationResolvers() {
 
       // Save to Firestore
       const db = getFirestore();
-      const colRef = db.collection(`users/${uid}/quotaSnapshots`);
+      const colRef = db.collection(`quotaSnapshots`);
       const docRef = await colRef.add(snapshot);
 
       // Prune to 90 snapshots
@@ -438,7 +438,7 @@ export function createQuotaMutationResolvers() {
       const db = getFirestore();
 
       // Get most recent snapshot
-      const snap = await db.collection(`users/${uid}/quotaSnapshots`).orderBy('collectedAt', 'desc').limit(1).get();
+      const snap = await db.collection(`quotaSnapshots`).orderBy('collectedAt', 'desc').limit(1).get();
       if (snap.empty) throw new Error('No snapshot available — collect a snapshot first');
       const snapshot = { id: snap.docs[0].id, ...snap.docs[0].data() };
 

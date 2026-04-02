@@ -10,7 +10,7 @@ Add a manual-trigger quota and billing monitor accessible from the UserMenu. A n
 
 **Language/Version**: TypeScript 5.x (frontend + Cloud Functions Node 22)
 **Primary Dependencies**: React 18, Apollo Client (via `@mycircle/shared`), Firebase Admin SDK, `google-auth-library` (already in `functions/node_modules`), `pg` (already in `functions/` for SQL dump)
-**Storage**: Firestore `users/{uid}/quotaSnapshots/{id}` (new subcollection); PostgreSQL `quota_snapshots` table (optional, existing connection)
+**Storage**: Firestore `quotaSnapshots/{id}` (new subcollection); PostgreSQL `quota_snapshots` table (optional, existing connection)
 **Testing**: Vitest + React Testing Library (frontend), Vitest (resolver unit tests)
 **Target Platform**: Firebase Cloud Functions (backend), React shell app (frontend)
 **Project Type**: Feature addition — shell page + GraphQL extension
@@ -80,7 +80,7 @@ packages/shared/src/i18n/
 
 1. Add GraphQL types to `schema.ts` (see `contracts/graphql-quota.graphql` for the full type list)
 2. Create `functions/src/resolvers/quota.ts`:
-   - `createQuotaQueryResolvers()` — `quotaSnapshots` resolver: reads `users/{uid}/quotaSnapshots` ordered by `collectedAt desc`, limit param (default 10, max 90)
+   - `createQuotaQueryResolvers()` — `quotaSnapshots` resolver: reads `quotaSnapshots` ordered by `collectedAt desc`, limit param (default 10, max 90)
    - `createQuotaMutationResolvers()` — two resolvers:
      - `collectQuotaSnapshot`: runs 5 GCP collections in parallel (`Promise.all`), each in a try/catch; assembles snapshot; saves to Firestore; prunes to 90 docs; returns snapshot
      - `dumpQuotaToSql`: reads most recent snapshot from Firestore; calls `createSqlClient()`; creates table if needed; inserts row; returns `true`

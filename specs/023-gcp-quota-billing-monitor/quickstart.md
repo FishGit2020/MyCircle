@@ -15,7 +15,7 @@ The page loads with no data. Click **"Refresh Now"** — this triggers the `coll
 3. Counts documents in key Firestore collections
 4. Reads existing TTS quota from Firestore (already tracked per-conversion)
 5. Calls Artifact Registry API for repository sizes
-6. Saves the snapshot to `users/{uid}/quotaSnapshots/{id}` in Firestore
+6. Saves the snapshot to `quotaSnapshots/{id}` in Firestore
 
 The page updates with metric cards showing usage vs free-tier limits.
 

@@ -20,7 +20,7 @@
 - [X] T001 Add `QuotaSnapshot`, `CloudRunQuotaMetric`, `StorageQuotaMetric`, `FirestoreQuotaMetric`, `ArtifactRegistryQuotaMetric`, `ServiceRequestCount`, `FolderSize`, `CollectionCount`, `RepositorySize`, `QuotaSnapshotList` GraphQL types to `functions/src/schema.ts` (after the existing TtsQuota type block, before `type Query`)
 - [X] T002 Add `quotaSnapshots(limit: Int): QuotaSnapshotList!` to `type Query` in `functions/src/schema.ts`
 - [X] T003 Add `collectQuotaSnapshot: QuotaSnapshot!` and `dumpQuotaToSql: Boolean!` to `type Mutation` in `functions/src/schema.ts`
-- [X] T004 [P] Create `functions/src/resolvers/quota.ts` with `createQuotaQueryResolvers()` returning a stub `quotaSnapshots` resolver (reads `users/{uid}/quotaSnapshots` ordered by `collectedAt desc`, limit param default 10 max 90) and `createQuotaMutationResolvers()` with stub `collectQuotaSnapshot` (returns empty snapshot) and `dumpQuotaToSql` (throws "not implemented")
+- [X] T004 [P] Create `functions/src/resolvers/quota.ts` with `createQuotaQueryResolvers()` returning a stub `quotaSnapshots` resolver (reads `quotaSnapshots` ordered by `collectedAt desc`, limit param default 10 max 90) and `createQuotaMutationResolvers()` with stub `collectQuotaSnapshot` (returns empty snapshot) and `dumpQuotaToSql` (throws "not implemented")
 - [X] T005 Register the new quota resolvers in `functions/src/graphql.ts` — spread `createQuotaQueryResolvers()` into `Query` and `createQuotaMutationResolvers()` into `Mutation`, following the existing resolver factory registration pattern
 - [X] T006 Add `GET_QUOTA_SNAPSHOTS`, `COLLECT_QUOTA_SNAPSHOT`, and `DUMP_QUOTA_TO_SQL` GraphQL operations to `packages/shared/src/apollo/queries.ts` — request all fields defined in `contracts/graphql-quota.graphql`
 - [X] T007 Run `pnpm codegen` to regenerate `packages/shared/src/apollo/generated.ts` with the new quota types and operation hooks
@@ -50,9 +50,9 @@
   - Implement `collectTtsQuota(db, uid)`: reads `users/{uid}/ttsUsage` doc (same source as existing `ttsQuota` resolver); returns `TtsQuota`-shaped object
   - Implement `collectArtifactRegistry(projectId, auth)`: `artifactregistry.googleapis.com/v1/projects/{project}/locations/-/repositories`; maps `sizeBytes`; returns `{totalBytes, byRepository[]}`
   - Implement `collectHostingMetrics(projectId, auth)`: Cloud Monitoring `firebasehosting.googleapis.com/...` for daily downloads if available; Firebase Management API or directory size estimate for storage; on failure returns `{storageBytes: null, dailyDownloadBytes: null, error: 'unavailable'}` without failing whole snapshot
-  - In `collectQuotaSnapshot` resolver: run all 7 collectors in `Promise.allSettled`; for each rejected result add service name to `errors[]`; compute `mtdCostUsd` per service; compute `projectedCostUsd` = `mtdCostUsd ÷ elapsedDays × daysInMonth`; include `elapsedDays` in snapshot root; save to `users/{uid}/quotaSnapshots/{id}`; prune to 90 docs; return snapshot
+  - In `collectQuotaSnapshot` resolver: run all 7 collectors in `Promise.allSettled`; for each rejected result add service name to `errors[]`; compute `mtdCostUsd` per service; compute `projectedCostUsd` = `mtdCostUsd ÷ elapsedDays × daysInMonth`; include `elapsedDays` in snapshot root; save to `quotaSnapshots/{id}`; prune to 90 docs; return snapshot
 
-- [X] T013 [US1] Implement `quotaSnapshots` query resolver fully in `functions/src/resolvers/quota.ts`: query `users/{uid}/quotaSnapshots` ordered by `collectedAt desc`, apply limit (clamp to max 90), map Firestore docs to `QuotaSnapshot` shape, return `{snapshots, total}`
+- [X] T013 [US1] Implement `quotaSnapshots` query resolver fully in `functions/src/resolvers/quota.ts`: query `quotaSnapshots` ordered by `collectedAt desc`, apply limit (clamp to max 90), map Firestore docs to `QuotaSnapshot` shape, return `{snapshots, total}`
 
 - [X] T014 [P] [US1] Create `packages/shell/src/pages/QuotaPage.tsx`:
   - Use `useQuery(GET_QUOTA_SNAPSHOTS, { variables: { limit: 10 } })` from `@mycircle/shared`
@@ -110,7 +110,7 @@
   - INSERT row mapping all snapshot fields to columns; `raw_json = JSON.stringify(snapshot)` for the JSONB column; use parameterized query (no string interpolation)
 
 - [X] T021 [US3] Implement `dumpQuotaToSql` mutation resolver in `functions/src/resolvers/quota.ts`:
-  - Fetch the most recent snapshot from `users/{uid}/quotaSnapshots` (limit 1, ordered by `collectedAt desc`)
+  - Fetch the most recent snapshot from `quotaSnapshots` (limit 1, ordered by `collectedAt desc`)
   - Throw `new Error('No snapshot available — collect a snapshot first')` if none exists
   - Call `createSqlClient(uid)` from `functions/src/sqlClient.ts` (throws if no SQL connection configured)
   - Call `logQuotaToSql(client, snapshot)` from `functions/src/sqlWriter.ts`

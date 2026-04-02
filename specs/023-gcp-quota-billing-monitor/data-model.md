@@ -2,7 +2,7 @@
 
 ## Firestore Schema
 
-### `users/{uid}/quotaSnapshots/{snapshotId}`
+### `quotaSnapshots/{snapshotId}`
 
 Stores one snapshot per manual refresh. Pruned to last 90 documents on write.
 

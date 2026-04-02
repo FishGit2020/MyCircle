@@ -42,7 +42,7 @@
 
 ## Decision 4: Snapshot Persistence — Firestore
 
-**Decision**: Store snapshots in **`users/{uid}/quotaSnapshots/{snapshotId}`** in Firestore.
+**Decision**: Store snapshots in **`quotaSnapshots/{snapshotId}`** in Firestore.
 
 **Rationale**: Follows the established pattern for per-user data (notes, routes, flashcards all use `users/{uid}/collection/{id}`). The 5-user scale means Firestore read costs are negligible. Snapshots are small (~1KB each).
 
