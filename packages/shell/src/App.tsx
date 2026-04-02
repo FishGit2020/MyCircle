@@ -10,6 +10,7 @@ import WeatherLandingPage from './pages/WeatherLandingPage';
 import WeatherPage from './pages/WeatherPage';
 import WhatsNewPage from './pages/WhatsNewPage';
 import RecycleBinPage from './pages/RecycleBinPage';
+import QuotaPage from './pages/QuotaPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import { tracedLazy } from './lib/tracedLazy';
@@ -121,6 +122,7 @@ export default function App() {
         <Route path="resume" element={<RequireAuth><MFEPageWrapper component={ResumeTailorMF} name="Resume Tailor" /></RequireAuth>} />
         <Route path="setup" element={<RequireAuth><MFEPageWrapper component={SetupMF} name="Setup" /></RequireAuth>} />
         <Route path="trash" element={<RequireAuth><RecycleBinPage /></RequireAuth>} />
+        <Route path="quota" element={<RequireAuth><QuotaPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />
         <Route path="privacy" element={<PrivacyPolicyPage />} />
         <Route path="terms" element={<TermsOfServicePage />} />

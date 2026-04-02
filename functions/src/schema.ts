@@ -241,6 +241,114 @@ export const typeDefs = `#graphql
     chirp3: TtsQuotaEntry!            # SKU F977: Chirp3 HD — 1M free/month
   }
 
+  # ─── GCP Quota & Billing Monitor ──────────────────────────────────────────
+
+  type ServiceRequestCount {
+    serviceName: String!
+    requests: Int!
+  }
+
+  type FunctionInvocationCount {
+    functionName: String!
+    invocations: Int!
+  }
+
+  type FolderSize {
+    folder: String!
+    bytes: Float!
+  }
+
+  type CollectionCount {
+    collection: String!
+    count: Int!
+  }
+
+  type RepositorySize {
+    repository: String!
+    bytes: Float!
+  }
+
+  type DailyMetricWithPeak {
+    today: Float!
+    peak7d: Float!
+    freeTierLimit: Float!
+    exceeded7d: Boolean!
+  }
+
+  type CloudRunQuotaMetric {
+    totalRequests: Int!
+    byService: [ServiceRequestCount!]!
+    freeTierLimit: Int!
+    mtdCostUsd: Float!
+    projectedCostUsd: Float!
+  }
+
+  type FunctionsQuotaMetric {
+    totalInvocations: Int!
+    byFunction: [FunctionInvocationCount!]!
+    freeTierLimit: Int!
+    mtdCostUsd: Float!
+    projectedCostUsd: Float!
+  }
+
+  type StorageQuotaMetric {
+    totalBytes: Float!
+    byFolder: [FolderSize!]!
+    bandwidthBytes: Float!
+    freeTierStorageBytes: Float!
+    freeTierBandwidthBytes: Float!
+    mtdCostUsd: Float!
+    projectedCostUsd: Float!
+  }
+
+  type FirestoreQuotaMetric {
+    reads: DailyMetricWithPeak!
+    writes: DailyMetricWithPeak!
+    deletes: DailyMetricWithPeak!
+    mtdCostUsd: Float!
+    projectedCostUsd: Float!
+  }
+
+  type ArtifactRegistryQuotaMetric {
+    totalBytes: Float!
+    byRepository: [RepositorySize!]!
+    freeTierBytes: Float!
+    mtdCostUsd: Float!
+    projectedCostUsd: Float!
+  }
+
+  type HostingQuotaMetric {
+    storageBytes: Float
+    dailyDownloadBytes: Float
+    freeTierStorageBytes: Float!
+    freeTierDailyDownloadBytes: Float!
+    mtdCostUsd: Float!
+    projectedCostUsd: Float!
+    unavailable: Boolean!
+  }
+
+  type QuotaSnapshot {
+    id: String!
+    collectedAt: String!
+    elapsedDays: Int!
+    daysInMonth: Int!
+    cloudRun: CloudRunQuotaMetric!
+    functions: FunctionsQuotaMetric!
+    storage: StorageQuotaMetric!
+    firestore: FirestoreQuotaMetric!
+    tts: TtsQuota!
+    artifactRegistry: ArtifactRegistryQuotaMetric!
+    hosting: HostingQuotaMetric!
+    totalMtdCostUsd: Float!
+    totalProjectedCostUsd: Float!
+    errors: [String!]!
+  }
+
+  type QuotaSnapshotList {
+    snapshots: [QuotaSnapshot!]!
+    total: Int!
+  }
+
   # Firebase Storage bucket usage (cached hourly)
   type StorageUsage {
     usedBytes: Float!    # total bytes across all paths in the bucket
@@ -599,6 +707,9 @@ export const typeDefs = `#graphql
     resumeParseJob(id: ID!): ResumeParseJob
     resumeActiveParseJob: ResumeParseJob
     scrapeJobUrl(url: String!): String
+
+    # GCP Quota Monitor (auth required)
+    quotaSnapshots(limit: Int): QuotaSnapshotList!
 
     # SQL Analytics (auth required)
     sqlConnectionStatus: SqlConnectionStatus
@@ -1389,6 +1500,10 @@ export const typeDefs = `#graphql
     startSqlBackfill: SqlBackfillStatus!
     cancelSqlBackfill: Boolean!
     sqlRunQuery(sql: String!, limit: Int): SqlQueryResult!
+
+    # GCP Quota Monitor (auth required)
+    collectQuotaSnapshot: QuotaSnapshot!
+    dumpQuotaToSql: Boolean!
   }
 
   schema {

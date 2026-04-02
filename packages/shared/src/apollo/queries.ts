@@ -1909,3 +1909,197 @@ export const SQL_RUN_QUERY = gql`
     }
   }
 `;
+
+
+export const GET_QUOTA_SNAPSHOTS = gql`
+  query GetQuotaSnapshots($limit: Int) {
+    quotaSnapshots(limit: $limit) {
+      total
+      snapshots {
+        id
+        collectedAt
+        elapsedDays
+        daysInMonth
+        totalMtdCostUsd
+        totalProjectedCostUsd
+        errors
+        cloudRun {
+          totalRequests
+          freeTierLimit
+          mtdCostUsd
+          projectedCostUsd
+          byService {
+            serviceName
+            requests
+          }
+        }
+        functions {
+          totalInvocations
+          freeTierLimit
+          mtdCostUsd
+          projectedCostUsd
+          byFunction {
+            functionName
+            invocations
+          }
+        }
+        storage {
+          totalBytes
+          bandwidthBytes
+          freeTierStorageBytes
+          freeTierBandwidthBytes
+          mtdCostUsd
+          projectedCostUsd
+          byFolder {
+            folder
+            bytes
+          }
+        }
+        firestore {
+          mtdCostUsd
+          projectedCostUsd
+          reads {
+            today
+            peak7d
+            freeTierLimit
+            exceeded7d
+          }
+          writes {
+            today
+            peak7d
+            freeTierLimit
+            exceeded7d
+          }
+          deletes {
+            today
+            peak7d
+            freeTierLimit
+            exceeded7d
+          }
+        }
+        tts {
+          wavenetStandard { used limit remaining }
+          neural2Polyglot { used limit remaining }
+          chirp3 { used limit remaining }
+        }
+        artifactRegistry {
+          totalBytes
+          freeTierBytes
+          mtdCostUsd
+          projectedCostUsd
+          byRepository {
+            repository
+            bytes
+          }
+        }
+        hosting {
+          storageBytes
+          dailyDownloadBytes
+          freeTierStorageBytes
+          freeTierDailyDownloadBytes
+          mtdCostUsd
+          projectedCostUsd
+          unavailable
+        }
+      }
+    }
+  }
+`;
+
+export const COLLECT_QUOTA_SNAPSHOT = gql`
+  mutation CollectQuotaSnapshot {
+    collectQuotaSnapshot {
+      id
+      collectedAt
+      elapsedDays
+      daysInMonth
+      totalMtdCostUsd
+      totalProjectedCostUsd
+      errors
+      cloudRun {
+        totalRequests
+        freeTierLimit
+        mtdCostUsd
+        projectedCostUsd
+        byService {
+          serviceName
+          requests
+        }
+      }
+      functions {
+        totalInvocations
+        freeTierLimit
+        mtdCostUsd
+        projectedCostUsd
+        byFunction {
+          functionName
+          invocations
+        }
+      }
+      storage {
+        totalBytes
+        bandwidthBytes
+        freeTierStorageBytes
+        freeTierBandwidthBytes
+        mtdCostUsd
+        projectedCostUsd
+        byFolder {
+          folder
+          bytes
+        }
+      }
+      firestore {
+        mtdCostUsd
+        projectedCostUsd
+        reads {
+          today
+          peak7d
+          freeTierLimit
+          exceeded7d
+        }
+        writes {
+          today
+          peak7d
+          freeTierLimit
+          exceeded7d
+        }
+        deletes {
+          today
+          peak7d
+          freeTierLimit
+          exceeded7d
+        }
+      }
+      tts {
+        wavenetStandard { used limit remaining }
+        neural2Polyglot { used limit remaining }
+        chirp3 { used limit remaining }
+      }
+      artifactRegistry {
+        totalBytes
+        freeTierBytes
+        mtdCostUsd
+        projectedCostUsd
+        byRepository {
+          repository
+          bytes
+        }
+      }
+      hosting {
+        storageBytes
+        dailyDownloadBytes
+        freeTierStorageBytes
+        freeTierDailyDownloadBytes
+        mtdCostUsd
+        projectedCostUsd
+        unavailable
+      }
+    }
+  }
+`;
+
+export const DUMP_QUOTA_TO_SQL = gql`
+  mutation DumpQuotaToSql {
+    dumpQuotaToSql
+  }
+`;
