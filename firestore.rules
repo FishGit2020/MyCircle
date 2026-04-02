@@ -101,6 +101,11 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
+      // NAS connection config - private per-user NAS credentials and status
+      match /nasConnection/{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
       // Crawl jobs subcollection - private per-user web crawler jobs
       match /crawlJobs/{jobId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;

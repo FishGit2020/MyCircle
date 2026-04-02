@@ -1070,6 +1070,8 @@ export const GET_BOOK_CHAPTERS = gql`
       characterCount
       audioUrl
       audioDuration
+      nasArchived
+      nasPath
     }
   }
 `;
@@ -2118,5 +2120,89 @@ export const COLLECT_QUOTA_SNAPSHOT = gql`
 export const DUMP_QUOTA_TO_SQL = gql`
   mutation DumpQuotaToSql {
     dumpQuotaToSql
+  }
+`;
+
+// ─── NAS Storage ──────────────────────────────────────────────
+
+export const GET_NAS_CONNECTION_STATUS = gql`
+  query GetNasConnectionStatus {
+    nasConnectionStatus {
+      nasUrl
+      destFolder
+      status
+      lastTestedAt
+      hasCredentials
+    }
+  }
+`;
+
+export const SAVE_NAS_CONNECTION = gql`
+  mutation SaveNasConnection($input: NasConnectionInput!) {
+    saveNasConnection(input: $input) {
+      nasUrl
+      destFolder
+      status
+      lastTestedAt
+      hasCredentials
+    }
+  }
+`;
+
+export const TEST_NAS_CONNECTION = gql`
+  mutation TestNasConnection {
+    testNasConnection {
+      nasUrl
+      destFolder
+      status
+      lastTestedAt
+      hasCredentials
+    }
+  }
+`;
+
+export const DELETE_NAS_CONNECTION = gql`
+  mutation DeleteNasConnection {
+    deleteNasConnection
+  }
+`;
+
+export const ARCHIVE_CHAPTER_TO_NAS = gql`
+  mutation ArchiveChapterToNas($bookId: ID!, $chapterIndex: Int!) {
+    archiveChapterToNas(bookId: $bookId, chapterIndex: $chapterIndex) {
+      bookId
+      chapterIndex
+      success
+      nasPath
+      error
+    }
+  }
+`;
+
+export const ARCHIVE_BOOK_TO_NAS = gql`
+  mutation ArchiveBookToNas($bookId: ID!) {
+    archiveBookToNas(bookId: $bookId) {
+      bookId
+      chapterIndex
+      success
+      nasPath
+      error
+    }
+  }
+`;
+
+export const RESTORE_CHAPTER_FROM_NAS = gql`
+  mutation RestoreChapterFromNas($bookId: ID!, $chapterIndex: Int!) {
+    restoreChapterFromNas(bookId: $bookId, chapterIndex: $chapterIndex) {
+      id
+      index
+      title
+      href
+      characterCount
+      audioUrl
+      audioDuration
+      nasArchived
+      nasPath
+    }
   }
 `;
