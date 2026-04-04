@@ -3223,6 +3223,7 @@ const zh: Record<TranslationKey, string> = {
   'hsaExpenses.fileTooLarge': '\u6587\u4ef6\u8fc7\u5927\uff08\u6700\u5927 5MB\uff09',
   'hsaExpenses.invalidFileType': '\u65e0\u6548\u7684\u6587\u4ef6\u7c7b\u578b\u3002\u8bf7\u4e0a\u4f20 JPEG\u3001PNG \u6216 PDF',
   'hsaExpenses.uploadFailed': '\u4e0a\u4f20\u5931\u8d25\u3002\u8bf7\u91cd\u8bd5\u3002',
+  'hsaExpenses.takePhoto': '\u62cd\u7167',
   'hsaExpenses.medical': '\u533b\u7597',
   'hsaExpenses.dental': '\u7259\u79d1',
   'hsaExpenses.vision': '\u89c6\u529b',

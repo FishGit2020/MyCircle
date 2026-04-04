@@ -3223,6 +3223,7 @@ const es: Record<TranslationKey, string> = {
   'hsaExpenses.fileTooLarge': 'El archivo es demasiado grande (m\u00e1x. 5MB)',
   'hsaExpenses.invalidFileType': 'Tipo de archivo no v\u00e1lido. Sube JPEG, PNG o PDF',
   'hsaExpenses.uploadFailed': 'Error al subir. Int\u00e9ntalo de nuevo.',
+  'hsaExpenses.takePhoto': 'Tomar foto',
   'hsaExpenses.medical': 'M\u00e9dico',
   'hsaExpenses.dental': 'Dental',
   'hsaExpenses.vision': 'Visi\u00f3n',
