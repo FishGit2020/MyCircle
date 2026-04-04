@@ -45,6 +45,7 @@ const DealFinderMF = tracedLazy('mfe_deals_load', () => import('dealFinder/DealF
 const WebCrawlerMF = tracedLazy('mfe_web_crawler_load', () => import('webCrawler/WebCrawler'), getPerf);
 const ResumeTailorMF = tracedLazy('mfe_resume_tailor_load', () => import('resumeTailor/ResumeTailor'), getPerf);
 const SetupMF = tracedLazy('mfe_setup_load', () => import('setup/Setup'), getPerf);
+const HsaExpensesMF = tracedLazy('mfe_hsa_expenses_load', () => import('hsaExpenses/HsaExpenses'), getPerf);
 
 // 404 Not Found
 function NotFound() {
@@ -121,6 +122,7 @@ export default function App() {
         <Route path="web-crawler" element={<RequireAuth><MFEPageWrapper component={WebCrawlerMF} name="Web Crawler" /></RequireAuth>} />
         <Route path="resume" element={<RequireAuth><MFEPageWrapper component={ResumeTailorMF} name="Resume Tailor" /></RequireAuth>} />
         <Route path="setup" element={<RequireAuth><MFEPageWrapper component={SetupMF} name="Setup" /></RequireAuth>} />
+        <Route path="hsa-expenses" element={<RequireAuth><MFEPageWrapper component={HsaExpensesMF} name="HSA Expenses" /></RequireAuth>} />
         <Route path="trash" element={<RequireAuth><RecycleBinPage /></RequireAuth>} />
         <Route path="quota" element={<RequireAuth><QuotaPage /></RequireAuth>} />
         <Route path="whats-new" element={<WhatsNewPage />} />

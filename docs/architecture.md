@@ -1504,3 +1504,16 @@ Interactive world map (MapLibre GL) where users can pin places they have been, l
 - **useTravelPins** — CRUD hook via `window.__travelPins` bridge (Firestore) with localStorage fallback
 - **TravelMapWidget** — Dashboard widget showing total pin count
 - **Route**: `/travel-map` (RequireAuth)
+
+### HSA Expense Tracker - `packages/hsa-expenses/`
+
+Exposes `HsaExpenses` component via Module Federation. Port **3033**.
+
+Personal HSA (Health Savings Account) expense tracker with receipt upload and reimbursement tracking. Users can add healthcare expenses with provider, date, amount, and category; upload receipt images/PDFs to Firebase Storage; toggle reimbursement status (Pending/Reimbursed); and filter/search expenses with a year-by-year summary.
+
+- **HsaExpenses** — Main page with expense list, search, filters, and summary panel
+- **ExpenseForm** — Add/edit expense form with validation (provider, date, amount, category)
+- **ReceiptUpload** — File upload component for receipt images and PDFs (max 5MB)
+- **useHsaExpenses** — CRUD hook for expenses via GraphQL with Firestore persistence
+- **HsaExpensesWidget** — Dashboard widget showing pending expense count
+- **Route**: `/hsa-expenses` (RequireAuth)

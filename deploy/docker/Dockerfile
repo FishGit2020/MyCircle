@@ -39,6 +39,7 @@ COPY packages/deal-finder/package.json packages/deal-finder/
 COPY packages/web-crawler/package.json packages/web-crawler/
 COPY packages/resume-tailor/package.json packages/resume-tailor/
 COPY packages/setup/package.json packages/setup/
+COPY packages/hsa-expenses/package.json packages/hsa-expenses/
 
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
@@ -105,6 +106,7 @@ COPY --from=builder /app/packages/deal-finder/package.json packages/deal-finder/
 COPY --from=builder /app/packages/web-crawler/package.json packages/web-crawler/
 COPY --from=builder /app/packages/resume-tailor/package.json packages/resume-tailor/
 COPY --from=builder /app/packages/setup/package.json packages/setup/
+COPY --from=builder /app/packages/hsa-expenses/package.json packages/hsa-expenses/
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts && \
     pnpm store prune

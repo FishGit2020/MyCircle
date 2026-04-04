@@ -53,6 +53,7 @@ export default defineConfig({
       'webCrawler/WebCrawler': resolve(__dirname, './test/mocks/WebCrawlerMock.tsx'),
       'resumeTailor/ResumeTailor': resolve(__dirname, './test/mocks/ResumeTailorMock.tsx'),
       'setup/Setup': resolve(__dirname, './test/mocks/SetupMock.tsx'),
+      'hsaExpenses/HsaExpenses': resolve(__dirname, './test/mocks/HsaExpensesMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

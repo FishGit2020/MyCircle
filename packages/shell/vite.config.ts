@@ -212,6 +212,10 @@ const setupRemote = isProduction
   ? '/setup/assets/remoteEntry.js'
   : 'http://localhost:3032/assets/remoteEntry.js';
 
+const hsaExpensesRemote = isProduction
+  ? '/hsa-expenses/assets/remoteEntry.js'
+  : 'http://localhost:3033/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -248,7 +252,8 @@ export default defineConfig({
         dealFinder: dealFinderRemote,
         webCrawler: webCrawlerRemote,
         resumeTailor: resumeTailorRemote,
-        setup: setupRemote
+        setup: setupRemote,
+        hsaExpenses: hsaExpensesRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
@@ -322,6 +327,7 @@ export default defineConfig({
           /^\/api\//,
           /^\/transit-api\//,
           /^\/__\//,
+          /^\/hsa-expenses\//,
         ],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         globIgnores: ['**/firebase-messaging-sw.js'],

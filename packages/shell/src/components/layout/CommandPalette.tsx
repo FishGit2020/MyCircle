@@ -46,6 +46,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
   '/deals': 'commandPalette.goToDeals',
   '/web-crawler': 'commandPalette.goToWebCrawler',
   '/resume': 'commandPalette.goToResumeTailor',
+  '/hsa-expenses': 'commandPalette.goToHsaExpenses',
 };
 
 const clockIcon = (

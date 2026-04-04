@@ -31,6 +31,7 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   'web-crawler': 'nav.webCrawler',
   resume: 'nav.resumeTailor',
   setup: 'nav.setup',
+  'hsa-expenses': 'nav.hsaExpenses',
   trash: 'nav.recycleBin',
   quota: 'nav.quotaBilling',
 };

@@ -55,9 +55,9 @@ export const getCryptoPricesTool: ToolDef = {
 
 export const navigateToTool: ToolDef = {
   name: 'navigateTo',
-  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, weather/compare, bible, worship, notebook, flashcards, baby, child-dev, daily-log, files, benchmark, immigration, ai, library, family-games, doc-scanner, hiking, interview, transit, travel-map, deals, web-crawler.',
+  description: 'Navigate the user to a specific page in the MyCircle app. Available pages: weather (home), stocks, podcasts, weather/compare, bible, worship, notebook, flashcards, baby, child-dev, daily-log, files, benchmark, immigration, ai, library, family-games, doc-scanner, hiking, interview, transit, travel-map, deals, web-crawler, hsa-expenses.',
   parameters: z.object({
-    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "weather/compare", "bible", "worship", "notebook", "flashcards", "baby", "child-dev", "daily-log", "files", "benchmark", "immigration", "ai", "library", "family-games", "doc-scanner", "hiking", "interview", "transit", "travel-map", "deals", "web-crawler"'),
+    page: z.string().describe('Page to navigate to: "weather", "stocks", "podcasts", "weather/compare", "bible", "worship", "notebook", "flashcards", "baby", "child-dev", "daily-log", "files", "benchmark", "immigration", "ai", "library", "family-games", "doc-scanner", "hiking", "interview", "transit", "travel-map", "deals", "web-crawler", "hsa-expenses"'),
   }),
   category: 'navigation',
   isFrontendAction: true,

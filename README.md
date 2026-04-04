@@ -273,6 +273,11 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 │  │      (MFE)      │ │    (MFE)     │ │    (MFE)     │ │      (MFE)      │       │
 │  │   Port 3028     │ │  Port 3029   │ │  Port 3030   │ │   Port 3031     │       │
 │  └─────────────────┘ └──────────────┘ └──────────────┘ └─────────────────┘       │
+│  ┌────────────────┐ ┌─────────────────────┐                                      │
+│  │ Resume Tailor  │ │ HSA Expense Tracker │                                      │
+│  │     (MFE)      │ │       (MFE)         │                                      │
+│  │  Port 3023     │ │    Port 3033        │                                      │
+│  └────────────────┘ └─────────────────────┘                                      │
 └──────────────────────────────────────────────────────────────────────────────────┘
                                      │
                                      ▼
@@ -322,6 +327,8 @@ MyCircle uses a **micro frontend architecture** with Vite Module Federation. Eac
 | **Travel Map** | World map with color-coded pins (lived/visited/wishlist) and per-user Firestore storage | `TravelMap` |
 | **Deal Finder** | Curated deals and discounts discovery | `DealFinder` |
 | **Web Crawler** | Submit URLs for crawling, extract content, view documents and real-time trace logs, search history | `WebCrawler` |
+| **Resume Tailor** | AI-powered resume customization with fact bank, job description parsing, and application tracking | `ResumeTailor` |
+| **HSA Expense Tracker** | Personal HSA expense tracker with receipt upload and reimbursement tracking | `HsaExpenses` |
 | **Shared** | Apollo client, GraphQL queries, event bus, i18n, types, hooks, utilities | Library (not standalone) |
 
 ### Dashboard Widgets
@@ -375,6 +382,8 @@ The homepage features a customizable widget dashboard with drag-and-drop reorder
 | `/travel-map` | Travel Map — world map with travel pins |
 | `/deals` | Deal Finder — curated deals and discounts |
 | `/web-crawler` | Web Crawler — submit URLs, extract content, view documents and traces |
+| `/resume` | Resume Tailor — AI-powered resume customization |
+| `/hsa-expenses` | HSA Expense Tracker — healthcare expense and reimbursement tracking |
 | `/compare` | Legacy multi-city comparison (still accessible) |
 
 ### Technology Stack
@@ -566,7 +575,7 @@ mycircle/
    This starts all services concurrently:
    - Express server (GraphQL + proxies): http://localhost:3000
    - Shell (host): http://localhost:3000
-   - All 27 MFE preview servers (City Search, Weather, Stocks, Podcasts, AI Assistant, Bible Reader, Worship Songs, Notebook, Baby Tracker, Child Development, Flashcards, Daily Log, Cloud Files, Model Benchmark, Immigration Tracker, Digital Library, Family Games, Doc Scanner, Hiking Map, Trip Planner, Poll System, Radio Station, AI Interviewer, Transit Tracker, Travel Map, Deal Finder, Web Crawler)
+   - All 29 MFE preview servers (City Search, Weather, Stocks, Podcasts, AI Assistant, Bible Reader, Worship Songs, Notebook, Baby Tracker, Child Development, Flashcards, Daily Log, Cloud Files, Model Benchmark, Immigration Tracker, Digital Library, Family Games, Doc Scanner, Hiking Map, Trip Planner, Poll System, Radio Station, AI Interviewer, Transit Tracker, Travel Map, Deal Finder, Web Crawler, Resume Tailor, HSA Expense Tracker)
 
 ### Available Scripts
 
