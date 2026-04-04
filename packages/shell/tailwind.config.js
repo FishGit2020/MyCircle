@@ -32,6 +32,7 @@ export default {
     "../web-crawler/src/**/*.{js,ts,jsx,tsx}",
     "../resume-tailor/src/**/*.{js,ts,jsx,tsx}",
     "../setup/src/**/*.{js,ts,jsx,tsx}",
+    "../hsa-expenses/src/**/*.{js,ts,jsx,tsx}",
     "../shared/src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',

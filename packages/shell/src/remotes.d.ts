@@ -182,3 +182,8 @@ declare module 'setup/Setup' {
   const Setup: React.ComponentType;
   export default Setup;
 }
+
+declare module 'hsaExpenses/HsaExpenses' {
+  const HsaExpenses: React.ComponentType;
+  export default HsaExpenses;
+}

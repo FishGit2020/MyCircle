@@ -26,6 +26,7 @@ import { createResumeTailorQueryResolvers, createResumeTailorMutationResolvers }
 import { createSqlQueryResolvers, createSqlMutationResolvers } from './sql.js';
 import { createQuotaQueryResolvers, createQuotaMutationResolvers } from './quota.js';
 import { createNasQueryResolvers, createNasMutationResolvers } from './nas.js';
+import { createHsaExpenseResolvers } from './hsaExpenses.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -46,6 +47,7 @@ export function createResolvers(
   const dailyLogResolvers = createDailyLogResolvers();
   const dealsResolvers = createDealsResolvers();
   const webCrawlerResolvers = createWebCrawlerResolvers();
+  const hsaExpenseResolvers = createHsaExpenseResolvers();
 
   return {
     JSON: JSONScalar,
@@ -67,6 +69,7 @@ export function createResolvers(
       ...createRadioStationResolvers().Mutation,
       ...createQuotaMutationResolvers(),
       ...createNasMutationResolvers(),
+      ...hsaExpenseResolvers.Mutation,
     },
 
     Query: {
@@ -96,6 +99,7 @@ export function createResolvers(
       ...createSqlQueryResolvers(),
       ...createQuotaQueryResolvers(),
       ...createNasQueryResolvers(),
+      ...hsaExpenseResolvers.Query,
     },
   };
 }

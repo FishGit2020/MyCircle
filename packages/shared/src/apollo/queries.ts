@@ -2206,3 +2206,83 @@ export const RESTORE_CHAPTER_FROM_NAS = gql`
     }
   }
 `;
+
+// ─── HSA Expenses ─────────────────────────────────────────────
+
+export const GET_HSA_EXPENSES = gql`
+  query GetHsaExpenses {
+    hsaExpenses {
+      id
+      provider
+      dateOfService
+      amountCents
+      category
+      description
+      status
+      receiptUrl
+      receiptContentType
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const ADD_HSA_EXPENSE = gql`
+  mutation AddHsaExpense($input: HSAExpenseInput!) {
+    addHsaExpense(input: $input) {
+      id
+      provider
+      dateOfService
+      amountCents
+      category
+      description
+      status
+      receiptUrl
+      receiptContentType
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_HSA_EXPENSE = gql`
+  mutation UpdateHsaExpense($id: ID!, $input: HSAExpenseUpdateInput!) {
+    updateHsaExpense(id: $id, input: $input) {
+      id
+      provider
+      dateOfService
+      amountCents
+      category
+      description
+      status
+      receiptUrl
+      receiptContentType
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_HSA_EXPENSE = gql`
+  mutation DeleteHsaExpense($id: ID!) {
+    deleteHsaExpense(id: $id)
+  }
+`;
+
+export const MARK_HSA_EXPENSE_REIMBURSED = gql`
+  mutation MarkHsaExpenseReimbursed($id: ID!, $reimbursed: Boolean!) {
+    markHsaExpenseReimbursed(id: $id, reimbursed: $reimbursed) {
+      id
+      provider
+      dateOfService
+      amountCents
+      category
+      description
+      status
+      receiptUrl
+      receiptContentType
+      createdAt
+      updatedAt
+    }
+  }
+`;

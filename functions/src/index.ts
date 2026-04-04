@@ -12,6 +12,9 @@ export { onZipJobCreated } from './handlers/zipWorker.js';
 export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.js';
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';
 
+// HSA Expenses — receipt upload/delete handler
+export { hsaExpenses } from './handlers/hsaExpenses.js';
+
 // Web Crawler — Firestore-triggered crawl worker
 export { crawlWorker } from './handlers/webCrawler.js';
 

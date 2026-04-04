@@ -1,0 +1,136 @@
+import { useState, useCallback } from 'react';
+import {
+  useQuery,
+  useMutation,
+  GET_HSA_EXPENSES,
+  ADD_HSA_EXPENSE,
+  UPDATE_HSA_EXPENSE,
+  DELETE_HSA_EXPENSE,
+  MARK_HSA_EXPENSE_REIMBURSED,
+} from '@mycircle/shared';
+import type { HSAExpense, HSAExpenseInput, HSAExpenseUpdateInput } from '../types';
+import { fileToBase64, isFileTooLarge } from '../utils/expenseHelpers';
+
+export function useHsaExpenses() {
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
+  const { data, loading, error, refetch } = useQuery(GET_HSA_EXPENSES, {
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const [addMutation, { loading: adding }] = useMutation(ADD_HSA_EXPENSE, {
+    refetchQueries: [{ query: GET_HSA_EXPENSES }],
+  });
+
+  const [updateMutation, { loading: updating }] = useMutation(UPDATE_HSA_EXPENSE, {
+    refetchQueries: [{ query: GET_HSA_EXPENSES }],
+  });
+
+  const [deleteMutation, { loading: deleting }] = useMutation(DELETE_HSA_EXPENSE, {
+    refetchQueries: [{ query: GET_HSA_EXPENSES }],
+  });
+
+  const [markMutation] = useMutation(MARK_HSA_EXPENSE_REIMBURSED, {
+    refetchQueries: [{ query: GET_HSA_EXPENSES }],
+  });
+
+  const expenses: HSAExpense[] = data?.hsaExpenses ?? [];
+
+  const addExpense = useCallback(
+    async (input: HSAExpenseInput) => {
+      await addMutation({ variables: { input } });
+    },
+    [addMutation]
+  );
+
+  const updateExpense = useCallback(
+    async (id: string, input: HSAExpenseUpdateInput) => {
+      await updateMutation({ variables: { id, input } });
+    },
+    [updateMutation]
+  );
+
+  const deleteExpense = useCallback(
+    async (id: string) => {
+      await deleteMutation({ variables: { id } });
+    },
+    [deleteMutation]
+  );
+
+  const markReimbursed = useCallback(
+    async (id: string, reimbursed: boolean) => {
+      await markMutation({ variables: { id, reimbursed } });
+    },
+    [markMutation]
+  );
+
+  const uploadReceipt = useCallback(
+    async (expenseId: string, file: File) => {
+      if (isFileTooLarge(file, 5)) {
+        throw new Error('File too large');
+      }
+      setUploadingReceipt(true);
+      try {
+        const fileBase64 = await fileToBase64(file);
+        const token = await (window as any).__getIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
+        const res = await fetch('/hsa-expenses/upload-receipt', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            expenseId,
+            fileBase64,
+            fileName: file.name,
+            contentType: file.type,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+          throw new Error(err.error || 'Upload failed');
+        }
+        await refetch();
+      } finally {
+        setUploadingReceipt(false);
+      }
+    },
+    [refetch]
+  );
+
+  const deleteReceipt = useCallback(
+    async (expenseId: string) => {
+      const token = await (window as any).__getIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
+      const res = await fetch('/hsa-expenses/delete-receipt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ expenseId }),
+      });
+      if (!res.ok) {
+        throw new Error('Failed to delete receipt');
+      }
+      await refetch();
+    },
+    [refetch]
+  );
+
+  return {
+    expenses,
+    loading,
+    error,
+    adding,
+    updating,
+    deleting,
+    uploadingReceipt,
+    addExpense,
+    updateExpense,
+    deleteExpense,
+    markReimbursed,
+    uploadReceipt,
+    deleteReceipt,
+    refetch,
+  };
+}

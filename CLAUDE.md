@@ -209,6 +209,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - Firestore `quotaSnapshots/{id}` (project-scoped top-level collection); PostgreSQL `quota_snapshots` table (optional, existing connection) (023-gcp-quota-billing-monitor)
 - TypeScript 5.x (frontend + Cloud Functions Node 22) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions v2, `archiver@^7` (new — ZIP assembly), `@types/archiver@^6` (new dev dep) (024-audiobook-batch-download)
 - Firestore `books/{bookId}` (5 new fields) + `books/{bookId}/zipJobs/{jobId}` (new subcollection) · Firebase Storage `books/{bookId}/audiobook.zip` (new file) (024-audiobook-batch-download)
+- TypeScript 5.x + React 18, `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent), Firebase Cloud Functions v2, Zod (input validation), Tailwind CSS (025-hsa-expense-tracker)
+- Firestore `users/{uid}/hsaExpenses/{expenseId}` + Firebase Storage `users/{uid}/hsa-receipts/` (025-hsa-expense-tracker)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)

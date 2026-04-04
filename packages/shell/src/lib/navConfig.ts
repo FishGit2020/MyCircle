@@ -32,6 +32,7 @@ const ROUTE_MODULE_MAP: Record<string, () => Promise<unknown>> = {
   '/deals': () => import('dealFinder/DealFinder'),
   '/web-crawler': () => import('webCrawler/WebCrawler'),
   '/resume': () => import('resumeTailor/ResumeTailor'),
+  '/hsa-expenses': () => import('hsaExpenses/HsaExpenses'),
 };
 
 export { ROUTE_MODULE_MAP };
@@ -80,6 +81,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' }, // eslint-disable-line @typescript-eslint/no-explicit-any
     { path: '/web-crawler', labelKey: 'nav.webCrawler' as any, icon: 'web-crawler' }, // eslint-disable-line @typescript-eslint/no-explicit-any
     { path: '/resume', labelKey: 'nav.resumeTailor' as any, icon: 'resume' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+    { path: '/hsa-expenses', labelKey: 'nav.hsaExpenses' as any, icon: 'hsa-expenses' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   ]},
   { labelKey: 'nav.group.outdoor', items: [
     { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
@@ -116,4 +118,5 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { path: '/deals', labelKey: 'nav.dealFinder' as any, icon: 'deals' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   { path: '/web-crawler', labelKey: 'nav.webCrawler' as any, icon: 'web-crawler' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   { path: '/resume', labelKey: 'nav.resumeTailor' as any, icon: 'resume' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+  { path: '/hsa-expenses', labelKey: 'nav.hsaExpenses' as any, icon: 'hsa-expenses' }, // eslint-disable-line @typescript-eslint/no-explicit-any
 ];

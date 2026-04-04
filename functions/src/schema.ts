@@ -718,6 +718,9 @@ export const typeDefs = `#graphql
     # GCP Quota Monitor (auth required)
     quotaSnapshots(limit: Int): QuotaSnapshotList!
 
+    # HSA Expenses (auth required)
+    hsaExpenses: [HSAExpense!]!
+
     # NAS Storage (auth required)
     nasConnectionStatus: NasConnectionStatus
 
@@ -1425,6 +1428,53 @@ export const typeDefs = `#graphql
     apiKey: String
   }
 
+  # ─── HSA Expenses ──────────────────────────────────────────────
+
+  enum HSAExpenseCategory {
+    MEDICAL
+    DENTAL
+    VISION
+    PRESCRIPTION
+    MENTAL_HEALTH
+    LAB_TEST
+    OTHER
+  }
+
+  enum HSAExpenseStatus {
+    PENDING
+    REIMBURSED
+  }
+
+  type HSAExpense {
+    id: ID!
+    provider: String!
+    dateOfService: String!
+    amountCents: Int!
+    category: HSAExpenseCategory!
+    description: String
+    status: HSAExpenseStatus!
+    receiptUrl: String
+    receiptContentType: String
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  input HSAExpenseInput {
+    provider: String!
+    dateOfService: String!
+    amountCents: Int!
+    category: HSAExpenseCategory!
+    description: String
+  }
+
+  input HSAExpenseUpdateInput {
+    provider: String
+    dateOfService: String
+    amountCents: Int
+    category: HSAExpenseCategory
+    description: String
+  }
+
   # ─── NAS Storage Types ────────────────────────────────────────
 
   type NasConnectionStatus {
@@ -1545,6 +1595,12 @@ export const typeDefs = `#graphql
     archiveChapterToNas(bookId: ID!, chapterIndex: Int!): NasArchiveResult!
     archiveBookToNas(bookId: ID!): [NasArchiveResult!]!
     restoreChapterFromNas(bookId: ID!, chapterIndex: Int!): BookChapter!
+
+    # HSA Expenses (auth required)
+    addHsaExpense(input: HSAExpenseInput!): HSAExpense!
+    updateHsaExpense(id: ID!, input: HSAExpenseUpdateInput!): HSAExpense!
+    deleteHsaExpense(id: ID!): Boolean!
+    markHsaExpenseReimbursed(id: ID!, reimbursed: Boolean!): HSAExpense!
 
     # GCP Quota Monitor (auth required)
     collectQuotaSnapshot: QuotaSnapshot!
