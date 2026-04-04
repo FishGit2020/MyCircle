@@ -134,7 +134,7 @@ export function createNasMutationResolvers() {
         throw new Error(`Chapter ${chapterIndex} has no converted audio to offload`);
       }
 
-      const storagePath = `books/${bookId}/audio/chapter-${chapterIndex}.mp3`;
+      const storagePath = `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
       const bucket = getStorage().bucket();
       const [fileExists] = await bucket.file(storagePath).exists();
       if (!fileExists) {
@@ -211,7 +211,7 @@ export function createNasMutationResolvers() {
         for (const chapterDoc of audioChapters) {
           const chapterData = chapterDoc.data();
           const chapterIndex: number = chapterData.index ?? 0;
-          const storagePath = `books/${bookId}/audio/chapter-${chapterIndex}.mp3`;
+          const storagePath = `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
           try {
             const [fileExists] = await bucket.file(storagePath).exists();
             if (!fileExists) {
@@ -277,7 +277,7 @@ export function createNasMutationResolvers() {
         await client.login(config.username, config.password);
         const buffer = await client.download(chapterData.nasPath);
 
-        const storagePath = `books/${bookId}/audio/chapter-${chapterIndex}.mp3`;
+        const storagePath = `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
         const bucket = getStorage().bucket();
         const { downloadUrl } = await uploadToStorage(bucket, storagePath, buffer, 'audio/mpeg');
 
