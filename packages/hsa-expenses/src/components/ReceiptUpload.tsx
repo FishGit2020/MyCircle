@@ -21,6 +21,7 @@ export default function ReceiptUpload({
 }: ReceiptUploadProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,6 +65,7 @@ export default function ReceiptUpload({
     if (file) validateAndUpload(file);
     // Reset input so the same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
   };
 
   // Show existing receipt preview
@@ -112,35 +114,36 @@ export default function ReceiptUpload({
         {t('hsaExpenses.receipt' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
       </p>
 
-      <div
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onClick={() => fileInputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            fileInputRef.current?.click();
-          }
-        }}
-        aria-label={t('hsaExpenses.uploadReceipt' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
-        className={`flex flex-col items-center justify-center min-h-[120px] rounded-lg border-2 border-dashed cursor-pointer transition ${
-          dragOver
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-gray-50 dark:bg-gray-700/50'
-        }`}
-      >
-        {uploading ? (
-          <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {t('hsaExpenses.saving' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
-            </span>
-          </div>
-        ) : (
-          <>
+      {uploading ? (
+        <div className="flex items-center justify-center gap-2 min-h-[120px] rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500" />
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {t('hsaExpenses.saving' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          </span>
+        </div>
+      ) : (
+        <>
+          {/* Drag-and-drop zone (visible on all, useful on desktop) */}
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={() => fileInputRef.current?.click()}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
+            aria-label={t('hsaExpenses.uploadReceipt' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+            className={`flex flex-col items-center justify-center min-h-[100px] rounded-lg border-2 border-dashed cursor-pointer transition ${
+              dragOver
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-gray-50 dark:bg-gray-700/50'
+            }`}
+          >
             <svg className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
@@ -150,14 +153,40 @@ export default function ReceiptUpload({
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
               JPEG, PNG, PDF (max 5MB)
             </p>
-          </>
-        )}
-      </div>
+          </div>
 
+          {/* Take Photo button — opens camera on mobile */}
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            aria-label={t('hsaExpenses.takePhoto' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+            className="w-full flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+            </svg>
+            {t('hsaExpenses.takePhoto' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          </button>
+        </>
+      )}
+
+      {/* File browse input */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,application/pdf"
+        onChange={handleFileChange}
+        className="hidden"
+        aria-hidden="true"
+      />
+
+      {/* Camera capture input — opens rear camera on mobile */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
         onChange={handleFileChange}
         className="hidden"
         aria-hidden="true"
