@@ -65,6 +65,7 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/immigration', labelKey: 'nav.immigration', icon: 'immigration' },
     { path: '/family-games', labelKey: 'nav.familyGames', icon: 'family-games' },
     { path: '/polls', labelKey: 'nav.pollSystem' as any, icon: 'poll-system' }, // eslint-disable-line @typescript-eslint/no-explicit-any
+    { path: '/hsa-expenses', labelKey: 'nav.hsaExpenses' as any, icon: 'hsa-expenses' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   ]},
   { labelKey: 'nav.group.learning', items: [
     { path: '/flashcards', labelKey: 'nav.flashcards', icon: 'flashcards' },
@@ -81,7 +82,6 @@ export const NAV_GROUPS: NavGroup[] = [
     { path: '/trips', labelKey: 'nav.tripPlanner' as any, icon: 'trip-planner' }, // eslint-disable-line @typescript-eslint/no-explicit-any
     { path: '/web-crawler', labelKey: 'nav.webCrawler' as any, icon: 'web-crawler' }, // eslint-disable-line @typescript-eslint/no-explicit-any
     { path: '/resume', labelKey: 'nav.resumeTailor' as any, icon: 'resume' }, // eslint-disable-line @typescript-eslint/no-explicit-any
-    { path: '/hsa-expenses', labelKey: 'nav.hsaExpenses' as any, icon: 'hsa-expenses' }, // eslint-disable-line @typescript-eslint/no-explicit-any
   ]},
   { labelKey: 'nav.group.outdoor', items: [
     { path: '/hiking', labelKey: 'nav.hikingMap', icon: 'hiking' },
