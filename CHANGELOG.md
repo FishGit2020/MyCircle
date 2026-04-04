@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.26.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.25.0...mycircle-v1.26.0) (2026-04-04)
+
+
+### Features
+
+* **hsa-expenses:** add HSA Expense Tracker MFE ([#939](https://github.com/FishGit2020/MyCircle/issues/939)) ([425228f](https://github.com/FishGit2020/MyCircle/commit/425228fa8547e9826809694e696344de6205bfae))
+
+
+### Bug Fixes
+
+* **hsa-expenses:** add Quick Access tile and move to Family nav group ([#940](https://github.com/FishGit2020/MyCircle/issues/940)) ([5b296f3](https://github.com/FishGit2020/MyCircle/commit/5b296f30bfabe246743630ebd0cab5fa1ee4b421))
+* **nas:** use zero-padded chapter indices in storage paths ([#937](https://github.com/FishGit2020/MyCircle/issues/937)) ([e04f8b0](https://github.com/FishGit2020/MyCircle/commit/e04f8b035a1990c66fe45978f36f1007954ca75f))
+
+
+### Documentation
+
+* add screenshot evidence utility documentation ([#936](https://github.com/FishGit2020/MyCircle/issues/936)) ([94f9f1a](https://github.com/FishGit2020/MyCircle/commit/94f9f1a81e09d60a6561081beac2e9416fdfc8a0))
+
 ## [1.25.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.24.0...mycircle-v1.25.0) (2026-04-02)
 
 
