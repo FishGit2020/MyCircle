@@ -91,7 +91,7 @@ export class NasFileStationClient {
     url.searchParams.set('_sid', this.sid);
 
     const formData = new FormData();
-    formData.append('dest_folder_path', destFolder);
+    formData.append('path', destFolder);
     formData.append('create_parents', 'true');
     formData.append('overwrite', 'true');
     const blob = new Blob([new Uint8Array(buffer)], { type: 'audio/mpeg' });
