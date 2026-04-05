@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.27.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.26.0...mycircle-v1.27.0) (2026-04-04)
+
+
+### Features
+
+* **hsa-expenses:** add Take Photo button for mobile camera receipt capture ([#943](https://github.com/FishGit2020/MyCircle/issues/943)) ([8f0dd53](https://github.com/FishGit2020/MyCircle/commit/8f0dd53ee359b4f20498dd3ddf1939a3f6829b99))
+
+
+### Miscellaneous
+
+* **deps:** bump lodash from 4.17.23 to 4.18.1 in /functions ([#933](https://github.com/FishGit2020/MyCircle/issues/933)) ([92e3640](https://github.com/FishGit2020/MyCircle/commit/92e3640a908504ab46d2f1465dbad00cdf016c33))
+
 ## [1.26.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.25.0...mycircle-v1.26.0) (2026-04-04)
 
 
