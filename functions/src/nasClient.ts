@@ -85,16 +85,19 @@ export class NasFileStationClient {
   async upload(destFolder: string, fileName: string, buffer: Buffer): Promise<void> {
     if (!this.sid) throw new Error('Not logged in');
     const url = new URL('/webapi/entry.cgi', this.baseUrl);
-    url.searchParams.set('api', 'SYNO.FileStation.Upload');
-    url.searchParams.set('version', '2');
-    url.searchParams.set('method', 'upload');
-    url.searchParams.set('_sid', this.sid);
 
+    // Per Synology official API guide (p.64): all params go in multipart
+    // form body, with file content as the last part.
     const formData = new FormData();
+    formData.append('api', 'SYNO.FileStation.Upload');
+    formData.append('version', '2');
+    formData.append('method', 'upload');
+    formData.append('_sid', this.sid);
     formData.append('path', destFolder);
     formData.append('create_parents', 'true');
     formData.append('overwrite', 'true');
-    const blob = new Blob([new Uint8Array(buffer)], { type: 'audio/mpeg' });
+    // File must be the last part per the spec
+    const blob = new Blob([new Uint8Array(buffer)], { type: 'application/octet-stream' });
     formData.append('file', blob, fileName);
 
     const resp = await fetch(url.toString(), {
