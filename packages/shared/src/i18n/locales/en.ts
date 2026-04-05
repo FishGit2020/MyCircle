@@ -3223,6 +3223,7 @@ const en = {
   'hsaExpenses.fileTooLarge': 'File is too large (max 5MB)',
   'hsaExpenses.invalidFileType': 'Invalid file type. Please upload JPEG, PNG, or PDF',
   'hsaExpenses.uploadFailed': 'Upload failed. Please try again.',
+  'hsaExpenses.takePhoto': 'Take Photo',
   'hsaExpenses.medical': 'Medical',
   'hsaExpenses.dental': 'Dental',
   'hsaExpenses.vision': 'Vision',
