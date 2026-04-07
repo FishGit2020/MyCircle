@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.28.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.27.0...mycircle-v1.28.0) (2026-04-07)
+
+
+### Features
+
+* **ai-interviewer:** session history, progress analytics, import/export, and timed mode ([#959](https://github.com/FishGit2020/MyCircle/issues/959)) ([7d0de23](https://github.com/FishGit2020/MyCircle/commit/7d0de2381224150f38cb402f3143bacc48750f83))
+* **hsa-expenses:** add download button for image receipts ([#958](https://github.com/FishGit2020/MyCircle/issues/958)) ([f0367ba](https://github.com/FishGit2020/MyCircle/commit/f0367ba0f18d0eef76890fca03d2a77b6ebe3d06))
+* **hsa-expenses:** multiple receipts per expense with recycle bin ([#960](https://github.com/FishGit2020/MyCircle/issues/960)) ([1f7aab1](https://github.com/FishGit2020/MyCircle/commit/1f7aab18b930ff620cd11055b6efbd2d4a192d3d))
+
+
+### Bug Fixes
+
+* **e2e:** remove flaky podcast e2e tests already covered by unit tests ([#945](https://github.com/FishGit2020/MyCircle/issues/945)) ([378b817](https://github.com/FishGit2020/MyCircle/commit/378b8174e08ca2daa50ac6baef4246bac74418ce))
+* **hsa-expenses:** support HEIC uploads and allow receipt at creation ([#954](https://github.com/FishGit2020/MyCircle/issues/954)) ([2df2fd2](https://github.com/FishGit2020/MyCircle/commit/2df2fd26b2f6b021551451c0bc87004cafbded5e))
+* **hsa-expenses:** use heic2any for cross-browser HEIC conversion ([#956](https://github.com/FishGit2020/MyCircle/issues/956)) ([0fbc64a](https://github.com/FishGit2020/MyCircle/commit/0fbc64a183cdb4408990bc5f144caaf299543400))
+* **nas:** move upload params to multipart form body per Synology API spec ([#944](https://github.com/FishGit2020/MyCircle/issues/944)) ([85357f7](https://github.com/FishGit2020/MyCircle/commit/85357f7d39e1a6ae8a68dbe282d1a4227ee0b96d))
+* **security:** resolve 9 npm audit vulnerabilities via pnpm overrides ([#955](https://github.com/FishGit2020/MyCircle/issues/955)) ([439bef9](https://github.com/FishGit2020/MyCircle/commit/439bef98cf704d8094366c3d87c7c06514b664b3))
+
+
+### Code Refactoring
+
+* **docs:** remove stale Active Technologies and Recent Changes sections from CLAUDE.md ([#953](https://github.com/FishGit2020/MyCircle/issues/953)) ([d5fbbb5](https://github.com/FishGit2020/MyCircle/commit/d5fbbb5bcc74043268f78c196d89fc329afc3998))
+* **hsa-expenses:** migrate receipt upload/delete to GraphQL ([#957](https://github.com/FishGit2020/MyCircle/issues/957)) ([873f721](https://github.com/FishGit2020/MyCircle/commit/873f7216c6e03ea968c9b8b6ae4fc6685a0d7f96))
+
+
+### Miscellaneous
+
+* **deps-dev:** bump @types/archiver from 6.0.4 to 7.0.0 in /functions ([#948](https://github.com/FishGit2020/MyCircle/issues/948)) ([441d7f4](https://github.com/FishGit2020/MyCircle/commit/441d7f40e3cb8bc0344221fa4dc183c813dfbc83))
+* **deps-dev:** bump @types/node from 20.19.33 to 25.5.2 in /functions ([#949](https://github.com/FishGit2020/MyCircle/issues/949)) ([b96d149](https://github.com/FishGit2020/MyCircle/commit/b96d14972ba22219fb0cd76afa9de209d8ae7739))
+* **deps:** bump the minor-and-patch group in /functions with 4 updates ([#947](https://github.com/FishGit2020/MyCircle/issues/947)) ([f1a87fc](https://github.com/FishGit2020/MyCircle/commit/f1a87fcaf1f3310a04547a0d0ee9b2e3386a1327))
+* **deps:** bump vite from 8.0.3 to 8.0.5 in /functions ([#951](https://github.com/FishGit2020/MyCircle/issues/951)) ([c294285](https://github.com/FishGit2020/MyCircle/commit/c29428587070eac49078564f09406a3c0c94878f))
+
 ## [1.27.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.26.0...mycircle-v1.27.0) (2026-04-04)
 
 
