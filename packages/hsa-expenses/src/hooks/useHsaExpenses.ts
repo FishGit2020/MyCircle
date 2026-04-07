@@ -8,7 +8,9 @@ import {
   DELETE_HSA_EXPENSE,
   MARK_HSA_EXPENSE_REIMBURSED,
   UPLOAD_HSA_RECEIPT,
-  DELETE_HSA_RECEIPT,
+  TRASH_HSA_RECEIPT,
+  RESTORE_HSA_RECEIPT,
+  PERMANENTLY_DELETE_HSA_RECEIPT,
 } from '@mycircle/shared';
 import type { HSAExpense, HSAExpenseInput, HSAExpenseUpdateInput } from '../types';
 import { fileToBase64, isFileTooLarge } from '../utils/expenseHelpers';
@@ -38,9 +40,18 @@ export function useHsaExpenses() {
     refetchQueries: [{ query: GET_HSA_EXPENSES }],
   });
 
-  const [deleteReceiptMutation] = useMutation(DELETE_HSA_RECEIPT, {
+  const [trashReceiptMutation, { loading: trashingReceipt }] = useMutation(TRASH_HSA_RECEIPT, {
     refetchQueries: [{ query: GET_HSA_EXPENSES }],
   });
+
+  const [restoreReceiptMutation] = useMutation(RESTORE_HSA_RECEIPT, {
+    refetchQueries: [{ query: GET_HSA_EXPENSES }],
+  });
+
+  const [permanentlyDeleteReceiptMutation, { loading: deletingReceipt }] = useMutation(
+    PERMANENTLY_DELETE_HSA_RECEIPT,
+    { refetchQueries: [{ query: GET_HSA_EXPENSES }] },
+  );
 
   const expenses: HSAExpense[] = data?.hsaExpenses ?? [];
 
@@ -49,48 +60,60 @@ export function useHsaExpenses() {
       const result = await addMutation({ variables: { input } });
       return result.data?.addHsaExpense ?? null;
     },
-    [addMutation]
+    [addMutation],
   );
 
   const updateExpense = useCallback(
     async (id: string, input: HSAExpenseUpdateInput) => {
       await updateMutation({ variables: { id, input } });
     },
-    [updateMutation]
+    [updateMutation],
   );
 
   const deleteExpense = useCallback(
     async (id: string) => {
       await deleteMutation({ variables: { id } });
     },
-    [deleteMutation]
+    [deleteMutation],
   );
 
   const markReimbursed = useCallback(
     async (id: string, reimbursed: boolean) => {
       await markMutation({ variables: { id, reimbursed } });
     },
-    [markMutation]
+    [markMutation],
   );
 
   const uploadReceipt = useCallback(
     async (expenseId: string, file: File) => {
-      if (isFileTooLarge(file, 5)) {
-        throw new Error('File too large');
-      }
+      if (isFileTooLarge(file, 5)) throw new Error('File too large');
       const fileBase64 = await fileToBase64(file);
       await uploadReceiptMutation({
         variables: { expenseId, fileBase64, fileName: file.name, contentType: file.type },
       });
     },
-    [uploadReceiptMutation]
+    [uploadReceiptMutation],
   );
 
-  const deleteReceipt = useCallback(
-    async (expenseId: string) => {
-      await deleteReceiptMutation({ variables: { expenseId } });
+  const trashReceipt = useCallback(
+    async (expenseId: string, receiptId: string) => {
+      await trashReceiptMutation({ variables: { expenseId, receiptId } });
     },
-    [deleteReceiptMutation]
+    [trashReceiptMutation],
+  );
+
+  const restoreReceipt = useCallback(
+    async (expenseId: string, receiptId: string) => {
+      await restoreReceiptMutation({ variables: { expenseId, receiptId } });
+    },
+    [restoreReceiptMutation],
+  );
+
+  const permanentlyDeleteReceipt = useCallback(
+    async (expenseId: string, receiptId: string) => {
+      await permanentlyDeleteReceiptMutation({ variables: { expenseId, receiptId } });
+    },
+    [permanentlyDeleteReceiptMutation],
   );
 
   return {
@@ -101,12 +124,16 @@ export function useHsaExpenses() {
     updating,
     deleting,
     uploadingReceipt,
+    trashingReceipt,
+    deletingReceipt,
     addExpense,
     updateExpense,
     deleteExpense,
     markReimbursed,
     uploadReceipt,
-    deleteReceipt,
+    trashReceipt,
+    restoreReceipt,
+    permanentlyDeleteReceipt,
     refetch,
   };
 }

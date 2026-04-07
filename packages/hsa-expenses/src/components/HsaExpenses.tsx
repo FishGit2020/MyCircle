@@ -29,12 +29,16 @@ export default function HsaExpenses() {
     updating,
     deleting,
     uploadingReceipt,
+    trashingReceipt,
+    deletingReceipt,
     addExpense,
     updateExpense,
     deleteExpense,
     markReimbursed,
     uploadReceipt,
-    deleteReceipt,
+    trashReceipt,
+    restoreReceipt,
+    permanentlyDeleteReceipt,
   } = useHsaExpenses();
 
   // UI state
@@ -148,14 +152,35 @@ export default function HsaExpenses() {
         await uploadReceipt(viewingExpense.id, file);
       }
     },
-    [viewingExpense, uploadReceipt]
+    [viewingExpense, uploadReceipt],
   );
 
-  const handleDeleteReceipt = useCallback(async () => {
-    if (viewingExpense) {
-      await deleteReceipt(viewingExpense.id);
-    }
-  }, [viewingExpense, deleteReceipt]);
+  const handleTrashReceipt = useCallback(
+    async (receiptId: string) => {
+      if (viewingExpense) {
+        await trashReceipt(viewingExpense.id, receiptId);
+      }
+    },
+    [viewingExpense, trashReceipt],
+  );
+
+  const handleRestoreReceipt = useCallback(
+    async (receiptId: string) => {
+      if (viewingExpense) {
+        await restoreReceipt(viewingExpense.id, receiptId);
+      }
+    },
+    [viewingExpense, restoreReceipt],
+  );
+
+  const handlePermanentlyDeleteReceipt = useCallback(
+    async (receiptId: string) => {
+      if (viewingExpense) {
+        await permanentlyDeleteReceipt(viewingExpense.id, receiptId);
+      }
+    },
+    [viewingExpense, permanentlyDeleteReceipt],
+  );
 
   // Keep viewingExpense in sync with refetched data
   const currentViewingExpense = useMemo(() => {
@@ -250,7 +275,7 @@ export default function HsaExpenses() {
       {showForm && (
         <ExpenseForm
           expense={editingExpense}
-          saving={adding || updating || uploadingReceipt}
+          saving={adding || updating || uploadingReceipt || trashingReceipt}
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />
@@ -261,9 +286,13 @@ export default function HsaExpenses() {
         <ExpenseDetailModal
           expense={currentViewingExpense}
           uploadingReceipt={uploadingReceipt}
+          trashingReceipt={trashingReceipt}
+          deletingReceipt={deletingReceipt}
           onClose={() => setViewingExpense(null)}
           onUploadReceipt={handleUploadReceipt}
-          onDeleteReceipt={handleDeleteReceipt}
+          onTrashReceipt={handleTrashReceipt}
+          onRestoreReceipt={handleRestoreReceipt}
+          onPermanentlyDeleteReceipt={handlePermanentlyDeleteReceipt}
         />
       )}
 
