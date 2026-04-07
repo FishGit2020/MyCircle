@@ -2209,58 +2209,60 @@ export const RESTORE_CHAPTER_FROM_NAS = gql`
 
 // ─── HSA Expenses ─────────────────────────────────────────────
 
+const HSA_RECEIPT_FIELDS = gql`
+  fragment HsaReceiptFields on HSAReceipt {
+    id
+    url
+    contentType
+    fileName
+    uploadedAt
+    trashedAt
+  }
+`;
+
+const HSA_EXPENSE_FIELDS = gql`
+  fragment HsaExpenseFields on HSAExpense {
+    id
+    provider
+    dateOfService
+    amountCents
+    category
+    description
+    status
+    receipts {
+      ...HsaReceiptFields
+    }
+    createdAt
+    updatedAt
+  }
+  ${HSA_RECEIPT_FIELDS}
+`;
+
 export const GET_HSA_EXPENSES = gql`
   query GetHsaExpenses {
     hsaExpenses {
-      id
-      provider
-      dateOfService
-      amountCents
-      category
-      description
-      status
-      receiptUrl
-      receiptContentType
-      createdAt
-      updatedAt
+      ...HsaExpenseFields
     }
   }
+  ${HSA_EXPENSE_FIELDS}
 `;
 
 export const ADD_HSA_EXPENSE = gql`
   mutation AddHsaExpense($input: HSAExpenseInput!) {
     addHsaExpense(input: $input) {
-      id
-      provider
-      dateOfService
-      amountCents
-      category
-      description
-      status
-      receiptUrl
-      receiptContentType
-      createdAt
-      updatedAt
+      ...HsaExpenseFields
     }
   }
+  ${HSA_EXPENSE_FIELDS}
 `;
 
 export const UPDATE_HSA_EXPENSE = gql`
   mutation UpdateHsaExpense($id: ID!, $input: HSAExpenseUpdateInput!) {
     updateHsaExpense(id: $id, input: $input) {
-      id
-      provider
-      dateOfService
-      amountCents
-      category
-      description
-      status
-      receiptUrl
-      receiptContentType
-      createdAt
-      updatedAt
+      ...HsaExpenseFields
     }
   }
+  ${HSA_EXPENSE_FIELDS}
 `;
 
 export const DELETE_HSA_EXPENSE = gql`
@@ -2269,20 +2271,44 @@ export const DELETE_HSA_EXPENSE = gql`
   }
 `;
 
+export const UPLOAD_HSA_RECEIPT = gql`
+  mutation UploadHsaReceipt($expenseId: ID!, $fileBase64: String!, $fileName: String!, $contentType: String!) {
+    uploadHsaReceipt(expenseId: $expenseId, fileBase64: $fileBase64, fileName: $fileName, contentType: $contentType) {
+      ...HsaReceiptFields
+    }
+  }
+  ${HSA_RECEIPT_FIELDS}
+`;
+
+export const TRASH_HSA_RECEIPT = gql`
+  mutation TrashHsaReceipt($expenseId: ID!, $receiptId: ID!) {
+    trashHsaReceipt(expenseId: $expenseId, receiptId: $receiptId) {
+      ...HsaReceiptFields
+    }
+  }
+  ${HSA_RECEIPT_FIELDS}
+`;
+
+export const RESTORE_HSA_RECEIPT = gql`
+  mutation RestoreHsaReceipt($expenseId: ID!, $receiptId: ID!) {
+    restoreHsaReceipt(expenseId: $expenseId, receiptId: $receiptId) {
+      ...HsaReceiptFields
+    }
+  }
+  ${HSA_RECEIPT_FIELDS}
+`;
+
+export const PERMANENTLY_DELETE_HSA_RECEIPT = gql`
+  mutation PermanentlyDeleteHsaReceipt($expenseId: ID!, $receiptId: ID!) {
+    permanentlyDeleteHsaReceipt(expenseId: $expenseId, receiptId: $receiptId)
+  }
+`;
+
 export const MARK_HSA_EXPENSE_REIMBURSED = gql`
   mutation MarkHsaExpenseReimbursed($id: ID!, $reimbursed: Boolean!) {
     markHsaExpenseReimbursed(id: $id, reimbursed: $reimbursed) {
-      id
-      provider
-      dateOfService
-      amountCents
-      category
-      description
-      status
-      receiptUrl
-      receiptContentType
-      createdAt
-      updatedAt
+      ...HsaExpenseFields
     }
   }
+  ${HSA_EXPENSE_FIELDS}
 `;

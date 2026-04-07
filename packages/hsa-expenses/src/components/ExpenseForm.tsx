@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { HSAExpenseCategory, type HSAExpense, type HSAExpenseInput } from '../types';
-import { dollarsToAmountCents, CATEGORY_OPTIONS } from '../utils/expenseHelpers';
+import { dollarsToAmountCents, CATEGORY_OPTIONS, isHeicFile, convertHeicToJpeg } from '../utils/expenseHelpers';
 
 interface ExpenseFormProps {
   expense?: HSAExpense | null;
   saving?: boolean;
-  onSubmit: (input: HSAExpenseInput) => void;
+  onSubmit: (input: HSAExpenseInput, file?: File) => void;
   onCancel: () => void;
 }
 
@@ -20,6 +20,9 @@ export default function ExpenseForm({ expense, saving, onSubmit, onCancel }: Exp
   const [category, setCategory] = useState<HSAExpenseCategory>(HSAExpenseCategory.MEDICAL);
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const attachInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (expense) {
@@ -41,6 +44,32 @@ export default function ExpenseForm({ expense, saving, onSubmit, onCancel }: Exp
     return Object.keys(newErrors).length === 0;
   }, [provider, dateOfService, amountDollars]);
 
+  const handleAttachFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (attachInputRef.current) attachInputRef.current.value = '';
+    if (!file) return;
+    setFileError(null);
+    let processedFile = file;
+    if (isHeicFile(file)) {
+      try {
+        processedFile = await convertHeicToJpeg(file);
+      } catch {
+        setFileError(t('hsaExpenses.invalidFileType' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
+        return;
+      }
+    }
+    const ALLOWED = ['image/jpeg', 'image/png', 'application/pdf'];
+    if (!ALLOWED.includes(processedFile.type)) {
+      setFileError(t('hsaExpenses.invalidFileType' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
+      return;
+    }
+    if (processedFile.size > 5 * 1024 * 1024) {
+      setFileError(t('hsaExpenses.fileTooLarge' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
+      return;
+    }
+    setPendingFile(processedFile);
+  }, [t]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -53,7 +82,7 @@ export default function ExpenseForm({ expense, saving, onSubmit, onCancel }: Exp
     if (description.trim()) {
       input.description = description.trim();
     }
-    onSubmit(input);
+    onSubmit(input, pendingFile ?? undefined);
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -193,6 +222,56 @@ export default function ExpenseForm({ expense, saving, onSubmit, onCancel }: Exp
                 placeholder="Optional notes..."
               />
             </div>
+
+            {/* Receipt attachment — only shown when creating a new expense */}
+            {!isEdit && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('hsaExpenses.receipt' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+                </p>
+                {pendingFile ? (
+                  <div className="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+                    <svg className="w-5 h-5 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{pendingFile.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => setPendingFile(null)}
+                      className="min-h-[28px] min-w-[28px] flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition"
+                      aria-label={t('hsaExpenses.cancel' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => attachInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 transition"
+                    aria-label={t('hsaExpenses.uploadReceipt' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span className="text-sm">{t('hsaExpenses.uploadReceipt' as any)}</span> {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+                  </button>
+                )}
+                <input
+                  ref={attachInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,application/pdf,image/heic,image/heif,.heic,.heif"
+                  onChange={handleAttachFile}
+                  className="hidden"
+                  aria-hidden="true"
+                />
+                {fileError && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fileError}</p>
+                )}
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex justify-end gap-3 pt-2">

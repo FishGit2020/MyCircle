@@ -1445,6 +1445,15 @@ export const typeDefs = `#graphql
     REIMBURSED
   }
 
+  type HSAReceipt {
+    id: ID!
+    url: String!
+    contentType: String!
+    fileName: String!
+    uploadedAt: String!
+    trashedAt: String
+  }
+
   type HSAExpense {
     id: ID!
     provider: String!
@@ -1453,8 +1462,7 @@ export const typeDefs = `#graphql
     category: HSAExpenseCategory!
     description: String
     status: HSAExpenseStatus!
-    receiptUrl: String
-    receiptContentType: String
+    receipts: [HSAReceipt!]!
     createdAt: String!
     updatedAt: String!
   }
@@ -1601,6 +1609,10 @@ export const typeDefs = `#graphql
     updateHsaExpense(id: ID!, input: HSAExpenseUpdateInput!): HSAExpense!
     deleteHsaExpense(id: ID!): Boolean!
     markHsaExpenseReimbursed(id: ID!, reimbursed: Boolean!): HSAExpense!
+    uploadHsaReceipt(expenseId: ID!, fileBase64: String!, fileName: String!, contentType: String!): HSAReceipt!
+    trashHsaReceipt(expenseId: ID!, receiptId: ID!): HSAReceipt!
+    restoreHsaReceipt(expenseId: ID!, receiptId: ID!): HSAReceipt!
+    permanentlyDeleteHsaReceipt(expenseId: ID!, receiptId: ID!): Boolean!
 
     # GCP Quota Monitor (auth required)
     collectQuotaSnapshot: QuotaSnapshot!
