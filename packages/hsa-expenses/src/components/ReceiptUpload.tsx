@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import { isFileTooLarge } from '../utils/expenseHelpers';
+import { isFileTooLarge, isHeicFile, convertHeicToJpeg } from '../utils/expenseHelpers';
 
 interface ReceiptUploadProps {
   receiptUrl: string | null;
@@ -26,17 +26,26 @@ export default function ReceiptUpload({
   const [error, setError] = useState<string | null>(null);
 
   const validateAndUpload = useCallback(
-    (file: File) => {
+    async (file: File) => {
       setError(null);
-      if (!ACCEPTED_TYPES.includes(file.type)) {
+      let processedFile = file;
+      if (isHeicFile(file)) {
+        try {
+          processedFile = await convertHeicToJpeg(file);
+        } catch {
+          setError(t('hsaExpenses.invalidFileType' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
+          return;
+        }
+      }
+      if (!ACCEPTED_TYPES.includes(processedFile.type)) {
         setError(t('hsaExpenses.invalidFileType' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
         return;
       }
-      if (isFileTooLarge(file, 5)) {
+      if (isFileTooLarge(processedFile, 5)) {
         setError(t('hsaExpenses.fileTooLarge' as any)); // eslint-disable-line @typescript-eslint/no-explicit-any
         return;
       }
-      onUpload(file);
+      onUpload(processedFile);
     },
     [onUpload, t]
   );
@@ -46,7 +55,7 @@ export default function ReceiptUpload({
       e.preventDefault();
       setDragOver(false);
       const file = e.dataTransfer.files[0];
-      if (file) validateAndUpload(file);
+      if (file) void validateAndUpload(file);
     },
     [validateAndUpload]
   );
@@ -62,7 +71,7 @@ export default function ReceiptUpload({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) validateAndUpload(file);
+    if (file) void validateAndUpload(file);
     // Reset input so the same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (cameraInputRef.current) cameraInputRef.current.value = '';
@@ -151,7 +160,7 @@ export default function ReceiptUpload({
               {t('hsaExpenses.uploadReceipt' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              JPEG, PNG, PDF (max 5MB)
+              JPEG, PNG, PDF, HEIC (max 5MB)
             </p>
           </div>
 
@@ -175,7 +184,7 @@ export default function ReceiptUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,application/pdf"
+        accept="image/jpeg,image/png,application/pdf,image/heic,image/heif,.heic,.heif"
         onChange={handleFileChange}
         className="hidden"
         aria-hidden="true"
