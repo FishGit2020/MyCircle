@@ -73,7 +73,7 @@ export function useHsaExpenses() {
       setUploadingReceipt(true);
       try {
         const fileBase64 = await fileToBase64(file);
-        const token = await (window as any).__getIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
+        const token = await (window as any).__getFirebaseIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
         const res = await fetch('/hsa-expenses/upload-receipt', {
           method: 'POST',
           headers: {
@@ -101,7 +101,7 @@ export function useHsaExpenses() {
 
   const deleteReceipt = useCallback(
     async (expenseId: string) => {
-      const token = await (window as any).__getIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
+      const token = await (window as any).__getFirebaseIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
       const res = await fetch('/hsa-expenses/delete-receipt', {
         method: 'POST',
         headers: {
