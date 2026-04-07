@@ -1,6 +1,7 @@
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { GraphQLError } from 'graphql';
+import { uploadToStorage } from '../handlers/shared.js';
 
 interface ResolverContext {
   uid: string | null;
@@ -127,6 +128,72 @@ export function createHsaExpenseResolvers() {
         }
         await docRef.delete();
         return true;
+      },
+      uploadHsaReceipt: async (_: any, { expenseId, fileBase64, fileName, contentType }: { expenseId: string; fileBase64: string; fileName: string; contentType: string }, context: ResolverContext) => {
+        const uid = requireAuth(context);
+        const ALLOWED = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (!ALLOWED.includes(contentType)) {
+          throw new GraphQLError('Invalid content type', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+        const db = getFirestore();
+        const expenseRef = db.doc(`users/${uid}/hsaExpenses/${expenseId}`);
+        const expenseDoc = await expenseRef.get();
+        if (!expenseDoc.exists) {
+          throw new GraphQLError('Expense not found', { extensions: { code: 'NOT_FOUND' } });
+        }
+        const buffer = Buffer.from(fileBase64, 'base64');
+        if (buffer.length > 5 * 1024 * 1024) {
+          throw new GraphQLError('File too large (max 5MB)', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+        const bucket = getStorage().bucket();
+        const storagePath = `users/${uid}/hsa-receipts/${expenseId}/${fileName}`;
+        const { downloadUrl } = await uploadToStorage(bucket, storagePath, buffer, contentType);
+        await expenseRef.update({ receiptUrl: downloadUrl, receiptStoragePath: storagePath, receiptContentType: contentType });
+        const updated = (await expenseRef.get()).data()!;
+        return {
+          id: expenseId,
+          provider: updated.provider ?? '',
+          dateOfService: updated.dateOfService ?? '',
+          amountCents: updated.amountCents ?? 0,
+          category: updated.category ?? 'OTHER',
+          description: updated.description ?? null,
+          status: updated.status ?? 'PENDING',
+          receiptUrl: downloadUrl,
+          receiptContentType: contentType,
+          createdAt: toIso(updated.createdAt),
+          updatedAt: toIso(updated.updatedAt),
+        };
+      },
+      deleteHsaReceipt: async (_: any, { expenseId }: { expenseId: string }, context: ResolverContext) => {
+        const uid = requireAuth(context);
+        const db = getFirestore();
+        const expenseRef = db.doc(`users/${uid}/hsaExpenses/${expenseId}`);
+        const expenseDoc = await expenseRef.get();
+        if (!expenseDoc.exists) {
+          throw new GraphQLError('Expense not found', { extensions: { code: 'NOT_FOUND' } });
+        }
+        const data = expenseDoc.data()!;
+        if (data.receiptStoragePath) {
+          try {
+            await getStorage().bucket().file(data.receiptStoragePath).delete();
+          } catch {
+            // File may already be deleted
+          }
+        }
+        await expenseRef.update({ receiptUrl: null, receiptStoragePath: null, receiptContentType: null });
+        return {
+          id: expenseId,
+          provider: data.provider ?? '',
+          dateOfService: data.dateOfService ?? '',
+          amountCents: data.amountCents ?? 0,
+          category: data.category ?? 'OTHER',
+          description: data.description ?? null,
+          status: data.status ?? 'PENDING',
+          receiptUrl: null,
+          receiptContentType: null,
+          createdAt: toIso(data.createdAt),
+          updatedAt: toIso(data.updatedAt),
+        };
       },
       markHsaExpenseReimbursed: async (_: any, { id, reimbursed }: { id: string; reimbursed: boolean }, context: ResolverContext) => {
         const uid = requireAuth(context);

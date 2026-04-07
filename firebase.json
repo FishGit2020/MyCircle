@@ -39,10 +39,6 @@
         "function": "resumeTailor"
       },
       {
-        "source": "/hsa-expenses/**",
-        "function": "hsaExpenses"
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }

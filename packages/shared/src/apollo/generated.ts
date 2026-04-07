@@ -718,6 +718,7 @@ export type Mutation = {
   deleteFile: Scalars['Boolean']['output'];
   deleteFolder: Scalars['Boolean']['output'];
   deleteHsaExpense: Scalars['Boolean']['output'];
+  deleteHsaReceipt: HsaExpense;
   deleteInterviewQuestion: Scalars['Boolean']['output'];
   deleteInterviewSession: Scalars['Boolean']['output'];
   deleteNasConnection: Scalars['Boolean']['output'];
@@ -767,6 +768,7 @@ export type Mutation = {
   updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
   uploadBook: Book;
+  uploadHsaReceipt: HsaExpense;
   voteRadioStation: Scalars['Boolean']['output'];
 };
 
@@ -892,6 +894,11 @@ export type MutationDeleteFolderArgs = {
 
 export type MutationDeleteHsaExpenseArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteHsaReceiptArgs = {
+  expenseId: Scalars['ID']['input'];
 };
 
 
@@ -1136,6 +1143,14 @@ export type MutationUpdateWorshipSongArgs = {
 
 export type MutationUploadBookArgs = {
   fileBase64: Scalars['String']['input'];
+};
+
+
+export type MutationUploadHsaReceiptArgs = {
+  contentType: Scalars['String']['input'];
+  expenseId: Scalars['ID']['input'];
+  fileBase64: Scalars['String']['input'];
+  fileName: Scalars['String']['input'];
 };
 
 
@@ -3423,6 +3438,23 @@ export type DeleteHsaExpenseMutationVariables = Exact<{
 
 
 export type DeleteHsaExpenseMutation = { __typename?: 'Mutation', deleteHsaExpense: boolean };
+
+export type UploadHsaReceiptMutationVariables = Exact<{
+  expenseId: Scalars['ID']['input'];
+  fileBase64: Scalars['String']['input'];
+  fileName: Scalars['String']['input'];
+  contentType: Scalars['String']['input'];
+}>;
+
+
+export type UploadHsaReceiptMutation = { __typename?: 'Mutation', uploadHsaReceipt: { __typename?: 'HSAExpense', id: string, provider: string, dateOfService: string, amountCents: number, category: HsaExpenseCategory, description?: string | null, status: HsaExpenseStatus, receiptUrl?: string | null, receiptContentType?: string | null, createdAt: string, updatedAt: string } };
+
+export type DeleteHsaReceiptMutationVariables = Exact<{
+  expenseId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteHsaReceiptMutation = { __typename?: 'Mutation', deleteHsaReceipt: { __typename?: 'HSAExpense', id: string, provider: string, dateOfService: string, amountCents: number, category: HsaExpenseCategory, description?: string | null, status: HsaExpenseStatus, receiptUrl?: string | null, receiptContentType?: string | null, createdAt: string, updatedAt: string } };
 
 export type MarkHsaExpenseReimbursedMutationVariables = Exact<{
   id: Scalars['ID']['input'];
