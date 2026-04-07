@@ -124,14 +124,27 @@ export default function ExpenseDetailModal({
                     alt={t('hsaExpenses.receipt' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
                     className="max-w-full rounded-lg border border-gray-200 dark:border-gray-700"
                   />
-                  <button
-                    type="button"
-                    onClick={onDeleteReceipt}
-                    className="min-h-[44px] min-w-[44px] px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
-                    aria-label={t('hsaExpenses.deleteExpense' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
-                  >
-                    {t('hsaExpenses.deleteExpense' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
-                  </button>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <a
+                      href={expense.receiptUrl}
+                      download
+                      className="inline-flex items-center gap-2 px-3 py-2 min-h-[44px] text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition"
+                      aria-label={t('hsaExpenses.downloadReceipt' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      {t('hsaExpenses.downloadReceipt' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={onDeleteReceipt}
+                      className="min-h-[44px] min-w-[44px] px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
+                      aria-label={t('hsaExpenses.deleteExpense' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+                    >
+                      {t('hsaExpenses.deleteExpense' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+                    </button>
+                  </div>
                 </div>
               ) : expense.receiptUrl && expense.receiptContentType === 'application/pdf' ? (
                 <div className="space-y-2">
