@@ -37,41 +37,12 @@ export function isHeicFile(file: File): boolean {
   );
 }
 
-export function convertHeicToJpeg(file: File): Promise<File> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        URL.revokeObjectURL(url);
-        reject(new Error('Canvas context unavailable'));
-        return;
-      }
-      ctx.drawImage(img, 0, 0);
-      canvas.toBlob(
-        (blob) => {
-          URL.revokeObjectURL(url);
-          if (!blob) {
-            reject(new Error('HEIC conversion failed'));
-            return;
-          }
-          const jpegName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
-          resolve(new File([blob], jpegName, { type: 'image/jpeg' }));
-        },
-        'image/jpeg',
-        0.92
-      );
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Failed to load image'));
-    };
-    img.src = url;
-  });
+export async function convertHeicToJpeg(file: File): Promise<File> {
+  const heic2any = (await import('heic2any')).default;
+  const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+  const resultBlob = Array.isArray(blob) ? blob[0] : blob;
+  const jpegName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+  return new File([resultBlob], jpegName, { type: 'image/jpeg' });
 }
 
 export const CATEGORY_OPTIONS: { value: HSAExpenseCategory; labelKey: string }[] = [
