@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mycircle/shared": "workspace:*",
+    "heic2any": "^0.0.4",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router": "catalog:"

@@ -1601,6 +1601,8 @@ export const typeDefs = `#graphql
     updateHsaExpense(id: ID!, input: HSAExpenseUpdateInput!): HSAExpense!
     deleteHsaExpense(id: ID!): Boolean!
     markHsaExpenseReimbursed(id: ID!, reimbursed: Boolean!): HSAExpense!
+    uploadHsaReceipt(expenseId: ID!, fileBase64: String!, fileName: String!, contentType: String!): HSAExpense!
+    deleteHsaReceipt(expenseId: ID!): HSAExpense!
 
     # GCP Quota Monitor (auth required)
     collectQuotaSnapshot: QuotaSnapshot!
