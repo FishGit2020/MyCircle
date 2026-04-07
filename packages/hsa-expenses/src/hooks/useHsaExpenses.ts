@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
   useQuery,
   useMutation,
@@ -7,13 +7,13 @@ import {
   UPDATE_HSA_EXPENSE,
   DELETE_HSA_EXPENSE,
   MARK_HSA_EXPENSE_REIMBURSED,
+  UPLOAD_HSA_RECEIPT,
+  DELETE_HSA_RECEIPT,
 } from '@mycircle/shared';
 import type { HSAExpense, HSAExpenseInput, HSAExpenseUpdateInput } from '../types';
 import { fileToBase64, isFileTooLarge } from '../utils/expenseHelpers';
 
 export function useHsaExpenses() {
-  const [uploadingReceipt, setUploadingReceipt] = useState(false);
-
   const { data, loading, error, refetch } = useQuery(GET_HSA_EXPENSES, {
     fetchPolicy: 'cache-and-network',
   });
@@ -31,6 +31,14 @@ export function useHsaExpenses() {
   });
 
   const [markMutation] = useMutation(MARK_HSA_EXPENSE_REIMBURSED, {
+    refetchQueries: [{ query: GET_HSA_EXPENSES }],
+  });
+
+  const [uploadReceiptMutation, { loading: uploadingReceipt }] = useMutation(UPLOAD_HSA_RECEIPT, {
+    refetchQueries: [{ query: GET_HSA_EXPENSES }],
+  });
+
+  const [deleteReceiptMutation] = useMutation(DELETE_HSA_RECEIPT, {
     refetchQueries: [{ query: GET_HSA_EXPENSES }],
   });
 
@@ -70,52 +78,19 @@ export function useHsaExpenses() {
       if (isFileTooLarge(file, 5)) {
         throw new Error('File too large');
       }
-      setUploadingReceipt(true);
-      try {
-        const fileBase64 = await fileToBase64(file);
-        const token = await (window as any).__getIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
-        const res = await fetch('/hsa-expenses/upload-receipt', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({
-            expenseId,
-            fileBase64,
-            fileName: file.name,
-            contentType: file.type,
-          }),
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({ error: 'Upload failed' }));
-          throw new Error(err.error || 'Upload failed');
-        }
-        await refetch();
-      } finally {
-        setUploadingReceipt(false);
-      }
+      const fileBase64 = await fileToBase64(file);
+      await uploadReceiptMutation({
+        variables: { expenseId, fileBase64, fileName: file.name, contentType: file.type },
+      });
     },
-    [refetch]
+    [uploadReceiptMutation]
   );
 
   const deleteReceipt = useCallback(
     async (expenseId: string) => {
-      const token = await (window as any).__getIdToken?.(); // eslint-disable-line @typescript-eslint/no-explicit-any
-      const res = await fetch('/hsa-expenses/delete-receipt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ expenseId }),
-      });
-      if (!res.ok) {
-        throw new Error('Failed to delete receipt');
-      }
-      await refetch();
+      await deleteReceiptMutation({ variables: { expenseId } });
     },
-    [refetch]
+    [deleteReceiptMutation]
   );
 
   return {

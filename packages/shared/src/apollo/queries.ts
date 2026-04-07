@@ -2269,6 +2269,42 @@ export const DELETE_HSA_EXPENSE = gql`
   }
 `;
 
+export const UPLOAD_HSA_RECEIPT = gql`
+  mutation UploadHsaReceipt($expenseId: ID!, $fileBase64: String!, $fileName: String!, $contentType: String!) {
+    uploadHsaReceipt(expenseId: $expenseId, fileBase64: $fileBase64, fileName: $fileName, contentType: $contentType) {
+      id
+      provider
+      dateOfService
+      amountCents
+      category
+      description
+      status
+      receiptUrl
+      receiptContentType
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_HSA_RECEIPT = gql`
+  mutation DeleteHsaReceipt($expenseId: ID!) {
+    deleteHsaReceipt(expenseId: $expenseId) {
+      id
+      provider
+      dateOfService
+      amountCents
+      category
+      description
+      status
+      receiptUrl
+      receiptContentType
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const MARK_HSA_EXPENSE_REIMBURSED = gql`
   mutation MarkHsaExpenseReimbursed($id: ID!, $reimbursed: Boolean!) {
     markHsaExpenseReimbursed(id: $id, reimbursed: $reimbursed) {
