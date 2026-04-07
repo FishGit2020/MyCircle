@@ -127,12 +127,15 @@ describe('ExpenseForm', () => {
 
     fireEvent.submit(screen.getByRole('button', { name: 'hsaExpenses.save' }));
 
-    expect(onSubmit).toHaveBeenCalledWith({
-      provider: 'Dr. Smith',
-      dateOfService: '2024-06-15',
-      amountCents: 4599,
-      category: HSAExpenseCategory.DENTAL,
-    });
+    expect(onSubmit).toHaveBeenCalledWith(
+      {
+        provider: 'Dr. Smith',
+        dateOfService: '2024-06-15',
+        amountCents: 4599,
+        category: HSAExpenseCategory.DENTAL,
+      },
+      undefined
+    );
   });
 
   it('includes description when provided', () => {
@@ -148,7 +151,8 @@ describe('ExpenseForm', () => {
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         description: 'Annual checkup',
-      })
+      }),
+      undefined
     );
   });
 

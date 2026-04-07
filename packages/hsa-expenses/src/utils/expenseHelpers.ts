@@ -29,6 +29,51 @@ export function isFileTooLarge(file: File, maxMB: number): boolean {
   return file.size > maxMB * 1024 * 1024;
 }
 
+export function isHeicFile(file: File): boolean {
+  return (
+    file.type === 'image/heic' ||
+    file.type === 'image/heif' ||
+    /\.(heic|heif)$/i.test(file.name)
+  );
+}
+
+export function convertHeicToJpeg(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        reject(new Error('Canvas context unavailable'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) {
+            reject(new Error('HEIC conversion failed'));
+            return;
+          }
+          const jpegName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+          resolve(new File([blob], jpegName, { type: 'image/jpeg' }));
+        },
+        'image/jpeg',
+        0.92
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Failed to load image'));
+    };
+    img.src = url;
+  });
+}
+
 export const CATEGORY_OPTIONS: { value: HSAExpenseCategory; labelKey: string }[] = [
   { value: HSAExpenseCategory.MEDICAL, labelKey: 'hsaExpenses.medical' },
   { value: HSAExpenseCategory.DENTAL, labelKey: 'hsaExpenses.dental' },

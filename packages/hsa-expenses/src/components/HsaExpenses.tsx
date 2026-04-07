@@ -99,16 +99,19 @@ export default function HsaExpenses() {
   }, []);
 
   const handleFormSubmit = useCallback(
-    async (input: HSAExpenseInput) => {
+    async (input: HSAExpenseInput, file?: File) => {
       if (editingExpense) {
         await updateExpense(editingExpense.id, input);
       } else {
-        await addExpense(input);
+        const newExpense = await addExpense(input);
+        if (file && newExpense?.id) {
+          await uploadReceipt(newExpense.id, file);
+        }
       }
       setShowForm(false);
       setEditingExpense(null);
     },
-    [editingExpense, updateExpense, addExpense]
+    [editingExpense, updateExpense, addExpense, uploadReceipt]
   );
 
   const handleFormCancel = useCallback(() => {
@@ -247,7 +250,7 @@ export default function HsaExpenses() {
       {showForm && (
         <ExpenseForm
           expense={editingExpense}
-          saving={adding || updating}
+          saving={adding || updating || uploadingReceipt}
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />

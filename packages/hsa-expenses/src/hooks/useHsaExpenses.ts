@@ -38,7 +38,8 @@ export function useHsaExpenses() {
 
   const addExpense = useCallback(
     async (input: HSAExpenseInput) => {
-      await addMutation({ variables: { input } });
+      const result = await addMutation({ variables: { input } });
+      return result.data?.addHsaExpense ?? null;
     },
     [addMutation]
   );
