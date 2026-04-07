@@ -207,6 +207,7 @@
       "flatted": ">=3.4.2",
       "picomatch@<2.3.2": "2.3.2",
       "picomatch@>=4.0.0 <4.0.4": "4.0.4",
+      "vite": ">=7.3.2",
       "node-forge": ">=1.4.0",
       "hono": ">=4.12.7",
       "express>path-to-regexp": "0.1.13",

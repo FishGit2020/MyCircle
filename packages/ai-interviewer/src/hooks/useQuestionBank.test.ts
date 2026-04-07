@@ -39,6 +39,7 @@ let mockQueryResult = {
 
 vi.mock('@mycircle/shared', () => ({
   useQuery: () => ({ ...mockQueryResult, refetch: mockRefetch }),
+  useLazyQuery: () => [vi.fn(), { data: undefined, loading: false }],
   useMutation: (query: unknown) => {
     if (query === 'CREATE_INTERVIEW_QUESTION') return [mockCreateMutation, { loading: false }];
     if (query === 'UPDATE_INTERVIEW_QUESTION') return [mockUpdateMutation, { loading: false }];
@@ -49,6 +50,8 @@ vi.mock('@mycircle/shared', () => ({
   CREATE_INTERVIEW_QUESTION: 'CREATE_INTERVIEW_QUESTION',
   UPDATE_INTERVIEW_QUESTION: 'UPDATE_INTERVIEW_QUESTION',
   DELETE_INTERVIEW_QUESTION: 'DELETE_INTERVIEW_QUESTION',
+  EXPORT_QUESTION_BANK: 'EXPORT_QUESTION_BANK',
+  IMPORT_QUESTIONS: 'IMPORT_QUESTIONS',
   createLogger: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() }),
 }));
 

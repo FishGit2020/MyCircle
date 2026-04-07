@@ -3,12 +3,15 @@ import { useTranslation, PageContent, useQuery, useLazyQuery, GET_BENCHMARK_ENDP
 import type { GetBenchmarkEndpointsQuery, GetBenchmarkEndpointModelsQuery } from '@mycircle/shared';
 import { useInterviewChat } from '../hooks/useInterviewChat';
 import type { InterviewSession } from '../hooks/useInterviewChat';
+import { useSessionHistory } from '../hooks/useSessionHistory';
 import { useQuestionBank } from '../hooks/useQuestionBank';
 import type { InterviewConfig } from '../hooks/useInterviewStateMachine';
 import InterviewSetup from './InterviewSetup';
 import QuestionPanel from './QuestionPanel';
 import InterviewChat from './InterviewChat';
 import QuestionManager from './QuestionManager';
+import SessionHistoryPanel from './SessionHistoryPanel';
+import ProgressDashboard from './ProgressDashboard';
 
 const ENDPOINT_KEY = 'interview-endpoint';
 const MODEL_KEY = 'interview-model';
@@ -41,6 +44,7 @@ export default function AiInterviewer() {
   const [endpointId, setEndpointIdLocal] = useState(() => loadPref(ENDPOINT_KEY));
   const [model, setModelLocal] = useState(() => loadPref(MODEL_KEY));
   const [showSessions, setShowSessions] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
   const mountedRef = useRef(false);
 
   const [showQuestionManager, setShowQuestionManager] = useState(false);
@@ -53,7 +57,12 @@ export default function AiInterviewer() {
     createQuestion,
     updateQuestion,
     deleteQuestion: deleteQuestionFromBank,
+    exportQuestions,
+    importQuestions,
   } = useQuestionBank();
+
+  // Session history (for the panel and progress dashboard)
+  const { sessions: historySessions } = useSessionHistory();
 
   // Endpoint / model queries
   const { data: endpointsData } = useQuery<GetBenchmarkEndpointsQuery>(GET_BENCHMARK_ENDPOINTS, {
@@ -90,6 +99,11 @@ export default function AiInterviewer() {
     isStructuredMode,
     scores,
     isLastQuestion,
+    // Timer
+    timerConfig,
+    timerElapsedMs,
+    setTimerConfig,
+    startTimer,
     // Actions
     setQuestion,
     setDocument,
@@ -167,26 +181,29 @@ export default function AiInterviewer() {
   const handleStartStructured = useCallback((config: InterviewConfig) => {
     if (!modelSelected || !questionBankData) return;
     setInterviewActive(true);
+    startTimer();
     startStructuredInterview(
       config,
       questionBankData.questions,
       endpointId || undefined,
       model || undefined,
     );
-  }, [modelSelected, questionBankData, endpointId, model, startStructuredInterview]);
+  }, [modelSelected, questionBankData, endpointId, model, startStructuredInterview, startTimer]);
 
   const handleStartCustom = useCallback((customQuestion: string) => {
     if (!customQuestion.trim() || !modelSelected) return;
     setQuestionLocal(customQuestion);
     setInterviewActive(true);
+    startTimer();
     startInterview(customQuestion, endpointId || undefined, model || undefined);
-  }, [endpointId, model, modelSelected, startInterview]);
+  }, [endpointId, model, modelSelected, startInterview, startTimer]);
 
   const handleStart = useCallback(() => {
     if (!question.trim() || !modelSelected) return;
     setInterviewActive(true);
+    startTimer();
     startInterview(question, endpointId || undefined, model || undefined);
-  }, [question, endpointId, model, modelSelected, startInterview]);
+  }, [question, endpointId, model, modelSelected, startInterview, startTimer]);
 
   const handleRepeat = useCallback(() => {
     repeatQuestion(endpointId || undefined, model || undefined);
@@ -220,11 +237,14 @@ export default function AiInterviewer() {
   }, [clearChat]);
 
   const handleToggleSessions = useCallback(() => {
-    if (!showSessions) {
-      loadSessions();
-    }
-    setShowSessions(!showSessions);
-  }, [showSessions, loadSessions]);
+    setShowSessions((prev) => !prev);
+    setShowProgress(false);
+  }, []);
+
+  const handleToggleProgress = useCallback(() => {
+    setShowProgress((prev) => !prev);
+    setShowSessions(false);
+  }, []);
 
   const handleLoadSession = useCallback(async (session: InterviewSession) => {
     const loaded = await loadSession(session.id);
@@ -247,6 +267,24 @@ export default function AiInterviewer() {
     }
   }, [deleteSession, currentSessionId]);
 
+  const handleRerun = useCallback((config: { chapter: string; difficulty: string }) => {
+    setShowSessions(false);
+    clearChat();
+    setInterviewActive(false);
+    setQuestionLocal('');
+    setDocumentLocal('');
+    setSessionHash('');
+    try {
+      sessionStorage.setItem('interview-rerun-chapter', config.chapter);
+      sessionStorage.setItem('interview-rerun-difficulty', config.difficulty);
+    } catch { /* */ }
+  }, [clearChat]);
+
+  // Legacy: kept for backward compat with useInterviewChat sessions state
+  void sessions;
+  void loadSessions;
+  void timerElapsedMs;
+
   return (
     <PageContent fill className="overflow-hidden">
       <div className="flex flex-col flex-1 min-h-0">
@@ -255,7 +293,7 @@ export default function AiInterviewer() {
           <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {t('aiInterviewer.title')}
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {saveStatus === 'saving' && (
               <span className="text-xs text-gray-400 dark:text-gray-500">{t('aiInterviewer.saving')}</span>
             )}
@@ -265,9 +303,24 @@ export default function AiInterviewer() {
             <button
               type="button"
               onClick={handleToggleSessions}
-              className="rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                showSessions
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
             >
               {t('aiInterviewer.sessions')}
+            </button>
+            <button
+              type="button"
+              onClick={handleToggleProgress}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                showProgress
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              {t('aiInterviewer.progressDashboard')}
             </button>
             {interviewActive && (
               <button
@@ -281,33 +334,21 @@ export default function AiInterviewer() {
           </div>
         </div>
 
-        {/* Sessions dropdown */}
+        {/* Session history panel */}
         {showSessions && (
-          <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-4 py-3 max-h-48 overflow-y-auto">
-            {sessions.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">{t('aiInterviewer.noSessions')}</p>
-            ) : (
-              <div className="space-y-2">
-                {sessions.map((s) => (
-                  <div key={s.id} className="flex items-center justify-between gap-2 text-sm">
-                    <button
-                      type="button"
-                      onClick={() => handleLoadSession(s)}
-                      className="flex-1 text-left truncate text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                    >
-                      {s.questionPreview || 'Untitled'} ({s.messageCount} msgs)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteSession(s.id)}
-                      className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xs transition-colors"
-                    >
-                      {t('aiInterviewer.deleteSession')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+          <SessionHistoryPanel
+            onOpen={(sessionId) => {
+              handleLoadSession({ id: sessionId } as InterviewSession);
+            }}
+            onDelete={handleDeleteSession}
+            onRerun={handleRerun}
+          />
+        )}
+
+        {/* Progress dashboard */}
+        {showProgress && (
+          <div className="border-b border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto">
+            <ProgressDashboard sessions={historySessions} />
           </div>
         )}
 
@@ -322,6 +363,8 @@ export default function AiInterviewer() {
                 onCreateQuestion={createQuestion}
                 onUpdateQuestion={updateQuestion}
                 onDeleteQuestion={deleteQuestionFromBank}
+                onExportQuestions={exportQuestions}
+                onImportQuestions={importQuestions}
               />
             ) : !interviewActive ? (
               <InterviewSetup
@@ -333,6 +376,8 @@ export default function AiInterviewer() {
                 questionBankLoading={questionBankLoading}
                 questionBankError={questionBankError}
                 questionBankAvailable={!!(questionBankData && questionBankData.questions.length > 0)}
+                timerConfig={timerConfig}
+                onTimerConfigChange={setTimerConfig}
               />
             ) : (
               <QuestionPanel

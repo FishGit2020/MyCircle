@@ -8,10 +8,10 @@ catalogs:
   default:
     '@apollo/client':
       specifier: ^4.1.1
-      version: 4.1.1
+      version: 4.1.6
     graphql:
       specifier: ^16.12.0
-      version: 16.12.0
+      version: 16.13.1
     react:
       specifier: ^18.2.0
       version: 18.3.1
@@ -20,7 +20,7 @@ catalogs:
       version: 18.3.1
     react-router:
       specifier: ^7
-      version: 7.13.0
+      version: 7.13.1
 
 overrides:
   esbuild: '>=0.25.0'
@@ -31,6 +31,7 @@ overrides:
   flatted: '>=3.4.2'
   picomatch@<2.3.2: 2.3.2
   picomatch@>=4.0.0 <4.0.4: 4.0.4
+  vite: '>=7.3.2'
   node-forge: '>=1.4.0'
   hono: '>=4.12.7'
   express>path-to-regexp: 0.1.13
@@ -202,10 +203,10 @@ importers:
         version: 8.18.1
       '@vitejs/plugin-react':
         specifier: ^5.1.4
-        version: 5.1.4(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 5.1.4(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/coverage-v8':
         specifier: ~4.0.18
-        version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -241,7 +242,7 @@ importers:
         version: 8.5.8
       rollup-plugin-visualizer:
         specifier: ^6.0.11
-        version: 6.0.11(rollup@4.59.0)
+        version: 6.0.11(rolldown@1.0.0-rc.13)(rollup@4.59.0)
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -255,11 +256,11 @@ importers:
         specifier: ^8.57.1
         version: 8.57.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.9.3)
       vite:
-        specifier: ^5.4.21
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -268,13 +269,13 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -283,7 +284,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -308,7 +309,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -322,11 +323,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/ai-interviewer:
     dependencies:
@@ -341,7 +342,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -366,7 +367,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -380,11 +381,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/baby-tracker:
     dependencies:
@@ -399,7 +400,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -424,7 +425,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -438,23 +439,23 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/bible-reader:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -463,7 +464,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -488,7 +489,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -502,11 +503,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/child-development:
     dependencies:
@@ -521,7 +522,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -546,7 +547,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -560,23 +561,23 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/city-search:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -585,7 +586,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -610,7 +611,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -624,11 +625,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/cloud-files:
     dependencies:
@@ -646,7 +647,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -671,7 +672,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -685,11 +686,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/daily-log:
     dependencies:
@@ -704,7 +705,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -729,7 +730,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -743,23 +744,23 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/deal-finder:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -768,7 +769,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -793,7 +794,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -807,11 +808,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/digital-library:
     dependencies:
@@ -829,7 +830,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -854,7 +855,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -868,23 +869,23 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/doc-scanner:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       jspdf:
         specifier: ^4.2.1
         version: 4.2.1
@@ -896,7 +897,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -921,7 +922,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -935,23 +936,23 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/family-games:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -960,7 +961,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -985,7 +986,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -999,23 +1000,23 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/flashcards:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -1024,7 +1025,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1049,7 +1050,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1063,11 +1064,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/hiking-map:
     dependencies:
@@ -1088,7 +1089,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1113,7 +1114,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1127,11 +1128,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/hsa-expenses:
     dependencies:
@@ -1149,7 +1150,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1174,7 +1175,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1188,11 +1189,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/immigration-tracker:
     dependencies:
@@ -1207,7 +1208,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1232,7 +1233,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1246,11 +1247,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/model-benchmark:
     dependencies:
@@ -1265,7 +1266,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1290,7 +1291,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1304,11 +1305,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/notebook:
     dependencies:
@@ -1323,7 +1324,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1348,7 +1349,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1362,11 +1363,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/podcast-player:
     dependencies:
@@ -1381,7 +1382,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1406,7 +1407,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1420,11 +1421,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/poll-system:
     dependencies:
@@ -1439,7 +1440,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1464,7 +1465,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1478,11 +1479,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/radio-station:
     dependencies:
@@ -1497,7 +1498,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1522,7 +1523,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1536,11 +1537,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/resume-tailor:
     dependencies:
@@ -1561,7 +1562,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1589,7 +1590,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1603,11 +1604,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/setup:
     dependencies:
@@ -1622,7 +1623,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1647,7 +1648,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1661,26 +1662,26 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/shared:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       graphql-tag:
         specifier: ^2.12.6
-        version: 2.12.6(graphql@16.12.0)
+        version: 2.12.6(graphql@16.13.1)
       graphql-ws:
         specifier: ^6.0.7
-        version: 6.0.7(graphql@16.12.0)(ws@8.19.0)
+        version: 6.0.7(graphql@16.13.1)(ws@8.19.0)
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -1705,7 +1706,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
@@ -1717,7 +1718,7 @@ importers:
         version: 12.10.0
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -1726,7 +1727,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       workbox-window:
         specifier: ^7.4.0
         version: 7.4.0
@@ -1754,7 +1755,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1774,26 +1775,26 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-pwa:
         specifier: ^1.2.0
-        version: 1.2.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
+        version: 1.2.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/stock-tracker:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -1802,7 +1803,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1827,7 +1828,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1841,11 +1842,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/transit-tracker:
     dependencies:
@@ -1860,7 +1861,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1885,7 +1886,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1899,11 +1900,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/travel-map:
     dependencies:
@@ -1921,7 +1922,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -1946,7 +1947,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -1960,11 +1961,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/trip-planner:
     dependencies:
@@ -1982,7 +1983,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -2007,7 +2008,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -2021,23 +2022,23 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/weather-display:
     dependencies:
       '@apollo/client':
         specifier: 'catalog:'
-        version: 4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
+        version: 4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@mycircle/shared':
         specifier: workspace:*
         version: link:../shared
       graphql:
         specifier: 'catalog:'
-        version: 16.12.0
+        version: 16.13.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -2046,7 +2047,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -2071,7 +2072,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -2085,11 +2086,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/web-crawler:
     dependencies:
@@ -2104,7 +2105,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -2129,7 +2130,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -2143,11 +2144,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/worship-songs:
     dependencies:
@@ -2162,7 +2163,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-router:
         specifier: 'catalog:'
-        version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@originjs/vite-plugin-federation':
         specifier: ^1.3.5
@@ -2187,7 +2188,7 @@ importers:
         version: 6.0.0
       '@vitejs/plugin-react':
         specifier: ^4.2.1
-        version: 4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))
+        version: 4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       autoprefixer:
         specifier: ^10.4.27
         version: 10.4.27(postcss@8.5.8)
@@ -2201,11 +2202,11 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
       vite:
-        specifier: ^5.0.11
-        version: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+        specifier: '>=7.3.2'
+        version: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: ~4.0.18
-        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
 packages:
 
@@ -2229,25 +2230,6 @@ packages:
     resolution: {integrity: sha512-F17/vCp7QVwom9eG7ToauIKdAxpSoadsJnqIfyryLFSkLSOEqu+eC5Z3N8OXcUVStuOMcNHlyraRsA6rRICu4g==}
     peerDependencies:
       graphql: 14.x || 15.x || 16.x
-
-  '@apollo/client@4.1.1':
-    resolution: {integrity: sha512-EizMzR+qfn3kRZ7dy9LxEI2omkyaylWNbBy3Sce8QBmeQP+sOlmYqx2uu5aDFk+uGdrf/QtzHLOI6hUPGfm34A==}
-    peerDependencies:
-      graphql: ^16.0.0
-      graphql-ws: ^5.5.5 || ^6.0.3
-      react: ^17.0.0 || ^18.0.0 || >=19.0.0-rc
-      react-dom: ^17.0.0 || ^18.0.0 || >=19.0.0-rc
-      rxjs: ^7.3.0
-      subscriptions-transport-ws: ^0.9.0 || ^0.11.0
-    peerDependenciesMeta:
-      graphql-ws:
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-      subscriptions-transport-ws:
-        optional: true
 
   '@apollo/client@4.1.6':
     resolution: {integrity: sha512-ak8uzqmKeX3u9BziGf83RRyODAJKFkPG72hTNvEj4WjMWFmuKW2gGN1i3OfajKT6yuGjvo+n23ES2zqWDKFCZg==}
@@ -2993,8 +2975,17 @@ packages:
   '@electric-sql/pglite@0.3.16':
     resolution: {integrity: sha512-mZkZfOd9OqTMHsK+1cje8OSzfAQcpD7JmILXTl5ahdempjUDdmg4euf1biDex5/LfQIDJ3gvCu6qDgdnDxfJmA==}
 
+  '@emnapi/core@1.9.1':
+    resolution: {integrity: sha512-mukuNALVsoix/w1BJwFzwXBN/dHeejQtuVzcDsfOEsdpCumXb/E9j8w11h5S54tT1xhifGfbbSm/ICrObRb3KA==}
+
   '@emnapi/runtime@1.8.1':
     resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
+
+  '@emnapi/runtime@1.9.1':
+    resolution: {integrity: sha512-VYi5+ZVLhpgK4hQ0TAjiQiZ6ol0oe4mBx7mVv7IflsiEp0OWoVsp/+f9Vc1hOhE0TtkORVrI1GvzyreqpgWtkA==}
+
+  '@emnapi/wasi-threads@1.2.0':
+    resolution: {integrity: sha512-N10dEJNSsUx41Z6pZsXU8FjPjpBEplgH24sfkmITrBED1/U2Esum9F3lfLrMjKHHjmi557zQn7kR9R+XWXu5Rg==}
 
   '@envelop/core@5.5.1':
     resolution: {integrity: sha512-3DQg8sFskDo386TkL5j12jyRAdip/8yzK3x7YGbZBgobZ4aKXrvDU0GppU0SnmrpQnNaiTUsxBs9LKkwQ/eyvw==}
@@ -4161,6 +4152,12 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
+  '@napi-rs/wasm-runtime@1.1.2':
+    resolution: {integrity: sha512-sNXv5oLJ7ob93xkZ1XnxisYhGYXfaG9f65/ZgYuAu3qt7b3NadcOEhLvx28hv31PgX8SZJRYrAIPQilQmFpLVw==}
+    peerDependencies:
+      '@emnapi/core': ^1.7.1
+      '@emnapi/runtime': ^1.7.1
+
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -4210,6 +4207,9 @@ packages:
   '@originjs/vite-plugin-federation@1.4.1':
     resolution: {integrity: sha512-Uo08jW5pj1t58OUKuZNkmzcfTN2pqeVuAWCCiKf/75/oll4Efq4cHOqSE1FXMlvwZNGDziNdDyBbQ5IANem3CQ==}
     engines: {node: '>=14.0.0', pnpm: '>=7.0.1'}
+
+  '@oxc-project/types@0.123.0':
+    resolution: {integrity: sha512-YtECP/y8Mj1lSHiUWGSRzy/C6teUKlS87dEfuVKT09LgQbUsBW1rNg+MiJ4buGu3yuADV60gbIvo9/HplA56Ew==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -4268,8 +4268,100 @@ packages:
   '@repeaterjs/repeater@3.0.6':
     resolution: {integrity: sha512-Javneu5lsuhwNCryN+pXH93VPQ8g0dBX7wItHFgYiwQmzE1sVdg5tWHiOgHywzL2W21XQopa7IwIEnNbmeUJYA==}
 
+  '@rolldown/binding-android-arm64@1.0.0-rc.13':
+    resolution: {integrity: sha512-5ZiiecKH2DXAVJTNN13gNMUcCDg4Jy8ZjbXEsPnqa248wgOVeYRX0iqXXD5Jz4bI9BFHgKsI2qmyJynstbmr+g==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [android]
+
+  '@rolldown/binding-darwin-arm64@1.0.0-rc.13':
+    resolution: {integrity: sha512-tz/v/8G77seu8zAB3A5sK3UFoOl06zcshEzhUO62sAEtrEuW/H1CcyoupOrD+NbQJytYgA4CppXPzlrmp4JZKA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@rolldown/binding-darwin-x64@1.0.0-rc.13':
+    resolution: {integrity: sha512-8DakphqOz8JrMYWTJmWA+vDJxut6LijZ8Xcdc4flOlAhU7PNVwo2MaWBF9iXjJAPo5rC/IxEFZDhJ3GC7NHvug==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [darwin]
+
+  '@rolldown/binding-freebsd-x64@1.0.0-rc.13':
+    resolution: {integrity: sha512-4wBQFfjDuXYN/SVI8inBF3Aa+isq40rc6VMFbk5jcpolUBTe5cYnMsHZ51nFWsx3PVyyNN3vgoESki0Hmr/4BA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@rolldown/binding-linux-arm-gnueabihf@1.0.0-rc.13':
+    resolution: {integrity: sha512-JW/e4yPIXLms+jmnbwwy5LA/LxVwZUWLN8xug+V200wzaVi5TEGIWQlh8o91gWYFxW609euI98OCCemmWGuPrw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@rolldown/binding-linux-arm64-gnu@1.0.0-rc.13':
+    resolution: {integrity: sha512-ZfKWpXiUymDnavepCaM6KG/uGydJ4l2nBmMxg60Ci4CbeefpqjPWpfaZM7PThOhk2dssqBAcwLc6rAyr0uTdXg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+
+  '@rolldown/binding-linux-arm64-musl@1.0.0-rc.13':
+    resolution: {integrity: sha512-bmRg3O6Z0gq9yodKKWCIpnlH051sEfdVwt+6m5UDffAQMUUqU0xjnQqqAUm+Gu7ofAAly9DqiQDtKu2nPDEABA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+
+  '@rolldown/binding-linux-ppc64-gnu@1.0.0-rc.13':
+    resolution: {integrity: sha512-8Wtnbw4k7pMYN9B/mOEAsQ8HOiq7AZ31Ig4M9BKn2So4xRaFEhtCSa4ZJaOutOWq50zpgR4N5+L/opnlaCx8wQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ppc64]
+    os: [linux]
+
+  '@rolldown/binding-linux-s390x-gnu@1.0.0-rc.13':
+    resolution: {integrity: sha512-D/0Nlo8mQuxSMohNJUF2lDXWRsFDsHldfRRgD9bRgktj+EndGPj4DOV37LqDKPYS+osdyhZEH7fTakTAEcW7qg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [s390x]
+    os: [linux]
+
+  '@rolldown/binding-linux-x64-gnu@1.0.0-rc.13':
+    resolution: {integrity: sha512-eRrPvat2YaVQcwwKi/JzOP6MKf1WRnOCr+VaI3cTWz3ZoLcP/654z90lVCJ4dAuMEpPdke0n+qyAqXDZdIC4rA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+
+  '@rolldown/binding-linux-x64-musl@1.0.0-rc.13':
+    resolution: {integrity: sha512-PsdONiFRp8hR8KgVjTWjZ9s7uA3uueWL0t74/cKHfM4dR5zXYv4AjB8BvA+QDToqxAFg4ZkcVEqeu5F7inoz5w==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+
+  '@rolldown/binding-openharmony-arm64@1.0.0-rc.13':
+    resolution: {integrity: sha512-hCNXgC5dI3TVOLrPT++PKFNZ+1EtS0mLQwfXXXSUD/+rGlB65gZDwN/IDuxLpQP4x8RYYHqGomlUXzpO8aVI2w==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@rolldown/binding-wasm32-wasi@1.0.0-rc.13':
+    resolution: {integrity: sha512-viLS5C5et8NFtLWw9Sw3M/w4vvnVkbWkO7wSNh3C+7G1+uCkGpr6PcjNDSFcNtmXY/4trjPBqUfcOL+P3sWy/g==}
+    engines: {node: '>=14.0.0'}
+    cpu: [wasm32]
+
+  '@rolldown/binding-win32-arm64-msvc@1.0.0-rc.13':
+    resolution: {integrity: sha512-Fqa3Tlt1xL4wzmAYxGNFV36Hb+VfPc9PYU+E25DAnswXv3ODDu/yyWjQDbXMo5AGWkQVjLgQExuVu8I/UaZhPQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [win32]
+
+  '@rolldown/binding-win32-x64-msvc@1.0.0-rc.13':
+    resolution: {integrity: sha512-/pLI5kPkGEi44TDlnbio3St/5gUFeN51YWNAk/Gnv6mEQBOahRBh52qVFVBpmrnU01n2yysvBML9Ynu7K4kGAQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [win32]
+
   '@rolldown/pluginutils@1.0.0-beta.27':
     resolution: {integrity: sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==}
+
+  '@rolldown/pluginutils@1.0.0-rc.13':
+    resolution: {integrity: sha512-3ngTAv6F/Py35BsYbeeLeecvhMKdsKm4AoOETVhAA+Qc8nrA2I0kF7oa93mE9qnIurngOSpMnQ0x2nQY2FPviA==}
 
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
@@ -4539,6 +4631,9 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
+  '@tybys/wasm-util@0.10.1':
+    resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
+
   '@types/aria-query@5.0.4':
     resolution: {integrity: sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw==}
 
@@ -4753,13 +4848,13 @@ packages:
     resolution: {integrity: sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+      vite: '>=7.3.2'
 
   '@vitejs/plugin-react@5.1.4':
     resolution: {integrity: sha512-VIcFLdRi/VYRU8OL/puL7QXMYafHmqOnwTZY50U1JPlCNj30PxCMx65c494b1K9be9hX83KVt0+gTEwTWLqToA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+      vite: '>=7.3.2'
 
   '@vitest/coverage-v8@4.0.18':
     resolution: {integrity: sha512-7i+N2i0+ME+2JFZhfuz7Tg/FqKtilHjGyGvoHYQ6iLV0zahbsJ9sljC9OcFcPDbhYKCet+sG8SsVqlyGvPflZg==}
@@ -4777,7 +4872,7 @@ packages:
     resolution: {integrity: sha512-HhVd0MDnzzsgevnOWCBj5Otnzobjy5wLBe4EdeeFGv8luMsGcYqDuFRMcttKWZA5vVO8RFjexVovXvAM4JoJDQ==}
     peerDependencies:
       msw: ^2.4.9
-      vite: ^6.0.0 || ^7.0.0-0
+      vite: '>=7.3.2'
     peerDependenciesMeta:
       msw:
         optional: true
@@ -6472,10 +6567,6 @@ packages:
     engines: {node: '>= 6.x'}
     deprecated: 'No longer supported; please update to a newer version. Details: https://github.com/graphql/graphql-js#version-support'
 
-  graphql@16.12.0:
-    resolution: {integrity: sha512-DKKrynuQRne0PNpEbzuEdHlYOMksHSUI8Zc9Unei5gTsMNA2/vMpoMz/yKba50pejK56qj98qM0SjYxAKi13gQ==}
-    engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
-
   graphql@16.13.1:
     resolution: {integrity: sha512-gGgrVCoDKlIZ8fIqXBBb0pPKqDgki0Z/FSKNiQzSGj2uEYHr1tq5wmBegGwJx6QB5S5cM0khSBpi/JFHMCvsmQ==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
@@ -7131,6 +7222,76 @@ packages:
 
   lie@3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
+
+  lightningcss-android-arm64@1.32.0:
+    resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [android]
+
+  lightningcss-darwin-arm64@1.32.0:
+    resolution: {integrity: sha512-RzeG9Ju5bag2Bv1/lwlVJvBE3q6TtXskdZLLCyfg5pt+HLz9BqlICO7LZM7VHNTTn/5PRhHFBSjk5lc4cmscPQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  lightningcss-darwin-x64@1.32.0:
+    resolution: {integrity: sha512-U+QsBp2m/s2wqpUYT/6wnlagdZbtZdndSmut/NJqlCcMLTWp5muCrID+K5UJ6jqD2BFshejCYXniPDbNh73V8w==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
+  lightningcss-freebsd-x64@1.32.0:
+    resolution: {integrity: sha512-JCTigedEksZk3tHTTthnMdVfGf61Fky8Ji2E4YjUTEQX14xiy/lTzXnu1vwiZe3bYe0q+SpsSH/CTeDXK6WHig==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [freebsd]
+
+  lightningcss-linux-arm-gnueabihf@1.32.0:
+    resolution: {integrity: sha512-x6rnnpRa2GL0zQOkt6rts3YDPzduLpWvwAF6EMhXFVZXD4tPrBkEFqzGowzCsIWsPjqSK+tyNEODUBXeeVHSkw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm]
+    os: [linux]
+
+  lightningcss-linux-arm64-gnu@1.32.0:
+    resolution: {integrity: sha512-0nnMyoyOLRJXfbMOilaSRcLH3Jw5z9HDNGfT/gwCPgaDjnx0i8w7vBzFLFR1f6CMLKF8gVbebmkUN3fa/kQJpQ==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  lightningcss-linux-arm64-musl@1.32.0:
+    resolution: {integrity: sha512-UpQkoenr4UJEzgVIYpI80lDFvRmPVg6oqboNHfoH4CQIfNA+HOrZ7Mo7KZP02dC6LjghPQJeBsvXhJod/wnIBg==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  lightningcss-linux-x64-gnu@1.32.0:
+    resolution: {integrity: sha512-V7Qr52IhZmdKPVr+Vtw8o+WLsQJYCTd8loIfpDaMRWGUZfBOYEJeyJIkqGIDMZPwPx24pUMfwSxxI8phr/MbOA==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+
+  lightningcss-linux-x64-musl@1.32.0:
+    resolution: {integrity: sha512-bYcLp+Vb0awsiXg/80uCRezCYHNg1/l3mt0gzHnWV9XP1W5sKa5/TCdGWaR/zBM2PeF/HbsQv/j2URNOiVuxWg==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [linux]
+
+  lightningcss-win32-arm64-msvc@1.32.0:
+    resolution: {integrity: sha512-8SbC8BR40pS6baCM8sbtYDSwEVQd4JlFTOlaD3gWGHfThTcABnNDBda6eTZeqbofalIJhFx0qKzgHJmcPTnGdw==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  lightningcss-win32-x64-msvc@1.32.0:
+    resolution: {integrity: sha512-Amq9B/SoZYdDi1kFrojnoqPLxYhQ4Wo5XiL8EVJrVsB8ARoC1PWW6VGtT0WKCemjy8aC+louJnjS7U18x3b06Q==}
+    engines: {node: '>= 12.0.0'}
+    cpu: [x64]
+    os: [win32]
+
+  lightningcss@1.32.0:
+    resolution: {integrity: sha512-NXYBzinNrblfraPGyrbPoD19C1h9lfI/1mzgWYvXUTe414Gz/X1FD2XBZSZM7rRTrMA8JL3OtAaGifrIKhQ5yQ==}
+    engines: {node: '>= 12.0.0'}
 
   lilconfig@3.1.3:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
@@ -8288,16 +8449,6 @@ packages:
     resolution: {integrity: sha512-QgT5//D3jfjJb6Gsjxv0Slpj23ip+HtOpnNgnb2S5zU3CB26G/IDPGoy4RJB42wzFE46DRsstbW6tKHoKbhAxw==}
     engines: {node: '>=0.10.0'}
 
-  react-router@7.13.0:
-    resolution: {integrity: sha512-PZgus8ETambRT17BUm/LL8lX3Of+oiLaPuVTRH3l1eLvSPpKO3AvhAEb5N7ihAFZQrYDqkvvWfFh9p0z9VsjLw==}
-    engines: {node: '>=20.0.0'}
-    peerDependencies:
-      react: '>=18'
-      react-dom: '>=18'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-
   react-router@7.13.1:
     resolution: {integrity: sha512-td+xP4X2/6BJvZoX6xw++A2DdEi++YypA69bJUV5oVvqf6/9/9nNlD70YO1e9d3MyamJEBQFEzk6mbfDYbqrSA==}
     engines: {node: '>=20.0.0'}
@@ -8452,6 +8603,11 @@ packages:
   rimraf@6.1.3:
     resolution: {integrity: sha512-LKg+Cr2ZF61fkcaK1UdkH2yEBBKnYjTyWzTJT6KNPcSPaiT7HSdhtMXQuN5wkTX0Xu72KQ1l8S42rlmexS2hSA==}
     engines: {node: 20 || >=22}
+    hasBin: true
+
+  rolldown@1.0.0-rc.13:
+    resolution: {integrity: sha512-bvVj8YJmf0rq4pSFmH7laLa6pYrhghv3PRzrCdRAr23g66zOKVJ4wkvFtgohtPLWmthgg8/rkaqRHrpUEh0Zbw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
   rollup-plugin-visualizer@6.0.11:
@@ -9267,53 +9423,23 @@ packages:
     engines: {node: '>=16.0.0'}
     peerDependencies:
       '@vite-pwa/assets-generator': ^1.0.0
-      vite: ^3.1.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+      vite: '>=7.3.2'
       workbox-build: ^7.4.0
       workbox-window: ^7.4.0
     peerDependenciesMeta:
       '@vite-pwa/assets-generator':
         optional: true
 
-  vite@5.4.21:
-    resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || >=20.0.0
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      sass-embedded: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-
-  vite@7.3.1:
-    resolution: {integrity: sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==}
+  vite@8.0.7:
+    resolution: {integrity: sha512-P1PbweD+2/udplnThz3btF4cf6AgPky7kk23RtHUkJIU5BIxwPprhRGmOAHs6FTI7UiGbTNrgNP6jSYD6JaRnw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
       '@types/node': ^20.19.0 || >=22.12.0
+      '@vitejs/devtools': ^0.1.0
+      esbuild: '>=0.25.0'
       jiti: '>=1.21.0'
       less: ^4.0.0
-      lightningcss: ^1.21.0
       sass: ^1.70.0
       sass-embedded: ^1.70.0
       stylus: '>=0.54.8'
@@ -9324,11 +9450,13 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
+      '@vitejs/devtools':
+        optional: true
+      esbuild:
+        optional: true
       jiti:
         optional: true
       less:
-        optional: true
-      lightningcss:
         optional: true
       sass:
         optional: true
@@ -9705,22 +9833,6 @@ snapshots:
   '@apollo/cache-control-types@1.0.3(graphql@16.13.1)':
     dependencies:
       graphql: 16.13.1
-
-  '@apollo/client@4.1.1(graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)':
-    dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@16.12.0)
-      '@wry/caches': 1.0.1
-      '@wry/equality': 0.5.7
-      '@wry/trie': 0.5.0
-      graphql: 16.12.0
-      graphql-tag: 2.12.6(graphql@16.12.0)
-      optimism: 0.18.1
-      rxjs: 7.8.2
-      tslib: 2.8.1
-    optionalDependencies:
-      graphql-ws: 6.0.7(graphql@16.12.0)(ws@8.19.0)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   '@apollo/client@4.1.6(graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0))(graphql@16.13.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)':
     dependencies:
@@ -10654,7 +10766,23 @@ snapshots:
 
   '@electric-sql/pglite@0.3.16': {}
 
+  '@emnapi/core@1.9.1':
+    dependencies:
+      '@emnapi/wasi-threads': 1.2.0
+      tslib: 2.8.1
+    optional: true
+
   '@emnapi/runtime@1.8.1':
+    dependencies:
+      tslib: 2.8.1
+    optional: true
+
+  '@emnapi/runtime@1.9.1':
+    dependencies:
+      tslib: 2.8.1
+    optional: true
+
+  '@emnapi/wasi-threads@1.2.0':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -11633,10 +11761,6 @@ snapshots:
       graphql: 16.13.1
       tslib: 2.8.1
 
-  '@graphql-typed-document-node/core@3.2.0(graphql@16.12.0)':
-    dependencies:
-      graphql: 16.12.0
-
   '@graphql-typed-document-node/core@3.2.0(graphql@16.13.1)':
     dependencies:
       graphql: 16.13.1
@@ -12115,6 +12239,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@napi-rs/wasm-runtime@1.1.2(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)':
+    dependencies:
+      '@emnapi/core': 1.9.1
+      '@emnapi/runtime': 1.9.1
+      '@tybys/wasm-util': 0.10.1
+    optional: true
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -12166,6 +12297,8 @@ snapshots:
       estree-walker: 3.0.3
       magic-string: 0.27.0
 
+  '@oxc-project/types@0.123.0': {}
+
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -12212,7 +12345,58 @@ snapshots:
 
   '@repeaterjs/repeater@3.0.6': {}
 
+  '@rolldown/binding-android-arm64@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-darwin-arm64@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-darwin-x64@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-freebsd-x64@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-linux-arm-gnueabihf@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-linux-arm64-gnu@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-linux-arm64-musl@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-linux-ppc64-gnu@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-linux-s390x-gnu@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-linux-x64-gnu@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-linux-x64-musl@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-openharmony-arm64@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-wasm32-wasi@1.0.0-rc.13':
+    dependencies:
+      '@emnapi/core': 1.9.1
+      '@emnapi/runtime': 1.9.1
+      '@napi-rs/wasm-runtime': 1.1.2(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)
+    optional: true
+
+  '@rolldown/binding-win32-arm64-msvc@1.0.0-rc.13':
+    optional: true
+
+  '@rolldown/binding-win32-x64-msvc@1.0.0-rc.13':
+    optional: true
+
   '@rolldown/pluginutils@1.0.0-beta.27': {}
+
+  '@rolldown/pluginutils@1.0.0-rc.13': {}
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
@@ -12446,6 +12630,11 @@ snapshots:
   '@tsconfig/node14@1.0.3': {}
 
   '@tsconfig/node16@1.0.4': {}
+
+  '@tybys/wasm-util@0.10.1':
+    dependencies:
+      tslib: 2.8.1
+    optional: true
 
   '@types/aria-query@5.0.4': {}
 
@@ -12719,7 +12908,7 @@ snapshots:
       '@typescript-eslint/types': 8.57.1
       eslint-visitor-keys: 5.0.1
 
-  '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))':
+  '@vitejs/plugin-react@4.7.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
@@ -12727,11 +12916,11 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+      vite: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@5.1.4(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))':
+  '@vitejs/plugin-react@5.1.4(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
@@ -12739,11 +12928,11 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+      vite: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/coverage-v8@4.0.18(vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.0.18
@@ -12755,7 +12944,7 @@ snapshots:
       obug: 2.1.1
       std-env: 3.10.0
       tinyrainbow: 3.1.0
-      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/expect@4.0.18':
     dependencies:
@@ -12766,21 +12955,21 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.0.18(vite@7.3.1(@types/node@25.5.0)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/mocker@4.0.18(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@vitest/spy': 4.0.18
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.1(@types/node@25.5.0)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  '@vitest/mocker@4.0.18(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/mocker@4.0.18(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@vitest/spy': 4.0.18
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.1(@types/node@25.5.0)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/pretty-format@4.0.18':
     dependencies:
@@ -14939,21 +15128,10 @@ snapshots:
     dependencies:
       graphql: 16.13.1
 
-  graphql-tag@2.12.6(graphql@16.12.0):
-    dependencies:
-      graphql: 16.12.0
-      tslib: 2.8.1
-
   graphql-tag@2.12.6(graphql@16.13.1):
     dependencies:
       graphql: 16.13.1
       tslib: 2.8.1
-
-  graphql-ws@6.0.7(graphql@16.12.0)(ws@8.19.0):
-    dependencies:
-      graphql: 16.12.0
-    optionalDependencies:
-      ws: 8.19.0
 
   graphql-ws@6.0.7(graphql@16.13.1)(ws@8.19.0):
     dependencies:
@@ -14964,8 +15142,6 @@ snapshots:
   graphql@14.7.0:
     dependencies:
       iterall: 1.3.0
-
-  graphql@16.12.0: {}
 
   graphql@16.13.1: {}
 
@@ -15612,6 +15788,55 @@ snapshots:
   lie@3.3.0:
     dependencies:
       immediate: 3.0.6
+
+  lightningcss-android-arm64@1.32.0:
+    optional: true
+
+  lightningcss-darwin-arm64@1.32.0:
+    optional: true
+
+  lightningcss-darwin-x64@1.32.0:
+    optional: true
+
+  lightningcss-freebsd-x64@1.32.0:
+    optional: true
+
+  lightningcss-linux-arm-gnueabihf@1.32.0:
+    optional: true
+
+  lightningcss-linux-arm64-gnu@1.32.0:
+    optional: true
+
+  lightningcss-linux-arm64-musl@1.32.0:
+    optional: true
+
+  lightningcss-linux-x64-gnu@1.32.0:
+    optional: true
+
+  lightningcss-linux-x64-musl@1.32.0:
+    optional: true
+
+  lightningcss-win32-arm64-msvc@1.32.0:
+    optional: true
+
+  lightningcss-win32-x64-msvc@1.32.0:
+    optional: true
+
+  lightningcss@1.32.0:
+    dependencies:
+      detect-libc: 2.1.2
+    optionalDependencies:
+      lightningcss-android-arm64: 1.32.0
+      lightningcss-darwin-arm64: 1.32.0
+      lightningcss-darwin-x64: 1.32.0
+      lightningcss-freebsd-x64: 1.32.0
+      lightningcss-linux-arm-gnueabihf: 1.32.0
+      lightningcss-linux-arm64-gnu: 1.32.0
+      lightningcss-linux-arm64-musl: 1.32.0
+      lightningcss-linux-x64-gnu: 1.32.0
+      lightningcss-linux-x64-musl: 1.32.0
+      lightningcss-win32-arm64-msvc: 1.32.0
+      lightningcss-win32-x64-msvc: 1.32.0
 
   lilconfig@3.1.3: {}
 
@@ -16761,14 +16986,6 @@ snapshots:
 
   react-refresh@0.18.0: {}
 
-  react-router@7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      cookie: 1.1.1
-      react: 18.3.1
-      set-cookie-parser: 2.7.2
-    optionalDependencies:
-      react-dom: 18.3.1(react@18.3.1)
-
   react-router@7.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       cookie: 1.1.1
@@ -16947,13 +17164,35 @@ snapshots:
       glob: 13.0.6
       package-json-from-dist: 1.0.1
 
-  rollup-plugin-visualizer@6.0.11(rollup@4.59.0):
+  rolldown@1.0.0-rc.13:
+    dependencies:
+      '@oxc-project/types': 0.123.0
+      '@rolldown/pluginutils': 1.0.0-rc.13
+    optionalDependencies:
+      '@rolldown/binding-android-arm64': 1.0.0-rc.13
+      '@rolldown/binding-darwin-arm64': 1.0.0-rc.13
+      '@rolldown/binding-darwin-x64': 1.0.0-rc.13
+      '@rolldown/binding-freebsd-x64': 1.0.0-rc.13
+      '@rolldown/binding-linux-arm-gnueabihf': 1.0.0-rc.13
+      '@rolldown/binding-linux-arm64-gnu': 1.0.0-rc.13
+      '@rolldown/binding-linux-arm64-musl': 1.0.0-rc.13
+      '@rolldown/binding-linux-ppc64-gnu': 1.0.0-rc.13
+      '@rolldown/binding-linux-s390x-gnu': 1.0.0-rc.13
+      '@rolldown/binding-linux-x64-gnu': 1.0.0-rc.13
+      '@rolldown/binding-linux-x64-musl': 1.0.0-rc.13
+      '@rolldown/binding-openharmony-arm64': 1.0.0-rc.13
+      '@rolldown/binding-wasm32-wasi': 1.0.0-rc.13
+      '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.13
+      '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.13
+
+  rollup-plugin-visualizer@6.0.11(rolldown@1.0.0-rc.13)(rollup@4.59.0):
     dependencies:
       open: 8.4.2
       picomatch: 4.0.4
       source-map: 0.7.6
       yargs: 17.7.2
     optionalDependencies:
+      rolldown: 1.0.0-rc.13
       rollup: 4.59.0
 
   rollup@2.80.0:
@@ -16990,6 +17229,7 @@ snapshots:
       '@rollup/rollup-win32-x64-gnu': 4.59.0
       '@rollup/rollup-win32-x64-msvc': 4.59.0
       fsevents: 2.3.3
+    optional: true
 
   router@2.2.0:
     dependencies:
@@ -17967,63 +18207,53 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-plugin-pwa@1.2.0(vite@5.4.21(@types/node@25.5.0)(terser@5.46.1))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0):
+  vite-plugin-pwa@1.2.0(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))(workbox-build@7.4.0(@types/babel__core@7.20.5))(workbox-window@7.4.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: 5.4.21(@types/node@25.5.0)(terser@5.46.1)
+      vite: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       workbox-build: 7.4.0(@types/babel__core@7.20.5)
       workbox-window: 7.4.0
     transitivePeerDependencies:
       - supports-color
 
-  vite@5.4.21(@types/node@25.5.0)(terser@5.46.1):
+  vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
-      esbuild: 0.27.3
-      postcss: 8.5.8
-      rollup: 4.59.0
-    optionalDependencies:
-      '@types/node': 25.5.0
-      fsevents: 2.3.3
-      terser: 5.46.1
-
-  vite@7.3.1(@types/node@25.5.0)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
-    dependencies:
-      esbuild: 0.27.3
-      fdir: 6.5.0(picomatch@4.0.4)
+      lightningcss: 1.32.0
       picomatch: 4.0.4
       postcss: 8.5.8
-      rollup: 4.59.0
+      rolldown: 1.0.0-rc.13
       tinyglobby: 0.2.15
     optionalDependencies:
       '@types/node': 25.5.0
+      esbuild: 0.27.3
       fsevents: 2.3.3
       jiti: 1.21.7
       terser: 5.46.1
       tsx: 4.21.0
       yaml: 2.8.2
 
-  vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
+  vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
-      esbuild: 0.27.3
-      fdir: 6.5.0(picomatch@4.0.4)
+      lightningcss: 1.32.0
       picomatch: 4.0.4
       postcss: 8.5.8
-      rollup: 4.59.0
+      rolldown: 1.0.0-rc.13
       tinyglobby: 0.2.15
     optionalDependencies:
       '@types/node': 25.5.0
+      esbuild: 0.27.3
       fsevents: 2.3.3
       jiti: 2.6.1
       terser: 5.46.1
       tsx: 4.21.0
       yaml: 2.8.2
 
-  vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
+  vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(vite@7.3.1(@types/node@25.5.0)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@vitest/mocker': 4.0.18(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18
@@ -18040,16 +18270,17 @@ snapshots:
       tinyexec: 1.0.4
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 7.3.1(@types/node@25.5.0)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/node': 25.5.0
       jsdom: 29.0.0
     transitivePeerDependencies:
+      - '@vitejs/devtools'
+      - esbuild
       - jiti
       - less
-      - lightningcss
       - msw
       - sass
       - sass-embedded
@@ -18059,10 +18290,10 @@ snapshots:
       - tsx
       - yaml
 
-  vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
+  vitest@4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@29.0.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@vitest/mocker': 4.0.18(vite@8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18
@@ -18079,16 +18310,17 @@ snapshots:
       tinyexec: 1.0.4
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 7.3.1(@types/node@25.5.0)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 8.0.7(@types/node@25.5.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/node': 25.5.0
       jsdom: 29.0.0
     transitivePeerDependencies:
+      - '@vitejs/devtools'
+      - esbuild
       - jiti
       - less
-      - lightningcss
       - msw
       - sass
       - sass-embedded
