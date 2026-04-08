@@ -161,6 +161,7 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - [PR Lifecycle](./docs/pr-lifecycle.md) — branch protection, merge workflow
 - [CI/CD Pipeline](./docs/cicd.md) — pipeline details, troubleshooting
 - [Ollama Setup](./docs/ollama-setup.md) — self-hosted AI, Cloudflare tunnel/access, Firebase secrets, troubleshooting
+- [NAS Setup](./docs/nas-setup.md) — Synology WebDAV setup, port forwarding (required for Cloud Functions to reach NAS), troubleshooting
 - [AI Monitoring](./docs/ai-monitoring.md) — chat logging, raw data access, benchmark correlation
 - [SQL Analytics Setup](./docs/sql-analytics-setup.md) — PostgreSQL, Cloudflare tunnel, Docker setup, analytics dashboard
 - [Screenshot Evidence](./docs/screenshot-evidence.md) — Playwright screenshot utility for capturing all pages
