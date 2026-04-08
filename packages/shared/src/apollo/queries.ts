@@ -2312,3 +2312,61 @@ export const MARK_HSA_EXPENSE_REIMBURSED = gql`
   }
   ${HSA_EXPENSE_FIELDS}
 `;
+
+// ─── RAG Knowledge Base ──────────────────────────────────────────────
+export const INGEST_KNOWLEDGE_DOC = gql`
+  mutation IngestKnowledgeDoc(
+    $title: String!
+    $content: String!
+    $sourceUrl: String
+    $endpointId: ID
+    $embedModel: String!
+  ) {
+    ingestKnowledgeDoc(
+      title: $title
+      content: $content
+      sourceUrl: $sourceUrl
+      endpointId: $endpointId
+      embedModel: $embedModel
+    ) {
+      sourceId
+      title
+      chunkCount
+    }
+  }
+`;
+
+export const GET_KNOWLEDGE_SOURCES = gql`
+  query GetKnowledgeSources {
+    knowledgeSources {
+      id
+      title
+      sourceUrl
+      chunkCount
+      embedModel
+      createdAt
+    }
+  }
+`;
+
+export const RAG_SEARCH = gql`
+  query RagSearch(
+    $question: String!
+    $endpointId: ID
+    $embedModel: String!
+    $topK: Int
+  ) {
+    ragSearch(
+      question: $question
+      endpointId: $endpointId
+      embedModel: $embedModel
+      topK: $topK
+    ) {
+      id
+      text
+      sourceTitle
+      sourceUrl
+      score
+    }
+  }
+`;

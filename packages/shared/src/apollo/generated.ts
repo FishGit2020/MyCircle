@@ -659,6 +659,13 @@ export type HourlyForecast = {
   wind_speed: Scalars['Float']['output'];
 };
 
+export type IngestResult = {
+  __typename?: 'IngestResult';
+  chunkCount: Scalars['Int']['output'];
+  sourceId: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+};
+
 export type InterviewQuestion = {
   __typename?: 'InterviewQuestion';
   chapter: Scalars['String']['output'];
@@ -692,6 +699,25 @@ export type InterviewSessionSummary = {
   mode?: Maybe<Scalars['String']['output']>;
   questionPreview: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['String']['output']>;
+};
+
+export type KnowledgeSearchResult = {
+  __typename?: 'KnowledgeSearchResult';
+  id: Scalars['ID']['output'];
+  score: Scalars['Float']['output'];
+  sourceTitle: Scalars['String']['output'];
+  sourceUrl?: Maybe<Scalars['String']['output']>;
+  text: Scalars['String']['output'];
+};
+
+export type KnowledgeSource = {
+  __typename?: 'KnowledgeSource';
+  chunkCount: Scalars['Int']['output'];
+  createdAt: Scalars['String']['output'];
+  embedModel: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  sourceUrl?: Maybe<Scalars['String']['output']>;
+  title: Scalars['String']['output'];
 };
 
 export type LocationSearchResult = {
@@ -738,6 +764,7 @@ export type Mutation = {
   deleteWorshipSong: Scalars['Boolean']['output'];
   dumpQuotaToSql: Scalars['Boolean']['output'];
   generateResume: GeneratedResumeResult;
+  ingestKnowledgeDoc: IngestResult;
   markHsaExpenseReimbursed: HsaExpense;
   moveFile: CloudFile;
   permanentDeleteBook: Scalars['Boolean']['output'];
@@ -947,6 +974,15 @@ export type MutationGenerateResumeArgs = {
   endpointId?: InputMaybe<Scalars['ID']['input']>;
   jdText: Scalars['String']['input'];
   model: Scalars['String']['input'];
+};
+
+
+export type MutationIngestKnowledgeDocArgs = {
+  content: Scalars['String']['input'];
+  embedModel: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  sourceUrl?: InputMaybe<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
 };
 
 
@@ -1323,6 +1359,7 @@ export type Query = {
   hsaExpenses: Array<HsaExpense>;
   interviewSession?: Maybe<InterviewSessionDetail>;
   interviewSessions: Array<InterviewSessionSummary>;
+  knowledgeSources: Array<KnowledgeSource>;
   locationSearch: Array<LocationSearchResult>;
   nasConnectionStatus?: Maybe<NasConnectionStatus>;
   notes: Array<Note>;
@@ -1335,6 +1372,7 @@ export type Query = {
   radioStations: Array<RadioStation>;
   radioStationsByUuids: Array<RadioStation>;
   radioTags: Array<RadioTag>;
+  ragSearch: Array<KnowledgeSearchResult>;
   resumeActiveParseJob?: Maybe<ResumeParseJob>;
   resumeApplications: Array<ResumeApplication>;
   resumeFactBank?: Maybe<ResumeFactBank>;
@@ -1545,6 +1583,14 @@ export type QueryRadioStationsByUuidsArgs = {
 
 export type QueryRadioTagsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryRagSearchArgs = {
+  embedModel: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  question: Scalars['String']['input'];
+  topK?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -3508,3 +3554,29 @@ export type MarkHsaExpenseReimbursedMutationVariables = Exact<{
 
 
 export type MarkHsaExpenseReimbursedMutation = { __typename?: 'Mutation', markHsaExpenseReimbursed: { __typename?: 'HSAExpense', id: string, provider: string, dateOfService: string, amountCents: number, category: HsaExpenseCategory, description?: string | null, status: HsaExpenseStatus, createdAt: string, updatedAt: string, receipts: Array<{ __typename?: 'HSAReceipt', id: string, url: string, contentType: string, fileName: string, uploadedAt: string, trashedAt?: string | null }> } };
+
+export type IngestKnowledgeDocMutationVariables = Exact<{
+  title: Scalars['String']['input'];
+  content: Scalars['String']['input'];
+  sourceUrl?: InputMaybe<Scalars['String']['input']>;
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  embedModel: Scalars['String']['input'];
+}>;
+
+
+export type IngestKnowledgeDocMutation = { __typename?: 'Mutation', ingestKnowledgeDoc: { __typename?: 'IngestResult', sourceId: string, title: string, chunkCount: number } };
+
+export type GetKnowledgeSourcesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetKnowledgeSourcesQuery = { __typename?: 'Query', knowledgeSources: Array<{ __typename?: 'KnowledgeSource', id: string, title: string, sourceUrl?: string | null, chunkCount: number, embedModel: string, createdAt: string }> };
+
+export type RagSearchQueryVariables = Exact<{
+  question: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  embedModel: Scalars['String']['input'];
+  topK?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type RagSearchQuery = { __typename?: 'Query', ragSearch: Array<{ __typename?: 'KnowledgeSearchResult', id: string, text: string, sourceTitle: string, sourceUrl?: string | null, score: number }> };

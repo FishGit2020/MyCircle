@@ -733,6 +733,10 @@ export const typeDefs = `#graphql
     sqlToolCoOccurrences(days: Int = 30, minCount: Int = 2): [SqlToolCoOccurrence!]!
     sqlBenchmarkTrends(weeks: Int = 12): [SqlBenchmarkTrend!]!
     sqlChatSearch(query: String!, limit: Int = 20): [SqlChatSearchResult!]!
+
+    # RAG Knowledge Base (auth required)
+    knowledgeSources: [KnowledgeSource!]!
+    ragSearch(question: String!, endpointId: ID, embedModel: String!, topK: Int): [KnowledgeSearchResult!]!
   }
 
   type SqlQueryResult {
@@ -1508,6 +1512,30 @@ export const typeDefs = `#graphql
     error: String
   }
 
+  # RAG Knowledge Base
+  type KnowledgeSource {
+    id: ID!
+    title: String!
+    sourceUrl: String
+    chunkCount: Int!
+    embedModel: String!
+    createdAt: String!
+  }
+
+  type KnowledgeSearchResult {
+    id: ID!
+    text: String!
+    sourceTitle: String!
+    sourceUrl: String
+    score: Float!
+  }
+
+  type IngestResult {
+    sourceId: ID!
+    title: String!
+    chunkCount: Int!
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String, systemPrompt: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
@@ -1617,6 +1645,9 @@ export const typeDefs = `#graphql
     # GCP Quota Monitor (auth required)
     collectQuotaSnapshot: QuotaSnapshot!
     dumpQuotaToSql: Boolean!
+
+    # RAG Knowledge Base (auth required)
+    ingestKnowledgeDoc(title: String!, content: String!, sourceUrl: String, endpointId: ID, embedModel: String!): IngestResult!
   }
 
   schema {
