@@ -1648,6 +1648,10 @@ export const typeDefs = `#graphql
 
     # RAG Knowledge Base (auth required)
     ingestKnowledgeDoc(title: String!, content: String!, sourceUrl: String, endpointId: ID, embedModel: String!): IngestResult!
+    ingestKnowledgeFile(fileName: String!, fileBase64: String!, contentType: String!, endpointId: ID, embedModel: String!): IngestResult!
+    ingestCloudFile(fileId: ID!, endpointId: ID, embedModel: String!): IngestResult!
+    dumpKnowledgeToSql: Boolean!
+    offloadKnowledgeToSql: Boolean!
   }
 
   schema {

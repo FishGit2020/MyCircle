@@ -762,11 +762,15 @@ export type Mutation = {
   deleteSqlConnection: Scalars['Boolean']['output'];
   deleteWorshipSetlist: Scalars['Boolean']['output'];
   deleteWorshipSong: Scalars['Boolean']['output'];
+  dumpKnowledgeToSql: Scalars['Boolean']['output'];
   dumpQuotaToSql: Scalars['Boolean']['output'];
   generateResume: GeneratedResumeResult;
+  ingestCloudFile: IngestResult;
   ingestKnowledgeDoc: IngestResult;
+  ingestKnowledgeFile: IngestResult;
   markHsaExpenseReimbursed: HsaExpense;
   moveFile: CloudFile;
+  offloadKnowledgeToSql: Scalars['Boolean']['output'];
   permanentDeleteBook: Scalars['Boolean']['output'];
   permanentlyDeleteHsaReceipt: Scalars['Boolean']['output'];
   previewVoice: Scalars['String']['output'];
@@ -977,12 +981,28 @@ export type MutationGenerateResumeArgs = {
 };
 
 
+export type MutationIngestCloudFileArgs = {
+  embedModel: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  fileId: Scalars['ID']['input'];
+};
+
+
 export type MutationIngestKnowledgeDocArgs = {
   content: Scalars['String']['input'];
   embedModel: Scalars['String']['input'];
   endpointId?: InputMaybe<Scalars['ID']['input']>;
   sourceUrl?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
+};
+
+
+export type MutationIngestKnowledgeFileArgs = {
+  contentType: Scalars['String']['input'];
+  embedModel: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  fileBase64: Scalars['String']['input'];
+  fileName: Scalars['String']['input'];
 };
 
 
@@ -3580,3 +3600,33 @@ export type RagSearchQueryVariables = Exact<{
 
 
 export type RagSearchQuery = { __typename?: 'Query', ragSearch: Array<{ __typename?: 'KnowledgeSearchResult', id: string, text: string, sourceTitle: string, sourceUrl?: string | null, score: number }> };
+
+export type IngestKnowledgeFileMutationVariables = Exact<{
+  fileName: Scalars['String']['input'];
+  fileBase64: Scalars['String']['input'];
+  contentType: Scalars['String']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  embedModel: Scalars['String']['input'];
+}>;
+
+
+export type IngestKnowledgeFileMutation = { __typename?: 'Mutation', ingestKnowledgeFile: { __typename?: 'IngestResult', sourceId: string, title: string, chunkCount: number } };
+
+export type IngestCloudFileMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+  endpointId?: InputMaybe<Scalars['ID']['input']>;
+  embedModel: Scalars['String']['input'];
+}>;
+
+
+export type IngestCloudFileMutation = { __typename?: 'Mutation', ingestCloudFile: { __typename?: 'IngestResult', sourceId: string, title: string, chunkCount: number } };
+
+export type DumpKnowledgeToSqlMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DumpKnowledgeToSqlMutation = { __typename?: 'Mutation', dumpKnowledgeToSql: boolean };
+
+export type OffloadKnowledgeToSqlMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OffloadKnowledgeToSqlMutation = { __typename?: 'Mutation', offloadKnowledgeToSql: boolean };
