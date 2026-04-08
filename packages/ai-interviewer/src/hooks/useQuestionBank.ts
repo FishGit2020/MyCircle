@@ -1,11 +1,14 @@
 import { useCallback } from 'react';
 import {
   useQuery,
+  useLazyQuery,
   useMutation,
   GET_QUESTION_BANK,
   CREATE_INTERVIEW_QUESTION,
   UPDATE_INTERVIEW_QUESTION,
   DELETE_INTERVIEW_QUESTION,
+  EXPORT_QUESTION_BANK,
+  IMPORT_QUESTIONS,
 } from '@mycircle/shared';
 import type { BankQuestion } from './useInterviewStateMachine';
 
@@ -14,11 +17,19 @@ export interface QuestionBankData {
   questions: BankQuestion[];
 }
 
+export interface ImportResult {
+  added: number;
+  skipped: number;
+  errors: string[];
+}
+
 export function useQuestionBank() {
   const { data: queryData, loading, error: queryError, refetch } = useQuery(GET_QUESTION_BANK);
   const [createMutation] = useMutation(CREATE_INTERVIEW_QUESTION);
   const [updateMutation] = useMutation(UPDATE_INTERVIEW_QUESTION);
   const [deleteMutation] = useMutation(DELETE_INTERVIEW_QUESTION);
+  const [exportQuery] = useLazyQuery(EXPORT_QUESTION_BANK, { fetchPolicy: 'network-only' });
+  const [importMutation] = useMutation(IMPORT_QUESTIONS);
 
   const data: QuestionBankData | null = queryData?.questionBank
     ? {
@@ -81,6 +92,53 @@ export function useQuestionBank() {
     [deleteMutation, refetch],
   );
 
+  const exportQuestions = useCallback(
+    async (chapter?: string): Promise<boolean> => {
+      try {
+        const { data: result } = await exportQuery({
+          variables: { chapter: chapter || null },
+        });
+        const json = result?.exportQuestionBank;
+        if (!json) return false;
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = chapter ? `questions-${chapter}.json` : 'questions.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [exportQuery],
+  );
+
+  const importQuestions = useCallback(
+    async (questions: Omit<BankQuestion, 'id'>[]): Promise<ImportResult | null> => {
+      try {
+        const { data: result } = await importMutation({
+          variables: {
+            questions: questions.map((q) => ({
+              chapter: q.chapter,
+              chapterSlug: q.chapterSlug,
+              difficulty: q.difficulty,
+              title: q.title,
+              description: q.description,
+              tags: q.tags ?? [],
+            })),
+          },
+        });
+        await refetch();
+        return (result?.importQuestions as ImportResult) ?? null;
+      } catch {
+        return null;
+      }
+    },
+    [importMutation, refetch],
+  );
+
   return {
     data,
     loading,
@@ -89,5 +147,7 @@ export function useQuestionBank() {
     createQuestion,
     updateQuestion,
     deleteQuestion,
+    exportQuestions,
+    importQuestions,
   };
 }

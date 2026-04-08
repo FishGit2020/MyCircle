@@ -13,6 +13,15 @@ export enum HSAExpenseStatus {
   REIMBURSED = 'REIMBURSED',
 }
 
+export interface HSAReceipt {
+  id: string;
+  url: string;
+  contentType: string;
+  fileName: string;
+  uploadedAt: string;
+  trashedAt: string | null;
+}
+
 export interface HSAExpense {
   id: string;
   provider: string;
@@ -21,8 +30,7 @@ export interface HSAExpense {
   category: HSAExpenseCategory;
   description: string | null;
   status: HSAExpenseStatus;
-  receiptUrl: string | null;
-  receiptContentType: string | null;
+  receipts: HSAReceipt[];
   createdAt: string;
   updatedAt: string;
 }

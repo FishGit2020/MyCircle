@@ -9,150 +9,87 @@ export interface NasConnectionConfig {
   lastTestedAt?: string;
 }
 
-export class NasFileStationClient {
-  private sid: string | null = null;
+export class NasWebDavClient {
+  private authHeader: string;
 
-  constructor(private baseUrl: string) {}
+  constructor(
+    private baseUrl: string,
+    username: string,
+    password: string,
+  ) {
+    this.authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
+  }
 
-  async login(username: string, password: string): Promise<void> {
-    const url = new URL('/webapi/auth.cgi', this.baseUrl);
-    url.searchParams.set('api', 'SYNO.API.Auth');
-    url.searchParams.set('version', '3');
-    url.searchParams.set('method', 'login');
-    url.searchParams.set('account', username);
-    url.searchParams.set('passwd', password);
-    url.searchParams.set('session', 'FileStation');
-    url.searchParams.set('format', 'sid');
+  private url(path: string): string {
+    const cleanBase = this.baseUrl.replace(/\/$/, '');
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    return `${cleanBase}${cleanPath}`;
+  }
 
-    const resp = await fetch(url.toString(), {
-      method: 'GET',
+  /** Create a folder via MKCOL. Treats 405 (already exists) as success. */
+  async createFolder(folderPath: string): Promise<void> {
+    const resp = await fetch(this.url(folderPath), {
+      method: 'MKCOL',
+      headers: { Authorization: this.authHeader },
       signal: AbortSignal.timeout(15_000),
     });
-    if (!resp.ok) {
-      throw new Error(`NAS login HTTP error: ${resp.status}`);
-    }
-    const data = await resp.json() as { success: boolean; data?: { sid: string }; error?: { code: number } };
-    if (!data.success || !data.data?.sid) {
-      throw new Error(`NAS login failed: error code ${data.error?.code ?? 'unknown'}`);
-    }
-    this.sid = data.data.sid;
-  }
-
-  async logout(): Promise<void> {
-    if (!this.sid) return;
-    try {
-      const url = new URL('/webapi/auth.cgi', this.baseUrl);
-      url.searchParams.set('api', 'SYNO.API.Auth');
-      url.searchParams.set('version', '3');
-      url.searchParams.set('method', 'logout');
-      url.searchParams.set('session', 'FileStation');
-      url.searchParams.set('_sid', this.sid);
-      await fetch(url.toString(), { signal: AbortSignal.timeout(10_000) });
-    } catch {
-      // Logout failures are non-fatal
-    } finally {
-      this.sid = null;
+    // 201 = created, 405 = already exists — both OK
+    if (!resp.ok && resp.status !== 405) {
+      throw new Error(`NAS createFolder '${folderPath}' failed: HTTP ${resp.status}`);
     }
   }
 
-  /** Create a folder. Treats error code 1101 (already exists) as success. */
-  async createFolder(folderPath: string, name: string): Promise<void> {
-    if (!this.sid) throw new Error('Not logged in');
-    const url = new URL('/webapi/entry.cgi', this.baseUrl);
-    const body = new URLSearchParams({
-      api: 'SYNO.FileStation.CreateFolder',
-      version: '2',
-      method: 'create',
-      folder_path: `["${folderPath}"]`,
-      name: `["${name}"]`,
-      force_parent: 'true',
-      _sid: this.sid,
-    });
-    const resp = await fetch(url.toString(), {
-      method: 'POST',
-      body,
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!resp.ok) throw new Error(`NAS createFolder HTTP error: ${resp.status}`);
-    const data = await resp.json() as { success: boolean; error?: { code: number } };
-    // Error 1101 = folder already exists — treat as success
-    if (!data.success && data.error?.code !== 1101) {
-      throw new Error(`NAS createFolder failed: error code ${data.error?.code ?? 'unknown'}`);
-    }
-  }
-
-  /** Upload a buffer to the NAS via FileStation Upload API. */
+  /** Upload a buffer to the NAS via WebDAV PUT. */
   async upload(destFolder: string, fileName: string, buffer: Buffer): Promise<void> {
-    if (!this.sid) throw new Error('Not logged in');
-    const url = new URL('/webapi/entry.cgi', this.baseUrl);
-    url.searchParams.set('api', 'SYNO.FileStation.Upload');
-    url.searchParams.set('version', '2');
-    url.searchParams.set('method', 'upload');
-    url.searchParams.set('_sid', this.sid);
-
-    const formData = new FormData();
-    formData.append('path', destFolder);
-    formData.append('create_parents', 'true');
-    formData.append('overwrite', 'true');
-    const blob = new Blob([new Uint8Array(buffer)], { type: 'audio/mpeg' });
-    formData.append('file', blob, fileName);
-
-    const resp = await fetch(url.toString(), {
-      method: 'POST',
-      body: formData,
+    const filePath = `${destFolder}/${fileName}`;
+    const resp = await fetch(this.url(filePath), {
+      method: 'PUT',
+      headers: {
+        Authorization: this.authHeader,
+        'Content-Type': 'application/octet-stream',
+      },
+      body: new Uint8Array(buffer),
       signal: AbortSignal.timeout(120_000),
     });
-    if (!resp.ok) throw new Error(`NAS upload HTTP error: ${resp.status}`);
-    const data = await resp.json() as { success: boolean; error?: { code: number } };
-    if (!data.success) {
-      throw new Error(`NAS upload failed: error code ${data.error?.code ?? 'unknown'}`);
+    // 201 = created, 204 = overwritten
+    if (!resp.ok) {
+      throw new Error(`NAS upload failed: HTTP ${resp.status}`);
     }
   }
 
-  /** Download a file from the NAS via FileStation Download API. Returns a Buffer. */
+  /** Download a file from the NAS via WebDAV GET. Returns a Buffer. */
   async download(filePath: string): Promise<Buffer> {
-    if (!this.sid) throw new Error('Not logged in');
-    const url = new URL('/webapi/entry.cgi', this.baseUrl);
-    url.searchParams.set('api', 'SYNO.FileStation.Download');
-    url.searchParams.set('version', '2');
-    url.searchParams.set('method', 'download');
-    url.searchParams.set('path', JSON.stringify([filePath]));
-    url.searchParams.set('mode', 'download');
-    url.searchParams.set('_sid', this.sid);
-
-    const resp = await fetch(url.toString(), {
+    const resp = await fetch(this.url(filePath), {
+      method: 'GET',
+      headers: { Authorization: this.authHeader },
       signal: AbortSignal.timeout(120_000),
     });
-    if (!resp.ok) throw new Error(`NAS download HTTP error: ${resp.status}`);
+    if (!resp.ok) throw new Error(`NAS download failed: HTTP ${resp.status}`);
     const arrayBuffer = await resp.arrayBuffer();
     return Buffer.from(arrayBuffer);
   }
 }
 
-/** Test a NAS connection by logging in and attempting to list the destination folder. */
+/** Test a NAS connection by checking the destination folder via WebDAV PROPFIND. */
 export async function testNasConnection(
   config: NasConnectionConfig,
 ): Promise<{ ok: boolean; error?: string }> {
-  const client = new NasFileStationClient(config.nasUrl);
   try {
-    await client.login(config.username, config.password);
-    // List the dest folder as a connectivity check
-    const url = new URL('/webapi/entry.cgi', config.nasUrl);
-    url.searchParams.set('api', 'SYNO.FileStation.List');
-    url.searchParams.set('version', '2');
-    url.searchParams.set('method', 'list_share');
-    // @ts-ignore — sid is private but we access via the workaround below
-    const sid = (client as any).sid as string;
-    url.searchParams.set('_sid', sid);
-    const resp = await fetch(url.toString(), { signal: AbortSignal.timeout(15_000) });
-    if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}` };
-    const data = await resp.json() as { success: boolean; error?: { code: number } };
-    if (!data.success) return { ok: false, error: `FileStation error code ${data.error?.code}` };
-    return { ok: true };
+    const baseUrl = config.nasUrl.replace(/\/$/, '');
+    const folder = config.destFolder.startsWith('/') ? config.destFolder : `/${config.destFolder}`;
+    const resp = await fetch(`${baseUrl}${folder}`, {
+      method: 'PROPFIND',
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${config.username}:${config.password}`).toString('base64')}`,
+        Depth: '0',
+      },
+      signal: AbortSignal.timeout(15_000),
+    });
+    // 207 Multi-Status = PROPFIND success
+    if (resp.status === 207) return { ok: true };
+    return { ok: false, error: `HTTP ${resp.status}` };
   } catch (err: any) {
     return { ok: false, error: err.message || String(err) };
-  } finally {
-    await client.logout();
   }
 }
 

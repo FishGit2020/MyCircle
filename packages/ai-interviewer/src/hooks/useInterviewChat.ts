@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   useMutation,
   useLazyQuery,
@@ -155,6 +155,17 @@ interface InterviewChatState {
 }
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+export interface TimerConfig {
+  enabled: boolean;
+  totalMinutes: number;
+  startTimestamp: number | null;
+}
+
+export const DEFAULT_TIMER_CONFIG: TimerConfig = {
+  enabled: false,
+  totalMinutes: 30,
+  startTimestamp: null,
+};
 
 export interface InterviewSession {
   id: string;
@@ -162,6 +173,10 @@ export interface InterviewSession {
   messageCount: number;
   updatedAt: string | null;
   createdAt: string | null;
+  chapter?: string | null;
+  difficulty?: string | null;
+  questionCount?: number | null;
+  overallScore?: number | null;
 }
 
 export function useInterviewChat() {
@@ -188,10 +203,42 @@ export function useInterviewChat() {
   const interviewStateRef = useRef<InterviewState | null>(interviewState);
   const [evaluating, setEvaluating] = useState(false);
 
+  // Timer state
+  const [timerConfig, setTimerConfig] = useState<TimerConfig>(DEFAULT_TIMER_CONFIG);
+  const [timerElapsedMs, setTimerElapsedMs] = useState(0);
+  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerExpiredRef = useRef(false);
+  const endInterviewRef = useRef<((endpointId?: string, model?: string) => void) | null>(null);
+
   // Keep ref in sync
   useEffect(() => {
     interviewStateRef.current = interviewState;
   }, [interviewState]);
+
+  // Timer countdown
+  useEffect(() => {
+    if (!timerConfig.enabled || timerConfig.startTimestamp == null) {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+      return;
+    }
+
+    timerIntervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - (timerConfig.startTimestamp ?? Date.now());
+      setTimerElapsedMs(elapsed);
+      const totalMs = timerConfig.totalMinutes * 60 * 1000;
+      if (elapsed >= totalMs && !timerExpiredRef.current) {
+        timerExpiredRef.current = true;
+        endInterviewRef.current?.();
+      }
+    }, 1000);
+
+    return () => {
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    };
+  }, [timerConfig.enabled, timerConfig.startTimestamp, timerConfig.totalMinutes]);
 
   // Persist to localStorage whenever messages change
   useEffect(() => {
@@ -242,6 +289,26 @@ export function useInterviewChat() {
               config: interviewStateRef.current?.config
                 ? (interviewStateRef.current.config as unknown as Record<string, unknown>)
                 : undefined,
+              ...(() => {
+                const is = interviewStateRef.current;
+                if (!is || is.config.mode !== 'question-bank') return {};
+                const scoreList = (is.scores ?? []) as EvaluationScore[];
+                const chapter = is.config.chapters?.[0] || undefined;
+                const difficulty = is.config.difficulty || undefined;
+                const questionCount = is.config.questionCount || undefined;
+                if (scoreList.length === 0) return { chapter, difficulty, questionCount };
+                const avg = (key: keyof EvaluationScore) => {
+                  const vals = scoreList.map((s) => Number(s[key])).filter((v) => !isNaN(v));
+                  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : undefined;
+                };
+                const avgT = avg('technical');
+                const avgPS = avg('problemSolving');
+                const avgC = avg('communication');
+                const avgD = avg('depth');
+                const scores = [avgT, avgPS, avgC, avgD].filter((v) => v !== undefined) as number[];
+                const overallScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : undefined;
+                return { chapter, difficulty, questionCount, overallScore, avgTechnical: avgT, avgProblemSolving: avgPS, avgCommunication: avgC, avgDepth: avgD };
+              })(),
             },
           },
         });
@@ -581,6 +648,11 @@ export function useInterviewChat() {
     );
   }, [sendRawMessage, nextQuestion]);
 
+  // Keep endInterviewRef in sync for timer callback
+  useEffect(() => {
+    endInterviewRef.current = endInterview;
+  }, [endInterview]);
+
   const retry = useCallback(() => {
     if (!lastFailedRef.current) return;
     const { content, endpointId, model } = lastFailedRef.current;
@@ -605,6 +677,9 @@ export function useInterviewChat() {
     setSaveStatus('idle');
     setInterviewState(null);
     interviewStateRef.current = null;
+    setTimerConfig(DEFAULT_TIMER_CONFIG);
+    setTimerElapsedMs(0);
+    timerExpiredRef.current = false;
   }, []);
 
   // Load sessions list via GraphQL
@@ -677,6 +752,22 @@ export function useInterviewChat() {
     } catch { /* */ }
   }, [deleteSessionMutation]);
 
+  const startTimer = useCallback(() => {
+    setTimerConfig((prev) => {
+      if (!prev.enabled) return prev;
+      return { ...prev, startTimestamp: Date.now() };
+    });
+    timerExpiredRef.current = false;
+  }, []);
+
+  const timerIsExpired = useMemo(
+    () =>
+      timerConfig.enabled &&
+      timerConfig.startTimestamp != null &&
+      timerElapsedMs >= timerConfig.totalMinutes * 60 * 1000,
+    [timerConfig, timerElapsedMs],
+  );
+
   const hasPersistedSession = persisted !== null && persisted.messages.length > 0;
 
   // Derived structured mode values
@@ -704,6 +795,12 @@ export function useInterviewChat() {
     isStructuredMode,
     scores,
     isLastQuestion: isLast,
+    // Timer
+    timerConfig,
+    timerElapsedMs,
+    timerIsExpired,
+    setTimerConfig,
+    startTimer,
     // Actions
     setQuestion,
     setDocument,

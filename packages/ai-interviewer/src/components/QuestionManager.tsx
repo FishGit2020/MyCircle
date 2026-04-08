@@ -1,7 +1,8 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { CHAPTERS, toSlug } from '../hooks/useInterviewStateMachine';
 import type { BankQuestion, Difficulty } from '../hooks/useInterviewStateMachine';
+import type { ImportResult } from '../hooks/useQuestionBank';
 
 interface QuestionManagerProps {
   questions: BankQuestion[];
@@ -9,6 +10,8 @@ interface QuestionManagerProps {
   onCreateQuestion: (question: Omit<BankQuestion, 'id'>) => Promise<BankQuestion | null>;
   onUpdateQuestion: (id: string, updates: Partial<BankQuestion>) => Promise<BankQuestion | null>;
   onDeleteQuestion: (id: string) => Promise<boolean>;
+  onExportQuestions?: (chapter?: string) => Promise<boolean>;
+  onImportQuestions?: (questions: Omit<BankQuestion, 'id'>[]) => Promise<ImportResult | null>;
 }
 
 type ViewMode = 'list' | 'detail';
@@ -32,6 +35,8 @@ export default function QuestionManager({
   onCreateQuestion,
   onUpdateQuestion,
   onDeleteQuestion,
+  onExportQuestions,
+  onImportQuestions,
 }: QuestionManagerProps) {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -39,6 +44,8 @@ export default function QuestionManager({
   const [isNew, setIsNew] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -163,6 +170,47 @@ export default function QuestionManager({
     [onDeleteQuestion],
   );
 
+  const handleExport = useCallback(async () => {
+    if (!onExportQuestions) return;
+    await onExportQuestions(filterChapter || undefined);
+  }, [onExportQuestions, filterChapter]);
+
+  const handleImportFile = useCallback(
+    async (file: File) => {
+      if (!onImportQuestions) return;
+      try {
+        const text = await file.text();
+        const bundle = JSON.parse(text);
+        const qs: Omit<BankQuestion, 'id'>[] = Array.isArray(bundle.questions)
+          ? bundle.questions.filter(
+              (q: unknown) =>
+                q &&
+                typeof q === 'object' &&
+                'title' in q &&
+                'chapter' in q &&
+                'difficulty' in q &&
+                'description' in q,
+            )
+          : [];
+        if (qs.length === 0) {
+          setImportStatus(t('aiInterviewer.importFileInvalid'));
+          return;
+        }
+        const result = await onImportQuestions(qs);
+        if (result) {
+          setImportStatus(`${t('aiInterviewer.importSuccess')} (+${result.added}, skip ${result.skipped})`);
+        } else {
+          setImportStatus(t('aiInterviewer.importError'));
+        }
+      } catch {
+        setImportStatus(t('aiInterviewer.importFileInvalid'));
+      }
+    },
+    [onImportQuestions, t],
+  );
+
+
+
   if (viewMode === 'detail') {
     return (
       <div className="flex flex-col h-full min-h-0 p-4 gap-4">
@@ -282,7 +330,7 @@ export default function QuestionManager({
   return (
     <div className="flex flex-col h-full min-h-0 p-4 gap-3">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <button
           type="button"
           onClick={onBack}
@@ -290,14 +338,51 @@ export default function QuestionManager({
         >
           {t('aiInterviewer.backToSetup')}
         </button>
-        <button
-          type="button"
-          onClick={openNewForm}
-          className="rounded-lg bg-blue-600 dark:bg-blue-500 text-white px-3 py-1.5 text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
-        >
-          {t('aiInterviewer.addQuestion')}
-        </button>
+        <div className="flex items-center gap-2">
+          {onExportQuestions && (
+            <button
+              type="button"
+              onClick={handleExport}
+              className="rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1.5 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              {t('aiInterviewer.exportQuestions')}
+            </button>
+          )}
+          {onImportQuestions && (
+            <>
+              <button
+                type="button"
+                onClick={() => importInputRef.current?.click()}
+                className="rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1.5 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                {t('aiInterviewer.importQuestions')}
+              </button>
+              <input
+                ref={importInputRef}
+                type="file"
+                accept=".json"
+                className="hidden"
+                aria-label={t('aiInterviewer.importQuestions')}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImportFile(file);
+                  e.target.value = '';
+                }}
+              />
+            </>
+          )}
+          <button
+            type="button"
+            onClick={openNewForm}
+            className="rounded-lg bg-blue-600 dark:bg-blue-500 text-white px-3 py-1.5 text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+          >
+            {t('aiInterviewer.addQuestion')}
+          </button>
+        </div>
       </div>
+      {importStatus && (
+        <p className="text-xs text-gray-600 dark:text-gray-400">{importStatus}</p>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-2">

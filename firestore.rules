@@ -104,6 +104,11 @@ service cloud.firestore {
       // HSA Expenses subcollection - private per-user expense tracking
       match /hsaExpenses/{expenseId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        // HSA Receipts subcollection - per-expense receipt files with recycle bin support
+        match /receipts/{receiptId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
       }
 
       // NAS connection config - private per-user NAS credentials and status

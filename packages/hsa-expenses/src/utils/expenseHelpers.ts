@@ -29,6 +29,22 @@ export function isFileTooLarge(file: File, maxMB: number): boolean {
   return file.size > maxMB * 1024 * 1024;
 }
 
+export function isHeicFile(file: File): boolean {
+  return (
+    file.type === 'image/heic' ||
+    file.type === 'image/heif' ||
+    /\.(heic|heif)$/i.test(file.name)
+  );
+}
+
+export async function convertHeicToJpeg(file: File): Promise<File> {
+  const heic2any = (await import('heic2any')).default;
+  const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+  const resultBlob = Array.isArray(blob) ? blob[0] : blob;
+  const jpegName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+  return new File([resultBlob], jpegName, { type: 'image/jpeg' });
+}
+
 export const CATEGORY_OPTIONS: { value: HSAExpenseCategory; labelKey: string }[] = [
   { value: HSAExpenseCategory.MEDICAL, labelKey: 'hsaExpenses.medical' },
   { value: HSAExpenseCategory.DENTAL, labelKey: 'hsaExpenses.dental' },
