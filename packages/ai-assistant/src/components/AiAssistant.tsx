@@ -8,6 +8,7 @@ import type { ChatMessage as ChatMessageType } from '../hooks/useAiChat';
 import ToolCallDisplay from './ToolCallDisplay';
 
 const AiMonitor = lazy(() => import('./AiMonitor'));
+const KnowledgeBase = lazy(() => import('./KnowledgeBase'));
 
 const SUGGESTION_KEYS = [
   'ai.suggestWeather',
@@ -59,9 +60,10 @@ export default function AiAssistant() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
-  const VALID_TABS = new Set(['chat', 'monitor']);
-  const activeTab: 'chat' | 'monitor' = tabParam && VALID_TABS.has(tabParam) ? (tabParam as any) : 'chat'; // eslint-disable-line @typescript-eslint/no-explicit-any
-  const setActiveTab = useCallback((tab: 'chat' | 'monitor') => {
+  const VALID_TABS = new Set(['chat', 'monitor', 'knowledge-base']);
+  type TabId = 'chat' | 'monitor' | 'knowledge-base';
+  const activeTab: TabId = tabParam && VALID_TABS.has(tabParam) ? (tabParam as TabId) : 'chat';
+  const setActiveTab = useCallback((tab: TabId) => {
     setSearchParams(tab === 'chat' ? {} : { tab }, { replace: true });
   }, [setSearchParams]);
 
@@ -261,10 +263,29 @@ export default function AiAssistant() {
         >
           {t('ai.tabMonitor')}
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('knowledge-base')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'knowledge-base'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+          }`}
+        >
+          {t('ai.knowledgeBase.tab')}
+        </button>
       </div>
 
       {/* Tab content */}
-      {activeTab === 'monitor' ? (
+      {activeTab === 'knowledge-base' ? (
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">Loading...</div>}>
+          <KnowledgeBase onAskAi={(context) => {
+            setActiveTab('chat');
+            // Inject context as a prefilled system message via sendMessage
+            sendMessage(`Based on the following knowledge base context, please help me analyze and answer questions about this information:\n\n${context}`);
+          }} />
+        </Suspense>
+      ) : activeTab === 'monitor' ? (
         <Suspense fallback={<div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500">Loading...</div>}>
           <AiMonitor />
         </Suspense>

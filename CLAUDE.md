@@ -211,6 +211,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 - Firestore `books/{bookId}` (5 new fields) + `books/{bookId}/zipJobs/{jobId}` (new subcollection) · Firebase Storage `books/{bookId}/audiobook.zip` (new file) (024-audiobook-batch-download)
 - TypeScript 5.x + React 18, `@mycircle/shared` (Apollo re-exports, i18n, StorageKeys, PageContent), Firebase Cloud Functions v2, Zod (input validation), Tailwind CSS (025-hsa-expense-tracker)
 - Firestore `users/{uid}/hsaExpenses/{expenseId}` + Firebase Storage `users/{uid}/hsa-receipts/` (025-hsa-expense-tracker)
+- TypeScript 5.x (frontend + Cloud Functions Node 22) + React 18, Apollo Client (via `@mycircle/shared`), Firebase Cloud Functions v2, Firebase Admin SDK (Storage + Firestore) (026-rag-knowledge-base)
+- Firebase Storage (`users/{uid}/knowledge-base.json` for chunks+embeddings), Firestore (`users/{uid}/knowledgeMeta/{sourceId}` for source metadata) (026-rag-knowledge-base)
 
 ## Recent Changes
 - 011-daily-log-enhancements: Enhanced daily-log MFE with mood tracking (5 moods), tag chips, full-text search with highlight, stats view (streak, 30-day chart, mood distribution, top tags)
