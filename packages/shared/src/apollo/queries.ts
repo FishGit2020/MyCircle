@@ -2370,3 +2370,47 @@ export const RAG_SEARCH = gql`
     }
   }
 `;
+
+export const INGEST_KNOWLEDGE_FILE = gql`
+  mutation IngestKnowledgeFile(
+    $fileName: String!
+    $fileBase64: String!
+    $contentType: String!
+    $endpointId: ID
+    $embedModel: String!
+  ) {
+    ingestKnowledgeFile(
+      fileName: $fileName
+      fileBase64: $fileBase64
+      contentType: $contentType
+      endpointId: $endpointId
+      embedModel: $embedModel
+    ) {
+      sourceId
+      title
+      chunkCount
+    }
+  }
+`;
+
+export const INGEST_CLOUD_FILE = gql`
+  mutation IngestCloudFile($fileId: ID!, $endpointId: ID, $embedModel: String!) {
+    ingestCloudFile(fileId: $fileId, endpointId: $endpointId, embedModel: $embedModel) {
+      sourceId
+      title
+      chunkCount
+    }
+  }
+`;
+
+export const DUMP_KNOWLEDGE_TO_SQL = gql`
+  mutation DumpKnowledgeToSql {
+    dumpKnowledgeToSql
+  }
+`;
+
+export const OFFLOAD_KNOWLEDGE_TO_SQL = gql`
+  mutation OffloadKnowledgeToSql {
+    offloadKnowledgeToSql
+  }
+`;

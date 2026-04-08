@@ -36,6 +36,41 @@ function toTimestampString(val: unknown): string {
   return new Date().toISOString();
 }
 
+// ─── Text Extraction ────────────────────────────────────────────────
+
+async function extractTextFromPdf(buffer: Buffer): Promise<string> {
+  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs' as string) as {
+    getDocument: (src: { data: Uint8Array }) => { promise: Promise<{
+      numPages: number;
+      getPage: (n: number) => Promise<{
+        getTextContent: () => Promise<{ items: Array<{ str: string }> }>;
+      }>;
+    }> };
+  };
+  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+  const pages: string[] = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    pages.push(content.items.map((item) => item.str).join(' '));
+  }
+  return pages.join('\n');
+}
+
+async function extractTextFromDocx(buffer: Buffer): Promise<string> {
+  const mammoth = await import('mammoth');
+  const result = await mammoth.extractRawText({ buffer });
+  return result.value;
+}
+
+function extractText(buffer: Buffer, contentType: string): Promise<string> {
+  if (contentType === 'application/pdf') return extractTextFromPdf(buffer);
+  if (contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+      contentType === 'application/msword') return extractTextFromDocx(buffer);
+  // Plain text / markdown / JSON — direct UTF-8
+  return Promise.resolve(buffer.toString('utf-8'));
+}
+
 // ─── Chunking ───────────────────────────────────────────────────────
 
 function chunkText(content: string, maxChunkSize = 1500, overlap = 100): string[] {
@@ -44,7 +79,6 @@ function chunkText(content: string, maxChunkSize = 1500, overlap = 100): string[
   let current = '';
 
   for (const para of paragraphs) {
-    // If a single paragraph exceeds max, split at sentence boundaries
     if (para.length > maxChunkSize) {
       if (current.trim()) {
         chunks.push(current.trim());
@@ -55,7 +89,6 @@ function chunkText(content: string, maxChunkSize = 1500, overlap = 100): string[
       for (const sentence of sentences) {
         if (sentenceBuffer.length + sentence.length > maxChunkSize && sentenceBuffer.trim()) {
           chunks.push(sentenceBuffer.trim());
-          // Overlap: take the last `overlap` chars
           sentenceBuffer = sentenceBuffer.slice(-overlap) + sentence;
         } else {
           sentenceBuffer += sentence;
@@ -70,7 +103,6 @@ function chunkText(content: string, maxChunkSize = 1500, overlap = 100): string[
     const candidate = current ? current + '\n\n' + para : para;
     if (candidate.length > maxChunkSize && current.trim()) {
       chunks.push(current.trim());
-      // Overlap: take the last `overlap` chars from previous chunk
       const overlapText = current.slice(-overlap);
       current = overlapText + '\n\n' + para;
     } else {
@@ -155,6 +187,119 @@ async function writeKnowledgeBase(uid: string, chunks: KnowledgeChunk[]): Promis
   });
 }
 
+// ─── SQL helpers ────────────────────────────────────────────────────
+
+async function ensureKnowledgeTables(client: { query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[]; rowCount: number }> }): Promise<void> {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS knowledge_sources (
+      id TEXT PRIMARY KEY,
+      uid TEXT NOT NULL,
+      title TEXT NOT NULL,
+      source_url TEXT,
+      chunk_count INTEGER NOT NULL,
+      embed_model TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS knowledge_chunks (
+      id TEXT PRIMARY KEY,
+      uid TEXT NOT NULL,
+      source_id TEXT NOT NULL REFERENCES knowledge_sources(id),
+      text TEXT NOT NULL,
+      source_title TEXT NOT NULL,
+      source_url TEXT,
+      embedding JSONB NOT NULL,
+      embed_model TEXT NOT NULL
+    )
+  `);
+  await client.query(`CREATE INDEX IF NOT EXISTS idx_kc_uid ON knowledge_chunks(uid)`);
+  await client.query(`CREATE INDEX IF NOT EXISTS idx_ks_uid ON knowledge_sources(uid)`);
+}
+
+async function readKnowledgeFromSql(uid: string): Promise<KnowledgeChunk[]> {
+  const { getCachedSqlConfig, createSqlClient } = await import('../sqlClient.js');
+  const config = await getCachedSqlConfig(uid);
+  if (!config) return [];
+  const client = createSqlClient(config);
+  try {
+    const { rows } = await client.query(
+      `SELECT id, text, source_id, source_title, source_url, embedding, embed_model FROM knowledge_chunks WHERE uid = $1`,
+      [uid],
+    );
+    return (rows as Array<{ id: string; text: string; source_id: string; source_title: string; source_url: string | null; embedding: number[]; embed_model: string }>).map(r => ({
+      id: r.id,
+      text: r.text,
+      sourceId: r.source_id,
+      sourceTitle: r.source_title,
+      sourceUrl: r.source_url,
+      embedding: typeof r.embedding === 'string' ? JSON.parse(r.embedding) : r.embedding,
+      embedModel: r.embed_model,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// Read chunks from Storage first, fall back to SQL
+async function readAllChunks(uid: string): Promise<KnowledgeChunk[]> {
+  const storageChunks = await readKnowledgeBase(uid);
+  if (storageChunks.length > 0) return storageChunks;
+  return readKnowledgeFromSql(uid);
+}
+
+// ─── Shared ingest logic ────────────────────────────────────────────
+
+async function ingestContent(
+  uid: string,
+  title: string,
+  content: string,
+  sourceUrl: string | null,
+  endpointId: string | undefined,
+  embedModel: string,
+): Promise<{ sourceId: string; title: string; chunkCount: number }> {
+  if (!title.trim()) throw new GraphQLError('Title is required', { extensions: { code: 'BAD_USER_INPUT' } });
+  if (title.length > 200) throw new GraphQLError('Title must be 200 characters or less', { extensions: { code: 'BAD_USER_INPUT' } });
+  if (!content.trim() || content.trim().length < 50) throw new GraphQLError('Content must be at least 50 characters', { extensions: { code: 'BAD_USER_INPUT' } });
+  if (!embedModel.trim()) throw new GraphQLError('Embedding model is required', { extensions: { code: 'BAD_USER_INPUT' } });
+
+  const endpoint = await getUserOllamaEndpoint(uid, endpointId);
+  if (!endpoint) throw new GraphQLError('No AI endpoint configured. Please add an Ollama endpoint in Settings.', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
+
+  const textChunks = chunkText(content);
+  const embeddings: number[][] = [];
+  for (const chunk of textChunks) {
+    embeddings.push(await embedText(endpoint, embedModel, chunk));
+  }
+
+  const db = getFirestore();
+  const sourceRef = db.collection('users').doc(uid).collection('knowledgeMeta').doc();
+  const sourceId = sourceRef.id;
+
+  const newChunks: KnowledgeChunk[] = textChunks.map((text, i) => ({
+    id: `${sourceId}-${i}`,
+    text,
+    sourceId,
+    sourceTitle: title.trim(),
+    sourceUrl: sourceUrl?.trim() || null,
+    embedding: embeddings[i],
+    embedModel,
+  }));
+
+  const existingChunks = await readKnowledgeBase(uid);
+  await writeKnowledgeBase(uid, [...existingChunks, ...newChunks]);
+
+  await sourceRef.set({
+    title: title.trim(),
+    sourceUrl: sourceUrl?.trim() || null,
+    chunkCount: newChunks.length,
+    embedModel,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+
+  return { sourceId, title: title.trim(), chunkCount: newChunks.length };
+}
+
 // ─── Query Resolvers ────────────────────────────────────────────────
 
 export function createRagQueryResolvers() {
@@ -187,19 +332,16 @@ export function createRagQueryResolvers() {
       const k = topK && topK > 0 ? topK : 5;
 
       if (!question.trim()) {
-        throw new GraphQLError('Question cannot be empty', {
-          extensions: { code: 'BAD_USER_INPUT' },
-        });
+        throw new GraphQLError('Question cannot be empty', { extensions: { code: 'BAD_USER_INPUT' } });
       }
 
       const endpoint = await getUserOllamaEndpoint(uid, endpointId || undefined);
       if (!endpoint) {
-        throw new GraphQLError('No AI endpoint configured. Please add an Ollama endpoint in Settings.', {
-          extensions: { code: 'INTERNAL_SERVER_ERROR' },
-        });
+        throw new GraphQLError('No AI endpoint configured. Please add an Ollama endpoint in Settings.', { extensions: { code: 'INTERNAL_SERVER_ERROR' } });
       }
 
-      const chunks = await readKnowledgeBase(uid);
+      // Read from Storage first, fall back to SQL
+      const chunks = await readAllChunks(uid);
       if (chunks.length === 0) return [];
 
       const questionEmbedding = await embedText(endpoint, embedModel, question);
@@ -222,85 +364,152 @@ export function createRagQueryResolvers() {
 
 export function createRagMutationResolvers() {
   return {
+    // 1. Ingest plain text
     ingestKnowledgeDoc: async (
       _: unknown,
       { title, content, sourceUrl, endpointId, embedModel }: {
-        title: string;
-        content: string;
-        sourceUrl?: string | null;
-        endpointId?: string | null;
-        embedModel: string;
+        title: string; content: string; sourceUrl?: string | null;
+        endpointId?: string | null; embedModel: string;
+      },
+      context: ResolverContext,
+    ) => {
+      const uid = requireAuth(context);
+      return ingestContent(uid, title, content, sourceUrl ?? null, endpointId || undefined, embedModel);
+    },
+
+    // 2. Ingest uploaded file (PDF/DOCX/TXT via base64)
+    ingestKnowledgeFile: async (
+      _: unknown,
+      { fileName, fileBase64, contentType, endpointId, embedModel }: {
+        fileName: string; fileBase64: string; contentType: string;
+        endpointId?: string | null; embedModel: string;
       },
       context: ResolverContext,
     ) => {
       const uid = requireAuth(context);
 
-      // Validate input
-      if (!title.trim()) {
-        throw new GraphQLError('Title is required', { extensions: { code: 'BAD_USER_INPUT' } });
-      }
-      if (title.length > 200) {
-        throw new GraphQLError('Title must be 200 characters or less', { extensions: { code: 'BAD_USER_INPUT' } });
-      }
-      if (!content.trim() || content.trim().length < 50) {
-        throw new GraphQLError('Content must be at least 50 characters', { extensions: { code: 'BAD_USER_INPUT' } });
-      }
-      if (!embedModel.trim()) {
-        throw new GraphQLError('Embedding model is required', { extensions: { code: 'BAD_USER_INPUT' } });
+      const buffer = Buffer.from(fileBase64, 'base64');
+      if (buffer.length > 5 * 1024 * 1024) {
+        throw new GraphQLError('File must be under 5MB', { extensions: { code: 'BAD_USER_INPUT' } });
       }
 
-      const endpoint = await getUserOllamaEndpoint(uid, endpointId || undefined);
-      if (!endpoint) {
-        throw new GraphQLError('No AI endpoint configured. Please add an Ollama endpoint in Settings.', {
-          extensions: { code: 'INTERNAL_SERVER_ERROR' },
-        });
-      }
+      const content = await extractText(buffer, contentType);
+      const title = fileName.replace(/\.[^.]+$/, ''); // strip extension for title
+      return ingestContent(uid, title, content, null, endpointId || undefined, embedModel);
+    },
 
-      // Chunk the text
-      const textChunks = chunkText(content);
-
-      // Embed all chunks
-      const embeddings: number[][] = [];
-      for (const chunk of textChunks) {
-        const embedding = await embedText(endpoint, embedModel, chunk);
-        embeddings.push(embedding);
-      }
-
-      // Generate a source ID
+    // 3. Ingest from Cloud Files
+    ingestCloudFile: async (
+      _: unknown,
+      { fileId, endpointId, embedModel }: { fileId: string; endpointId?: string | null; embedModel: string },
+      context: ResolverContext,
+    ) => {
+      const uid = requireAuth(context);
       const db = getFirestore();
-      const sourceRef = db.collection('users').doc(uid).collection('knowledgeMeta').doc();
-      const sourceId = sourceRef.id;
 
-      // Build chunk objects
-      const newChunks: KnowledgeChunk[] = textChunks.map((text, i) => ({
-        id: `${sourceId}-${i}`,
-        text,
-        sourceId,
-        sourceTitle: title.trim(),
-        sourceUrl: sourceUrl?.trim() || null,
-        embedding: embeddings[i],
-        embedModel,
-      }));
+      // Fetch file metadata from Firestore
+      const fileDoc = await db.collection('users').doc(uid).collection('files').doc(fileId).get();
+      if (!fileDoc.exists) throw new GraphQLError('File not found', { extensions: { code: 'NOT_FOUND' } });
 
-      // Read existing chunks and append atomically
-      const existingChunks = await readKnowledgeBase(uid);
-      const allChunks = [...existingChunks, ...newChunks];
-      await writeKnowledgeBase(uid, allChunks);
+      const fileData = fileDoc.data()!;
+      const storagePath = fileData.storagePath as string;
+      const fileName = fileData.fileName as string;
+      const contentType = fileData.contentType as string;
 
-      // Write metadata to Firestore
-      await sourceRef.set({
-        title: title.trim(),
-        sourceUrl: sourceUrl?.trim() || null,
-        chunkCount: newChunks.length,
-        embedModel,
-        createdAt: FieldValue.serverTimestamp(),
-      });
+      // Download from Storage
+      const bucket = getStorage().bucket();
+      const storageFile = bucket.file(storagePath);
+      const [exists] = await storageFile.exists();
+      if (!exists) throw new GraphQLError('File not found in storage', { extensions: { code: 'NOT_FOUND' } });
 
-      return {
-        sourceId,
-        title: title.trim(),
-        chunkCount: newChunks.length,
-      };
+      const [buffer] = await storageFile.download();
+      if (buffer.length > 10 * 1024 * 1024) {
+        throw new GraphQLError('File must be under 10MB for knowledge base ingestion', { extensions: { code: 'BAD_USER_INPUT' } });
+      }
+
+      const content = await extractText(buffer, contentType);
+      const title = fileName.replace(/\.[^.]+$/, '');
+      return ingestContent(uid, title, content, null, endpointId || undefined, embedModel);
+    },
+
+    // 4. Dump knowledge base to SQL (copy for analytics, keep Storage)
+    dumpKnowledgeToSql: async (_: unknown, __: unknown, context: ResolverContext) => {
+      const uid = requireAuth(context);
+      const { getCachedSqlConfig, createSqlClient } = await import('../sqlClient.js');
+
+      const config = await getCachedSqlConfig(uid);
+      if (!config) throw new GraphQLError('SQL connection not configured. Set up SQL Analytics first.', { extensions: { code: 'BAD_USER_INPUT' } });
+      const client = createSqlClient(config);
+
+      await ensureKnowledgeTables(client);
+
+      // Read sources from Firestore
+      const db = getFirestore();
+      const sourcesSnap = await db.collection('users').doc(uid).collection('knowledgeMeta').get();
+      for (const doc of sourcesSnap.docs) {
+        const d = doc.data();
+        await client.query(
+          `INSERT INTO knowledge_sources (id, uid, title, source_url, chunk_count, embed_model, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO NOTHING`,
+          [doc.id, uid, d.title, d.sourceUrl || null, d.chunkCount, d.embedModel, toTimestampString(d.createdAt)],
+        );
+      }
+
+      // Read chunks from Storage and insert
+      const chunks = await readKnowledgeBase(uid);
+      for (const chunk of chunks) {
+        await client.query(
+          `INSERT INTO knowledge_chunks (id, uid, source_id, text, source_title, source_url, embedding, embed_model)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO NOTHING`,
+          [chunk.id, uid, chunk.sourceId, chunk.text, chunk.sourceTitle, chunk.sourceUrl, JSON.stringify(chunk.embedding), chunk.embedModel],
+        );
+      }
+
+      return true;
+    },
+
+    // 5. Offload knowledge base to SQL (move to SQL, delete from Storage)
+    offloadKnowledgeToSql: async (_: unknown, __: unknown, context: ResolverContext) => {
+      const uid = requireAuth(context);
+      const { getCachedSqlConfig, createSqlClient } = await import('../sqlClient.js');
+
+      const config = await getCachedSqlConfig(uid);
+      if (!config) throw new GraphQLError('SQL connection not configured. Set up SQL Analytics first.', { extensions: { code: 'BAD_USER_INPUT' } });
+      const client = createSqlClient(config);
+
+      await ensureKnowledgeTables(client);
+
+      // Read sources from Firestore
+      const db = getFirestore();
+      const sourcesSnap = await db.collection('users').doc(uid).collection('knowledgeMeta').get();
+      for (const doc of sourcesSnap.docs) {
+        const d = doc.data();
+        await client.query(
+          `INSERT INTO knowledge_sources (id, uid, title, source_url, chunk_count, embed_model, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO NOTHING`,
+          [doc.id, uid, d.title, d.sourceUrl || null, d.chunkCount, d.embedModel, toTimestampString(d.createdAt)],
+        );
+      }
+
+      // Read chunks from Storage and insert to SQL
+      const chunks = await readKnowledgeBase(uid);
+      for (const chunk of chunks) {
+        await client.query(
+          `INSERT INTO knowledge_chunks (id, uid, source_id, text, source_title, source_url, embedding, embed_model)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO NOTHING`,
+          [chunk.id, uid, chunk.sourceId, chunk.text, chunk.sourceTitle, chunk.sourceUrl, JSON.stringify(chunk.embedding), chunk.embedModel],
+        );
+      }
+
+      // Delete Storage file to free space
+      if (chunks.length > 0) {
+        const bucket = getStorage().bucket();
+        const file = bucket.file(KB_PATH(uid));
+        const [exists] = await file.exists();
+        if (exists) await file.delete();
+      }
+
+      return true;
     },
   };
 }
