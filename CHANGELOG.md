@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.29.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.28.0...mycircle-v1.29.0) (2026-04-08)
+
+
+### Features
+
+* **ai-assistant:** add file upload, Cloud Files import, SQL dump/offload to Knowledge Base ([#967](https://github.com/FishGit2020/MyCircle/issues/967)) ([ed36489](https://github.com/FishGit2020/MyCircle/commit/ed364895375550d4d3334a08d6a471f2c627bcb6))
+* **ai-assistant:** add RAG Knowledge Base tab ([#965](https://github.com/FishGit2020/MyCircle/issues/965)) ([ffd4334](https://github.com/FishGit2020/MyCircle/commit/ffd43340512ad8cff594219973af1c450954451c))
+* **nas:** switch from FileStation API to WebDAV for NAS uploads ([#963](https://github.com/FishGit2020/MyCircle/issues/963)) ([a618490](https://github.com/FishGit2020/MyCircle/commit/a6184909b60f4d18bf8c122e906274cc0cc85b94))
+
+
+### Documentation
+
+* add NAS WebDAV setup guide with port forwarding requirements ([#966](https://github.com/FishGit2020/MyCircle/issues/966)) ([432b900](https://github.com/FishGit2020/MyCircle/commit/432b900737713b2d3ff8a981b72867c7bc495215))
+
+
+### Miscellaneous
+
+* **deps:** bump @hono/node-server in /functions ([#961](https://github.com/FishGit2020/MyCircle/issues/961)) ([ae18e65](https://github.com/FishGit2020/MyCircle/commit/ae18e654660007ae9bca2f27d6e9ed10339be854))
+* **deps:** bump hono from 4.12.7 to 4.12.12 in /functions ([#962](https://github.com/FishGit2020/MyCircle/issues/962)) ([06a8b96](https://github.com/FishGit2020/MyCircle/commit/06a8b963640bd594c7b1d570f33646c6a13e29c9))
+
 ## [1.28.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.27.0...mycircle-v1.28.0) (2026-04-07)
 
 
