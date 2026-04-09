@@ -129,7 +129,7 @@
     "@graphql-tools/schema": "^10.0.31",
     "@sentry/react": "^10.47.0",
     "@types/cors": "^2.8.19",
-    "axios": "^1.14.0",
+    "axios": "^1.15.0",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
     "cross-env": "^7.0.3",
