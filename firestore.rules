@@ -247,5 +247,21 @@ service cloud.firestore {
         allow read: if request.auth != null;
       }
     }
+
+    // Anniversaries - owner + contributor access
+    match /anniversaries/{anniversaryId} {
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+      allow read: if request.auth != null && (resource.data.ownerUid == request.auth.uid || request.auth.uid in resource.data.contributorUids);
+      allow update: if request.auth != null && (resource.data.ownerUid == request.auth.uid || request.auth.uid in resource.data.contributorUids);
+      allow delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+
+      // Anniversary years subcollection - inherits access from parent
+      match /years/{yearNumber} {
+        allow read, write: if request.auth != null && (
+          get(/databases/$(database)/documents/anniversaries/$(anniversaryId)).data.ownerUid == request.auth.uid ||
+          request.auth.uid in get(/databases/$(database)/documents/anniversaries/$(anniversaryId)).data.contributorUids
+        );
+      }
+    }
   }
 }

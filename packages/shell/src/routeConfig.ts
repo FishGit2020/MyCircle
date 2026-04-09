@@ -32,6 +32,7 @@ export const ROUTE_LABEL_KEYS: Record<string, string> = {
   resume: 'nav.resumeTailor',
   setup: 'nav.setup',
   'hsa-expenses': 'nav.hsaExpenses',
+  anniversary: 'nav.anniversary',
   trash: 'nav.recycleBin',
   quota: 'nav.quotaBilling',
 };

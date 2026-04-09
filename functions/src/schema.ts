@@ -737,6 +737,12 @@ export const typeDefs = `#graphql
     # RAG Knowledge Base (auth required)
     knowledgeSources: [KnowledgeSource!]!
     ragSearch(question: String!, endpointId: ID, embedModel: String!, topK: Int): [KnowledgeSearchResult!]!
+
+    # Anniversary Tracker (auth required)
+    anniversaries: [Anniversary!]!
+    anniversary(id: ID!): Anniversary
+    anniversaryYear(anniversaryId: ID!, yearNumber: Int!): AnniversaryYear
+    searchUsers(query: String!): [UserSearchResult!]!
   }
 
   type SqlQueryResult {
@@ -1536,6 +1542,90 @@ export const typeDefs = `#graphql
     chunkCount: Int!
   }
 
+  # Anniversary Tracker types
+  type AnniversaryLocation {
+    lat: Float!
+    lon: Float!
+    name: String
+  }
+
+  type AnniversaryContributor {
+    uid: String!
+    displayName: String!
+    email: String!
+    addedAt: String!
+  }
+
+  type AnniversaryPicture {
+    url: String!
+    filename: String!
+    storagePath: String!
+    uploadedAt: String!
+    uploadedBy: String!
+  }
+
+  type AnniversaryYear {
+    yearNumber: Int!
+    year: Int!
+    activity: String
+    notes: String
+    pictures: [AnniversaryPicture!]!
+    location: AnniversaryLocation
+    updatedAt: String
+    updatedBy: String
+  }
+
+  type Anniversary {
+    id: ID!
+    ownerUid: String!
+    ownerDisplayName: String!
+    title: String!
+    originalDate: String!
+    location: AnniversaryLocation
+    contributorUids: [String!]!
+    contributors: [AnniversaryContributor!]!
+    years: [AnniversaryYear!]!
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  type UserSearchResult {
+    uid: String!
+    displayName: String
+    email: String!
+  }
+
+  input CreateAnniversaryInput {
+    title: String!
+    originalDate: String!
+    location: AnniversaryLocationInput
+  }
+
+  input UpdateAnniversaryInput {
+    title: String
+    location: AnniversaryLocationInput
+  }
+
+  input AnniversaryLocationInput {
+    lat: Float!
+    lon: Float!
+    name: String
+  }
+
+  input UpdateAnniversaryYearInput {
+    activity: String
+    notes: String
+    location: AnniversaryLocationInput
+  }
+
+  input AnniversaryPictureInput {
+    anniversaryId: ID!
+    yearNumber: Int!
+    filename: String!
+    base64Data: String!
+    mimeType: String!
+  }
+
   type Mutation {
     aiChat(message: String!, history: [AiChatHistoryInput!], context: JSON, model: String, endpointId: ID, toolMode: String, systemPrompt: String): AiChatResponse!
     runBenchmark(endpointId: String!, model: String!, prompt: String!): BenchmarkRunResult!
@@ -1652,6 +1742,16 @@ export const typeDefs = `#graphql
     ingestCloudFile(fileId: ID!, endpointId: ID, embedModel: String!): IngestResult!
     dumpKnowledgeToSql: Boolean!
     offloadKnowledgeToSql: Boolean!
+
+    # Anniversary Tracker (auth required)
+    createAnniversary(input: CreateAnniversaryInput!): Anniversary!
+    updateAnniversary(id: ID!, input: UpdateAnniversaryInput!): Anniversary!
+    deleteAnniversary(id: ID!): Boolean!
+    updateAnniversaryYear(anniversaryId: ID!, yearNumber: Int!, input: UpdateAnniversaryYearInput!): AnniversaryYear!
+    uploadAnniversaryPicture(input: AnniversaryPictureInput!): AnniversaryPicture!
+    deleteAnniversaryPicture(anniversaryId: ID!, yearNumber: Int!, storagePath: String!): Boolean!
+    addAnniversaryContributor(anniversaryId: ID!, contributorUid: String!): Anniversary!
+    removeAnniversaryContributor(anniversaryId: ID!, contributorUid: String!): Anniversary!
   }
 
   schema {

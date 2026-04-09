@@ -2414,3 +2414,155 @@ export const OFFLOAD_KNOWLEDGE_TO_SQL = gql`
     offloadKnowledgeToSql
   }
 `;
+
+// ─── Anniversary Tracker ─────────────────────────────────────────────
+
+export const GET_ANNIVERSARIES = gql`
+  query GetAnniversaries {
+    anniversaries {
+      id
+      ownerUid
+      ownerDisplayName
+      title
+      originalDate
+      location { lat lon name }
+      contributorUids
+      contributors { uid displayName email addedAt }
+      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } location { lat lon name } updatedAt updatedBy }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_ANNIVERSARY = gql`
+  query GetAnniversary($id: ID!) {
+    anniversary(id: $id) {
+      id
+      ownerUid
+      ownerDisplayName
+      title
+      originalDate
+      location { lat lon name }
+      contributorUids
+      contributors { uid displayName email addedAt }
+      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } location { lat lon name } updatedAt updatedBy }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_ANNIVERSARY_YEAR = gql`
+  query GetAnniversaryYear($anniversaryId: ID!, $yearNumber: Int!) {
+    anniversaryYear(anniversaryId: $anniversaryId, yearNumber: $yearNumber) {
+      yearNumber
+      year
+      activity
+      notes
+      pictures { url filename storagePath uploadedAt uploadedBy }
+      location { lat lon name }
+      updatedAt
+      updatedBy
+    }
+  }
+`;
+
+export const SEARCH_USERS = gql`
+  query SearchUsers($query: String!) {
+    searchUsers(query: $query) {
+      uid
+      displayName
+      email
+    }
+  }
+`;
+
+export const CREATE_ANNIVERSARY = gql`
+  mutation CreateAnniversary($input: CreateAnniversaryInput!) {
+    createAnniversary(input: $input) {
+      id
+      ownerUid
+      ownerDisplayName
+      title
+      originalDate
+      location { lat lon name }
+      contributorUids
+      contributors { uid displayName email addedAt }
+      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } location { lat lon name } updatedAt updatedBy }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_ANNIVERSARY = gql`
+  mutation UpdateAnniversary($id: ID!, $input: UpdateAnniversaryInput!) {
+    updateAnniversary(id: $id, input: $input) {
+      id
+      title
+      location { lat lon name }
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_ANNIVERSARY = gql`
+  mutation DeleteAnniversary($id: ID!) {
+    deleteAnniversary(id: $id)
+  }
+`;
+
+export const UPDATE_ANNIVERSARY_YEAR = gql`
+  mutation UpdateAnniversaryYear($anniversaryId: ID!, $yearNumber: Int!, $input: UpdateAnniversaryYearInput!) {
+    updateAnniversaryYear(anniversaryId: $anniversaryId, yearNumber: $yearNumber, input: $input) {
+      yearNumber
+      year
+      activity
+      notes
+      location { lat lon name }
+      updatedAt
+      updatedBy
+    }
+  }
+`;
+
+export const UPLOAD_ANNIVERSARY_PICTURE = gql`
+  mutation UploadAnniversaryPicture($input: AnniversaryPictureInput!) {
+    uploadAnniversaryPicture(input: $input) {
+      url
+      filename
+      storagePath
+      uploadedAt
+      uploadedBy
+    }
+  }
+`;
+
+export const DELETE_ANNIVERSARY_PICTURE = gql`
+  mutation DeleteAnniversaryPicture($anniversaryId: ID!, $yearNumber: Int!, $storagePath: String!) {
+    deleteAnniversaryPicture(anniversaryId: $anniversaryId, yearNumber: $yearNumber, storagePath: $storagePath)
+  }
+`;
+
+export const ADD_ANNIVERSARY_CONTRIBUTOR = gql`
+  mutation AddAnniversaryContributor($anniversaryId: ID!, $contributorUid: String!) {
+    addAnniversaryContributor(anniversaryId: $anniversaryId, contributorUid: $contributorUid) {
+      id
+      contributorUids
+      contributors { uid displayName email addedAt }
+      updatedAt
+    }
+  }
+`;
+
+export const REMOVE_ANNIVERSARY_CONTRIBUTOR = gql`
+  mutation RemoveAnniversaryContributor($anniversaryId: ID!, $contributorUid: String!) {
+    removeAnniversaryContributor(anniversaryId: $anniversaryId, contributorUid: $contributorUid) {
+      id
+      contributorUids
+      contributors { uid displayName email addedAt }
+      updatedAt
+    }
+  }
+`;

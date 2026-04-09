@@ -95,6 +95,71 @@ export type AirQuality = {
   so2: Scalars['Float']['output'];
 };
 
+export type Anniversary = {
+  __typename?: 'Anniversary';
+  contributorUids: Array<Scalars['String']['output']>;
+  contributors: Array<AnniversaryContributor>;
+  createdAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  location?: Maybe<AnniversaryLocation>;
+  originalDate: Scalars['String']['output'];
+  ownerDisplayName: Scalars['String']['output'];
+  ownerUid: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+  years: Array<AnniversaryYear>;
+};
+
+export type AnniversaryContributor = {
+  __typename?: 'AnniversaryContributor';
+  addedAt: Scalars['String']['output'];
+  displayName: Scalars['String']['output'];
+  email: Scalars['String']['output'];
+  uid: Scalars['String']['output'];
+};
+
+export type AnniversaryLocation = {
+  __typename?: 'AnniversaryLocation';
+  lat: Scalars['Float']['output'];
+  lon: Scalars['Float']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type AnniversaryLocationInput = {
+  lat: Scalars['Float']['input'];
+  lon: Scalars['Float']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AnniversaryPicture = {
+  __typename?: 'AnniversaryPicture';
+  filename: Scalars['String']['output'];
+  storagePath: Scalars['String']['output'];
+  uploadedAt: Scalars['String']['output'];
+  uploadedBy: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
+export type AnniversaryPictureInput = {
+  anniversaryId: Scalars['ID']['input'];
+  base64Data: Scalars['String']['input'];
+  filename: Scalars['String']['input'];
+  mimeType: Scalars['String']['input'];
+  yearNumber: Scalars['Int']['input'];
+};
+
+export type AnniversaryYear = {
+  __typename?: 'AnniversaryYear';
+  activity?: Maybe<Scalars['String']['output']>;
+  location?: Maybe<AnniversaryLocation>;
+  notes?: Maybe<Scalars['String']['output']>;
+  pictures: Array<AnniversaryPicture>;
+  updatedAt?: Maybe<Scalars['String']['output']>;
+  updatedBy?: Maybe<Scalars['String']['output']>;
+  year: Scalars['Int']['output'];
+  yearNumber: Scalars['Int']['output'];
+};
+
 export type ArtifactRegistryQuotaMetric = {
   __typename?: 'ArtifactRegistryQuotaMetric';
   byRepository: Array<RepositorySize>;
@@ -435,6 +500,12 @@ export type CrawledDocument = {
   url: Scalars['String']['output'];
 };
 
+export type CreateAnniversaryInput = {
+  location?: InputMaybe<AnniversaryLocationInput>;
+  originalDate: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
 export type CreateInterviewQuestionInput = {
   chapter: Scalars['String']['input'];
   chapterSlug: Scalars['String']['input'];
@@ -729,6 +800,7 @@ export type LocationSearchResult = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addAnniversaryContributor: Anniversary;
   addHsaExpense: HsaExpense;
   addNote: Note;
   addWorshipSetlist: Setlist;
@@ -740,9 +812,12 @@ export type Mutation = {
   cancelBookConversion: Scalars['Boolean']['output'];
   cancelSqlBackfill: Scalars['Boolean']['output'];
   collectQuotaSnapshot: QuotaSnapshot;
+  createAnniversary: Anniversary;
   createDailyLog: DailyLogEntry;
   createFolder: Folder;
   createInterviewQuestion: InterviewQuestion;
+  deleteAnniversary: Scalars['Boolean']['output'];
+  deleteAnniversaryPicture: Scalars['Boolean']['output'];
   deleteBabyPhoto: Scalars['Boolean']['output'];
   deleteBenchmarkEndpoint: Scalars['Boolean']['output'];
   deleteBenchmarkRun: Scalars['Boolean']['output'];
@@ -774,6 +849,7 @@ export type Mutation = {
   permanentDeleteBook: Scalars['Boolean']['output'];
   permanentlyDeleteHsaReceipt: Scalars['Boolean']['output'];
   previewVoice: Scalars['String']['output'];
+  removeAnniversaryContributor: Anniversary;
   renameFile: CloudFile;
   renameFolder: Folder;
   requestBookZip: Scalars['Boolean']['output'];
@@ -804,14 +880,23 @@ export type Mutation = {
   testNasConnection: NasConnectionStatus;
   testSqlConnection: SqlConnectionStatus;
   trashHsaReceipt: HsaReceipt;
+  updateAnniversary: Anniversary;
+  updateAnniversaryYear: AnniversaryYear;
   updateHsaExpense: HsaExpense;
   updateInterviewQuestion: InterviewQuestion;
   updateNote: Note;
   updateWorshipSetlist: Setlist;
   updateWorshipSong: WorshipSong;
+  uploadAnniversaryPicture: AnniversaryPicture;
   uploadBook: Book;
   uploadHsaReceipt: HsaReceipt;
   voteRadioStation: Scalars['Boolean']['output'];
+};
+
+
+export type MutationAddAnniversaryContributorArgs = {
+  anniversaryId: Scalars['ID']['input'];
+  contributorUid: Scalars['String']['input'];
 };
 
 
@@ -870,6 +955,11 @@ export type MutationCancelBookConversionArgs = {
 };
 
 
+export type MutationCreateAnniversaryArgs = {
+  input: CreateAnniversaryInput;
+};
+
+
 export type MutationCreateDailyLogArgs = {
   input: DailyLogInput;
 };
@@ -883,6 +973,18 @@ export type MutationCreateFolderArgs = {
 
 export type MutationCreateInterviewQuestionArgs = {
   input: CreateInterviewQuestionInput;
+};
+
+
+export type MutationDeleteAnniversaryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAnniversaryPictureArgs = {
+  anniversaryId: Scalars['ID']['input'];
+  storagePath: Scalars['String']['input'];
+  yearNumber: Scalars['Int']['input'];
 };
 
 
@@ -1031,6 +1133,12 @@ export type MutationPermanentlyDeleteHsaReceiptArgs = {
 
 export type MutationPreviewVoiceArgs = {
   voiceName: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveAnniversaryContributorArgs = {
+  anniversaryId: Scalars['ID']['input'];
+  contributorUid: Scalars['String']['input'];
 };
 
 
@@ -1191,6 +1299,19 @@ export type MutationTrashHsaReceiptArgs = {
 };
 
 
+export type MutationUpdateAnniversaryArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateAnniversaryInput;
+};
+
+
+export type MutationUpdateAnniversaryYearArgs = {
+  anniversaryId: Scalars['ID']['input'];
+  input: UpdateAnniversaryYearInput;
+  yearNumber: Scalars['Int']['input'];
+};
+
+
 export type MutationUpdateHsaExpenseArgs = {
   id: Scalars['ID']['input'];
   input: HsaExpenseUpdateInput;
@@ -1218,6 +1339,11 @@ export type MutationUpdateWorshipSetlistArgs = {
 export type MutationUpdateWorshipSongArgs = {
   id: Scalars['ID']['input'];
   input: WorshipSongUpdateInput;
+};
+
+
+export type MutationUploadAnniversaryPictureArgs = {
+  input: AnniversaryPictureInput;
 };
 
 
@@ -1344,6 +1470,9 @@ export type Query = {
   aiRecentLogs: Array<AiChatLogEntry>;
   aiUsageSummary: AiUsageSummary;
   airQuality?: Maybe<AirQuality>;
+  anniversaries: Array<Anniversary>;
+  anniversary?: Maybe<Anniversary>;
+  anniversaryYear?: Maybe<AnniversaryYear>;
   babyInfo: BabyInfo;
   babyMilestoneNotes: Array<BabyMilestoneNote>;
   babyPhotos: Array<BabyPhoto>;
@@ -1403,6 +1532,7 @@ export type Query = {
   searchCrawlJobs: Array<CrawlJob>;
   searchPodcasts: PodcastSearchResponse;
   searchStocks: Array<StockSearchResult>;
+  searchUsers: Array<UserSearchResult>;
   sharedFiles: Array<SharedFile>;
   sqlAnalyticsSummary?: Maybe<SqlAnalyticsSummary>;
   sqlBackfillStatus?: Maybe<SqlBackfillStatus>;
@@ -1441,6 +1571,17 @@ export type QueryAiUsageSummaryArgs = {
 export type QueryAirQualityArgs = {
   lat: Scalars['Float']['input'];
   lon: Scalars['Float']['input'];
+};
+
+
+export type QueryAnniversaryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAnniversaryYearArgs = {
+  anniversaryId: Scalars['ID']['input'];
+  yearNumber: Scalars['Int']['input'];
 };
 
 
@@ -1652,6 +1793,11 @@ export type QuerySearchPodcastsArgs = {
 
 
 export type QuerySearchStocksArgs = {
+  query: Scalars['String']['input'];
+};
+
+
+export type QuerySearchUsersArgs = {
   query: Scalars['String']['input'];
 };
 
@@ -2316,6 +2462,17 @@ export type TtsQuotaEntry = {
   used: Scalars['Int']['output'];
 };
 
+export type UpdateAnniversaryInput = {
+  location?: InputMaybe<AnniversaryLocationInput>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateAnniversaryYearInput = {
+  activity?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<AnniversaryLocationInput>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateInterviewQuestionInput = {
   chapter?: InputMaybe<Scalars['String']['input']>;
   chapterSlug?: InputMaybe<Scalars['String']['input']>;
@@ -2323,6 +2480,13 @@ export type UpdateInterviewQuestionInput = {
   difficulty?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserSearchResult = {
+  __typename?: 'UserSearchResult';
+  displayName?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  uid: Scalars['String']['output'];
 };
 
 export type WeatherCondition = {
@@ -3630,3 +3794,93 @@ export type OffloadKnowledgeToSqlMutationVariables = Exact<{ [key: string]: neve
 
 
 export type OffloadKnowledgeToSqlMutation = { __typename?: 'Mutation', offloadKnowledgeToSql: boolean };
+
+export type GetAnniversariesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAnniversariesQuery = { __typename?: 'Query', anniversaries: Array<{ __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null }> }> };
+
+export type GetAnniversaryQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetAnniversaryQuery = { __typename?: 'Query', anniversary?: { __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null }> } | null };
+
+export type GetAnniversaryYearQueryVariables = Exact<{
+  anniversaryId: Scalars['ID']['input'];
+  yearNumber: Scalars['Int']['input'];
+}>;
+
+
+export type GetAnniversaryYearQuery = { __typename?: 'Query', anniversaryYear?: { __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null } | null };
+
+export type SearchUsersQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+}>;
+
+
+export type SearchUsersQuery = { __typename?: 'Query', searchUsers: Array<{ __typename?: 'UserSearchResult', uid: string, displayName?: string | null, email: string }> };
+
+export type CreateAnniversaryMutationVariables = Exact<{
+  input: CreateAnniversaryInput;
+}>;
+
+
+export type CreateAnniversaryMutation = { __typename?: 'Mutation', createAnniversary: { __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null }> } };
+
+export type UpdateAnniversaryMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateAnniversaryInput;
+}>;
+
+
+export type UpdateAnniversaryMutation = { __typename?: 'Mutation', updateAnniversary: { __typename?: 'Anniversary', id: string, title: string, updatedAt: string, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null } };
+
+export type DeleteAnniversaryMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAnniversaryMutation = { __typename?: 'Mutation', deleteAnniversary: boolean };
+
+export type UpdateAnniversaryYearMutationVariables = Exact<{
+  anniversaryId: Scalars['ID']['input'];
+  yearNumber: Scalars['Int']['input'];
+  input: UpdateAnniversaryYearInput;
+}>;
+
+
+export type UpdateAnniversaryYearMutation = { __typename?: 'Mutation', updateAnniversaryYear: { __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null } };
+
+export type UploadAnniversaryPictureMutationVariables = Exact<{
+  input: AnniversaryPictureInput;
+}>;
+
+
+export type UploadAnniversaryPictureMutation = { __typename?: 'Mutation', uploadAnniversaryPicture: { __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string } };
+
+export type DeleteAnniversaryPictureMutationVariables = Exact<{
+  anniversaryId: Scalars['ID']['input'];
+  yearNumber: Scalars['Int']['input'];
+  storagePath: Scalars['String']['input'];
+}>;
+
+
+export type DeleteAnniversaryPictureMutation = { __typename?: 'Mutation', deleteAnniversaryPicture: boolean };
+
+export type AddAnniversaryContributorMutationVariables = Exact<{
+  anniversaryId: Scalars['ID']['input'];
+  contributorUid: Scalars['String']['input'];
+}>;
+
+
+export type AddAnniversaryContributorMutation = { __typename?: 'Mutation', addAnniversaryContributor: { __typename?: 'Anniversary', id: string, contributorUids: Array<string>, updatedAt: string, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }> } };
+
+export type RemoveAnniversaryContributorMutationVariables = Exact<{
+  anniversaryId: Scalars['ID']['input'];
+  contributorUid: Scalars['String']['input'];
+}>;
+
+
+export type RemoveAnniversaryContributorMutation = { __typename?: 'Mutation', removeAnniversaryContributor: { __typename?: 'Anniversary', id: string, contributorUids: Array<string>, updatedAt: string, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }> } };

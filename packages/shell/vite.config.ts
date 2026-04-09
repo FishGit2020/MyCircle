@@ -216,6 +216,10 @@ const hsaExpensesRemote = isProduction
   ? '/hsa-expenses/assets/remoteEntry.js'
   : 'http://localhost:3033/assets/remoteEntry.js';
 
+const anniversaryRemote = isProduction
+  ? '/anniversary/assets/remoteEntry.js'
+  : 'http://localhost:3034/assets/remoteEntry.js';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -253,7 +257,8 @@ export default defineConfig({
         webCrawler: webCrawlerRemote,
         resumeTailor: resumeTailorRemote,
         setup: setupRemote,
-        hsaExpenses: hsaExpensesRemote
+        hsaExpenses: hsaExpensesRemote,
+        anniversary: anniversaryRemote
       },
       shared: {
         react:              { singleton: true, requiredVersion: '^18.2.0' },
