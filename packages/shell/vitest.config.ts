@@ -54,6 +54,7 @@ export default defineConfig({
       'resumeTailor/ResumeTailor': resolve(__dirname, './test/mocks/ResumeTailorMock.tsx'),
       'setup/Setup': resolve(__dirname, './test/mocks/SetupMock.tsx'),
       'hsaExpenses/HsaExpenses': resolve(__dirname, './test/mocks/HsaExpensesMock.tsx'),
+      'anniversary/Anniversary': resolve(__dirname, './test/mocks/AnniversaryMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './test/mocks/pwaRegisterReactMock.ts')
     }
   }

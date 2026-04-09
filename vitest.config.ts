@@ -38,6 +38,7 @@ export default defineConfig({
       'resumeTailor/ResumeTailor': resolve(__dirname, './packages/shell/test/mocks/ResumeTailorMock.tsx'),
       'setup/Setup': resolve(__dirname, './packages/shell/test/mocks/SetupMock.tsx'),
       'hsaExpenses/HsaExpenses': resolve(__dirname, './packages/shell/test/mocks/HsaExpensesMock.tsx'),
+      'anniversary/Anniversary': resolve(__dirname, './packages/shell/test/mocks/AnniversaryMock.tsx'),
       'virtual:pwa-register/react': resolve(__dirname, './packages/shell/test/mocks/pwaRegisterReactMock.ts'),
       'epubjs': resolve(__dirname, './test/mocks/epubjsMock.ts'),
       '@mycircle/shared': resolve(__dirname, './packages/shared/src'),

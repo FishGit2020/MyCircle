@@ -28,6 +28,7 @@ import { createQuotaQueryResolvers, createQuotaMutationResolvers } from './quota
 import { createNasQueryResolvers, createNasMutationResolvers } from './nas.js';
 import { createHsaExpenseResolvers } from './hsaExpenses.js';
 import { createRagQueryResolvers, createRagMutationResolvers } from './rag.js';
+import { createAnniversaryQueryResolvers, createAnniversaryMutationResolvers } from './anniversary.js';
 
 // Resolver factory — identical signature and shape to the original resolvers.ts
 export function createResolvers(
@@ -72,6 +73,7 @@ export function createResolvers(
       ...createNasMutationResolvers(),
       ...hsaExpenseResolvers.Mutation,
       ...createRagMutationResolvers(),
+      ...createAnniversaryMutationResolvers(),
     },
 
     Query: {
@@ -103,6 +105,7 @@ export function createResolvers(
       ...createNasQueryResolvers(),
       ...hsaExpenseResolvers.Query,
       ...createRagQueryResolvers(),
+      ...createAnniversaryQueryResolvers(),
     },
   };
 }

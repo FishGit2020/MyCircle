@@ -187,3 +187,8 @@ declare module 'hsaExpenses/HsaExpenses' {
   const HsaExpenses: React.ComponentType;
   export default HsaExpenses;
 }
+
+declare module 'anniversary/Anniversary' {
+  const Anniversary: React.ComponentType;
+  export default Anniversary;
+}

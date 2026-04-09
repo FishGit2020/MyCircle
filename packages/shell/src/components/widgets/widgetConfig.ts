@@ -28,10 +28,11 @@ import DealFinderWidget from './DealFinderWidget';
 import WebCrawlerWidget from './WebCrawlerWidget';
 import ResumeTailorWidget from './ResumeTailorWidget';
 import HsaExpensesWidget from './HsaExpensesWidget';
+import AnniversaryWidget from './AnniversaryWidget';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'tripPlanner' | 'pollSystem' | 'radioStation' | 'aiAssistant' | 'aiInterviewer' | 'transitTracker' | 'travelMap' | 'dealFinder' | 'webCrawler' | 'resumeTailor' | 'hsaExpenses';
+export type WidgetType = 'weather' | 'stocks' | 'verse' | 'nowPlaying' | 'notebook' | 'babyTracker' | 'childDev' | 'worship' | 'flashcards' | 'dailyLog' | 'cloudFiles' | 'benchmark' | 'immigration' | 'digitalLibrary' | 'familyGames' | 'docScanner' | 'hikingMap' | 'tripPlanner' | 'pollSystem' | 'radioStation' | 'aiAssistant' | 'aiInterviewer' | 'transitTracker' | 'travelMap' | 'dealFinder' | 'webCrawler' | 'resumeTailor' | 'hsaExpenses' | 'anniversary';
 
 export type WidgetSize = 'comfortable' | 'tight';
 
@@ -49,7 +50,7 @@ const DEFAULT_WIDGET_LAYOUT: WidgetLayout = { pinned: [], size: 'comfortable' };
 const ALL_WIDGET_IDS = new Set<string>([
   'weather', 'stocks', 'verse', 'nowPlaying', 'notebook', 'babyTracker',
   'childDev', 'worship', 'flashcards', 'dailyLog', 'cloudFiles', 'benchmark',
-  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'tripPlanner', 'pollSystem', 'radioStation', 'aiAssistant', 'aiInterviewer', 'transitTracker', 'travelMap', 'dealFinder', 'webCrawler', 'resumeTailor', 'hsaExpenses',
+  'immigration', 'digitalLibrary', 'familyGames', 'docScanner', 'hikingMap', 'tripPlanner', 'pollSystem', 'radioStation', 'aiAssistant', 'aiInterviewer', 'transitTracker', 'travelMap', 'dealFinder', 'webCrawler', 'resumeTailor', 'hsaExpenses', 'anniversary',
 ]);
 
 export function loadWidgetLayout(): WidgetLayout {
@@ -107,6 +108,7 @@ export const WIDGET_COMPONENTS: Record<WidgetType, React.FC> = {
   webCrawler: WebCrawlerWidget,
   resumeTailor: ResumeTailorWidget,
   hsaExpenses: HsaExpensesWidget,
+  anniversary: AnniversaryWidget,
 };
 
 export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities: Array<{ lat: number; lon: number; id: string; name: string }> }) => string)> = {
@@ -138,6 +140,7 @@ export const WIDGET_ROUTES: Record<WidgetType, string | ((ctx: { favoriteCities:
   webCrawler: '/web-crawler',
   resumeTailor: '/resume',
   hsaExpenses: '/hsa-expenses',
+  anniversary: '/anniversary',
 };
 
 /** Reverse map: first path segment → WidgetType (for pin button lookup by route) */
