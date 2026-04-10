@@ -3529,9 +3529,9 @@ const zh: Record<TranslationKey, string> = {
   'anniversary.originalEvent': '\u539f\u59cb\u4e8b\u4ef6',
   'anniversary.editDetails': '\u7f16\u8f91\u8be6\u60c5',
   'anniversary.countdown': '\u5929\u540e',
-  'anniversary.happyAnniversary': '\u7eaa\u5ff5\u65e5\u5feb\u4e50\uff01',
+  'anniversary.happyAnniversary': '{{years}}\u5468\u5e74\u7eaa\u5ff5\u65e5\u5feb\u4e50\uff01',
   'anniversary.yearsMarried': '\u5e74\u5728\u4e00\u8d77',
-  'anniversary.daysUntil': '\u5929\u540e\u4e0b\u4e00\u4e2a\u7eaa\u5ff5\u65e5',
+  'anniversary.daysUntil': '{{days}}\u5929\u540e\u4e0b\u4e00\u4e2a\u7eaa\u5ff5\u65e5',
   'anniversary.contributors': '\u534f\u4f5c\u8005',
   'anniversary.searchByEmail': '\u901a\u8fc7\u90ae\u7bb1\u641c\u7d22',
   'anniversary.back': '\u8fd4\u56de',
@@ -3548,6 +3548,9 @@ const zh: Record<TranslationKey, string> = {
   'anniversary.noResults': '\u672a\u627e\u5230\u7528\u6237',
   'anniversary.confirmRemoveContributor': '\u79fb\u9664\u6b64\u534f\u4f5c\u8005\uff1f',
   'anniversary.yearsToday': '\u5e74\u4eca\u5929',
+  'anniversary.loading': '\u52a0\u8f7d\u4e2d...',
+  'anniversary.yearsTogether': '{{years}}\u5e74\u5728\u4e00\u8d77',
+  'anniversary.createFirst': '\u521b\u5efa\u4f60\u7684\u7b2c\u4e00\u4e2a\u7eaa\u5ff5\u65e5',
 };
 
 export default zh;

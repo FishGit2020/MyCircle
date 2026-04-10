@@ -3529,9 +3529,9 @@ const es: Record<TranslationKey, string> = {
   'anniversary.originalEvent': 'Evento Original',
   'anniversary.editDetails': 'Editar Detalles',
   'anniversary.countdown': 'd\u00edas hasta',
-  'anniversary.happyAnniversary': '\u00a1Feliz Aniversario!',
+  'anniversary.happyAnniversary': '\u00a1Feliz {{years}} Aniversario!',
   'anniversary.yearsMarried': 'a\u00f1os juntos',
-  'anniversary.daysUntil': 'd\u00edas hasta el pr\u00f3ximo aniversario',
+  'anniversary.daysUntil': '{{days}} d\u00edas hasta el pr\u00f3ximo aniversario',
   'anniversary.contributors': 'Colaboradores',
   'anniversary.searchByEmail': 'Buscar por correo electr\u00f3nico',
   'anniversary.back': 'Volver',
@@ -3548,6 +3548,9 @@ const es: Record<TranslationKey, string> = {
   'anniversary.noResults': 'No se encontraron usuarios',
   'anniversary.confirmRemoveContributor': '\u00bfEliminar este colaborador?',
   'anniversary.yearsToday': 'a\u00f1os hoy',
+  'anniversary.loading': 'Cargando...',
+  'anniversary.yearsTogether': '{{years}} a\u00f1os juntos',
+  'anniversary.createFirst': 'Crea tu primer aniversario',
 };
 
 export default es;
