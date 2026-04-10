@@ -24,7 +24,7 @@
     "@graphql-tools/schema": "^10.0.31",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/pg": "^8.20.0",
-    "axios": "^1.14.0",
+    "axios": "^1.15.0",
     "cheerio": "^1.2.0",
     "cors": "^2.8.5",
     "epub2": "^3.0.2",
