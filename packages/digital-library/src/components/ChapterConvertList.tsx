@@ -524,6 +524,17 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
                     </svg>
                     {t('library.play')}
                   </button>
+                  <a
+                    href={ch.audioUrl}
+                    download={`${bookTitle} - Ch${ch.index} ${ch.title}.mp3`}
+                    className="p-1 text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 transition min-h-[44px] min-w-[44px] flex items-center justify-center"
+                    aria-label={`${t('library.downloadChapter')} ${ch.title}`}
+                    title={t('library.downloadChapter')}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m0 0l-4.5-4.5M12 16.5l4.5-4.5" />
+                    </svg>
+                  </a>
                   {nasConnected && !ch.nasArchived && (
                     nasOffloading.has(ch.index) ? (
                       <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 px-2">

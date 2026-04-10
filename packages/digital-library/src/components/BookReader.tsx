@@ -6,7 +6,6 @@ import ReaderControls from './ReaderControls';
 import BrowserTTS from './BrowserTTS';
 import ConversionStatus from './ConversionStatus';
 import ChapterConvertList from './ChapterConvertList';
-import AudioDownload from './AudioDownload';
 import TtsQuotaBar from './TtsQuotaBar';
 import useSwipe from '../hooks/useSwipe';
 import { useReaderTheme } from '../hooks/useReaderTheme';
@@ -39,18 +38,12 @@ interface BookReaderProps {
   language: string;
   audioStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   audioProgress: number;
-  zipStatus?: string;
-  zipUrl?: string;
-  zipSize?: number;
-  zipGeneratedAt?: string;
-  zipError?: string;
   epubNasArchived?: boolean;
   onBack: () => void;
   onRefreshChapters?: () => Promise<void>;
-  onRefreshBook?: () => Promise<void>;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, zipStatus, zipUrl, zipSize, zipGeneratedAt, zipError, epubNasArchived, onBack: _onBack, onRefreshChapters, onRefreshBook }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, epubNasArchived, onBack: _onBack, onRefreshChapters }: BookReaderProps) {
   const { t } = useTranslation();
   const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -699,18 +692,6 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             onChapterConverted={async () => {
               await onRefreshChapters?.();
             }}
-          />
-
-          <AudioDownload
-            bookId={bookId}
-            bookTitle={title}
-            chapters={chapters}
-            zipStatus={zipStatus ?? 'none'}
-            zipUrl={zipUrl}
-            zipSize={zipSize}
-            zipGeneratedAt={zipGeneratedAt}
-            zipError={zipError}
-            onRefreshBook={onRefreshBook ?? (() => Promise.resolve())}
           />
 
         </div>

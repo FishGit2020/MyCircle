@@ -1922,6 +1922,7 @@ const zh: Record<TranslationKey, string> = {
   'library.deleteBook': '\u5220\u9664\u4e66\u7c4d',
   'library.delete': '\u5220\u9664',
   'library.downloadEpub': '\u4e0b\u8f7d EPUB',
+  'library.downloadChapter': '\u4e0b\u8f7d MP3',
   'library.epubOnly': '\u4ec5\u652f\u6301EPUB\u6587\u4ef6',
   'library.fileTooLarge': '\u6587\u4ef6\u5fc5\u987b\u5c0f\u4e8e20 MB',
   'library.authRequired': '\u8bf7\u767b\u5f55\u4ee5\u4e0a\u4f20\u4e66\u7c4d',
