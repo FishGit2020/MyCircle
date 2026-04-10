@@ -1922,6 +1922,7 @@ const es: Record<TranslationKey, string> = {
   'library.deleteBook': 'Eliminar libro',
   'library.delete': 'Eliminar',
   'library.downloadEpub': 'Descargar EPUB',
+  'library.downloadChapter': 'Descargar MP3',
   'library.epubOnly': 'Solo se admiten archivos EPUB',
   'library.fileTooLarge': 'El archivo debe ser menor de 20 MB',
   'library.authRequired': 'Inicia sesi\u00f3n para subir libros',

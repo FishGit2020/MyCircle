@@ -1920,6 +1920,7 @@ const en = {
   'library.deleteBook': 'Delete book',
   'library.delete': 'Delete',
   'library.downloadEpub': 'Download EPUB',
+  'library.downloadChapter': 'Download MP3',
   'library.epubOnly': 'Only EPUB files are supported',
   'library.fileTooLarge': 'File must be under 20 MB',
   'library.authRequired': 'Please sign in to upload books',
