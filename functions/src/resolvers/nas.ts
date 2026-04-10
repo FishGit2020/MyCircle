@@ -307,8 +307,8 @@ export function createNasMutationResolvers() {
       if (!bookSnap.exists) throw new Error(`Book ${bookId} not found`);
       const bookData = bookSnap.data()!;
 
-      if (bookData.epubNasArchived) {
-        throw new Error('EPUB is already archived on NAS');
+      if (!bookData.epubUrl) {
+        throw new Error('No EPUB file available to offload');
       }
 
       const storagePath = bookData.storagePath || `books/${bookId}/original.epub`;

@@ -143,7 +143,7 @@ function BookCard({ book, onSelect, onSelectListen, onDelete, readPercent, nasCo
                 </svg>
                 {t('library.downloadEpub')}
               </a>
-              {nasConnected && !book.epubNasArchived && (
+              {nasConnected && (
                 epubOffloading ? (
                   <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
                     <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
