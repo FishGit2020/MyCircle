@@ -14,6 +14,9 @@ vi.mock('@mycircle/shared', () => ({
   GET_BOOK_CHAPTERS: {},
   DELETE_BOOK: {},
   UPLOAD_BOOK: {},
+  GET_NAS_CONNECTION_STATUS: {},
+  ARCHIVE_EPUB_TO_NAS: {},
+  RESTORE_EPUB_FROM_NAS: {},
   GET_TTS_QUOTA: {},
   StorageKeys: { LIBRARY_SORT: 'library-sort' },
 }));

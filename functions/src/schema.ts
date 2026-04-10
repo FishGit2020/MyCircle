@@ -214,6 +214,8 @@ export const typeDefs = `#graphql
     zipSize: Int
     zipGeneratedAt: String
     zipError: String
+    epubNasArchived: Boolean
+    epubNasPath: String
   }
 
   type BookChapter {
@@ -1518,6 +1520,11 @@ export const typeDefs = `#graphql
     error: String
   }
 
+  type NasOffloadStartResult {
+    started: Boolean!
+    totalChapters: Int!
+  }
+
   # RAG Knowledge Base
   type KnowledgeSource {
     id: ID!
@@ -1719,8 +1726,10 @@ export const typeDefs = `#graphql
     testNasConnection: NasConnectionStatus!
     deleteNasConnection: Boolean!
     archiveChapterToNas(bookId: ID!, chapterIndex: Int!): NasArchiveResult!
-    archiveBookToNas(bookId: ID!): [NasArchiveResult!]!
+    archiveBookToNas(bookId: ID!): NasOffloadStartResult!
     restoreChapterFromNas(bookId: ID!, chapterIndex: Int!): BookChapter!
+    archiveEpubToNas(bookId: ID!): Book!
+    restoreEpubFromNas(bookId: ID!): Book!
 
     # HSA Expenses (auth required)
     addHsaExpense(input: HSAExpenseInput!): HSAExpense!

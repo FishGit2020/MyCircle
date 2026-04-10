@@ -44,12 +44,13 @@ interface BookReaderProps {
   zipSize?: number;
   zipGeneratedAt?: string;
   zipError?: string;
+  epubNasArchived?: boolean;
   onBack: () => void;
   onRefreshChapters?: () => Promise<void>;
   onRefreshBook?: () => Promise<void>;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, zipStatus, zipUrl, zipSize, zipGeneratedAt, zipError, onBack: _onBack, onRefreshChapters, onRefreshBook }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, zipStatus, zipUrl, zipSize, zipGeneratedAt, zipError, epubNasArchived, onBack: _onBack, onRefreshChapters, onRefreshBook }: BookReaderProps) {
   const { t } = useTranslation();
   const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -605,6 +606,15 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
 
       {/* Read tab — kept mounted so epubjs state persists */}
       <div className={activeTab === 'read' ? 'flex flex-col flex-1 min-h-0' : 'hidden'} role="tabpanel">
+        {!epubUrl && epubNasArchived ? (
+          <div className="flex flex-col items-center justify-center flex-1 text-center px-4">
+            <svg className="w-12 h-12 text-orange-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('library.nas.epubOffloadedNotice')}</p>
+          </div>
+        ) : (
+        <>
         <div className="flex flex-1 min-h-0 gap-4 overflow-hidden relative">
           {/* TOC Sidebar */}
           {tocOpen && (
@@ -652,6 +662,8 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
         <div className="flex-shrink-0 mt-3">
           <BrowserTTS text={ttsText} />
         </div>
+        </>
+        )}
       </div>
 
       {/* Listen tab */}

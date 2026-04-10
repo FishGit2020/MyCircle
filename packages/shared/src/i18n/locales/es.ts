@@ -2056,6 +2056,13 @@ const es: Record<TranslationKey, string> = {
   'library.nas.restoreError': 'Error al restaurar',
   'library.nas.batchSummary': '{success} cap\u00edtulos transferidos, {failed} fallidos',
   'library.nas.archivedTooltip': 'Audio archivado en NAS \u2014 restaura para reproducir',
+  'library.nas.offloadEpub': 'Transferir EPUB a NAS',
+  'library.nas.restoreEpub': 'Restaurar EPUB desde NAS',
+  'library.nas.epubArchived': 'EPUB en NAS',
+  'library.nas.offloadingEpub': 'Transfiriendo EPUB...',
+  'library.nas.restoringEpub': 'Restaurando EPUB...',
+  'library.nas.epubOffloadedNotice': 'El EPUB ha sido transferido a NAS. Restaura para leer.',
+  'library.nas.batchStarted': 'Transfiriendo {count} cap\u00edtulos en segundo plano...',
 
   'widgets.noAudiobook': 'No hay audiolibro en progreso',
 

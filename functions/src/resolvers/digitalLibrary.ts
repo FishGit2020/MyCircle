@@ -39,7 +39,7 @@ function toIso(val: any): string {
   return new Date().toISOString();
 }
 
-function docToBook(id: string, data: FirebaseFirestore.DocumentData) {
+export function docToBook(id: string, data: FirebaseFirestore.DocumentData) {
   return {
     id,
     title: data.title ?? '',
@@ -64,6 +64,8 @@ function docToBook(id: string, data: FirebaseFirestore.DocumentData) {
     zipSize: data.zipSize ?? null,
     zipGeneratedAt: data.zipGeneratedAt ? toIso(data.zipGeneratedAt) : null,
     zipError: data.zipError ?? null,
+    epubNasArchived: data.epubNasArchived ?? false,
+    epubNasPath: data.epubNasPath ?? null,
   };
 }
 
