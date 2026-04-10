@@ -418,7 +418,7 @@ export default function DigitalLibrary() {
     if (tab) {
       const params = new URLSearchParams({ tab });
       if (tab === 'listen') {
-        params.set('autoPlay', autoPlayParam || '1');
+        if (autoPlayParam) params.set('autoPlay', autoPlayParam);
         if (chapterParam) params.set('chapter', chapterParam);
       }
       url = `/library/${book.id}?${params.toString()}`;

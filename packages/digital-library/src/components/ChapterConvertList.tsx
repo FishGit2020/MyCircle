@@ -302,13 +302,15 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
       const { started, totalChapters } = result.data?.archiveBookToNas ?? {};
       if (started && totalChapters > 0) {
         // Poll for chapter status updates while background offload runs
+        // Keep batchOffloading=true until polling detects all chapters archived
         batchPollRef.current = setInterval(async () => {
           await onChapterConverted();
         }, 10_000);
+      } else {
+        setBatchOffloading(false);
       }
     } catch (err) {
       logger.error('Failed to start batch offload to NAS', err);
-    } finally {
       setBatchOffloading(false);
     }
   }, [bookId, archiveBookMutation, onChapterConverted]);
@@ -319,6 +321,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
     if (allArchived && batchPollRef.current) {
       clearInterval(batchPollRef.current);
       batchPollRef.current = null;
+      setBatchOffloading(false);
     }
     return () => {
       if (batchPollRef.current) {
