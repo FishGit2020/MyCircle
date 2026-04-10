@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.31.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.30.0...mycircle-v1.31.0) (2026-04-10)
+
+
+### Features
+
+* **digital-library:** add ZIP download button to listen tab toolbar ([#980](https://github.com/FishGit2020/MyCircle/issues/980)) ([86a03fb](https://github.com/FishGit2020/MyCircle/commit/86a03fbc49519be67f085712bc9628ae26ad3801))
+* **digital-library:** fire-and-forget batch NAS offload + EPUB offload support ([#973](https://github.com/FishGit2020/MyCircle/issues/973)) ([78b43fe](https://github.com/FishGit2020/MyCircle/commit/78b43fea397b3349561232d9c34629f4740c14f4))
+* **digital-library:** replace AudioDownload with per-chapter download button ([#977](https://github.com/FishGit2020/MyCircle/issues/977)) ([cfa622c](https://github.com/FishGit2020/MyCircle/commit/cfa622cc0b638d3524e0a307ac292423cb846798))
+
+
+### Bug Fixes
+
+* add ZIP generate loading state and function logging ([#976](https://github.com/FishGit2020/MyCircle/issues/976)) ([de7bd94](https://github.com/FishGit2020/MyCircle/commit/de7bd949da04b39c3ab55ca0970dfa7b860433b8))
+* **anniversary:** add missing i18n keys for widget tile ([#978](https://github.com/FishGit2020/MyCircle/issues/978)) ([35cc8ca](https://github.com/FishGit2020/MyCircle/commit/35cc8ca502d505aa2794c0c4e2c5c72e94d3e564))
+* **nas:** use stored audioStoragePath instead of reconstructing it ([#979](https://github.com/FishGit2020/MyCircle/issues/979)) ([e643edb](https://github.com/FishGit2020/MyCircle/commit/e643edb40ea884a88a2fc12a3c6e46905f6246fd))
+* sync pnpm-lock.yaml with package.json ([#975](https://github.com/FishGit2020/MyCircle/issues/975)) ([5225027](https://github.com/FishGit2020/MyCircle/commit/5225027fbafe4079fae18b614a2104a89d3e7da3))
+
 ## [1.30.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.29.0...mycircle-v1.30.0) (2026-04-10)
 
 
