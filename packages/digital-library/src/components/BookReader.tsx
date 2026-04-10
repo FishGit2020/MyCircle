@@ -39,11 +39,17 @@ interface BookReaderProps {
   audioStatus: 'none' | 'processing' | 'paused' | 'complete' | 'error';
   audioProgress: number;
   epubNasArchived?: boolean;
+  zipStatus?: 'none' | 'processing' | 'ready' | 'error';
+  zipUrl?: string;
+  zipSize?: number;
+  zipGeneratedAt?: string;
+  zipError?: string;
   onBack: () => void;
   onRefreshChapters?: () => Promise<void>;
+  onRefreshBook?: () => Promise<void>;
 }
 
-export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, epubNasArchived, onBack: _onBack, onRefreshChapters }: BookReaderProps) {
+export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl, language, audioStatus, audioProgress, epubNasArchived, zipStatus, zipUrl, zipSize, zipGeneratedAt, zipError, onBack: _onBack, onRefreshChapters, onRefreshBook }: BookReaderProps) {
   const { t } = useTranslation();
   const [submitConversions] = useMutation(SUBMIT_CHAPTER_CONVERSIONS);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -689,6 +695,12 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
               const lc = (language || 'en').startsWith('zh') ? 'cmn-CN' : (language || 'en').startsWith('es') ? 'es-US' : 'en-US';
               return `${lc}-Wavenet-${lc === 'en-US' ? 'D' : 'A'}`;
             })()}
+            zipStatus={zipStatus}
+            zipUrl={zipUrl}
+            zipSize={zipSize}
+            zipGeneratedAt={zipGeneratedAt}
+            zipError={zipError}
+            onRefreshBook={onRefreshBook}
             onChapterConverted={async () => {
               await onRefreshChapters?.();
             }}

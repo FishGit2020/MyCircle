@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, GET_CONVERSION_JOBS, GET_CONVERSION_BATCH_JOB, SUBMIT_BATCH_CONVERSION, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO, GET_NAS_CONNECTION_STATUS, ARCHIVE_CHAPTER_TO_NAS, ARCHIVE_BOOK_TO_NAS, RESTORE_CHAPTER_FROM_NAS } from '@mycircle/shared';
+import { useTranslation, createLogger, eventBus, MFEvents, StorageKeys, WindowEvents, useQuery, useMutation, GET_CONVERSION_JOBS, GET_CONVERSION_BATCH_JOB, SUBMIT_BATCH_CONVERSION, SUBMIT_CHAPTER_CONVERSIONS, DELETE_CHAPTER_AUDIO, GET_NAS_CONNECTION_STATUS, ARCHIVE_CHAPTER_TO_NAS, ARCHIVE_BOOK_TO_NAS, RESTORE_CHAPTER_FROM_NAS, REQUEST_BOOK_ZIP } from '@mycircle/shared';
 import type { AudioSource } from '@mycircle/shared';
 
 const logger = createLogger('ChapterConvertList');
@@ -27,9 +27,20 @@ interface Props {
   onChapterConverted: () => void;
   autoPlay?: boolean;
   initialChapter?: number;
+  zipStatus?: 'none' | 'processing' | 'ready' | 'error';
+  zipUrl?: string;
+  zipSize?: number;
+  zipGeneratedAt?: string;
+  zipError?: string;
+  onRefreshBook?: () => Promise<void>;
 }
 
-export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted, autoPlay, initialChapter }: Props) {
+function formatBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted, autoPlay, initialChapter, zipStatus, zipUrl, zipSize, zipGeneratedAt: _zipGeneratedAt, zipError: _zipError, onRefreshBook }: Props) {
   const { t } = useTranslation();
   const [converting, setConverting] = useState<number | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -239,6 +250,27 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   const [deleting, setDeleting] = useState<number | null>(null);
 
+  // ZIP download
+  const [requestZipMutation] = useMutation(REQUEST_BOOK_ZIP);
+  const [zipRequesting, setZipRequesting] = useState(false);
+
+  // Poll for ZIP status while generating
+  useEffect(() => {
+    if (zipStatus !== 'processing' || !onRefreshBook) return;
+    const id = setInterval(() => { onRefreshBook().catch(() => {}); }, 10_000);
+    return () => clearInterval(id);
+  }, [zipStatus, onRefreshBook]);
+
+  const handleRequestZip = useCallback(async () => {
+    setZipRequesting(true);
+    try {
+      await requestZipMutation({ variables: { bookId } });
+      await onRefreshBook?.();
+    } finally {
+      setZipRequesting(false);
+    }
+  }, [bookId, requestZipMutation, onRefreshBook]);
+
   // NAS integration
   const { data: nasData } = useQuery(GET_NAS_CONNECTION_STATUS);
   const [archiveChapterMutation] = useMutation(ARCHIVE_CHAPTER_TO_NAS);
@@ -283,7 +315,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   // Stop NAS batch poll when all chapters are archived or component unmounts
   useEffect(() => {
-    const allArchived = !chapters.some(c => c.audioUrl && !c.nasArchived);
+    const allArchived = !chapters.some(c => c.audioUrl);
     if (allArchived && batchPollRef.current) {
       clearInterval(batchPollRef.current);
       batchPollRef.current = null;
@@ -381,24 +413,98 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
           )}
         </div>
       )}
-      {/* NAS batch offload toolbar */}
-      {nasConnected && chapters.some(c => c.audioUrl && !c.nasArchived) && (
-        <div className="flex items-center gap-2 mb-2">
-          <button
-            type="button"
-            onClick={handleOffloadAll}
-            disabled={batchOffloading}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/40 border border-orange-200 dark:border-orange-700 rounded-lg transition min-h-[44px] disabled:opacity-50"
-          >
-            {batchOffloading ? (
-              <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      {/* Batch actions toolbar (ZIP download + NAS offload) */}
+      {(audioChapters.length > 0 || (nasConnected && chapters.some(c => c.audioUrl))) && (
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
+          {/* ZIP download button */}
+          {audioChapters.length > 0 && (
+            zipStatus === 'processing' ? (
+              <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg min-h-[44px]">
+                <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                {t('library.generatingZip')}
+              </span>
+            ) : zipStatus === 'ready' && zipUrl ? (
+              <div className="flex items-center gap-1.5">
+                <a
+                  href={zipUrl}
+                  download
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 border border-green-200 dark:border-green-700 rounded-lg transition min-h-[44px]"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m0 0l-4.5-4.5M12 16.5l4.5-4.5" />
+                  </svg>
+                  {t('library.downloadZip')}
+                  {zipSize != null && <span className="text-gray-500 dark:text-gray-400">({formatBytes(zipSize)})</span>}
+                </a>
+                <button
+                  type="button"
+                  onClick={handleRequestZip}
+                  disabled={zipRequesting}
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition min-h-[44px] disabled:opacity-50"
+                  title={t('library.generateNewZip')}
+                  aria-label={t('library.generateNewZip')}
+                >
+                  {zipRequesting ? (
+                    <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M2.985 19.644l3.181-3.183" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            ) : zipStatus === 'error' ? (
+              <button
+                type="button"
+                onClick={handleRequestZip}
+                disabled={zipRequesting}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-700 rounded-lg transition min-h-[44px] disabled:opacity-50"
+              >
+                {zipRequesting ? (
+                  <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                  </svg>
+                )}
+                {t('library.generateZip')}
+              </button>
             ) : (
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-              </svg>
-            )}
-            {t('library.nas.offloadAll')}
-          </button>
+              <button
+                type="button"
+                onClick={handleRequestZip}
+                disabled={zipRequesting}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-700 rounded-lg transition min-h-[44px] disabled:opacity-50"
+              >
+                {zipRequesting ? (
+                  <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                  </svg>
+                )}
+                {t('library.generateZip')}
+              </button>
+            )
+          )}
+          {/* NAS offload button */}
+          {nasConnected && chapters.some(c => c.audioUrl) && (
+            <button
+              type="button"
+              onClick={handleOffloadAll}
+              disabled={batchOffloading}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/40 border border-orange-200 dark:border-orange-700 rounded-lg transition min-h-[44px] disabled:opacity-50"
+            >
+              {batchOffloading ? (
+                <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
+              )}
+              {t('library.nas.offloadAll')}
+            </button>
+          )}
         </div>
       )}
       <ul className="divide-y divide-gray-200 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -535,7 +641,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m0 0l-4.5-4.5M12 16.5l4.5-4.5" />
                     </svg>
                   </a>
-                  {nasConnected && !ch.nasArchived && (
+                  {nasConnected && (
                     nasOffloading.has(ch.index) ? (
                       <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 px-2">
                         <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
