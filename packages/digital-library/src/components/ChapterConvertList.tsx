@@ -261,23 +261,40 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
     }
   }, [bookId, archiveChapterMutation, onChapterConverted]);
 
+  const batchPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const handleOffloadAll = useCallback(async () => {
     setBatchOffloading(true);
     try {
       const result = await archiveBookMutation({ variables: { bookId } });
-      const results = result.data?.archiveBookToNas ?? [];
-      const success = results.filter((r: { success: boolean }) => r.success).length;
-      const failed = results.filter((r: { success: boolean }) => !r.success).length;
-      if (failed > 0) {
-        logger.warn(`NAS batch offload: ${success} succeeded, ${failed} failed`);
+      const { started, totalChapters } = result.data?.archiveBookToNas ?? {};
+      if (started && totalChapters > 0) {
+        // Poll for chapter status updates while background offload runs
+        batchPollRef.current = setInterval(async () => {
+          await onChapterConverted();
+        }, 10_000);
       }
-      await onChapterConverted();
     } catch (err) {
-      logger.error('Failed to batch offload book to NAS', err);
+      logger.error('Failed to start batch offload to NAS', err);
     } finally {
       setBatchOffloading(false);
     }
   }, [bookId, archiveBookMutation, onChapterConverted]);
+
+  // Stop NAS batch poll when all chapters are archived or component unmounts
+  useEffect(() => {
+    const allArchived = !chapters.some(c => c.audioUrl && !c.nasArchived);
+    if (allArchived && batchPollRef.current) {
+      clearInterval(batchPollRef.current);
+      batchPollRef.current = null;
+    }
+    return () => {
+      if (batchPollRef.current) {
+        clearInterval(batchPollRef.current);
+        batchPollRef.current = null;
+      }
+    };
+  }, [chapters]);
 
   const handleRestoreFromNas = useCallback(async (chapterIndex: number) => {
     setNasRestoring(prev => new Set(prev).add(chapterIndex));

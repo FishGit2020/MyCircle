@@ -9,6 +9,9 @@ import {
   clearNasConfigCache,
 } from '../nasClient.js';
 import { uploadToStorage } from '../handlers/shared.js';
+import { docToBook } from './digitalLibrary.js';
+
+const logger = { error: (...args: any[]) => console.error('[NAS]', ...args) };
 
 interface ResolverContext {
   uid: string | null;
@@ -194,48 +197,48 @@ export function createNasMutationResolvers() {
       );
 
       if (audioChapters.length === 0) {
-        return [];
+        return { started: true, totalChapters: 0 };
       }
 
-      const bucket = getStorage().bucket();
-      const results: Array<{ bookId: string; chapterIndex: number; success: boolean; nasPath: string | null; error: string | null }> = [];
+      // Fire-and-forget: process chapters in background
+      const processInBackground = async () => {
+        const bucket = getStorage().bucket();
+        const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+        await client.createFolder(`${config.destFolder}/books`);
+        await client.createFolder(`${config.destFolder}/books/${bookId}`);
 
-      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
-      await client.createFolder(`${config.destFolder}/books`);
-      await client.createFolder(`${config.destFolder}/books/${bookId}`);
+        for (const chapterDoc of audioChapters) {
+          const chapterData = chapterDoc.data();
+          const chapterIndex: number = chapterData.index ?? 0;
+          const storagePath = `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
+          try {
+            const [fileExists] = await bucket.file(storagePath).exists();
+            if (!fileExists) continue;
 
-      for (const chapterDoc of audioChapters) {
-        const chapterData = chapterDoc.data();
-        const chapterIndex: number = chapterData.index ?? 0;
-        const storagePath = `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
-        try {
-          const [fileExists] = await bucket.file(storagePath).exists();
-          if (!fileExists) {
-            results.push({ bookId, chapterIndex, success: false, nasPath: null, error: 'File not found in storage' });
-            continue;
+            const [buffer] = await bucket.file(storagePath).download();
+            const nasFileName = `chapter-${chapterIndex}.mp3`;
+            const nasDestFolder = `${config.destFolder}/books/${bookId}`;
+            await client.upload(nasDestFolder, nasFileName, buffer as Buffer);
+            const nasPath = `${nasDestFolder}/${nasFileName}`;
+
+            await bucket.file(storagePath).delete();
+            await chapterDoc.ref.update({
+              audioUrl: FieldValue.delete(),
+              audioStoragePath: FieldValue.delete(),
+              nasArchived: true,
+              nasPath,
+            });
+          } catch (err: any) {
+            logger.error(`Background NAS offload failed for chapter ${chapterIndex}`, err.message || err);
           }
-
-          const [buffer] = await bucket.file(storagePath).download();
-          const nasFileName = `chapter-${chapterIndex}.mp3`;
-          const nasDestFolder = `${config.destFolder}/books/${bookId}`;
-          await client.upload(nasDestFolder, nasFileName, buffer as Buffer);
-          const nasPath = `${nasDestFolder}/${nasFileName}`;
-
-          await bucket.file(storagePath).delete();
-          await chapterDoc.ref.update({
-            audioUrl: FieldValue.delete(),
-            audioStoragePath: FieldValue.delete(),
-            nasArchived: true,
-            nasPath,
-          });
-
-          results.push({ bookId, chapterIndex, success: true, nasPath, error: null });
-        } catch (err: any) {
-          results.push({ bookId, chapterIndex, success: false, nasPath: null, error: err.message || String(err) });
         }
-      }
+      };
 
-      return results;
+      processInBackground().catch(err => {
+        logger.error('Background NAS batch offload failed', err);
+      });
+
+      return { started: true, totalChapters: audioChapters.length };
     },
 
     restoreChapterFromNas: async (
@@ -289,6 +292,87 @@ export function createNasMutationResolvers() {
         nasArchived: true,
         nasPath: chapterData.nasPath,
       };
+    },
+
+    archiveEpubToNas: async (_: any, { bookId }: { bookId: string }, ctx: ResolverContext) => {
+      const uid = requireAuth(ctx);
+      const config = await getCachedNasConfig(uid);
+      if (!config || config.status !== 'connected') {
+        throw new Error('NAS not configured or not connected. Save a NAS connection first.');
+      }
+
+      const db = getFirestore();
+      const bookRef = db.collection('books').doc(bookId);
+      const bookSnap = await bookRef.get();
+      if (!bookSnap.exists) throw new Error(`Book ${bookId} not found`);
+      const bookData = bookSnap.data()!;
+
+      if (bookData.epubNasArchived) {
+        throw new Error('EPUB is already archived on NAS');
+      }
+
+      const storagePath = bookData.storagePath || `books/${bookId}/original.epub`;
+      const bucket = getStorage().bucket();
+      const [fileExists] = await bucket.file(storagePath).exists();
+      if (!fileExists) {
+        throw new Error(`EPUB file not found in storage at ${storagePath}`);
+      }
+
+      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+      await client.createFolder(`${config.destFolder}/books`);
+      await client.createFolder(`${config.destFolder}/books/${bookId}`);
+
+      const [buffer] = await bucket.file(storagePath).download();
+      const nasDestFolder = `${config.destFolder}/books/${bookId}`;
+      await client.upload(nasDestFolder, 'original.epub', buffer as Buffer);
+      const nasPath = `${nasDestFolder}/original.epub`;
+
+      await bucket.file(storagePath).delete();
+      await bookRef.update({
+        epubUrl: FieldValue.delete(),
+        epubNasArchived: true,
+        epubNasPath: nasPath,
+      });
+
+      const updatedSnap = await bookRef.get();
+      return docToBook(bookId, updatedSnap.data()!);
+    },
+
+    restoreEpubFromNas: async (_: any, { bookId }: { bookId: string }, ctx: ResolverContext) => {
+      const uid = requireAuth(ctx);
+      const config = await getCachedNasConfig(uid);
+      if (!config || config.status !== 'connected') {
+        throw new Error('NAS not configured or not connected. Save a NAS connection first.');
+      }
+
+      const db = getFirestore();
+      const bookRef = db.collection('books').doc(bookId);
+      const bookSnap = await bookRef.get();
+      if (!bookSnap.exists) throw new Error(`Book ${bookId} not found`);
+      const bookData = bookSnap.data()!;
+
+      if (!bookData.epubNasArchived || !bookData.epubNasPath) {
+        throw new Error('EPUB is not archived on NAS');
+      }
+
+      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+      const buffer = await client.download(bookData.epubNasPath);
+
+      const storagePath = `books/${bookId}/original.epub`;
+      const bucket = getStorage().bucket();
+      const file = bucket.file(storagePath);
+      await file.save(buffer, { contentType: 'application/epub+zip', metadata: { cacheControl: 'public, max-age=31536000' } });
+      await file.makePublic();
+      const epubUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+
+      await bookRef.update({
+        epubUrl,
+        storagePath,
+        // Keep epubNasArchived and epubNasPath — EPUB exists in both places now
+      });
+
+      const updatedSnap = await bookRef.get();
+      return docToBook(bookId, updatedSnap.data()!);
     },
   };
 }

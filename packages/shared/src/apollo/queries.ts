@@ -1048,6 +1048,8 @@ const BOOK_FIELDS = gql`
     zipSize
     zipGeneratedAt
     zipError
+    epubNasArchived
+    epubNasPath
   }
 `;
 
@@ -2182,11 +2184,8 @@ export const ARCHIVE_CHAPTER_TO_NAS = gql`
 export const ARCHIVE_BOOK_TO_NAS = gql`
   mutation ArchiveBookToNas($bookId: ID!) {
     archiveBookToNas(bookId: $bookId) {
-      bookId
-      chapterIndex
-      success
-      nasPath
-      error
+      started
+      totalChapters
     }
   }
 `;
@@ -2203,6 +2202,24 @@ export const RESTORE_CHAPTER_FROM_NAS = gql`
       audioDuration
       nasArchived
       nasPath
+    }
+  }
+`;
+
+export const ARCHIVE_EPUB_TO_NAS = gql`
+  ${BOOK_FIELDS}
+  mutation ArchiveEpubToNas($bookId: ID!) {
+    archiveEpubToNas(bookId: $bookId) {
+      ...BookFields
+    }
+  }
+`;
+
+export const RESTORE_EPUB_FROM_NAS = gql`
+  ${BOOK_FIELDS}
+  mutation RestoreEpubFromNas($bookId: ID!) {
+    restoreEpubFromNas(bookId: $bookId) {
+      ...BookFields
     }
   }
 `;

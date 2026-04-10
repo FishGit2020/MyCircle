@@ -2056,6 +2056,13 @@ const zh: Record<TranslationKey, string> = {
   'library.nas.restoreError': '\u6062\u590d\u5931\u8d25',
   'library.nas.batchSummary': '\u5df2\u8f6c\u79fb {success} \u4e2a\u7ae0\u8282\uff0c{failed} \u4e2a\u5931\u8d25',
   'library.nas.archivedTooltip': '\u97f3\u9891\u5df2\u5f52\u6863\u5230 NAS\uff0c\u70b9\u51fb\u6062\u590d\u5373\u53ef\u64ad\u653e',
+  'library.nas.offloadEpub': '\u5c06EPUB\u8f6c\u79fb\u5230NAS',
+  'library.nas.restoreEpub': '\u4eceNAS\u6062\u590dEPUB',
+  'library.nas.epubArchived': 'EPUB\u5df2\u5f52\u6863\u5230NAS',
+  'library.nas.offloadingEpub': '\u6b63\u5728\u8f6c\u79fbEPUB...',
+  'library.nas.restoringEpub': '\u6b63\u5728\u6062\u590dEPUB...',
+  'library.nas.epubOffloadedNotice': 'EPUB\u5df2\u8f6c\u79fb\u5230NAS\uff0c\u6062\u590d\u540e\u5373\u53ef\u9605\u8bfb\u3002',
+  'library.nas.batchStarted': '\u6b63\u5728\u540e\u53f0\u8f6c\u79fb {count} \u4e2a\u7ae0\u8282...',
 
   'widgets.noAudiobook': '\u6ca1\u6709\u6b63\u5728\u8fdb\u884c\u7684\u6709\u58f0\u4e66',
 
