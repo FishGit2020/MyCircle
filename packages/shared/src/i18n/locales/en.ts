@@ -3525,9 +3525,9 @@ const en = {
   'anniversary.originalEvent': 'Original Event',
   'anniversary.editDetails': 'Edit Details',
   'anniversary.countdown': 'days until',
-  'anniversary.happyAnniversary': 'Happy Anniversary!',
+  'anniversary.happyAnniversary': 'Happy {{years}}-year Anniversary!',
   'anniversary.yearsMarried': 'years together',
-  'anniversary.daysUntil': 'days until next anniversary',
+  'anniversary.daysUntil': '{{days}} days until next anniversary',
   'anniversary.contributors': 'Contributors',
   'anniversary.searchByEmail': 'Search by email address',
   'anniversary.back': 'Back',
@@ -3544,6 +3544,9 @@ const en = {
   'anniversary.noResults': 'No users found',
   'anniversary.confirmRemoveContributor': 'Remove this contributor?',
   'anniversary.yearsToday': 'years today',
+  'anniversary.loading': 'Loading...',
+  'anniversary.yearsTogether': '{{years}} years together',
+  'anniversary.createFirst': 'Create your first anniversary',
 } as const;
 
 export default en;
