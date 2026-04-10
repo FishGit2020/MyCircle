@@ -474,7 +474,17 @@ export default function DigitalLibrary() {
         audioStatus={selectedBook.audioStatus}
         audioProgress={selectedBook.audioProgress}
         epubNasArchived={selectedBook.epubNasArchived}
+        zipStatus={selectedBook.zipStatus}
+        zipUrl={selectedBook.zipUrl}
+        zipSize={selectedBook.zipSize}
+        zipGeneratedAt={selectedBook.zipGeneratedAt}
+        zipError={selectedBook.zipError}
         onBack={handleBack}
+        onRefreshBook={async () => {
+          const result = await refetch();
+          const updated = (result.data?.books ?? []).find((b: Book) => b.id === selectedBook.id);
+          if (updated) setSelectedBook(updated);
+        }}
         onRefreshChapters={async () => {
           const result = await fetchChapters({ variables: { bookId: selectedBook.id } });
           const rawChapters = result.data?.bookChapters ?? [];

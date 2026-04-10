@@ -139,13 +139,25 @@ export function createNasMutationResolvers() {
 
       const storagePath = chapterData.audioStoragePath ?? `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
       const bucket = getStorage().bucket();
-      const [fileExists] = await bucket.file(storagePath).exists();
-      if (!fileExists) {
-        throw new Error(`Audio file not found in storage at ${storagePath}`);
-      }
 
-      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
       try {
+        // If already on NAS, just delete from Firebase Storage (skip re-upload)
+        if (chapterData.nasArchived && chapterData.nasPath) {
+          const [fileExists] = await bucket.file(storagePath).exists();
+          if (fileExists) await bucket.file(storagePath).delete();
+          await chapterDoc.ref.update({
+            audioUrl: FieldValue.delete(),
+            audioStoragePath: FieldValue.delete(),
+          });
+          return { bookId, chapterIndex, success: true, nasPath: chapterData.nasPath, error: null };
+        }
+
+        const [fileExists] = await bucket.file(storagePath).exists();
+        if (!fileExists) {
+          throw new Error(`Audio file not found in storage at ${storagePath}`);
+        }
+
+        const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
         // Download from Firebase Storage
         const [buffer] = await bucket.file(storagePath).download();
 
@@ -193,7 +205,7 @@ export function createNasMutationResolvers() {
         .get();
 
       const audioChapters = chaptersSnap.docs.filter(
-        d => d.data().audioUrl && !d.data().nasArchived,
+        d => d.data().audioUrl,
       );
 
       if (audioChapters.length === 0) {
@@ -212,6 +224,17 @@ export function createNasMutationResolvers() {
           const chapterIndex: number = chapterData.index ?? 0;
           const storagePath = chapterData.audioStoragePath ?? `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
           try {
+            // If already on NAS, just delete from Firebase Storage (skip re-upload)
+            if (chapterData.nasArchived && chapterData.nasPath) {
+              const [exists] = await bucket.file(storagePath).exists();
+              if (exists) await bucket.file(storagePath).delete();
+              await chapterDoc.ref.update({
+                audioUrl: FieldValue.delete(),
+                audioStoragePath: FieldValue.delete(),
+              });
+              continue;
+            }
+
             const [fileExists] = await bucket.file(storagePath).exists();
             if (!fileExists) continue;
 
@@ -313,26 +336,36 @@ export function createNasMutationResolvers() {
 
       const storagePath = bookData.storagePath || `books/${bookId}/original.epub`;
       const bucket = getStorage().bucket();
-      const [fileExists] = await bucket.file(storagePath).exists();
-      if (!fileExists) {
-        throw new Error(`EPUB file not found in storage at ${storagePath}`);
+
+      // If already on NAS, just delete from Firebase Storage (skip re-upload)
+      if (bookData.epubNasArchived && bookData.epubNasPath) {
+        const [exists] = await bucket.file(storagePath).exists();
+        if (exists) await bucket.file(storagePath).delete();
+        await bookRef.update({
+          epubUrl: FieldValue.delete(),
+        });
+      } else {
+        const [fileExists] = await bucket.file(storagePath).exists();
+        if (!fileExists) {
+          throw new Error(`EPUB file not found in storage at ${storagePath}`);
+        }
+
+        const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+        await client.createFolder(`${config.destFolder}/books`);
+        await client.createFolder(`${config.destFolder}/books/${bookId}`);
+
+        const [buffer] = await bucket.file(storagePath).download();
+        const nasDestFolder = `${config.destFolder}/books/${bookId}`;
+        await client.upload(nasDestFolder, 'original.epub', buffer as Buffer);
+        const nasPath = `${nasDestFolder}/original.epub`;
+
+        await bucket.file(storagePath).delete();
+        await bookRef.update({
+          epubUrl: FieldValue.delete(),
+          epubNasArchived: true,
+          epubNasPath: nasPath,
+        });
       }
-
-      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
-      await client.createFolder(`${config.destFolder}/books`);
-      await client.createFolder(`${config.destFolder}/books/${bookId}`);
-
-      const [buffer] = await bucket.file(storagePath).download();
-      const nasDestFolder = `${config.destFolder}/books/${bookId}`;
-      await client.upload(nasDestFolder, 'original.epub', buffer as Buffer);
-      const nasPath = `${nasDestFolder}/original.epub`;
-
-      await bucket.file(storagePath).delete();
-      await bookRef.update({
-        epubUrl: FieldValue.delete(),
-        epubNasArchived: true,
-        epubNasPath: nasPath,
-      });
 
       const updatedSnap = await bookRef.get();
       return docToBook(bookId, updatedSnap.data()!);
