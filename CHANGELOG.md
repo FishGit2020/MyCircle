@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.30.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.29.0...mycircle-v1.30.0) (2026-04-10)
+
+
+### Features
+
+* **anniversary:** add Anniversary Tracker MFE ([#968](https://github.com/FishGit2020/MyCircle/issues/968)) ([3e31b14](https://github.com/FishGit2020/MyCircle/commit/3e31b1417a88e27d4a14206c8d93e9a395d66382))
+* **anniversary:** add quick access tile and icon to dashboard ([#972](https://github.com/FishGit2020/MyCircle/issues/972)) ([438bc88](https://github.com/FishGit2020/MyCircle/commit/438bc88489b618e6073e0d4be9151b0f01a28fb2))
+
+
+### Miscellaneous
+
+* **deps:** bump axios from 1.14.0 to 1.15.0 ([#971](https://github.com/FishGit2020/MyCircle/issues/971)) ([dfe795c](https://github.com/FishGit2020/MyCircle/commit/dfe795c2d88c794263a0f3768f1bca44dad9154a))
+* **deps:** bump axios from 1.14.0 to 1.15.0 in /functions ([#970](https://github.com/FishGit2020/MyCircle/issues/970)) ([5c266a9](https://github.com/FishGit2020/MyCircle/commit/5c266a97d72bde39bd53b6afac126d5c9ea2eefd))
+
 ## [1.29.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.28.0...mycircle-v1.29.0) (2026-04-08)
 
 
