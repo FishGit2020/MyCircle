@@ -2066,6 +2066,12 @@ const zh: Record<TranslationKey, string> = {
   'library.nas.epubOffloadedConvertDisabled': 'EPUB\u5df2\u8f6c\u79fb\u5230NAS\uff0c\u8bf7\u5148\u6062\u590dEPUB\u518d\u8f6c\u6362\u7ae0\u8282\u4e3a\u97f3\u9891\u3002',
   'library.nas.batchStarted': '\u6b63\u5728\u540e\u53f0\u8f6c\u79fb {count} \u4e2a\u7ae0\u8282...',
 
+  'library.recycleBin': '\u56de\u6536\u7ad9',
+  'library.recycleBinEmpty': '\u56de\u6536\u7ad9\u4e3a\u7a7a\u3002',
+  'library.restore': '\u6062\u590d',
+  'library.permanentDelete': '\u6c38\u4e45\u5220\u9664',
+  'library.confirmPermanentDelete': '\u6c38\u4e45\u5220\u9664\u6b64\u4e66\uff1f\u6b64\u64cd\u4f5c\u4e0d\u53ef\u64a4\u9500 \u2014 \u6240\u6709\u6570\u636e\u548c\u97f3\u9891\u6587\u4ef6\u5c06\u88ab\u5220\u9664\u3002',
+
   'widgets.noAudiobook': '\u6ca1\u6709\u6b63\u5728\u8fdb\u884c\u7684\u6709\u58f0\u4e66',
 
   // Family Games

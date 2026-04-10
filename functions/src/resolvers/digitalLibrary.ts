@@ -81,6 +81,15 @@ export function createDigitalLibraryResolvers() {
           .map(d => docToBook(d.id, d.data()));
       },
 
+      deletedBooks: async (_: any, __: any, context: ResolverContext) => {
+        requireAuth(context);
+        const db = getFirestore();
+        const snap = await db.collection('books').orderBy('uploadedAt', 'desc').get();
+        return snap.docs
+          .filter(d => !!d.data().isDeleted)
+          .map(d => docToBook(d.id, d.data()));
+      },
+
       bookChapters: async (_: any, { bookId }: { bookId: string }, context: ResolverContext) => {
         requireAuth(context);
         const db = getFirestore();

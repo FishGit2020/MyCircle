@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, UPLOAD_BOOK, GET_NAS_CONNECTION_STATUS, ARCHIVE_EPUB_TO_NAS, RESTORE_EPUB_FROM_NAS, StorageKeys } from '@mycircle/shared';
+import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_DELETED_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, RESTORE_BOOK, PERMANENT_DELETE_BOOK, UPLOAD_BOOK, GET_NAS_CONNECTION_STATUS, ARCHIVE_EPUB_TO_NAS, RESTORE_EPUB_FROM_NAS, StorageKeys } from '@mycircle/shared';
 import BookReader from './BookReader';
 import LibrarySearchSort, { SortOption } from './LibrarySearchSort';
 import TtsQuotaBar from './TtsQuotaBar';
@@ -345,22 +345,31 @@ export default function DigitalLibrary() {
   const { getAllProgress, clearProgress } = useReadingProgress();
 
   const { data, loading, refetch } = useQuery(GET_BOOKS);
+  const { data: deletedData, refetch: refetchDeleted } = useQuery(GET_DELETED_BOOKS);
   const { data: nasData } = useQuery(GET_NAS_CONNECTION_STATUS);
   const nasConnected = nasData?.nasConnectionStatus?.status === 'connected';
   const [fetchChapters] = useLazyQuery(GET_BOOK_CHAPTERS, { fetchPolicy: 'network-only' });
   const [deleteBookMutation] = useMutation(DELETE_BOOK, {
-    refetchQueries: [{ query: GET_BOOKS }],
+    refetchQueries: [{ query: GET_BOOKS }, { query: GET_DELETED_BOOKS }],
   });
+  const [restoreBookMutation] = useMutation(RESTORE_BOOK, {
+    refetchQueries: [{ query: GET_BOOKS }, { query: GET_DELETED_BOOKS }],
+  });
+  const [permanentDeleteMutation] = useMutation(PERMANENT_DELETE_BOOK, {
+    refetchQueries: [{ query: GET_DELETED_BOOKS }],
+  });
+  const [showRecycleBin, setShowRecycleBin] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const books: Book[] = (data?.books ?? []) as Book[];
+  const deletedBooks: Book[] = (deletedData?.deletedBooks ?? []) as Book[];
 
   // Refetch when BOOKS_CHANGED event fires (after upload)
   useEffect(() => {
-    const handleBooksChanged = () => refetch();
+    const handleBooksChanged = () => { refetch(); refetchDeleted(); };
     window.addEventListener(WindowEvents.BOOKS_CHANGED, handleBooksChanged);
     return () => window.removeEventListener(WindowEvents.BOOKS_CHANGED, handleBooksChanged);
-  }, [refetch]);
+  }, [refetch, refetchDeleted]);
 
   const progressMap = useMemo(() => getAllProgress(), [getAllProgress, books]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -399,6 +408,25 @@ export default function DigitalLibrary() {
       logger.error('Failed to delete book', err);
     }
   }, [t, deleteBookMutation, clearProgress]);
+
+  const handleRestore = useCallback(async (bookId: string) => {
+    try {
+      await restoreBookMutation({ variables: { id: bookId } });
+      logger.info('Book restored', { bookId });
+    } catch (err) {
+      logger.error('Failed to restore book', err);
+    }
+  }, [restoreBookMutation]);
+
+  const handlePermanentDelete = useCallback(async (bookId: string) => {
+    if (!confirm(t('library.confirmPermanentDelete'))) return;
+    try {
+      await permanentDeleteMutation({ variables: { id: bookId } });
+      logger.info('Book permanently deleted', { bookId });
+    } catch (err) {
+      logger.error('Failed to permanently delete book', err);
+    }
+  }, [t, permanentDeleteMutation]);
 
   const handleSelect = useCallback(async (book: Book, tab?: 'read' | 'listen') => {
     try {
@@ -546,6 +574,69 @@ export default function DigitalLibrary() {
           ))}
         </div>
       )}
+
+      {/* Recycle Bin */}
+      <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-4">
+        <button
+          type="button"
+          onClick={() => setShowRecycleBin(v => !v)}
+          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors min-h-[44px]"
+        >
+          <svg className={`w-4 h-4 transition-transform ${showRecycleBin ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+          </svg>
+          {t('library.recycleBin')} ({deletedBooks.length})
+        </button>
+
+        {showRecycleBin && (
+          <div className="mt-3">
+            {deletedBooks.length === 0 ? (
+              <p className="text-sm text-gray-400 dark:text-gray-500 py-4">{t('library.recycleBinEmpty')}</p>
+            ) : (
+              <ul className="divide-y divide-gray-200 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                {deletedBooks.map(book => (
+                  <li key={book.id} className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {book.coverUrl ? (
+                        <img src={book.coverUrl} alt="" className="w-10 h-14 object-cover rounded flex-shrink-0" />
+                      ) : (
+                        <div className="w-10 h-14 bg-gray-200 dark:bg-gray-700 rounded flex-shrink-0 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                          </svg>
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{book.title}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{book.author}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleRestore(book.id)}
+                        className="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-md transition min-h-[44px]"
+                      >
+                        {t('library.restore')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePermanentDelete(book.id)}
+                        className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition min-h-[44px]"
+                      >
+                        {t('library.permanentDelete')}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
     </PageContent>
   );
 }
