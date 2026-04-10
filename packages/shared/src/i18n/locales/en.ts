@@ -2064,6 +2064,12 @@ const en = {
   'library.nas.epubOffloadedConvertDisabled': 'EPUB is offloaded to NAS. Restore the EPUB first to convert chapters to audio.',
   'library.nas.batchStarted': 'Offloading {count} chapters in background...',
 
+  'library.recycleBin': 'Recycle Bin',
+  'library.recycleBinEmpty': 'Recycle bin is empty.',
+  'library.restore': 'Restore',
+  'library.permanentDelete': 'Delete Forever',
+  'library.confirmPermanentDelete': 'Permanently delete this book? This cannot be undone — all data and audio files will be removed.',
+
   'widgets.noAudiobook': 'No audiobook in progress',
 
   // Family Games

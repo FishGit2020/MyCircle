@@ -689,6 +689,7 @@ export const typeDefs = `#graphql
 
     # Digital Library (auth required)
     books: [Book!]!
+    deletedBooks: [Book!]!
     bookChapters(bookId: ID!): [BookChapter!]!
     bookConversionProgress(bookId: ID!): BookConversionProgress!
     ttsQuota: TtsQuota!

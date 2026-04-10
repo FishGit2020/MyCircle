@@ -1519,6 +1519,7 @@ export type Query = {
   cryptoPrices: Array<CryptoPrice>;
   currentWeather: CurrentWeather;
   deals: Array<Deal>;
+  deletedBooks: Array<Book>;
   fileShareRecipients: Array<ShareRecipient>;
   filesSharedWithMe: Array<TargetedSharedFile>;
   folders: Array<Folder>;
@@ -3138,6 +3139,11 @@ export type GetBooksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetBooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, epubNasArchived?: boolean | null, epubNasPath?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } }> };
+
+export type GetDeletedBooksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDeletedBooksQuery = { __typename?: 'Query', deletedBooks: Array<{ __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, epubNasArchived?: boolean | null, epubNasPath?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } }> };
 
 export type GetBookChaptersQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];

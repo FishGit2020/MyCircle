@@ -2066,6 +2066,12 @@ const es: Record<TranslationKey, string> = {
   'library.nas.epubOffloadedConvertDisabled': 'El EPUB est\u00e1 en NAS. Restaura el EPUB primero para convertir cap\u00edtulos a audio.',
   'library.nas.batchStarted': 'Transfiriendo {count} cap\u00edtulos en segundo plano...',
 
+  'library.recycleBin': 'Papelera de reciclaje',
+  'library.recycleBinEmpty': 'La papelera est\u00e1 vac\u00eda.',
+  'library.restore': 'Restaurar',
+  'library.permanentDelete': 'Eliminar permanentemente',
+  'library.confirmPermanentDelete': '\u00bfEliminar permanentemente este libro? Esta acci\u00f3n no se puede deshacer \u2014 todos los datos y archivos de audio se eliminar\u00e1n.',
+
   'widgets.noAudiobook': 'No hay audiolibro en progreso',
 
   // Family Games

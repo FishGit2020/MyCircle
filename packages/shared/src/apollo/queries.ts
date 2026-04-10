@@ -1062,6 +1062,15 @@ export const GET_BOOKS = gql`
   }
 `;
 
+export const GET_DELETED_BOOKS = gql`
+  ${BOOK_FIELDS}
+  query GetDeletedBooks {
+    deletedBooks {
+      ...BookFields
+    }
+  }
+`;
+
 export const GET_BOOK_CHAPTERS = gql`
   query GetBookChapters($bookId: ID!) {
     bookChapters(bookId: $bookId) {
