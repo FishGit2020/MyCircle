@@ -250,7 +250,7 @@ export const onBatchConversionCreated = onDocumentCreated(
         const audioUrl = `https://storage.googleapis.com/${bucket.name}/${audioPath}`;
 
         // Update chapter doc
-        await chapterDoc.ref.update({ audioUrl });
+        await chapterDoc.ref.update({ audioUrl, audioStoragePath: audioPath });
         totalCharsUsed += chapterText.length;
         completedChapters.push(chapterIndex);
 

@@ -13,6 +13,17 @@ import { docToBook } from './digitalLibrary.js';
 
 const logger = { error: (...args: any[]) => console.error('[NAS]', ...args) };
 
+/** Extract storage path from a Firebase Storage public URL or download URL. */
+function storagePathFromUrl(url: string, bucketName: string): string | null {
+  // Public URL: https://storage.googleapis.com/BUCKET/path/to/file
+  const publicPrefix = `https://storage.googleapis.com/${bucketName}/`;
+  if (url.startsWith(publicPrefix)) return url.slice(publicPrefix.length).split('?')[0];
+  // Token URL: https://firebasestorage.googleapis.com/v0/b/BUCKET/o/ENCODED_PATH?alt=media&token=...
+  const tokenMatch = url.match(/\/o\/([^?]+)/);
+  if (tokenMatch) return decodeURIComponent(tokenMatch[1]);
+  return null;
+}
+
 interface ResolverContext {
   uid: string | null;
 }
@@ -137,8 +148,10 @@ export function createNasMutationResolvers() {
         throw new Error(`Chapter ${chapterIndex} has no converted audio to offload`);
       }
 
-      const storagePath = chapterData.audioStoragePath ?? `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
       const bucket = getStorage().bucket();
+      const storagePath = chapterData.audioStoragePath
+        ?? storagePathFromUrl(chapterData.audioUrl, bucket.name)
+        ?? `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
 
       try {
         // If already on NAS, just delete from Firebase Storage (skip re-upload)
@@ -222,7 +235,9 @@ export function createNasMutationResolvers() {
         for (const chapterDoc of audioChapters) {
           const chapterData = chapterDoc.data();
           const chapterIndex: number = chapterData.index ?? 0;
-          const storagePath = chapterData.audioStoragePath ?? `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
+          const storagePath = chapterData.audioStoragePath
+            ?? storagePathFromUrl(chapterData.audioUrl, bucket.name)
+            ?? `books/${bookId}/audio/chapter-${String(chapterIndex).padStart(4, '0')}.mp3`;
           try {
             // If already on NAS, just delete from Firebase Storage (skip re-upload)
             if (chapterData.nasArchived && chapterData.nasPath) {
