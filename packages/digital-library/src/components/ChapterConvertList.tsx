@@ -315,7 +315,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
 
   // Stop NAS batch poll when all chapters are archived or component unmounts
   useEffect(() => {
-    const allArchived = !chapters.some(c => c.audioUrl && !c.nasArchived);
+    const allArchived = !chapters.some(c => c.audioUrl);
     if (allArchived && batchPollRef.current) {
       clearInterval(batchPollRef.current);
       batchPollRef.current = null;
@@ -414,7 +414,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
         </div>
       )}
       {/* Batch actions toolbar (ZIP download + NAS offload) */}
-      {(audioChapters.length > 0 || (nasConnected && chapters.some(c => c.audioUrl && !c.nasArchived))) && (
+      {(audioChapters.length > 0 || (nasConnected && chapters.some(c => c.audioUrl))) && (
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           {/* ZIP download button */}
           {audioChapters.length > 0 && (
@@ -488,7 +488,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
             )
           )}
           {/* NAS offload button */}
-          {nasConnected && chapters.some(c => c.audioUrl && !c.nasArchived) && (
+          {nasConnected && chapters.some(c => c.audioUrl) && (
             <button
               type="button"
               onClick={handleOffloadAll}
@@ -641,7 +641,7 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m0 0l-4.5-4.5M12 16.5l4.5-4.5" />
                     </svg>
                   </a>
-                  {nasConnected && !ch.nasArchived && (
+                  {nasConnected && (
                     nasOffloading.has(ch.index) ? (
                       <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 px-2">
                         <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
