@@ -2063,6 +2063,7 @@ const es: Record<TranslationKey, string> = {
   'library.nas.offloadingEpub': 'Transfiriendo EPUB...',
   'library.nas.restoringEpub': 'Restaurando EPUB...',
   'library.nas.epubOffloadedNotice': 'El EPUB ha sido transferido a NAS. Restaura para leer.',
+  'library.nas.epubOffloadedConvertDisabled': 'El EPUB est\u00e1 en NAS. Restaura el EPUB primero para convertir cap\u00edtulos a audio.',
   'library.nas.batchStarted': 'Transfiriendo {count} cap\u00edtulos en segundo plano...',
 
   'widgets.noAudiobook': 'No hay audiolibro en progreso',

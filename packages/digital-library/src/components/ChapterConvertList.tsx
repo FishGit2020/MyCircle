@@ -33,6 +33,7 @@ interface Props {
   zipGeneratedAt?: string;
   zipError?: string;
   onRefreshBook?: () => Promise<void>;
+  epubOffloaded?: boolean;
 }
 
 function formatBytes(bytes: number): string {
@@ -40,7 +41,7 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted, autoPlay, initialChapter, zipStatus, zipUrl, zipSize, zipGeneratedAt: _zipGeneratedAt, zipError: _zipError, onRefreshBook }: Props) {
+export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapters, voiceName, onChapterConverted, autoPlay, initialChapter, zipStatus, zipUrl, zipSize, zipGeneratedAt: _zipGeneratedAt, zipError: _zipError, onRefreshBook, epubOffloaded }: Props) {
   const { t } = useTranslation();
   const [converting, setConverting] = useState<number | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -681,9 +682,10 @@ export default function ChapterConvertList({ bookId, bookTitle, coverUrl, chapte
                 <button
                   type="button"
                   onClick={() => handleConvert(ch.index)}
-                  disabled={converting !== null}
+                  disabled={converting !== null || !!epubOffloaded}
                   className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-md transition min-h-[44px] disabled:opacity-50"
                   aria-label={`${t('library.convertChapter')} ${ch.title}`}
+                  title={epubOffloaded ? t('library.nas.epubOffloadedConvertDisabled') : ''}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
