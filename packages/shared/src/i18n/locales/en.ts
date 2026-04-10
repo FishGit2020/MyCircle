@@ -2061,6 +2061,7 @@ const en = {
   'library.nas.offloadingEpub': 'Offloading EPUB...',
   'library.nas.restoringEpub': 'Restoring EPUB...',
   'library.nas.epubOffloadedNotice': 'EPUB has been offloaded to NAS. Restore to read.',
+  'library.nas.epubOffloadedConvertDisabled': 'EPUB is offloaded to NAS. Restore the EPUB first to convert chapters to audio.',
   'library.nas.batchStarted': 'Offloading {count} chapters in background...',
 
   'widgets.noAudiobook': 'No audiobook in progress',

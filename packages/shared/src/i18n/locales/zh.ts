@@ -2063,6 +2063,7 @@ const zh: Record<TranslationKey, string> = {
   'library.nas.offloadingEpub': '\u6b63\u5728\u8f6c\u79fbEPUB...',
   'library.nas.restoringEpub': '\u6b63\u5728\u6062\u590dEPUB...',
   'library.nas.epubOffloadedNotice': 'EPUB\u5df2\u8f6c\u79fb\u5230NAS\uff0c\u6062\u590d\u540e\u5373\u53ef\u9605\u8bfb\u3002',
+  'library.nas.epubOffloadedConvertDisabled': 'EPUB\u5df2\u8f6c\u79fb\u5230NAS\uff0c\u8bf7\u5148\u6062\u590dEPUB\u518d\u8f6c\u6362\u7ae0\u8282\u4e3a\u97f3\u9891\u3002',
   'library.nas.batchStarted': '\u6b63\u5728\u540e\u53f0\u8f6c\u79fb {count} \u4e2a\u7ae0\u8282...',
 
   'widgets.noAudiobook': '\u6ca1\u6709\u6b63\u5728\u8fdb\u884c\u7684\u6709\u58f0\u4e66',

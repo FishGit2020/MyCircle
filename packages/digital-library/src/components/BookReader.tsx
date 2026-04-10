@@ -674,6 +674,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             language={language}
             initialStatus={audioStatus}
             initialProgress={audioProgress}
+            epubOffloaded={epubNasArchived && !epubUrl}
             onComplete={() => { /* chapters refetch handles UI update */ }}
             onConvert={async (voiceName: string) => {
               // Submit all unconverted chapters to the conversion queue
@@ -701,6 +702,7 @@ export default function BookReader({ bookId, epubUrl, title, chapters, coverUrl,
             zipGeneratedAt={zipGeneratedAt}
             zipError={zipError}
             onRefreshBook={onRefreshBook}
+            epubOffloaded={epubNasArchived && !epubUrl}
             onChapterConverted={async () => {
               await onRefreshChapters?.();
             }}

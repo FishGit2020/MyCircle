@@ -81,9 +81,10 @@ interface ConversionStatusProps {
   initialProgress: number;
   onComplete: () => void;
   onConvert: (voiceName: string) => Promise<void>;
+  epubOffloaded?: boolean;
 }
 
-export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert }: ConversionStatusProps) {
+export default function ConversionStatus({ bookId, language, initialStatus, initialProgress, onComplete, onConvert, epubOffloaded }: ConversionStatusProps) {
   const { t } = useTranslation();
   const [status, setStatus] = useState(initialStatus);
   const [progress, setProgress] = useState(initialProgress);
@@ -452,8 +453,14 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
   );
 
   if (status === 'none') {
+    const convertDisabled = converting || isQuotaExhausted || !!epubOffloaded;
     return (
       <div>
+        {epubOffloaded && (
+          <p className="text-xs text-orange-600 dark:text-orange-400 mb-2">
+            {t('library.nas.epubOffloadedConvertDisabled')}
+          </p>
+        )}
         {voicePicker}
         {isQuotaExhausted && (
           <p className="text-xs text-red-600 dark:text-red-400 mb-2">
@@ -465,9 +472,9 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         <button
           type="button"
           onClick={handleConvert}
-          disabled={converting || isQuotaExhausted}
+          disabled={convertDisabled}
           className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition text-sm font-medium min-h-[44px] disabled:opacity-50"
-          title={isQuotaExhausted ? t('library.ttsQuotaExhausted') : ''}
+          title={epubOffloaded ? t('library.nas.epubOffloadedConvertDisabled') : isQuotaExhausted ? t('library.ttsQuotaExhausted') : ''}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
@@ -535,6 +542,11 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
         <div className="flex items-center gap-2">
           <span className="text-sm text-red-600 dark:text-red-400">{error || t('library.conversionFailed')}</span>
         </div>
+        {epubOffloaded && (
+          <p className="text-xs text-orange-600 dark:text-orange-400">
+            {t('library.nas.epubOffloadedConvertDisabled')}
+          </p>
+        )}
         {voicePicker}
         {isQuotaExhausted && (
           <p className="text-xs text-red-600 dark:text-red-400">
@@ -547,7 +559,7 @@ export default function ConversionStatus({ bookId, language, initialStatus, init
           <button
             type="button"
             onClick={handleConvert}
-            disabled={converting || isQuotaExhausted}
+            disabled={converting || isQuotaExhausted || !!epubOffloaded}
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline min-h-[44px] text-left disabled:opacity-50"
           >
             {converting ? t('library.converting') : progress > 0 ? t('library.retryConversion') : t('library.convertToAudio')}
