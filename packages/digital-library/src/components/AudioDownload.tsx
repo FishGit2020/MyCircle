@@ -167,10 +167,16 @@ function ZipSection({
   requestZipMutation: ReturnType<typeof useMutation>[0];
 }) {
   const { t } = useTranslation();
+  const [isRequesting, setIsRequesting] = useState(false);
 
   async function handleGenerate() {
-    await requestZipMutation({ variables: { bookId } });
-    await onRefreshBook();
+    setIsRequesting(true);
+    try {
+      await requestZipMutation({ variables: { bookId } });
+      await onRefreshBook();
+    } finally {
+      setIsRequesting(false);
+    }
   }
 
   const formattedDate = zipGeneratedAt
@@ -187,9 +193,16 @@ function ZipSection({
         <button
           type="button"
           onClick={handleGenerate}
-          className="w-full py-2 px-4 rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 min-h-[44px] transition-colors"
+          disabled={isRequesting}
+          className="w-full py-2 px-4 rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] transition-colors flex items-center justify-center gap-2"
         >
-          {t('library.generateZip')}
+          {isRequesting && (
+            <svg className="animate-spin h-4 w-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          )}
+          {isRequesting ? t('library.generatingZip') : t('library.generateZip')}
         </button>
       ) : zipStatus === 'processing' ? (
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -224,9 +237,16 @@ function ZipSection({
             <button
               type="button"
               onClick={handleGenerate}
-              className="flex-1 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px] transition-colors"
+              disabled={isRequesting}
+              className="flex-1 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] transition-colors flex items-center justify-center gap-2"
             >
-              {t('library.generateNewZip')}
+              {isRequesting && (
+                <svg className="animate-spin h-4 w-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {isRequesting ? t('library.generatingZip') : t('library.generateNewZip')}
             </button>
           </div>
         </div>
@@ -238,9 +258,16 @@ function ZipSection({
           <button
             type="button"
             onClick={handleGenerate}
-            className="w-full py-2 px-4 rounded-lg bg-red-600 dark:bg-red-500 text-white text-sm font-medium hover:bg-red-700 dark:hover:bg-red-600 min-h-[44px] transition-colors"
+            disabled={isRequesting}
+            className="w-full py-2 px-4 rounded-lg bg-red-600 dark:bg-red-500 text-white text-sm font-medium hover:bg-red-700 dark:hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] transition-colors flex items-center justify-center gap-2"
           >
-            {t('library.generateZip')}
+            {isRequesting && (
+              <svg className="animate-spin h-4 w-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+            {isRequesting ? t('library.generatingZip') : t('library.generateZip')}
           </button>
         </div>
       ) : null}

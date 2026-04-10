@@ -45,6 +45,7 @@ export const onResumeParseJobCreated = onDocumentCreated(
 
     try {
       const { fileName, fileBase64, contentType, model, endpointId } = data;
+      logger.info('Starting resume parse job', { uid, jobId, fileName, contentType, model });
 
       // Extract text
       const buffer = Buffer.from(fileBase64, 'base64');
@@ -62,9 +63,12 @@ export const onResumeParseJobCreated = onDocumentCreated(
       }
 
       if (!text.trim()) {
+        logger.warn('No text extracted from resume', { uid, jobId, fileName, contentType });
         await jobRef.update({ status: 'error', error: 'No text found in this file.' });
         return;
       }
+
+      logger.info('Text extracted from resume', { uid, jobId, textLength: text.length });
 
       // Clear base64 to save Firestore storage (no longer needed)
       await jobRef.update({ fileBase64: '' });
@@ -91,10 +95,12 @@ export const onResumeParseJobCreated = onDocumentCreated(
       }
 
       if (!endpointUrl) {
+        logger.warn('No AI endpoint configured for resume parse', { uid, jobId });
         await jobRef.update({ status: 'error', error: 'No AI endpoint configured. Please add an Ollama endpoint in Settings.' });
         return;
       }
 
+      logger.info('Calling AI for resume parse', { uid, jobId, model, endpoint: endpointUrl });
       // Update status to processing
       await jobRef.update({ status: 'processing' });
 
