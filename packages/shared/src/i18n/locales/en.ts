@@ -2054,6 +2054,13 @@ const en = {
   'library.nas.restoreError': 'Restore failed',
   'library.nas.batchSummary': '{success} chapters offloaded, {failed} failed',
   'library.nas.archivedTooltip': 'Audio archived on NAS — restore to play',
+  'library.nas.offloadEpub': 'Offload EPUB to NAS',
+  'library.nas.restoreEpub': 'Restore EPUB from NAS',
+  'library.nas.epubArchived': 'EPUB on NAS',
+  'library.nas.offloadingEpub': 'Offloading EPUB...',
+  'library.nas.restoringEpub': 'Restoring EPUB...',
+  'library.nas.epubOffloadedNotice': 'EPUB has been offloaded to NAS. Restore to read.',
+  'library.nas.batchStarted': 'Offloading {count} chapters in background...',
 
   'widgets.noAudiobook': 'No audiobook in progress',
 

@@ -306,6 +306,8 @@ export type Book = {
   chapterCount: Scalars['Int']['output'];
   coverUrl: Scalars['String']['output'];
   description: Scalars['String']['output'];
+  epubNasArchived?: Maybe<Scalars['Boolean']['output']>;
+  epubNasPath?: Maybe<Scalars['String']['output']>;
   epubUrl: Scalars['String']['output'];
   fileSize: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
@@ -806,8 +808,9 @@ export type Mutation = {
   addWorshipSetlist: Setlist;
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
-  archiveBookToNas: Array<NasArchiveResult>;
+  archiveBookToNas: NasOffloadStartResult;
   archiveChapterToNas: NasArchiveResult;
+  archiveEpubToNas: Book;
   boostAtsScore: GeneratedResumeResult;
   cancelBookConversion: Scalars['Boolean']['output'];
   cancelSqlBackfill: Scalars['Boolean']['output'];
@@ -856,6 +859,7 @@ export type Mutation = {
   resetBookConversion: Scalars['Boolean']['output'];
   restoreBook: Scalars['Boolean']['output'];
   restoreChapterFromNas: BookChapter;
+  restoreEpubFromNas: Book;
   restoreHsaReceipt: HsaReceipt;
   revokeFileAccess: Scalars['Boolean']['output'];
   runBenchmark: BenchmarkRunResult;
@@ -939,6 +943,11 @@ export type MutationArchiveBookToNasArgs = {
 export type MutationArchiveChapterToNasArgs = {
   bookId: Scalars['ID']['input'];
   chapterIndex: Scalars['Int']['input'];
+};
+
+
+export type MutationArchiveEpubToNasArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -1175,6 +1184,11 @@ export type MutationRestoreChapterFromNasArgs = {
 };
 
 
+export type MutationRestoreEpubFromNasArgs = {
+  bookId: Scalars['ID']['input'];
+};
+
+
 export type MutationRestoreHsaReceiptArgs = {
   expenseId: Scalars['ID']['input'];
   receiptId: Scalars['ID']['input'];
@@ -1387,6 +1401,12 @@ export type NasConnectionStatus = {
   lastTestedAt?: Maybe<Scalars['String']['output']>;
   nasUrl: Scalars['String']['output'];
   status: Scalars['String']['output'];
+};
+
+export type NasOffloadStartResult = {
+  __typename?: 'NasOffloadStartResult';
+  started: Scalars['Boolean']['output'];
+  totalChapters: Scalars['Int']['output'];
 };
 
 export type Note = {
@@ -3112,12 +3132,12 @@ export type SaveBabyMilestoneNotesMutationVariables = Exact<{
 
 export type SaveBabyMilestoneNotesMutation = { __typename?: 'Mutation', saveBabyMilestoneNotes: boolean };
 
-export type BookFieldsFragment = { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } };
+export type BookFieldsFragment = { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, epubNasArchived?: boolean | null, epubNasPath?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } };
 
 export type GetBooksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } }> };
+export type GetBooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, epubNasArchived?: boolean | null, epubNasPath?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } }> };
 
 export type GetBookChaptersQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];
@@ -3656,7 +3676,7 @@ export type ArchiveBookToNasMutationVariables = Exact<{
 }>;
 
 
-export type ArchiveBookToNasMutation = { __typename?: 'Mutation', archiveBookToNas: Array<{ __typename?: 'NasArchiveResult', bookId: string, chapterIndex: number, success: boolean, nasPath?: string | null, error?: string | null }> };
+export type ArchiveBookToNasMutation = { __typename?: 'Mutation', archiveBookToNas: { __typename?: 'NasOffloadStartResult', started: boolean, totalChapters: number } };
 
 export type RestoreChapterFromNasMutationVariables = Exact<{
   bookId: Scalars['ID']['input'];
@@ -3665,6 +3685,20 @@ export type RestoreChapterFromNasMutationVariables = Exact<{
 
 
 export type RestoreChapterFromNasMutation = { __typename?: 'Mutation', restoreChapterFromNas: { __typename?: 'BookChapter', id: string, index: number, title: string, href: string, characterCount: number, audioUrl?: string | null, audioDuration?: number | null, nasArchived?: boolean | null, nasPath?: string | null } };
+
+export type ArchiveEpubToNasMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type ArchiveEpubToNasMutation = { __typename?: 'Mutation', archiveEpubToNas: { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, epubNasArchived?: boolean | null, epubNasPath?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } } };
+
+export type RestoreEpubFromNasMutationVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type RestoreEpubFromNasMutation = { __typename?: 'Mutation', restoreEpubFromNas: { __typename?: 'Book', id: string, title: string, author: string, description: string, language: string, coverUrl: string, epubUrl: string, fileSize: number, chapterCount: number, totalCharacters: number, uploadedAt: string, audioStatus: string, audioProgress: number, audioError?: string | null, zipStatus?: string | null, zipUrl?: string | null, zipSize?: number | null, zipGeneratedAt?: string | null, zipError?: string | null, epubNasArchived?: boolean | null, epubNasPath?: string | null, uploadedBy: { __typename?: 'BookUploader', uid: string, displayName: string } } };
 
 export type HsaReceiptFieldsFragment = { __typename?: 'HSAReceipt', id: string, url: string, contentType: string, fileName: string, uploadedAt: string, trashedAt?: string | null };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, UPLOAD_BOOK, StorageKeys } from '@mycircle/shared';
+import { useTranslation, WindowEvents, createLogger, PageContent, useQuery, useMutation, useLazyQuery, GET_BOOKS, GET_BOOK_CHAPTERS, DELETE_BOOK, UPLOAD_BOOK, GET_NAS_CONNECTION_STATUS, ARCHIVE_EPUB_TO_NAS, RESTORE_EPUB_FROM_NAS, StorageKeys } from '@mycircle/shared';
 import BookReader from './BookReader';
 import LibrarySearchSort, { SortOption } from './LibrarySearchSort';
 import TtsQuotaBar from './TtsQuotaBar';
@@ -29,6 +29,8 @@ interface Book {
   zipSize?: number;
   zipGeneratedAt?: string;
   zipError?: string;
+  epubNasArchived?: boolean;
+  epubNasPath?: string;
 }
 
 function formatFileSize(bytes: number): string {
@@ -37,14 +39,20 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function BookCard({ book, onSelect, onSelectListen, onDelete, readPercent }: {
+function BookCard({ book, onSelect, onSelectListen, onDelete, readPercent, nasConnected, onRefresh }: {
   book: Book;
   onSelect: (book: Book) => void;
   onSelectListen: (book: Book) => void;
   onDelete: (bookId: string) => void;
   readPercent?: number; // 0–100 or undefined if never opened
+  nasConnected?: boolean;
+  onRefresh?: () => void;
 }) {
   const { t } = useTranslation();
+  const [archiveEpubMutation] = useMutation(ARCHIVE_EPUB_TO_NAS);
+  const [restoreEpubMutation] = useMutation(RESTORE_EPUB_FROM_NAS);
+  const [epubOffloading, setEpubOffloading] = useState(false);
+  const [epubRestoring, setEpubRestoring] = useState(false);
   const isComplete = readPercent != null && readPercent >= 98;
   const showProgress = readPercent != null && readPercent >= 1 && !isComplete;
 
@@ -119,19 +127,92 @@ function BookCard({ book, onSelect, onSelectListen, onDelete, readPercent }: {
           )}
         </div>
       </button>
-      <div className="px-4 pb-3 flex items-center justify-between">
-        <a
-          href={book.epubUrl}
-          download={`${book.title}.epub`}
-          onClick={(e) => e.stopPropagation()}
-          className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors min-h-[44px] flex items-center gap-1"
-          aria-label={`${t('library.downloadEpub')}: ${book.title}`}
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          {t('library.downloadEpub')}
-        </a>
+      <div className="px-4 pb-3 flex items-center justify-between flex-wrap gap-1">
+        <div className="flex items-center gap-2">
+          {book.epubUrl ? (
+            <>
+              <a
+                href={book.epubUrl}
+                download={`${book.title}.epub`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors min-h-[44px] flex items-center gap-1"
+                aria-label={`${t('library.downloadEpub')}: ${book.title}`}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                {t('library.downloadEpub')}
+              </a>
+              {nasConnected && !book.epubNasArchived && (
+                epubOffloading ? (
+                  <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                    <div className="w-3 h-3 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                    {t('library.nas.offloadingEpub')}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setEpubOffloading(true);
+                      try {
+                        await archiveEpubMutation({ variables: { bookId: book.id } });
+                        onRefresh?.();
+                      } catch (err) { logger.error('Failed to offload EPUB to NAS', err); }
+                      finally { setEpubOffloading(false); }
+                    }}
+                    className="text-xs text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300 transition-colors min-h-[44px] flex items-center gap-1"
+                    aria-label={`${t('library.nas.offloadEpub')}: ${book.title}`}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                    {t('library.nas.offloadEpub')}
+                  </button>
+                )
+              )}
+              {book.epubNasArchived && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-medium">
+                  NAS
+                </span>
+              )}
+            </>
+          ) : book.epubNasArchived ? (
+            <div className="flex items-center gap-1">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-medium">
+                {t('library.nas.epubArchived')}
+              </span>
+              {nasConnected && (
+                epubRestoring ? (
+                  <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                    <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    {t('library.nas.restoringEpub')}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setEpubRestoring(true);
+                      try {
+                        await restoreEpubMutation({ variables: { bookId: book.id } });
+                        onRefresh?.();
+                      } catch (err) { logger.error('Failed to restore EPUB from NAS', err); }
+                      finally { setEpubRestoring(false); }
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors min-h-[44px] flex items-center gap-1"
+                    aria-label={`${t('library.nas.restoreEpub')}: ${book.title}`}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m0 0l-4.5-4.5M12 16.5l4.5-4.5" />
+                    </svg>
+                    {t('library.nas.restoreEpub')}
+                  </button>
+                )
+              )}
+            </div>
+          ) : null}
+        </div>
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onDelete(book.id); }}
@@ -264,6 +345,8 @@ export default function DigitalLibrary() {
   const { getAllProgress, clearProgress } = useReadingProgress();
 
   const { data, loading, refetch } = useQuery(GET_BOOKS);
+  const { data: nasData } = useQuery(GET_NAS_CONNECTION_STATUS);
+  const nasConnected = nasData?.nasConnectionStatus?.status === 'connected';
   const [fetchChapters] = useLazyQuery(GET_BOOK_CHAPTERS, { fetchPolicy: 'network-only' });
   const [deleteBookMutation] = useMutation(DELETE_BOOK, {
     refetchQueries: [{ query: GET_BOOKS }],
@@ -395,6 +478,7 @@ export default function DigitalLibrary() {
         zipSize={selectedBook.zipSize}
         zipGeneratedAt={selectedBook.zipGeneratedAt}
         zipError={selectedBook.zipError}
+        epubNasArchived={selectedBook.epubNasArchived}
         onRefreshBook={async () => { await refetch(); }}
         onBack={handleBack}
         onRefreshChapters={async () => {
@@ -452,6 +536,8 @@ export default function DigitalLibrary() {
               onSelectListen={handleSelectListen}
               onDelete={handleDelete}
               readPercent={progressMap[book.id]?.percent}
+              nasConnected={nasConnected}
+              onRefresh={refetch}
             />
           ))}
         </div>
