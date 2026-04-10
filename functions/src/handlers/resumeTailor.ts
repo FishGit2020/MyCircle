@@ -148,6 +148,7 @@ export const resumeTailor = onRequest(
     }
 
     const { model, endpointId = null } = parsed.data;
+    logger.info('Resume tailor upload', { uid, fileName, contentType, textLength: text.length, model });
 
     // Get Ollama endpoint from Firestore
     const db = (await import('firebase-admin/firestore')).getFirestore();
@@ -172,11 +173,13 @@ export const resumeTailor = onRequest(
     }
 
     if (!endpointUrl) {
+      logger.warn('No AI endpoint configured for resume tailor', { uid });
       res.status(500).json({ error: 'No AI endpoint configured. Please add an Ollama endpoint in Settings.' });
       return;
     }
 
     try {
+      logger.info('Calling AI for resume tailor', { uid, model, endpoint: endpointUrl });
       const OpenAI = (await import('openai')).default;
       const openai = new OpenAI({
         baseURL: `${endpointUrl}/v1`,
@@ -222,6 +225,7 @@ Use sequential ids (exp-1, exp-2, etc.). Extract all experiences with their bull
         const match = content.match(/\{[\s\S]*\}/);
         structured = match ? JSON.parse(match[0]) as Record<string, unknown> : {};
       }
+      logger.info('Resume tailor complete', { uid, fileName });
       res.status(200).json(structured);
     } catch (err: any) {
       logger.error('Resume AI parse error', { uid, error: err.message });
