@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.32.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.31.0...mycircle-v1.32.0) (2026-04-10)
+
+
+### Features
+
+* **digital-library:** add recycle bin with restore and permanent delete ([#985](https://github.com/FishGit2020/MyCircle/issues/985)) ([f3cf001](https://github.com/FishGit2020/MyCircle/commit/f3cf001c4d43dd2169e87e78b75a70f44219f8a6))
+
+
+### Bug Fixes
+
+* **digital-library:** disable audio conversion when EPUB is offloaded to NAS ([#984](https://github.com/FishGit2020/MyCircle/issues/984)) ([91a1ae8](https://github.com/FishGit2020/MyCircle/commit/91a1ae8532b8583265fa05d9a1989d90bd9b6216))
+* **digital-library:** keep NAS offload spinner active during batch + fix autoPlay default ([#983](https://github.com/FishGit2020/MyCircle/issues/983)) ([7d9b853](https://github.com/FishGit2020/MyCircle/commit/7d9b85357f74174fb7bc23878b11967c45bb0dbe))
+* **nas:** resolve audio storage path from URL when audioStoragePath missing ([#981](https://github.com/FishGit2020/MyCircle/issues/981)) ([96a59fb](https://github.com/FishGit2020/MyCircle/commit/96a59fb96faabb678be8b6b9f8cd3ee89eff7424))
+
 ## [1.31.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.30.0...mycircle-v1.31.0) (2026-04-10)
 
 
