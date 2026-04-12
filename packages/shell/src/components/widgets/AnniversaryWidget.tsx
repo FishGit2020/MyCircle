@@ -1,36 +1,10 @@
 import React from 'react';
-import { useTranslation, useQuery, GET_ANNIVERSARIES } from '@mycircle/shared';
-import type { GetAnniversariesQuery } from '@mycircle/shared';
+import {
+  useTranslation, useQuery, GET_ANNIVERSARIES,
+  daysUntilNextFixed, daysUntilNextFloating, yearsElapsed,
+} from '@mycircle/shared';
+import type { GetAnniversariesQuery, FloatingRule } from '@mycircle/shared';
 import { Link } from 'react-router';
-
-function getDaysUntilNext(originalDate: string): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const orig = new Date(originalDate);
-  if (isNaN(orig.getTime())) return 0;
-  const month = orig.getMonth();
-  const day = orig.getDate();
-  const thisYear = today.getFullYear();
-  let next = new Date(thisYear, month, day);
-  next.setHours(0, 0, 0, 0);
-  if (next < today) {
-    next = new Date(thisYear + 1, month, day);
-    next.setHours(0, 0, 0, 0);
-  }
-  return Math.round((next.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
-}
-
-function getYearsTogether(originalDate: string): number {
-  const today = new Date();
-  const orig = new Date(originalDate);
-  if (isNaN(orig.getTime())) return 0;
-  let years = today.getFullYear() - orig.getFullYear();
-  const monthDiff = today.getMonth() - orig.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < orig.getDate())) {
-    years--;
-  }
-  return Math.max(0, years);
-}
 
 const AnniversaryWidget = React.memo(function AnniversaryWidget() {
   const { t } = useTranslation();
@@ -38,17 +12,20 @@ const AnniversaryWidget = React.memo(function AnniversaryWidget() {
 
   const anniversaries = data?.anniversaries ?? [];
 
+  const getDays = (ann: { originalDate: string; floatingRule?: { month: number; weekday: number; ordinal: number } | null }) => {
+    const rule = ann.floatingRule as FloatingRule | null;
+    return rule ? daysUntilNextFloating(rule) : daysUntilNextFixed(ann.originalDate);
+  };
+
   // Find the anniversary with the nearest upcoming date
   const nearest = anniversaries.length > 0
     ? anniversaries.reduce((best, curr) => {
-        const bestDays = getDaysUntilNext(best.originalDate);
-        const currDays = getDaysUntilNext(curr.originalDate);
-        return currDays < bestDays ? curr : best;
+        return getDays(curr) < getDays(best) ? curr : best;
       })
     : null;
 
-  const daysUntil = nearest ? getDaysUntilNext(nearest.originalDate) : null;
-  const yearsTogether = nearest ? getYearsTogether(nearest.originalDate) : null;
+  const daysUntil = nearest ? getDays(nearest) : null;
+  const yearsTogether = nearest ? yearsElapsed(nearest.originalDate) : null;
   const isToday = daysUntil === 0;
 
   return (

@@ -18,6 +18,39 @@ interface AnniversaryLocationInput {
   name?: string;
 }
 
+interface FloatingRuleInput {
+  month: number;
+  weekday: number;
+  ordinal: number;
+}
+
+function resolveFloatingDate(rule: FloatingRuleInput, year: number): Date {
+  const { month, weekday, ordinal } = rule;
+  if (ordinal === -1) {
+    const lastDay = new Date(year, month + 1, 0);
+    const diff = (lastDay.getDay() - weekday + 7) % 7;
+    lastDay.setDate(lastDay.getDate() - diff);
+    return lastDay;
+  }
+  const first = new Date(year, month, 1);
+  const firstDayOfWeek = first.getDay();
+  const daysUntilFirst = (weekday - firstDayOfWeek + 7) % 7;
+  const day = 1 + daysUntilFirst + (ordinal - 1) * 7;
+  return new Date(year, month, day);
+}
+
+function validateFloatingRule(rule: FloatingRuleInput): void {
+  if (rule.month < 0 || rule.month > 11) {
+    throw new GraphQLError('FloatingRule month must be 0-11', { extensions: { code: 'BAD_USER_INPUT' } });
+  }
+  if (rule.weekday < 0 || rule.weekday > 6) {
+    throw new GraphQLError('FloatingRule weekday must be 0-6', { extensions: { code: 'BAD_USER_INPUT' } });
+  }
+  if (![-1, 1, 2, 3, 4, 5].includes(rule.ordinal)) {
+    throw new GraphQLError('FloatingRule ordinal must be 1-5 or -1', { extensions: { code: 'BAD_USER_INPUT' } });
+  }
+}
+
 /* ---------- helpers ---------- */
 
 async function getAnniversaryDoc(id: string) {
@@ -51,6 +84,7 @@ function formatAnniversary(doc: Record<string, unknown>) {
   return {
     ...doc,
     originalDate: toISOString(doc.originalDate),
+    floatingRule: doc.floatingRule || null,
     createdAt: toISOString(doc.createdAt),
     updatedAt: toISOString(doc.updatedAt),
     contributorUids: doc.contributorUids || [],
@@ -150,17 +184,33 @@ export function createAnniversaryQueryResolvers() {
 
 export function createAnniversaryMutationResolvers() {
   return {
-    createAnniversary: async (_: unknown, args: { input: { title: string; originalDate: string; location?: AnniversaryLocationInput } }, context: { uid?: string }) => {
+    createAnniversary: async (_: unknown, args: { input: { title: string; originalDate?: string; floatingRule?: FloatingRuleInput; location?: AnniversaryLocationInput } }, context: { uid?: string }) => {
       if (!context.uid) throw new GraphQLError('Authentication required', { extensions: { code: 'UNAUTHENTICATED' } });
 
-      const { title, originalDate, location } = args.input;
+      const { title, originalDate, floatingRule, location } = args.input;
       if (!title.trim() || title.trim().length > 100) {
         throw new GraphQLError('Title must be 1-100 characters', { extensions: { code: 'BAD_USER_INPUT' } });
       }
 
-      const parsedDate = new Date(originalDate);
-      if (isNaN(parsedDate.getTime())) {
-        throw new GraphQLError('Invalid date format', { extensions: { code: 'BAD_USER_INPUT' } });
+      if (!originalDate && !floatingRule) {
+        throw new GraphQLError('Either originalDate or floatingRule is required', { extensions: { code: 'BAD_USER_INPUT' } });
+      }
+
+      let parsedDate: Date;
+      if (originalDate) {
+        parsedDate = new Date(originalDate);
+        if (isNaN(parsedDate.getTime())) {
+          throw new GraphQLError('Invalid date format', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+      } else {
+        validateFloatingRule(floatingRule!);
+        parsedDate = resolveFloatingDate(floatingRule!, new Date().getFullYear());
+      }
+
+      if (floatingRule && !originalDate) {
+        // Already validated above
+      } else if (floatingRule) {
+        validateFloatingRule(floatingRule);
       }
 
       const userRecord = await getAuth().getUser(context.uid);
@@ -170,6 +220,7 @@ export function createAnniversaryMutationResolvers() {
         ownerDisplayName: userRecord.displayName || 'Unknown',
         title: title.trim(),
         originalDate: Timestamp.fromDate(parsedDate),
+        floatingRule: floatingRule ? { month: floatingRule.month, weekday: floatingRule.weekday, ordinal: floatingRule.ordinal } : null,
         location: location || null,
         contributorUids: [] as string[],
         contributors: [] as unknown[],

@@ -8,3 +8,4 @@ export * from './getErrorMessage';
 export * from './safeStorage';
 export * from './logger';
 export * from './platform';
+export * from './floatingDate';
