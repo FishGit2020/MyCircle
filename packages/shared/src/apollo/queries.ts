@@ -2451,6 +2451,7 @@ export const GET_ANNIVERSARIES = gql`
       ownerDisplayName
       title
       originalDate
+      floatingRule { month weekday ordinal }
       location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
@@ -2469,6 +2470,7 @@ export const GET_ANNIVERSARY = gql`
       ownerDisplayName
       title
       originalDate
+      floatingRule { month weekday ordinal }
       location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
@@ -2512,6 +2514,7 @@ export const CREATE_ANNIVERSARY = gql`
       ownerDisplayName
       title
       originalDate
+      floatingRule { month weekday ordinal }
       location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }

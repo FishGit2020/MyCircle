@@ -1551,6 +1551,12 @@ export const typeDefs = `#graphql
   }
 
   # Anniversary Tracker types
+  type FloatingRule {
+    month: Int!
+    weekday: Int!
+    ordinal: Int!
+  }
+
   type AnniversaryLocation {
     lat: Float!
     lon: Float!
@@ -1589,6 +1595,7 @@ export const typeDefs = `#graphql
     ownerDisplayName: String!
     title: String!
     originalDate: String!
+    floatingRule: FloatingRule
     location: AnniversaryLocation
     contributorUids: [String!]!
     contributors: [AnniversaryContributor!]!
@@ -1603,9 +1610,16 @@ export const typeDefs = `#graphql
     email: String!
   }
 
+  input FloatingRuleInput {
+    month: Int!
+    weekday: Int!
+    ordinal: Int!
+  }
+
   input CreateAnniversaryInput {
     title: String!
-    originalDate: String!
+    originalDate: String
+    floatingRule: FloatingRuleInput
     location: AnniversaryLocationInput
   }
 

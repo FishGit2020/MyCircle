@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { PageContent, useTranslation } from '@mycircle/shared';
+import {
+  PageContent, useTranslation,
+  yearsElapsed, formatDateLocale, daysUntilNextFixed, daysUntilNextFloating, resolveFloatingDate,
+} from '@mycircle/shared';
+import type { FloatingRule } from '@mycircle/shared';
 import { useAnniversaryDetail } from '../hooks/useAnniversaryDetail';
 import { useDeleteAnniversary, useUpdateAnniversary } from '../hooks/useAnniversaryMutations';
 import YearlyTile from './YearlyTile';
@@ -11,40 +15,21 @@ interface AnniversaryDetailProps {
   id: string;
 }
 
-function yearsElapsed(originalDate: string): number {
-  const d = new Date(originalDate);
-  const now = new Date();
-  let years = now.getFullYear() - d.getFullYear();
-  const monthDiff = now.getMonth() - d.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < d.getDate())) {
-    years--;
-  }
-  return Math.max(0, years);
-}
+const WEEKDAY_KEYS: Record<number, string> = {
+  0: 'anniversary.sunday', 1: 'anniversary.monday', 2: 'anniversary.tuesday',
+  3: 'anniversary.wednesday', 4: 'anniversary.thursday', 5: 'anniversary.friday',
+  6: 'anniversary.saturday',
+};
 
-function formatDate(dateStr: string, locale: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch {
-    return dateStr;
-  }
-}
+const ORDINAL_KEYS: Record<number, string> = {
+  1: 'anniversary.ordinal1', 2: 'anniversary.ordinal2', 3: 'anniversary.ordinal3',
+  4: 'anniversary.ordinal4', 5: 'anniversary.ordinal5', '-1': 'anniversary.ordinalLast',
+};
 
-function daysUntilNext(originalDate: string): number {
-  const d = new Date(originalDate);
-  const now = new Date();
-  const thisYear = now.getFullYear();
-  let next = new Date(thisYear, d.getMonth(), d.getDate());
-  if (next <= now) {
-    next = new Date(thisYear + 1, d.getMonth(), d.getDate());
-  }
-  const diff = next.getTime() - now.getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
 
 export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
   const { t, locale } = useTranslation();
@@ -99,8 +84,11 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
     );
   }
 
+  const rule = anniversary.floatingRule as FloatingRule | null;
   const years = yearsElapsed(anniversary.originalDate);
-  const daysNext = daysUntilNext(anniversary.originalDate);
+  const daysNext = rule
+    ? daysUntilNextFloating(rule)
+    : daysUntilNextFixed(anniversary.originalDate);
   const isToday = daysNext === 0;
 
   // Find the year data being edited
@@ -186,7 +174,21 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
                 </h1>
               )}
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {t('anniversary.originalEvent')}: {formatDate(anniversary.originalDate, locale)}
+                {rule ? (
+                  <>
+                    {t('anniversary.floatingDescription', {
+                      ordinal: t(ORDINAL_KEYS[rule.ordinal] as never),
+                      weekday: t(WEEKDAY_KEYS[rule.weekday] as never),
+                      month: MONTH_NAMES[rule.month],
+                    })}
+                    {' \u2014 '}
+                    {resolveFloatingDate(rule, new Date().getFullYear()).toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </>
+                ) : (
+                  <>
+                    {t('anniversary.originalEvent')}: {formatDateLocale(anniversary.originalDate, locale)}
+                  </>
+                )}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">

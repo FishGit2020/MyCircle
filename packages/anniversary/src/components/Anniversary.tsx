@@ -1,32 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { PageContent, useTranslation } from '@mycircle/shared';
+import {
+  PageContent, useTranslation,
+  yearsElapsed, formatDateLocale, daysUntilNextFixed, daysUntilNextFloating, resolveFloatingDate,
+} from '@mycircle/shared';
+import type { FloatingRule } from '@mycircle/shared';
 import { useAnniversaries } from '../hooks/useAnniversaries';
 import AnniversaryDetail from './AnniversaryDetail';
 import AnniversaryForm from './AnniversaryForm';
-
-function yearsElapsed(originalDate: string): number {
-  const d = new Date(originalDate);
-  const now = new Date();
-  let years = now.getFullYear() - d.getFullYear();
-  const monthDiff = now.getMonth() - d.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < d.getDate())) {
-    years--;
-  }
-  return Math.max(0, years);
-}
-
-function formatDate(dateStr: string, locale: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString(locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch {
-    return dateStr;
-  }
-}
 
 export default function Anniversary() {
   const { id } = useParams<{ id?: string }>();
@@ -103,6 +84,13 @@ export default function Anniversary() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {anniversaries.map((ann) => {
               const years = yearsElapsed(ann.originalDate);
+              const rule = ann.floatingRule as FloatingRule | null;
+              const daysNext = rule
+                ? daysUntilNextFloating(rule)
+                : daysUntilNextFixed(ann.originalDate);
+              const displayDate = rule
+                ? resolveFloatingDate(rule, new Date().getFullYear()).toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' })
+                : formatDateLocale(ann.originalDate, locale);
               const isContributor =
                 currentUid && ann.contributorUids.includes(currentUid);
               const isOwner = currentUid === ann.ownerUid;
@@ -121,6 +109,11 @@ export default function Anniversary() {
                       {ann.title}
                     </h2>
                     <div className="flex flex-shrink-0 gap-1">
+                      {rule && (
+                        <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                          {t('anniversary.floatingHoliday')}
+                        </span>
+                      )}
                       {isContributor && !isOwner && (
                         <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
                           {t('anniversary.shared')}
@@ -136,13 +129,18 @@ export default function Anniversary() {
 
                   {/* Date */}
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatDate(ann.originalDate, locale)}
+                    {displayDate}
                   </p>
 
-                  {/* Years elapsed */}
-                  <p className="mt-1 text-lg font-bold text-blue-600 dark:text-blue-400">
-                    {years} {t('anniversary.yearsSince')}
-                  </p>
+                  {/* Days until / years elapsed */}
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                      {years} {t('anniversary.yearsSince')}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {daysNext === 0 ? t('anniversary.today') : t('anniversary.daysUntil', { days: String(daysNext) })}
+                    </span>
+                  </div>
 
                   {/* Location */}
                   {ann.location?.name && (
