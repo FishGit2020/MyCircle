@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mycircle/shared": "workspace:*",
+    "maplibre-gl": "^5.22.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router": "catalog:"

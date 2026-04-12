@@ -79,8 +79,8 @@ describe('resolveFloatingDate', () => {
 });
 
 describe('FLOATING_PRESETS', () => {
-  it('has 7 presets', () => {
-    expect(FLOATING_PRESETS).toHaveLength(7);
+  it('has 8 presets', () => {
+    expect(FLOATING_PRESETS).toHaveLength(8);
   });
 
   it('all presets have valid fields', () => {
