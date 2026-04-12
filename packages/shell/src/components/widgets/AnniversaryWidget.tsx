@@ -21,7 +21,12 @@ function getYearsTogether(originalDate: string): number {
   const today = new Date();
   const orig = new Date(originalDate);
   if (isNaN(orig.getTime())) return 0;
-  return today.getFullYear() - orig.getFullYear();
+  let years = today.getFullYear() - orig.getFullYear();
+  const monthDiff = today.getMonth() - orig.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < orig.getDate())) {
+    years--;
+  }
+  return Math.max(0, years);
 }
 
 const AnniversaryWidget = React.memo(function AnniversaryWidget() {
