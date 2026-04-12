@@ -3546,6 +3546,7 @@ const es: Record<TranslationKey, string> = {
   'anniversary.dateLabel': 'Fecha de Aniversario',
   'anniversary.locationLabel': 'Ubicaci\u00f3n (opcional)',
   'anniversary.cancel': 'Cancelar',
+  'anniversary.editTitle': 'Haz clic para editar el t\u00edtulo',
   'anniversary.create': 'Crear',
   'anniversary.activityPlaceholder': '\u00bfQu\u00e9 hicieron?',
   'anniversary.notesPlaceholder': 'Agregar notas...',
