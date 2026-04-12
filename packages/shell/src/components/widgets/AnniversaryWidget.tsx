@@ -19,7 +19,8 @@ function getDaysUntilNext(originalDate: string): number {
 
 function getYearsTogether(originalDate: string): number {
   const today = new Date();
-  const orig = new Date(originalDate + 'T00:00:00');
+  const orig = new Date(originalDate);
+  if (isNaN(orig.getTime())) return 0;
   return today.getFullYear() - orig.getFullYear();
 }
 
@@ -73,15 +74,15 @@ const AnniversaryWidget = React.memo(function AnniversaryWidget() {
           </p>
           {isToday ? (
             <p className="text-sm text-rose-600 dark:text-rose-400 font-semibold">
-              {t('anniversary.happyAnniversary' as any, { years: yearsTogether } as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+              {t('anniversary.happyAnniversary' as any, { years: String(yearsTogether ?? 0) } as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
             </p>
           ) : (
             <>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                {t('anniversary.daysUntil' as any, { days: daysUntil } as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+                {t('anniversary.daysUntil' as any, { days: String(daysUntil ?? 0) } as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {t('anniversary.yearsTogether' as any, { years: yearsTogether } as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+                {t('anniversary.yearsTogether' as any, { years: String(yearsTogether ?? 0) } as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
               </p>
             </>
           )}
