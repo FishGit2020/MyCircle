@@ -18,8 +18,12 @@ export function useCreateAnniversary() {
   });
 }
 
-export function useUpdateAnniversary() {
-  return useMutation(UPDATE_ANNIVERSARY);
+export function useUpdateAnniversary(anniversaryId?: string) {
+  return useMutation(UPDATE_ANNIVERSARY, {
+    refetchQueries: anniversaryId
+      ? [{ query: GET_ANNIVERSARY, variables: { id: anniversaryId } }, { query: GET_ANNIVERSARIES }]
+      : [{ query: GET_ANNIVERSARIES }],
+  });
 }
 
 export function useDeleteAnniversary() {
