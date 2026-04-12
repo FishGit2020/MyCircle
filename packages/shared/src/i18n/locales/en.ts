@@ -3540,9 +3540,9 @@ const en = {
   'anniversary.originalEvent': 'Original Event',
   'anniversary.editDetails': 'Edit Details',
   'anniversary.countdown': 'days until',
-  'anniversary.happyAnniversary': 'Happy {{years}}-year Anniversary!',
+  'anniversary.happyAnniversary': 'Happy {years}-year Anniversary!',
   'anniversary.yearsMarried': 'years together',
-  'anniversary.daysUntil': '{{days}} days until next anniversary',
+  'anniversary.daysUntil': '{days} days until next anniversary',
   'anniversary.contributors': 'Contributors',
   'anniversary.searchByEmail': 'Search by email address',
   'anniversary.back': 'Back',
@@ -3550,6 +3550,7 @@ const en = {
   'anniversary.dateLabel': 'Anniversary Date',
   'anniversary.locationLabel': 'Location (optional)',
   'anniversary.cancel': 'Cancel',
+  'anniversary.editTitle': 'Click to edit title',
   'anniversary.create': 'Create',
   'anniversary.activityPlaceholder': 'What did you do?',
   'anniversary.notesPlaceholder': 'Add notes...',
@@ -3560,7 +3561,7 @@ const en = {
   'anniversary.confirmRemoveContributor': 'Remove this contributor?',
   'anniversary.yearsToday': 'years today',
   'anniversary.loading': 'Loading...',
-  'anniversary.yearsTogether': '{{years}} years together',
+  'anniversary.yearsTogether': '{years} years together',
   'anniversary.createFirst': 'Create your first anniversary',
 } as const;
 

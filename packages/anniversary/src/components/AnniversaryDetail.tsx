@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { PageContent, useTranslation } from '@mycircle/shared';
 import { useAnniversaryDetail } from '../hooks/useAnniversaryDetail';
-import { useDeleteAnniversary } from '../hooks/useAnniversaryMutations';
+import { useDeleteAnniversary, useUpdateAnniversary } from '../hooks/useAnniversaryMutations';
 import YearlyTile from './YearlyTile';
 import YearlyEditor from './YearlyEditor';
 import ContributorManager from './ContributorManager';
@@ -51,8 +51,11 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
   const navigate = useNavigate();
   const { anniversary, loading, error } = useAnniversaryDetail(id);
   const [deleteAnniversary, { loading: deleting }] = useDeleteAnniversary();
+  const [updateAnniversary] = useUpdateAnniversary(id);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingYear, setEditingYear] = useState<number | null>(null);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState('');
 
   const currentUid = window.__currentUid;
   const isOwner = anniversary ? currentUid === anniversary.ownerUid : false;
@@ -98,7 +101,7 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
 
   const years = yearsElapsed(anniversary.originalDate);
   const daysNext = daysUntilNext(anniversary.originalDate);
-  const isToday = daysNext === 365 || daysNext === 366 || daysNext === 0;
+  const isToday = daysNext === 0;
 
   // Find the year data being edited
   const editingYearData = editingYear !== null
@@ -131,9 +134,57 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {anniversary.title}
-              </h1>
+              {editingTitle && isOwner ? (
+                <form
+                  className="flex items-center gap-2"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const trimmed = titleDraft.trim();
+                    if (!trimmed || trimmed === anniversary.title) {
+                      setEditingTitle(false);
+                      return;
+                    }
+                    await updateAnniversary({ variables: { id, input: { title: trimmed } } });
+                    setEditingTitle(false);
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={titleDraft}
+                    onChange={(e) => setTitleDraft(e.target.value)}
+                    maxLength={100}
+                    autoFocus
+                    className="text-2xl font-bold text-gray-900 dark:text-gray-100 bg-transparent border-b-2 border-blue-500 outline-none w-full"
+                    onKeyDown={(e) => { if (e.key === 'Escape') setEditingTitle(false); }}
+                  />
+                  <button
+                    type="submit"
+                    className="min-h-[44px] rounded-md px-2 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                  >
+                    {t('anniversary.save')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingTitle(false)}
+                    className="min-h-[44px] rounded-md px-2 py-1 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                  >
+                    {t('anniversary.cancel')}
+                  </button>
+                </form>
+              ) : (
+                <h1
+                  className={`text-2xl font-bold text-gray-900 dark:text-gray-100 ${isOwner ? 'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400' : ''}`}
+                  onClick={isOwner ? () => { setTitleDraft(anniversary.title); setEditingTitle(true); } : undefined}
+                  title={isOwner ? t('anniversary.editTitle') : undefined}
+                >
+                  {anniversary.title}
+                  {isOwner && (
+                    <svg className="inline-block ml-2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                    </svg>
+                  )}
+                </h1>
+              )}
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 {t('anniversary.originalEvent')}: {formatDate(anniversary.originalDate, locale)}
               </p>
@@ -147,7 +198,7 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
                   </span>
                 ) : (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {daysNext} {t('anniversary.daysUntil')}
+                    {t('anniversary.daysUntil', { days: String(daysNext) })}
                   </span>
                 )}
               </div>
