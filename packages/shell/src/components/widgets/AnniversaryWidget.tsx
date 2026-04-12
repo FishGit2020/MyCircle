@@ -6,12 +6,15 @@ import { Link } from 'react-router';
 function getDaysUntilNext(originalDate: string): number {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const [, month, day] = originalDate.split('-').map(Number);
+  const orig = new Date(originalDate);
+  if (isNaN(orig.getTime())) return 0;
+  const month = orig.getMonth();
+  const day = orig.getDate();
   const thisYear = today.getFullYear();
-  let next = new Date(thisYear, month - 1, day);
+  let next = new Date(thisYear, month, day);
   next.setHours(0, 0, 0, 0);
   if (next < today) {
-    next = new Date(thisYear + 1, month - 1, day);
+    next = new Date(thisYear + 1, month, day);
     next.setHours(0, 0, 0, 0);
   }
   return Math.round((next.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
