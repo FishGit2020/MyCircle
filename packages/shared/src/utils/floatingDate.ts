@@ -87,11 +87,12 @@ export interface FloatingPreset {
 }
 
 export const FLOATING_PRESETS: FloatingPreset[] = [
-  { key: 'mothersDay',    month: 4,  weekday: 0, ordinal: 2  },
-  { key: 'fathersDay',    month: 5,  weekday: 0, ordinal: 3  },
-  { key: 'thanksgiving',  month: 10, weekday: 4, ordinal: 4  },
-  { key: 'laborDay',      month: 8,  weekday: 1, ordinal: 1  },
-  { key: 'memorialDay',   month: 4,  weekday: 1, ordinal: -1 },
-  { key: 'mlkDay',        month: 0,  weekday: 1, ordinal: 3  },
-  { key: 'presidentsDay', month: 1,  weekday: 1, ordinal: 3  },
+  { key: 'mlkDay',          month: 0,  weekday: 1, ordinal: 3  },
+  { key: 'presidentsDay',   month: 1,  weekday: 1, ordinal: 3  },
+  { key: 'memorialDay',     month: 4,  weekday: 1, ordinal: -1 },
+  { key: 'mothersDay',      month: 4,  weekday: 0, ordinal: 2  },
+  { key: 'fathersDay',      month: 5,  weekday: 0, ordinal: 3  },
+  { key: 'laborDay',        month: 8,  weekday: 1, ordinal: 1  },
+  { key: 'columbusDay',     month: 9,  weekday: 1, ordinal: 2  },
+  { key: 'thanksgiving',    month: 10, weekday: 4, ordinal: 4  },
 ];

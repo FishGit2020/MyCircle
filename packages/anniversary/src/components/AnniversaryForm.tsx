@@ -26,13 +26,14 @@ const ORDINAL_KEYS: Record<number, string> = {
 };
 
 const PRESET_TITLE_KEYS: Record<string, string> = {
-  mothersDay: 'anniversary.presetMothersDay',
-  fathersDay: 'anniversary.presetFathersDay',
-  thanksgiving: 'anniversary.presetThanksgiving',
-  laborDay: 'anniversary.presetLaborDay',
-  memorialDay: 'anniversary.presetMemorialDay',
   mlkDay: 'anniversary.presetMlkDay',
   presidentsDay: 'anniversary.presetPresidentsDay',
+  memorialDay: 'anniversary.presetMemorialDay',
+  mothersDay: 'anniversary.presetMothersDay',
+  fathersDay: 'anniversary.presetFathersDay',
+  laborDay: 'anniversary.presetLaborDay',
+  columbusDay: 'anniversary.presetColumbusDay',
+  thanksgiving: 'anniversary.presetThanksgiving',
 };
 
 function presetResolvedDate(preset: FloatingPreset, locale: string): string {
@@ -56,6 +57,7 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [customRule, setCustomRule] = useState({ month: 0, weekday: 0, ordinal: 1 });
   const [showCustom, setShowCustom] = useState(false);
+  const [startYear, setStartYear] = useState('');
 
   const activeRule = selectedPreset
     ? FLOATING_PRESETS.find(p => p.key === selectedPreset)!
@@ -77,6 +79,10 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
         input.originalDate = date;
       } else if (activeRule) {
         input.floatingRule = { month: activeRule.month, weekday: activeRule.weekday, ordinal: activeRule.ordinal };
+        // Use start year for originalDate so "years together" calculates correctly
+        const year = startYear ? Number(startYear) : new Date().getFullYear();
+        const resolved = resolveFloatingDate(activeRule, year);
+        input.originalDate = resolved.toISOString().split('T')[0];
       }
 
       if (locationName.trim()) {
@@ -102,6 +108,7 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
     setSelectedPreset(null);
     setShowCustom(false);
     setCustomRule({ month: 0, weekday: 0, ordinal: 1 });
+    setStartYear('');
   };
 
   const handleCancel = () => {
@@ -308,6 +315,26 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
                     date: presetResolvedDate(FLOATING_PRESETS.find(p => p.key === selectedPreset)!, locale),
                   })}
                 </p>
+              )}
+
+              {/* Start year (optional) */}
+              {(selectedPreset || showCustom) && (
+                <div>
+                  <label htmlFor="anniversary-start-year" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('anniversary.startYear')}
+                  </label>
+                  <input
+                    id="anniversary-start-year"
+                    type="number"
+                    min={1900}
+                    max={new Date().getFullYear()}
+                    placeholder={String(new Date().getFullYear())}
+                    value={startYear}
+                    onChange={(e) => setStartYear(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                  />
+                  <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">{t('anniversary.startYearHint')}</p>
+                </div>
               )}
             </div>
           )}
