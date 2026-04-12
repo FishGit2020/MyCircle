@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.33.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.32.0...mycircle-v1.33.0) (2026-04-12)
+
+
+### Features
+
+* **anniversary:** add floating holiday support ([#992](https://github.com/FishGit2020/MyCircle/issues/992)) ([22910a0](https://github.com/FishGit2020/MyCircle/commit/22910a00d7db9a9ad98faa605594b30eb53e0958))
+* **anniversary:** integrate map with click-to-pin location picking ([#994](https://github.com/FishGit2020/MyCircle/issues/994)) ([2d0bc3f](https://github.com/FishGit2020/MyCircle/commit/2d0bc3f7528c077a51a01763dd3b5c586fb64959))
+* **anniversary:** start year for floating holidays + Columbus Day ([#993](https://github.com/FishGit2020/MyCircle/issues/993)) ([4c19d85](https://github.com/FishGit2020/MyCircle/commit/4c19d858b78dc05bb209314fed8dfa64bed74b49))
+
+
+### Bug Fixes
+
+* **anniversary:** add inline title editing on detail page ([#987](https://github.com/FishGit2020/MyCircle/issues/987)) ([698573c](https://github.com/FishGit2020/MyCircle/commit/698573c59978c08f9d9cf5289ae001c7c715bd44))
+* **anniversary:** fix i18n double-brace interpolation and NaN in widget ([#989](https://github.com/FishGit2020/MyCircle/issues/989)) ([380e8f9](https://github.com/FishGit2020/MyCircle/commit/380e8f9bde02e8fb3db30f730157bb2b57ac38d7))
+* **anniversary:** fix NaN days in widget from ISO date parsing ([#991](https://github.com/FishGit2020/MyCircle/issues/991)) ([bc0ef00](https://github.com/FishGit2020/MyCircle/commit/bc0ef007bc4f40133e33d867a5ce33281a09c4c2))
+* **anniversary:** fix years-together calculation and isToday detection ([#990](https://github.com/FishGit2020/MyCircle/issues/990)) ([d1449e7](https://github.com/FishGit2020/MyCircle/commit/d1449e7c030a1a8e3709b0e0cd28350f3ea15d32))
+
 ## [1.32.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.31.0...mycircle-v1.32.0) (2026-04-10)
 
 
