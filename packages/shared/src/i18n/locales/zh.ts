@@ -3588,6 +3588,13 @@ const zh: Record<TranslationKey, string> = {
   'anniversary.thursday': '\u661f\u671f\u56db',
   'anniversary.friday': '\u661f\u671f\u4e94',
   'anniversary.saturday': '\u661f\u671f\u516d',
+  'anniversary.addLocation': '\u6dfb\u52a0\u4f4d\u7f6e',
+  'anniversary.removeLocation': '\u5220\u9664',
+  'anniversary.clickMapToAdd': '\u70b9\u51fb\u5730\u56fe\u6dfb\u52a0\u56fe\u9489',
+  'anniversary.locationName': '\u4f4d\u7f6e\u540d\u79f0\uff08\u53ef\u9009\uff09',
+  'anniversary.searchLocation': '\u641c\u7d22\u5730\u70b9...',
+  'anniversary.locations': '\u4f4d\u7f6e',
+  'anniversary.noLocations': '\u672a\u6dfb\u52a0\u4f4d\u7f6e',
 };
 
 export default zh;

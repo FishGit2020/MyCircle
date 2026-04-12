@@ -1584,7 +1584,7 @@ export const typeDefs = `#graphql
     activity: String
     notes: String
     pictures: [AnniversaryPicture!]!
-    location: AnniversaryLocation
+    locations: [AnniversaryLocation!]!
     updatedAt: String
     updatedBy: String
   }
@@ -1637,7 +1637,7 @@ export const typeDefs = `#graphql
   input UpdateAnniversaryYearInput {
     activity: String
     notes: String
-    location: AnniversaryLocationInput
+    locations: [AnniversaryLocationInput!]
   }
 
   input AnniversaryPictureInput {
