@@ -101,7 +101,7 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
 
   const years = yearsElapsed(anniversary.originalDate);
   const daysNext = daysUntilNext(anniversary.originalDate);
-  const isToday = daysNext === 365 || daysNext === 366 || daysNext === 0;
+  const isToday = daysNext === 0;
 
   // Find the year data being edited
   const editingYearData = editingYear !== null
