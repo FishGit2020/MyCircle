@@ -37,6 +37,16 @@ const PRESET_TITLE_KEYS: Record<string, string> = {
   thanksgiving: 'anniversary.presetThanksgiving',
 };
 
+// Fixed-date US holidays (month is 1-indexed for display, day is the date)
+const FIXED_HOLIDAYS: Array<{ key: string; titleKey: string; month: number; day: number }> = [
+  { key: 'newYears', titleKey: 'anniversary.presetNewYears', month: 1, day: 1 },
+  { key: 'valentines', titleKey: 'anniversary.presetValentines', month: 2, day: 14 },
+  { key: 'independence', titleKey: 'anniversary.presetIndependence', month: 7, day: 4 },
+  { key: 'halloween', titleKey: 'anniversary.presetHalloween', month: 10, day: 31 },
+  { key: 'veterans', titleKey: 'anniversary.presetVeterans', month: 11, day: 11 },
+  { key: 'christmas', titleKey: 'anniversary.presetChristmas', month: 12, day: 25 },
+];
+
 function presetResolvedDate(preset: FloatingPreset, locale: string): string {
   const d = resolveFloatingDate(preset, new Date().getFullYear());
   try {
@@ -190,22 +200,48 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
 
           {/* Fixed date input */}
           {dateMode === 'fixed' && (
-            <div>
-              <label
-                htmlFor="anniversary-date"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                {t('anniversary.dateLabel')} *
-              </label>
-              <input
-                id="anniversary-date"
-                type="date"
-                required
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                aria-label={t('anniversary.dateLabel')}
-              />
+            <div className="space-y-3">
+              <div>
+                <label
+                  htmlFor="anniversary-date"
+                  className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {t('anniversary.dateLabel')} *
+                </label>
+                <input
+                  id="anniversary-date"
+                  type="date"
+                  required
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                  aria-label={t('anniversary.dateLabel')}
+                />
+              </div>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('anniversary.quickFillHoliday')}</p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {FIXED_HOLIDAYS.map((h) => {
+                  const thisYearDate = `${new Date().getFullYear()}-${String(h.month).padStart(2, '0')}-${String(h.day).padStart(2, '0')}`;
+                  const isSelected = date === thisYearDate && title === t(h.titleKey as never);
+                  return (
+                    <button
+                      key={h.key}
+                      type="button"
+                      onClick={() => {
+                        setDate(thisYearDate);
+                        if (!title.trim()) setTitle(t(h.titleKey as never));
+                      }}
+                      className={`min-h-[36px] rounded-md border px-2 py-1 text-xs transition-colors ${
+                        isSelected
+                          ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-900/30 dark:text-blue-300'
+                          : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:border-gray-500'
+                      }`}
+                    >
+                      {t(h.titleKey as never)}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
