@@ -10,6 +10,7 @@ import { useDeleteAnniversary, useUpdateAnniversary } from '../hooks/useAnnivers
 import YearlyTile from './YearlyTile';
 import YearlyEditor from './YearlyEditor';
 import ContributorManager from './ContributorManager';
+import AnniversaryMap from './AnniversaryMap';
 
 interface AnniversaryDetailProps {
   id: string;
@@ -251,6 +252,41 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
             )}
           </div>
         </div>
+
+        {/* Map — show all locations from all years + anniversary-level location */}
+        {(() => {
+          const mapLocations: Array<{ lat: number; lon: number; label: string; anniversaryId: string; year?: number }> = [];
+          if (anniversary.location && (anniversary.location.lat !== 0 || anniversary.location.lon !== 0)) {
+            mapLocations.push({
+              lat: anniversary.location.lat,
+              lon: anniversary.location.lon,
+              label: anniversary.location.name || anniversary.title,
+              anniversaryId: anniversary.id,
+            });
+          }
+          anniversary.years.forEach((y) => {
+            const locs = (y as unknown as { locations?: Array<{ lat: number; lon: number; name?: string | null }> }).locations;
+            if (locs) {
+              locs.forEach((loc) => {
+                if (loc.lat !== 0 || loc.lon !== 0) {
+                  mapLocations.push({
+                    lat: loc.lat,
+                    lon: loc.lon,
+                    label: loc.name || `Year ${y.yearNumber}`,
+                    anniversaryId: anniversary.id,
+                    year: y.year,
+                  });
+                }
+              });
+            }
+          });
+          if (mapLocations.length === 0) return null;
+          return (
+            <section aria-label={t('anniversary.locations')}>
+              <AnniversaryMap locations={mapLocations} />
+            </section>
+          );
+        })()}
 
         {/* Yearly tiles grid */}
         <section aria-label={t('anniversary.year')}>

@@ -6,7 +6,7 @@ interface YearlyTileYear {
   activity?: string | null;
   notes?: string | null;
   pictures: Array<{ url: string; filename: string }>;
-  location?: { name?: string | null } | null;
+  locations?: Array<{ name?: string | null }> | null;
 }
 
 interface YearlyTileProps {
@@ -67,11 +67,20 @@ export default function YearlyTile({ yearData, onClick }: YearlyTileProps) {
         </div>
       )}
 
-      {/* Location badge */}
-      {yearData.location?.name && (
-        <span className="inline-flex items-center rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300">
-          {yearData.location.name}
-        </span>
+      {/* Location badges */}
+      {yearData.locations && yearData.locations.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {yearData.locations.slice(0, 2).map((loc, i) => (
+            <span key={i} className="inline-flex items-center rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+              {loc.name || t('anniversary.location')}
+            </span>
+          ))}
+          {yearData.locations.length > 2 && (
+            <span className="inline-flex items-center rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+              +{yearData.locations.length - 2}
+            </span>
+          )}
+        </div>
       )}
 
       {/* Placeholder indicator */}
