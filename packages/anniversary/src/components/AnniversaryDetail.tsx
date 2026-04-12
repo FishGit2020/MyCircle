@@ -198,7 +198,7 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
                   </span>
                 ) : (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {daysNext} {t('anniversary.daysUntil')}
+                    {t('anniversary.daysUntil', { days: String(daysNext) })}
                   </span>
                 )}
               </div>
