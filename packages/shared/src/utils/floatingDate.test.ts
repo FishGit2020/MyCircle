@@ -119,18 +119,25 @@ describe('daysUntilNextFixed', () => {
 
   it('returns days until next occurrence', () => {
     vi.useFakeTimers({ now: new Date(2026, 0, 1) });
-    // June 15 anniversary
-    const days = daysUntilNextFixed('2020-06-15T00:00:00.000Z');
-    // Jan 1 to Jun 15 = 164 days
-    expect(days).toBe(164);
+    // Use local-time date string to avoid timezone drift
+    const origDate = new Date(2020, 5, 15).toISOString();
+    const days = daysUntilNextFixed(origDate);
+    // Jan 1 to Jun 15 — compute expected dynamically for timezone safety
+    const expected = Math.ceil(
+      (new Date(2026, 5, 15).getTime() - new Date(2026, 0, 1).getTime()) / (1000 * 60 * 60 * 24),
+    );
+    expect(days).toBe(expected);
   });
 
   it('rolls to next year when date has passed', () => {
     vi.useFakeTimers({ now: new Date(2026, 7, 1) });
-    // June 15 has passed, next is June 15 2027
-    const days = daysUntilNextFixed('2020-06-15T00:00:00.000Z');
-    // Aug 1, 2026 to Jun 15, 2027 = 317 days
-    expect(days).toBe(317);
+    const origDate = new Date(2020, 5, 15).toISOString();
+    const days = daysUntilNextFixed(origDate);
+    // Aug 1, 2026 to Jun 15, 2027 — compute dynamically
+    const expected = Math.ceil(
+      (new Date(2027, 5, 15).getTime() - new Date(2026, 7, 1).getTime()) / (1000 * 60 * 60 * 24),
+    );
+    expect(days).toBe(expected);
   });
 });
 
@@ -139,16 +146,19 @@ describe('yearsElapsed', () => {
 
   it('returns years since original date', () => {
     vi.useFakeTimers({ now: new Date(2026, 5, 20) });
-    expect(yearsElapsed('2020-06-15T00:00:00.000Z')).toBe(6);
+    const origDate = new Date(2020, 5, 15).toISOString();
+    expect(yearsElapsed(origDate)).toBe(6);
   });
 
   it('subtracts 1 if anniversary has not occurred yet this year', () => {
     vi.useFakeTimers({ now: new Date(2026, 5, 10) });
-    expect(yearsElapsed('2020-06-15T00:00:00.000Z')).toBe(5);
+    const origDate = new Date(2020, 5, 15).toISOString();
+    expect(yearsElapsed(origDate)).toBe(5);
   });
 
   it('returns 0 for same year', () => {
     vi.useFakeTimers({ now: new Date(2026, 0, 1) });
-    expect(yearsElapsed('2026-06-15T00:00:00.000Z')).toBe(0);
+    const origDate = new Date(2026, 5, 15).toISOString();
+    expect(yearsElapsed(origDate)).toBe(0);
   });
 });
