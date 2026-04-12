@@ -97,11 +97,16 @@ function formatAnniversary(doc: Record<string, unknown>) {
 }
 
 function formatYear(data: Record<string, unknown>) {
+  // Backward compat: old docs have `location` (single), new ones have `locations` (array)
+  let locations = data.locations as Array<Record<string, unknown>> | undefined;
+  if (!locations && data.location) {
+    locations = [data.location as Record<string, unknown>];
+  }
   return {
     ...data,
     pictures: data.pictures || [],
+    locations: locations || [],
     updatedAt: toISOString(data.updatedAt),
-    location: data.location || null,
   };
 }
 
@@ -244,7 +249,7 @@ export function createAnniversaryMutationResolvers() {
           activity: null,
           notes: null,
           pictures: [],
-          location: null,
+          locations: [],
           updatedAt: now,
           updatedBy: null,
         });
@@ -302,7 +307,7 @@ export function createAnniversaryMutationResolvers() {
       return true;
     },
 
-    updateAnniversaryYear: async (_: unknown, args: { anniversaryId: string; yearNumber: number; input: { activity?: string; notes?: string; location?: AnniversaryLocationInput } }, context: { uid?: string }) => {
+    updateAnniversaryYear: async (_: unknown, args: { anniversaryId: string; yearNumber: number; input: { activity?: string; notes?: string; locations?: AnniversaryLocationInput[] } }, context: { uid?: string }) => {
       if (!context.uid) throw new GraphQLError('Authentication required', { extensions: { code: 'UNAUTHENTICATED' } });
       const doc = await getAnniversaryDoc(args.anniversaryId);
       if (!doc) throw new GraphQLError('Anniversary not found', { extensions: { code: 'NOT_FOUND' } });
@@ -329,7 +334,7 @@ export function createAnniversaryMutationResolvers() {
         }
         updates.notes = args.input.notes;
       }
-      if (args.input.location !== undefined) updates.location = args.input.location;
+      if (args.input.locations !== undefined) updates.locations = args.input.locations;
 
       await yearRef.update(updates);
       const updated = await yearRef.get();

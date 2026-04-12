@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation, FLOATING_PRESETS, resolveFloatingDate } from '@mycircle/shared';
 import type { FloatingPreset } from '@mycircle/shared';
 import { useCreateAnniversary } from '../hooks/useAnniversaryMutations';
+import LocationMapPicker from './LocationMapPicker';
 
 interface AnniversaryFormProps {
   open: boolean;
@@ -51,7 +52,7 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
-  const [locationName, setLocationName] = useState('');
+  const [locationPins, setLocationPins] = useState<Array<{ lat: number; lon: number; name: string }>>([]);
   const [error, setError] = useState('');
   const [dateMode, setDateMode] = useState<'fixed' | 'floating'>('fixed');
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
@@ -85,8 +86,8 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
         input.originalDate = resolved.toISOString().split('T')[0];
       }
 
-      if (locationName.trim()) {
-        input.location = { lat: 0, lon: 0, name: locationName.trim() };
+      if (locationPins.length > 0) {
+        input.location = { lat: locationPins[0].lat, lon: locationPins[0].lon, name: locationPins[0].name };
       }
 
       const result = await createAnniversary({ variables: { input } });
@@ -102,7 +103,7 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
   const resetForm = () => {
     setTitle('');
     setDate('');
-    setLocationName('');
+    setLocationPins([]);
     setError('');
     setDateMode('fixed');
     setSelectedPreset(null);
@@ -339,23 +340,8 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
             </div>
           )}
 
-          {/* Location */}
-          <div>
-            <label
-              htmlFor="anniversary-location"
-              className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t('anniversary.locationLabel')}
-            </label>
-            <input
-              id="anniversary-location"
-              type="text"
-              value={locationName}
-              onChange={(e) => setLocationName(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-              aria-label={t('anniversary.locationLabel')}
-            />
-          </div>
+          {/* Location (single pin for anniversary-level) */}
+          <LocationMapPicker locations={locationPins} onChange={setLocationPins} maxLocations={1} />
 
           {error && (
             <p className="text-sm text-red-600 dark:text-red-400" role="alert">

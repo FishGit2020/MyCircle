@@ -3595,6 +3595,13 @@ const en = {
   'anniversary.thursday': 'Thursday',
   'anniversary.friday': 'Friday',
   'anniversary.saturday': 'Saturday',
+  'anniversary.addLocation': 'Add Location',
+  'anniversary.removeLocation': 'Remove',
+  'anniversary.clickMapToAdd': 'Click on the map to drop a pin',
+  'anniversary.locationName': 'Location name (optional)',
+  'anniversary.searchLocation': 'Search for a place...',
+  'anniversary.locations': 'Locations',
+  'anniversary.noLocations': 'No locations added',
 } as const;
 
 export default en;

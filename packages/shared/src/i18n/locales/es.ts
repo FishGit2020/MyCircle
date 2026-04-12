@@ -3591,6 +3591,13 @@ const es: Record<TranslationKey, string> = {
   'anniversary.thursday': 'jueves',
   'anniversary.friday': 'viernes',
   'anniversary.saturday': 's\u00e1bado',
+  'anniversary.addLocation': 'Agregar ubicaci\u00f3n',
+  'anniversary.removeLocation': 'Eliminar',
+  'anniversary.clickMapToAdd': 'Haz clic en el mapa para a\u00f1adir un pin',
+  'anniversary.locationName': 'Nombre del lugar (opcional)',
+  'anniversary.searchLocation': 'Buscar un lugar...',
+  'anniversary.locations': 'Ubicaciones',
+  'anniversary.noLocations': 'Sin ubicaciones',
 };
 
 export default es;

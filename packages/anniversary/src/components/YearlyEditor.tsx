@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from '@mycircle/shared';
 import { useUpdateAnniversaryYear } from '../hooks/useAnniversaryMutations';
 import PictureGallery from './PictureGallery';
+import LocationMapPicker from './LocationMapPicker';
+
+interface LocationPin {
+  lat: number;
+  lon: number;
+  name: string;
+}
 
 interface YearData {
   yearNumber: number;
@@ -15,7 +22,7 @@ interface YearData {
     uploadedAt: string;
     uploadedBy: string;
   }>;
-  location?: { lat: number; lon: number; name?: string | null } | null;
+  locations?: Array<{ lat: number; lon: number; name?: string | null }> | null;
 }
 
 interface YearlyEditorProps {
@@ -36,14 +43,18 @@ export default function YearlyEditor({
 
   const [activity, setActivity] = useState(yearData?.activity ?? '');
   const [notes, setNotes] = useState(yearData?.notes ?? '');
-  const [locationName, setLocationName] = useState(yearData?.location?.name ?? '');
+  const [locations, setLocations] = useState<LocationPin[]>(
+    (yearData?.locations ?? []).map((l) => ({ lat: l.lat, lon: l.lon, name: l.name ?? '' })),
+  );
   const [error, setError] = useState('');
 
   // Sync state when yearData changes (e.g. after refetch)
   useEffect(() => {
     setActivity(yearData?.activity ?? '');
     setNotes(yearData?.notes ?? '');
-    setLocationName(yearData?.location?.name ?? '');
+    setLocations(
+      (yearData?.locations ?? []).map((l) => ({ lat: l.lat, lon: l.lon, name: l.name ?? '' })),
+    );
   }, [yearData]);
 
   const handleSave = async () => {
@@ -56,15 +67,7 @@ export default function YearlyEditor({
           input: {
             activity: activity.trim() || null,
             notes: notes.trim() || null,
-            ...(locationName.trim()
-              ? {
-                  location: {
-                    lat: yearData?.location?.lat ?? 0,
-                    lon: yearData?.location?.lon ?? 0,
-                    name: locationName.trim(),
-                  },
-                }
-              : {}),
+            locations: locations.map((l) => ({ lat: l.lat, lon: l.lon, name: l.name })),
           },
         },
       });
@@ -149,23 +152,8 @@ export default function YearlyEditor({
             </p>
           </div>
 
-          {/* Location name */}
-          <div>
-            <label
-              htmlFor="year-location"
-              className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t('anniversary.location')}
-            </label>
-            <input
-              id="year-location"
-              type="text"
-              value={locationName}
-              onChange={(e) => setLocationName(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-              aria-label={t('anniversary.location')}
-            />
-          </div>
+          {/* Location map picker */}
+          <LocationMapPicker locations={locations} onChange={setLocations} />
 
           {/* Picture Gallery */}
           <PictureGallery

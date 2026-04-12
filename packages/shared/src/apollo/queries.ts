@@ -2455,7 +2455,7 @@ export const GET_ANNIVERSARIES = gql`
       location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
-      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } location { lat lon name } updatedAt updatedBy }
+      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } locations { lat lon name } updatedAt updatedBy }
       createdAt
       updatedAt
     }
@@ -2474,7 +2474,7 @@ export const GET_ANNIVERSARY = gql`
       location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
-      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } location { lat lon name } updatedAt updatedBy }
+      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } locations { lat lon name } updatedAt updatedBy }
       createdAt
       updatedAt
     }
@@ -2489,7 +2489,7 @@ export const GET_ANNIVERSARY_YEAR = gql`
       activity
       notes
       pictures { url filename storagePath uploadedAt uploadedBy }
-      location { lat lon name }
+      locations { lat lon name }
       updatedAt
       updatedBy
     }
@@ -2518,7 +2518,7 @@ export const CREATE_ANNIVERSARY = gql`
       location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
-      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } location { lat lon name } updatedAt updatedBy }
+      years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } locations { lat lon name } updatedAt updatedBy }
       createdAt
       updatedAt
     }
@@ -2549,7 +2549,7 @@ export const UPDATE_ANNIVERSARY_YEAR = gql`
       year
       activity
       notes
-      location { lat lon name }
+      locations { lat lon name }
       updatedAt
       updatedBy
     }
