@@ -3538,7 +3538,7 @@ const zh: Record<TranslationKey, string> = {
   'anniversary.countdown': '\u5929\u540e',
   'anniversary.happyAnniversary': '{years}\u5468\u5e74\u7eaa\u5ff5\u65e5\u5feb\u4e50\uff01',
   'anniversary.yearsMarried': '\u5e74\u5728\u4e00\u8d77',
-  'anniversary.daysUntil': '{days}\u5929\u540e\u4e0b\u4e00\u4e2a\u7eaa\u5ff5\u65e5',
+  'anniversary.daysUntil': '{days}\u5929',
   'anniversary.contributors': '\u534f\u4f5c\u8005',
   'anniversary.searchByEmail': '\u901a\u8fc7\u90ae\u7bb1\u641c\u7d22',
   'anniversary.back': '\u8fd4\u56de',

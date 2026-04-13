@@ -205,11 +205,6 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
                   </span>
                 )}
               </div>
-              {anniversary.location?.name && (
-                <span className="mt-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                  {anniversary.location.name}
-                </span>
-              )}
             </div>
 
             {/* Owner actions */}
@@ -256,14 +251,6 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
         {/* Map — show all locations from all years + anniversary-level location */}
         {(() => {
           const mapLocations: Array<{ lat: number; lon: number; label: string; anniversaryId: string; year?: number }> = [];
-          if (anniversary.location && (anniversary.location.lat !== 0 || anniversary.location.lon !== 0)) {
-            mapLocations.push({
-              lat: anniversary.location.lat,
-              lon: anniversary.location.lon,
-              label: anniversary.location.name || anniversary.title,
-              anniversaryId: anniversary.id,
-            });
-          }
           anniversary.years.forEach((y) => {
             const locs = (y as unknown as { locations?: Array<{ lat: number; lon: number; name?: string | null }> }).locations;
             if (locs) {

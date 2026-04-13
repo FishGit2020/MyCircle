@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation, FLOATING_PRESETS, resolveFloatingDate } from '@mycircle/shared';
 import type { FloatingPreset } from '@mycircle/shared';
 import { useCreateAnniversary } from '../hooks/useAnniversaryMutations';
-import LocationMapPicker from './LocationMapPicker';
 
 interface AnniversaryFormProps {
   open: boolean;
@@ -62,7 +61,6 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
-  const [locationPins, setLocationPins] = useState<Array<{ lat: number; lon: number; name: string }>>([]);
   const [error, setError] = useState('');
   const [dateMode, setDateMode] = useState<'fixed' | 'floating'>('fixed');
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
@@ -96,10 +94,6 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
         input.originalDate = resolved.toISOString().split('T')[0];
       }
 
-      if (locationPins.length > 0) {
-        input.location = { lat: locationPins[0].lat, lon: locationPins[0].lon, name: locationPins[0].name };
-      }
-
       const result = await createAnniversary({ variables: { input } });
       const newId = result.data?.createAnniversary?.id;
       resetForm();
@@ -113,7 +107,6 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
   const resetForm = () => {
     setTitle('');
     setDate('');
-    setLocationPins([]);
     setError('');
     setDateMode('fixed');
     setSelectedPreset(null);
@@ -375,9 +368,6 @@ export default function AnniversaryForm({ open, onClose, onCreated }: Anniversar
               )}
             </div>
           )}
-
-          {/* Location (single pin for anniversary-level) */}
-          <LocationMapPicker locations={locationPins} onChange={setLocationPins} maxLocations={1} />
 
           {error && (
             <p className="text-sm text-red-600 dark:text-red-400" role="alert">

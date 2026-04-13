@@ -102,7 +102,6 @@ export type Anniversary = {
   createdAt: Scalars['String']['output'];
   floatingRule?: Maybe<FloatingRule>;
   id: Scalars['ID']['output'];
-  location?: Maybe<AnniversaryLocation>;
   originalDate: Scalars['String']['output'];
   ownerDisplayName: Scalars['String']['output'];
   ownerUid: Scalars['String']['output'];
@@ -505,7 +504,6 @@ export type CrawledDocument = {
 
 export type CreateAnniversaryInput = {
   floatingRule?: InputMaybe<FloatingRuleInput>;
-  location?: InputMaybe<AnniversaryLocationInput>;
   originalDate?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
 };
@@ -2499,7 +2497,6 @@ export type TtsQuotaEntry = {
 };
 
 export type UpdateAnniversaryInput = {
-  location?: InputMaybe<AnniversaryLocationInput>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -3853,14 +3850,14 @@ export type OffloadKnowledgeToSqlMutation = { __typename?: 'Mutation', offloadKn
 export type GetAnniversariesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAnniversariesQuery = { __typename?: 'Query', anniversaries: Array<{ __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, floatingRule?: { __typename?: 'FloatingRule', month: number, weekday: number, ordinal: number } | null, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, locations: Array<{ __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null }> }> }> };
+export type GetAnniversariesQuery = { __typename?: 'Query', anniversaries: Array<{ __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, floatingRule?: { __typename?: 'FloatingRule', month: number, weekday: number, ordinal: number } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, locations: Array<{ __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null }> }> }> };
 
 export type GetAnniversaryQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetAnniversaryQuery = { __typename?: 'Query', anniversary?: { __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, floatingRule?: { __typename?: 'FloatingRule', month: number, weekday: number, ordinal: number } | null, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, locations: Array<{ __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null }> }> } | null };
+export type GetAnniversaryQuery = { __typename?: 'Query', anniversary?: { __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, floatingRule?: { __typename?: 'FloatingRule', month: number, weekday: number, ordinal: number } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, locations: Array<{ __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null }> }> } | null };
 
 export type GetAnniversaryYearQueryVariables = Exact<{
   anniversaryId: Scalars['ID']['input'];
@@ -3882,7 +3879,7 @@ export type CreateAnniversaryMutationVariables = Exact<{
 }>;
 
 
-export type CreateAnniversaryMutation = { __typename?: 'Mutation', createAnniversary: { __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, floatingRule?: { __typename?: 'FloatingRule', month: number, weekday: number, ordinal: number } | null, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, locations: Array<{ __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null }> }> } };
+export type CreateAnniversaryMutation = { __typename?: 'Mutation', createAnniversary: { __typename?: 'Anniversary', id: string, ownerUid: string, ownerDisplayName: string, title: string, originalDate: string, contributorUids: Array<string>, createdAt: string, updatedAt: string, floatingRule?: { __typename?: 'FloatingRule', month: number, weekday: number, ordinal: number } | null, contributors: Array<{ __typename?: 'AnniversaryContributor', uid: string, displayName: string, email: string, addedAt: string }>, years: Array<{ __typename?: 'AnniversaryYear', yearNumber: number, year: number, activity?: string | null, notes?: string | null, updatedAt?: string | null, updatedBy?: string | null, pictures: Array<{ __typename?: 'AnniversaryPicture', url: string, filename: string, storagePath: string, uploadedAt: string, uploadedBy: string }>, locations: Array<{ __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null }> }> } };
 
 export type UpdateAnniversaryMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -3890,7 +3887,7 @@ export type UpdateAnniversaryMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAnniversaryMutation = { __typename?: 'Mutation', updateAnniversary: { __typename?: 'Anniversary', id: string, title: string, updatedAt: string, location?: { __typename?: 'AnniversaryLocation', lat: number, lon: number, name?: string | null } | null } };
+export type UpdateAnniversaryMutation = { __typename?: 'Mutation', updateAnniversary: { __typename?: 'Anniversary', id: string, title: string, updatedAt: string } };
 
 export type DeleteAnniversaryMutationVariables = Exact<{
   id: Scalars['ID']['input'];

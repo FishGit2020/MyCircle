@@ -189,10 +189,10 @@ export function createAnniversaryQueryResolvers() {
 
 export function createAnniversaryMutationResolvers() {
   return {
-    createAnniversary: async (_: unknown, args: { input: { title: string; originalDate?: string; floatingRule?: FloatingRuleInput; location?: AnniversaryLocationInput } }, context: { uid?: string }) => {
+    createAnniversary: async (_: unknown, args: { input: { title: string; originalDate?: string; floatingRule?: FloatingRuleInput } }, context: { uid?: string }) => {
       if (!context.uid) throw new GraphQLError('Authentication required', { extensions: { code: 'UNAUTHENTICATED' } });
 
-      const { title, originalDate, floatingRule, location } = args.input;
+      const { title, originalDate, floatingRule } = args.input;
       if (!title.trim() || title.trim().length > 100) {
         throw new GraphQLError('Title must be 1-100 characters', { extensions: { code: 'BAD_USER_INPUT' } });
       }
@@ -226,7 +226,6 @@ export function createAnniversaryMutationResolvers() {
         title: title.trim(),
         originalDate: Timestamp.fromDate(parsedDate),
         floatingRule: floatingRule ? { month: floatingRule.month, weekday: floatingRule.weekday, ordinal: floatingRule.ordinal } : null,
-        location: location || null,
         contributorUids: [] as string[],
         contributors: [] as unknown[],
         createdAt: now,
@@ -264,7 +263,7 @@ export function createAnniversaryMutationResolvers() {
       return { ...formatAnniversary(createdData), years };
     },
 
-    updateAnniversary: async (_: unknown, args: { id: string; input: { title?: string; location?: AnniversaryLocationInput } }, context: { uid?: string }) => {
+    updateAnniversary: async (_: unknown, args: { id: string; input: { title?: string } }, context: { uid?: string }) => {
       if (!context.uid) throw new GraphQLError('Authentication required', { extensions: { code: 'UNAUTHENTICATED' } });
       const doc = await getAnniversaryDoc(args.id);
       if (!doc) throw new GraphQLError('Anniversary not found', { extensions: { code: 'NOT_FOUND' } });
@@ -277,8 +276,6 @@ export function createAnniversaryMutationResolvers() {
         }
         updates.title = args.input.title.trim();
       }
-      if (args.input.location !== undefined) updates.location = args.input.location;
-
       await db.collection(ANNIVERSARIES).doc(args.id).update(updates);
       const updated = await getAnniversaryDoc(args.id);
       const yearSnaps = await db.collection(ANNIVERSARIES).doc(args.id).collection(YEARS_SUB).orderBy('yearNumber').get();

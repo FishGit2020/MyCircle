@@ -2452,7 +2452,6 @@ export const GET_ANNIVERSARIES = gql`
       title
       originalDate
       floatingRule { month weekday ordinal }
-      location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
       years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } locations { lat lon name } updatedAt updatedBy }
@@ -2471,7 +2470,6 @@ export const GET_ANNIVERSARY = gql`
       title
       originalDate
       floatingRule { month weekday ordinal }
-      location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
       years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } locations { lat lon name } updatedAt updatedBy }
@@ -2515,7 +2513,6 @@ export const CREATE_ANNIVERSARY = gql`
       title
       originalDate
       floatingRule { month weekday ordinal }
-      location { lat lon name }
       contributorUids
       contributors { uid displayName email addedAt }
       years { yearNumber year activity notes pictures { url filename storagePath uploadedAt uploadedBy } locations { lat lon name } updatedAt updatedBy }
@@ -2530,7 +2527,6 @@ export const UPDATE_ANNIVERSARY = gql`
     updateAnniversary(id: $id, input: $input) {
       id
       title
-      location { lat lon name }
       updatedAt
     }
   }

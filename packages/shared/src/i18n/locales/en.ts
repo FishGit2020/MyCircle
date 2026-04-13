@@ -3542,7 +3542,7 @@ const en = {
   'anniversary.countdown': 'days until',
   'anniversary.happyAnniversary': 'Happy {years}-year Anniversary!',
   'anniversary.yearsMarried': 'years together',
-  'anniversary.daysUntil': '{days} days until next anniversary',
+  'anniversary.daysUntil': '{days} days',
   'anniversary.contributors': 'Contributors',
   'anniversary.searchByEmail': 'Search by email address',
   'anniversary.back': 'Back',
