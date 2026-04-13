@@ -3559,6 +3559,7 @@ const es: Record<TranslationKey, string> = {
   'anniversary.loading': 'Cargando...',
   'anniversary.yearsTogether': '{years} a\u00f1os juntos',
   'anniversary.createFirst': 'Crea tu primer aniversario',
+  'anniversary.nextOccurrence': 'Pr\u00f3ximo: {date}',
   'anniversary.fixedDate': 'Fecha fija',
   'anniversary.floatingHoliday': 'Festivo variable',
   'anniversary.selectPreset': 'Selecci\u00f3n r\u00e1pida de festivo',

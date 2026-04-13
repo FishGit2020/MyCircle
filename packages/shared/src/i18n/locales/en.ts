@@ -3563,6 +3563,7 @@ const en = {
   'anniversary.loading': 'Loading...',
   'anniversary.yearsTogether': '{years} years together',
   'anniversary.createFirst': 'Create your first anniversary',
+  'anniversary.nextOccurrence': 'Next: {date}',
   'anniversary.fixedDate': 'Fixed Date',
   'anniversary.floatingHoliday': 'Floating Holiday',
   'anniversary.selectPreset': 'Quick-select a holiday',
