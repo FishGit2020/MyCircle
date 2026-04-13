@@ -52,16 +52,17 @@ export default function Anniversary() {
         .sort((a, b) => a.daysNext - b.daysNext);
     }, [anniversaries, thisYear]);
 
-    // Collect map locations from year 0 of each anniversary
+    // Collect map locations from all years of each anniversary
     const mapLocations = useMemo(() => {
       const locs: Array<{ lat: number; lon: number; label: string; anniversaryId: string }> = [];
       for (const { ann } of sorted) {
-        const year0 = ann.years?.find((y: { yearNumber: number }) => y.yearNumber === 0);
-        const yearLocs = (year0 as unknown as { locations?: Array<{ lat: number; lon: number; name?: string | null }> })?.locations;
-        if (yearLocs) {
-          for (const loc of yearLocs) {
-            if (loc.lat !== 0 || loc.lon !== 0) {
-              locs.push({ lat: loc.lat, lon: loc.lon, label: loc.name || ann.title, anniversaryId: ann.id });
+        for (const y of ann.years ?? []) {
+          const yearLocs = (y as unknown as { locations?: Array<{ lat: number; lon: number; name?: string | null }> })?.locations;
+          if (yearLocs) {
+            for (const loc of yearLocs) {
+              if (loc.lat !== 0 || loc.lon !== 0) {
+                locs.push({ lat: loc.lat, lon: loc.lon, label: loc.name || ann.title, anniversaryId: ann.id });
+              }
             }
           }
         }
