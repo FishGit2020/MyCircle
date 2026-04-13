@@ -10,6 +10,9 @@ import AnniversaryDetail from './AnniversaryDetail';
 import AnniversaryForm from './AnniversaryForm';
 import AnniversaryMap from './AnniversaryMap';
 
+// Color palette for grouping pins by anniversary on the map
+const PIN_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+
 export default function Anniversary() {
   const { id } = useParams<{ id?: string }>();
   const { t, locale } = useTranslation();
@@ -52,21 +55,22 @@ export default function Anniversary() {
         .sort((a, b) => a.daysNext - b.daysNext);
     }, [anniversaries, thisYear]);
 
-    // Collect map locations from all years of each anniversary
+    // Collect map locations from all years, color-coded per anniversary
     const mapLocations = useMemo(() => {
-      const locs: Array<{ lat: number; lon: number; label: string; anniversaryId: string }> = [];
-      for (const { ann } of sorted) {
+      const locs: Array<{ lat: number; lon: number; label: string; anniversaryId: string; color: string }> = [];
+      sorted.forEach(({ ann }, annIdx) => {
+        const color = PIN_COLORS[annIdx % PIN_COLORS.length];
         for (const y of ann.years ?? []) {
           const yearLocs = (y as unknown as { locations?: Array<{ lat: number; lon: number; name?: string | null }> })?.locations;
           if (yearLocs) {
             for (const loc of yearLocs) {
               if (loc.lat !== 0 || loc.lon !== 0) {
-                locs.push({ lat: loc.lat, lon: loc.lon, label: loc.name || ann.title, anniversaryId: ann.id });
+                locs.push({ lat: loc.lat, lon: loc.lon, label: loc.name || ann.title, anniversaryId: ann.id, color });
               }
             }
           }
         }
-      }
+      });
       return locs;
     }, [sorted]);
 
