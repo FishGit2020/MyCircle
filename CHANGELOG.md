@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.33.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.33.0...mycircle-v1.33.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* **anniversary:** prevent timezone day-shift when saving dates ([#1005](https://github.com/FishGit2020/MyCircle/issues/1005)) ([499bc5f](https://github.com/FishGit2020/MyCircle/commit/499bc5f4a6c442d4fb06c4cdee76919d39ffb59c))
+
 ## [1.33.0](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.32.0...mycircle-v1.33.0) (2026-04-13)
 
 
