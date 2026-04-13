@@ -2497,6 +2497,7 @@ export type TtsQuotaEntry = {
 };
 
 export type UpdateAnniversaryInput = {
+  originalDate?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -3887,7 +3888,7 @@ export type UpdateAnniversaryMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAnniversaryMutation = { __typename?: 'Mutation', updateAnniversary: { __typename?: 'Anniversary', id: string, title: string, updatedAt: string } };
+export type UpdateAnniversaryMutation = { __typename?: 'Mutation', updateAnniversary: { __typename?: 'Anniversary', id: string, title: string, originalDate: string, updatedAt: string } };
 
 export type DeleteAnniversaryMutationVariables = Exact<{
   id: Scalars['ID']['input'];

@@ -2527,6 +2527,7 @@ export const UPDATE_ANNIVERSARY = gql`
     updateAnniversary(id: $id, input: $input) {
       id
       title
+      originalDate
       updatedAt
     }
   }
