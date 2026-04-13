@@ -263,7 +263,7 @@ export function createAnniversaryMutationResolvers() {
       return { ...formatAnniversary(createdData), years };
     },
 
-    updateAnniversary: async (_: unknown, args: { id: string; input: { title?: string } }, context: { uid?: string }) => {
+    updateAnniversary: async (_: unknown, args: { id: string; input: { title?: string; originalDate?: string } }, context: { uid?: string }) => {
       if (!context.uid) throw new GraphQLError('Authentication required', { extensions: { code: 'UNAUTHENTICATED' } });
       const doc = await getAnniversaryDoc(args.id);
       if (!doc) throw new GraphQLError('Anniversary not found', { extensions: { code: 'NOT_FOUND' } });
@@ -275,6 +275,13 @@ export function createAnniversaryMutationResolvers() {
           throw new GraphQLError('Title must be 1-100 characters', { extensions: { code: 'BAD_USER_INPUT' } });
         }
         updates.title = args.input.title.trim();
+      }
+      if (args.input.originalDate !== undefined) {
+        const parsed = new Date(args.input.originalDate);
+        if (isNaN(parsed.getTime())) {
+          throw new GraphQLError('Invalid date format', { extensions: { code: 'BAD_USER_INPUT' } });
+        }
+        updates.originalDate = Timestamp.fromDate(parsed);
       }
       await db.collection(ANNIVERSARIES).doc(args.id).update(updates);
       const updated = await getAnniversaryDoc(args.id);

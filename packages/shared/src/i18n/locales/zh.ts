@@ -3547,6 +3547,7 @@ const zh: Record<TranslationKey, string> = {
   'anniversary.locationLabel': '\u5730\u70b9\uff08\u53ef\u9009\uff09',
   'anniversary.cancel': '\u53d6\u6d88',
   'anniversary.editTitle': '\u70b9\u51fb\u7f16\u8f91\u6807\u9898',
+  'anniversary.editDate': '\u70b9\u51fb\u7f16\u8f91\u65e5\u671f',
   'anniversary.create': '\u521b\u5efa',
   'anniversary.activityPlaceholder': '\u4f60\u4eec\u505a\u4e86\u4ec0\u4e48\uff1f',
   'anniversary.notesPlaceholder': '\u6dfb\u52a0\u7b14\u8bb0...',

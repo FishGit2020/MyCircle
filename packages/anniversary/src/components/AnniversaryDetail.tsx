@@ -42,6 +42,8 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
   const [editingYear, setEditingYear] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState('');
+  const [editingDate, setEditingDate] = useState(false);
+  const [dateDraft, setDateDraft] = useState('');
 
   const currentUid = window.__currentUid;
   const isOwner = anniversary ? currentUid === anniversary.ownerUid : false;
@@ -174,23 +176,70 @@ export default function AnniversaryDetail({ id }: AnniversaryDetailProps) {
                   )}
                 </h1>
               )}
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {rule ? (
-                  <>
-                    {t('anniversary.floatingDescription', {
-                      ordinal: t(ORDINAL_KEYS[rule.ordinal] as never),
-                      weekday: t(WEEKDAY_KEYS[rule.weekday] as never),
-                      month: MONTH_NAMES[rule.month],
-                    })}
-                    {' \u2014 '}
-                    {resolveFloatingDate(rule, new Date().getFullYear()).toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' })}
-                  </>
-                ) : (
-                  <>
-                    {t('anniversary.originalEvent')}: {formatDateLocale(anniversary.originalDate, locale)}
-                  </>
-                )}
-              </p>
+              {editingDate && isOwner && !rule ? (
+                <form
+                  className="mt-1 flex items-center gap-2"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!dateDraft) { setEditingDate(false); return; }
+                    await updateAnniversary({ variables: { id, input: { originalDate: dateDraft } } });
+                    setEditingDate(false);
+                  }}
+                >
+                  <input
+                    type="date"
+                    value={dateDraft}
+                    onChange={(e) => setDateDraft(e.target.value)}
+                    autoFocus
+                    className="rounded-md border-b-2 border-blue-500 bg-transparent px-1 py-0.5 text-sm text-gray-900 outline-none dark:text-gray-100"
+                    onKeyDown={(e) => { if (e.key === 'Escape') setEditingDate(false); }}
+                  />
+                  <button
+                    type="submit"
+                    className="min-h-[44px] rounded-md px-2 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                  >
+                    {t('anniversary.save')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingDate(false)}
+                    className="min-h-[44px] rounded-md px-2 py-1 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                  >
+                    {t('anniversary.cancel')}
+                  </button>
+                </form>
+              ) : (
+                <p
+                  className={`mt-1 text-sm text-gray-500 dark:text-gray-400 ${isOwner && !rule ? 'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400' : ''}`}
+                  onClick={isOwner && !rule ? () => {
+                    const d = new Date(anniversary.originalDate);
+                    setDateDraft(d.toISOString().split('T')[0]);
+                    setEditingDate(true);
+                  } : undefined}
+                  title={isOwner && !rule ? t('anniversary.editDate') : undefined}
+                >
+                  {rule ? (
+                    <>
+                      {t('anniversary.floatingDescription', {
+                        ordinal: t(ORDINAL_KEYS[rule.ordinal] as never),
+                        weekday: t(WEEKDAY_KEYS[rule.weekday] as never),
+                        month: MONTH_NAMES[rule.month],
+                      })}
+                      {' \u2014 '}
+                      {resolveFloatingDate(rule, new Date().getFullYear()).toLocaleDateString(locale, { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </>
+                  ) : (
+                    <>
+                      {t('anniversary.originalEvent')}: {formatDateLocale(anniversary.originalDate, locale)}
+                      {isOwner && (
+                        <svg className="inline-block ml-2 w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                        </svg>
+                      )}
+                    </>
+                  )}
+                </p>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {years} {t('anniversary.yearsSince')}
