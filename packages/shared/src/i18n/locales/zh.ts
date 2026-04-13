@@ -3559,6 +3559,7 @@ const zh: Record<TranslationKey, string> = {
   'anniversary.loading': '\u52a0\u8f7d\u4e2d...',
   'anniversary.yearsTogether': '{years}\u5e74\u5728\u4e00\u8d77',
   'anniversary.createFirst': '\u521b\u5efa\u4f60\u7684\u7b2c\u4e00\u4e2a\u7eaa\u5ff5\u65e5',
+  'anniversary.nextOccurrence': '\u4e0b\u6b21: {date}',
   'anniversary.fixedDate': '\u56fa\u5b9a\u65e5\u671f',
   'anniversary.floatingHoliday': '\u6d6e\u52a8\u8282\u65e5',
   'anniversary.selectPreset': '\u5feb\u901f\u9009\u62e9\u8282\u65e5',
