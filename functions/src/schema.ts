@@ -1596,7 +1596,6 @@ export const typeDefs = `#graphql
     title: String!
     originalDate: String!
     floatingRule: FloatingRule
-    location: AnniversaryLocation
     contributorUids: [String!]!
     contributors: [AnniversaryContributor!]!
     years: [AnniversaryYear!]!
@@ -1620,12 +1619,10 @@ export const typeDefs = `#graphql
     title: String!
     originalDate: String
     floatingRule: FloatingRuleInput
-    location: AnniversaryLocationInput
   }
 
   input UpdateAnniversaryInput {
     title: String
-    location: AnniversaryLocationInput
   }
 
   input AnniversaryLocationInput {

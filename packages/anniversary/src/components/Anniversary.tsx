@@ -52,16 +52,21 @@ export default function Anniversary() {
         .sort((a, b) => a.daysNext - b.daysNext);
     }, [anniversaries, thisYear]);
 
-    // Collect map locations from all anniversaries that have lat/lon
+    // Collect map locations from year 0 of each anniversary
     const mapLocations = useMemo(() => {
-      return sorted
-        .filter((s) => s.ann.location && s.ann.location.lat !== 0 && s.ann.location.lon !== 0)
-        .map((s) => ({
-          lat: s.ann.location!.lat,
-          lon: s.ann.location!.lon,
-          label: s.ann.title,
-          anniversaryId: s.ann.id,
-        }));
+      const locs: Array<{ lat: number; lon: number; label: string; anniversaryId: string }> = [];
+      for (const { ann } of sorted) {
+        const year0 = ann.years?.find((y: { yearNumber: number }) => y.yearNumber === 0);
+        const yearLocs = (year0 as unknown as { locations?: Array<{ lat: number; lon: number; name?: string | null }> })?.locations;
+        if (yearLocs) {
+          for (const loc of yearLocs) {
+            if (loc.lat !== 0 || loc.lon !== 0) {
+              locs.push({ lat: loc.lat, lon: loc.lon, label: loc.name || ann.title, anniversaryId: ann.id });
+            }
+          }
+        }
+      }
+      return locs;
     }, [sorted]);
 
     if (loading) {
@@ -121,17 +126,19 @@ export default function Anniversary() {
 
           {/* Map + list layout */}
           {sorted.length > 0 && (
-            <div className="flex flex-col gap-6 lg:flex-row">
-              {/* Map */}
-              <div className="w-full lg:w-1/2">
-                <AnniversaryMap
-                  locations={mapLocations}
-                  onMarkerClick={(id) => navigate(`/anniversary/${id}`)}
-                />
-              </div>
+            <div className={`flex flex-col gap-6 ${mapLocations.length > 0 ? 'lg:flex-row' : ''}`}>
+              {/* Map — only when there are pinned locations */}
+              {mapLocations.length > 0 && (
+                <div className="w-full lg:w-1/2">
+                  <AnniversaryMap
+                    locations={mapLocations}
+                    onMarkerClick={(id) => navigate(`/anniversary/${id}`)}
+                  />
+                </div>
+              )}
 
               {/* Anniversary tiles — sorted by soonest */}
-              <div className="w-full space-y-3 lg:w-1/2 lg:max-h-[400px] lg:overflow-y-auto">
+              <div className={`w-full space-y-3 ${mapLocations.length > 0 ? 'lg:w-1/2 lg:max-h-[400px] lg:overflow-y-auto' : ''}`}>
                 {sorted.map(({ ann, daysNext, nextDate, rule }) => {
                   const years = yearsElapsed(ann.originalDate);
                   const nextDateStr = nextDate.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -173,11 +180,6 @@ export default function Anniversary() {
                         {isContributor && !isOwner && (
                           <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
                             {t('anniversary.shared')}
-                          </span>
-                        )}
-                        {ann.location?.name && (
-                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                            {ann.location.name}
                           </span>
                         )}
                       </div>
