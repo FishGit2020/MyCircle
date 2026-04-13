@@ -3551,6 +3551,7 @@ const en = {
   'anniversary.locationLabel': 'Location (optional)',
   'anniversary.cancel': 'Cancel',
   'anniversary.editTitle': 'Click to edit title',
+  'anniversary.editDate': 'Click to edit date',
   'anniversary.create': 'Create',
   'anniversary.activityPlaceholder': 'What did you do?',
   'anniversary.notesPlaceholder': 'Add notes...',

@@ -1623,6 +1623,7 @@ export const typeDefs = `#graphql
 
   input UpdateAnniversaryInput {
     title: String
+    originalDate: String
   }
 
   input AnniversaryLocationInput {
