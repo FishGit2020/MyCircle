@@ -203,7 +203,7 @@ export function createAnniversaryMutationResolvers() {
 
       let parsedDate: Date;
       if (originalDate) {
-        parsedDate = new Date(originalDate);
+        parsedDate = new Date(originalDate + 'T12:00:00Z');
         if (isNaN(parsedDate.getTime())) {
           throw new GraphQLError('Invalid date format', { extensions: { code: 'BAD_USER_INPUT' } });
         }
@@ -277,7 +277,7 @@ export function createAnniversaryMutationResolvers() {
         updates.title = args.input.title.trim();
       }
       if (args.input.originalDate !== undefined) {
-        const parsed = new Date(args.input.originalDate);
+        const parsed = new Date(args.input.originalDate + 'T12:00:00Z');
         if (isNaN(parsed.getTime())) {
           throw new GraphQLError('Invalid date format', { extensions: { code: 'BAD_USER_INPUT' } });
         }
