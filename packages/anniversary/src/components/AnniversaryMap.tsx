@@ -64,6 +64,10 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
           .setPopup(popup)
           .addTo(map);
 
+        // Show/hide popup on pin hover
+        el.addEventListener('mouseenter', () => { if (!marker.getPopup().isOpen()) marker.togglePopup(); });
+        el.addEventListener('mouseleave', () => { if (marker.getPopup().isOpen()) marker.togglePopup(); });
+
         bounds.extend([loc.lon, loc.lat]);
         markersRef.current.push({ marker, anniversaryId: loc.anniversaryId, color: pinColor });
       });
