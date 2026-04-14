@@ -19,10 +19,10 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markersRef = useRef<{ marker: any; anniversaryId: string }[]>([]);
+  const markersRef = useRef<{ marker: any; anniversaryId: string; color: string }[]>([]);
   const { map, mapReady } = useMapLibre(containerRef, {
-    zoom: 3,
-    center: [-98.5, 39.8], // center of US
+    zoom: 1,
+    center: [0, 20], // world view
   });
 
   // Add/update markers when map is ready or locations change
@@ -52,7 +52,7 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
         el.className = 'anniversary-map-marker';
         const pinColor = loc.color || '#3b82f6';
         el.style.cssText =
-          `width:24px;height:24px;background:${pinColor};border:2px solid white;border-radius:50%;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.3);`;
+          `width:24px;height:24px;background:${pinColor};border:2px solid white;border-radius:50%;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.3);transition:all 0.2s ease;`;
 
         const yearSuffix = loc.year ? ` <span style="font-weight:400;color:#6b7280;">(${loc.year})</span>` : '';
         const popup = new ml.Popup({ offset: 25, closeButton: false }).setHTML(
@@ -65,7 +65,7 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
           .addTo(map);
 
         bounds.extend([loc.lon, loc.lat]);
-        markersRef.current.push({ marker, anniversaryId: loc.anniversaryId });
+        markersRef.current.push({ marker, anniversaryId: loc.anniversaryId, color: pinColor });
       });
 
       // Fit bounds with padding
@@ -85,14 +85,34 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
     });
   }, [map, mapReady, locations]);
 
-  // Toggle popups when a tile is hovered
+  // Highlight pins when a tile is hovered (color + scale change)
   useEffect(() => {
-    markersRef.current.forEach(({ marker, anniversaryId }) => {
+    markersRef.current.forEach(({ marker, anniversaryId, color }) => {
       try {
+        const el = marker.getElement() as HTMLElement | undefined;
+        if (!el) return;
         const isHighlighted = anniversaryId === highlightedId;
-        const popupOpen = marker.getPopup()?.isOpen();
-        if (isHighlighted && !popupOpen) marker.togglePopup();
-        if (!isHighlighted && popupOpen) marker.togglePopup();
+        if (highlightedId) {
+          if (isHighlighted) {
+            el.style.background = '#ffffff';
+            el.style.border = `3px solid ${color}`;
+            el.style.transform = 'scale(1.4)';
+            el.style.opacity = '1';
+            el.style.zIndex = '10';
+          } else {
+            el.style.background = color;
+            el.style.border = '2px solid white';
+            el.style.transform = 'scale(1)';
+            el.style.opacity = '0.35';
+            el.style.zIndex = '';
+          }
+        } else {
+          el.style.background = color;
+          el.style.border = '2px solid white';
+          el.style.transform = 'scale(1)';
+          el.style.opacity = '1';
+          el.style.zIndex = '';
+        }
       } catch { /* marker may be destroyed */ }
     });
   }, [highlightedId]);
