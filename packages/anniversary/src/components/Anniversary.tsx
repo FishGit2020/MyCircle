@@ -29,6 +29,7 @@ export default function Anniversary() {
     const { anniversaries, loading, error } = useAnniversaries();
     const currentUid = window.__currentUid;
     const thisYear = new Date().getFullYear();
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
 
     // Compute daysNext and nextDate for each anniversary, then sort by soonest
     const sorted = useMemo(() => {
@@ -135,7 +136,7 @@ export default function Anniversary() {
               {/* Map — only when there are pinned locations */}
               {mapLocations.length > 0 && (
                 <div className="w-full lg:w-1/2">
-                  <AnniversaryMap locations={mapLocations} />
+                  <AnniversaryMap locations={mapLocations} highlightedId={hoveredId} />
                 </div>
               )}
 
@@ -152,6 +153,8 @@ export default function Anniversary() {
                       key={ann.id}
                       type="button"
                       onClick={() => navigate(`/anniversary/${ann.id}`)}
+                      onMouseEnter={() => setHoveredId(ann.id)}
+                      onMouseLeave={() => setHoveredId(null)}
                       className="w-full rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:border-blue-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-600"
                       aria-label={`${ann.title} - ${years} ${t('anniversary.yearsSince')}`}
                     >
