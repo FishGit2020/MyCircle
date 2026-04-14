@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { useMapLibre, useTranslation } from '@mycircle/shared';
+import { useMapLibre, useTranslation, MapControls } from '@mycircle/shared';
 
 interface MapLocation {
   lat: number;
@@ -98,11 +98,14 @@ export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="h-64 w-full overflow-hidden rounded-lg border border-gray-200 md:h-80 dark:border-gray-700"
-      role="img"
-      aria-label={t('anniversary.location')}
-    />
+    <div className="relative h-64 w-full overflow-hidden rounded-lg border border-gray-200 md:h-80 dark:border-gray-700">
+      <div
+        ref={containerRef}
+        className="h-full w-full"
+        role="img"
+        aria-label={t('anniversary.location')}
+      />
+      <MapControls map={map} showFullscreen={false} showScale={false} />
+    </div>
   );
 }
