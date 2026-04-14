@@ -11,17 +11,16 @@ interface MapLocation {
 
 interface AnniversaryMapProps {
   locations: MapLocation[];
-  onMarkerClick?: (anniversaryId: string) => void;
 }
 
-export default function AnniversaryMap({ locations, onMarkerClick }: AnniversaryMapProps) {
+export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markersRef = useRef<any[]>([]);
   const { map, mapReady } = useMapLibre(containerRef, {
-    zoom: 2,
-    center: [0, 20],
+    zoom: 3,
+    center: [-98.5, 39.8], // center of US
   });
 
   // Add/update markers when map is ready or locations change
@@ -50,10 +49,10 @@ export default function AnniversaryMap({ locations, onMarkerClick }: Anniversary
         const el = document.createElement('div');
         el.className = 'anniversary-map-marker';
         el.style.cssText =
-          'width:24px;height:24px;background:#3b82f6;border:2px solid white;border-radius:50%;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.3);';
+          'width:24px;height:24px;background:#3b82f6;border:2px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.3);';
 
         const yearSuffix = loc.year ? ` <span style="font-weight:400;color:#6b7280;">(${loc.year})</span>` : '';
-        const popup = new ml.Popup({ offset: 25, closeButton: false }).setHTML(
+        const popup = new ml.Popup({ offset: 25, closeButton: false, closeOnClick: false }).setHTML(
           `<div style="font-size:13px;font-weight:600;padding:2px 4px;">${loc.label}${yearSuffix}</div>`,
         );
 
@@ -62,9 +61,8 @@ export default function AnniversaryMap({ locations, onMarkerClick }: Anniversary
           .setPopup(popup)
           .addTo(map);
 
-        if (onMarkerClick) {
-          el.addEventListener('click', () => onMarkerClick(loc.anniversaryId));
-        }
+        // Show label by default
+        marker.togglePopup();
 
         bounds.extend([loc.lon, loc.lat]);
         markersRef.current.push(marker);
@@ -85,7 +83,7 @@ export default function AnniversaryMap({ locations, onMarkerClick }: Anniversary
         }
       }
     });
-  }, [map, mapReady, locations, onMarkerClick]);
+  }, [map, mapReady, locations]);
 
   if (locations.length === 0) {
     return (
