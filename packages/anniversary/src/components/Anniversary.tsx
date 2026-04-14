@@ -135,10 +135,7 @@ export default function Anniversary() {
               {/* Map — only when there are pinned locations */}
               {mapLocations.length > 0 && (
                 <div className="w-full lg:w-1/2">
-                  <AnniversaryMap
-                    locations={mapLocations}
-                    onMarkerClick={(id) => navigate(`/anniversary/${id}`)}
-                  />
+                  <AnniversaryMap locations={mapLocations} />
                 </div>
               )}
 
