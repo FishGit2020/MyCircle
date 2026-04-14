@@ -51,10 +51,10 @@ export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
         el.className = 'anniversary-map-marker';
         const pinColor = loc.color || '#3b82f6';
         el.style.cssText =
-          `width:24px;height:24px;background:${pinColor};border:2px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.3);`;
+          `width:24px;height:24px;background:${pinColor};border:2px solid white;border-radius:50%;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.3);`;
 
         const yearSuffix = loc.year ? ` <span style="font-weight:400;color:#6b7280;">(${loc.year})</span>` : '';
-        const popup = new ml.Popup({ offset: 25, closeButton: false, closeOnClick: false }).setHTML(
+        const popup = new ml.Popup({ offset: 25, closeButton: false }).setHTML(
           `<div style="font-size:13px;font-weight:600;padding:2px 4px;">${loc.label}${yearSuffix}</div>`,
         );
 
@@ -62,9 +62,6 @@ export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
           .setLngLat([loc.lon, loc.lat])
           .setPopup(popup)
           .addTo(map);
-
-        // Show label by default
-        marker.togglePopup();
 
         bounds.extend([loc.lon, loc.lat]);
         markersRef.current.push(marker);
