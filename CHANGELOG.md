@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.33.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.33.1...mycircle-v1.33.2) (2026-04-13)
+
+
+### Miscellaneous
+
+* **deps:** bump marked from 17.0.6 to 18.0.0 ([#1001](https://github.com/FishGit2020/MyCircle/issues/1001)) ([e9796d2](https://github.com/FishGit2020/MyCircle/commit/e9796d2bcc6bceaba19d5d9c771356d4098e90cc))
+
 ## [1.33.1](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.33.0...mycircle-v1.33.1) (2026-04-13)
 
 
