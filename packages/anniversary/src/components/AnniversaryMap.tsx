@@ -12,13 +12,14 @@ interface MapLocation {
 
 interface AnniversaryMapProps {
   locations: MapLocation[];
+  highlightedId?: string | null;
 }
 
-export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
+export default function AnniversaryMap({ locations, highlightedId }: AnniversaryMapProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markersRef = useRef<any[]>([]);
+  const markersRef = useRef<{ marker: any; anniversaryId: string }[]>([]);
   const { map, mapReady } = useMapLibre(containerRef, {
     zoom: 3,
     center: [-98.5, 39.8], // center of US
@@ -29,9 +30,9 @@ export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
     if (!map || !mapReady) return;
 
     // Remove existing markers
-    markersRef.current.forEach((m) => {
+    markersRef.current.forEach(({ marker }) => {
       try {
-        m.remove();
+        marker.remove();
       } catch {
         // Marker may already be removed
       }
@@ -64,7 +65,7 @@ export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
           .addTo(map);
 
         bounds.extend([loc.lon, loc.lat]);
-        markersRef.current.push(marker);
+        markersRef.current.push({ marker, anniversaryId: loc.anniversaryId });
       });
 
       // Fit bounds with padding
@@ -83,6 +84,18 @@ export default function AnniversaryMap({ locations }: AnniversaryMapProps) {
       }
     });
   }, [map, mapReady, locations]);
+
+  // Toggle popups when a tile is hovered
+  useEffect(() => {
+    markersRef.current.forEach(({ marker, anniversaryId }) => {
+      try {
+        const isHighlighted = anniversaryId === highlightedId;
+        const popupOpen = marker.getPopup()?.isOpen();
+        if (isHighlighted && !popupOpen) marker.togglePopup();
+        if (!isHighlighted && popupOpen) marker.togglePopup();
+      } catch { /* marker may be destroyed */ }
+    });
+  }, [highlightedId]);
 
   if (locations.length === 0) {
     return (
