@@ -43,8 +43,8 @@ export default function TripForm({ trip, onSave, onCancel, initialDestination, i
       lat,
       lon,
       itinerary: trip?.itinerary || [],
-      tickets: trip?.tickets,
-      checklist: trip?.checklist,
+      tickets: trip?.tickets || [],
+      checklist: trip?.checklist || [],
       status,
     });
   }, [destination, startDate, endDate, notes, budget, currency, lat, lon, status, trip, onSave]);
