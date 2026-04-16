@@ -2634,6 +2634,7 @@ const zh: Record<TranslationKey, string> = {
   'tripPlanner.editTrip': '\u7f16\u8f91\u65c5\u884c',
   'tripPlanner.createTrip': '\u521b\u5efa\u65c5\u884c',
   'tripPlanner.save': '\u4fdd\u5b58',
+  'tripPlanner.saveFailed': '\u4fdd\u5b58\u65c5\u884c\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002',
   'tripPlanner.cancel': '\u53d6\u6d88',
   'tripPlanner.back': '\u8fd4\u56de',
   'tripPlanner.edit': '\u7f16\u8f91',
