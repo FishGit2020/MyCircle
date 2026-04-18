@@ -2634,6 +2634,7 @@ const es: Record<TranslationKey, string> = {
   'tripPlanner.editTrip': 'Editar viaje',
   'tripPlanner.createTrip': 'Crear viaje',
   'tripPlanner.save': 'Guardar',
+  'tripPlanner.saveFailed': 'No se pudo guardar el viaje. Int\u00e9ntalo de nuevo.',
   'tripPlanner.cancel': 'Cancelar',
   'tripPlanner.back': 'Volver',
   'tripPlanner.edit': 'Editar',

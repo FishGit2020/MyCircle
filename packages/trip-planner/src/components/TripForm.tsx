@@ -5,7 +5,7 @@ import DestinationSearch from './DestinationSearch';
 
 interface TripFormProps {
   trip: Trip | null;
-  onSave: (data: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSave: (data: Omit<Trip, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void> | void;
   onCancel: () => void;
   initialDestination?: string;
   initialLat?: number;
@@ -23,6 +23,8 @@ export default function TripForm({ trip, onSave, onCancel, initialDestination, i
   const [budget, setBudget] = useState(trip?.budget || 0);
   const [currency, setCurrency] = useState(trip?.currency || 'USD');
   const [status, setStatus] = useState<TripStatus>(trip?.status || 'planning');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const handleDestinationSelect = useCallback((result: { displayName: string; lat: number; lon: number }) => {
     setDestination(result.displayName);
@@ -30,24 +32,32 @@ export default function TripForm({ trip, onSave, onCancel, initialDestination, i
     setLon(result.lon);
   }, []);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!destination.trim() || !startDate || !endDate) return;
-    onSave({
-      destination: destination.trim(),
-      startDate,
-      endDate,
-      notes: notes.trim(),
-      budget,
-      currency,
-      lat,
-      lon,
-      itinerary: trip?.itinerary || [],
-      tickets: trip?.tickets,
-      checklist: trip?.checklist,
-      status,
-    });
-  }, [destination, startDate, endDate, notes, budget, currency, lat, lon, status, trip, onSave]);
+    setSaving(true);
+    setError('');
+    try {
+      await onSave({
+        destination: destination.trim(),
+        startDate,
+        endDate,
+        notes: notes.trim(),
+        budget,
+        currency,
+        lat,
+        lon,
+        itinerary: trip?.itinerary || [],
+        tickets: trip?.tickets || [],
+        checklist: trip?.checklist || [],
+        status,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('tripPlanner.saveFailed'));
+    } finally {
+      setSaving(false);
+    }
+  }, [destination, startDate, endDate, notes, budget, currency, lat, lon, status, trip, onSave, t]);
 
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-4">
@@ -173,11 +183,21 @@ export default function TripForm({ trip, onSave, onCancel, initialDestination, i
         />
       </div>
 
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400" role="alert">{error}</p>
+      )}
+
       <button
         type="submit"
-        disabled={!destination.trim() || !startDate || !endDate}
-        className="w-full py-2.5 px-4 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition"
+        disabled={!destination.trim() || !startDate || !endDate || saving}
+        className="w-full py-2.5 px-4 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition flex items-center justify-center gap-2"
       >
+        {saving && (
+          <svg className="animate-spin h-4 w-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        )}
         {trip ? t('tripPlanner.save') : t('tripPlanner.createTrip')}
       </button>
     </form>
