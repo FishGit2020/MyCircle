@@ -2634,6 +2634,7 @@ const en = {
   'tripPlanner.editTrip': 'Edit Trip',
   'tripPlanner.createTrip': 'Create Trip',
   'tripPlanner.save': 'Save',
+  'tripPlanner.saveFailed': 'Failed to save trip. Please try again.',
   'tripPlanner.cancel': 'Cancel',
   'tripPlanner.back': 'Back',
   'tripPlanner.edit': 'Edit',
