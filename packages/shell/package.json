@@ -18,7 +18,7 @@
     "graphql": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "@sentry/react": "^10.48.0",
+    "@sentry/react": "^10.49.0",
     "react-router": "catalog:",
     "workbox-window": "^7.4.0"
   },
@@ -30,13 +30,13 @@
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.27",
-    "cssnano": "^7.1.4",
+    "autoprefixer": "^10.5.0",
+    "cssnano": "^7.1.5",
     "jsdom": "^29.0.1",
-    "postcss": "^8.5.9",
+    "postcss": "^8.5.10",
     "tailwindcss": "^3.4.1",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.8",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.9",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "~4.1.4"
   }
