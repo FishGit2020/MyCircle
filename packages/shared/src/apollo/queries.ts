@@ -843,7 +843,8 @@ export const GET_CLOUD_FILES = gql`
       storagePath
       folderId
       uploadedAt
-      folderId
+      nasArchived
+      nasPath
     }
   }
 `;
@@ -983,6 +984,51 @@ export const SHARE_FILE_WITH = gql`
 export const REVOKE_FILE_ACCESS = gql`
   mutation RevokeFileAccess($shareId: String!) {
     revokeFileAccess(shareId: $shareId)
+  }
+`;
+
+// ─── Cloud Files NAS Operations ─────────────────────────────
+
+export const ARCHIVE_CLOUD_FILE_TO_NAS = gql`
+  mutation ArchiveCloudFileToNas($fileId: ID!) {
+    archiveCloudFileToNas(fileId: $fileId) {
+      id
+      fileName
+      contentType
+      size
+      downloadUrl
+      storagePath
+      uploadedAt
+      folderId
+      nasArchived
+      nasPath
+    }
+  }
+`;
+
+export const RESTORE_CLOUD_FILE_FROM_NAS = gql`
+  mutation RestoreCloudFileFromNas($fileId: ID!) {
+    restoreCloudFileFromNas(fileId: $fileId) {
+      id
+      fileName
+      contentType
+      size
+      downloadUrl
+      storagePath
+      uploadedAt
+      folderId
+      nasArchived
+      nasPath
+    }
+  }
+`;
+
+export const ARCHIVE_ALL_CLOUD_FILES_TO_NAS = gql`
+  mutation ArchiveAllCloudFilesToNas {
+    archiveAllCloudFilesToNas {
+      started
+      totalFiles
+    }
   }
 `;
 

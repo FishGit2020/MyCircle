@@ -7,15 +7,20 @@ interface FileListProps {
   emptyMessage: string;
   isShared?: boolean;
   isTargetedShared?: boolean;
+  nasConnected?: boolean;
+  nasOffloadingIds?: Set<string>;
+  nasRestoringIds?: Set<string>;
   onShare?: (fileId: string) => void;
   onDelete?: (fileId: string) => void;
   onPreview?: (file: FileItem | SharedFileItem) => void;
   onRename?: (fileId: string, newName: string) => void;
   onShareWith?: (fileId: string) => void;
   onMove?: (fileId: string) => void;
+  onOffloadToNas?: (fileId: string) => void;
+  onRestoreFromNas?: (fileId: string) => void;
 }
 
-export default function FileList({ files, emptyMessage, isShared, isTargetedShared, onShare, onDelete, onPreview, onRename, onShareWith, onMove }: FileListProps) {
+export default function FileList({ files, emptyMessage, isShared, isTargetedShared, nasConnected, nasOffloadingIds, nasRestoringIds, onShare, onDelete, onPreview, onRename, onShareWith, onMove, onOffloadToNas, onRestoreFromNas }: FileListProps) {
   const { t } = useTranslation();
 
   if (files.length === 0) {
@@ -52,6 +57,14 @@ export default function FileList({ files, emptyMessage, isShared, isTargetedShar
           }
           const shared = file as SharedFileItem;
           const own = file as FileItem;
+          const hasCloudUrl = !!file.downloadUrl;
+          const isNasArchived = !isShared && (own as FileItem).nasArchived;
+          const isOffloading = nasOffloadingIds?.has(file.id);
+          const isRestoring = nasRestoringIds?.has(file.id);
+          // Show offload button if: NAS connected, file in cloud, and not a shared-tab file
+          const canOffload = !isShared && nasConnected && hasCloudUrl && onOffloadToNas;
+          // Show restore button if: NAS connected, file on NAS but not in cloud
+          const canRestore = !isShared && nasConnected && isNasArchived && !hasCloudUrl && onRestoreFromNas;
           return (
             <FileCard
               key={file.id}
@@ -61,12 +74,17 @@ export default function FileList({ files, emptyMessage, isShared, isTargetedShar
               downloadUrl={file.downloadUrl}
               date={isShared ? shared.sharedAt : own.uploadedAt}
               sharedBy={isShared ? shared.sharedByName : undefined}
+              nasArchived={isNasArchived}
+              nasOffloading={isOffloading}
+              nasRestoring={isRestoring}
               onShare={!isShared && onShare ? () => onShare(file.id) : undefined}
               onDelete={onDelete ? () => onDelete(file.id) : undefined}
-              onPreview={onPreview ? () => onPreview(file as FileItem | SharedFileItem) : undefined}
+              onPreview={onPreview && hasCloudUrl ? () => onPreview(file as FileItem | SharedFileItem) : undefined}
               onRename={!isShared && onRename ? (newName: string) => onRename(file.id, newName) : undefined}
               onShareWith={!isShared && onShareWith ? () => onShareWith(file.id) : undefined}
               onMove={!isShared && onMove ? () => onMove(file.id) : undefined}
+              onOffloadToNas={canOffload ? () => onOffloadToNas(file.id) : undefined}
+              onRestoreFromNas={canRestore ? () => onRestoreFromNas(file.id) : undefined}
             />
           );
         })}

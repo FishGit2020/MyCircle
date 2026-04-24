@@ -1761,6 +1761,16 @@ const en = {
   'cloudFiles.storageOf': 'of',
   'cloudFiles.storageViewConsole': 'Firebase Console',
   'cloudFiles.uploadBlocked': 'Storage full. Delete files before uploading.',
+  'cloudFiles.offloadToNas': 'Offload to NAS',
+  'cloudFiles.restoreFromNas': 'Restore from NAS',
+  'cloudFiles.onNas': 'Stored on NAS',
+  'cloudFiles.offloading': 'Offloading...',
+  'cloudFiles.restoring': 'Restoring...',
+  'cloudFiles.offloadAll': 'Offload All to NAS',
+  'cloudFiles.offloadConfirm': 'Move this file to NAS? It will be removed from cloud storage.',
+  'cloudFiles.offloadAllConfirm': 'Move all cloud files to NAS? They will be removed from cloud storage.',
+  'cloudFiles.offloadingProgress': 'Offloading in background...',
+  'cloudFiles.nasNotConnected': 'Connect a NAS in Settings to offload files for local storage.',
 
   // Model Benchmark
   'nav.benchmark': 'Benchmark',

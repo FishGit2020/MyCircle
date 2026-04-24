@@ -10,12 +10,17 @@ interface FileCardProps {
   date: string | Date | { toDate?: () => Date };
   sharedBy?: string;
   isOwner?: boolean;
+  nasArchived?: boolean | null;
+  nasOffloading?: boolean;
+  nasRestoring?: boolean;
   onShare?: () => void;
   onDelete?: () => void;
   onPreview?: () => void;
   onRename?: (newName: string) => void;
   onShareWith?: () => void;
   onMove?: () => void;
+  onOffloadToNas?: () => void;
+  onRestoreFromNas?: () => void;
 }
 
 function FileIconSvg({ type }: { type: string }) {
@@ -48,7 +53,7 @@ function FileIconSvg({ type }: { type: string }) {
   );
 }
 
-export default function FileCard({ fileName, contentType, size, downloadUrl, date, sharedBy, isOwner, onShare, onDelete, onPreview, onRename, onShareWith, onMove }: FileCardProps) {
+export default function FileCard({ fileName, contentType, size, downloadUrl, date, sharedBy, isOwner, nasArchived, nasOffloading, nasRestoring, onShare, onDelete, onPreview, onRename, onShareWith, onMove, onOffloadToNas, onRestoreFromNas }: FileCardProps) {
   const { t } = useTranslation();
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState(fileName);
@@ -83,9 +88,19 @@ export default function FileCard({ fileName, contentType, size, downloadUrl, dat
               aria-label={t('cloudFiles.renameFile')}
             />
           ) : (
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate" title={fileName}>
-              {fileName}
-            </h4>
+            <div className="flex items-center gap-1.5">
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate" title={fileName}>
+                {fileName}
+              </h4>
+              {nasArchived && (
+                <span
+                  className="shrink-0 inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                  title={t('cloudFiles.onNas')}
+                >
+                  NAS
+                </span>
+              )}
+            </div>
           )}
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {formatFileSize(size)} &middot; {dateObj.toLocaleDateString()}
@@ -174,6 +189,48 @@ export default function FileCard({ fileName, contentType, size, downloadUrl, dat
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
             </svg>
+          </button>
+        )}
+        {/* Offload to NAS */}
+        {onOffloadToNas && (
+          <button
+            type="button"
+            onClick={onOffloadToNas}
+            disabled={nasOffloading}
+            className="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 px-2 py-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors min-h-[44px] min-w-[44px] justify-center disabled:opacity-50"
+            aria-label={`${t('cloudFiles.offloadToNas')} ${fileName}`}
+          >
+            {nasOffloading ? (
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+            )}
+          </button>
+        )}
+        {/* Restore from NAS */}
+        {onRestoreFromNas && (
+          <button
+            type="button"
+            onClick={onRestoreFromNas}
+            disabled={nasRestoring}
+            className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-2 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors min-h-[44px] min-w-[44px] justify-center disabled:opacity-50"
+            aria-label={`${t('cloudFiles.restoreFromNas')} ${fileName}`}
+          >
+            {nasRestoring ? (
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+            )}
           </button>
         )}
         {/* Delete */}

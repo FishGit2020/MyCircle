@@ -385,9 +385,17 @@ export type CloudFile = {
   fileName: Scalars['String']['output'];
   folderId?: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
+  nasArchived?: Maybe<Scalars['Boolean']['output']>;
+  nasPath?: Maybe<Scalars['String']['output']>;
   size: Scalars['Int']['output'];
   storagePath: Scalars['String']['output'];
   uploadedAt: Scalars['String']['output'];
+};
+
+export type CloudFileNasBatchResult = {
+  __typename?: 'CloudFileNasBatchResult';
+  started: Scalars['Boolean']['output'];
+  totalFiles: Scalars['Int']['output'];
 };
 
 export type CloudRunQuotaMetric = {
@@ -821,8 +829,10 @@ export type Mutation = {
   addWorshipSetlist: Setlist;
   addWorshipSong: WorshipSong;
   aiChat: AiChatResponse;
+  archiveAllCloudFilesToNas: CloudFileNasBatchResult;
   archiveBookToNas: NasOffloadStartResult;
   archiveChapterToNas: NasArchiveResult;
+  archiveCloudFileToNas: CloudFile;
   archiveEpubToNas: Book;
   boostAtsScore: GeneratedResumeResult;
   cancelBookConversion: Scalars['Boolean']['output'];
@@ -872,6 +882,7 @@ export type Mutation = {
   resetBookConversion: Scalars['Boolean']['output'];
   restoreBook: Scalars['Boolean']['output'];
   restoreChapterFromNas: BookChapter;
+  restoreCloudFileFromNas: CloudFile;
   restoreEpubFromNas: Book;
   restoreHsaReceipt: HsaReceipt;
   revokeFileAccess: Scalars['Boolean']['output'];
@@ -956,6 +967,11 @@ export type MutationArchiveBookToNasArgs = {
 export type MutationArchiveChapterToNasArgs = {
   bookId: Scalars['ID']['input'];
   chapterIndex: Scalars['Int']['input'];
+};
+
+
+export type MutationArchiveCloudFileToNasArgs = {
+  fileId: Scalars['ID']['input'];
 };
 
 
@@ -1194,6 +1210,11 @@ export type MutationRestoreBookArgs = {
 export type MutationRestoreChapterFromNasArgs = {
   bookId: Scalars['ID']['input'];
   chapterIndex: Scalars['Int']['input'];
+};
+
+
+export type MutationRestoreCloudFileFromNasArgs = {
+  fileId: Scalars['ID']['input'];
 };
 
 
@@ -3020,7 +3041,7 @@ export type DeleteWorshipSetlistMutation = { __typename?: 'Mutation', deleteWors
 export type GetCloudFilesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCloudFilesQuery = { __typename?: 'Query', cloudFiles: Array<{ __typename?: 'CloudFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, folderId?: string | null, uploadedAt: string }> };
+export type GetCloudFilesQuery = { __typename?: 'Query', cloudFiles: Array<{ __typename?: 'CloudFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, folderId?: string | null, uploadedAt: string, nasArchived?: boolean | null, nasPath?: string | null }> };
 
 export type GetSharedFilesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3119,6 +3140,25 @@ export type RevokeFileAccessMutationVariables = Exact<{
 
 
 export type RevokeFileAccessMutation = { __typename?: 'Mutation', revokeFileAccess: boolean };
+
+export type ArchiveCloudFileToNasMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+}>;
+
+
+export type ArchiveCloudFileToNasMutation = { __typename?: 'Mutation', archiveCloudFileToNas: { __typename?: 'CloudFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, uploadedAt: string, folderId?: string | null, nasArchived?: boolean | null, nasPath?: string | null } };
+
+export type RestoreCloudFileFromNasMutationVariables = Exact<{
+  fileId: Scalars['ID']['input'];
+}>;
+
+
+export type RestoreCloudFileFromNasMutation = { __typename?: 'Mutation', restoreCloudFileFromNas: { __typename?: 'CloudFile', id: string, fileName: string, contentType: string, size: number, downloadUrl: string, storagePath: string, uploadedAt: string, folderId?: string | null, nasArchived?: boolean | null, nasPath?: string | null } };
+
+export type ArchiveAllCloudFilesToNasMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ArchiveAllCloudFilesToNasMutation = { __typename?: 'Mutation', archiveAllCloudFilesToNas: { __typename?: 'CloudFileNasBatchResult', started: boolean, totalFiles: number } };
 
 export type GetBabyPhotosQueryVariables = Exact<{ [key: string]: never; }>;
 

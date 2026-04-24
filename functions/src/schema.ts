@@ -120,6 +120,13 @@ export const typeDefs = `#graphql
     storagePath: String!
     uploadedAt: String!
     folderId: ID
+    nasArchived: Boolean
+    nasPath: String
+  }
+
+  type CloudFileNasBatchResult {
+    started: Boolean!
+    totalFiles: Int!
   }
 
   type Folder {
@@ -1743,6 +1750,9 @@ export const typeDefs = `#graphql
     restoreChapterFromNas(bookId: ID!, chapterIndex: Int!): BookChapter!
     archiveEpubToNas(bookId: ID!): Book!
     restoreEpubFromNas(bookId: ID!): Book!
+    archiveCloudFileToNas(fileId: ID!): CloudFile!
+    restoreCloudFileFromNas(fileId: ID!): CloudFile!
+    archiveAllCloudFilesToNas: CloudFileNasBatchResult!
 
     # HSA Expenses (auth required)
     addHsaExpense(input: HSAExpenseInput!): HSAExpense!

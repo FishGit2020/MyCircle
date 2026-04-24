@@ -1763,6 +1763,16 @@ const es: Record<TranslationKey, string> = {
   'cloudFiles.storageOf': 'de',
   'cloudFiles.storageViewConsole': 'Consola Firebase',
   'cloudFiles.uploadBlocked': 'Almacenamiento lleno. Elimina archivos antes de subir.',
+  'cloudFiles.offloadToNas': 'Transferir a NAS',
+  'cloudFiles.restoreFromNas': 'Restaurar desde NAS',
+  'cloudFiles.onNas': 'Almacenado en NAS',
+  'cloudFiles.offloading': 'Transfiriendo...',
+  'cloudFiles.restoring': 'Restaurando...',
+  'cloudFiles.offloadAll': 'Transferir todo a NAS',
+  'cloudFiles.offloadConfirm': '\u00bfMover este archivo a NAS? Se eliminar\u00e1 del almacenamiento en la nube.',
+  'cloudFiles.offloadAllConfirm': '\u00bfMover todos los archivos a NAS? Se eliminar\u00e1n del almacenamiento en la nube.',
+  'cloudFiles.offloadingProgress': 'Transfiriendo en segundo plano...',
+  'cloudFiles.nasNotConnected': 'Conecta un NAS en Configuraci\u00f3n para transferir archivos al almacenamiento local.',
 
   // Model Benchmark
   'nav.benchmark': 'Benchmark',

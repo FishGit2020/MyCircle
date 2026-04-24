@@ -7,6 +7,8 @@ export interface FileItem {
   storagePath: string;
   uploadedAt: string;
   folderId?: string | null;
+  nasArchived?: boolean | null;
+  nasPath?: string | null;
 }
 
 export interface SharedFileItem {
