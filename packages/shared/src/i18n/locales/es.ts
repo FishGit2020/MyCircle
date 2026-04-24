@@ -3346,6 +3346,9 @@ const es: Record<TranslationKey, string> = {
   'hsaExpenses.mentalHealth': 'Salud mental',
   'hsaExpenses.labTest': 'Laboratorio / Prueba',
   'hsaExpenses.other': 'Otro',
+  'hsaExpenses.backupToNas': 'Respaldar en NAS',
+  'hsaExpenses.backingUp': 'Respaldando...',
+  'hsaExpenses.backupSuccess': 'Se respaldaron {expenses} gastos y {receipts} recibos en NAS.',
   'widgets.hsaExpenses': 'Gastos de HSA',
   'widgets.hsaExpensesDesc': 'Rastrea reembolsos de gastos de HSA',
   // Setup

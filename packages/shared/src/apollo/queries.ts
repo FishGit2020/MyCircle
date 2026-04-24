@@ -1032,6 +1032,17 @@ export const ARCHIVE_ALL_CLOUD_FILES_TO_NAS = gql`
   }
 `;
 
+export const BACKUP_HSA_TO_NAS = gql`
+  mutation BackupHsaToNas {
+    backupHsaToNas {
+      success
+      totalExpenses
+      totalReceipts
+      error
+    }
+  }
+`;
+
 // ─── Baby Photos ─────────────────────────────────────────────
 
 export const GET_BABY_PHOTOS = gql`
