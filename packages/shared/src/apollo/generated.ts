@@ -753,6 +753,14 @@ export type HourlyForecast = {
   wind_speed: Scalars['Float']['output'];
 };
 
+export type HsaNasBackupResult = {
+  __typename?: 'HsaNasBackupResult';
+  error?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+  totalExpenses: Scalars['Int']['output'];
+  totalReceipts: Scalars['Int']['output'];
+};
+
 export type IngestResult = {
   __typename?: 'IngestResult';
   chunkCount: Scalars['Int']['output'];
@@ -834,6 +842,7 @@ export type Mutation = {
   archiveChapterToNas: NasArchiveResult;
   archiveCloudFileToNas: CloudFile;
   archiveEpubToNas: Book;
+  backupHsaToNas: HsaNasBackupResult;
   boostAtsScore: GeneratedResumeResult;
   cancelBookConversion: Scalars['Boolean']['output'];
   cancelSqlBackfill: Scalars['Boolean']['output'];
@@ -3159,6 +3168,11 @@ export type ArchiveAllCloudFilesToNasMutationVariables = Exact<{ [key: string]: 
 
 
 export type ArchiveAllCloudFilesToNasMutation = { __typename?: 'Mutation', archiveAllCloudFilesToNas: { __typename?: 'CloudFileNasBatchResult', started: boolean, totalFiles: number } };
+
+export type BackupHsaToNasMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BackupHsaToNasMutation = { __typename?: 'Mutation', backupHsaToNas: { __typename?: 'HsaNasBackupResult', success: boolean, totalExpenses: number, totalReceipts: number, error?: string | null } };
 
 export type GetBabyPhotosQueryVariables = Exact<{ [key: string]: never; }>;
 

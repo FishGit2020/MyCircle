@@ -1505,6 +1505,13 @@ export const typeDefs = `#graphql
 
   # ─── NAS Storage Types ────────────────────────────────────────
 
+  type HsaNasBackupResult {
+    success: Boolean!
+    totalExpenses: Int!
+    totalReceipts: Int!
+    error: String
+  }
+
   type NasConnectionStatus {
     nasUrl: String!
     destFolder: String!
@@ -1753,6 +1760,7 @@ export const typeDefs = `#graphql
     archiveCloudFileToNas(fileId: ID!): CloudFile!
     restoreCloudFileFromNas(fileId: ID!): CloudFile!
     archiveAllCloudFilesToNas: CloudFileNasBatchResult!
+    backupHsaToNas: HsaNasBackupResult!
 
     # HSA Expenses (auth required)
     addHsaExpense(input: HSAExpenseInput!): HSAExpense!

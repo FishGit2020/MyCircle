@@ -3346,6 +3346,9 @@ const zh: Record<TranslationKey, string> = {
   'hsaExpenses.mentalHealth': '\u5fc3\u7406\u5065\u5eb7',
   'hsaExpenses.labTest': '\u68c0\u9a8c/\u5316\u9a8c',
   'hsaExpenses.other': '\u5176\u4ed6',
+  'hsaExpenses.backupToNas': '\u5907\u4efd\u5230 NAS',
+  'hsaExpenses.backingUp': '\u5907\u4efd\u4e2d...',
+  'hsaExpenses.backupSuccess': '\u5df2\u5907\u4efd {expenses} \u7b14\u8d39\u7528\u548c {receipts} \u5f20\u6536\u636e\u5230 NAS\u3002',
   'widgets.hsaExpenses': 'HSA \u8d39\u7528',
   'widgets.hsaExpensesDesc': '\u8ddf\u8e2a HSA \u8d39\u7528\u62a5\u9500',
   // Setup

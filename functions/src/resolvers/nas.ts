@@ -592,6 +592,129 @@ export function createNasMutationResolvers() {
       return { started: true, totalFiles: cloudFiles.length };
     },
 
+    // ─── HSA Backup to NAS ──────────────────────────────────────
+
+    backupHsaToNas: async (_: any, __: any, ctx: ResolverContext) => {
+      const uid = requireAuth(ctx);
+      const config = await getCachedNasConfig(uid);
+      if (!config || config.status !== 'connected') {
+        throw new Error('NAS not configured or not connected. Save a NAS connection first.');
+      }
+
+      const db = getFirestore();
+      const bucket = getStorage().bucket();
+      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+
+      // Fetch all expenses with receipts
+      const expensesSnap = await db
+        .collection(`users/${uid}/hsaExpenses`)
+        .orderBy('dateOfService', 'desc')
+        .get();
+
+      const expenses: any[] = [];
+      let totalReceipts = 0;
+
+      // Create backup folder structure
+      await client.createFolder(`${config.destFolder}/hsa-backup`);
+      await client.createFolder(`${config.destFolder}/hsa-backup/receipts`);
+
+      for (const expenseDoc of expensesSnap.docs) {
+        const data = expenseDoc.data();
+        const expenseId = expenseDoc.id;
+
+        // Fetch receipts for this expense
+        const receiptsSnap = await db
+          .collection(`users/${uid}/hsaExpenses/${expenseId}/receipts`)
+          .orderBy('uploadedAt', 'asc')
+          .get();
+
+        const receiptsMeta: any[] = [];
+        const hasReceipts = receiptsSnap.docs.length > 0;
+
+        if (hasReceipts) {
+          await client.createFolder(`${config.destFolder}/hsa-backup/receipts/${expenseId}`);
+        }
+
+        for (const receiptDoc of receiptsSnap.docs) {
+          const rData = receiptDoc.data();
+          const fileName = rData.fileName || `receipt-${receiptDoc.id}`;
+
+          receiptsMeta.push({
+            id: receiptDoc.id,
+            fileName,
+            contentType: rData.contentType ?? '',
+            uploadedAt: rData.uploadedAt?.toMillis
+              ? new Date(rData.uploadedAt.toMillis()).toISOString()
+              : (rData.uploadedAt ?? ''),
+            trashedAt: rData.trashedAt?.toMillis
+              ? new Date(rData.trashedAt.toMillis()).toISOString()
+              : (rData.trashedAt ?? null),
+          });
+
+          // Download receipt from Storage and upload to NAS
+          if (rData.storagePath) {
+            try {
+              const [exists] = await bucket.file(rData.storagePath).exists();
+              if (exists) {
+                const [buffer] = await bucket.file(rData.storagePath).download();
+                await client.upload(
+                  `${config.destFolder}/hsa-backup/receipts/${expenseId}`,
+                  fileName,
+                  buffer as Buffer,
+                );
+                totalReceipts++;
+              }
+            } catch (err: any) {
+              logger.error(`HSA backup: failed to copy receipt ${receiptDoc.id}`, err.message || err);
+            }
+          }
+        }
+
+        // Format amount for readability
+        const amountCents = data.amountCents ?? 0;
+        const amountDollars = (amountCents / 100).toFixed(2);
+
+        expenses.push({
+          id: expenseId,
+          provider: data.provider ?? '',
+          dateOfService: data.dateOfService ?? '',
+          amount: `$${amountDollars}`,
+          amountCents,
+          category: data.category ?? 'OTHER',
+          description: data.description ?? null,
+          status: data.status ?? 'PENDING',
+          receipts: receiptsMeta,
+          createdAt: data.createdAt?.toMillis
+            ? new Date(data.createdAt.toMillis()).toISOString()
+            : (data.createdAt ?? ''),
+          updatedAt: data.updatedAt?.toMillis
+            ? new Date(data.updatedAt.toMillis()).toISOString()
+            : (data.updatedAt ?? ''),
+        });
+      }
+
+      // Write summary JSON to NAS
+      const summary = {
+        exportedAt: new Date().toISOString(),
+        totalExpenses: expenses.length,
+        totalReceipts,
+        expenses,
+      };
+      const summaryBuffer = Buffer.from(JSON.stringify(summary, null, 2), 'utf-8');
+      await client.upload(
+        `${config.destFolder}/hsa-backup`,
+        'hsa-expenses.json',
+        summaryBuffer,
+      );
+
+      return {
+        success: true,
+        totalExpenses: expenses.length,
+        totalReceipts,
+        error: null,
+      };
+    },
+
     restoreEpubFromNas: async (_: any, { bookId }: { bookId: string }, ctx: ResolverContext) => {
       const uid = requireAuth(ctx);
       const config = await getCachedNasConfig(uid);

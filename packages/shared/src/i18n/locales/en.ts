@@ -3350,6 +3350,9 @@ const en = {
   'hsaExpenses.mentalHealth': 'Mental Health',
   'hsaExpenses.labTest': 'Lab / Test',
   'hsaExpenses.other': 'Other',
+  'hsaExpenses.backupToNas': 'Backup to NAS',
+  'hsaExpenses.backingUp': 'Backing up...',
+  'hsaExpenses.backupSuccess': 'Backed up {expenses} expenses and {receipts} receipts to NAS.',
   'widgets.hsaExpenses': 'HSA Expenses',
   'widgets.hsaExpensesDesc': 'Track HSA expense reimbursements',
   // Setup

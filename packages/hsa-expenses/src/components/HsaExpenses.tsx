@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { PageContent, useTranslation } from '@mycircle/shared';
+import { PageContent, useTranslation, useQuery, GET_NAS_CONNECTION_STATUS } from '@mycircle/shared';
 import { useHsaExpenses } from '../hooks/useHsaExpenses';
 import {
   HSAExpenseCategory,
@@ -39,7 +39,14 @@ export default function HsaExpenses() {
     trashReceipt,
     restoreReceipt,
     permanentlyDeleteReceipt,
+    backupToNas,
+    backingUpToNas,
   } = useHsaExpenses();
+
+  // NAS connection status
+  const { data: nasData } = useQuery(GET_NAS_CONNECTION_STATUS);
+  const nasConnected = nasData?.nasConnectionStatus?.status === 'connected';
+  const [backupResult, setBackupResult] = useState<{ totalExpenses: number; totalReceipts: number } | null>(null);
 
   // UI state
   const [showForm, setShowForm] = useState(false);
@@ -182,6 +189,14 @@ export default function HsaExpenses() {
     [viewingExpense, permanentlyDeleteReceipt],
   );
 
+  const handleBackupToNas = useCallback(async () => {
+    setBackupResult(null);
+    const result = await backupToNas();
+    if (result) {
+      setBackupResult({ totalExpenses: result.totalExpenses, totalReceipts: result.totalReceipts });
+    }
+  }, [backupToNas]);
+
   // Keep viewingExpense in sync with refetched data
   const currentViewingExpense = useMemo(() => {
     if (!viewingExpense) return null;
@@ -225,18 +240,57 @@ export default function HsaExpenses() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           {t('hsaExpenses.title' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
         </h1>
-        <button
-          type="button"
-          onClick={handleAdd}
-          className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
-          aria-label={t('hsaExpenses.addExpense' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          {t('hsaExpenses.addExpense' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
-        </button>
+        <div className="flex items-center gap-2">
+          {nasConnected && expenses.length > 0 && (
+            <button
+              type="button"
+              onClick={handleBackupToNas}
+              disabled={backingUpToNas}
+              className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-sm font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition disabled:opacity-50"
+              aria-label={t('hsaExpenses.backupToNas' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+            >
+              {backingUpToNas ? (
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
+              )}
+              {backingUpToNas ? t('hsaExpenses.backingUp' as any) : t('hsaExpenses.backupToNas' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+            aria-label={t('hsaExpenses.addExpense' as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            {t('hsaExpenses.addExpense' as any)} {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          </button>
+        </div>
       </div>
+
+      {/* Backup success message */}
+      {backupResult && (
+        <div className="mb-4 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-sm flex items-center justify-between">
+          <span>
+            {(t('hsaExpenses.backupSuccess' as any) as string) // eslint-disable-line @typescript-eslint/no-explicit-any
+              .replace('{expenses}', String(backupResult.totalExpenses))
+              .replace('{receipts}', String(backupResult.totalReceipts))}
+          </span>
+          <button type="button" onClick={() => setBackupResult(null)} className="text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-200 min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="Dismiss">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Error state */}
       {error && (
