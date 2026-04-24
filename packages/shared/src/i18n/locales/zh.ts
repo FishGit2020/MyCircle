@@ -1763,6 +1763,16 @@ const zh: Record<TranslationKey, string> = {
   'cloudFiles.storageOf': '\u5171',
   'cloudFiles.storageViewConsole': 'Firebase \u63a7\u5236\u53f0',
   'cloudFiles.uploadBlocked': '\u5b58\u50a8\u7a7a\u95f4\u5df2\u6ee1\uff0c\u8bf7\u5148\u5220\u9664\u6587\u4ef6\u518d\u4e0a\u4f20\u3002',
+  'cloudFiles.offloadToNas': '\u8f6c\u5b58\u5230 NAS',
+  'cloudFiles.restoreFromNas': '\u4ece NAS \u6062\u590d',
+  'cloudFiles.onNas': '\u5df2\u5b58\u50a8\u5728 NAS',
+  'cloudFiles.offloading': '\u8f6c\u5b58\u4e2d...',
+  'cloudFiles.restoring': '\u6062\u590d\u4e2d...',
+  'cloudFiles.offloadAll': '\u5168\u90e8\u8f6c\u5b58\u5230 NAS',
+  'cloudFiles.offloadConfirm': '\u5c06\u6b64\u6587\u4ef6\u8f6c\u5b58\u5230 NAS\uff1f\u5b83\u5c06\u4ece\u4e91\u5b58\u50a8\u4e2d\u5220\u9664\u3002',
+  'cloudFiles.offloadAllConfirm': '\u5c06\u6240\u6709\u4e91\u6587\u4ef6\u8f6c\u5b58\u5230 NAS\uff1f\u5b83\u4eec\u5c06\u4ece\u4e91\u5b58\u50a8\u4e2d\u5220\u9664\u3002',
+  'cloudFiles.offloadingProgress': '\u540e\u53f0\u8f6c\u5b58\u4e2d...',
+  'cloudFiles.nasNotConnected': '\u5728\u8bbe\u7f6e\u4e2d\u8fde\u63a5 NAS \u4ee5\u5c06\u6587\u4ef6\u8f6c\u5b58\u5230\u672c\u5730\u5b58\u50a8\u3002',
 
   // Model Benchmark
   'nav.benchmark': '\u6027\u80fd\u6d4b\u8bd5',

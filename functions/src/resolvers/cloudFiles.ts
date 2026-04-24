@@ -93,6 +93,8 @@ export function createCloudFileResolvers() {
             storagePath: data.storagePath ?? '',
             folderId: data.folderId ?? null,
             uploadedAt: toIso(data.uploadedAt),
+            nasArchived: data.nasArchived ?? null,
+            nasPath: data.nasPath ?? null,
           };
         });
       },
@@ -166,11 +168,14 @@ export function createCloudFileResolvers() {
         if (!fileSnap.exists) return true; // already gone
         const fileData = fileSnap.data()!;
 
-        const bucket = getStorage().bucket();
-        try {
-          await bucket.file(fileData.storagePath).delete();
-        } catch (e: any) {
-          if (e.code !== 404) throw e;
+        // Delete from Firebase Storage if the file is still in the cloud
+        if (fileData.storagePath) {
+          const bucket = getStorage().bucket();
+          try {
+            await bucket.file(fileData.storagePath).delete();
+          } catch (e: any) {
+            if (e.code !== 404) throw e;
+          }
         }
         await fileRef.delete();
         return true;

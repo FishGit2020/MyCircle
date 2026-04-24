@@ -386,6 +386,212 @@ export function createNasMutationResolvers() {
       return docToBook(bookId, updatedSnap.data()!);
     },
 
+    // ─── Cloud Files NAS Operations ─────────────────────────────────
+
+    archiveCloudFileToNas: async (_: any, { fileId }: { fileId: string }, ctx: ResolverContext) => {
+      const uid = requireAuth(ctx);
+      const config = await getCachedNasConfig(uid);
+      if (!config || config.status !== 'connected') {
+        throw new Error('NAS not configured or not connected. Save a NAS connection first.');
+      }
+
+      const db = getFirestore();
+      const fileRef = db.doc(`users/${uid}/files/${fileId}`);
+      const fileSnap = await fileRef.get();
+      if (!fileSnap.exists) throw new Error('File not found');
+      const fileData = fileSnap.data()!;
+
+      if (!fileData.downloadUrl || !fileData.storagePath) {
+        throw new Error('File has no cloud storage data to offload');
+      }
+
+      const bucket = getStorage().bucket();
+      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+
+      // If already on NAS, just delete from Firebase Storage
+      if (fileData.nasArchived && fileData.nasPath) {
+        const [exists] = await bucket.file(fileData.storagePath).exists();
+        if (exists) await bucket.file(fileData.storagePath).delete();
+        await fileRef.update({
+          downloadUrl: FieldValue.delete(),
+          storagePath: FieldValue.delete(),
+        });
+        const updated = (await fileRef.get()).data()!;
+        return {
+          id: fileId,
+          fileName: updated.fileName ?? '',
+          contentType: updated.contentType ?? '',
+          size: updated.size ?? 0,
+          downloadUrl: updated.downloadUrl ?? '',
+          storagePath: updated.storagePath ?? '',
+          uploadedAt: updated.uploadedAt?.toMillis ? new Date(updated.uploadedAt.toMillis()).toISOString() : (updated.uploadedAt ?? ''),
+          folderId: updated.folderId ?? null,
+          nasArchived: true,
+          nasPath: fileData.nasPath,
+        };
+      }
+
+      const [fileExists] = await bucket.file(fileData.storagePath).exists();
+      if (!fileExists) throw new Error('File not found in cloud storage');
+
+      // Download from Firebase Storage
+      const [buffer] = await bucket.file(fileData.storagePath).download();
+
+      // Create folder structure on NAS: {destFolder}/cloud-files/{fileId}/
+      await client.createFolder(`${config.destFolder}/cloud-files`);
+      await client.createFolder(`${config.destFolder}/cloud-files/${fileId}`);
+
+      // Upload with original filename preserved
+      const nasDestFolder = `${config.destFolder}/cloud-files/${fileId}`;
+      const nasFileName = fileData.fileName ?? `file-${fileId}`;
+      await client.upload(nasDestFolder, nasFileName, buffer as Buffer);
+      const nasPath = `${nasDestFolder}/${nasFileName}`;
+
+      // Delete from Firebase Storage
+      await bucket.file(fileData.storagePath).delete();
+
+      // Update Firestore doc
+      await fileRef.update({
+        downloadUrl: FieldValue.delete(),
+        storagePath: FieldValue.delete(),
+        nasArchived: true,
+        nasPath,
+      });
+
+      const updated = (await fileRef.get()).data()!;
+      return {
+        id: fileId,
+        fileName: updated.fileName ?? '',
+        contentType: updated.contentType ?? '',
+        size: updated.size ?? 0,
+        downloadUrl: '',
+        storagePath: '',
+        uploadedAt: updated.uploadedAt?.toMillis ? new Date(updated.uploadedAt.toMillis()).toISOString() : (updated.uploadedAt ?? ''),
+        folderId: updated.folderId ?? null,
+        nasArchived: true,
+        nasPath,
+      };
+    },
+
+    restoreCloudFileFromNas: async (_: any, { fileId }: { fileId: string }, ctx: ResolverContext) => {
+      const uid = requireAuth(ctx);
+      const config = await getCachedNasConfig(uid);
+      if (!config || config.status !== 'connected') {
+        throw new Error('NAS not configured or not connected. Save a NAS connection first.');
+      }
+
+      const db = getFirestore();
+      const fileRef = db.doc(`users/${uid}/files/${fileId}`);
+      const fileSnap = await fileRef.get();
+      if (!fileSnap.exists) throw new Error('File not found');
+      const fileData = fileSnap.data()!;
+
+      if (!fileData.nasArchived || !fileData.nasPath) {
+        throw new Error('File is not archived on NAS');
+      }
+
+      const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+      const buffer = await client.download(fileData.nasPath);
+
+      const storagePath = `users/${uid}/files/${fileId}/${fileData.fileName ?? `file-${fileId}`}`;
+      const bucket = getStorage().bucket();
+      const { downloadUrl } = await uploadToStorage(
+        bucket,
+        storagePath,
+        buffer,
+        fileData.contentType ?? 'application/octet-stream',
+      );
+
+      await fileRef.update({
+        downloadUrl,
+        storagePath,
+        // Keep nasArchived and nasPath — file exists in both places now
+      });
+
+      const updated = (await fileRef.get()).data()!;
+      return {
+        id: fileId,
+        fileName: updated.fileName ?? '',
+        contentType: updated.contentType ?? '',
+        size: updated.size ?? 0,
+        downloadUrl,
+        storagePath,
+        uploadedAt: updated.uploadedAt?.toMillis ? new Date(updated.uploadedAt.toMillis()).toISOString() : (updated.uploadedAt ?? ''),
+        folderId: updated.folderId ?? null,
+        nasArchived: true,
+        nasPath: fileData.nasPath,
+      };
+    },
+
+    archiveAllCloudFilesToNas: async (_: any, __: any, ctx: ResolverContext) => {
+      const uid = requireAuth(ctx);
+      const config = await getCachedNasConfig(uid);
+      if (!config || config.status !== 'connected') {
+        throw new Error('NAS not configured or not connected. Save a NAS connection first.');
+      }
+
+      const db = getFirestore();
+      const snap = await db.collection(`users/${uid}/files`).get();
+      const cloudFiles = snap.docs.filter(d => {
+        const data = d.data();
+        return !data.isDeleted && data.downloadUrl && data.storagePath;
+      });
+
+      if (cloudFiles.length === 0) {
+        return { started: true, totalFiles: 0 };
+      }
+
+      // Fire-and-forget background processing
+      const processInBackground = async () => {
+        const bucket = getStorage().bucket();
+        const client = new NasWebDavClient(config.nasUrl, config.username, config.password);
+        await client.createFolder(`${config.destFolder}/cloud-files`);
+
+        for (const doc of cloudFiles) {
+          const data = doc.data();
+          const fileId = doc.id;
+          try {
+            // If already on NAS, just delete from Storage
+            if (data.nasArchived && data.nasPath) {
+              const [exists] = await bucket.file(data.storagePath).exists();
+              if (exists) await bucket.file(data.storagePath).delete();
+              await doc.ref.update({
+                downloadUrl: FieldValue.delete(),
+                storagePath: FieldValue.delete(),
+              });
+              continue;
+            }
+
+            const [fileExists] = await bucket.file(data.storagePath).exists();
+            if (!fileExists) continue;
+
+            const [buffer] = await bucket.file(data.storagePath).download();
+            await client.createFolder(`${config.destFolder}/cloud-files/${fileId}`);
+            const nasFileName = data.fileName ?? `file-${fileId}`;
+            const nasDestFolder = `${config.destFolder}/cloud-files/${fileId}`;
+            await client.upload(nasDestFolder, nasFileName, buffer as Buffer);
+            const nasPath = `${nasDestFolder}/${nasFileName}`;
+
+            await bucket.file(data.storagePath).delete();
+            await doc.ref.update({
+              downloadUrl: FieldValue.delete(),
+              storagePath: FieldValue.delete(),
+              nasArchived: true,
+              nasPath,
+            });
+          } catch (err: any) {
+            logger.error(`Background NAS offload failed for cloud file ${fileId}`, err.message || err);
+          }
+        }
+      };
+
+      processInBackground().catch(err => {
+        logger.error('Background NAS batch offload for cloud files failed', err);
+      });
+
+      return { started: true, totalFiles: cloudFiles.length };
+    },
+
     restoreEpubFromNas: async (_: any, { bookId }: { bookId: string }, ctx: ResolverContext) => {
       const uid = requireAuth(ctx);
       const config = await getCachedNasConfig(uid);

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslation, WindowEvents, PageContent } from '@mycircle/shared';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useTranslation, useQuery, WindowEvents, PageContent, GET_NAS_CONNECTION_STATUS } from '@mycircle/shared';
 import { useFiles } from '../hooks/useFiles';
 import { useSharedFiles } from '../hooks/useSharedFiles';
 import { useFilesSharedWithMe } from '../hooks/useFilesSharedWithMe';
@@ -40,9 +40,19 @@ export default function CloudFiles() {
   const [shareWithFileId, setShareWithFileId] = useState<string | null>(null);
   const [moveFileId, setMoveFileId] = useState<string | null>(null);
 
-  const { files, loading, error, uploadFile, shareFile, deleteFile, renameFile, moveFile, reload } = useFiles();
+  const { files, loading, error, uploadFile, shareFile, deleteFile, renameFile, moveFile, offloadToNas, restoreFromNas, offloadAllToNas, reload } = useFiles();
   const { files: sharedFiles, loading: sharedLoading, error: sharedError, deleteSharedFile, reload: reloadShared } = useSharedFiles();
   const { files: sharedWithMeFiles, loading: sharedWithMeLoading, error: sharedWithMeError, reload: reloadSharedWithMe } = useFilesSharedWithMe();
+
+  // NAS connection status
+  const { data: nasData } = useQuery(GET_NAS_CONNECTION_STATUS);
+  const nasConnected = nasData?.nasConnectionStatus?.status === 'connected';
+
+  // NAS operation loading states
+  const [nasOffloadingIds, setNasOffloadingIds] = useState<Set<string>>(new Set());
+  const [nasRestoringIds, setNasRestoringIds] = useState<Set<string>>(new Set());
+  const [batchOffloading, setBatchOffloading] = useState(false);
+  const batchPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Auth check
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -113,6 +123,60 @@ export default function CloudFiles() {
   const handleRename = useCallback(async (fileId: string, newName: string) => {
     await renameFile(fileId, newName);
   }, [renameFile]);
+
+  const handleOffloadToNas = useCallback(async (fileId: string) => {
+    if (!window.confirm(t('cloudFiles.offloadConfirm'))) return;
+    setNasOffloadingIds(prev => new Set(prev).add(fileId));
+    try {
+      await offloadToNas(fileId);
+    } finally {
+      setNasOffloadingIds(prev => { const next = new Set(prev); next.delete(fileId); return next; });
+    }
+  }, [offloadToNas, t]);
+
+  const handleRestoreFromNas = useCallback(async (fileId: string) => {
+    setNasRestoringIds(prev => new Set(prev).add(fileId));
+    try {
+      await restoreFromNas(fileId);
+    } finally {
+      setNasRestoringIds(prev => { const next = new Set(prev); next.delete(fileId); return next; });
+    }
+  }, [restoreFromNas]);
+
+  const handleOffloadAll = useCallback(async () => {
+    if (!window.confirm(t('cloudFiles.offloadAllConfirm'))) return;
+    setBatchOffloading(true);
+    try {
+      await offloadAllToNas();
+      // Poll for completion every 10 seconds
+      batchPollRef.current = setInterval(() => {
+        reload().then(() => {
+          // Stop polling when no more files have downloadUrl
+          // (checked in next render cycle)
+        });
+      }, 10_000);
+    } catch {
+      setBatchOffloading(false);
+    }
+  }, [offloadAllToNas, reload, t]);
+
+  // Stop batch polling when all cloud files are offloaded
+  useEffect(() => {
+    if (!batchOffloading) return;
+    const hasCloudFiles = files.some(f => !!f.downloadUrl);
+    if (!hasCloudFiles && batchPollRef.current) {
+      clearInterval(batchPollRef.current);
+      batchPollRef.current = null;
+      setBatchOffloading(false);
+    }
+  }, [files, batchOffloading]);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (batchPollRef.current) clearInterval(batchPollRef.current);
+    };
+  }, []);
 
   const handleNavigateIntoFolder = useCallback((folder: Folder) => {
     setFolderStack(prev => [...prev, folder]);
@@ -224,17 +288,56 @@ export default function CloudFiles() {
               ) : (
                 <FileUpload onUpload={handleUpload} />
               )}
+              {/* NAS Batch Offload */}
+              {nasConnected && files.some(f => !!f.downloadUrl) && (
+                <div className="mb-4 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleOffloadAll}
+                    disabled={batchOffloading}
+                    className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 px-4 py-2 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors min-h-[44px] disabled:opacity-50"
+                    aria-label={t('cloudFiles.offloadAll')}
+                  >
+                    {batchOffloading ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                      </svg>
+                    )}
+                    {batchOffloading ? t('cloudFiles.offloading') : t('cloudFiles.offloadAll')}
+                  </button>
+                  {batchOffloading && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400" role="status" aria-live="polite">
+                      {t('cloudFiles.offloadingProgress')}
+                    </span>
+                  )}
+                </div>
+              )}
+              {!nasConnected && files.length > 0 && (
+                <p className="mb-4 text-xs text-gray-400 dark:text-gray-500">
+                  {t('cloudFiles.nasNotConnected')}
+                </p>
+              )}
               <FolderBreadcrumb folderStack={folderStack} onNavigate={handleBreadcrumbNavigate} />
               <FolderList currentFolderId={currentFolderId} onNavigateInto={handleNavigateIntoFolder} />
               <FileList
                 files={filteredMyFiles}
                 emptyMessage={hasActiveFilter ? t('cloudFiles.noResults') : t('cloudFiles.noFiles')}
+                nasConnected={nasConnected}
+                nasOffloadingIds={nasOffloadingIds}
+                nasRestoringIds={nasRestoringIds}
                 onShare={handleShare}
                 onDelete={handleDelete}
                 onPreview={f => setPreviewFile(f)}
                 onRename={handleRename}
                 onShareWith={fileId => setShareWithFileId(fileId)}
                 onMove={fileId => setMoveFileId(fileId)}
+                onOffloadToNas={handleOffloadToNas}
+                onRestoreFromNas={handleRestoreFromNas}
               />
             </>
           )}
