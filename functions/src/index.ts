@@ -12,6 +12,8 @@ export { onZipJobCreated } from './handlers/zipWorker.js';
 export { subscribeToAlerts, checkWeatherAlerts } from './handlers/weatherAlerts.js';
 export { manageTopicSubscription, onAnnouncementCreated, buildAnnouncementMessage } from './handlers/notifications.js';
 
+export { passkey } from './handlers/passkey.js';
+
 // Web Crawler — Firestore-triggered crawl worker
 export { crawlWorker } from './handlers/webCrawler.js';
 

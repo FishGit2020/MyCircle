@@ -8,6 +8,8 @@ import {
   signInWithEmail as firebaseSignInWithEmail,
   signUpWithEmail as firebaseSignUpWithEmail,
   resetPassword as firebaseResetPassword,
+  signInWithPasskeyCredential,
+  registerPasskey as firebaseRegisterPasskey,
   logOut,
   getUserProfile,
   updateStockWatchlist,
@@ -71,6 +73,8 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   signIn: () => Promise<void>;
+  signInWithPasskey: () => Promise<void>;
+  registerPasskey: (displayName?: string) => Promise<boolean>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -163,6 +167,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithPasskeyFn = async () => {
+    try {
+      await signInWithPasskeyCredential();
+    } catch (error) {
+      logger.error('Passkey sign in failed:', error);
+      throw error;
+    }
+  };
+
+  const registerPasskeyFn = async (displayName?: string) => {
+    try {
+      return await firebaseRegisterPasskey(displayName);
+    } catch (error) {
+      logger.error('Passkey registration failed:', error);
+      throw error;
+    }
+  };
+
   const signInWithEmailFn = async (email: string, password: string) => {
     try {
       await firebaseSignInWithEmail(email, password);
@@ -240,6 +262,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile,
         loading,
         signIn,
+        signInWithPasskey: signInWithPasskeyFn,
+        registerPasskey: registerPasskeyFn,
         signInWithEmail: signInWithEmailFn,
         signUpWithEmail: signUpWithEmailFn,
         resetPassword: resetPasswordFn,
