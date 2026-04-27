@@ -1,6 +1,7 @@
 import { createLogger, WindowEvents } from '@mycircle/shared';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, User, Auth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, signInWithCustomToken, User, Auth } from 'firebase/auth';
+import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator, doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, Firestore, collection, addDoc, getDocs, deleteDoc, query, orderBy, limit, onSnapshot, writeBatch, runTransaction } from 'firebase/firestore';
 import { getPerformance, FirebasePerformance } from 'firebase/performance';
 import { getAnalytics, setUserId, setUserProperties, logEvent as firebaseLogEvent, Analytics } from 'firebase/analytics';
@@ -298,6 +299,54 @@ export async function logOut() {
     log.error('Error signing out:', error);
     throw error;
   }
+}
+
+// ─── Passkey (WebAuthn) ─────────────────────────────────────────────
+const PASSKEY_API = import.meta.env.DEV ? 'http://localhost:5001/mycircle-dash/us-central1/passkey/passkey-api' : '/passkey-api';
+
+async function passkeyFetch(path: string, body?: unknown) {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (auth?.currentUser) {
+    const token = await auth.currentUser.getIdToken();
+    headers.Authorization = `Bearer ${token}`;
+  }
+  const res = await fetch(`${PASSKEY_API}/${path}`, {
+    method: 'POST',
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || 'Passkey request failed');
+  }
+  return res.json();
+}
+
+/** Register a new passkey for the currently signed-in user */
+export async function registerPasskey(displayName?: string): Promise<boolean> {
+  if (!auth?.currentUser) throw new Error('Must be signed in to register a passkey');
+
+  const options = await passkeyFetch('register/options');
+  const registration = await startRegistration({ optionsJSON: options });
+  const result = await passkeyFetch('register/verify', { ...registration, displayName: displayName || 'Passkey' });
+  return result.verified;
+}
+
+/** Sign in using a discoverable passkey (resident credential) */
+export async function signInWithPasskeyCredential(): Promise<User | null> {
+  if (!auth) throw new Error('Firebase not initialized');
+
+  const options = await passkeyFetch('authenticate/options');
+  const authentication = await startAuthentication({ optionsJSON: options });
+  const result = await passkeyFetch('authenticate/verify', { ...authentication, challenge: options.challenge });
+
+  if (!result.verified || !result.customToken) {
+    throw new Error('Passkey authentication failed');
+  }
+
+  const userCredential = await signInWithCustomToken(auth, result.customToken);
+  await ensureUserProfile(userCredential.user);
+  return userCredential.user;
 }
 
 export function subscribeToAuthChanges(callback: (user: User | null) => void) {

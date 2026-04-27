@@ -235,6 +235,10 @@ const es: Record<TranslationKey, string> = {
   'auth.maxAccountsReached': 'M\u00e1ximo de cuentas alcanzado',
   'auth.signInToAccess': 'Inicio de sesi\u00f3n requerido',
   'auth.signInPrompt': 'Inicia sesi\u00f3n para acceder a esta funci\u00f3n.',
+  'auth.signInWithPasskey': 'Iniciar sesi\u00f3n con clave de acceso',
+  'auth.createPasskey': 'Crear clave de acceso',
+  'auth.passkeyRegistered': '\u00a1Clave de acceso registrada correctamente!',
+  'auth.passkeyError': 'Error al registrar la clave de acceso. Int\u00e9ntalo de nuevo.',
 
   // Errors
   'error.somethingWentWrong': 'Algo sali\u00f3 mal',

@@ -235,6 +235,10 @@ const zh: Record<TranslationKey, string> = {
   'auth.maxAccountsReached': '\u5df2\u8fbe\u5230\u6700\u5927\u8d26\u6237\u6570',
   'auth.signInToAccess': '\u9700\u8981\u767b\u5f55',
   'auth.signInPrompt': '\u8bf7\u767b\u5f55\u4ee5\u8bbf\u95ee\u6b64\u529f\u80fd\u3002',
+  'auth.signInWithPasskey': '\u4f7f\u7528\u901a\u884c\u5bc6\u94a5\u767b\u5f55',
+  'auth.createPasskey': '\u521b\u5efa\u901a\u884c\u5bc6\u94a5',
+  'auth.passkeyRegistered': '\u901a\u884c\u5bc6\u94a5\u6ce8\u518c\u6210\u529f\uff01',
+  'auth.passkeyError': '\u901a\u884c\u5bc6\u94a5\u6ce8\u518c\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002',
 
   // Errors
   'error.somethingWentWrong': '\u51fa\u4e86\u70b9\u95ee\u9898',

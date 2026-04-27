@@ -233,6 +233,10 @@ const en = {
   'auth.maxAccountsReached': 'Maximum accounts reached',
   'auth.signInToAccess': 'Sign in required',
   'auth.signInPrompt': 'Please sign in to access this feature.',
+  'auth.signInWithPasskey': 'Sign in with Passkey',
+  'auth.createPasskey': 'Create Passkey',
+  'auth.passkeyRegistered': 'Passkey registered successfully!',
+  'auth.passkeyError': 'Failed to register passkey. Please try again.',
 
   // Errors
   'error.somethingWentWrong': 'Something went wrong',

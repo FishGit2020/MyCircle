@@ -11,7 +11,7 @@ type Tab = 'signIn' | 'signUp';
 
 export default function AuthModal({ open, onClose }: Props) {
   const { t } = useTranslation();
-  const { signIn, signInWithEmail, signUpWithEmail, resetPassword } = useAuth();
+  const { signIn, signInWithPasskey, signInWithEmail, signUpWithEmail, resetPassword } = useAuth();
   const [tab, setTab] = useState<Tab>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -125,6 +125,25 @@ export default function AuthModal({ open, onClose }: Props) {
     }
   };
 
+  const handlePasskeySignIn = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await signInWithPasskey();
+      onClose();
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      const msg = err?.message || '';
+      // User cancelled the WebAuthn ceremony
+      if (msg.includes('cancelled') || msg.includes('AbortError') || msg.includes('NotAllowedError')) {
+        setLoading(false);
+        return;
+      }
+      setError(msg || t('auth.errorGeneric'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     setError(null);
     setLoading(true);
@@ -201,6 +220,19 @@ export default function AuthModal({ open, onClose }: Props) {
               <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
             </svg>
             {t('auth.continueWithGoogle')}
+          </button>
+
+          {/* Passkey sign-in button */}
+          <button
+            type="button"
+            onClick={handlePasskeySignIn}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 mt-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 11V7a5 5 0 0110 0v4M5 11h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z" />
+            </svg>
+            {t('auth.signInWithPasskey')}
           </button>
 
           {/* Divider */}

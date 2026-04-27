@@ -86,7 +86,7 @@ function AccountAvatar({ account, size = 'sm' }: { account: { displayName: strin
 
 export default function UserMenu() {
   const { t } = useTranslation();
-  const { user, loading, signOut, updateTheme, updateUnitSystem, knownAccounts, switchToAccount, removeKnownAccount } = useAuth();
+  const { user, loading, signOut, updateTheme, updateUnitSystem, knownAccounts, switchToAccount, removeKnownAccount, registerPasskey } = useAuth();
   const { theme, setThemeMode } = useTheme();
   const { tempUnit, speedUnit: _speedUnit, distanceUnit, setTempUnit, setSpeedUnit, setDistanceUnit } = useUnits();
   const [isOpen, setIsOpen] = useState(false);
@@ -96,6 +96,7 @@ export default function UserMenu() {
   const [password, setPassword] = useState('');
   const [switchError, setSwitchError] = useState('');
   const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [passkeyStatus, setPasskeyStatus] = useState<string | null>(null);
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
@@ -120,6 +121,21 @@ export default function UserMenu() {
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   }, []);
+
+  const handleRegisterPasskey = useCallback(async () => {
+    setPasskeyStatus(null);
+    try {
+      const verified = await registerPasskey();
+      if (verified) {
+        setPasskeyStatus(t('auth.passkeyRegistered'));
+        logEvent('passkey_registered');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('cancelled') || msg.includes('AbortError') || msg.includes('NotAllowedError')) return;
+      setPasskeyStatus(t('auth.passkeyError'));
+    }
+  }, [registerPasskey, t]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -355,6 +371,22 @@ export default function UserMenu() {
             </svg>
             {knownAccounts.length >= 5 ? t('auth.maxAccountsReached') : t('auth.addAnotherAccount')}
           </button>
+
+          {/* Create passkey */}
+          <button
+            role="menuitem"
+            type="button"
+            onClick={handleRegisterPasskey}
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 11V7a5 5 0 0110 0v4M5 11h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z" />
+            </svg>
+            {t('auth.createPasskey')}
+          </button>
+          {passkeyStatus && (
+            <div className="px-4 py-1 text-xs text-blue-600 dark:text-blue-400">{passkeyStatus}</div>
+          )}
 
           {/* Units preferences */}
           <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
