@@ -5,17 +5,13 @@ export const transitCache = new NodeCache();
 
 const OBA_BASE_URL = 'https://api.pugetsound.onebusaway.org/api/where';
 
-let warnedMissingKey = false;
+// 'TEST' is OneBusAway's documented public demo key — works against the
+// Puget Sound endpoint without registration. Used as a fallback so the
+// resolver keeps responding when no project-specific key has been
+// provisioned in the API_KEYS Firebase secret.
+const OBA_DEMO_KEY = 'TEST';
 function getObaKey(): string {
-  const k = process.env.ONEBUSAWAY_API_KEY;
-  if (!k) {
-    if (!warnedMissingKey) {
-      console.warn('[transit] ONEBUSAWAY_API_KEY is missing — returning empty results');
-      warnedMissingKey = true;
-    }
-    return '';
-  }
-  return k;
+  return process.env.ONEBUSAWAY_API_KEY || OBA_DEMO_KEY;
 }
 
 interface TransitArrival {
@@ -47,8 +43,6 @@ export function createTransitQueryResolvers() {
       if (cached) return cached;
 
       const key = getObaKey();
-      if (!key) return [];
-
       const url = `${OBA_BASE_URL}/arrivals-and-departures-for-stop/${encodeURIComponent(stopId)}.json?key=${key}`;
       const response = await axios.get(url, { timeout: 10000 });
       const data = response.data?.data?.entry;
@@ -84,8 +78,6 @@ export function createTransitQueryResolvers() {
       if (cached) return cached;
 
       const key = getObaKey();
-      if (!key) return null;
-
       const url = `${OBA_BASE_URL}/stop/${encodeURIComponent(stopId)}.json?key=${key}`;
       const response = await axios.get(url, { timeout: 10000 });
       const data = response.data?.data?.entry;
@@ -111,8 +103,6 @@ export function createTransitQueryResolvers() {
       if (cached) return cached;
 
       const key = getObaKey();
-      if (!key) return [];
-
       const url = `${OBA_BASE_URL}/stops-for-location.json?key=${key}&lat=${lat}&lon=${lon}&radius=${r}`;
       const response = await axios.get(url, { timeout: 10000 });
       const stops: TransitStop[] = (response.data?.data?.list || []).map((s: Record<string, unknown>) => ({
