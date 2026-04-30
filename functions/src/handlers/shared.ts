@@ -27,6 +27,7 @@ export function expandApiKeys() {
     process.env.FINNHUB_API_KEY = ak.finnhub || '';
     process.env.GEMINI_API_KEY = ak.gemini || '';
     process.env.YOUVERSION_APP_KEY = ak.youversion || '';
+    process.env.ONEBUSAWAY_API_KEY = ak.onebusaway || '';
   }
 }
 

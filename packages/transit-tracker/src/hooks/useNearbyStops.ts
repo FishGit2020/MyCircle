@@ -11,15 +11,19 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+export type NearbyPermission = 'unknown' | 'granted' | 'denied' | 'unavailable';
+
 interface UseNearbyStopsResult {
   stops: NearbyStop[];
   loading: boolean;
   error: string | null;
+  permission: NearbyPermission;
   findNearby: (coords?: { lat: number; lon: number }) => void;
 }
 
 export function useNearbyStops(): UseNearbyStopsResult {
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [permission, setPermission] = useState<NearbyPermission>('unknown');
   const userCoordsRef = useRef<{ lat: number; lon: number } | null>(null);
 
   const [fetchNearby, { data, loading: queryLoading, error: queryError }] = useLazyQuery(
@@ -46,12 +50,14 @@ export function useNearbyStops(): UseNearbyStopsResult {
   const findNearby = useCallback((coords?: { lat: number; lon: number }) => {
     if (coords) {
       setGeoError(null);
+      setPermission('granted');
       userCoordsRef.current = { lat: coords.lat, lon: coords.lon };
       fetchNearby({ variables: { lat: coords.lat, lon: coords.lon, radius: 500 } });
       return;
     }
 
     if (!navigator.geolocation) {
+      setPermission('unavailable');
       setGeoError('Geolocation is not supported by your browser');
       return;
     }
@@ -60,16 +66,23 @@ export function useNearbyStops(): UseNearbyStopsResult {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        setPermission('granted');
         const { latitude, longitude } = position.coords;
         userCoordsRef.current = { lat: latitude, lon: longitude };
         fetchNearby({ variables: { lat: latitude, lon: longitude, radius: 500 } });
       },
       (err) => {
+        // 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT
+        if (err.code === 1) {
+          setPermission('denied');
+        } else {
+          setPermission('unavailable');
+        }
         setGeoError(err.message || 'Failed to get location');
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, [fetchNearby]);
 
-  return { stops, loading, error, findNearby };
+  return { stops, loading, error, permission, findNearby };
 }

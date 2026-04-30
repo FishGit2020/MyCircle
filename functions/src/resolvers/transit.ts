@@ -1,10 +1,22 @@
 import axios from 'axios';
 import NodeCache from 'node-cache';
 
-const transitCache = new NodeCache();
+export const transitCache = new NodeCache();
 
 const OBA_BASE_URL = 'https://api.pugetsound.onebusaway.org/api/where';
-const OBA_API_KEY = 'TEST';
+
+let warnedMissingKey = false;
+function getObaKey(): string {
+  const k = process.env.ONEBUSAWAY_API_KEY;
+  if (!k) {
+    if (!warnedMissingKey) {
+      console.warn('[transit] ONEBUSAWAY_API_KEY is missing — returning empty results');
+      warnedMissingKey = true;
+    }
+    return '';
+  }
+  return k;
+}
 
 interface TransitArrival {
   routeId: string;
@@ -34,7 +46,10 @@ export function createTransitQueryResolvers() {
       const cached = transitCache.get<TransitArrival[]>(cacheKey);
       if (cached) return cached;
 
-      const url = `${OBA_BASE_URL}/arrivals-and-departures-for-stop/${encodeURIComponent(stopId)}.json?key=${OBA_API_KEY}`;
+      const key = getObaKey();
+      if (!key) return [];
+
+      const url = `${OBA_BASE_URL}/arrivals-and-departures-for-stop/${encodeURIComponent(stopId)}.json?key=${key}`;
       const response = await axios.get(url, { timeout: 10000 });
       const data = response.data?.data?.entry;
       const now = Date.now();
@@ -68,7 +83,10 @@ export function createTransitQueryResolvers() {
       const cached = transitCache.get<TransitStop>(cacheKey);
       if (cached) return cached;
 
-      const url = `${OBA_BASE_URL}/stop/${encodeURIComponent(stopId)}.json?key=${OBA_API_KEY}`;
+      const key = getObaKey();
+      if (!key) return null;
+
+      const url = `${OBA_BASE_URL}/stop/${encodeURIComponent(stopId)}.json?key=${key}`;
       const response = await axios.get(url, { timeout: 10000 });
       const data = response.data?.data?.entry;
       if (!data) return null;
@@ -92,7 +110,10 @@ export function createTransitQueryResolvers() {
       const cached = transitCache.get<TransitStop[]>(cacheKey);
       if (cached) return cached;
 
-      const url = `${OBA_BASE_URL}/stops-for-location.json?key=${OBA_API_KEY}&lat=${lat}&lon=${lon}&radius=${r}`;
+      const key = getObaKey();
+      if (!key) return [];
+
+      const url = `${OBA_BASE_URL}/stops-for-location.json?key=${key}&lat=${lat}&lon=${lon}&radius=${r}`;
       const response = await axios.get(url, { timeout: 10000 });
       const stops: TransitStop[] = (response.data?.data?.list || []).map((s: Record<string, unknown>) => ({
         id: String(s.id || ''),

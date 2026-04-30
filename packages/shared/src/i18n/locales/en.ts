@@ -3000,6 +3000,15 @@ const en = {
   'transit.favorites': 'Favorite Stops',
   'transit.noFavorites': 'No favorite stops yet',
   'transit.favoriteCities': 'Favorite Cities',
+  'transit.refreshFailed': "Couldn't refresh — showing last result",
+  'transit.retry': 'Retry',
+  'transit.locationPermissionDenied': 'Location permission was denied',
+  'transit.locationPermissionExplain': 'We use your location only to find nearby stops. You can enable it in your browser settings.',
+  'transit.locationUnavailable': 'Location is unavailable on this device',
+  'transit.noSearchMatch': 'No stops match your search. Try a different name or find nearby stops.',
+  'transit.departed': 'Departed',
+  'transit.stopNotFound': 'Stop not found',
+  'transit.removeFromRecent': 'Remove from recent',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': 'Travel Map',
