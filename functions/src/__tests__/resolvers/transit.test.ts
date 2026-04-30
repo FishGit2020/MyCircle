@@ -18,12 +18,12 @@ describe('transit resolvers — credential handling', () => {
     process.env.ONEBUSAWAY_API_KEY = originalKey;
   });
 
-  describe('when ONEBUSAWAY_API_KEY is present', () => {
+  describe('when ONEBUSAWAY_API_KEY is provided', () => {
     beforeEach(() => {
       process.env.ONEBUSAWAY_API_KEY = 'real-key';
     });
 
-    it('transitArrivals calls axios and returns mapped arrivals', async () => {
+    it('transitArrivals calls axios with the configured key', async () => {
       vi.mocked(axios.get).mockResolvedValueOnce({
         data: {
           data: {
@@ -118,28 +118,49 @@ describe('transit resolvers — credential handling', () => {
       delete process.env.ONEBUSAWAY_API_KEY;
     });
 
-    it('transitArrivals returns [] without calling axios', async () => {
-      const resolvers = createTransitQueryResolvers();
-      const result = await resolvers.transitArrivals(null, { stopId: '1_29248' });
+    it('transitArrivals falls back to the OBA demo key (TEST)', async () => {
+      vi.mocked(axios.get).mockResolvedValueOnce({
+        data: { data: { entry: { arrivalsAndDepartures: [] } } },
+      });
 
-      expect(result).toEqual([]);
-      expect(axios.get).not.toHaveBeenCalled();
+      const resolvers = createTransitQueryResolvers();
+      await resolvers.transitArrivals(null, { stopId: '1_29248' });
+
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith(
+        expect.stringContaining('key=TEST'),
+        expect.objectContaining({ timeout: 10000 }),
+      );
     });
 
-    it('transitStop returns null without calling axios', async () => {
-      const resolvers = createTransitQueryResolvers();
-      const result = await resolvers.transitStop(null, { stopId: '1_29248' });
+    it('transitStop falls back to the OBA demo key (TEST)', async () => {
+      vi.mocked(axios.get).mockResolvedValueOnce({
+        data: { data: { entry: { id: '1_29248', name: 'A', direction: '', lat: 0, lon: 0, routeIds: [] } } },
+      });
 
-      expect(result).toBeNull();
-      expect(axios.get).not.toHaveBeenCalled();
+      const resolvers = createTransitQueryResolvers();
+      await resolvers.transitStop(null, { stopId: '1_29248' });
+
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith(
+        expect.stringContaining('key=TEST'),
+        expect.anything(),
+      );
     });
 
-    it('transitNearbyStops returns [] without calling axios', async () => {
-      const resolvers = createTransitQueryResolvers();
-      const result = await resolvers.transitNearbyStops(null, { lat: 47.6, lon: -122.3 });
+    it('transitNearbyStops falls back to the OBA demo key (TEST)', async () => {
+      vi.mocked(axios.get).mockResolvedValueOnce({
+        data: { data: { list: [] } },
+      });
 
-      expect(result).toEqual([]);
-      expect(axios.get).not.toHaveBeenCalled();
+      const resolvers = createTransitQueryResolvers();
+      await resolvers.transitNearbyStops(null, { lat: 47.6, lon: -122.3 });
+
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith(
+        expect.stringContaining('key=TEST'),
+        expect.anything(),
+      );
     });
   });
 });
