@@ -2996,6 +2996,15 @@ const es: Record<TranslationKey, string> = {
   'transit.favorites': 'Paradas Favoritas',
   'transit.noFavorites': 'Sin paradas favoritas a\u00fan',
   'transit.favoriteCities': 'Ciudades favoritas',
+  'transit.refreshFailed': 'No se pudo actualizar; se muestra el \u00faltimo resultado',
+  'transit.retry': 'Reintentar',
+  'transit.locationPermissionDenied': 'Se deneg\u00f3 el permiso de ubicaci\u00f3n',
+  'transit.locationPermissionExplain': 'Solo usamos tu ubicaci\u00f3n para encontrar paradas cercanas. Puedes habilitarla en la configuraci\u00f3n del navegador.',
+  'transit.locationUnavailable': 'La ubicaci\u00f3n no est\u00e1 disponible en este dispositivo',
+  'transit.noSearchMatch': 'Ninguna parada coincide con tu b\u00fasqueda. Prueba otro nombre o busca paradas cercanas.',
+  'transit.departed': 'Sali\u00f3',
+  'transit.stopNotFound': 'Parada no encontrada',
+  'transit.removeFromRecent': 'Quitar de recientes',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': 'Mapa de Viajes',
