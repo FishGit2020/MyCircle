@@ -49,10 +49,12 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
 
       locations.forEach((loc) => {
         const el = document.createElement('div');
-        el.className = 'anniversary-map-marker';
+        const inner = document.createElement('div');
+        inner.className = 'anniversary-map-marker';
         const pinColor = loc.color || '#3b82f6';
-        el.style.cssText =
+        inner.style.cssText =
           `width:24px;height:24px;background:${pinColor};border:2px solid white;border-radius:50%;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.3);transition:all 0.2s ease;`;
+        el.appendChild(inner);
 
         const yearSuffix = loc.year ? ` <span style="font-weight:400;color:#6b7280;">(${loc.year})</span>` : '';
         const popup = new ml.Popup({ offset: 25, closeButton: false }).setHTML(
@@ -65,8 +67,8 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
           .addTo(map);
 
         // Show/hide popup on pin hover
-        el.addEventListener('mouseenter', () => { if (!marker.getPopup().isOpen()) marker.togglePopup(); });
-        el.addEventListener('mouseleave', () => { if (marker.getPopup().isOpen()) marker.togglePopup(); });
+        inner.addEventListener('mouseenter', () => { if (!marker.getPopup().isOpen()) marker.togglePopup(); });
+        inner.addEventListener('mouseleave', () => { if (marker.getPopup().isOpen()) marker.togglePopup(); });
 
         bounds.extend([loc.lon, loc.lat]);
         markersRef.current.push({ marker, anniversaryId: loc.anniversaryId, color: pinColor });
@@ -95,27 +97,29 @@ export default function AnniversaryMap({ locations, highlightedId }: Anniversary
       try {
         const el = marker.getElement() as HTMLElement | undefined;
         if (!el) return;
+        const inner = el.firstChild as HTMLElement | null;
+        if (!inner) return;
         const isHighlighted = anniversaryId === highlightedId;
         if (highlightedId) {
           if (isHighlighted) {
-            el.style.background = '#ffffff';
-            el.style.border = `3px solid ${color}`;
-            el.style.transform = 'scale(1.4)';
-            el.style.opacity = '1';
-            el.style.zIndex = '10';
+            inner.style.background = '#ffffff';
+            inner.style.border = `3px solid ${color}`;
+            inner.style.transform = 'scale(1.4)';
+            inner.style.opacity = '1';
+            inner.style.zIndex = '10';
           } else {
-            el.style.background = color;
-            el.style.border = '2px solid white';
-            el.style.transform = 'scale(1)';
-            el.style.opacity = '0.35';
-            el.style.zIndex = '';
+            inner.style.background = color;
+            inner.style.border = '2px solid white';
+            inner.style.transform = 'scale(1)';
+            inner.style.opacity = '0.35';
+            inner.style.zIndex = '';
           }
         } else {
-          el.style.background = color;
-          el.style.border = '2px solid white';
-          el.style.transform = 'scale(1)';
-          el.style.opacity = '1';
-          el.style.zIndex = '';
+          inner.style.background = color;
+          inner.style.border = '2px solid white';
+          inner.style.transform = 'scale(1)';
+          inner.style.opacity = '1';
+          inner.style.zIndex = '';
         }
       } catch { /* marker may be destroyed */ }
     });

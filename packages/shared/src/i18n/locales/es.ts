@@ -235,6 +235,10 @@ const es: Record<TranslationKey, string> = {
   'auth.maxAccountsReached': 'M\u00e1ximo de cuentas alcanzado',
   'auth.signInToAccess': 'Inicio de sesi\u00f3n requerido',
   'auth.signInPrompt': 'Inicia sesi\u00f3n para acceder a esta funci\u00f3n.',
+  'auth.signInWithPasskey': 'Iniciar sesi\u00f3n con clave de acceso',
+  'auth.createPasskey': 'Crear clave de acceso',
+  'auth.passkeyRegistered': '\u00a1Clave de acceso registrada correctamente!',
+  'auth.passkeyError': 'Error al registrar la clave de acceso. Int\u00e9ntalo de nuevo.',
 
   // Errors
   'error.somethingWentWrong': 'Algo sali\u00f3 mal',
@@ -1763,6 +1767,16 @@ const es: Record<TranslationKey, string> = {
   'cloudFiles.storageOf': 'de',
   'cloudFiles.storageViewConsole': 'Consola Firebase',
   'cloudFiles.uploadBlocked': 'Almacenamiento lleno. Elimina archivos antes de subir.',
+  'cloudFiles.offloadToNas': 'Transferir a NAS',
+  'cloudFiles.restoreFromNas': 'Restaurar desde NAS',
+  'cloudFiles.onNas': 'Almacenado en NAS',
+  'cloudFiles.offloading': 'Transfiriendo...',
+  'cloudFiles.restoring': 'Restaurando...',
+  'cloudFiles.offloadAll': 'Transferir todo a NAS',
+  'cloudFiles.offloadConfirm': '\u00bfMover este archivo a NAS? Se eliminar\u00e1 del almacenamiento en la nube.',
+  'cloudFiles.offloadAllConfirm': '\u00bfMover todos los archivos a NAS? Se eliminar\u00e1n del almacenamiento en la nube.',
+  'cloudFiles.offloadingProgress': 'Transfiriendo en segundo plano...',
+  'cloudFiles.nasNotConnected': 'Conecta un NAS en Configuraci\u00f3n para transferir archivos al almacenamiento local.',
 
   // Model Benchmark
   'nav.benchmark': 'Benchmark',
@@ -2982,6 +2996,15 @@ const es: Record<TranslationKey, string> = {
   'transit.favorites': 'Paradas Favoritas',
   'transit.noFavorites': 'Sin paradas favoritas a\u00fan',
   'transit.favoriteCities': 'Ciudades favoritas',
+  'transit.refreshFailed': 'No se pudo actualizar; se muestra el \u00faltimo resultado',
+  'transit.retry': 'Reintentar',
+  'transit.locationPermissionDenied': 'Se deneg\u00f3 el permiso de ubicaci\u00f3n',
+  'transit.locationPermissionExplain': 'Solo usamos tu ubicaci\u00f3n para encontrar paradas cercanas. Puedes habilitarla en la configuraci\u00f3n del navegador.',
+  'transit.locationUnavailable': 'La ubicaci\u00f3n no est\u00e1 disponible en este dispositivo',
+  'transit.noSearchMatch': 'Ninguna parada coincide con tu b\u00fasqueda. Prueba otro nombre o busca paradas cercanas.',
+  'transit.departed': 'Sali\u00f3',
+  'transit.stopNotFound': 'Parada no encontrada',
+  'transit.removeFromRecent': 'Quitar de recientes',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': 'Mapa de Viajes',
@@ -3336,6 +3359,9 @@ const es: Record<TranslationKey, string> = {
   'hsaExpenses.mentalHealth': 'Salud mental',
   'hsaExpenses.labTest': 'Laboratorio / Prueba',
   'hsaExpenses.other': 'Otro',
+  'hsaExpenses.backupToNas': 'Respaldar en NAS',
+  'hsaExpenses.backingUp': 'Respaldando...',
+  'hsaExpenses.backupSuccess': 'Se respaldaron {expenses} gastos y {receipts} recibos en NAS.',
   'widgets.hsaExpenses': 'Gastos de HSA',
   'widgets.hsaExpensesDesc': 'Rastrea reembolsos de gastos de HSA',
   // Setup

@@ -11,6 +11,7 @@ import {
   TRASH_HSA_RECEIPT,
   RESTORE_HSA_RECEIPT,
   PERMANENTLY_DELETE_HSA_RECEIPT,
+  BACKUP_HSA_TO_NAS,
 } from '@mycircle/shared';
 import type { HSAExpense, HSAExpenseInput, HSAExpenseUpdateInput } from '../types';
 import { fileToBase64, isFileTooLarge } from '../utils/expenseHelpers';
@@ -52,6 +53,8 @@ export function useHsaExpenses() {
     PERMANENTLY_DELETE_HSA_RECEIPT,
     { refetchQueries: [{ query: GET_HSA_EXPENSES }] },
   );
+
+  const [backupToNasMutation, { loading: backingUpToNas }] = useMutation(BACKUP_HSA_TO_NAS);
 
   const expenses: HSAExpense[] = data?.hsaExpenses ?? [];
 
@@ -116,6 +119,11 @@ export function useHsaExpenses() {
     [permanentlyDeleteReceiptMutation],
   );
 
+  const backupToNas = useCallback(async () => {
+    const result = await backupToNasMutation();
+    return result.data?.backupHsaToNas ?? null;
+  }, [backupToNasMutation]);
+
   return {
     expenses,
     loading,
@@ -126,6 +134,7 @@ export function useHsaExpenses() {
     uploadingReceipt,
     trashingReceipt,
     deletingReceipt,
+    backingUpToNas,
     addExpense,
     updateExpense,
     deleteExpense,
@@ -134,6 +143,7 @@ export function useHsaExpenses() {
     trashReceipt,
     restoreReceipt,
     permanentlyDeleteReceipt,
+    backupToNas,
     refetch,
   };
 }

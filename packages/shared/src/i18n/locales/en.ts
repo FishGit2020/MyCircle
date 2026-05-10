@@ -233,6 +233,10 @@ const en = {
   'auth.maxAccountsReached': 'Maximum accounts reached',
   'auth.signInToAccess': 'Sign in required',
   'auth.signInPrompt': 'Please sign in to access this feature.',
+  'auth.signInWithPasskey': 'Sign in with Passkey',
+  'auth.createPasskey': 'Create Passkey',
+  'auth.passkeyRegistered': 'Passkey registered successfully!',
+  'auth.passkeyError': 'Failed to register passkey. Please try again.',
 
   // Errors
   'error.somethingWentWrong': 'Something went wrong',
@@ -1761,6 +1765,16 @@ const en = {
   'cloudFiles.storageOf': 'of',
   'cloudFiles.storageViewConsole': 'Firebase Console',
   'cloudFiles.uploadBlocked': 'Storage full. Delete files before uploading.',
+  'cloudFiles.offloadToNas': 'Offload to NAS',
+  'cloudFiles.restoreFromNas': 'Restore from NAS',
+  'cloudFiles.onNas': 'Stored on NAS',
+  'cloudFiles.offloading': 'Offloading...',
+  'cloudFiles.restoring': 'Restoring...',
+  'cloudFiles.offloadAll': 'Offload All to NAS',
+  'cloudFiles.offloadConfirm': 'Move this file to NAS? It will be removed from cloud storage.',
+  'cloudFiles.offloadAllConfirm': 'Move all cloud files to NAS? They will be removed from cloud storage.',
+  'cloudFiles.offloadingProgress': 'Offloading in background...',
+  'cloudFiles.nasNotConnected': 'Connect a NAS in Settings to offload files for local storage.',
 
   // Model Benchmark
   'nav.benchmark': 'Benchmark',
@@ -2986,6 +3000,15 @@ const en = {
   'transit.favorites': 'Favorite Stops',
   'transit.noFavorites': 'No favorite stops yet',
   'transit.favoriteCities': 'Favorite Cities',
+  'transit.refreshFailed': "Couldn't refresh — showing last result",
+  'transit.retry': 'Retry',
+  'transit.locationPermissionDenied': 'Location permission was denied',
+  'transit.locationPermissionExplain': 'We use your location only to find nearby stops. You can enable it in your browser settings.',
+  'transit.locationUnavailable': 'Location is unavailable on this device',
+  'transit.noSearchMatch': 'No stops match your search. Try a different name or find nearby stops.',
+  'transit.departed': 'Departed',
+  'transit.stopNotFound': 'Stop not found',
+  'transit.removeFromRecent': 'Remove from recent',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': 'Travel Map',
@@ -3340,6 +3363,9 @@ const en = {
   'hsaExpenses.mentalHealth': 'Mental Health',
   'hsaExpenses.labTest': 'Lab / Test',
   'hsaExpenses.other': 'Other',
+  'hsaExpenses.backupToNas': 'Backup to NAS',
+  'hsaExpenses.backingUp': 'Backing up...',
+  'hsaExpenses.backupSuccess': 'Backed up {expenses} expenses and {receipts} receipts to NAS.',
   'widgets.hsaExpenses': 'HSA Expenses',
   'widgets.hsaExpensesDesc': 'Track HSA expense reimbursements',
   // Setup

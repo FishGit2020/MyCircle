@@ -74,9 +74,9 @@ export default function ArrivalsList({ arrivals, lastUpdated }: ArrivalsListProp
               </div>
 
               {/* ETA */}
-              <div className={`flex-shrink-0 text-right ${getStatusColor(arrival.predicted, minutesAway)}`}>
+              <div className={`flex-shrink-0 text-right ${arrival.departed ? 'text-gray-500 dark:text-gray-400' : getStatusColor(arrival.predicted, minutesAway)}`}>
                 <p className="text-lg font-bold leading-tight">
-                  {formatMinutes(msAway)}
+                  {arrival.departed ? t('transit.departed') : formatMinutes(msAway)}
                 </p>
               </div>
             </li>

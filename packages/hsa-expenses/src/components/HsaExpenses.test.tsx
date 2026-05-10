@@ -7,8 +7,9 @@ import { HSAExpenseCategory, HSAExpenseStatus, type HSAExpense } from '../types'
 vi.mock('@mycircle/shared', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
   PageContent: ({ children }: { children: React.ReactNode }) => <div data-testid="page-content">{children}</div>,
-  useQuery: vi.fn(),
+  useQuery: vi.fn(() => ({ data: null, loading: false, error: null })),
   useMutation: vi.fn(),
+  GET_NAS_CONNECTION_STATUS: 'GET_NAS_CONNECTION_STATUS',
 }));
 
 const mockHook = {
@@ -19,12 +20,18 @@ const mockHook = {
   updating: false,
   deleting: false,
   uploadingReceipt: false,
+  trashingReceipt: false,
+  deletingReceipt: false,
+  backingUpToNas: false,
   addExpense: vi.fn(),
   updateExpense: vi.fn(),
   deleteExpense: vi.fn(),
   markReimbursed: vi.fn(),
   uploadReceipt: vi.fn(),
-  deleteReceipt: vi.fn(),
+  trashReceipt: vi.fn(),
+  restoreReceipt: vi.fn(),
+  permanentlyDeleteReceipt: vi.fn(),
+  backupToNas: vi.fn(),
   refetch: vi.fn(),
 };
 

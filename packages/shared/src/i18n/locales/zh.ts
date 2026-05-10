@@ -235,6 +235,10 @@ const zh: Record<TranslationKey, string> = {
   'auth.maxAccountsReached': '\u5df2\u8fbe\u5230\u6700\u5927\u8d26\u6237\u6570',
   'auth.signInToAccess': '\u9700\u8981\u767b\u5f55',
   'auth.signInPrompt': '\u8bf7\u767b\u5f55\u4ee5\u8bbf\u95ee\u6b64\u529f\u80fd\u3002',
+  'auth.signInWithPasskey': '\u4f7f\u7528\u901a\u884c\u5bc6\u94a5\u767b\u5f55',
+  'auth.createPasskey': '\u521b\u5efa\u901a\u884c\u5bc6\u94a5',
+  'auth.passkeyRegistered': '\u901a\u884c\u5bc6\u94a5\u6ce8\u518c\u6210\u529f\uff01',
+  'auth.passkeyError': '\u901a\u884c\u5bc6\u94a5\u6ce8\u518c\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002',
 
   // Errors
   'error.somethingWentWrong': '\u51fa\u4e86\u70b9\u95ee\u9898',
@@ -1763,6 +1767,16 @@ const zh: Record<TranslationKey, string> = {
   'cloudFiles.storageOf': '\u5171',
   'cloudFiles.storageViewConsole': 'Firebase \u63a7\u5236\u53f0',
   'cloudFiles.uploadBlocked': '\u5b58\u50a8\u7a7a\u95f4\u5df2\u6ee1\uff0c\u8bf7\u5148\u5220\u9664\u6587\u4ef6\u518d\u4e0a\u4f20\u3002',
+  'cloudFiles.offloadToNas': '\u8f6c\u5b58\u5230 NAS',
+  'cloudFiles.restoreFromNas': '\u4ece NAS \u6062\u590d',
+  'cloudFiles.onNas': '\u5df2\u5b58\u50a8\u5728 NAS',
+  'cloudFiles.offloading': '\u8f6c\u5b58\u4e2d...',
+  'cloudFiles.restoring': '\u6062\u590d\u4e2d...',
+  'cloudFiles.offloadAll': '\u5168\u90e8\u8f6c\u5b58\u5230 NAS',
+  'cloudFiles.offloadConfirm': '\u5c06\u6b64\u6587\u4ef6\u8f6c\u5b58\u5230 NAS\uff1f\u5b83\u5c06\u4ece\u4e91\u5b58\u50a8\u4e2d\u5220\u9664\u3002',
+  'cloudFiles.offloadAllConfirm': '\u5c06\u6240\u6709\u4e91\u6587\u4ef6\u8f6c\u5b58\u5230 NAS\uff1f\u5b83\u4eec\u5c06\u4ece\u4e91\u5b58\u50a8\u4e2d\u5220\u9664\u3002',
+  'cloudFiles.offloadingProgress': '\u540e\u53f0\u8f6c\u5b58\u4e2d...',
+  'cloudFiles.nasNotConnected': '\u5728\u8bbe\u7f6e\u4e2d\u8fde\u63a5 NAS \u4ee5\u5c06\u6587\u4ef6\u8f6c\u5b58\u5230\u672c\u5730\u5b58\u50a8\u3002',
 
   // Model Benchmark
   'nav.benchmark': '\u6027\u80fd\u6d4b\u8bd5',
@@ -2982,6 +2996,15 @@ const zh: Record<TranslationKey, string> = {
   'transit.favorites': '\u6536\u85cf\u7ad9\u70b9',
   'transit.noFavorites': '\u6682\u65e0\u6536\u85cf\u7ad9\u70b9',
   'transit.favoriteCities': '\u6536\u85cf\u57ce\u5e02',
+  'transit.refreshFailed': '\u65e0\u6cd5\u5237\u65b0\uff0c\u663e\u793a\u4e0a\u6b21\u7ed3\u679c',
+  'transit.retry': '\u91cd\u8bd5',
+  'transit.locationPermissionDenied': '\u4f4d\u7f6e\u6743\u9650\u88ab\u62d2\u7edd',
+  'transit.locationPermissionExplain': '\u6211\u4eec\u4ec5\u4f7f\u7528\u60a8\u7684\u4f4d\u7f6e\u67e5\u627e\u9644\u8fd1\u7ad9\u70b9\u3002\u53ef\u5728\u6d4f\u89c8\u5668\u8bbe\u7f6e\u4e2d\u542f\u7528\u3002',
+  'transit.locationUnavailable': '\u6b64\u8bbe\u5907\u65e0\u6cd5\u83b7\u53d6\u4f4d\u7f6e',
+  'transit.noSearchMatch': '\u6ca1\u6709\u627e\u5230\u5339\u914d\u7684\u7ad9\u70b9\u3002\u8bf7\u5c1d\u8bd5\u5176\u4ed6\u540d\u79f0\u6216\u67e5\u627e\u9644\u8fd1\u7ad9\u70b9\u3002',
+  'transit.departed': '\u5df2\u79bb\u7ad9',
+  'transit.stopNotFound': '\u672a\u627e\u5230\u7ad9\u70b9',
+  'transit.removeFromRecent': '\u4ece\u6700\u8fd1\u79fb\u9664',
 
   // ─── Travel Map ──────────────────────────────────────────────
   'nav.travelMap': '\u65c5\u884c\u5730\u56fe',
@@ -3336,6 +3359,9 @@ const zh: Record<TranslationKey, string> = {
   'hsaExpenses.mentalHealth': '\u5fc3\u7406\u5065\u5eb7',
   'hsaExpenses.labTest': '\u68c0\u9a8c/\u5316\u9a8c',
   'hsaExpenses.other': '\u5176\u4ed6',
+  'hsaExpenses.backupToNas': '\u5907\u4efd\u5230 NAS',
+  'hsaExpenses.backingUp': '\u5907\u4efd\u4e2d...',
+  'hsaExpenses.backupSuccess': '\u5df2\u5907\u4efd {expenses} \u7b14\u8d39\u7528\u548c {receipts} \u5f20\u6536\u636e\u5230 NAS\u3002',
   'widgets.hsaExpenses': 'HSA \u8d39\u7528',
   'widgets.hsaExpensesDesc': '\u8ddf\u8e2a HSA \u8d39\u7528\u62a5\u9500',
   // Setup

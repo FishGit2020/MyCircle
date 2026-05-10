@@ -4,28 +4,15 @@ import { useTranslation, PageContent } from '@mycircle/shared';
 import { useTransitArrivals } from '../hooks/useTransitArrivals';
 import { useNearbyStops } from '../hooks/useNearbyStops';
 import { useFavoriteStops } from '../hooks/useFavoriteStops';
+import {
+  loadRecentStops,
+  saveRecentStops,
+  upsertRecentStop,
+  removeRecentStop,
+} from '../lib/recentStops';
+import type { RecentStopEntry } from '../types';
 import StopSearch from './StopSearch';
 import ArrivalsList from './ArrivalsList';
-
-const RECENT_STOPS_KEY = 'transit-recent-stops';
-const MAX_RECENT = 5;
-
-function loadRecentStops(): string[] {
-  try {
-    const raw = localStorage.getItem(RECENT_STOPS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed.slice(0, MAX_RECENT);
-    }
-  } catch { /* ignore */ }
-  return [];
-}
-
-function saveRecentStops(stops: string[]) {
-  try {
-    localStorage.setItem(RECENT_STOPS_KEY, JSON.stringify(stops.slice(0, MAX_RECENT)));
-  } catch { /* ignore */ }
-}
 
 interface FavoriteCity {
   id: string;
@@ -43,11 +30,11 @@ const TransitTracker: React.FC<TransitTrackerProps> = ({ favoriteCities }) => {
   const { stopId: routeStopId } = useParams<{ stopId: string }>();
   const navigate = useNavigate();
   const [selectedStopId, setSelectedStopId] = useState<string | null>(routeStopId || null);
-  const [recentStops, setRecentStops] = useState<string[]>(loadRecentStops);
+  const [recentStops, setRecentStops] = useState<RecentStopEntry[]>(loadRecentStops);
   const [selectedCityChip, setSelectedCityChip] = useState<string | null>(null);
 
-  const { arrivals, stop, loading, error, refresh, lastUpdated } = useTransitArrivals(selectedStopId);
-  const { stops: nearbyStops, loading: nearbyLoading, error: nearbyError, findNearby } = useNearbyStops();
+  const { arrivals, stop, loading, error, refreshError, refresh, lastUpdated } = useTransitArrivals(selectedStopId);
+  const { stops: nearbyStops, loading: nearbyLoading, error: nearbyError, permission: nearbyPermission, findNearby } = useNearbyStops();
   const { favorites, isFavorite, toggleFavorite } = useFavoriteStops();
 
   // Sync URL param to state — including clearing when navigating back to /transit
@@ -59,12 +46,59 @@ const TransitTracker: React.FC<TransitTrackerProps> = ({ favoriteCities }) => {
   const handleSelectStop = useCallback((stopId: string) => {
     setSelectedStopId(stopId);
     navigate(`/transit/${encodeURIComponent(stopId)}`, { replace: true });
+    // Seed an entry from any existing cache row for this stop so the user
+    // sees something while the new fetch resolves; metadata is refreshed
+    // by the effect below once the server response arrives.
     setRecentStops((prev) => {
-      const next = [stopId, ...prev.filter((id) => id !== stopId)].slice(0, MAX_RECENT);
+      const existing = prev.find((e) => e.stopId === stopId);
+      const seed: RecentStopEntry = existing ?? {
+        stopId,
+        name: '',
+        direction: '',
+        routeIds: [],
+        lastSeenAt: Date.now(),
+      };
+      const next = upsertRecentStop(prev, { ...seed, lastSeenAt: Date.now() });
       saveRecentStops(next);
       return next;
     });
   }, [navigate]);
+
+  const handleRemoveRecent = useCallback((stopId: string) => {
+    const next = removeRecentStop(stopId);
+    setRecentStops(next);
+    setSelectedStopId(null);
+    navigate('/transit', { replace: true });
+  }, [navigate]);
+
+  // When the upstream stop metadata resolves, refresh the cached entry so
+  // future renders show the correct name/direction/routes without re-fetching.
+  useEffect(() => {
+    if (!selectedStopId || !stop) return;
+    setRecentStops((prev) => {
+      const existing = prev.find((e) => e.stopId === selectedStopId);
+      const incoming: RecentStopEntry = {
+        stopId: selectedStopId,
+        name: stop.name || existing?.name || '',
+        direction: stop.direction || existing?.direction || '',
+        routeIds: stop.routeIds?.length ? stop.routeIds : (existing?.routeIds ?? []),
+        lastSeenAt: Date.now(),
+      };
+      // Only persist if something changed (avoid render loops).
+      if (
+        existing &&
+        existing.name === incoming.name &&
+        existing.direction === incoming.direction &&
+        existing.routeIds.join(',') === incoming.routeIds.join(',')
+      ) {
+        return prev;
+      }
+      const next = upsertRecentStop(prev, incoming);
+      saveRecentStops(next);
+      return next;
+    });
+
+  }, [selectedStopId, stop]);
 
   const handleBack = useCallback(() => {
     setSelectedStopId(null);
@@ -174,15 +208,43 @@ const TransitTracker: React.FC<TransitTrackerProps> = ({ favoriteCities }) => {
             </div>
           )}
 
-          {/* Error state */}
+          {/* Error state — initial load failed, no data at all */}
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
               {error}
             </div>
           )}
 
+          {/* Refresh-failure banner — prior data is still shown below */}
+          {refreshError && (
+            <div className="mb-3 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+              <span>{t('transit.refreshFailed')}</span>
+              <button
+                type="button"
+                onClick={refresh}
+                className="min-h-[44px] rounded-lg border border-amber-300 bg-white px-3 py-1 text-sm font-medium text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-900 dark:text-amber-100 dark:hover:bg-amber-800"
+              >
+                {t('transit.retry')}
+              </button>
+            </div>
+          )}
+
+          {/* Stop not found — fetch resolved with no stop record */}
+          {!loading && !error && stop === null && (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+              <span>{t('transit.stopNotFound')}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveRecent(selectedStopId)}
+                className="min-h-[44px] rounded-lg border border-amber-300 bg-white px-3 py-1 text-sm font-medium text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-900 dark:text-amber-100 dark:hover:bg-amber-800"
+              >
+                {t('transit.removeFromRecent')}
+              </button>
+            </div>
+          )}
+
           {/* Arrivals list */}
-          {!loading || arrivals.length > 0 ? (
+          {(!loading || arrivals.length > 0) && stop !== null ? (
             <ArrivalsList arrivals={arrivals} lastUpdated={lastUpdated} />
           ) : null}
         </div>
@@ -219,6 +281,7 @@ const TransitTracker: React.FC<TransitTrackerProps> = ({ favoriteCities }) => {
             nearbyStops={nearbyStops}
             nearbyLoading={nearbyLoading}
             nearbyError={nearbyError}
+            nearbyPermission={nearbyPermission}
             onFindNearby={(coords) => {
               setSelectedCityChip(null);
               findNearby(coords);

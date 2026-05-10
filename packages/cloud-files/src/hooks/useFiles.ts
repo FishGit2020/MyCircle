@@ -1,5 +1,18 @@
 import { useCallback } from 'react';
-import { useQuery, useMutation, useTranslation, WindowEvents, GET_CLOUD_FILES, SHARE_FILE, DELETE_FILE, RENAME_FILE, MOVE_FILE } from '@mycircle/shared';
+import {
+  useQuery,
+  useMutation,
+  useTranslation,
+  WindowEvents,
+  GET_CLOUD_FILES,
+  SHARE_FILE,
+  DELETE_FILE,
+  RENAME_FILE,
+  MOVE_FILE,
+  ARCHIVE_CLOUD_FILE_TO_NAS,
+  RESTORE_CLOUD_FILE_FROM_NAS,
+  ARCHIVE_ALL_CLOUD_FILES_TO_NAS,
+} from '@mycircle/shared';
 import type { FileItem } from '../types';
 import { fileToBase64 } from '../utils/fileHelpers';
 
@@ -18,6 +31,13 @@ export function useFiles() {
   const [moveFileMutation] = useMutation(MOVE_FILE, {
     refetchQueries: [{ query: GET_CLOUD_FILES }],
   });
+  const [archiveToNasMutation] = useMutation(ARCHIVE_CLOUD_FILE_TO_NAS, {
+    refetchQueries: [{ query: GET_CLOUD_FILES }],
+  });
+  const [restoreFromNasMutation] = useMutation(RESTORE_CLOUD_FILE_FROM_NAS, {
+    refetchQueries: [{ query: GET_CLOUD_FILES }],
+  });
+  const [archiveAllToNasMutation] = useMutation(ARCHIVE_ALL_CLOUD_FILES_TO_NAS);
 
   const files: FileItem[] = (data?.cloudFiles ?? []) as FileItem[];
 
@@ -49,6 +69,21 @@ export function useFiles() {
     await moveFileMutation({ variables: { fileId, targetFolderId } });
   }, [moveFileMutation]);
 
+  const offloadToNas = useCallback(async (fileId: string) => {
+    await archiveToNasMutation({ variables: { fileId } });
+    window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
+  }, [archiveToNasMutation]);
+
+  const restoreFromNas = useCallback(async (fileId: string) => {
+    await restoreFromNasMutation({ variables: { fileId } });
+    window.dispatchEvent(new Event(WindowEvents.CLOUD_FILES_CHANGED));
+  }, [restoreFromNasMutation]);
+
+  const offloadAllToNas = useCallback(async () => {
+    await archiveAllToNasMutation();
+    // Batch is fire-and-forget — poll via refetch
+  }, [archiveAllToNasMutation]);
+
   return {
     files,
     loading,
@@ -58,6 +93,9 @@ export function useFiles() {
     deleteFile,
     renameFile,
     moveFile,
+    offloadToNas,
+    restoreFromNas,
+    offloadAllToNas,
     reload: refetch,
   };
 }
