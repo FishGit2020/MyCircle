@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@mycircle/shared": "workspace:*",
-    "docx": "^9.6.1",
+    "docx": "^9.7.1",
     "file-saver": "^2.0.5",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -29,10 +29,10 @@
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.5.0",
-    "jsdom": "^29.0.1",
-    "postcss": "^8.5.10",
+    "jsdom": "^29.1.1",
+    "postcss": "^8.5.15",
     "typescript": "^6.0.3",
-    "vite": "^8.0.9",
-    "vitest": "~4.1.4"
+    "vite": "^8.0.16",
+    "vitest": "~4.1.9"
   }
 }
