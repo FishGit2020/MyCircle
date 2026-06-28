@@ -1,0 +1,54 @@
+name: Deploy Auth Debug
+
+# Temporary diagnostic — manual trigger only.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  auth-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: 'projects/441498720264/locations/global/workloadIdentityPools/github-actions/providers/github'
+          service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
+
+      - name: firebase projects:list --debug (the real error)
+        run: pnpm dlx firebase-tools@15.16.0 projects:list --debug 2>&1 | tail -80 || true
+
+      - name: Reproduce firebase-tools exact GoogleAuth call (workspace v10)
+        run: |
+          node -e "
+          const { GoogleAuth } = require('google-auth-library');
+          (async () => {
+            try {
+              const client = new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'], projectId: 'mycircle-dash' });
+              const token = await client.getAccessToken();
+              console.log('GoogleAuth.getAccessToken() OK, len:', (token||'').length);
+              const pid = await client.getProjectId().catch(e => 'projectId-err: ' + e.message);
+              console.log('projectId:', pid);
+            } catch (e) {
+              console.error('REPRO FAILED:', e.stack || e.message);
+            }
+          })();
+          " || true
+
+      - name: Which google-auth-library does dlx firebase-tools use?
+        run: |
+          DIR=$(pnpm dlx --help >/dev/null 2>&1; node -e "console.log(require('os').tmpdir())")
+          echo "checking dlx cache for firebase-tools google-auth-library..."
+          find ~/.cache/pnpm ~/.local/share/pnpm -path "*firebase-tools*" -name "google-auth-library" -type d 2>/dev/null | head
+          find / -path "*dlx*firebase-tools*google-auth-library/package.json" 2>/dev/null | head -3 | while read f; do node -e "console.log(require('$f').version)"; done || true
