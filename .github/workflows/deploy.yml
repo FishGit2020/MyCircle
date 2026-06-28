@@ -61,20 +61,19 @@ jobs:
           workload_identity_provider: 'projects/441498720264/locations/global/workloadIdentityPools/github-actions/providers/github'
           service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
 
-      # Run firebase-tools ISOLATED and version-pinned via `pnpm dlx`, NOT from
-      # the workspace (`pnpm exec`) and NOT unpinned (`npx firebase-tools`):
-      #   - firebase-tools 15.16.0 needs google-auth-library@9 for Workload
-      #     Identity auth, but the workspace hoists google-auth-library@10
-      #     (a direct repo dep), whose breaking changes make firebase-tools fail
-      #     with "Failed to authenticate, have you run firebase login?".
-      #     `pnpm dlx` installs firebase-tools in isolation with its own v9.
-      #   - 15.16.0 is pinned because `npx firebase-tools` (unpinned) pulls the
-      #     latest, and 15.17+ regressed WIF auth on its own.
+      # Run the workspace firebase-tools (`pnpm exec`) so it picks up the
+      # `firebase-tools>google-auth-library: ^10` pnpm override. firebase-tools
+      # depends on google-auth-library@9, but v9's STS token exchange fails on
+      # this runner with "Invalid response body ... Premature close", surfacing
+      # as "Failed to authenticate, have you run firebase login?". v10 fixes the
+      # transport; the override forces firebase-tools onto v10. Do NOT use
+      # `npx`/`pnpm dlx firebase-tools` here — those install in isolation and
+      # ignore the override, pulling the broken v9.
       - name: Deploy hosting
-        run: pnpm dlx firebase-tools@15.16.0 deploy --only hosting --project mycircle-dash
+        run: pnpm exec firebase deploy --only hosting --project mycircle-dash
 
       - name: Deploy functions and firestore
-        run: pnpm dlx firebase-tools@15.16.0 deploy --only functions,firestore --project mycircle-dash
+        run: pnpm exec firebase deploy --only functions,firestore --project mycircle-dash
 
       - name: Create Sentry release and upload source maps
         if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
