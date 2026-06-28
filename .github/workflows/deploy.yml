@@ -61,15 +61,20 @@ jobs:
           workload_identity_provider: 'projects/441498720264/locations/global/workloadIdentityPools/github-actions/providers/github'
           service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
 
-      # Use the lockfile-pinned firebase-tools (via pnpm exec), NOT `npx
-      # firebase-tools` which ignores the lockfile and downloads npm's latest.
-      # firebase-tools >= 15.17 broke Workload Identity auth ("Failed to
-      # authenticate, have you run firebase login?"), silently breaking deploys.
+      # Run firebase-tools ISOLATED and version-pinned via `pnpm dlx`, NOT from
+      # the workspace (`pnpm exec`) and NOT unpinned (`npx firebase-tools`):
+      #   - firebase-tools 15.16.0 needs google-auth-library@9 for Workload
+      #     Identity auth, but the workspace hoists google-auth-library@10
+      #     (a direct repo dep), whose breaking changes make firebase-tools fail
+      #     with "Failed to authenticate, have you run firebase login?".
+      #     `pnpm dlx` installs firebase-tools in isolation with its own v9.
+      #   - 15.16.0 is pinned because `npx firebase-tools` (unpinned) pulls the
+      #     latest, and 15.17+ regressed WIF auth on its own.
       - name: Deploy hosting
-        run: pnpm exec firebase deploy --only hosting --project mycircle-dash
+        run: pnpm dlx firebase-tools@15.16.0 deploy --only hosting --project mycircle-dash
 
       - name: Deploy functions and firestore
-        run: pnpm exec firebase deploy --only functions,firestore --project mycircle-dash
+        run: pnpm dlx firebase-tools@15.16.0 deploy --only functions,firestore --project mycircle-dash
 
       - name: Create Sentry release and upload source maps
         if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
