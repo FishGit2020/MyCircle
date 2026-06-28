@@ -61,19 +61,22 @@ jobs:
           workload_identity_provider: 'projects/441498720264/locations/global/workloadIdentityPools/github-actions/providers/github'
           service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
 
-      # Run the workspace firebase-tools (`pnpm exec`) so it picks up the
-      # `firebase-tools>google-auth-library: ^10` pnpm override. firebase-tools
-      # depends on google-auth-library@9, but v9's STS token exchange fails on
-      # this runner with "Invalid response body ... Premature close", surfacing
-      # as "Failed to authenticate, have you run firebase login?". v10 fixes the
-      # transport; the override forces firebase-tools onto v10. Do NOT use
-      # `npx`/`pnpm dlx firebase-tools` here — those install in isolation and
-      # ignore the override, pulling the broken v9.
+      # firebase-tools' (google-auth-library@9) STS token exchange was failing
+      # with "Invalid response body while trying to fetch sts.googleapis.com:
+      # Premature close", surfacing as "Failed to authenticate". Cause: Node's
+      # Happy Eyeballs (`autoSelectFamily`, on by default since Node 20)
+      # destroys the socket mid-response on this runner. Disabling it via
+      # NODE_OPTIONS restores the working transport. firebase-tools is pinned
+      # and isolated via `pnpm dlx` so it uses its own intended dependencies.
       - name: Deploy hosting
-        run: pnpm exec firebase deploy --only hosting --project mycircle-dash
+        run: pnpm dlx firebase-tools@15.16.0 deploy --only hosting --project mycircle-dash
+        env:
+          NODE_OPTIONS: --no-network-family-autoselection
 
       - name: Deploy functions and firestore
-        run: pnpm exec firebase deploy --only functions,firestore --project mycircle-dash
+        run: pnpm dlx firebase-tools@15.16.0 deploy --only functions,firestore --project mycircle-dash
+        env:
+          NODE_OPTIONS: --no-network-family-autoselection
 
       - name: Create Sentry release and upload source maps
         if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
