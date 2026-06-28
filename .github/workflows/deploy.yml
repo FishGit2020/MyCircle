@@ -61,11 +61,15 @@ jobs:
           workload_identity_provider: 'projects/441498720264/locations/global/workloadIdentityPools/github-actions/providers/github'
           service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
 
+      # Use the lockfile-pinned firebase-tools (via pnpm exec), NOT `npx
+      # firebase-tools` which ignores the lockfile and downloads npm's latest.
+      # firebase-tools >= 15.17 broke Workload Identity auth ("Failed to
+      # authenticate, have you run firebase login?"), silently breaking deploys.
       - name: Deploy hosting
-        run: npx firebase-tools deploy --only hosting --project mycircle-dash
+        run: pnpm exec firebase deploy --only hosting --project mycircle-dash
 
       - name: Deploy functions and firestore
-        run: npx firebase-tools deploy --only functions,firestore --project mycircle-dash
+        run: pnpm exec firebase deploy --only functions,firestore --project mycircle-dash
 
       - name: Create Sentry release and upload source maps
         if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
