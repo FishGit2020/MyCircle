@@ -87,6 +87,50 @@ export const mockStockCandles = {
   s: 'ok',
 };
 
+// ─── Deals mock data ────────────────────────────────────────────────
+
+export const mockDeals = [
+  {
+    id: '1',
+    title: 'Apple AirPods Pro 2 at 40% off',
+    url: 'https://example.com/airpods-deal',
+    source: 'slickdeals' as const,
+    price: '$129.99',
+    originalPrice: '$249.00',
+    store: 'Amazon',
+    category: 'electronics',
+    thumbnail: 'https://example.com/airpods.jpg',
+    postedAt: new Date(Date.now() - 3600000).toISOString(),
+    score: 42,
+  },
+  {
+    id: '2',
+    title: '50% off Coffee Maker Bundle',
+    url: 'https://example.com/coffee-deal',
+    source: 'dealnews' as const,
+    price: '$34.99',
+    originalPrice: '$69.99',
+    store: 'Best Buy',
+    category: 'home',
+    thumbnail: 'https://example.com/coffee.jpg',
+    postedAt: new Date(Date.now() - 7200000).toISOString(),
+    score: 38,
+  },
+  {
+    id: '3',
+    title: 'Nike Shoes Sale - Limited Time',
+    url: 'https://example.com/nike-deal',
+    source: 'reddit' as const,
+    price: '$79.99',
+    originalPrice: '$120.00',
+    store: 'Nike.com',
+    category: 'fashion',
+    thumbnail: 'https://example.com/nike.jpg',
+    postedAt: new Date(Date.now() - 10800000).toISOString(),
+    score: 25,
+  },
+];
+
 // ─── Crypto mock data ───────────────────────────────────────────────
 
 export const mockCryptoPrices = [
@@ -360,6 +404,18 @@ export async function mockGraphQL(page: Page) {
         contentType: 'application/json',
         body: JSON.stringify({
           data: { cryptoPrices: mockCryptoPrices },
+        }),
+      });
+    }
+
+    // ─── Deals GraphQL query ──────────────────────────────────
+
+    if (operationName === 'GetDeals') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          data: { deals: mockDeals },
         }),
       });
     }
