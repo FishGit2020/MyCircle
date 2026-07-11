@@ -170,6 +170,8 @@ For the `createdAt` timestamp, use `$(date -u +%Y-%m-%dT%H:%M:%SZ)` in the shell
 ## Active Technologies
 - TypeScript 5.x (strict) + React 18, Tailwind CSS, Apollo Client (via `@mycircle/shared`), MapLibre GL (via `@mycircle/shared`), Vite Module Federation (027-anniversary-mfe)
 - Firestore (top-level `anniversaries/` collection + `years/` subcollection), Firebase Storage (pictures) (027-anniversary-mfe)
+- TypeScript 5.x (strict mode) + React 18, Tailwind CSS, Apollo Client (consumed via `@mycircle/shared`), Vite Module Federation (028-transit-improvements)
+- `localStorage` for the recent-stops cache (existing key `transit-recent-stops`, schema upgraded); Firebase secret for the OneBusAway API key (028-transit-improvements)
 
 ## Recent Changes
 - 027-anniversary-mfe: Added TypeScript 5.x (strict) + React 18, Tailwind CSS, Apollo Client (via `@mycircle/shared`), MapLibre GL (via `@mycircle/shared`), Vite Module Federation

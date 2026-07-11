@@ -27,7 +27,10 @@ Sentry.init({
   tracePropagationTargets: ['localhost', /^https:\/\/mycircle-dash\.web\.app/],
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
-  enabled: import.meta.env.PROD,
+  enabled: import.meta.env.PROD
+    && typeof window !== 'undefined'
+    && window.location.hostname !== 'localhost'
+    && window.location.hostname !== '127.0.0.1',
   // Ignore errors from Google OAuth popup flow to prevent interference
   denyUrls: [
     /accounts\.google\.com/,

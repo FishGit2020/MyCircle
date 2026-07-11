@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from '@mycircle/shared';
-import type { NearbyStop } from '../types';
+import type { NearbyStop, RecentStopEntry } from '../types';
 import type { FavoriteStop } from '../hooks/useFavoriteStops';
+import type { NearbyPermission } from '../hooks/useNearbyStops';
 
 /** Check if user is logged in at call-time (read from window, not cached) */
 function isLoggedIn(): boolean {
@@ -13,8 +14,9 @@ interface StopSearchProps {
   nearbyStops: NearbyStop[];
   nearbyLoading: boolean;
   nearbyError: string | null;
+  nearbyPermission?: NearbyPermission;
   onFindNearby: (coords?: { lat: number; lon: number }) => void;
-  recentStops: string[];
+  recentStops: RecentStopEntry[];
   favorites: FavoriteStop[];
   onToggleFavorite: (stop: { stopId: string; stopName: string; direction: string; routes: string[] }) => void;
 }
@@ -24,6 +26,7 @@ export default function StopSearch({
   nearbyStops,
   nearbyLoading,
   nearbyError,
+  nearbyPermission = 'unknown',
   onFindNearby,
   recentStops,
   favorites,
@@ -108,9 +111,27 @@ export default function StopSearch({
         {nearbyLoading ? t('transit.findingNearby') : t('transit.findNearby')}
       </button>
 
-      {nearbyError && (
+      {nearbyPermission === 'denied' && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-800 dark:bg-amber-950">
+          <p className="font-medium text-amber-800 dark:text-amber-200">{t('transit.locationPermissionDenied')}</p>
+          <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">{t('transit.locationPermissionExplain')}</p>
+        </div>
+      )}
+
+      {nearbyPermission === 'unavailable' && (
+        <p className="text-sm text-amber-700 dark:text-amber-300">{t('transit.locationUnavailable')}</p>
+      )}
+
+      {nearbyError && nearbyPermission !== 'denied' && nearbyPermission !== 'unavailable' && (
         <p className="text-sm text-red-500 dark:text-red-400">{nearbyError}</p>
       )}
+
+      {/* No-search-match empty state — only when user typed something and no list matched. */}
+      {query &&
+        filteredNearby.length === 0 &&
+        filteredFavorites.length === 0 && (
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('transit.noSearchMatch')}</p>
+        )}
 
       {/* Nearby stops list */}
       {filteredNearby.length > 0 && (
@@ -197,24 +218,46 @@ export default function StopSearch({
         </div>
       )}
 
-      {/* Recent stops */}
+      {/* Recent stops — rendered from local cache, no network call */}
       {recentStops.length > 0 && (
         <div>
           <h3 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('transit.recentStops')}
           </h3>
-          <div className="flex flex-wrap gap-2">
-            {recentStops.map((stopId) => (
-              <button
-                key={stopId}
-                type="button"
-                onClick={() => onSelectStop(stopId)}
-                className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-              >
-                {stopId}
-              </button>
+          <ul className="space-y-1">
+            {recentStops.map((entry) => (
+              <li key={entry.stopId}>
+                <button
+                  type="button"
+                  onClick={() => onSelectStop(entry.stopId)}
+                  className="flex min-h-[44px] w-full items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium text-gray-900 dark:text-white">
+                      {entry.name || entry.stopId}
+                    </div>
+                    {entry.direction && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {entry.direction}
+                      </div>
+                    )}
+                  </div>
+                  {entry.routeIds.length > 0 && (
+                    <div className="flex flex-shrink-0 flex-wrap gap-1">
+                      {entry.routeIds.slice(0, 4).map((routeId) => (
+                        <span
+                          key={routeId}
+                          className="rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-semibold text-teal-700 dark:bg-teal-900 dark:text-teal-200"
+                        >
+                          {routeId.split('_').pop()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
     </div>

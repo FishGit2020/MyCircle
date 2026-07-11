@@ -29,11 +29,11 @@ jobs:
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
         with:
@@ -61,11 +61,22 @@ jobs:
           workload_identity_provider: 'projects/441498720264/locations/global/workloadIdentityPools/github-actions/providers/github'
           service_account: 'firebase-adminsdk-fbsvc@mycircle-dash.iam.gserviceaccount.com'
 
+      # firebase-tools' (google-auth-library@9) STS token exchange was failing
+      # with "Invalid response body while trying to fetch sts.googleapis.com:
+      # Premature close", surfacing as "Failed to authenticate". Cause: Node's
+      # Happy Eyeballs (`autoSelectFamily`, on by default since Node 20)
+      # destroys the socket mid-response on this runner. Disabling it via
+      # NODE_OPTIONS restores the working transport. firebase-tools is pinned
+      # and isolated via `pnpm dlx` so it uses its own intended dependencies.
       - name: Deploy hosting
-        run: npx firebase-tools deploy --only hosting --project mycircle-dash
+        run: pnpm dlx firebase-tools@15.16.0 deploy --only hosting --project mycircle-dash
+        env:
+          NODE_OPTIONS: --no-network-family-autoselection
 
       - name: Deploy functions and firestore
-        run: npx firebase-tools deploy --only functions,firestore --project mycircle-dash
+        run: pnpm dlx firebase-tools@15.16.0 deploy --only functions,firestore --project mycircle-dash
+        env:
+          NODE_OPTIONS: --no-network-family-autoselection
 
       - name: Create Sentry release and upload source maps
         if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
@@ -88,9 +99,9 @@ jobs:
       E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
       E2E_APPCHECK_DEBUG_TOKEN: ${{ secrets.APPCHECK_DEBUG_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
         with:
@@ -101,7 +112,7 @@ jobs:
 
       - name: Cache Playwright browsers
         id: pw-cache-smoke
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
