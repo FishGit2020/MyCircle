@@ -127,6 +127,13 @@ export default function HeadToHead({ onBack }: HeadToHeadProps) {
             aria-label="Player 2 name"
             className="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
           />
+          <button
+            type="button"
+            onClick={() => { setPlayer2('Doty'); }}
+            className="text-xs text-fuchsia-600 dark:text-fuchsia-400 hover:text-fuchsia-700 dark:hover:text-fuchsia-300 transition font-medium text-center py-1"
+          >
+            {t('games.playWithDoty' as any)} 💕 {/* eslint-disable-line @typescript-eslint/no-explicit-any */}
+          </button>
         </div>
 
         <div>
