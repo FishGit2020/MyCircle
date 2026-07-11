@@ -63,6 +63,13 @@ export const babyPhotos = onRequest(
 
         // Write metadata to Firestore subcollection
         const db = getFirestore();
+        // Materialize the parent milestone doc so it isn't a "missing" document.
+        // Without this, the parent has only a subcollection and is omitted from
+        // collection().get() queries, so babyPhotos would return [].
+        await db.doc(`users/${uid}/babyMilestones/${stageId}`).set(
+          { stageId, updatedAt: FieldValue.serverTimestamp() },
+          { merge: true }
+        );
         await db.doc(`users/${uid}/babyMilestones/${stageId}/photos/${photoId}`).set({
           photoUrl,
           caption: caption || null,

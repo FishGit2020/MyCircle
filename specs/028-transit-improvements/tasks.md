@@ -118,10 +118,10 @@ description: "Task list for transit-tracker improvements"
 
 **Purpose**: Confirm the constitution's ship criteria and run the quickstart manually.
 
-- [ ] T027 Run `pnpm build:shared && pnpm lint && pnpm test:run && pnpm typecheck` from repo root — all four MUST pass before pushing (constitution V; CLAUDE.md PR-lifecycle)
-- [ ] T028 Run `cd functions && npx tsc --noEmit && cd ..` — `functions/` has a stricter tsconfig (`noUnusedLocals: true`) that the root typecheck does not exercise (CLAUDE.md gotcha)
-- [ ] T029 Walk through `quickstart.md` manually: US1 reload-with-cache (offline) shows full metadata; legacy `string[]` value migrates silently; US2 four failure modes each render their distinct message with prior data preserved on refresh failure; US3 no negative-minute ETAs appear after a refresh
-- [ ] T030 Verify zero source references to the placeholder credential: `git grep "OBA_API_KEY = 'TEST'" functions/` returns nothing
+- [X] T027 Run `pnpm build:shared && pnpm lint && pnpm test:run && pnpm typecheck` from repo root — all four MUST pass before pushing (constitution V; CLAUDE.md PR-lifecycle)
+- [X] T028 Run `cd functions && npx tsc --noEmit && cd ..` — `functions/` has a stricter tsconfig (`noUnusedLocals: true`) that the root typecheck does not exercise (CLAUDE.md gotcha)
+- [X] T029 Walk through `quickstart.md` manually: US1 reload-with-cache (offline) shows full metadata; legacy `string[]` value migrates silently; US2 four failure modes each render their distinct message with prior data preserved on refresh failure; US3 no negative-minute ETAs appear after a refresh
+- [X] T030 Verify zero source references to the placeholder credential: `git grep "OBA_API_KEY = 'TEST'" functions/` returns nothing
 - [ ] T031 [OPERATIONAL] Set the production `API_KEYS` secret to include the real onebusaway value: `printf '<json with onebusaway field>' | npx firebase functions:secrets:set API_KEYS` — `printf`, never `echo` (CLAUDE.md). Skip locally if no real key on hand; the build still passes since the resolver fails closed.
 
 ---

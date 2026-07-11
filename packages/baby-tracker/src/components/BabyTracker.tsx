@@ -60,10 +60,13 @@ export default function BabyTracker() {
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [inputName, setInputName] = useState('');
   const [inputBirthDate, setInputBirthDate] = useState('');
+  const [showBornDialog, setShowBornDialog] = useState(false);
+  const [bornDate, setBornDate] = useState('');
 
   // The effective selected baby (from multi-child or single)
   const currentBaby = babyChildren.find(c => c.id === selectedId) ?? babyChildren[0] ?? null;
   const dueDate = currentBaby?.dueDate || legacyDueDate;
+  const isBabyBorn = currentBaby?.bornDate !== undefined && currentBaby?.bornDate !== null;
 
   // Load legacy due date from localStorage on mount
   useEffect(() => {
@@ -119,6 +122,14 @@ export default function BabyTracker() {
       window.dispatchEvent(new Event(WindowEvents.BABY_DUE_DATE_CHANGED));
     }
   }, [currentBaby, updateChild]);
+
+  const markBabyBorn = useCallback(async () => {
+    if (!bornDate || !currentBaby) return;
+    await updateChild(currentBaby.id, { bornDate });
+    setShowBornDialog(false);
+    setBornDate('');
+    window.__logAnalyticsEvent?.('baby_marked_born');
+  }, [bornDate, currentBaby, updateChild]);
 
   const saveNewChild = useCallback(async () => {
     if (!inputName.trim() || !inputBirthDate) return;
@@ -333,6 +344,14 @@ export default function BabyTracker() {
             <p className="text-pink-600 dark:text-pink-400 text-sm mt-1">
               {Math.abs(weeksRemaining)} {t('baby.weeksPast')}
             </p>
+          )}
+          {!isBabyBorn && (
+            <button
+              onClick={() => { setShowBornDialog(true); setBornDate(''); }}
+              className="mt-3 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors font-medium"
+            >
+              {t('baby.markBabyBorn')}
+            </button>
           )}
         </section>
       )}
@@ -589,6 +608,69 @@ export default function BabyTracker() {
             </p>
           </div>
         </section>
+      )}
+
+      {/* Born Completion Screen */}
+      {isBabyBorn && currentBaby && (
+        <section className="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-xl p-8 border border-pink-200 dark:border-pink-800 text-center">
+          <div className="text-6xl mb-4">👶</div>
+          <h2 className="text-3xl font-bold text-pink-700 dark:text-pink-300 mb-2">
+            {t('baby.trackingComplete')}
+          </h2>
+          <p className="text-pink-600 dark:text-pink-400 mb-4">
+            {currentBaby?.name ? `${currentBaby.name} ${t('baby.journeyComplete')}` : t('baby.journeyComplete')}
+          </p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => { /* TODO: Link to child development tracker */ }}
+              className="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors font-medium"
+            >
+              {t('baby.startChildTracking')}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Mark Baby as Born Modal */}
+      {showBornDialog && currentBaby && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {t('baby.bornStage')}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              {currentBaby.name} {t('baby.markBabyBorn')}
+            </p>
+            <div>
+              <label htmlFor="born-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('baby.babyBornDate')}
+              </label>
+              <input
+                id="born-date"
+                type="date"
+                value={bornDate}
+                onChange={(e) => setBornDate(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none"
+                placeholder={t('baby.babyBornDatePlaceholder')}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowBornDialog(false); setBornDate(''); }}
+                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              >
+                {t('baby.cancel')}
+              </button>
+              <button
+                onClick={markBabyBorn}
+                disabled={!bornDate}
+                className="flex-1 px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                {t('baby.markBabyBorn')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </PageContent>
   );

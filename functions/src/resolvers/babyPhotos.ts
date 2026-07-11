@@ -28,12 +28,17 @@ export function createBabyPhotoResolvers() {
       babyPhotos: async (_: any, __: any, context: ResolverContext) => {
         const uid = requireAuth(context);
         const db = getFirestore();
-        const milestonesSnap = await db.collection(`users/${uid}/babyMilestones`).get();
+        // Use listDocuments() (not get()) so "missing" parent docs are included.
+        // Photo uploads write only to the `photos` subcollection without creating
+        // the parent milestone doc, leaving it a non-existent document that
+        // collection().get() silently omits — which made babyPhotos return [].
+        const milestoneRefs = await db.collection(`users/${uid}/babyMilestones`).listDocuments();
 
         const allPhotos: any[] = [];
-        for (const milestoneDoc of milestonesSnap.docs) {
-          const stageId = Number(milestoneDoc.id);
-          const data = milestoneDoc.data();
+        for (const milestoneRef of milestoneRefs) {
+          const stageId = Number(milestoneRef.id);
+          const milestoneDoc = await milestoneRef.get();
+          const data = milestoneDoc.data() ?? {};
 
           // Legacy single-photo format: parent doc has photoUrl directly
           if (data.photoUrl && typeof data.photoUrl === 'string') {
@@ -47,7 +52,7 @@ export function createBabyPhotoResolvers() {
           }
 
           // New multi-photo format: photos subcollection
-          const photosSnap = await milestoneDoc.ref.collection('photos').orderBy('uploadedAt', 'asc').get();
+          const photosSnap = await milestoneRef.collection('photos').orderBy('uploadedAt', 'asc').get();
           for (const photoDoc of photosSnap.docs) {
             allPhotos.push({
               stageId,
