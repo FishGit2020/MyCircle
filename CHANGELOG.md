@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.33.3](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.33.2...mycircle-v1.33.3) (2026-04-16)
+
+
+### Bug Fixes
+
+* **anniversary:** center map on US and show labels by default ([#1011](https://github.com/FishGit2020/MyCircle/issues/1011)) ([db8dd1c](https://github.com/FishGit2020/MyCircle/commit/db8dd1c0f5f3ebd5b3a1c7506d30a83591521dfb))
+* **anniversary:** click pin to toggle label ([#1012](https://github.com/FishGit2020/MyCircle/issues/1012)) ([170cc8c](https://github.com/FishGit2020/MyCircle/commit/170cc8c130633dd3fa94c44945987d39d4184ab5))
+* **anniversary:** hover highlights pins instead of showing popups ([#1013](https://github.com/FishGit2020/MyCircle/issues/1013)) ([57a9f25](https://github.com/FishGit2020/MyCircle/commit/57a9f256dc6ff356478c18ff1f1e59a1640412ca))
+* **trip-planner:** add error feedback and loading state to trip form ([#1017](https://github.com/FishGit2020/MyCircle/issues/1017)) ([7e30ae0](https://github.com/FishGit2020/MyCircle/commit/7e30ae0000dc424239428e48575f1ae3141220b9))
+* **trip-planner:** prevent undefined tickets/checklist in updateDoc ([#1016](https://github.com/FishGit2020/MyCircle/issues/1016)) ([b06b650](https://github.com/FishGit2020/MyCircle/commit/b06b650310dcc49bc07c20efc7269dc0cbb7e640))
+
+
+### Miscellaneous
+
+* **deps-dev:** bump typescript from 5.9.3 to 6.0.2 ([#1000](https://github.com/FishGit2020/MyCircle/issues/1000)) ([797d631](https://github.com/FishGit2020/MyCircle/commit/797d631dad7395c72bb70ad20eadca6d124246dc))
+
 ## [1.33.2](https://github.com/FishGit2020/MyCircle/compare/mycircle-v1.33.1...mycircle-v1.33.2) (2026-04-13)
 
 
