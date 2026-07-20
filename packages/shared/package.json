@@ -35,8 +35,8 @@
   "dependencies": {
     "@apollo/client": "catalog:",
     "graphql": "catalog:",
-    "graphql-tag": "^2.12.6",
-    "graphql-ws": "^6.0.8"
+    "graphql-tag": "^2.12.7",
+    "graphql-ws": "^6.1.0"
   },
   "peerDependencies": {
     "react": "catalog:",
@@ -45,7 +45,7 @@
   "devDependencies": {
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
-    "maplibre-gl": "^5.23.0",
+    "maplibre-gl": "^5.24.0",
     "typescript": "^6.0.3"
   }
 }
