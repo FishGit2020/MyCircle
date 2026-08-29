@@ -22,7 +22,7 @@
     "@google-cloud/text-to-speech": "^5.5.0",
     "@google/genai": "^1.49.0",
     "@graphql-tools/schema": "^10.0.32",
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@simplewebauthn/server": "^11.0.0",
     "@types/pg": "^8.20.0",
     "archiver": "^7.0.0",
