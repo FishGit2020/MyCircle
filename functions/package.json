@@ -23,7 +23,7 @@
     "@google/genai": "^1.49.0",
     "@graphql-tools/schema": "^10.0.32",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@simplewebauthn/server": "^11.0.0",
+    "@simplewebauthn/server": "^13.3.2",
     "@types/pg": "^8.20.0",
     "archiver": "^7.0.0",
     "axios": "^1.15.0",
