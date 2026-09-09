@@ -15,7 +15,7 @@
   "dependencies": {
     "@mycircle/shared": "workspace:*",
     "idb": "^8.0.3",
-    "maplibre-gl": "^5.23.0",
+    "maplibre-gl": "^6.4.1",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router": "catalog:"
