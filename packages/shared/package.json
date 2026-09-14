@@ -35,8 +35,8 @@
   "dependencies": {
     "@apollo/client": "catalog:",
     "graphql": "catalog:",
-    "graphql-tag": "^2.12.6",
-    "graphql-ws": "^6.0.8"
+    "graphql-tag": "^2.12.7",
+    "graphql-ws": "^6.2.1"
   },
   "peerDependencies": {
     "react": "catalog:",
